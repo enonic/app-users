@@ -3,6 +3,15 @@ var mustache = require('/lib/xp/mustache');
 var portal = require('/lib/xp/portal');
 
 function handleGet() {
+    var baseHref = portal.pageUrl({
+        path: '',
+        type: 'absolute'
+    });
+    var serviceUrl = portal.serviceUrl({
+        service: 'graphql',
+        type: 'absolute'
+    });
+
     var view = resolve('./main.html');
 
     var params = {
@@ -11,6 +20,8 @@ function handleGet() {
         assetsUri: portal.assetUrl({
             path: ''
         }),
+        baseHref: baseHref,
+        serviceUrl: serviceUrl,
         appName: 'Users',
         appId: app.name,
         xpVersion: app.version
