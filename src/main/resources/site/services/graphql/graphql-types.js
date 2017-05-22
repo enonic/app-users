@@ -1,12 +1,13 @@
 var graphQl = require('/lib/graphql');
 var graphQlEnums = require('./graphql-enums');
+var principals = require('principals');
 
 var UserItemType = graphQl.createInterfaceType({
     name: 'UserItem',
-    description: 'User item is a base entity for every principal or user store. Contains key, displayName and description',
+    description: 'User item is a base entity for every principal or user store',
     fields: {
-        key: {
-            type: graphQl.GraphQLString,
+        id: {
+            type: graphQl.GraphQLID,
             resolve: function (env) {
                 return env.source._id;
             }
@@ -28,6 +29,63 @@ var UserItemType = graphQl.createInterfaceType({
             resolve: function (env) {
                 return env.source.displayName;
             }
+        },
+        description: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.description;
+            }
+        },
+        modifiedTime: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._timestamp;
+            }
+        }
+    }
+});
+
+var AccessControlEntry = graphQl.createObjectType({
+    name: 'AccessControlEntry',
+    description: 'Domain representation of access control entry',
+    fields: {
+        principal: {
+            type: graphQl.reference('Principal'),
+            resolve: function (env) {
+                return principals.getByIds(env.source.principal);
+            }
+        },
+        allow: {
+            type: graphQl.list(graphQlEnums.PermissionEnum),
+            resolve: function (env) {
+                return env.source.allow;
+            }
+        },
+        deny: {
+            type: graphQl.list(graphQlEnums.PermissionEnum),
+            resolve: function (env) {
+                return env.source.deny;
+            }
+        }
+    }
+});
+
+var UserStoreAccessControlEntry = graphQl.createObjectType({
+    name: 'UserStoreAccessControlEntry',
+    description: 'Domain representation of user store access control entry',
+    fields: {
+        principal: {
+            type: graphQl.reference('Principal'),
+            resolve: function (env) {
+                return principals.getByIds(env.source.principal);
+            }
+        },
+        access: {
+            type: graphQlEnums.UserStoreAccessEnum,
+            resolve: function (env) {
+                //TODO: UserStoreNodeTranslator.java:101
+                return 'READ';
+            }
         }
     }
 });
@@ -37,6 +95,80 @@ exports.UserStoreType = graphQl.createObjectType({
     description: 'Domain representation of a user store',
     interfaces: [UserItemType],
     fields: {
+        id: {
+            type: graphQl.GraphQLID,
+            resolve: function (env) {
+                return env.source._id;
+            }
+        },
+        key: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._name;
+            }
+        },
+        name: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._name;
+            }
+        },
+        path: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._path;
+            }
+        },
+        displayName: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.displayName;
+            }
+        },
+        description: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.description;
+            }
+        },
+        authConfig: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._authConfig;
+            }
+        },
+        idProviderMode: {
+            type: graphQlEnums.IdProviderModeEnum,
+            resolve: function (env) {
+                return env.source.idProviderMode;
+            }
+        },
+        permissions: {
+            type: graphQl.list(UserStoreAccessControlEntry),
+            resolve: function (env) {
+                return env.source._permissions;
+            }
+        },
+        modifiedTime: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._timestamp;
+            }
+        }
+    }
+});
+
+exports.PrincipalType = graphQl.createObjectType({
+    name: 'Principal',
+    description: 'Domain representation of a principal',
+    interfaces: [UserItemType],
+    fields: {
+        id: {
+            type: graphQl.GraphQLID,
+            resolve: function (env) {
+                return env.source._id;
+            }
+        },
         key: {
             type: graphQl.GraphQLString,
             resolve: function (env) {
@@ -64,57 +196,7 @@ exports.UserStoreType = graphQl.createObjectType({
         description: {
             type: graphQl.GraphQLString,
             resolve: function (env) {
-                return env.source.description || '';
-            }
-        },
-        authConfig: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source._authConfig;
-            }
-        },
-        idProviderMode: {
-            type: graphQlEnums.IdProviderModeEnum,
-            resolve: function (env) {
-                return env.source.idProviderMode
-            }
-        },
-        permissions: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source._permissions;
-            }
-        }
-    }
-});
-
-exports.PrincipalType = graphQl.createObjectType({
-    name: 'Principal',
-    description: 'Domain representation of a principal',
-    interfaces: [UserItemType],
-    fields: {
-        key: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source._id;
-            }
-        },
-        name: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source._name;
-            }
-        },
-        path: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source._path;
-            }
-        },
-        displayName: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source.displayName;
+                return env.source.description;
             }
         },
         principalType: {
@@ -130,9 +212,15 @@ exports.PrincipalType = graphQl.createObjectType({
             }
         },
         permissions: {
-            type: graphQl.GraphQLString,
+            type: graphQl.list(AccessControlEntry),
             resolve: function (env) {
                 return env.source._permissions;
+            }
+        },
+        modifiedTime: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._timestamp;
             }
         }
     }

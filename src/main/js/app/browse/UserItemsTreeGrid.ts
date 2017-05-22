@@ -1,8 +1,10 @@
 import '../../api.ts';
-import {UserTreeGridItem, UserTreeGridItemType, UserTreeGridItemBuilder} from './UserTreeGridItem';
+import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {UserTreeGridActions} from './UserTreeGridActions';
 import {EditPrincipalEvent} from './EditPrincipalEvent';
 import {UserItemsRowFormatter} from './UserItemsRowFormatter';
+import {ListUserStoresRequest} from '../../api/graphql/userStore/ListUserStoresRequest';
+import {ListPrincipalsRequest} from '../../api/graphql/principal/ListPrincipalsRequest';
 
 import GridColumn = api.ui.grid.GridColumn;
 import GridColumnBuilder = api.ui.grid.GridColumnBuilder;
@@ -12,7 +14,6 @@ import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
 import DateTimeFormatter = api.ui.treegrid.DateTimeFormatter;
 import TreeGridContextMenu = api.ui.treegrid.TreeGridContextMenu;
 
-import ListUserStoresRequest = api.security.ListUserStoresRequest;
 import FindPrincipalsRequest = api.security.FindPrincipalsRequest;
 import UserStoreListResult = api.security.UserStoreListResult;
 import UserStoreJson = api.security.UserStoreJson;
@@ -23,7 +24,8 @@ import UserStoreKey = api.security.UserStoreKey;
 import BrowseFilterResetEvent = api.app.browse.filter.BrowseFilterResetEvent;
 import BrowseFilterSearchEvent = api.app.browse.filter.BrowseFilterSearchEvent;
 
-export class UserItemsTreeGrid extends TreeGrid<UserTreeGridItem> {
+export class UserItemsTreeGrid
+    extends TreeGrid<UserTreeGridItem> {
 
     private treeGridActions: UserTreeGridActions;
 
@@ -231,32 +233,34 @@ export class UserItemsTreeGrid extends TreeGrid<UserTreeGridItem> {
         let userStoreNode: UserTreeGridItem = null;
         let userStoreKey: UserStoreKey = null;
         // fetch principals from the user store, if parent node 'Groups' or 'Users' was selected
-        if(parentNode.getData().getType() !== UserTreeGridItemType.ROLES) {
+        if (parentNode.getData().getType() !== UserTreeGridItemType.ROLES) {
             userStoreNode = parentNode.getParent().getData();
             userStoreKey = userStoreNode.getUserStore().getKey();
         }
 
-        new FindPrincipalsRequest().setUserStoreKey(userStoreKey).
-            setAllowedTypes(allowedTypes).
-            setFrom(from).
-            setSize(10).
-            sendAndParse().then(
-            (result) => {
-                let principals = result.getPrincipals();
+        new ListPrincipalsRequest()
+            .setUserStoreKey(userStoreKey)
+            .setTypes(allowedTypes)
+            .setStart(from)
+            .setCount(10)
+            .sendAndParse()
+            .then(
+                (result) => {
+                    let principals = result.getPrincipals();
 
-                principals.forEach((principal: Principal) => {
-                    gridItems.push(
-                        new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build());
-                });
+                    principals.forEach((principal: Principal) => {
+                        gridItems.push(
+                            new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build());
+                    });
 
-                if (from + principals.length < result.getTotalSize()) {
-                    gridItems.push(UserTreeGridItem.create().build());
-                }
+                    if (from + principals.length < result.getTotalSize()) {
+                        gridItems.push(UserTreeGridItem.create().build());
+                    }
 
-                deferred.resolve(gridItems);
-            }).catch((reason: any) => {
-                api.DefaultErrorHandler.handle(reason);
-            }).done();
+                    deferred.resolve(gridItems);
+                }).catch((reason: any) => {
+            api.DefaultErrorHandler.handle(reason);
+        }).done();
 
         return deferred.promise;
     }

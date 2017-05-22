@@ -7,7 +7,7 @@ function handleGet() {
         path: '',
         type: 'absolute'
     });
-    var serviceUrl = portal.serviceUrl({
+    var graphQlUrl = portal.serviceUrl({
         service: 'graphql',
         type: 'absolute'
     });
@@ -21,7 +21,7 @@ function handleGet() {
             path: ''
         }),
         baseHref: baseHref,
-        serviceUrl: serviceUrl,
+        graphQlUrl: graphQlUrl,
         appName: 'Users',
         appId: app.name,
         xpVersion: app.version

@@ -1,12 +1,12 @@
 var common = require('./common');
 
 module.exports = {
-    getByKey: function (key) {
-        return common.querySingle(constructPrincipalQuery(key));
+    getByIds: function (ids) {
+        return common.getByIds(ids);
     },
-    list: function (userstore, types, start, count, sort) {
+    list: function (userStoreKey, types, start, count, sort) {
         return common.queryAll({
-            query: constructPrincipalQuery(null, userstore, types),
+            query: constructPrincipalQuery(userStoreKey, types),
             start: start,
             count: count,
             sort: sort
@@ -14,18 +14,13 @@ module.exports = {
     }
 };
 
-function constructPrincipalQuery(key, userstoreKey, types) {
-    var query;
-    if (key) {
-        query = '_id=\"' + key + '"';
-    } else {
-        query = 'userStoreKey="' + userstoreKey + '"';
-        if (types) {
-            var typeString = types.map(function (type) {
-                return '"' + type + '"';
-            }).join(', ');
-            query += ' AND principalType IN (' + typeString + ')'
-        }
+function constructPrincipalQuery(userStoreKey, types) {
+    var query = 'userStoreKey="' + userStoreKey + '"';
+    if (types) {
+        var typeString = types.map(function (type) {
+            return '"' + type + '"';
+        }).join(', ');
+        query += ' AND principalType IN (' + typeString + ')'
     }
     return query;
 }

@@ -1,8 +1,8 @@
 var common = require('./common');
 
 module.exports = {
-    getByKey: function (key) {
-        return common.querySingle(constructUserstoreQuery(key));
+    getByIds: function (ids) {
+        return common.getByIds(ids);
     },
     list: function (start, count, sort) {
         return common.queryAll({
@@ -14,12 +14,6 @@ module.exports = {
     }
 };
 
-function constructUserstoreQuery(key) {
-    var query;
-    if (key) {
-        query = '_id=\"' + key + '"';
-    } else {
-        query = '_parentPath="/identity"';
-    }
-    return query;
+function constructUserstoreQuery() {
+    return '_parentPath="/identity"';
 }

@@ -4,6 +4,10 @@ var REPO_NAME = "system-repo";
 var REPO_BRANCH = 'master';
 var MAX_COUNT = 100;
 
+exports.getByIds = function (ids) {
+    return getConnection().get(ids);
+};
+
 exports.querySingle = function (query) {
     var results = queryAll({
         start: 0,
@@ -11,7 +15,7 @@ exports.querySingle = function (query) {
         query: query
     });
     // if there's 1 result, it is returned as hits
-    return results.total == 1 ? results.hits : null;
+    return results.total === 1 ? results.hits : null;
 };
 
 var queryAll = exports.queryAll = function (params) {

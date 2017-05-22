@@ -28,3 +28,29 @@ exports.PrincipalTypeEnum = graphQl.createEnumType({
         ROLE: 'ROLE'
     }
 });
+
+exports.PermissionEnum = graphQl.createEnumType({
+    name: 'Permission',
+    description: 'Enumeration of permissions',
+    values: {
+        READ: 'READ',
+        CREATE: 'CREATE',
+        MODIFY: 'MODIFY',
+        DELETE: 'DELETE',
+        PUBLISH: 'PUBLISH',
+        READ_PERMISSIONS: 'READ_PERMISSIONS',
+        WRITE_PERMISSIONS: 'WRITE_PERMISSIONS'
+    }
+});
+
+exports.UserStoreAccessEnum = graphQl.createEnumType({
+    name: 'UserStoreAccess',
+    description: 'Enumeration of user store access permissions',
+    values: {
+        READ: 'READ',
+        CREATE_USERS: 'CREATE_USERS',
+        WRITE_USERS: 'WRITE_USERS',
+        USER_STORE_MANAGER: 'USER_STORE_MANAGER',
+        ADMINISTRATOR: 'ADMINISTRATOR'
+    }
+});

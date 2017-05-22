@@ -7,7 +7,7 @@ var graphQlEnums = require('./graphql-enums');
 exports.query = graphQl.createObjectType({
     name: 'Query',
     fields: {
-        userstores: {
+        userStores: {
             type: graphQl.list(graphQlObjectTypes.UserStoreType),
             args: {
                 start: graphQl.GraphQLInt,
@@ -23,7 +23,7 @@ exports.query = graphQl.createObjectType({
                 });
             }
         },
-        userstore: {
+        userStore: {
             type: graphQlObjectTypes.UserStoreType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString)
@@ -31,7 +31,7 @@ exports.query = graphQl.createObjectType({
             resolve: function (env) {
                 graphQl.required(env.args, 'key');
                 var key = env.args.key;
-                return userstores.getByKey(key);
+                return userstores.getByIds(key);
             }
         },
         principals: {
@@ -60,7 +60,7 @@ exports.query = graphQl.createObjectType({
             resolve: function (env) {
                 graphQl.required(env.args, 'key');
                 var key = env.args.key;
-                return principals.getByKey(key);
+                return principals.getByIds(key);
             }
         },
     }
