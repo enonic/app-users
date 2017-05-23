@@ -1,5 +1,6 @@
 var graphQl = require('/lib/graphql');
 var graphQlEnums = require('./graphql-enums');
+var graphQlConnection = require('./graphql-connection');
 var principals = require('principals');
 
 var UserItemType = graphQl.createInterfaceType({
@@ -225,3 +226,5 @@ exports.PrincipalType = graphQl.createObjectType({
         }
     }
 });
+
+exports.PrincipalConnectionType = graphQlConnection.createConnectionType('PrincipalConnection', exports.PrincipalType);

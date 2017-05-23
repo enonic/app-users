@@ -14,8 +14,8 @@ exports.querySingle = function (query) {
         count: 1,
         query: query
     });
-    // if there's 1 result, it is returned as hits
-    return results.total === 1 ? results.hits : null;
+
+    return results.total === 1 ? results.hits[0] : null;
 };
 
 var queryAll = exports.queryAll = function (params) {
@@ -32,11 +32,13 @@ var queryAll = exports.queryAll = function (params) {
         sort: params.sort
     });
 
+
     var hits = [];
     if (queryResult.count > 0) {
         var ids = queryResult.hits.map(function (hit) {
             return hit.id;
         });
+        log.info('repoConn.get(): ' + JSON.stringify(ids));
         hits = repoConn.get(ids);
     }
 
@@ -44,7 +46,7 @@ var queryAll = exports.queryAll = function (params) {
         total: queryResult.total,
         start: start,
         count: count,
-        hits: hits
+        hits: [].concat(hits)
     };
 };
 

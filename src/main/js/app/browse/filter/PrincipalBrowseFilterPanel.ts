@@ -1,9 +1,9 @@
 import '../../../api.ts';
 import {UserTreeGridItem} from '../UserTreeGridItem';
+import {ListPrincipalsRequest} from '../../../api/graphql/principal/ListPrincipalsRequest';
 import AggregationGroupView = api.aggregation.AggregationGroupView;
 import SearchInputValues = api.query.SearchInputValues;
 import Principal = api.security.Principal;
-import FindPrincipalsRequest = api.security.FindPrincipalsRequest;
 import PrincipalType = api.security.PrincipalType;
 import BrowseFilterResetEvent = api.app.browse.filter.BrowseFilterResetEvent;
 import BrowseFilterSearchEvent = api.app.browse.filter.BrowseFilterSearchEvent;
@@ -16,7 +16,8 @@ import LogicalExp = api.query.expr.LogicalExpr;
 import FieldExpr = api.query.expr.FieldExpr;
 import QueryField = api.query.QueryField;
 
-export class PrincipalBrowseFilterPanel extends api.app.browse.filter.BrowseFilterPanel<UserTreeGridItem> {
+export class PrincipalBrowseFilterPanel
+    extends api.app.browse.filter.BrowseFilterPanel<UserTreeGridItem> {
 
     constructor() {
         super();
@@ -61,28 +62,22 @@ export class PrincipalBrowseFilterPanel extends api.app.browse.filter.BrowseFilt
 
     private searchDataAndHandleResponse(searchString: string, fireEvent: boolean = true) {
 
-        let findPrincipalsRequest = new FindPrincipalsRequest()
-            .setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER, PrincipalType.ROLE])
-            .setSearchQuery(searchString);
-
-        if (this.hasConstraint()) {
-            let principalKeys = this.getSelectionItems().map(key => key.getDataId());
-
-            findPrincipalsRequest.setResultFilter(
-                (principal: Principal) => principalKeys.some(pr => pr === principal.getKey().toString())
-            );
-        }
-
-        findPrincipalsRequest
+        new ListPrincipalsRequest()
+            .setQuery(searchString)
             .sendAndParse()
-            .then((result: api.security.FindPrincipalsResult) => {
+            .then((result) => {
+                let principals = result.principals;
 
-            let principals = result.getPrincipals();
-            if (fireEvent) {
-                new BrowseFilterSearchEvent(principals).fire();
-            }
-            this.updateHitsCounter(principals ? principals.length : 0, api.util.StringHelper.isBlank(searchString));
-        }).catch((reason: any) => {
+                if (this.hasConstraint()) {
+                    let principalKeys = this.getSelectionItems().map(key => key.getDataId());
+                    principals = principals.filter(principal => principalKeys.some(pr => pr === principal.getKey().toString()));
+                }
+
+                if (fireEvent) {
+                    new BrowseFilterSearchEvent(principals).fire();
+                }
+                this.updateHitsCounter(principals ? principals.length : 0, api.util.StringHelper.isBlank(searchString));
+            }).catch((reason: any) => {
             api.DefaultErrorHandler.handle(reason);
         }).done();
     }

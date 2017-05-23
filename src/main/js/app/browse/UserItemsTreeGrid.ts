@@ -14,9 +14,6 @@ import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
 import DateTimeFormatter = api.ui.treegrid.DateTimeFormatter;
 import TreeGridContextMenu = api.ui.treegrid.TreeGridContextMenu;
 
-import FindPrincipalsRequest = api.security.FindPrincipalsRequest;
-import UserStoreListResult = api.security.UserStoreListResult;
-import UserStoreJson = api.security.UserStoreJson;
 import Principal = api.security.Principal;
 import UserStore = api.security.UserStore;
 import PrincipalType = api.security.PrincipalType;
@@ -246,14 +243,14 @@ export class UserItemsTreeGrid
             .sendAndParse()
             .then(
                 (result) => {
-                    let principals = result.getPrincipals();
+                    let principals = result.principals;
 
                     principals.forEach((principal: Principal) => {
                         gridItems.push(
                             new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build());
                     });
 
-                    if (from + principals.length < result.getTotalSize()) {
+                    if (from + principals.length < result.total) {
                         gridItems.push(UserTreeGridItem.create().build());
                     }
 

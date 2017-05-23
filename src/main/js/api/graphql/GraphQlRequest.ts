@@ -34,6 +34,11 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
         return [];
     }
 
+    formatQueryParams(): string {
+        let params = this.getQueryParams();
+        return params.length > 0 ? '(' + params.join(',') + ')' : '';
+    }
+
     setTimeout(timeoutMillis: number) {
         this.timeoutMillis = timeoutMillis;
     }

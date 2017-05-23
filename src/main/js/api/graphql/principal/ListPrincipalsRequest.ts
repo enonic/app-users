@@ -9,31 +9,35 @@ import PrincipalType = api.security.PrincipalType;
 import UserStoreKey = api.security.UserStoreKey;
 
 export class ListPrincipalsRequest
-    extends ListGraphQlRequest<PrincipalListJson, Principal[]> {
+    extends ListGraphQlRequest<any, any> {
 
     private types: PrincipalType[];
     private userStoreKey: UserStoreKey;
+    private query: string;
 
     getQuery() {
-        return `{
-            principals ${this.getQueryParams().join(',')} {
-                key,
-                name,
-                path,
-                description,
-                displayName,    
-                authConfig,
-                idProviderMode,
-                permissions {
-                    principal {
-                        displayName
-                        key
+        return `query {
+                    principalsConnection ${this.formatQueryParams()} {
+                        totalCount
+                        edges {
+                            node {
+                                key,
+                                name,
+                                path,
+                                description,
+                                displayName,
+                                permissions {
+                                    principal {
+                                        displayName
+                                        key
+                                    }
+                                    allow,
+                                    deny
+                                }
+                            }
+                        }
                     }
-                    allow,
-                    deny
-                }
-            }
-        }`;
+                }`;
     }
 
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
@@ -46,22 +50,34 @@ export class ListPrincipalsRequest
         return this;
     }
 
+    setQuery(query: string): ListPrincipalsRequest {
+        this.query = query;
+        return this;
+    }
+
     getQueryParams(): string[] {
         let params = super.getQueryParams();
         if (this.types && this.types.length > 0) {
-            params.push('types: ' + JSON.stringify(this.types))
+            params.push(`types: [${this.types.map(type => PrincipalType[type]).join(',')}]`);
         }
-        if (this.userStoreKey) {
-            params.push('userStoreKey: ' + this.userStoreKey.toString());
+        if (!!this.userStoreKey) {
+            params.push(`userstore: "${this.userStoreKey.toString()}"`);
+        }
+        if (!!this.query) {
+            params.push(`query: "${this.query}"`);
         }
         return params;
     }
 
-    sendAndParse(): wemQ.Promise<Principal[]> {
-        return this.send().then((response: PrincipalListJson) => {
-            return response.principals.map((userStoreJson: UserStoreJson) => {
-                return this.fromJsonToPrincipal(userStoreJson);
-            });
+    sendAndParse(): wemQ.Promise<any> {
+        return this.send().then((response: any) => {
+            let data = response.principalsConnection;
+            return {
+                principals: data.edges.map((edge: any) => {
+                    return this.fromJsonToPrincipal(edge.node);
+                }),
+                total: data.totalCount
+            }
         });
     }
 

@@ -34,22 +34,24 @@ exports.query = graphQl.createObjectType({
                 return userstores.getByIds(key);
             }
         },
-        principals: {
-            type: graphQl.list(graphQlObjectTypes.PrincipalType),
+        principalsConnection: {
+            type: graphQlObjectTypes.PrincipalConnectionType,
             args: {
                 userstore: graphQl.GraphQLString,
                 types: graphQl.list(graphQlEnums.PrincipalTypeEnum),
+                query: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
             },
             resolve: function (env) {
                 var userstore = env.args.userstore || 'system';
-                var types = env.args.types;
+                var types = env.args.types || [principals.Type.USER, principals.Type.GROUP, principals.Type.ROLE];
+                var query = env.args.query;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return principals.list(userstore, types, start, count, sort).hits;
+                return principals.list(userstore, types, query, start, count, sort);
             }
         },
         principal: {

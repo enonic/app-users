@@ -29,13 +29,13 @@ export class ListGraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE>
     getQueryParams(): string[] {
         let filter = super.getQueryParams();
         if (this.start > 0) {
-            filter.push('start: ' + this.start);
+            filter.push(`start: ${this.start}`);
         }
         if (this.count > 0) {
-            filter.push('count: ' + this.count);
+            filter.push(`count: ${this.count}`);
         }
         if (!!this.sort) {
-            filter.push('sort: ' + this.sort);
+            filter.push(`sort: "${this.sort}"`);
         }
         return filter;
     }
