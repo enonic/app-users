@@ -1,5 +1,6 @@
 import '../../api.ts';
 import {UserStoreWizardPanelParams} from './UserStoreWizardPanelParams';
+import {GetUserStoreByKeyRequest} from '../../api/graphql/userStore/GetUserStoreByKeyRequest';
 
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;
@@ -43,7 +44,7 @@ export class UserStoreWizardDataLoader {
 
     private loadUserStoreToEdit(params: UserStoreWizardPanelParams): wemQ.Promise<UserStore> {
         if (!params.persistedItem && !!params.userStoreKey) {
-            return new api.security.GetUserStoreByKeyRequest(params.userStoreKey).sendAndParse();
+            return new GetUserStoreByKeyRequest(params.userStoreKey).sendAndParse();
         } else {
             return wemQ(params.persistedItem);
         }

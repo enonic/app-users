@@ -84,8 +84,7 @@ var UserStoreAccessControlEntry = graphQl.createObjectType({
         access: {
             type: graphQlEnums.UserStoreAccessEnum,
             resolve: function (env) {
-                //TODO: UserStoreNodeTranslator.java:101
-                return 'READ';
+                return env.source.access;
             }
         }
     }

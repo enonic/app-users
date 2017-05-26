@@ -8,6 +8,27 @@ exports.getByIds = function (ids) {
     return getConnection().get(ids);
 };
 
+exports.createQueryByField = function (field, values) {
+    if (!values || !field) {
+        return null;
+    }
+    var clause = String(field);
+    if (values instanceof Array) {
+        clause += ' IN (' + serializeValues(values) + ')';
+    } else {
+        clause += '=' + serializeValue(values);
+    }
+    return clause
+};
+
+function serializeValues(values) {
+    return values ? values.map(serializeValue).join(',') : '';
+}
+
+function serializeValue(value) {
+    return typeof value === 'string' ? '"' + value + '"' : value;
+}
+
 exports.querySingle = function (query) {
     var results = queryAll({
         start: 0,

@@ -12,7 +12,7 @@ module.exports = {
     },
     list: function (userStoreKey, types, query, start, count, sort) {
         return common.queryAll({
-            query: constructPrincipalQuery(userStoreKey, types, query),
+            query: createPrincipalQuery(userStoreKey, types, query),
             start: start,
             count: count,
             sort: sort
@@ -21,7 +21,7 @@ module.exports = {
     Type: PrincipalType
 };
 
-function constructPrincipalQuery(userStoreKey, types, query) {
+function createPrincipalQuery(userStoreKey, types, query) {
 
     var q = !!query ? textQuery(query) : '';
     if (!types) {

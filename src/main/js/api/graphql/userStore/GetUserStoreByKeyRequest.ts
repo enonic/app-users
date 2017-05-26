@@ -1,14 +1,22 @@
 import UserStoreListResult = api.security.UserStoreListResult;
 import UserStore = api.security.UserStore;
 import UserStoreJson = api.security.UserStoreJson;
-import {ListGraphQlRequest} from '../ListGraphQlRequest';
+import {GraphQlRequest} from '../GraphQlRequest';
+import UserStoreKey = api.security.UserStoreKey;
 
-export class ListUserStoresRequest
-    extends ListGraphQlRequest<UserStoreListResult, UserStore[]> {
+export class GetUserStoreByKeyRequest
+    extends GraphQlRequest<any, UserStore> {
+
+    private key: UserStoreKey;
+
+    constructor(key: api.security.UserStoreKey) {
+        super();
+        this.key = key;
+    }
 
     getQuery() {
         return `{
-            userStores ${this.formatQueryParams()} {
+            userStore ${this.formatQueryParams()} {
                 id,
                 key,
                 name,
@@ -29,11 +37,17 @@ export class ListUserStoresRequest
         }`;
     }
 
-    sendAndParse(): wemQ.Promise<UserStore[]> {
-        return this.send().then((response: UserStoreListResult) => {
-            return response.userStores.map((userStoreJson: UserStoreJson) => {
-                return this.fromJsonToUserStore(userStoreJson);
-            });
+    getQueryParams(): string[] {
+        let params = super.getQueryParams();
+        if (this.key) {
+            params.push(`key: "${this.key.toString()}"`);
+        }
+        return params;
+    }
+
+    sendAndParse(): wemQ.Promise<UserStore> {
+        return this.send().then((result: any) => {
+            return this.fromJsonToUserStore(result.userStore);
         });
     }
 

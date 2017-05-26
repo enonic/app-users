@@ -18,9 +18,7 @@ exports.query = graphQl.createObjectType({
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return userstores.list(start, count, sort).hits.filter(function (hit) {
-                    return hit._name != 'roles';
-                });
+                return userstores.list(start, count, sort).hits;
             }
         },
         userStore: {
@@ -29,9 +27,8 @@ exports.query = graphQl.createObjectType({
                 key: graphQl.nonNull(graphQl.GraphQLString)
             },
             resolve: function (env) {
-                graphQl.required(env.args, 'key');
                 var key = env.args.key;
-                return userstores.getByIds(key);
+                return userstores.getByKeys(key);
             }
         },
         principalsConnection: {
@@ -60,10 +57,9 @@ exports.query = graphQl.createObjectType({
                 key: graphQl.nonNull(graphQl.GraphQLString)
             },
             resolve: function (env) {
-                graphQl.required(env.args, 'key');
                 var key = env.args.key;
                 return principals.getByIds(key);
             }
-        },
+        }
     }
 });
