@@ -1,6 +1,7 @@
 var graphQl = require('/lib/graphql');
 var graphQlEnums = require('./graphql-enums');
 var graphQlConnection = require('./graphql-connection');
+var util = require('./graphql-util');
 var principals = require('principals');
 
 var UserItemType = graphQl.createInterfaceType({
@@ -53,7 +54,7 @@ var AccessControlEntry = graphQl.createObjectType({
         principal: {
             type: graphQl.reference('Principal'),
             resolve: function (env) {
-                return principals.getByIds(env.source.principal);
+                return principals.getByKeys(env.source.principal);
             }
         },
         allow: {
@@ -78,7 +79,7 @@ var UserStoreAccessControlEntry = graphQl.createObjectType({
         principal: {
             type: graphQl.reference('Principal'),
             resolve: function (env) {
-                return principals.getByIds(env.source.principal);
+                return principals.getByKeys(env.source.principal);
             }
         },
         access: {
@@ -214,7 +215,19 @@ exports.PrincipalType = graphQl.createObjectType({
         permissions: {
             type: graphQl.list(AccessControlEntry),
             resolve: function (env) {
-                return env.source._permissions;
+                return env.source._permissions || [];
+            }
+        },
+        memberships: {
+            type: graphQl.list(graphQl.reference('Principal')),
+            resolve: function (env) {
+                return util.toArray(env.source.memberships);
+            }
+        },
+        members: {
+            type: graphQl.list(graphQl.GraphQLString),
+            resolve: function (env) {
+                return util.toArray(env.source.member);
             }
         },
         modifiedTime: {

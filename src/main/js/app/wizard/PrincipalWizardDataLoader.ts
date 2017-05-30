@@ -1,5 +1,6 @@
 import '../../api.ts';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
+import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
@@ -42,7 +43,7 @@ export class PrincipalWizardDataLoader {
 
     private loadPrincipalToEdit(params: PrincipalWizardPanelParams): wemQ.Promise<Principal> {
         if (!params.persistedItem && !!params.principalKey) {
-            return new api.security.GetPrincipalByKeyRequest(params.principalKey).includeUserMemberships(true).sendAndParse();
+            return new GetPrincipalByKeyRequest(params.principalKey).includeUserMemberships(true).sendAndParse();
         } else {
             return wemQ(params.persistedItem);
         }

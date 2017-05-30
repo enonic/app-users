@@ -43,7 +43,7 @@ exports.query = graphQl.createObjectType({
             },
             resolve: function (env) {
                 var userstore = env.args.userstore || 'system';
-                var types = env.args.types || [principals.Type.USER, principals.Type.GROUP, principals.Type.ROLE];
+                var types = env.args.types || principals.Type.all();
                 var query = env.args.query;
                 var start = env.args.start;
                 var count = env.args.count;
@@ -54,11 +54,13 @@ exports.query = graphQl.createObjectType({
         principal: {
             type: graphQlObjectTypes.PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString)
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                memberships: graphQl.GraphQLBoolean
             },
             resolve: function (env) {
                 var key = env.args.key;
-                return principals.getByIds(key);
+                var memberships = env.args.memberships;
+                return principals.getByKeys(key, memberships);
             }
         }
     }

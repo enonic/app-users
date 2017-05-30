@@ -9,7 +9,8 @@ import Validators = api.ui.form.Validators;
 import DivEl = api.dom.DivEl;
 import LabelEl = api.dom.LabelEl;
 
-export class UserEmailWizardStepForm extends api.app.wizard.WizardStepForm {
+export class UserEmailWizardStepForm
+    extends api.app.wizard.WizardStepForm {
 
     private email: EmailInput;
 
@@ -45,9 +46,12 @@ export class UserEmailWizardStepForm extends api.app.wizard.WizardStepForm {
     }
 
     layout(principal: Principal) {
-        this.email.setValue(principal.asUser().getEmail());
-        this.email.setName(principal.asUser().getEmail());
-        this.email.setOriginEmail(principal.asUser().getEmail());
+        let user = principal.asUser();
+        if (user) {
+            this.email.setValue(user.getEmail());
+            this.email.setName(user.getEmail());
+            this.email.setOriginEmail(user.getEmail());
+        }
     }
 
     isValid(): boolean {

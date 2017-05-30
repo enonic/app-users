@@ -1,4 +1,3 @@
-import UserStoreListResult = api.security.UserStoreListResult;
 import UserStore = api.security.UserStore;
 import UserStoreJson = api.security.UserStoreJson;
 import {GraphQlRequest} from '../GraphQlRequest';

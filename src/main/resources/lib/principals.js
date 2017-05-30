@@ -3,12 +3,44 @@ var common = require('./common');
 var PrincipalType = {
     ROLE: 'ROLE',
     USER: 'USER',
-    GROUP: 'GROUP'
+    GROUP: 'GROUP',
+    all: function () {
+        return [PrincipalType.ROLE, PrincipalType.USER, PrincipalType.GROUP];
+    }
 };
 
+function isUser(key) {
+    return key && key.split(":")[0] === 'user';
+}
+function isGroup(key) {
+    return key && key.split(":")[0] === 'group';
+}
+function isRole(key) {
+    return key && key.split(":")[0] === 'role';
+}
+
 module.exports = {
-    getByIds: function (ids) {
-        return common.getByIds(ids);
+    getByKeys: function (ids, includeMemberships) {
+        var principals = common.getByIds(ids);
+        if (includeMemberships) {
+            // principals may be object so make sure we have array
+            [].concat(principals).forEach(function (p) {
+                var key = p._id;
+                if (isUser(key)) {
+                    p["memberships"] = module.exports.getMemberships(key);
+                } else if (isGroup(key) || isRole(key)) {
+                    // uncomment to return principals instead of their keys
+                    // p["member"] = common.getByIds(p.member);
+                }
+            });
+        }
+        return common.singleOrArray(principals);
+    },
+    getMemberships: function (id) {
+        return common.queryAll({
+            query: 'member="' + id + '"',
+            count: -1
+        }).hits;
     },
     list: function (userStoreKey, types, query, start, count, sort) {
         return common.queryAll({

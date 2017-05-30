@@ -13,7 +13,6 @@ import UpdateUserRequest = api.security.UpdateUserRequest;
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import UserStoreKey = api.security.UserStoreKey;
-import GetPrincipalByKeyRequest = api.security.GetPrincipalByKeyRequest;
 
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import WizardStep = api.app.wizard.WizardStep;

@@ -4,6 +4,10 @@ var REPO_NAME = "system-repo";
 var REPO_BRANCH = 'master';
 var MAX_COUNT = 100;
 
+exports.singleOrArray = function (value) {
+    return value && value.length === 1 ? value[0] : value;
+};
+
 exports.getByIds = function (ids) {
     return getConnection().get(ids);
 };
@@ -43,7 +47,7 @@ var queryAll = exports.queryAll = function (params) {
     var start = params.start || 0;
     var count = params.count || MAX_COUNT;
 
-    log.info('queryAll() with params: ' + JSON.stringify(params));
+    log.info(' >>> queryAll(' + JSON.stringify(params) + ')');
 
     var repoConn = getConnection();
     var queryResult = repoConn.query({
@@ -62,6 +66,8 @@ var queryAll = exports.queryAll = function (params) {
         log.info('repoConn.get(): ' + JSON.stringify(ids));
         hits = repoConn.get(ids);
     }
+
+    log.info(' <<< queryAll() = ' + JSON.stringify(hits));
 
     return {
         total: queryResult.total,

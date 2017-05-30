@@ -41,7 +41,7 @@ module.exports = {
         });
         result.hits = result.hits.filter(rolesFilter);
         result.hits.forEach(calculateAccess);
-        return result.hits.length === 1 ? result.hits[0] : result;
+        return common.singleOrArray(result.hits);
     },
     list: function (start, count, sort) {
         var result = common.queryAll({
@@ -112,15 +112,9 @@ function getPrincipals(store) {
 
 function isAllowedFor(store, principalKey, actions) {
 
-    var result = store._permissions && store._permissions.some(function (p) {
+    return store._permissions && store._permissions.some(function (p) {
             return principalKey === p.principal && actions.every(function (a) {
                     return p.allow.indexOf(a) >= 0;
                 });
         });
-
-
-    log.info('isAllowedFor(): store: ' + store._name + '\nprincipal: ' + principalKey + '\nactions: ' + JSON.stringify(actions) + '\n' +
-             String(result).toUpperCase());
-
-    return result;
 }
