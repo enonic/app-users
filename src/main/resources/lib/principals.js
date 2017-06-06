@@ -1,4 +1,5 @@
 var common = require('./common');
+var authLib = require('/lib/xp/auth');
 
 var PrincipalType = {
     ROLE: 'ROLE',
@@ -10,37 +11,44 @@ var PrincipalType = {
 };
 
 function isUser(key) {
-    return key && key.split(":")[0] === 'user';
+    return key && key.split(":")[0].toUpperCase() === PrincipalType.USER;
 }
 function isGroup(key) {
-    return key && key.split(":")[0] === 'group';
+    return key && key.split(":")[0].toUpperCase() === PrincipalType.GROUP;
 }
 function isRole(key) {
-    return key && key.split(":")[0] === 'role';
+    return key && key.split(":")[0].toUpperCase() === PrincipalType.ROLE;
 }
 
 module.exports = {
     getByKeys: function (ids, includeMemberships) {
-        var principals = common.getByIds(ids);
+        var principals = common.getByKeys(ids);
         if (includeMemberships) {
             // principals may be object so make sure we have array
             [].concat(principals).forEach(function (p) {
-                var key = p._id;
+                var key = p.key || p._id;
                 if (isUser(key)) {
                     p["memberships"] = module.exports.getMemberships(key);
                 } else if (isGroup(key) || isRole(key)) {
                     // uncomment to return principals instead of their keys
-                    // p["member"] = common.getByIds(p.member);
+                    // p["member"] = common.getByKeys(p.member);
                 }
             });
         }
         return common.singleOrArray(principals);
     },
     getMemberships: function (id) {
-        return common.queryAll({
-            query: 'member="' + id + '"',
-            count: -1
-        }).hits;
+        return authLib.getMemberships(id);
+    },
+    addMemberships: function (key, memberships) {
+        return [].concat(memberships).map(function (current) {
+            try {
+                authLib.addMembers(current, key);
+                return current;
+            } catch (e) {
+                log.error('Could not add member [' + key + '] to [' + current + ']');
+            }
+        });
     },
     list: function (userStoreKey, types, query, start, count, sort) {
         return common.queryAll({

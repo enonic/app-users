@@ -1,13 +1,18 @@
 var graphQl = require('/lib/graphql');
 var graphQlQuery = require('./graphql-query').query;
+var graphQlMutation = require('./graphql-mutation').mutation;
 
 var schema = graphQl.createSchema({
-    query: graphQlQuery
+    query: graphQlQuery,
+    mutation: graphQlMutation
 });
 
 exports.post = function (req) {
-    log.info('graphQL service [post]: ' + JSON.stringify(req.body));
     var body = JSON.parse(req.body);
+    var operation = body.query || body.mutation;
+    if (!operation) {
+        throw 'query or mutation param is missing';
+    }
     var result = graphQl.execute(schema, body.query, body.variables);
     return {
         contentType: 'application/json',
@@ -16,8 +21,18 @@ exports.post = function (req) {
 };
 
 exports.get = function (req) {
-    log.info('graphQL service [get]: ' + JSON.stringify(req.params));
-    var result = graphQl.execute(schema, req.params.query, req.params.variables);
+    var operation = req.params.query || req.params.mutation;
+    if (!operation) {
+        throw 'query or mutation param is missing';
+    }
+    var vars = req.params.variables;
+    if (typeof vars === 'string') {
+        try {
+            vars = JSON.parse(vars);
+        } catch (e) {
+        }
+    }
+    var result = graphQl.execute(schema, operation, vars);
     return {
         contentType: 'application/json',
         body: result

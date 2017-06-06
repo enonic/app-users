@@ -25,18 +25,17 @@ export class ListGraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE>
         return this;
     }
 
-
-    getQueryParams(): string[] {
-        let filter = super.getQueryParams();
+    getVariables(): { [key: string]: any } {
+        let vars = super.getVariables();
         if (this.start > 0) {
-            filter.push(`start: ${this.start}`);
+            vars['start'] = this.start;
         }
         if (this.count > 0) {
-            filter.push(`count: ${this.count}`);
+            vars['count'] = this.count;
         }
         if (!!this.sort) {
-            filter.push(`sort: "${this.sort}"`);
+            vars['sort'] = this.sort;
         }
-        return filter;
+        return vars;
     }
 }

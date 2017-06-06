@@ -8,14 +8,8 @@ export class GetUserStoreByKeyRequest
 
     private key: UserStoreKey;
 
-    constructor(key: api.security.UserStoreKey) {
-        super();
-        this.key = key;
-    }
-
-    getQuery() {
-        return `{
-            userStore ${this.formatQueryParams()} {
+    private static readonly getByKeyQuery = `query($key: String!) {
+            userStore(key: $key) {
                 id,
                 key,
                 name,
@@ -34,23 +28,21 @@ export class GetUserStoreByKeyRequest
                 }
             }
         }`;
+
+    constructor(key: api.security.UserStoreKey) {
+        super();
+        this.key = key;
     }
 
-    getQueryParams(): string[] {
-        let params = super.getQueryParams();
-        if (this.key) {
-            params.push(`key: "${this.key.toString()}"`);
-        }
-        return params;
+
+    getVariables(): { [key: string]: any } {
+        let vars = super.getVariables();
+        vars['key'] = this.key.toString();
+        return vars;
     }
 
     sendAndParse(): wemQ.Promise<UserStore> {
-        return this.send().then((result: any) => {
-            return this.fromJsonToUserStore(result.userStore);
-        });
+        return this.query(GetUserStoreByKeyRequest.getByKeyQuery).then((result: any) => UserStore.fromJson(result.userStore));
     }
 
-    fromJsonToUserStore(json: UserStoreJson): UserStore {
-        return UserStore.fromJson(json);
-    }
 }

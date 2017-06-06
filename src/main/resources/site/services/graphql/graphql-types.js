@@ -173,7 +173,7 @@ exports.PrincipalType = graphQl.createObjectType({
         key: {
             type: graphQl.GraphQLString,
             resolve: function (env) {
-                return env.source._id;
+                return env.source.key || env.source._id;
             }
         },
         name: {
@@ -216,6 +216,18 @@ exports.PrincipalType = graphQl.createObjectType({
             type: graphQl.list(AccessControlEntry),
             resolve: function (env) {
                 return env.source._permissions || [];
+            }
+        },
+        login: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.login;
+            }
+        },
+        email: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.email;
             }
         },
         memberships: {

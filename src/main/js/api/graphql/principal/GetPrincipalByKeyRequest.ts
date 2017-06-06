@@ -8,36 +8,26 @@ import Group = api.security.Group;
 import GroupJson = api.security.GroupJson;
 import User = api.security.User;
 import UserJson = api.security.UserJson;
+import PrincipalType = api.security.PrincipalType;
 
 export class GetPrincipalByKeyRequest
     extends GraphQlRequest<any, Principal> {
 
     private key: PrincipalKey;
     private userMemberships: boolean = false;
+    private getByKeyQuery;
 
     constructor(key: PrincipalKey) {
         super();
         this.key = key;
-    }
-
-    includeUserMemberships(value: boolean): GetPrincipalByKeyRequest {
-        this.userMemberships = value;
-        return this;
-    }
-
-    getQuery() {
-        return `query {
-                    principal ${this.formatQueryParams()} {
+        this.getByKeyQuery = `query ($key: String!, $memberships: Boolean) {
+                    principal (key: $key, memberships: $memberships) {
                         key
                         name
                         path
                         description
                         displayName
-                        members
-                        memberships {
-                            key
-                            displayName
-                        }
+                        ${this.getFieldsByKey(key)}
                         permissions {
                             principal {
                                 key
@@ -50,17 +40,41 @@ export class GetPrincipalByKeyRequest
                 }`;
     }
 
-    getQueryParams(): string[] {
-        let params = super.getQueryParams();
+    includeUserMemberships(value: boolean): GetPrincipalByKeyRequest {
+        this.userMemberships = value;
+        return this;
+    }
+
+    getVariables(): { [key: string]: any } {
+        let vars = super.getVariables();
         if (this.key) {
-            params.push(`key: "${this.key.toString()}"`);
+            vars['key'] = this.key.toString();
         }
-        params.push(`memberships: ${this.userMemberships}`);
-        return params;
+        vars['memberships'] = this.userMemberships;
+        return vars;
+    }
+
+    private getFieldsByKey(key: PrincipalKey): string {
+        let fields = '';
+        switch (key.getType()) {
+        case PrincipalType.USER:
+            fields = `email
+                      login
+                      memberships {
+                          key
+                          displayName
+                      }`;
+            break;
+        case PrincipalType.GROUP:
+        case PrincipalType.ROLE:
+            fields = `members`;
+            break;
+        }
+        return fields;
     }
 
     sendAndParse(): wemQ.Promise<Principal> {
-        return this.send().then((result: any) => {
+        return this.query(this.getByKeyQuery).then((result: any) => {
             return this.fromJsonToPrincipal(result.principal);
         });
     }

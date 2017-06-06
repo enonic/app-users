@@ -6,9 +6,8 @@ import {ListGraphQlRequest} from '../ListGraphQlRequest';
 export class ListUserStoresRequest
     extends ListGraphQlRequest<UserStoreListResult, UserStore[]> {
 
-    getQuery() {
-        return `{
-            userStores ${this.formatQueryParams()} {
+    private static listQuery = `query($start: Int, $count: Int, $sort: SortMode) {
+            userStores(start: $start, count: $count, sort: $sort) {
                 id,
                 key,
                 name,
@@ -27,17 +26,10 @@ export class ListUserStoresRequest
                 }
             }
         }`;
-    }
 
     sendAndParse(): wemQ.Promise<UserStore[]> {
-        return this.send().then((response: UserStoreListResult) => {
-            return response.userStores.map((userStoreJson: UserStoreJson) => {
-                return this.fromJsonToUserStore(userStoreJson);
-            });
+        return this.query(ListUserStoresRequest.listQuery).then((response: UserStoreListResult) => {
+            return response.userStores.map(UserStore.fromJson);
         });
-    }
-
-    fromJsonToUserStore(json: UserStoreJson): UserStore {
-        return UserStore.fromJson(json);
     }
 }

@@ -9,42 +9,27 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
 
     private method: string = 'GET';
 
-    private heavyOperation: boolean;
-
-    private timeoutMillis: number;
-
     constructor() {
         this.path = Path.fromString(window['CONFIG'] && window['CONFIG']['graphQlUrl']);
     }
 
-    getParams(): Object {
+    private getParams(query, mutation): Object {
         let params: any = {};
-        let query = this.getQuery();
         if (!StringHelper.isEmpty(query)) {
-            params.query = query;
+            params['query'] = query;
+        }
+        if (!StringHelper.isEmpty(mutation)) {
+            params['mutation'] = mutation;
+        }
+        let vars = this.getVariables();
+        if (vars && Object.keys(vars).length > 0) {
+            params['variables'] = JSON.stringify(vars);
         }
         return params;
     }
 
-    getQuery() {
-        return ''
-    }
-
-    getQueryParams(): string[] {
-        return [];
-    }
-
-    formatQueryParams(): string {
-        let params = this.getQueryParams();
-        return params.length > 0 ? '(' + params.join(',') + ')' : '';
-    }
-
-    setTimeout(timeoutMillis: number) {
-        this.timeoutMillis = timeoutMillis;
-    }
-
-    setHeavyOperation(value: boolean) {
-        this.heavyOperation = value;
+    getVariables(): { [key: string]: any } {
+        return {};
     }
 
     validate() {
@@ -52,15 +37,22 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
         return true;
     }
 
-    send(): wemQ.Promise<RAW_JSON_TYPE> {
+    query(query: string): wemQ.Promise<RAW_JSON_TYPE> {
+        return this.send(query, null);
+    }
+
+    mutate(mutation: string): wemQ.Promise<RAW_JSON_TYPE> {
+        return this.send(null, mutation);
+    }
+
+    private send(query: string, mutation: string): wemQ.Promise<RAW_JSON_TYPE> {
 
         if (this.validate()) {
 
             let jsonRequest = new JsonRequest<RAW_JSON_TYPE>()
                 .setMethod(this.method)
-                .setParams(this.getParams())
-                .setPath(this.path)
-                .setTimeout(!this.heavyOperation ? this.timeoutMillis : 0);
+                .setParams(this.getParams(query, mutation))
+                .setPath(this.path);
 
             return jsonRequest.send().then(response => {
                 let json = response.getJson();

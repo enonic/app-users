@@ -13,11 +13,10 @@ export class ListPrincipalsRequest
 
     private types: PrincipalType[];
     private userStoreKey: UserStoreKey;
-    private query: string;
+    private searchQuery: string;
 
-    getQuery() {
-        return `query {
-                    principalsConnection ${this.formatQueryParams()} {
+    private static readonly listQuery = `query($userstore: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
+                    principalsConnection (userstore: $userstore, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
                         totalCount
                         edges {
                             node {
@@ -38,7 +37,6 @@ export class ListPrincipalsRequest
                         }
                     }
                 }`;
-    }
 
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
         this.types = types;
@@ -51,37 +49,31 @@ export class ListPrincipalsRequest
     }
 
     setQuery(query: string): ListPrincipalsRequest {
-        this.query = query;
+        this.searchQuery = query;
         return this;
     }
 
-    getQueryParams(): string[] {
-        let params = super.getQueryParams();
+    getVariables(): { [key: string]: any } {
+        let vars = super.getVariables();
         if (this.types && this.types.length > 0) {
-            params.push(`types: [${this.types.map(type => PrincipalType[type]).join(',')}]`);
+            vars['types'] = this.types.map(type => PrincipalType[type]);
         }
         if (!!this.userStoreKey) {
-            params.push(`userstore: "${this.userStoreKey.toString()}"`);
+            vars['userstore'] = this.userStoreKey.toString();
         }
-        if (!!this.query) {
-            params.push(`query: "${this.query}"`);
+        if (!!this.searchQuery) {
+            vars['query'] = this.searchQuery;
         }
-        return params;
+        return vars;
     }
 
     sendAndParse(): wemQ.Promise<any> {
-        return this.send().then((response: any) => {
+        return this.query(ListPrincipalsRequest.listQuery).then((response: any) => {
             let data = response.principalsConnection;
             return {
-                principals: data.edges.map((edge: any) => {
-                    return this.fromJsonToPrincipal(edge.node);
-                }),
+                principals: data.edges.map((edge: any) => Principal.fromJson(edge.node)),
                 total: data.totalCount
             }
         });
-    }
-
-    fromJsonToPrincipal(json: PrincipalJson): Principal {
-        return Principal.fromJson(json);
     }
 }

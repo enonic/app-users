@@ -1,4 +1,7 @@
 var nodeLib = require('/lib/xp/node');
+var valueLib = require('/lib/xp/value');
+var imageLib = require('image');
+var namePrettyfier = Java.type('com.enonic.xp.name.NamePrettyfier');
 
 var REPO_NAME = "system-repo";
 var REPO_BRANCH = 'master';
@@ -8,9 +11,35 @@ exports.singleOrArray = function (value) {
     return value && value.length === 1 ? value[0] : value;
 };
 
-exports.getByIds = function (ids) {
-    return getConnection().get(ids);
+exports.refresh = function () {
+    newConnection().refresh('SEARCH');
 };
+
+exports.required = function (params, name) {
+    var value = params[name];
+    if (value === undefined || value === null) {
+        throw "Parameter '" + name + "' is required";
+    }
+    return value;
+};
+
+exports.default = function (params, name, defaultValue) {
+    var value = params[name];
+    if (value === undefined || value === null) {
+        return defaultValue;
+    }
+    return value;
+};
+
+exports.getByIds = function (ids) {
+    return newConnection().get(ids);
+};
+
+exports.getByKeys = function (keys) {
+    return exports.queryAll({
+        query: '(' + exports.createQueryByField('_id', keys) + ') OR (' + exports.createQueryByField('key', keys) + ')'
+    }).hits;
+}
 
 exports.createQueryByField = function (field, values) {
     if (!values || !field) {
@@ -33,6 +62,24 @@ function serializeValue(value) {
     return typeof value === 'string' ? '"' + value + '"' : value;
 }
 
+exports.extensionFromMimeType = function (mimeType) {
+    var ext = '';
+    if (mimeType.indexOf('image/png') > -1) {
+        ext = '.png';
+    } else if (mimeType.indexOf('image/jpg') > -1 || mimeType.indexOf('image/jpeg') > -1) {
+        ext = '.jpg';
+    } else if (mimeType.indexOf('image/gif') > -1) {
+        ext = '.gif';
+    } else if (mimeType.indexOf('image/svg+xml') > -1) {
+        ext = '.svg';
+    }
+    return ext;
+};
+
+exports.prettifyName = function (text) {
+    return namePrettyfier.create(text);
+};
+
 exports.querySingle = function (query) {
     var results = queryAll({
         start: 0,
@@ -43,13 +90,21 @@ exports.querySingle = function (query) {
     return results.total === 1 ? results.hits[0] : null;
 };
 
+exports.create = function (params) {
+    return newConnection().create(params);
+};
+
+exports.update = function (params) {
+    return newConnection().modify(params);
+};
+
 var queryAll = exports.queryAll = function (params) {
     var start = params.start || 0;
     var count = params.count || MAX_COUNT;
 
-    log.info(' >>> queryAll(' + JSON.stringify(params) + ')');
+    log.info('queryAll(): query="' + params.query + '"');
 
-    var repoConn = getConnection();
+    var repoConn = newConnection();
     var queryResult = repoConn.query({
         start: start,
         count: count,
@@ -63,11 +118,8 @@ var queryAll = exports.queryAll = function (params) {
         var ids = queryResult.hits.map(function (hit) {
             return hit.id;
         });
-        log.info('repoConn.get(): ' + JSON.stringify(ids));
         hits = repoConn.get(ids);
     }
-
-    log.info(' <<< queryAll() = ' + JSON.stringify(hits));
 
     return {
         total: queryResult.total,
@@ -77,9 +129,26 @@ var queryAll = exports.queryAll = function (params) {
     };
 };
 
-var getConnection = function () {
+var newConnection = function () {
     return nodeLib.connect({
         repoId: REPO_NAME,
         branch: REPO_BRANCH
     });
+};
+
+var newAttachment = function (attachmentName, attachmentBinary, mimeType, label) {
+    var bin = valueLib.binary(required(attachmentName, 'attachmentName'), required(attachmentBinary, 'attachmentBinary'));
+    var orientation;
+    if (mimeType !== 'image/svg+xml') {
+        orientation = imageLib.getImageOrientation(attachmentBinary);
+    }
+
+    return {
+        name: attachmentName,
+        binary: bin,
+        mimeType: required(mimeType, 'mimeType'),
+        label: label,
+        size: attachmentBinary.size(),
+        orientation: orientation
+    };
 };
