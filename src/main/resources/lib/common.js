@@ -35,12 +35,6 @@ exports.getByIds = function (ids) {
     return newConnection().get(ids);
 };
 
-exports.getByKeys = function (keys) {
-    return exports.queryAll({
-        query: '(' + exports.createQueryByField('_id', keys) + ') OR (' + exports.createQueryByField('key', keys) + ')'
-    }).hits;
-}
-
 exports.createQueryByField = function (field, values) {
     if (!values || !field) {
         return null;

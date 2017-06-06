@@ -22,7 +22,7 @@ function isRole(key) {
 
 module.exports = {
     getByKeys: function (ids, includeMemberships) {
-        var principals = common.getByKeys(ids);
+        var principals = common.getByIds(ids);
         if (includeMemberships) {
             // principals may be object so make sure we have array
             [].concat(principals).forEach(function (p) {
@@ -31,7 +31,7 @@ module.exports = {
                     p["memberships"] = module.exports.getMemberships(key);
                 } else if (isGroup(key) || isRole(key)) {
                     // uncomment to return principals instead of their keys
-                    // p["member"] = common.getByKeys(p.member);
+                    // p["member"] = common.getByIds(p.member);
                 }
             });
         }
