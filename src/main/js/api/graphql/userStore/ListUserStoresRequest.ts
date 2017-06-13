@@ -14,7 +14,10 @@ export class ListUserStoresRequest
                 path,
                 displayName,    
                 description,
-                authConfig,
+                authConfig {
+                    applicationKey
+                    config
+                }
                 idProviderMode,
                 modifiedTime,
                 permissions {
@@ -29,7 +32,15 @@ export class ListUserStoresRequest
 
     sendAndParse(): wemQ.Promise<UserStore[]> {
         return this.query(ListUserStoresRequest.listQuery).then((response: UserStoreListResult) => {
-            return response.userStores.map(UserStore.fromJson);
+            return response.userStores.map(this.userStorefromJson);
         });
+    }
+
+    userStorefromJson(us) {
+        if (us.authConfig && typeof us.authConfig.config === 'string') {
+            // config is passed as string
+            us.authConfig.config = JSON.parse(us.authConfig.config);
+        }
+        return UserStore.fromJson(us);
     }
 }

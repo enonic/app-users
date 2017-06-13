@@ -53,8 +53,127 @@ module.exports = {
         result.hits = result.hits.filter(rolesFilter);
         result.hits.forEach(calculateAccess);
         return result;
+    },
+    create: function (params) {
+
+        var idProvider = params.authConfig ? {
+            applicationKey: params.authConfig.applicationKey,
+            config: params.authConfig.config || {}
+        } : undefined;
+
+        var createdUserStore = common.create({
+            _parentPath: '/identity',
+            _name: common.prettifyName(params.key),
+            _permissions: calculateUserStorePermissions(params.permissions),
+            displayName: params.displayName,
+            description: params.description,
+            idProvider: idProvider
+        });
+        log.info('Created userStore:\n' + JSON.stringify(createdUserStore));
+
+        var users, groups;
+        if (createdUserStore) {
+
+            if (createdUserStore.idProvider && createdUserStore.idProvider.applicationKey) {
+                var appKey = createdUserStore.idProvider.applicationKey;
+                //TODO: get idProvider
+                //createdUserStore['idProviderMode'] = idProvider.getMode();
+            }
+
+            users = common.create({
+                _parentPath: '/identity/' + createdUserStore._name,
+                _name: 'users',
+                _permissions: calculateUsersPermissions(params.permissions)
+            });
+
+            groups = common.create({
+                _parentPath: '/identity/' + createdUserStore._name,
+                _name: 'groups',
+                _permissions: calculateGroupsPermissions(params.permissions)
+            });
+
+            log.info('Created users and groups nodes:\n' + users._path + '\n' + groups._path);
+        }
+
+        return createdUserStore;
     }
 };
+
+function calculateUserStorePermissions(access) {
+    var permissions = [];
+    [].concat(access).forEach(function (acc) {
+        if (acc.access === Access.ADMINISTRATOR) {
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.admin()
+            })
+        }
+    });
+    log.debug('Calculated userStore permissions: \n' + JSON.stringify(permissions));
+    return permissions;
+}
+
+function calculateGroupsPermissions(access) {
+    var permissions = [];
+    [].concat(access).forEach(function (acc) {
+        switch (acc.access) {
+        case Access.USER_STORE_MANAGER:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.manager()
+            });
+            break;
+        case Access.ADMINISTRATOR:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.admin()
+            });
+            break;
+        }
+    });
+    log.debug('Calculated groups permissions: \n' + JSON.stringify(permissions));
+    return permissions;
+}
+
+function calculateUsersPermissions(access) {
+    var permissions = [];
+    [].concat(access).forEach(function (acc) {
+        switch (acc.access) {
+        case Access.CREATE_USERS:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.create()
+            });
+            break;
+        case Permission.WRITE_USERS:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.write()
+            });
+            break;
+        case Permission.USER_STORE_MANAGER:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.manager()
+            });
+            break;
+        case Permission.ADMINISTRATOR:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.admin()
+            });
+            break;
+        case Permission.READ:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.read()
+            });
+            break;
+        }
+    });
+    log.debug('Calculated users permissions: \n' + JSON.stringify(permissions));
+    return permissions;
+}
 
 function rolesFilter(hit) {
     return hit._name !== 'roles';

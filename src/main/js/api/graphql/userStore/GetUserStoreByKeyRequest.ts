@@ -16,7 +16,10 @@ export class GetUserStoreByKeyRequest
                 path,
                 displayName,    
                 description,
-                authConfig,
+                authConfig {
+                    applicationKey
+                    config
+                }
                 idProviderMode,
                 modifiedTime,
                 permissions {
@@ -42,7 +45,14 @@ export class GetUserStoreByKeyRequest
     }
 
     sendAndParse(): wemQ.Promise<UserStore> {
-        return this.query(GetUserStoreByKeyRequest.getByKeyQuery).then((result: any) => UserStore.fromJson(result.userStore));
+        return this.query(GetUserStoreByKeyRequest.getByKeyQuery).then(result => this.userStorefromJson(result.userStore));
     }
 
+    userStorefromJson(us) {
+        if (us.authConfig && typeof us.authConfig.config === 'string') {
+            // config is passed as string
+            us.authConfig.config = JSON.parse(us.authConfig.config);
+        }
+        return UserStore.fromJson(us);
+    }
 }

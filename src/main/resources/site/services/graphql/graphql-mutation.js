@@ -2,14 +2,14 @@ var graphQl = require('/lib/graphql');
 var userstores = require('userstores');
 var principals = require('principals');
 var users = require('users');
-var graphQlObjectTypes = require('./graphql-types');
-var graphQlEnums = require('./graphql-enums');
+var types = require('./graphql-types');
+var inputs = require('./graphql-inputs');
 
 exports.mutation = graphQl.createObjectType({
     name: 'Mutation',
     fields: {
         createUser: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: types.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -36,6 +36,35 @@ exports.mutation = graphQl.createObjectType({
 
                 log.info('Created user [' + createdUser.key + '] with memberships in ' + JSON.stringify(updatedMms));
                 return createdUser;
+            }
+        },
+        createUserStore: {
+            type: types.UserStoreType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                description: graphQl.GraphQLString,
+                authConfig: inputs.AuthConfigInput,
+                permissions: graphQl.list(inputs.UserStoreAccessControlInput)
+            },
+            resolve: function (env) {
+
+                var authConfig = env.args.authConfig;
+                if (authConfig) {
+                    // parse config as there's no graphql type for it
+                    authConfig.config = JSON.parse(authConfig.config)
+                }
+
+                var createdUserStore = userstores.create({
+                    key: env.args.key,
+                    displayName: env.args.displayName,
+                    description: env.args.description,
+                    authConfig: authConfig,
+                    permissions: env.args.permissions
+                });
+
+                log.info('Created userStore [' + createdUserStore.key + ']');
+                return createdUserStore;
             }
         }
     }

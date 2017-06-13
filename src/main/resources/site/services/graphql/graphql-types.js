@@ -72,7 +72,7 @@ var AccessControlEntry = graphQl.createObjectType({
     }
 });
 
-var UserStoreAccessControlEntry = graphQl.createObjectType({
+exports.UserStoreAccessControlEntry = graphQl.createObjectType({
     name: 'UserStoreAccessControlEntry',
     description: 'Domain representation of user store access control entry',
     fields: {
@@ -86,6 +86,26 @@ var UserStoreAccessControlEntry = graphQl.createObjectType({
             type: graphQlEnums.UserStoreAccessEnum,
             resolve: function (env) {
                 return env.source.access;
+            }
+        }
+    }
+});
+
+var AuthConfig = graphQl.createObjectType({
+    name: 'AuthConfig',
+    description: 'Domain representation of auth config for user store',
+    fields: {
+        applicationKey: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.applicationKey;
+            }
+        },
+        config: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                //TODO: config is not read from db yet, and there's no suitable graphql type for unstructured data
+                return JSON.stringify([]);
             }
         }
     }
@@ -133,9 +153,9 @@ exports.UserStoreType = graphQl.createObjectType({
             }
         },
         authConfig: {
-            type: graphQl.GraphQLString,
+            type: AuthConfig,
             resolve: function (env) {
-                return env.source._authConfig;
+                return env.source.idProvider;
             }
         },
         idProviderMode: {
@@ -145,7 +165,7 @@ exports.UserStoreType = graphQl.createObjectType({
             }
         },
         permissions: {
-            type: graphQl.list(UserStoreAccessControlEntry),
+            type: graphQl.list(exports.UserStoreAccessControlEntry),
             resolve: function (env) {
                 return env.source._permissions;
             }

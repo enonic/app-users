@@ -5,11 +5,11 @@ import {UserStoreWizardPanelParams} from './UserStoreWizardPanelParams';
 import {UserStoreWizardStepForm} from './UserStoreWizardStepForm';
 import {Router} from '../Router';
 import {UserStoreWizardDataLoader} from './UserStoreWizardDataLoader';
+import {CreateUserStoreRequest} from '../../api/graphql/principal/userStore/CreateUserStoreRequest';
 
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;
 import UserStoreNamedEvent = api.security.UserStoreNamedEvent;
-import CreateUserStoreRequest = api.security.CreateUserStoreRequest;
 import UpdateUserStoreRequest = api.security.UpdateUserStoreRequest;
 import UserStoreBuilder = api.security.UserStoreBuilder;
 
