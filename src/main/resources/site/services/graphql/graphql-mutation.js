@@ -2,6 +2,7 @@ var graphQl = require('/lib/graphql');
 var userstores = require('userstores');
 var principals = require('principals');
 var users = require('users');
+var groups = require('groups');
 var types = require('./graphql-types');
 var inputs = require('./graphql-inputs');
 
@@ -36,6 +37,32 @@ exports.mutation = graphQl.createObjectType({
 
                 log.info('Created user [' + createdUser.key + '] with memberships in ' + JSON.stringify(updatedMms));
                 return createdUser;
+            }
+        },
+        createGroup: {
+            type: types.PrincipalType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                description: graphQl.GraphQLString,
+                members: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+
+                var createdGroup = groups.create({
+                    key: env.args.key,
+                    displayName: env.args.displayName,
+                    description: env.args.description
+                });
+
+                var members = env.args.members;
+                if (members && members.length > 0) {
+                    principals.addMembers(createdGroup.key, members);
+                }
+
+                log.info('Created group [' + createdGroup.key + '] with members in ' + JSON.stringify(members));
+
+                return createdGroup;
             }
         },
         createUserStore: {

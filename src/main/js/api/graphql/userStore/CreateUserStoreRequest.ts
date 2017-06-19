@@ -1,4 +1,4 @@
-import {GraphQlRequest} from '../../GraphQlRequest';
+import {GraphQlRequest} from '../GraphQlRequest';
 import UserStoreJson = api.security.UserStoreJson;
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;

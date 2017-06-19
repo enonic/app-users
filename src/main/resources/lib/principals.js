@@ -11,13 +11,13 @@ var PrincipalType = {
 };
 
 function isUser(key) {
-    return key && key.split(":")[0].toUpperCase() === PrincipalType.USER;
+    return common.typeFromKey(key).toUpperCase() === PrincipalType.USER;
 }
 function isGroup(key) {
-    return key && key.split(":")[0].toUpperCase() === PrincipalType.GROUP;
+    return common.typeFromKey(key).toUpperCase() === PrincipalType.GROUP;
 }
 function isRole(key) {
-    return key && key.split(":")[0].toUpperCase() === PrincipalType.ROLE;
+    return common.typeFromKey(key).toUpperCase() === PrincipalType.ROLE;
 }
 
 module.exports = {
@@ -49,6 +49,9 @@ module.exports = {
                 log.error('Could not add member [' + key + '] to [' + current + ']');
             }
         });
+    },
+    addMembers: function (key, members) {
+        return authLib.addMembers(key, members);
     },
     list: function (userStoreKey, types, query, start, count, sort) {
         return common.queryAll({

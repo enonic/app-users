@@ -5,7 +5,7 @@ import {UserStoreWizardPanelParams} from './UserStoreWizardPanelParams';
 import {UserStoreWizardStepForm} from './UserStoreWizardStepForm';
 import {Router} from '../Router';
 import {UserStoreWizardDataLoader} from './UserStoreWizardDataLoader';
-import {CreateUserStoreRequest} from '../../api/graphql/principal/userStore/CreateUserStoreRequest';
+import {CreateUserStoreRequest} from '../../api/graphql/userStore/CreateUserStoreRequest';
 
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;

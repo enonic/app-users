@@ -70,6 +70,26 @@ exports.extensionFromMimeType = function (mimeType) {
     return ext;
 };
 
+function splitKey(key) {
+    var parts = key && key.split(':');
+    if (!parts || parts.length !== 3) {
+        throw "Invalid user key [" + key + "]";
+    }
+    return parts;
+}
+
+exports.userStoreFromKey = function (key) {
+    return splitKey(key)[1];
+};
+
+exports.nameFromKey = function (key) {
+    return splitKey(key)[2];
+};
+
+exports.typeFromKey = function (key) {
+    return splitKey(key)[0];
+};
+
 exports.prettifyName = function (text) {
     return namePrettyfier.create(text);
 };
