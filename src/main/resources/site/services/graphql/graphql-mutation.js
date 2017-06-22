@@ -10,6 +10,7 @@ var inputs = require('./graphql-inputs');
 exports.mutation = graphQl.createObjectType({
     name: 'Mutation',
     fields: {
+        // User
         createUser: {
             type: types.PrincipalType,
             args: {
@@ -22,24 +23,40 @@ exports.mutation = graphQl.createObjectType({
             },
             resolve: function (env) {
 
-                var createdUser = users.create({
+                return users.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     email: env.args.email,
                     login: env.args.login,
-                    password: env.args.password
+                    password: env.args.password,
+                    memberships: env.args.memberships
                 });
-
-                var mms = env.args.memberships;
-                var updatedMms = [];
-                if (createdUser && mms && mms.length > 0) {
-                    updatedMms = principals.addMemberships(createdUser.key, mms);
-                }
-
-                log.info('Created user [' + createdUser.key + '] with memberships in ' + JSON.stringify(updatedMms));
-                return createdUser;
             }
         },
+        updateUser: {
+            type: types.PrincipalType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                email: graphQl.nonNull(graphQl.GraphQLString),
+                login: graphQl.nonNull(graphQl.GraphQLString),
+                addMemberships: graphQl.list(graphQl.GraphQLString),
+                removeMemberships: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+
+                return users.update({
+                    key: env.args.key,
+                    displayName: env.args.displayName,
+                    email: env.args.email,
+                    login: env.args.login,
+                    addMemberships: env.args.addMemberships,
+                    removeMemberships: env.args.removeMemberships
+                });
+            }
+        },
+
+        // Group
         createGroup: {
             type: types.PrincipalType,
             args: {
@@ -66,6 +83,8 @@ exports.mutation = graphQl.createObjectType({
                 return createdGroup;
             }
         },
+
+        // Role
         createRole: {
             type: types.PrincipalType,
             args: {
@@ -92,6 +111,8 @@ exports.mutation = graphQl.createObjectType({
                 return createdRole;
             }
         },
+
+        // UserStore
         createUserStore: {
             type: types.UserStoreType,
             args: {

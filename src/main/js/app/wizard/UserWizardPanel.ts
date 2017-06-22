@@ -5,10 +5,10 @@ import {UserPasswordWizardStepForm} from './UserPasswordWizardStepForm';
 import {UserMembershipsWizardStepForm} from './UserMembershipsWizardStepForm';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {CreateUserRequest} from '../../api/graphql/principal/user/CreateUserRequest';
+import {UpdateUserRequest} from '../../api/graphql/principal/user/UpdateUserRequest';
 
 import User = api.security.User;
 import UserBuilder = api.security.UserBuilder;
-import UpdateUserRequest = api.security.UpdateUserRequest;
 
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;

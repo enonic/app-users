@@ -188,7 +188,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         }
     }
 
-    protected produceUpdateRequest(viewedPrincipal: Principal): SecurityResourceRequest<PrincipalJson, Principal> {
+    protected produceUpdateRequest(viewedPrincipal: Principal): any {
         throw new Error('Must be implemented by inheritors');
     }
 

@@ -53,8 +53,21 @@ module.exports = {
             }
         });
     },
+    removeMemberships: function (key, memberships) {
+        return [].concat(memberships).map(function (current) {
+            try {
+                authLib.removeMembers(current, key);
+                return current;
+            } catch (e) {
+                log.error('Could not remove member [' + key + '] from [' + current + ']');
+            }
+        });
+    },
     addMembers: function (key, members) {
         return authLib.addMembers(key, members);
+    },
+    removeMembers: function (key, members) {
+        return authLib.removeMembers(key, members);
     },
     list: function (userStoreKey, types, query, start, count, sort) {
         return common.queryAll({
