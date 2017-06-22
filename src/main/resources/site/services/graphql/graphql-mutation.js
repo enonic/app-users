@@ -55,6 +55,16 @@ exports.mutation = graphQl.createObjectType({
                 });
             }
         },
+        updatePwd: {
+            type: graphQl.GraphQLBoolean,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                password: graphQl.nonNull(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                return users.updatePwd(env.args.key, env.args.password);
+            }
+        },
 
         // Group
         createGroup: {

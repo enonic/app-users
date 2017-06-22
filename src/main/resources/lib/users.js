@@ -22,10 +22,7 @@ exports.create = function createUser(params) {
         log.info('Added memberships for [' + key + '] in ' + JSON.stringify(updatedMms))
     }
 
-    authLib.changePassword({
-        userKey: createdUser.key || createdUser._id,
-        password: common.required(params, 'password')
-    });
+    exports.updatePwd(key, common.required(params, 'password'));
 
     return createdUser;
 };
@@ -61,4 +58,18 @@ exports.update = function updateUser(params) {
     updatedUser['memberships'] = principals.getMemberships(key);
 
     return updatedUser;
+};
+
+exports.updatePwd = function (key, pwd) {
+    try {
+        authLib.changePassword({
+            userKey: key,
+            password: pwd
+        });
+        log.info('Updated password for [' + key + '] to "' + pwd + '"');
+        return true;
+    } catch (e) {
+        log.error('Could not update password for [' + key + ']');
+        return false;
+    }
 };
