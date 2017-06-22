@@ -21,10 +21,10 @@ function isRole(key) {
 }
 
 module.exports = {
-    getByKeys: function (ids, includeMemberships) {
+    getByKeys: function (keys, includeMemberships) {
         // users and groups have their keys as _id, but roles have them stored as key
         var principals = common.queryAll({
-            query: common.createQueryByField('_id', ids) + ' OR ' + common.createQueryByField('key', ids)
+            query: common.createQueryByField('_id', keys) + ' OR ' + common.createQueryByField('key', keys)
         }).hits;
         if (includeMemberships && principals) {
             // principals may be object so make sure we have array
@@ -40,8 +40,8 @@ module.exports = {
         }
         return common.singleOrArray(principals);
     },
-    getMemberships: function (id) {
-        return authLib.getMemberships(id);
+    getMemberships: function (key) {
+        return authLib.getMemberships(key);
     },
     addMemberships: function (key, memberships) {
         return [].concat(memberships).map(function (current) {
@@ -63,11 +63,16 @@ module.exports = {
             }
         });
     },
+    getMembers: function (key) {
+        return authLib.getMembers(key);
+    },
     addMembers: function (key, members) {
-        return authLib.addMembers(key, members);
+        authLib.addMembers(key, members);
+        return members;
     },
     removeMembers: function (key, members) {
-        return authLib.removeMembers(key, members);
+        authLib.removeMembers(key, members);
+        return members;
     },
     list: function (userStoreKey, types, query, start, count, sort) {
         return common.queryAll({

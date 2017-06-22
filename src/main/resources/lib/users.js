@@ -17,9 +17,9 @@ exports.create = function createUser(params) {
     log.info('createdUser: ' + JSON.stringify(createdUser));
 
     var mms = params.memberships;
-    if (createdUser && mms && mms.length > 0) {
+    if (mms && mms.length > 0) {
         var updatedMms = principals.addMemberships(key, mms);
-        log.info('Added memberships for [' + key + '] in ' + JSON.stringify(updatedMms))
+        log.info('Added memberships for [' + key + '] in ' + JSON.stringify(updatedMms));
     }
 
     exports.updatePwd(key, common.required(params, 'password'));

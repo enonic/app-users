@@ -77,20 +77,31 @@ exports.mutation = graphQl.createObjectType({
             },
             resolve: function (env) {
 
-                var createdGroup = groups.create({
+                return groups.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description
                 });
+            }
+        },
+        updateGroup: {
+            type: types.PrincipalType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                description: graphQl.GraphQLString,
+                addMembers: graphQl.list(graphQl.GraphQLString),
+                removeMembers: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
 
-                var members = env.args.members;
-                if (members && members.length > 0) {
-                    principals.addMembers(createdGroup.key, members);
-                }
-
-                log.info('Created group [' + createdGroup.key + '] with members ' + JSON.stringify(members));
-
-                return createdGroup;
+                return groups.update({
+                    key: env.args.key,
+                    displayName: env.args.displayName,
+                    description: env.args.description,
+                    addMembers: env.args.addMembers,
+                    removeMembers: env.args.removeMembers
+                });
             }
         },
 
