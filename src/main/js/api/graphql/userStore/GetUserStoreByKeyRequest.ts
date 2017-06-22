@@ -2,6 +2,7 @@ import UserStore = api.security.UserStore;
 import UserStoreJson = api.security.UserStoreJson;
 import {GraphQlRequest} from '../GraphQlRequest';
 import UserStoreKey = api.security.UserStoreKey;
+import User = api.security.User;
 
 export class GetUserStoreByKeyRequest
     extends GraphQlRequest<any, UserStore> {
@@ -48,7 +49,10 @@ export class GetUserStoreByKeyRequest
         return this.query(GetUserStoreByKeyRequest.getByKeyQuery).then(result => this.userStorefromJson(result.userStore));
     }
 
-    userStorefromJson(us) {
+    userStorefromJson(us: UserStoreJson) {
+        if (!us) {
+            throw `UserStore[${this.key.toString()}] not found`;
+        }
         if (us.authConfig && typeof us.authConfig.config === 'string') {
             // config is passed as string
             us.authConfig.config = JSON.parse(us.authConfig.config);

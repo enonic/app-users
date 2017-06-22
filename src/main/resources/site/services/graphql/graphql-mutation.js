@@ -3,6 +3,7 @@ var userstores = require('userstores');
 var principals = require('principals');
 var users = require('users');
 var groups = require('groups');
+var roles = require('roles');
 var types = require('./graphql-types');
 var inputs = require('./graphql-inputs');
 
@@ -60,9 +61,35 @@ exports.mutation = graphQl.createObjectType({
                     principals.addMembers(createdGroup.key, members);
                 }
 
-                log.info('Created group [' + createdGroup.key + '] with members in ' + JSON.stringify(members));
+                log.info('Created group [' + createdGroup.key + '] with members ' + JSON.stringify(members));
 
                 return createdGroup;
+            }
+        },
+        createRole: {
+            type: types.PrincipalType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                description: graphQl.GraphQLString,
+                members: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+
+                var createdRole = roles.create({
+                    key: env.args.key,
+                    displayName: env.args.displayName,
+                    description: env.args.description
+                });
+
+                var members = env.args.members;
+                if (members && members.length > 0) {
+                    principals.addMembers(createdRole.key, members);
+                }
+
+                log.info('Created role [' + createdRole._id + '] with members ' + JSON.stringify(members));
+
+                return createdRole;
             }
         },
         createUserStore: {

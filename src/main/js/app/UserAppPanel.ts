@@ -12,6 +12,7 @@ import {RoleWizardPanel} from './wizard/RoleWizardPanel';
 import {UserWizardPanel} from './wizard/UserWizardPanel';
 import {GroupWizardPanel} from './wizard/GroupWizardPanel';
 import {GetUserStoreByKeyRequest} from '../api/graphql/userStore/GetUserStoreByKeyRequest';
+import {GetPrincipalByKeyRequest} from '../api/graphql/principal/GetPrincipalByKeyRequest';
 
 import AppBarTabMenuItem = api.app.bar.AppBarTabMenuItem;
 import AppBarTabMenuItemBuilder = api.app.bar.AppBarTabMenuItemBuilder;
@@ -54,7 +55,7 @@ export class UserAppPanel extends api.app.NavigatedAppPanel<UserTreeGridItem> {
         case 'edit':
             id = path.getElement(1);
             if (id && this.isValidPrincipalKey(id)) {
-                new api.security.GetPrincipalByKeyRequest(api.security.PrincipalKey.fromString(id)).sendAndParse().done(
+                new GetPrincipalByKeyRequest(api.security.PrincipalKey.fromString(id)).sendAndParse().done(
                     (principal: api.security.Principal) => {
                         new EditPrincipalEvent([
                             new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build()

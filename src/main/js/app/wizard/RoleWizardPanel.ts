@@ -2,10 +2,10 @@ import '../../api.ts';
 import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {RoleMembersWizardStepForm} from './RoleMembersWizardStepForm';
+import {CreateRoleRequest} from '../../api/graphql/principal/role/CreateRoleRequest';
 
 import Role = api.security.Role;
 import RoleBuilder = api.security.RoleBuilder;
-import CreateRoleRequest = api.security.CreateRoleRequest;
 import UpdateRoleRequest = api.security.UpdateRoleRequest;
 
 import Principal = api.security.Principal;

@@ -22,8 +22,11 @@ function isRole(key) {
 
 module.exports = {
     getByKeys: function (ids, includeMemberships) {
-        var principals = common.getByIds(ids);
-        if (includeMemberships) {
+        // users and groups have their keys as _id, but roles have them stored as key
+        var principals = common.queryAll({
+            query: common.createQueryByField('_id', ids) + ' OR ' + common.createQueryByField('key', ids)
+        }).hits;
+        if (includeMemberships && principals) {
             // principals may be object so make sure we have array
             [].concat(principals).forEach(function (p) {
                 var key = p.key || p._id;

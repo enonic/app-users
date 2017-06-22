@@ -80,6 +80,9 @@ export class GetPrincipalByKeyRequest
     }
 
     fromJsonToPrincipal(json: PrincipalJson): Principal {
+        if (!json) {
+            throw `Principal[${this.key.toString()}] not found`;
+        }
         let pKey: PrincipalKey = PrincipalKey.fromString(json.key);
         if (pKey.isRole()) {
             return Role.fromJson(<RoleJson>json);

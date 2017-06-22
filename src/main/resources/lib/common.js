@@ -1,6 +1,4 @@
 var nodeLib = require('/lib/xp/node');
-var valueLib = require('/lib/xp/value');
-var imageLib = require('image');
 var namePrettyfier = Java.type('com.enonic.xp.name.NamePrettyfier');
 
 var REPO_NAME = "system-repo";
@@ -72,18 +70,24 @@ exports.extensionFromMimeType = function (mimeType) {
 
 function splitKey(key) {
     var parts = key && key.split(':');
-    if (!parts || parts.length !== 3) {
-        throw "Invalid user key [" + key + "]";
+    var isRole = parts[0] === 'role';
+    if (!parts || !isRole && parts.length !== 3 || isRole && parts.length !== 2) {
+        throw "Invalid principal key [" + key + "]";
     }
     return parts;
 }
 
 exports.userStoreFromKey = function (key) {
-    return splitKey(key)[1];
+    var parts = splitKey(key);
+    if (parts[0] === 'role') {
+        throw "Principal keys of type role can't have userStore [" + key + "]";
+    }
+    return parts[1];
 };
 
 exports.nameFromKey = function (key) {
-    return splitKey(key)[2];
+    var parts = splitKey(key);
+    return parts[0] !== 'role' ? parts[2] : parts[1];
 };
 
 exports.typeFromKey = function (key) {
@@ -148,21 +152,4 @@ var newConnection = function () {
         repoId: REPO_NAME,
         branch: REPO_BRANCH
     });
-};
-
-var newAttachment = function (attachmentName, attachmentBinary, mimeType, label) {
-    var bin = valueLib.binary(required(attachmentName, 'attachmentName'), required(attachmentBinary, 'attachmentBinary'));
-    var orientation;
-    if (mimeType !== 'image/svg+xml') {
-        orientation = imageLib.getImageOrientation(attachmentBinary);
-    }
-
-    return {
-        name: attachmentName,
-        binary: bin,
-        mimeType: required(mimeType, 'mimeType'),
-        label: label,
-        size: attachmentBinary.size(),
-        orientation: orientation
-    };
 };
