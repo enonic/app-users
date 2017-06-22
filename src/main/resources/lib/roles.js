@@ -1,4 +1,5 @@
 var common = require('./common');
+var principals = require('./principals');
 
 exports.create = function createRole(params) {
 
@@ -10,7 +11,8 @@ exports.create = function createRole(params) {
         _name: name,
         key: key,   //TODO: save key to a separate field because we can't save it as id
         displayName: common.required(params, 'displayName'),
-        description: params.description
+        description: params.description,
+        principalType: principals.Type.ROLE
     });
 
     log.info('createdRole: ' + JSON.stringify(createdRole));
