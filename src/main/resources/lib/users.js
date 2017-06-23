@@ -18,8 +18,7 @@ exports.create = function createUser(params) {
 
     var mms = params.memberships;
     if (mms && mms.length > 0) {
-        var updatedMms = principals.addMemberships(key, mms);
-        log.info('Added memberships for [' + key + '] in ' + JSON.stringify(updatedMms));
+        principals.addMemberships(key, mms);
     }
 
     exports.updatePwd(key, common.required(params, 'password'));
@@ -43,17 +42,7 @@ exports.update = function updateUser(params) {
 
     log.info('updatedUser: ' + JSON.stringify(updatedUser));
 
-    var addMs = params.addMemberships;
-    if (addMs && addMs.length > 0) {
-        var addedMs = principals.addMemberships(key, addMs);
-        log.info('added memberships for [' + key + '] to ' + JSON.stringify(addedMs));
-    }
-
-    var removeMs = params.removeMemberships;
-    if (removeMs && removeMs.length > 0) {
-        var removedMs = principals.removeMemberships(key, removeMs);
-        log.info('removed memberships for [' + key + '] from ' + JSON.stringify(removedMs));
-    }
+    principals.updateMemberships(key, params.addMemberships, params.removeMemberships);
 
     updatedUser['memberships'] = principals.getMemberships(key);
 

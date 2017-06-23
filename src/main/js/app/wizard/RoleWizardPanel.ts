@@ -3,10 +3,10 @@ import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {RoleMembersWizardStepForm} from './RoleMembersWizardStepForm';
 import {CreateRoleRequest} from '../../api/graphql/principal/role/CreateRoleRequest';
+import {UpdateRoleRequest} from '../../api/graphql/principal/role/UpdateRoleRequest';
 
 import Role = api.security.Role;
 import RoleBuilder = api.security.RoleBuilder;
-import UpdateRoleRequest = api.security.UpdateRoleRequest;
 
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
@@ -14,7 +14,8 @@ import RoleKeys = api.security.RoleKeys;
 
 import WizardStep = api.app.wizard.WizardStep;
 
-export class RoleWizardPanel extends GroupRoleWizardPanel {
+export class RoleWizardPanel
+    extends GroupRoleWizardPanel {
 
     constructor(params: PrincipalWizardPanelParams) {
 
@@ -59,7 +60,7 @@ export class RoleWizardPanel extends GroupRoleWizardPanel {
         return new CreateRoleRequest().setKey(key).setDisplayName(name).setMembers(members).setDescription(description);
     }
 
-    produceUpdateRequest(viewedPrincipal:Principal):UpdateRoleRequest {
+    produceUpdateRequest(viewedPrincipal: Principal): UpdateRoleRequest {
         let role = viewedPrincipal.asRole();
         let key = role.getKey();
         let displayName = role.getDisplayName();
@@ -78,8 +79,8 @@ export class RoleWizardPanel extends GroupRoleWizardPanel {
     assembleViewedItem(): Principal {
         return <Principal>new RoleBuilder(this.getPersistedItem().asRole()).setMembers(
             this.getMembersWizardStepForm().getMembers().map((el) => {
-            return el.getKey();
-        })).setDisplayName(this.getWizardHeader().getDisplayName()).setDescription(
+                return el.getKey();
+            })).setDisplayName(this.getWizardHeader().getDisplayName()).setDescription(
             this.getDescriptionWizardStepForm().getDescription()).build();
     }
 

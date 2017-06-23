@@ -19,8 +19,7 @@ exports.create = function createGroup(params) {
 
     var ms = params.members;
     if (ms && ms.length > 0) {
-        var updatedMs = principals.addMembers(key, ms);
-        log.info('Added members for [' + key + '] ' + JSON.stringify(updatedMs));
+        principals.addMembers(key, ms);
     }
 
     return createdGroup;
@@ -41,17 +40,7 @@ exports.update = function updateGroup(params) {
 
     log.info('updatedGroup: ' + JSON.stringify(updatedGroup));
 
-    var addMs = params.addMembers;
-    if (addMs && addMs.length > 0) {
-        var addedMs = principals.addMembers(key, addMs);
-        log.info('added to [' + key + '] members ' + JSON.stringify(addedMs));
-    }
-
-    var removeMs = params.removeMembers;
-    if (removeMs && removeMs.length > 0) {
-        var removedMs = principals.removeMembers(key, removeMs);
-        log.info('removed from [' + key + '] members ' + JSON.stringify(removedMs));
-    }
+    principals.updateMembers(key, params.addMembers, params.removeMembers);
 
     updatedGroup['member'] = principals.getMembers(key).map(function (member) {
         return member.key;

@@ -116,20 +116,32 @@ exports.mutation = graphQl.createObjectType({
             },
             resolve: function (env) {
 
-                var createdRole = roles.create({
+                return roles.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
-                    description: env.args.description
+                    description: env.args.description,
+                    members: env.args.members
                 });
+            }
+        },
+        updateRole: {
+            type: types.PrincipalType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                description: graphQl.GraphQLString,
+                addMembers: graphQl.list(graphQl.GraphQLString),
+                removeMembers: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
 
-                var members = env.args.members;
-                if (members && members.length > 0) {
-                    principals.addMembers(createdRole.key, members);
-                }
-
-                log.info('Created role [' + createdRole._id + '] with members ' + JSON.stringify(members));
-
-                return createdRole;
+                return roles.update({
+                    key: env.args.key,
+                    displayName: env.args.displayName,
+                    description: env.args.description,
+                    addMembers: env.args.addMembers,
+                    removeMembers: env.args.removeMembers
+                });
             }
         },
 

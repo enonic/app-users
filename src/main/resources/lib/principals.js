@@ -44,35 +44,57 @@ module.exports = {
         return authLib.getMemberships(key);
     },
     addMemberships: function (key, memberships) {
-        return [].concat(memberships).map(function (current) {
-            try {
-                authLib.addMembers(current, key);
-                return current;
-            } catch (e) {
-                log.error('Could not add member [' + key + '] to [' + current + ']');
-            }
+        var addMms = [].concat(memberships).map(function (current) {
+            module.exports.addMembers(current, key);
+            return current;
         });
+        log.info('Added memberships of [' + key + '] in: ' + JSON.stringify(addMms));
+        return addMms;
     },
     removeMemberships: function (key, memberships) {
-        return [].concat(memberships).map(function (current) {
-            try {
-                authLib.removeMembers(current, key);
-                return current;
-            } catch (e) {
-                log.error('Could not remove member [' + key + '] from [' + current + ']');
-            }
+        var removeMms = [].concat(memberships).map(function (current) {
+            module.exports.removeMembers(current, key);
+            return current;
         });
+        log.info('Removed memberships of [' + key + '] from: ' + JSON.stringify(removeMms));
+        return removeMms;
+    },
+    updateMemberships: function (key, addMms, removeMms) {
+        if (addMms && addMms.length > 0) {
+            module.exports.addMemberships(key, addMms);
+        }
+        if (removeMms && removeMms.length > 0) {
+            module.exports.removeMemberships(key, removeMms);
+        }
     },
     getMembers: function (key) {
         return authLib.getMembers(key);
     },
     addMembers: function (key, members) {
-        authLib.addMembers(key, members);
-        return members;
+        try {
+            authLib.addMembers(key, members);
+            log.info('Added members to [' + key + ']: ' + JSON.stringify(members));
+            return members;
+        } catch (e) {
+            log.error('Could not add members ' + JSON.stringify(members) + ' to [' + key + ']', e);
+        }
     },
     removeMembers: function (key, members) {
-        authLib.removeMembers(key, members);
-        return members;
+        try {
+            authLib.removeMembers(key, members);
+            log.info('Removed members from [' + key + ']: ' + JSON.stringify(members));
+            return members;
+        } catch (e) {
+            log.error('Could not remove members ' + JSON.stringify(members) + ' from [' + key + ']', e);
+        }
+    },
+    updateMembers: function (key, addMs, removeMs) {
+        if (addMs && addMs.length > 0) {
+            module.exports.addMembers(key, addMs);
+        }
+        if (removeMs && removeMs.length > 0) {
+            module.exports.removeMembers(key, removeMs);
+        }
     },
     list: function (userStoreKey, types, query, start, count, sort) {
         return common.queryAll({
