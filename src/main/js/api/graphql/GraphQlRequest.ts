@@ -32,17 +32,25 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
         return {};
     }
 
+    getQuery(): string {
+        throw 'getQuery() should be overridden to use query()';
+    }
+
+    getMutation(): string {
+        throw 'getMutation() should be overridden to use mutate()';
+    }
+
     validate() {
         // Override to ensure any validation of ResourceRequest before sending.
         return true;
     }
 
-    query(query: string): wemQ.Promise<RAW_JSON_TYPE> {
-        return this.send(query, null);
+    query(): wemQ.Promise<RAW_JSON_TYPE> {
+        return this.send(this.getQuery(), null);
     }
 
-    mutate(mutation: string): wemQ.Promise<RAW_JSON_TYPE> {
-        return this.send(null, mutation);
+    mutate(): wemQ.Promise<RAW_JSON_TYPE> {
+        return this.send(null, this.getMutation());
     }
 
     private send(query: string, mutation: string): wemQ.Promise<RAW_JSON_TYPE> {

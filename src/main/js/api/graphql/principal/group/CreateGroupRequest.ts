@@ -11,14 +11,6 @@ export class CreateGroupRequest
     private description: string;
     private members: PrincipalKey[] = [];
 
-    private static readonly mutation = `mutation ($key: String!, $displayName: String!, $description: String, $members: [String]) {
-            createGroup(key: $key, displayName: $displayName, description: $description, members: $members) {
-                key
-                path
-                displayName
-            }
-        }`;
-
     setKey(key: PrincipalKey): CreateGroupRequest {
         this.key = key;
         return this;
@@ -48,8 +40,18 @@ export class CreateGroupRequest
         return vars;
     }
 
+    getMutation(): string {
+        return `mutation ($key: String!, $displayName: String!, $description: String, $members: [String]) {
+            createGroup(key: $key, displayName: $displayName, description: $description, members: $members) {
+                key
+                path
+                displayName
+            }
+        }`;
+    }
+
     sendAndParse(): wemQ.Promise<Group> {
-        return this.mutate(CreateGroupRequest.mutation).then(json => Group.fromJson(json.createGroup));
+        return this.mutate().then(json => Group.fromJson(json.createGroup));
     }
 
 }

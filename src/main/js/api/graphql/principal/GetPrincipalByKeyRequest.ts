@@ -15,29 +15,10 @@ export class GetPrincipalByKeyRequest
 
     private key: PrincipalKey;
     private userMemberships: boolean = false;
-    private getByKeyQuery;
 
     constructor(key: PrincipalKey) {
         super();
         this.key = key;
-        this.getByKeyQuery = `query ($key: String!, $memberships: Boolean) {
-                    principal (key: $key, memberships: $memberships) {
-                        key
-                        name
-                        path
-                        description
-                        displayName
-                        ${this.getFieldsByKey(key)}
-                        permissions {
-                            principal {
-                                key
-                                displayName
-                            }
-                            allow
-                            deny
-                        }                       
-                    }
-                }`;
     }
 
     includeUserMemberships(value: boolean): GetPrincipalByKeyRequest {
@@ -52,6 +33,27 @@ export class GetPrincipalByKeyRequest
         }
         vars['memberships'] = this.userMemberships;
         return vars;
+    }
+
+    getQuery(): string {
+        return `query ($key: String!, $memberships: Boolean) {
+                    principal (key: $key, memberships: $memberships) {
+                        key
+                        name
+                        path
+                        description
+                        displayName
+                        ${this.getFieldsByKey(this.key)}
+                        permissions {
+                            principal {
+                                key
+                                displayName
+                            }
+                            allow
+                            deny
+                        }                       
+                    }
+                }`;
     }
 
     private getFieldsByKey(key: PrincipalKey): string {
@@ -74,9 +76,7 @@ export class GetPrincipalByKeyRequest
     }
 
     sendAndParse(): wemQ.Promise<Principal> {
-        return this.query(this.getByKeyQuery).then((result: any) => {
-            return this.fromJsonToPrincipal(result.principal);
-        });
+        return this.query().then(result => this.fromJsonToPrincipal(result.principal));
     }
 
     fromJsonToPrincipal(json: PrincipalJson): Principal {

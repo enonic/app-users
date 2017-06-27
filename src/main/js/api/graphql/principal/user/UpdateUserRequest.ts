@@ -12,20 +12,6 @@ export class UpdateUserRequest
     private membershipsToAdd: PrincipalKey[] = [];
     private membershipsToRemove: PrincipalKey[] = [];
 
-    private static readonly mutation = `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $addMemberships: [String], $removeMemberships: [String]) {
-            updateUser(key: $key, displayName: $displayName, email: $email, login: $login, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
-                key
-                login
-                displayName
-                email
-                memberships {
-                    key
-                    displayName
-                }
-            }
-        }`;
-
-
     setKey(key: PrincipalKey): UpdateUserRequest {
         this.key = key;
         return this;
@@ -58,19 +44,32 @@ export class UpdateUserRequest
 
     getVariables(): Object {
         let vars = super.getVariables();
-
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;
         vars['email'] = this.email;
         vars['login'] = this.login;
         vars['addMemberships'] = this.membershipsToAdd.map((memberKey) => memberKey.toString());
         vars['removeMemberships'] = this.membershipsToRemove.map((memberKey) => memberKey.toString());
-
         return vars;
     }
 
+    getMutation(): string {
+        return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $addMemberships: [String], $removeMemberships: [String]) {
+            updateUser(key: $key, displayName: $displayName, email: $email, login: $login, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
+                key
+                login
+                displayName
+                email
+                memberships {
+                    key
+                    displayName
+                }
+            }
+        }`;
+    }
+
     sendAndParse(): wemQ.Promise<User> {
-        return this.mutate(UpdateUserRequest.mutation).then(json => User.fromJson(json.updateUser));
+        return this.mutate().then(json => User.fromJson(json.updateUser));
     }
 
 }

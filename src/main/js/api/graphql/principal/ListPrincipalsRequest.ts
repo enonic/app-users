@@ -15,29 +15,6 @@ export class ListPrincipalsRequest
     private userStoreKey: UserStoreKey;
     private searchQuery: string;
 
-    private static readonly listQuery = `query($userstore: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
-                    principalsConnection (userstore: $userstore, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
-                        totalCount
-                        edges {
-                            node {
-                                key,
-                                name,
-                                path,
-                                description,
-                                displayName,
-                                permissions {
-                                    principal {
-                                        displayName
-                                        key
-                                    }
-                                    allow,
-                                    deny
-                                }
-                            }
-                        }
-                    }
-                }`;
-
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
         this.types = types;
         return this;
@@ -67,8 +44,33 @@ export class ListPrincipalsRequest
         return vars;
     }
 
+    getQuery(): string {
+        return `query($userstore: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
+                    principalsConnection (userstore: $userstore, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
+                        totalCount
+                        edges {
+                            node {
+                                key,
+                                name,
+                                path,
+                                description,
+                                displayName,
+                                permissions {
+                                    principal {
+                                        displayName
+                                        key
+                                    }
+                                    allow,
+                                    deny
+                                }
+                            }
+                        }
+                    }
+                }`;
+    }
+
     sendAndParse(): wemQ.Promise<any> {
-        return this.query(ListPrincipalsRequest.listQuery).then((response: any) => {
+        return this.query().then((response: any) => {
             let data = response.principalsConnection;
             return {
                 principals: data.edges.map((edge: any) => Principal.fromJson(edge.node)),

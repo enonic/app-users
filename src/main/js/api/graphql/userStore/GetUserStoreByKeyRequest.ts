@@ -9,7 +9,19 @@ export class GetUserStoreByKeyRequest
 
     private key: UserStoreKey;
 
-    private static readonly getByKeyQuery = `query($key: String!) {
+    constructor(key: api.security.UserStoreKey) {
+        super();
+        this.key = key;
+    }
+
+    getVariables(): { [key: string]: any } {
+        let vars = super.getVariables();
+        vars['key'] = this.key.toString();
+        return vars;
+    }
+
+    getQuery(): string {
+        return `query($key: String!) {
             userStore(key: $key) {
                 id,
                 key,
@@ -32,21 +44,10 @@ export class GetUserStoreByKeyRequest
                 }
             }
         }`;
-
-    constructor(key: api.security.UserStoreKey) {
-        super();
-        this.key = key;
-    }
-
-
-    getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
-        vars['key'] = this.key.toString();
-        return vars;
     }
 
     sendAndParse(): wemQ.Promise<UserStore> {
-        return this.query(GetUserStoreByKeyRequest.getByKeyQuery).then(result => this.userStorefromJson(result.userStore));
+        return this.query().then(result => this.userStorefromJson(result.userStore));
     }
 
     userStorefromJson(us: UserStoreJson) {
@@ -55,7 +56,7 @@ export class GetUserStoreByKeyRequest
         }
         if (us.authConfig && typeof us.authConfig.config === 'string') {
             // config is passed as string
-            us.authConfig.config = JSON.parse(us.authConfig.config);
+            us.authConfig.config = JSON.parse(<string>us.authConfig.config);
         }
         return UserStore.fromJson(us);
     }

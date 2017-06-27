@@ -167,7 +167,7 @@ exports.UserStoreType = graphQl.createObjectType({
         permissions: {
             type: graphQl.list(exports.UserStoreAccessControlEntry),
             resolve: function (env) {
-                return env.source._permissions;
+                return env.source.access;
             }
         },
         modifiedTime: {

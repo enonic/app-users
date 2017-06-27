@@ -8,9 +8,6 @@ export class UpdatePasswordRequest
     private key: PrincipalKey;
     private password: string;
 
-    private static readonly mutation = `mutation ($key: String!, $password: String!) {
-            updatePwd(key: $key, password: $password)
-        }`;
 
     setKey(key: PrincipalKey): UpdatePasswordRequest {
         this.key = key;
@@ -24,15 +21,19 @@ export class UpdatePasswordRequest
 
     getVariables(): Object {
         let vars = super.getVariables();
-
         vars['key'] = this.key.toString();
         vars['password'] = this.password;
-
         return vars;
     }
 
+    getMutation(): string {
+        return `mutation ($key: String!, $password: String!) {
+            updatePwd(key: $key, password: $password)
+        }`;
+    }
+
     sendAndParse(): wemQ.Promise<Boolean> {
-        return this.mutate(UpdatePasswordRequest.mutation).then(json => json.updatePwd);
+        return this.mutate().then(json => json.updatePwd);
     }
 
 }

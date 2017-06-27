@@ -6,11 +6,11 @@ import {UserStoreWizardStepForm} from './UserStoreWizardStepForm';
 import {Router} from '../Router';
 import {UserStoreWizardDataLoader} from './UserStoreWizardDataLoader';
 import {CreateUserStoreRequest} from '../../api/graphql/userStore/CreateUserStoreRequest';
+import {UpdateUserStoreRequest} from '../../api/graphql/userStore/UpdateUserStoreRequest';
 
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;
 import UserStoreNamedEvent = api.security.UserStoreNamedEvent;
-import UpdateUserStoreRequest = api.security.UpdateUserStoreRequest;
 import UserStoreBuilder = api.security.UserStoreBuilder;
 
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;

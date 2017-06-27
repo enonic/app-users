@@ -6,7 +6,8 @@ import {ListGraphQlRequest} from '../ListGraphQlRequest';
 export class ListUserStoresRequest
     extends ListGraphQlRequest<UserStoreListResult, UserStore[]> {
 
-    private static listQuery = `query($start: Int, $count: Int, $sort: SortMode) {
+    getQuery(): string {
+        return `query($start: Int, $count: Int, $sort: SortMode) {
             userStores(start: $start, count: $count, sort: $sort) {
                 id,
                 key,
@@ -29,9 +30,10 @@ export class ListUserStoresRequest
                 }
             }
         }`;
+    }
 
     sendAndParse(): wemQ.Promise<UserStore[]> {
-        return this.query(ListUserStoresRequest.listQuery).then((response: UserStoreListResult) => {
+        return this.query().then((response: UserStoreListResult) => {
             return response.userStores.map(this.userStorefromJson);
         });
     }

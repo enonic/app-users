@@ -13,14 +13,6 @@ export class CreateUserRequest
     private password: string;
     private memberships: PrincipalKey[] = [];
 
-    private static readonly mutation = `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String!, $memberships: [String]) {
-            createUser(key: $key, displayName: $displayName, email: $email, login: $login, password: $password, memberships: $memberships) {
-                key
-                path
-                displayName
-            }
-        }`;
-
     setKey(key: PrincipalKey): CreateUserRequest {
         this.key = key;
         return this;
@@ -62,8 +54,18 @@ export class CreateUserRequest
         return vars;
     }
 
+    getMutation(): string {
+        return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String!, $memberships: [String]) {
+            createUser(key: $key, displayName: $displayName, email: $email, login: $login, password: $password, memberships: $memberships) {
+                key
+                path
+                displayName
+            }
+        }`;
+    }
+
     sendAndParse(): wemQ.Promise<User> {
-        return this.mutate(CreateUserRequest.mutation).then(json => User.fromJson(json.createUser));
+        return this.mutate().then(json => User.fromJson(json.createUser));
     }
 
 }

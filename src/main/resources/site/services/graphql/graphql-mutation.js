@@ -163,16 +163,39 @@ exports.mutation = graphQl.createObjectType({
                     authConfig.config = JSON.parse(authConfig.config)
                 }
 
-                var createdUserStore = userstores.create({
+                return userstores.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
                     authConfig: authConfig,
                     permissions: env.args.permissions
                 });
+            }
+        },
+        updateUserStore: {
+            type: types.UserStoreType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                description: graphQl.GraphQLString,
+                authConfig: inputs.AuthConfigInput,
+                permissions: graphQl.list(inputs.UserStoreAccessControlInput)
+            },
+            resolve: function (env) {
 
-                log.info('Created userStore [' + createdUserStore.key + ']');
-                return createdUserStore;
+                var authConfig = env.args.authConfig;
+                if (authConfig) {
+                    // parse config as there's no graphql type for it
+                    authConfig.config = JSON.parse(authConfig.config)
+                }
+
+                return userstores.update({
+                    key: env.args.key,
+                    displayName: env.args.displayName,
+                    description: env.args.description,
+                    authConfig: authConfig,
+                    permissions: env.args.permissions
+                });
             }
         }
     }

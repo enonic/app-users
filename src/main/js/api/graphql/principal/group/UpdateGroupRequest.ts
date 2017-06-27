@@ -11,15 +11,6 @@ export class UpdateGroupRequest
     private membersToRemove: PrincipalKey[] = [];
     private description: string;
 
-    private static readonly mutation = `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String]) {
-            updateGroup(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers) {
-                key
-                displayName
-                description
-                members
-            }
-        }`;
-
     setKey(key: PrincipalKey): UpdateGroupRequest {
         this.key = key;
         return this;
@@ -57,9 +48,19 @@ export class UpdateGroupRequest
         return vars;
     }
 
-    sendAndParse(): wemQ.Promise<Group> {
+    getMutation(): string {
+        return `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String]) {
+            updateGroup(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers) {
+                key
+                displayName
+                description
+                members
+            }
+        }`;
+    }
 
-        return this.mutate(UpdateGroupRequest.mutation).then(json => Group.fromJson(json.updateGroup));
+    sendAndParse(): wemQ.Promise<Group> {
+        return this.mutate().then(json => Group.fromJson(json.updateGroup));
     }
 
 }

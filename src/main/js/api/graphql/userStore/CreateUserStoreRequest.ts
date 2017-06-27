@@ -13,14 +13,6 @@ export class CreateUserStoreRequest
     private authConfig: AuthConfig;
     private permissions: api.security.acl.UserStoreAccessControlList;
 
-    private static readonly mutation = `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
-            createUserStore(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
-                key
-                path
-                displayName
-            }
-        }`;
-
     getVariables(): { [p: string]: any } {
         let vars = super.getVariables();
 
@@ -39,6 +31,16 @@ export class CreateUserStoreRequest
         vars['authConfig'] = authConfig;
         vars['permissions'] = this.permissions ? this.permissions.toJson() : [];
         return vars;
+    }
+
+    getMutation(): string {
+        return `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
+            createUserStore(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
+                key
+                path
+                displayName
+            }
+        }`;
     }
 
     setKey(userStoreKey: UserStoreKey): CreateUserStoreRequest {
@@ -67,6 +69,6 @@ export class CreateUserStoreRequest
     }
 
     sendAndParse(): wemQ.Promise<UserStore> {
-        return this.mutate(CreateUserStoreRequest.mutation).then(json => UserStore.fromJson(json.createUserStore));
+        return this.mutate().then(json => UserStore.fromJson(json.createUserStore));
     }
 }

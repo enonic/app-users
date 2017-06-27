@@ -55,115 +55,165 @@ module.exports = {
         return result;
     },
     create: function (params) {
-
-        var idProvider = params.authConfig ? {
-            applicationKey: params.authConfig.applicationKey,
-            config: params.authConfig.config || {}
-        } : undefined;
-
-        var createdUserStore = common.create({
+        log.info('Create userStore with params: ' + JSON.stringify(params));
+        var createdStore = common.create({
             _parentPath: '/identity',
             _name: common.prettifyName(params.key),
             _permissions: calculateUserStorePermissions(params.permissions),
             displayName: params.displayName,
             description: params.description,
-            idProvider: idProvider
+            idProvider: calculateIdProvider(params.authConfig)
         });
-        log.info('Created userStore:\n' + JSON.stringify(createdUserStore));
+        log.info('\nCreated userStore:\n' + JSON.stringify(createdStore) + '\n');
 
         var users, groups;
-        if (createdUserStore) {
-
-            if (createdUserStore.idProvider && createdUserStore.idProvider.applicationKey) {
-                var appKey = createdUserStore.idProvider.applicationKey;
-                //TODO: get idProvider
-                //createdUserStore['idProviderMode'] = idProvider.getMode();
-            }
+        if (createdStore) {
 
             users = common.create({
-                _parentPath: '/identity/' + createdUserStore._name,
+                _parentPath: '/identity/' + createdStore._name,
                 _name: 'users',
                 _permissions: calculateUsersPermissions(params.permissions)
             });
 
             groups = common.create({
-                _parentPath: '/identity/' + createdUserStore._name,
+                _parentPath: '/identity/' + createdStore._name,
                 _name: 'groups',
                 _permissions: calculateGroupsPermissions(params.permissions)
             });
 
-            log.info('Created users and groups nodes:\n' + users._path + '\n' + groups._path);
+            log.info('\nCreated users and groups nodes:\n' + users._path + '\n' + groups._path + '\n');
         }
 
-        return createdUserStore;
+        createdStore['idProviderMode'] = calculateIdProviderMode(params.authConfig);
+
+        return createdStore;
+    },
+    update: function (params) {
+        log.info('\nUpdate userStore with params:\n' + JSON.stringify(params) + '\n');
+        var key = common.required(params, 'key');
+
+        var updatedStore = common.update({
+            key: '/identity/' + key,
+            editor: function (store) {
+                store.displayName = params.displayName;
+                store.description = params.description;
+                store._permissions = calculateUserStorePermissions(params.permissions);
+                store.idProvider = calculateIdProvider(params.authConfig);
+                return store;
+            }
+        });
+        log.info('\nUpdated userStore:\n' + JSON.stringify(updatedStore) + '\n');
+
+        var updatedUsers = common.update({
+            key: '/identity/' + key + '/users',
+            editor: function (users) {
+                users._permissions = calculateUsersPermissions(params.permissions);
+                return users;
+            }
+        });
+
+        log.info('\nUpdated permissions for: ' + updatedUsers._path + '\n' + JSON.stringify(updatedUsers._permissions) + '\n');
+
+        var updatedGroups = common.update({
+            key: '/identity/' + key + '/groups',
+            editor: function (groups) {
+                groups._permissions = calculateGroupsPermissions(params.permissions);
+                return groups;
+            }
+        });
+
+        log.info('\nUpdated permissions for: ' + updatedGroups._path + '\n' + JSON.stringify(updatedGroups._permissions) + '\n');
+
+        updatedStore['idProviderMode'] = calculateIdProviderMode(params.authConfig);
+
+        return updatedStore;
     }
 };
 
+function calculateIdProviderMode(authConfig) {
+    var appKey = authConfig && authConfig.applicationKey;
+    if (appKey) {
+        //TODO: get idProvider
+        //return = idProvider.getMode();
+    }
+    return undefined;
+}
+
+function calculateIdProvider(authConfig) {
+    return authConfig ? {
+        applicationKey: authConfig.applicationKey,
+        config: authConfig.config || {}
+    } : undefined;
+}
+
 function calculateUserStorePermissions(access) {
     var permissions = [];
-    [].concat(access).forEach(function (acc) {
+    access.forEach(function (acc) {
         if (acc.access === Access.ADMINISTRATOR) {
             permissions.push({
                 principal: acc.principal.key,
                 allow: Permission.admin()
-            })
+            });
         }
     });
-    log.debug('Calculated userStore permissions: \n' + JSON.stringify(permissions));
+    log.info(
+        '\nCalculated userStore permissions from access: \n' + JSON.stringify(access) + '\npermissions: ' + JSON.stringify(permissions) +
+        '\n');
     return permissions;
 }
 
 function calculateGroupsPermissions(access) {
     var permissions = [];
-    [].concat(access).forEach(function (acc) {
+    access.forEach(function (acc) {
         switch (acc.access) {
-        case Access.USER_STORE_MANAGER:
-            permissions.push({
-                principal: acc.principal.key,
-                allow: Permission.manager()
-            });
-            break;
         case Access.ADMINISTRATOR:
             permissions.push({
                 principal: acc.principal.key,
                 allow: Permission.admin()
             });
             break;
+        case Access.USER_STORE_MANAGER:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.manager()
+            });
+            break;
         }
     });
-    log.debug('Calculated groups permissions: \n' + JSON.stringify(permissions));
+    log.info('\nCalculated groups permissions from access: \n' + JSON.stringify(access) + '\npermissions: ' + JSON.stringify(permissions) +
+             '\n');
     return permissions;
 }
 
 function calculateUsersPermissions(access) {
     var permissions = [];
-    [].concat(access).forEach(function (acc) {
+    access.forEach(function (acc) {
         switch (acc.access) {
+        case Access.ADMINISTRATOR:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.admin()
+            });
+            break;
+        case Access.USER_STORE_MANAGER:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.manager()
+            });
+            break;
+        case Access.WRITE_USERS:
+            permissions.push({
+                principal: acc.principal.key,
+                allow: Permission.write()
+            });
+            break;
         case Access.CREATE_USERS:
             permissions.push({
                 principal: acc.principal.key,
                 allow: Permission.create()
             });
             break;
-        case Permission.WRITE_USERS:
-            permissions.push({
-                principal: acc.principal.key,
-                allow: Permission.write()
-            });
-            break;
-        case Permission.USER_STORE_MANAGER:
-            permissions.push({
-                principal: acc.principal.key,
-                allow: Permission.manager()
-            });
-            break;
-        case Permission.ADMINISTRATOR:
-            permissions.push({
-                principal: acc.principal.key,
-                allow: Permission.admin()
-            });
-            break;
-        case Permission.READ:
+        case Access.READ:
             permissions.push({
                 principal: acc.principal.key,
                 allow: Permission.read()
@@ -171,7 +221,8 @@ function calculateUsersPermissions(access) {
             break;
         }
     });
-    log.debug('Calculated users permissions: \n' + JSON.stringify(permissions));
+    log.info(
+        '\nCalculated users permissions from access: \n' + JSON.stringify(access) + '\npermissions: ' + JSON.stringify(permissions) + '\n');
     return permissions;
 }
 
@@ -184,43 +235,58 @@ function createUserstoreQuery(path) {
 }
 
 function calculateAccess(userStore) {
-    var ps = getPrincipals(userStore);
+    var isRole = !rolesFilter(userStore);
 
-    if (rolesFilter(userStore)) {
+    if (!isRole) {
         var userNode = common.querySingle('_path="/identity/' + userStore._name + '/users"');
         var groupNode = common.querySingle('_path="/identity/' + userStore._name + '/groups"');
 
         var uniques = {};
-        ps = ps.concat(getPrincipals(userNode), getPrincipals(groupNode)).filter(function (item) {
+        var ps = getPrincipals(userStore).concat(getPrincipals(userNode), getPrincipals(groupNode)).filter(function (item) {
             var existing = uniques[item];
             if (!existing) {
                 uniques[item] = true;
             }
             return !existing;
         });
+        var accesses = [];
+        ps.forEach(function (p) {
+            var access = null;
+            if (isAllowedFor(userStore, p, Permission.admin()) &&
+                isAllowedFor(userNode, p, Permission.admin()) &&
+                isAllowedFor(groupNode, p, Permission.admin())) {
+
+                access = Access.ADMINISTRATOR;
+
+            } else if (isAllowedFor(userNode, p, Permission.manager()) &&
+                       isAllowedFor(groupNode, p, Permission.manager())) {
+
+                access = Access.USER_STORE_MANAGER;
+
+            } else if (isAllowedFor(userNode, p, Permission.write())) {
+
+                access = Access.WRITE_USERS;
+
+            } else if (isAllowedFor(userNode, p, Permission.create())) {
+
+                access = Access.CREATE_USERS;
+
+            } else if (isAllowedFor(userNode, p, Permission.read())) {
+
+                access = Access.READ;
+            }
+            if (access) {
+                accesses.push({
+                    principal: p,
+                    access: access
+                });
+            }
+        });
+        log.info(
+            '\nCalculated access for [' + userStore._name + '] from permissions: \n' + JSON.stringify(ps) + '\npermissions: ' +
+            JSON.stringify(accesses) + '\n');
+        userStore.access = accesses;
     }
-
-    var permissions = [];
-    var access;
-    ps.forEach(function (p) {
-        if (isAllowedFor(userStore, p, Permission.admin())) {
-            access = Access.ADMINISTRATOR;
-        } else if (isAllowedFor(userStore, p, Permission.manager())) {
-            access = Access.USER_STORE_MANAGER;
-        } else if (isAllowedFor(userStore, p, Permission.write())) {
-            access = Access.WRITE_USERS;
-        } else if (isAllowedFor(userStore, p, Permission.create())) {
-            access = Access.CREATE_USERS;
-        } else if (isAllowedFor(userStore, p, Permission.read())) {
-            access = Access.READ;
-        }
-        permissions.push({
-            principal: p,
-            access: access
-        })
-    });
-
-    userStore._permissions = permissions;
 }
 
 function getPrincipals(store) {
@@ -231,9 +297,9 @@ function getPrincipals(store) {
 
 function isAllowedFor(store, principalKey, actions) {
 
-    return store._permissions && store._permissions.some(function (p) {
-            return principalKey === p.principal && actions.every(function (a) {
-                    return p.allow.indexOf(a) >= 0;
+    return store._permissions && store._permissions.some(function (perm) {
+            return principalKey === perm.principal && actions.every(function (a) {
+                    return perm.allow.indexOf(a) >= 0;
                 });
         });
 }

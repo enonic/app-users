@@ -10,14 +10,6 @@ export class CreateRoleRequest
     private description: string;
     private members: PrincipalKey[] = [];
 
-    private static readonly mutation = `mutation ($key: String!, $displayName: String!, $description: String, $members: [String]) {
-            createRole(key: $key, displayName: $displayName, description: $description, members: $members) {
-                key
-                path
-                displayName
-            }
-        }`;
-
     setKey(key: PrincipalKey): CreateRoleRequest {
         this.key = key;
         return this;
@@ -47,8 +39,18 @@ export class CreateRoleRequest
         return vars;
     }
 
+    getMutation(): string {
+        return `mutation ($key: String!, $displayName: String!, $description: String, $members: [String]) {
+            createRole(key: $key, displayName: $displayName, description: $description, members: $members) {
+                key
+                path
+                displayName
+            }
+        }`;
+    }
+
     sendAndParse(): wemQ.Promise<Role> {
-        return this.mutate(CreateRoleRequest.mutation).then(json => Role.fromJson(json.createRole));
+        return this.mutate().then(json => Role.fromJson(json.createRole));
     }
 
 }
