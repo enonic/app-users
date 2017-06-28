@@ -104,8 +104,44 @@ module.exports = {
             sort: sort
         });
     },
+    delete: function (keys) {
+        // convert keys to paths because userstores and roles
+        // can't have custom ids and thus be deleted by keys
+        var results = common.delete(keysToPaths(keys));
+        log.info('Delete result for keys ' + JSON.stringify(keys) + ': ' + JSON.stringify(results));
+
+        keys.forEach(function (key) {
+            var memberships = module.exports.getMemberships(key);
+            log.info('Got memberships for key ' + key + ': ' + JSON.stringify(memberships));
+            module.exports.removeMemberships(key, memberships.map(function (membership) {
+                return membership.key;
+            }));
+        });
+
+        return keys.map(function (key) {
+            return {
+                key: key,
+                deleted: true,
+                reason: ''
+            }
+        });
+    },
     Type: PrincipalType
 };
+
+function keysToPaths(keys) {
+    return keys.map(function (key) {
+        if (isUser(key)) {
+            return '/identity/' + common.userStoreFromKey(key) + '/users/' + common.nameFromKey(key);
+        }
+        if (isGroup(key)) {
+            return '/identity/' + common.userStoreFromKey(key) + '/groups/' + common.nameFromKey(key);
+        }
+        if (isRole(key)) {
+            return '/identity/roles/' + common.nameFromKey(key);
+        }
+    });
+}
 
 function createPrincipalQuery(userStoreKey, types, query) {
 

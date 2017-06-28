@@ -1,16 +1,20 @@
 import '../../../api.ts';
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
-import {UserTreeGridItemType, UserTreeGridItem} from '../UserTreeGridItem';
+import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
+import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
 
 import Action = api.ui.Action;
+import DeletePrincipalResult = api.security.DeletePrincipalResult;
+import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 
-export class DeletePrincipalAction extends Action {
+export class DeletePrincipalAction
+    extends Action {
 
     constructor(grid: UserItemsTreeGrid) {
         super('Delete', 'mod+del');
         this.setEnabled(false);
         this.onExecuted(() => {
-            api.ui.dialog.ConfirmationDialog.get()
+            new ConfirmationDialog()
                 .setQuestion('Are you sure you want to delete this user item?')
                 .setNoCallback(null)
                 .setYesCallback(() => {
@@ -38,16 +42,20 @@ export class DeletePrincipalAction extends Action {
                     });
 
                     if (principalKeys && principalKeys.length > 0) {
-                        new api.security.DeletePrincipalRequest()
+                        new DeletePrincipalRequest()
                             .setKeys(principalKeys)
-                            .send()
-                            .done((jsonResponse: api.rest.JsonResponse<any>) => {
-                                let json = jsonResponse.getJson();
+                            .sendAndParse()
+                            .done((results: DeletePrincipalResult[]) => {
 
-                                if (json.results && json.results.length > 0) {
-                                    let key = json.results[0].principalKey;
+                                if (results.length > 0) {
+                                    let keys = results.reduce((prev, result) => {
+                                        if (result.isDeleted()) {
+                                            prev.push(result.getPrincipalKey().toString());
+                                        }
+                                        return prev;
+                                    }, []).join(', ');
 
-                                    api.notify.showFeedback('Principal [' + key + '] deleted!');
+                                    api.notify.showFeedback('Principal(s) [' + keys + '] deleted!');
                                     api.security.UserItemDeletedEvent.create().setPrincipals(principalItems).build().fire();
                                 }
                             });

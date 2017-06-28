@@ -13,7 +13,6 @@ import UserStoreKey = api.security.UserStoreKey;
 import UserStoreNamedEvent = api.security.UserStoreNamedEvent;
 import UserStoreBuilder = api.security.UserStoreBuilder;
 
-import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import ResponsiveManager = api.ui.responsive.ResponsiveManager;
 import ResponsiveItem = api.ui.responsive.ResponsiveItem;
 import WizardStep = api.app.wizard.WizardStep;

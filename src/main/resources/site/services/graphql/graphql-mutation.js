@@ -10,6 +10,17 @@ var inputs = require('./graphql-inputs');
 exports.mutation = graphQl.createObjectType({
     name: 'Mutation',
     fields: {
+        // Principal
+        deletePrincipals: {
+            type: graphQl.list(types.PrincipalDeleteType),
+            args: {
+                keys: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                return principals.delete(env.args.keys);
+            }
+        },
+
         // User
         createUser: {
             type: types.PrincipalType,
@@ -80,7 +91,8 @@ exports.mutation = graphQl.createObjectType({
                 return groups.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
-                    description: env.args.description
+                    description: env.args.description,
+                    members: env.args.members
                 });
             }
         },

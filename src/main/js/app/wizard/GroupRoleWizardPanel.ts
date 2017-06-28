@@ -45,7 +45,7 @@ export class GroupRoleWizardPanel extends PrincipalWizardPanel {
                     console.warn(' persistedPrincipal: ', persistedPrincipal);
 
                     const msg = 'Received Principal from server differs from what you have. Would you like to load changes from server?';
-                    ConfirmationDialog.get()
+                    new ConfirmationDialog()
                         .setQuestion(msg)
                         .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null))
                         .setNoCallback(() => { /* empty */ })

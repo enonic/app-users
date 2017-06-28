@@ -271,4 +271,29 @@ exports.PrincipalType = graphQl.createObjectType({
     }
 });
 
+exports.PrincipalDeleteType = graphQl.createObjectType({
+    name: 'PrincipalDelete',
+    description: 'Result of a principal delete operation',
+    fields: {
+        principalKey: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.key;
+            }
+        },
+        deleted: {
+            type: graphQl.GraphQLBoolean,
+            resolve: function (env) {
+                return env.source.deleted;
+            }
+        },
+        reason: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.reason;
+            }
+        }
+    }
+});
+
 exports.PrincipalConnectionType = graphQlConnection.createConnectionType('PrincipalConnection', exports.PrincipalType);

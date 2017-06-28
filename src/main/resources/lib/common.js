@@ -33,6 +33,10 @@ exports.getByIds = function (ids) {
     return newConnection().get(ids);
 };
 
+exports.delete = function (ids) {
+    return newConnection().delete(ids);
+};
+
 exports.createQueryByField = function (field, values) {
     if (!values || !field) {
         return null;
