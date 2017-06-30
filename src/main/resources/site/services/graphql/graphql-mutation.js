@@ -209,6 +209,15 @@ exports.mutation = graphQl.createObjectType({
                     permissions: env.args.permissions
                 });
             }
+        },
+        deleteUserStores: {
+            type: graphQl.list(types.UserStoreDeleteType),
+            args: {
+                keys: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                return userstores.delete(env.args.keys);
+            }
         }
     }
 });

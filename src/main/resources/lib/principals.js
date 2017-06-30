@@ -1,25 +1,6 @@
 var common = require('./common');
 var authLib = require('/lib/xp/auth');
 
-var PrincipalType = {
-    ROLE: 'ROLE',
-    USER: 'USER',
-    GROUP: 'GROUP',
-    all: function () {
-        return [PrincipalType.ROLE, PrincipalType.USER, PrincipalType.GROUP];
-    }
-};
-
-function isUser(key) {
-    return common.typeFromKey(key).toUpperCase() === PrincipalType.USER;
-}
-function isGroup(key) {
-    return common.typeFromKey(key).toUpperCase() === PrincipalType.GROUP;
-}
-function isRole(key) {
-    return common.typeFromKey(key).toUpperCase() === PrincipalType.ROLE;
-}
-
 module.exports = {
     getByKeys: function (keys, includeMemberships) {
         // users and groups have their keys as _id, but roles have them stored as key
@@ -30,9 +11,9 @@ module.exports = {
             // principals may be object so make sure we have array
             [].concat(principals).forEach(function (p) {
                 var key = p.key || p._id;
-                if (isUser(key)) {
+                if (common.isUser(key)) {
                     p["memberships"] = module.exports.getMemberships(key);
-                } else if (isGroup(key) || isRole(key)) {
+                } else if (common.isGroup(key) || common.isRole(key)) {
                     // uncomment to return principals instead of their keys
                     // p["member"] = common.getByIds(p.member);
                 }
@@ -107,9 +88,10 @@ module.exports = {
     delete: function (keys) {
         // convert keys to paths because userstores and roles
         // can't have custom ids and thus be deleted by keys
-        var results = common.delete(keysToPaths(keys));
-        log.info('Delete result for keys ' + JSON.stringify(keys) + ': ' + JSON.stringify(results));
+        var deletedIds = common.delete(common.keysToPaths(keys));
+        log.info('Delete result for keys ' + JSON.stringify(keys) + ': ' + JSON.stringify(deletedIds));
 
+        //TODO: find which keys could not be deleted with reasons instead of returning all
         keys.forEach(function (key) {
             var memberships = module.exports.getMemberships(key);
             log.info('Got memberships for key ' + key + ': ' + JSON.stringify(memberships));
@@ -126,22 +108,8 @@ module.exports = {
             }
         });
     },
-    Type: PrincipalType
+    Type: common.PrincipalType
 };
-
-function keysToPaths(keys) {
-    return keys.map(function (key) {
-        if (isUser(key)) {
-            return '/identity/' + common.userStoreFromKey(key) + '/users/' + common.nameFromKey(key);
-        }
-        if (isGroup(key)) {
-            return '/identity/' + common.userStoreFromKey(key) + '/groups/' + common.nameFromKey(key);
-        }
-        if (isRole(key)) {
-            return '/identity/roles/' + common.nameFromKey(key);
-        }
-    });
-}
 
 function createPrincipalQuery(userStoreKey, types, query) {
 
@@ -153,11 +121,11 @@ function createPrincipalQuery(userStoreKey, types, query) {
         types.forEach(function (type, index) {
             var add;
             switch (type) {
-            case PrincipalType.ROLE:
+            case common.PrincipalType.ROLE:
                 add = rolesQuery();
                 break;
-            case PrincipalType.GROUP:
-            case PrincipalType.USER:
+            case common.PrincipalType.GROUP:
+            case common.PrincipalType.USER:
                 add = userStoreQuery(userStoreKey, type);
                 break;
             }

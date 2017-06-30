@@ -1,11 +1,13 @@
 import '../../../api.ts';
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
+import {DeleteUserStoreRequest} from '../../../api/graphql/userStore/DeleteUserStoreRequest';
 
 import UserStore = api.security.UserStore;
 import Principal = api.security.Principal;
 import UserItem = api.security.UserItem;
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import DeletePrincipalResult = api.security.DeletePrincipalResult;
+import DeleteUserStoreResult = api.security.DeleteUserStoreResult;
 
 export class DeleteUserItemAction extends api.ui.Action {
 
@@ -30,12 +32,9 @@ export class DeleteUserItemAction extends api.ui.Action {
                             .done((results: DeletePrincipalResult[]) => {
 
                                 if (results.length > 0) {
-                                    let keys = results.reduce((prev, result) => {
-                                        if (result.isDeleted()) {
-                                            prev.push(result.getPrincipalKey().toString());
-                                        }
-                                        return prev;
-                                    }, []).join(', ');
+                                    let keys = results.filter(result => result.isDeleted())
+                                        .map(result => result.getPrincipalKey())
+                                        .join(', ');
 
                                     api.notify.showFeedback('Principal(s) [' + keys + '] deleted!');
                                     api.security.UserItemDeletedEvent.create().setPrincipals([<Principal>persistedItem]).build().fire();
@@ -43,16 +42,17 @@ export class DeleteUserItemAction extends api.ui.Action {
                             });
                     } else {
                         userItemKey = (<UserStore>persistedItem).getKey();
-                        new api.security.DeleteUserStoreRequest()
+                        new DeleteUserStoreRequest()
                             .setKeys([userItemKey])
-                            .send()
-                            .done((jsonResponse: api.rest.JsonResponse<any>) => {
-                                let json = jsonResponse.getJson();
+                            .sendAndParse()
+                            .done((results: DeleteUserStoreResult[]) => {
 
-                                if (json.results && json.results.length > 0) {
-                                    let key = json.results[0].userStoreKey;
+                                if (results && results.length > 0) {
+                                    let keys = results.filter(result => result.isDeleted())
+                                        .map(result => result.getUserStoreKey())
+                                        .join(', ');
 
-                                    api.notify.showFeedback('UserStore [' + key + '] deleted!');
+                                    api.notify.showFeedback('UserStore(s) [' + keys + '] deleted!');
                                     api.security.UserItemDeletedEvent.create().setUserStores([<UserStore>persistedItem]).build().fire();
                                 }
                             });

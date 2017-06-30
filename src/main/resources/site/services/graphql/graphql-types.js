@@ -296,4 +296,29 @@ exports.PrincipalDeleteType = graphQl.createObjectType({
     }
 });
 
+exports.UserStoreDeleteType = graphQl.createObjectType({
+    name: 'UserStoreDelete',
+    description: 'Result of a userStore delete operation',
+    fields: {
+        userStoreKey: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.key;
+            }
+        },
+        deleted: {
+            type: graphQl.GraphQLBoolean,
+            resolve: function (env) {
+                return env.source.deleted;
+            }
+        },
+        reason: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.reason;
+            }
+        }
+    }
+});
+
 exports.PrincipalConnectionType = graphQlConnection.createConnectionType('PrincipalConnection', exports.PrincipalType);

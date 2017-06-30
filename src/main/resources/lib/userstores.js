@@ -127,6 +127,19 @@ module.exports = {
         updatedStore['idProviderMode'] = calculateIdProviderMode(params.authConfig);
 
         return updatedStore;
+    },
+    delete: function (keys) {
+        var deletedIds = common.delete(common.keysToPaths(keys));
+        log.info('Delete result for keys ' + JSON.stringify(keys) + ': ' + JSON.stringify(deletedIds));
+
+        //TODO: find which keys could not be deleted with reasons instead of returning all
+        return keys.map(function (key) {
+            return {
+                key: key,
+                deleted: true,
+                reason: ''
+            }
+        });
     }
 };
 

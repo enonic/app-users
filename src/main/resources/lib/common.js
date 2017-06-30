@@ -5,6 +5,15 @@ var REPO_NAME = "system-repo";
 var REPO_BRANCH = 'master';
 var MAX_COUNT = 100;
 
+var PrincipalType = exports.PrincipalType = {
+    ROLE: 'ROLE',
+    USER: 'USER',
+    GROUP: 'GROUP',
+    all: function () {
+        return [PrincipalType.ROLE, PrincipalType.USER, PrincipalType.GROUP];
+    }
+};
+
 exports.singleOrArray = function (value) {
     return value && value.length === 1 ? value[0] : value;
 };
@@ -35,6 +44,36 @@ exports.getByIds = function (ids) {
 
 exports.delete = function (ids) {
     return newConnection().delete(ids);
+};
+
+exports.keysToPaths = function (keys) {
+    return keys.map(function (key) {
+        if (isUserStore(key)) {
+            return '/identity/' + userStoreFromKey(key);
+        }
+        if (isUser(key)) {
+            return '/identity/' + userStoreFromKey(key) + '/users/' + nameFromKey(key);
+        }
+        if (isGroup(key)) {
+            return '/identity/' + userStoreFromKey(key) + '/groups/' + nameFromKey(key);
+        }
+        if (isRole(key)) {
+            return '/identity/roles/' + nameFromKey(key);
+        }
+    });
+};
+
+var isUser = exports.isUser = function (key) {
+    return exports.typeFromKey(key).toUpperCase() === PrincipalType.USER;
+};
+var isGroup = exports.isGroup = function isGroup(key) {
+    return exports.typeFromKey(key).toUpperCase() === PrincipalType.GROUP;
+};
+var isRole = exports.isRole = function isRole(key) {
+    return exports.typeFromKey(key).toUpperCase() === PrincipalType.ROLE;
+};
+var isUserStore = exports.isUserStore = function isUserStore(key) {
+    return splitKey(key).length === 1;
 };
 
 exports.createQueryByField = function (field, values) {
@@ -74,28 +113,36 @@ exports.extensionFromMimeType = function (mimeType) {
 
 function splitKey(key) {
     var parts = key && key.split(':');
-    var isRole = parts[0] === 'role';
-    if (!parts || !isRole && parts.length !== 3 || isRole && parts.length !== 2) {
+    var isRole = parts && parts.length === 2 && parts[0] === PrincipalType.ROLE;
+    var isUserStore = parts && parts.length === 1;
+    if (!isRole && !isUserStore && !(parts && parts.length === 3)) {
         throw "Invalid principal key [" + key + "]";
     }
     return parts;
 }
 
-exports.userStoreFromKey = function (key) {
+var userStoreFromKey = exports.userStoreFromKey = function (key) {
     var parts = splitKey(key);
-    if (parts[0] === 'role') {
+    if (parts[0].toUpperCase() === PrincipalType.ROLE) {
         throw "Principal keys of type role can't have userStore [" + key + "]";
     }
-    return parts[1];
+    return parts.length === 1 ? parts[0] : parts[1];
 };
 
-exports.nameFromKey = function (key) {
+var nameFromKey = exports.nameFromKey = function (key) {
     var parts = splitKey(key);
-    return parts[0] !== 'role' ? parts[2] : parts[1];
+    if (parts.length === 1) {
+        throw "Key don't have name [" + key + "]";
+    }
+    return parts[0].toUpperCase() !== PrincipalType.ROLE ? parts[2] : parts[1];
 };
 
 exports.typeFromKey = function (key) {
-    return splitKey(key)[0];
+    var parts = splitKey(key);
+    if (parts.length === 1) {
+        throw "Key don't have type [" + key + "]";
+    }
+    return parts[0];
 };
 
 exports.prettifyName = function (text) {
