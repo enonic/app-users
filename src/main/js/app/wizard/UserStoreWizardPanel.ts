@@ -5,15 +5,14 @@ import {UserStoreWizardPanelParams} from './UserStoreWizardPanelParams';
 import {UserStoreWizardStepForm} from './UserStoreWizardStepForm';
 import {Router} from '../Router';
 import {UserStoreWizardDataLoader} from './UserStoreWizardDataLoader';
+import {CreateUserStoreRequest} from '../../api/graphql/userStore/CreateUserStoreRequest';
+import {UpdateUserStoreRequest} from '../../api/graphql/userStore/UpdateUserStoreRequest';
 
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;
 import UserStoreNamedEvent = api.security.UserStoreNamedEvent;
-import CreateUserStoreRequest = api.security.CreateUserStoreRequest;
-import UpdateUserStoreRequest = api.security.UpdateUserStoreRequest;
 import UserStoreBuilder = api.security.UserStoreBuilder;
 
-import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import ResponsiveManager = api.ui.responsive.ResponsiveManager;
 import ResponsiveItem = api.ui.responsive.ResponsiveItem;
 import WizardStep = api.app.wizard.WizardStep;

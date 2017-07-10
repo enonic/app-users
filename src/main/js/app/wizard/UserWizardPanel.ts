@@ -4,21 +4,21 @@ import {UserEmailWizardStepForm} from './UserEmailWizardStepForm';
 import {UserPasswordWizardStepForm} from './UserPasswordWizardStepForm';
 import {UserMembershipsWizardStepForm} from './UserMembershipsWizardStepForm';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
+import {CreateUserRequest} from '../../api/graphql/principal/user/CreateUserRequest';
+import {UpdateUserRequest} from '../../api/graphql/principal/user/UpdateUserRequest';
 
 import User = api.security.User;
 import UserBuilder = api.security.UserBuilder;
-import CreateUserRequest = api.security.CreateUserRequest;
-import UpdateUserRequest = api.security.UpdateUserRequest;
 
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import UserStoreKey = api.security.UserStoreKey;
-import GetPrincipalByKeyRequest = api.security.GetPrincipalByKeyRequest;
 
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import WizardStep = api.app.wizard.WizardStep;
 
-export class UserWizardPanel extends PrincipalWizardPanel {
+export class UserWizardPanel
+    extends PrincipalWizardPanel {
 
     private userEmailWizardStepForm: UserEmailWizardStepForm;
     private userPasswordWizardStepForm: UserPasswordWizardStepForm;
@@ -73,10 +73,11 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
                     const msg = 'Received Principal from server differs from what you have. Would you like to load changes from server?';
 
-                    ConfirmationDialog.get()
+                    new ConfirmationDialog()
                         .setQuestion(msg)
                         .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal.clone()))
-                        .setNoCallback(() => { /* empty */})
+                        .setNoCallback(() => { /* empty */
+                        })
                         .show();
                 }
 
@@ -118,9 +119,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         let name = wizardHeader.getDisplayName();
         let email = this.userEmailWizardStepForm.getEmail();
         let password = this.userPasswordWizardStepForm.getPassword();
-        let memberships = this.userMembershipsWizardStepForm.getMemberships().map((el) => {
-            return el.getKey();
-        });
+        let memberships = this.userMembershipsWizardStepForm.getMemberships().map(el => el.getKey());
         return new CreateUserRequest()
             .setKey(key)
             .setDisplayName(name)
@@ -131,14 +130,14 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     updatePersistedItem(): wemQ.Promise<Principal> {
-        return super.updatePersistedItem().then((principal:Principal) => {
+        return super.updatePersistedItem().then((principal: Principal) => {
             //remove after users event handling is configured and layout is updated on receiving upd from server
             this.userMembershipsWizardStepForm.layout(principal);
             return principal;
         });
     }
 
-    produceUpdateRequest(viewedPrincipal:Principal):UpdateUserRequest {
+    produceUpdateRequest(viewedPrincipal: Principal): UpdateUserRequest {
         let user = viewedPrincipal.asUser();
         let key = user.getKey();
         let displayName = user.getDisplayName();

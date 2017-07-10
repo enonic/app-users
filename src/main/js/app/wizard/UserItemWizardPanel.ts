@@ -9,7 +9,6 @@ import PrincipalType = api.security.PrincipalType;
 import PrincipalNamedEvent = api.security.PrincipalNamedEvent;
 import UserStoreKey = api.security.UserStoreKey;
 
-import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import ResponsiveManager = api.ui.responsive.ResponsiveManager;
 import ResponsiveItem = api.ui.responsive.ResponsiveItem;
 import FormIcon = api.app.wizard.FormIcon;

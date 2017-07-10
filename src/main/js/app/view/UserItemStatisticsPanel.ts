@@ -1,5 +1,6 @@
 import '../../api.ts';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
+import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
@@ -7,11 +8,11 @@ import ItemDataGroup = api.app.view.ItemDataGroup;
 
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
-import GetPrincipalByKeyRequest = api.security.GetPrincipalByKeyRequest;
 
 import PrincipalViewer = api.ui.security.PrincipalViewer;
 
-export class UserItemStatisticsPanel extends ItemStatisticsPanel<UserTreeGridItem> {
+export class UserItemStatisticsPanel
+    extends ItemStatisticsPanel<UserTreeGridItem> {
 
     private userDataContainer: api.dom.DivEl;
 

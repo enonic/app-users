@@ -2,11 +2,11 @@ import '../../api.ts';
 import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {GroupMembersWizardStepForm} from './GroupMembersWizardStepForm';
+import {CreateGroupRequest} from '../../api/graphql/principal/group/CreateGroupRequest';
+import {UpdateGroupRequest} from '../../api/graphql/principal/group/UpdateGroupRequest';
 
 import Group = api.security.Group;
 import GroupBuilder = api.security.GroupBuilder;
-import CreateGroupRequest = api.security.CreateGroupRequest;
-import UpdateGroupRequest = api.security.UpdateGroupRequest;
 
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;

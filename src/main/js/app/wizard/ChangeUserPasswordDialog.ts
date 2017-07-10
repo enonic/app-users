@@ -1,5 +1,6 @@
 import '../../api.ts';
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
+import {UpdatePasswordRequest} from '../../api/graphql/principal/user/UpdatePasswordRequest';
 
 import Principal = api.security.Principal;
 import PasswordGenerator = api.ui.text.PasswordGenerator;
@@ -57,7 +58,7 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
     private initializeActions() {
 
         this.changePasswordButton = this.addAction(new api.ui.Action('Change Password', '').onExecuted(() => {
-            new api.security.SetUserPasswordRequest().setKey(this.principal.getKey()).setPassword(
+            new UpdatePasswordRequest().setKey(this.principal.getKey()).setPassword(
                 this.password.getValue()).sendAndParse().then((result) => {
                 api.notify.showFeedback('Password was changed!');
                 this.close();

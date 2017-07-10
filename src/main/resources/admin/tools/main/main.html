@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
+    <base href="{{baseHref}}">
 
     <title>{{appName}} - Enonic XP Admin</title>
 
@@ -42,7 +43,9 @@
     var CONFIG = {
         appId: '{{appId}}',
         xpVersion: '{{xpVersion}}',
-        appIconUrl: '{{assetsUri}}/icons/icon-white.svg'
+        appIconUrl: '{{assetsUri}}/icons/icon-white.svg',
+        baseHref: '{{baseHref}}',
+        graphQlUrl: '{{graphQlUrl}}'
     };
 </script>
 

@@ -1,15 +1,20 @@
 import '../../../api.ts';
+import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
+import {DeleteUserStoreRequest} from '../../../api/graphql/userStore/DeleteUserStoreRequest';
 
 import UserStore = api.security.UserStore;
 import Principal = api.security.Principal;
 import UserItem = api.security.UserItem;
+import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
+import DeletePrincipalResult = api.security.DeletePrincipalResult;
+import DeleteUserStoreResult = api.security.DeleteUserStoreResult;
 
 export class DeleteUserItemAction extends api.ui.Action {
 
     constructor(wizardPanel: api.app.wizard.WizardPanel<UserItem>) {
         super('Delete', 'mod+del', true);
         this.onExecuted(() => {
-            api.ui.dialog.ConfirmationDialog.get()
+            new ConfirmationDialog()
                 .setQuestion('Are you sure you want to delete this item?')
                 .setNoCallback(null)
                 .setYesCallback(() => {
@@ -21,31 +26,33 @@ export class DeleteUserItemAction extends api.ui.Action {
                     let userItemKey;
                     if (isPrincipal) {
                         userItemKey = (<Principal>persistedItem).getKey();
-                        new api.security.DeletePrincipalRequest()
+                        new DeletePrincipalRequest()
                             .setKeys([userItemKey])
-                            .send()
-                            .done((jsonResponse: api.rest.JsonResponse<any>) => {
-                                let json = jsonResponse.getJson();
+                            .sendAndParse()
+                            .done((results: DeletePrincipalResult[]) => {
 
-                                if (json.results && json.results.length > 0) {
-                                    let key = json.results[0].principalKey;
+                                if (results.length > 0) {
+                                    let keys = results.filter(result => result.isDeleted())
+                                        .map(result => result.getPrincipalKey())
+                                        .join(', ');
 
-                                    api.notify.showFeedback('Principal [' + key + '] deleted!');
+                                    api.notify.showFeedback('Principal(s) [' + keys + '] deleted!');
                                     api.security.UserItemDeletedEvent.create().setPrincipals([<Principal>persistedItem]).build().fire();
                                 }
                             });
                     } else {
                         userItemKey = (<UserStore>persistedItem).getKey();
-                        new api.security.DeleteUserStoreRequest()
+                        new DeleteUserStoreRequest()
                             .setKeys([userItemKey])
-                            .send()
-                            .done((jsonResponse: api.rest.JsonResponse<any>) => {
-                                let json = jsonResponse.getJson();
+                            .sendAndParse()
+                            .done((results: DeleteUserStoreResult[]) => {
 
-                                if (json.results && json.results.length > 0) {
-                                    let key = json.results[0].userStoreKey;
+                                if (results && results.length > 0) {
+                                    let keys = results.filter(result => result.isDeleted())
+                                        .map(result => result.getUserStoreKey())
+                                        .join(', ');
 
-                                    api.notify.showFeedback('UserStore [' + key + '] deleted!');
+                                    api.notify.showFeedback('UserStore(s) [' + keys + '] deleted!');
                                     api.security.UserItemDeletedEvent.create().setUserStores([<UserStore>persistedItem]).build().fire();
                                 }
                             });
