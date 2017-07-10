@@ -7,6 +7,10 @@ import PrincipalJson = api.security.PrincipalJson;
 import PrincipalListJson = api.security.PrincipalListJson;
 import PrincipalType = api.security.PrincipalType;
 import UserStoreKey = api.security.UserStoreKey;
+import PrincipalKey = api.security.PrincipalKey;
+import Role = api.security.Role;
+import Group = api.security.Group;
+import User = api.security.User;
 
 export class ListPrincipalsRequest
     extends ListGraphQlRequest<any, any> {
@@ -73,9 +77,22 @@ export class ListPrincipalsRequest
         return this.query().then((response: any) => {
             let data = response.principalsConnection;
             return {
-                principals: data.edges.map((edge: any) => Principal.fromJson(edge.node)),
+                principals: data.edges.map(edge => this.fromJsonToPrincipal(edge.node)),
                 total: data.totalCount
             }
         });
+    }
+
+    private fromJsonToPrincipal(json: PrincipalJson): Principal {
+        let pKey: PrincipalKey = PrincipalKey.fromString(json.key);
+        if (pKey.isRole()) {
+            return Role.fromJson(<api.security.RoleJson>json);
+
+        } else if (pKey.isGroup()) {
+            return Group.fromJson(<api.security.GroupJson>json);
+
+        } else if (pKey.isUser()) {
+            return User.fromJson(<api.security.UserJson>json);
+        }
     }
 }
