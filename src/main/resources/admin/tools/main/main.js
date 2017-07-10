@@ -24,7 +24,8 @@ function handleGet() {
         graphQlUrl: graphQlUrl,
         appName: 'Users',
         appId: app.name,
-        xpVersion: app.version
+        xpVersion: app.version,
+        messages: admin.getPhrases()
     };
 
     return {

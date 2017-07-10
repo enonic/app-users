@@ -13,6 +13,7 @@ import PrincipalKey = api.security.PrincipalKey;
 import RoleKeys = api.security.RoleKeys;
 
 import WizardStep = api.app.wizard.WizardStep;
+import i18n = api.util.i18n;
 
 export class RoleWizardPanel
     extends GroupRoleWizardPanel {
@@ -29,12 +30,12 @@ export class RoleWizardPanel
 
         let descriptionStep = this.getDescriptionWizardStepForm();
 
-        steps.push(new WizardStep('Role', descriptionStep));
+        steps.push(new WizardStep(i18n('field.role'), descriptionStep));
 
         let principalKey: PrincipalKey = principal ? principal.getKey() : undefined;
         if (!RoleKeys.EVERYONE.equals(principalKey)) {
             let membersStep = this.getMembersWizardStepForm();
-            steps.push(new WizardStep('Grants', membersStep));
+            steps.push(new WizardStep(i18n('field.grants'), membersStep));
         }
 
         return steps;
@@ -43,7 +44,7 @@ export class RoleWizardPanel
     persistNewItem(): wemQ.Promise<Principal> {
         return this.produceCreateRoleRequest().sendAndParse().then((principal: Principal) => {
 
-            api.notify.showFeedback('Role was created!');
+            api.notify.showFeedback(i18n('notify.create.role'));
             new api.security.UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 

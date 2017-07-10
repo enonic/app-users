@@ -16,6 +16,7 @@ import UserStoreKey = api.security.UserStoreKey;
 
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import WizardStep = api.app.wizard.WizardStep;
+import i18n = api.util.i18n;
 
 export class UserWizardPanel
     extends PrincipalWizardPanel {
@@ -51,9 +52,9 @@ export class UserWizardPanel
         this.userPasswordWizardStepForm = new UserPasswordWizardStepForm();
         this.userMembershipsWizardStepForm = new UserMembershipsWizardStepForm();
 
-        steps.push(new WizardStep('User', this.userEmailWizardStepForm));
-        steps.push(new WizardStep('Authentication', this.userPasswordWizardStepForm));
-        steps.push(new WizardStep('Groups & Roles', this.userMembershipsWizardStepForm));
+        steps.push(new WizardStep(i18n('field.user'), this.userEmailWizardStepForm));
+        steps.push(new WizardStep(i18n('field.authentication'), this.userPasswordWizardStepForm));
+        steps.push(new WizardStep(i18n('field.rolesAndGroups'), this.userMembershipsWizardStepForm));
 
         return steps;
     }
@@ -71,13 +72,10 @@ export class UserWizardPanel
                     console.warn(' viewedPrincipal: ', viewedPrincipal);
                     console.warn(' persistedPrincipal: ', persistedPrincipal);
 
-                    const msg = 'Received Principal from server differs from what you have. Would you like to load changes from server?';
-
                     new ConfirmationDialog()
-                        .setQuestion(msg)
+                        .setQuestion(i18n('dialog.principal.update'))
                         .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal.clone()))
-                        .setNoCallback(() => { /* empty */
-                        })
+                        .setNoCallback(() => { /* empty */ })
                         .show();
                 }
 
@@ -105,7 +103,7 @@ export class UserWizardPanel
 
             new api.security.UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
 
-            api.notify.showFeedback('User was created!');
+            api.notify.showFeedback(i18n('notify.create.user'));
             this.notifyPrincipalNamed(principal);
 
             return principal;
@@ -156,7 +154,7 @@ export class UserWizardPanel
 
     assembleViewedItem(): Principal {
         let wizardHeader = this.getWizardHeader();
-        return <Principal>new UserBuilder(!!this.getPersistedItem() ? this.getPersistedItem().asUser() : null).setEmail(
+        return <Principal>new UserBuilder(this.getPersistedItem() ? this.getPersistedItem().asUser() : null).setEmail(
             this.userEmailWizardStepForm.getEmail()).setLogin(wizardHeader.getName()).setMemberships(
             this.userMembershipsWizardStepForm.getMemberships()).setDisplayName(
             wizardHeader.getDisplayName()).// setDisabled().
@@ -217,9 +215,9 @@ export class UserWizardPanel
     private showEmailErrors() {
         let formEmail = this.userEmailWizardStepForm.getEmail();
         if (api.util.StringHelper.isEmpty(formEmail)) {
-            api.notify.showError('E-mail can not be empty.');
+            api.notify.showError(i18n('notify.empty.email'));
         } else if (!this.userEmailWizardStepForm.isValid()) {
-            api.notify.showError('E-mail is invalid.');
+            api.notify.showError(i18n('notify.invalid.email'));
         }
 
     }
@@ -227,9 +225,9 @@ export class UserWizardPanel
     private showPasswordErrors() {
         let password = this.userPasswordWizardStepForm.getPassword();
         if (api.util.StringHelper.isEmpty(password)) {
-            api.notify.showError('Password can not be empty.');
+            api.notify.showError(i18n('notify.empty.password'));
         } else if (!this.userEmailWizardStepForm.isValid()) {
-            api.notify.showError('Password is invalid.');
+            api.notify.showError(i18n('notify.invalid.password'));
         }
     }
 }

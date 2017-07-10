@@ -10,6 +10,7 @@ import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 
 import PrincipalViewer = api.ui.security.PrincipalViewer;
+import i18n = api.util.i18n;
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel<UserTreeGridItem> {
@@ -66,21 +67,21 @@ export class UserItemStatisticsPanel
 
     private appendUserMetadata(item: ViewItem<UserTreeGridItem>) {
         // Insert an empty data first to avoid blinking, after full data is loaded.
-        let userGroup = new ItemDataGroup('User', 'user');
-        userGroup.addDataList('E-mail', ' ');
+        let userGroup = new ItemDataGroup(i18n('field.user'), 'user');
+        userGroup.addDataList(i18n('field.email'), ' ');
         this.userDataContainer.appendChild(userGroup);
 
-        let rolesAndGroupsGroup = new ItemDataGroup('Roles & Groups', 'roles-and-groups');
-        rolesAndGroupsGroup.addDataArray('Roles', []);
-        rolesAndGroupsGroup.addDataArray('Groups', []);
+        let rolesAndGroupsGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'roles-and-groups');
+        rolesAndGroupsGroup.addDataArray(i18n('field.roles'), []);
+        rolesAndGroupsGroup.addDataArray(i18n('field.groups'), []);
         this.userDataContainer.appendChild(rolesAndGroupsGroup);
 
         new GetPrincipalByKeyRequest(item.getModel().getPrincipal().getKey()).includeUserMemberships(true).sendAndParse().then(
             (principal: Principal) => {
-                userGroup = new ItemDataGroup('User', 'user');
-                userGroup.addDataList('E-mail', principal.asUser().getEmail());
+                userGroup = new ItemDataGroup(i18n('field.user'), 'user');
+                userGroup.addDataList(i18n('field.email'), principal.asUser().getEmail());
 
-                rolesAndGroupsGroup = new ItemDataGroup('Roles & Groups', 'memeberships');
+                rolesAndGroupsGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'memeberships');
 
                 let roles = principal.asUser().getMemberships().filter((el) => {
                     return el.isRole();
@@ -89,7 +90,7 @@ export class UserItemStatisticsPanel
                     viewer.setObject(el);
                     return viewer;
                 });
-                rolesAndGroupsGroup.addDataElements('Roles', roles);
+                rolesAndGroupsGroup.addDataElements(i18n('field.roles'), roles);
 
                 let groups = principal.asUser().getMemberships().filter((el) => {
                     return el.isGroup();
@@ -98,7 +99,7 @@ export class UserItemStatisticsPanel
                     viewer.setObject(el);
                     return viewer;
                 });
-                rolesAndGroupsGroup.addDataElements('Groups', groups);
+                rolesAndGroupsGroup.addDataElements(i18n('field.groups'), groups);
 
                 this.userDataContainer.removeChildren();
                 this.userDataContainer.appendChild(userGroup);
@@ -117,8 +118,8 @@ export class UserItemStatisticsPanel
         groupAndRoleGroup.appendChild(new api.dom.DivEl('description').setHtml(item.getModel().getPrincipal().getDescription()));
         this.userDataContainer.appendChild(groupAndRoleGroup);
 
-        const membersGroup = new ItemDataGroup('Members', 'members');
-        membersGroup.addDataArray('Members', []);
+        const membersGroup = new ItemDataGroup(i18n('field.members'), 'members');
+        membersGroup.addDataArray(i18n('field.members'), []);
         this.userDataContainer.appendChild(membersGroup);
 
         new GetPrincipalByKeyRequest(item.getModel().getPrincipal().getKey())
@@ -134,9 +135,9 @@ export class UserItemStatisticsPanel
 
                 wemQ.all(membersPromises).then((results: Principal[]) => {
 
-                    const newMembersGroup = new ItemDataGroup('Members', 'members');
+                    const newMembersGroup = new ItemDataGroup(i18n('field.members'), 'members');
 
-                    newMembersGroup.addDataElements('Members', results.map((el) => {
+                    newMembersGroup.addDataElements(i18n('field.members'), results.map((el) => {
                         const viewer = new PrincipalViewer();
                         viewer.setObject(el);
                         return viewer;

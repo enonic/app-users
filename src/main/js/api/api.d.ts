@@ -25,6 +25,7 @@ declare module api.util {
         static dispatchCustomEvent(name: string, element: api.dom.Element): void;
         static focusInOut(element: api.dom.Element, onFocusOut: () => void, wait?: number, preventMouseDown?: boolean): void;
         static lockEvent(event: Event): void;
+        static isDirty(element: api.dom.Element): boolean;
     }
 }
 declare module api.util {
@@ -258,6 +259,7 @@ declare module api.util {
          * @returns {number}
          */
         static numDaysInMonth(year: number, month: number): number;
+        static getModifiedString(modified: Date): string;
     }
 }
 declare module api.util {
@@ -511,6 +513,10 @@ declare module api.util {
     }
 }
 declare module api.util {
+    function i18nInit(bundle: Object): void;
+    function i18n(key: string, ...args: any[]): string;
+}
+declare module api.util {
     class Timezone implements api.Equitable {
         private offset;
         private location;
@@ -593,6 +599,7 @@ declare module api {
         static anyEquals(a: any, b: any): boolean;
         static objectEquals(a: Object, b: Object): boolean;
         static contains(array: Equitable[], el: Equitable): boolean;
+        static filter(array: Equitable[], el: Equitable): Equitable[];
         static objectPropertyIterator(object: any, callback: {
             (name: string, property: any, index?: number): void;
         }): void;
@@ -875,14 +882,6 @@ declare module api.util.loader {
         private static cachedImages;
         static get(url: string, width?: number, height?: number): HTMLImageElement;
     }
-}
-declare module api.i18n {
-    function setLocale(locale: string): void;
-    function addBundle(locale: string, bundle: Object): void;
-    function message(key: string, args: any[]): string;
-    function i18n(key: string, ...args: any[]): string;
-}
-declare module api.i18n {
 }
 declare module api.cache {
     class Cache<T, KEY> {
@@ -4689,7 +4688,9 @@ declare module api.ui {
         private trigger;
         private side;
         private mode;
+        private active;
         constructor(target: api.dom.Element, text?: string, showDelay?: number, hideTimeout?: number);
+        setActive(value: boolean): void;
         show(): void;
         hide(): void;
         isVisible(): boolean;
@@ -4724,12 +4725,14 @@ declare module api.ui {
 declare module api.ui {
     class ProgressBar extends api.dom.DivEl {
         private progress;
+        private label;
         private value;
         /**
          * Widget to display progress
          * @param value the initial value (defaults to 0)
          */
-        constructor(value?: number);
+        constructor(value?: number, label?: string);
+        setLabel(label: string): void;
         setValue(value: number): void;
         getValue(): number;
         isComplete(): boolean;
@@ -4974,13 +4977,14 @@ declare module api.ui.menu {
         private notifyItemClicked(item);
         private createMenuItem(action);
         private removeMenuItem(menuItem);
-        private getMenuItem(action);
+        getMenuItem(action: api.ui.Action): MenuItem;
     }
 }
 declare module api.ui.menu {
     class MenuItem extends api.dom.LiEl {
         private action;
         constructor(action: api.ui.Action);
+        setLabel(label: string): void;
         getAction(): api.ui.Action;
         setEnabled(value: boolean): void;
         isEnabled(): boolean;
@@ -5104,6 +5108,7 @@ declare module api.ui.button {
     }
 }
 declare module api.ui.button {
+    import MenuItem = api.ui.menu.MenuItem;
     class MenuButton extends api.dom.DivEl {
         private dropdownHandle;
         private actionButton;
@@ -5111,6 +5116,9 @@ declare module api.ui.button {
         constructor(mainAction: Action, menuActions?: Action[]);
         private initDropdownHandle();
         private initActionButton(action);
+        getActionButton(): ActionButton;
+        getMenuItem(action: api.ui.Action): MenuItem;
+        getDropdownHandle(): DropdownHandle;
         private initMenu(actions);
         private getMenuActions();
         private updateActionEnabled();
@@ -5120,6 +5128,7 @@ declare module api.ui.button {
         hideDropdown(hidden?: boolean): void;
         minimize(): void;
         maximize(): void;
+        setEnabled(enable: boolean): void;
     }
 }
 declare module api.ui.text {
@@ -5174,6 +5183,7 @@ declare module api.ui.text {
         setRows(rows: number): void;
         setColumns(columns: number): void;
         private updateSize();
+        setReadOnly(readOnly: boolean): void;
     }
 }
 declare module api.ui.text {
@@ -5416,10 +5426,11 @@ declare module api.ui.tab {
         constructor(className?: string);
         private initTabMenuButton();
         private initListeners();
+        isEnabled(): boolean;
         giveFocusToMenu(): boolean;
         returnFocusFromMenu(): boolean;
-        focusNextTab(): void;
-        focusPreviousTab(): void;
+        focusNextTab(): boolean;
+        focusPreviousTab(): boolean;
         isKeyNext(event: KeyboardEvent): boolean;
         isKeyPrevious(event: KeyboardEvent): void;
         setEnabled(enabled: boolean): TabMenu;
@@ -5470,6 +5481,8 @@ declare module api.ui.tab {
         private labelEl;
         constructor();
         setLabel(value: string, addTitle?: boolean): void;
+        getLabel(): api.dom.AEl;
+        focus(): boolean;
     }
 }
 declare module api.ui.tab {
@@ -5478,9 +5491,12 @@ declare module api.ui.tab {
         constructor(builder: TabMenuItemBuilder);
         isVisibleInMenu(): boolean;
         setVisibleInMenu(value: boolean): void;
+        static create(): TabMenuItemBuilder;
     }
     class TabMenuItemBuilder extends TabItemBuilder {
         build(): TabMenuItem;
+        setLabel(label: string): TabMenuItemBuilder;
+        setAddLabelTitleAttribute(addLabelTitleAttribute: boolean): TabMenuItemBuilder;
     }
 }
 declare module api.ui.tab {
@@ -6035,39 +6051,59 @@ declare module api.ui.dialog {
     }
 }
 declare module api.ui.dialog {
-    class ModalDialog extends api.dom.DivEl {
+    import DivEl = api.dom.DivEl;
+    import Action = api.ui.Action;
+    import Element = api.dom.Element;
+    interface ConfirmationConfig {
+        question?: string;
+        yesCallback: () => void;
+        noCallback?: () => void;
+    }
+    interface ModalDialogConfig {
+        title?: string;
+        buttonRow?: ButtonRow;
+        confirmation?: ConfirmationConfig;
+        closeIconCallback?: () => void;
+    }
+    class ModalDialog extends DivEl {
         protected header: api.ui.dialog.ModalDialogHeader;
         private contentPanel;
         private buttonRow;
         private cancelAction;
-        private actions;
-        private cancelButton;
+        protected closeIcon: DivEl;
+        protected confirmationDialog: ConfirmationDialog;
         private static openDialogsCounter;
         private tabbable;
-        private forceHorizontalCentering;
         private listOfClickIgnoredElements;
+        private onClosedListeners;
+        private closeIconCallback;
         static debug: boolean;
-        constructor(title?: string, forceHorizontalCentering?: boolean);
+        constructor(config?: ModalDialogConfig);
+        private initConfirmationDialog(confirmation);
         private initListeners();
+        private isActive();
         private handleClickOutsideDialog();
         private handleFocusInOutEvents();
         protected createHeader(title: string): api.ui.dialog.ModalDialogHeader;
         addClickIgnoredElement(elem: api.dom.Element): void;
         private isIgnoredElementClicked(element);
         private createDefaultCancelAction();
-        getCancelAction(): api.ui.Action;
-        addCancelButtonToBottom(buttonLabel?: string): void;
+        getCancelAction(): Action;
+        addCancelButtonToBottom(buttonLabel?: string): DialogButton;
         setTitle(value: string): void;
         appendChildToContentPanel(child: api.dom.Element): void;
+        prependChildToContentPanel(child: api.dom.Element): void;
         appendChildToHeader(child: api.dom.Element): void;
+        prependChildToHeader(child: api.dom.Element): void;
         removeChildFromContentPanel(child: api.dom.Element): void;
-        addAction(action: api.ui.Action, useDefault?: boolean, prepend?: boolean): DialogButton;
+        addAction(action: Action, useDefault?: boolean, prepend?: boolean): DialogButton;
+        removeAction(actionButton: DialogButton): void;
         show(): void;
         hide(): void;
         protected centerMyself(): void;
         centerHorisontally(): void;
-        getButtonRow(): ModalDialogButtonRow;
-        protected getContentPanel(): ModalDialogContentPanel;
+        getButtonRow(): ButtonRow;
+        getContentPanel(): ModalDialogContentPanel;
         protected hasSubDialog(): boolean;
         private hasTabbable();
         updateTabbable(): void;
@@ -6075,39 +6111,62 @@ declare module api.ui.dialog {
         private focusNextTabbable();
         private focusPreviousTabbable();
         open(): void;
+        isDirty(): boolean;
+        confirmBeforeClose(): void;
         close(): void;
+        onClosed(onCloseCallback: () => void): void;
+        unClosed(listener: {
+            (): void;
+        }): void;
+        private notifyClosed();
     }
-    class ModalDialogHeader extends api.dom.DivEl {
+    class ModalDialogHeader extends DivEl {
         private titleEl;
         constructor(title: string);
         setTitle(value: string): void;
+        appendElement(el: Element): void;
     }
-    class ModalDialogContentPanel extends api.dom.DivEl {
+    class ModalDialogContentPanel extends DivEl {
         constructor();
     }
-    class ModalDialogButtonRow extends api.dom.DivEl {
-        private defaultButton;
+    class ButtonRow extends DivEl {
+        private defaultElement;
         private buttonContainer;
+        private actions;
         constructor();
-        addAction(action: api.ui.Action, useDefault?: boolean, prepend?: boolean): DialogButton;
+        addElement(element: Element): void;
+        getActions(): Action[];
+        addToActions(action: Action): void;
+        addAction(action: Action, useDefault?: boolean, prepend?: boolean): DialogButton;
+        removeAction(action: Action): void;
+        setDefaultElement(element: api.dom.Element): void;
+        resetDefaultElement(): void;
         focusDefaultAction(): void;
-        getLastButton(): api.dom.Element;
     }
 }
 declare module api.ui.dialog {
     class ConfirmationDialog extends ModalDialog {
-        private static instance;
         private questionEl;
         private yesCallback;
         private noCallback;
         private yesAction;
         private noAction;
-        constructor();
-        static get(): ConfirmationDialog;
+        constructor(config?: ModalDialogConfig);
         setQuestion(question: string): ConfirmationDialog;
         setYesCallback(callback: () => void): ConfirmationDialog;
         setNoCallback(callback: () => void): ConfirmationDialog;
+        open(): void;
         close(): void;
+        private closeWithoutCallback();
+    }
+}
+declare module api.ui.dialog {
+    import MenuButton = api.ui.button.MenuButton;
+    class DropdownButtonRow extends ButtonRow {
+        protected actionMenu: MenuButton;
+        constructor();
+        makeActionMenu(mainAction: Action, menuActions: Action[], useDefault?: boolean): MenuButton;
+        getActionMenu(): MenuButton;
     }
 }
 declare module api.ui.form {
@@ -6166,6 +6225,7 @@ declare module api.ui.form {
         private focusListeners;
         private blurListeners;
         constructor(builder: FormItemBuilder);
+        setLabel(value: string): void;
         getLabel(): api.dom.LabelEl;
         getInput(): api.dom.FormItemEl;
         getValidator(): (input: api.dom.FormItemEl) => string;
@@ -6421,6 +6481,7 @@ declare module api.ui.grid {
         setFormatter(formatter: Slick.Formatter<T>): GridColumn<T>;
         setHeaderCssClass(headerCssClass: string): GridColumn<T>;
         setId(id: string): GridColumn<T>;
+        setBoundaryWidth(minWidth: number, maxWidth: number): GridColumn<T>;
         setMaxWidth(maxWidth: number): GridColumn<T>;
         setMinWidth(minWidth: number): GridColumn<T>;
         setName(name: string): GridColumn<T>;
@@ -6855,6 +6916,11 @@ declare module api.ui.treegrid {
     import Grid = api.ui.grid.Grid;
     import GridOptions = api.ui.grid.GridOptions;
     import GridColumn = api.ui.grid.GridColumn;
+    enum SelectionOnClickType {
+        HIGHLIGHT = 0,
+        SELECT = 1,
+        NONE = 2,
+    }
     class TreeGrid<DATA> extends api.ui.panel.Panel {
         static LEVEL_STEP_INDENT: number;
         private columns;
@@ -6878,8 +6944,9 @@ declare module api.ui.treegrid {
         private quietErrorHandling;
         private errorPanel;
         private highlightedNode;
-        protected highlightingEnabled: boolean;
+        private selectionOnClick;
         private interval;
+        private idPropertyName;
         constructor(builder: TreeGridBuilder<DATA>);
         private initSelectorPlugin();
         private initToolbar(showToolbar);
@@ -6976,8 +7043,8 @@ declare module api.ui.treegrid {
          */
         fetchRoot(): wemQ.Promise<DATA[]>;
         private fetchData(parentNode?);
-        dataToTreeNode(data: DATA, parent: TreeNode<DATA>): TreeNode<DATA>;
-        dataToTreeNodes(dataArray: DATA[], parent: TreeNode<DATA>): TreeNode<DATA>[];
+        dataToTreeNode(data: DATA, parent: TreeNode<DATA>, expandAllowed?: boolean): TreeNode<DATA>;
+        dataToTreeNodes(dataArray: DATA[], parent: TreeNode<DATA>, expandAllowed?: boolean): TreeNode<DATA>[];
         filter(dataList: DATA[]): void;
         resetFilter(): void;
         selectNode(dataId: string): void;
@@ -6987,7 +7054,8 @@ declare module api.ui.treegrid {
         deselectNodes(dataIds: string[]): void;
         getSelectedNodes(): TreeNode<DATA>[];
         getSelectedDataList(): DATA[];
-        reload(parentNodeData?: DATA): wemQ.Promise<void>;
+        setSelectionOnClick(type: SelectionOnClickType): void;
+        reload(parentNodeData?: DATA, idPropertyName?: string): wemQ.Promise<void>;
         protected handleError(reason: any, message?: String): void;
         protected hideErrorPanel(): void;
         private reloadNode(parentNode?, expandedNodesDataId?);
@@ -7016,7 +7084,7 @@ declare module api.ui.treegrid {
         isAnySelected(): boolean;
         protected updateExpanded(): void;
         private updateSelectedNode(node);
-        private collapseNode(node);
+        collapseNode(node: TreeNode<DATA>, collapseAll?: boolean): void;
         notifyLoaded(): void;
         onLoaded(listener: () => void): this;
         unLoaded(listener: () => void): this;
@@ -7172,6 +7240,8 @@ declare module api.ui.treegrid {
         private partialLoadEnabled;
         private loadBufferSize;
         private quietErrorHandling;
+        private idPropertyName;
+        private columnUpdater;
         constructor(grid?: TreeGrid<NODE>);
         nodeExtractor(node: any, column: Slick.Column<NODE>): any;
         buildDefaultOptions(): GridOptions<NODE>;
@@ -7213,6 +7283,10 @@ declare module api.ui.treegrid {
         setRowHeight(rowHeight: number): TreeGridBuilder<NODE>;
         setQuietErrorHandling(value: boolean): TreeGridBuilder<NODE>;
         getQuietErrorHandling(): boolean;
+        setIdPropertyName(value: string): TreeGridBuilder<NODE>;
+        getIdPropertyName(): string;
+        setColumnUpdater(columnUpdater: () => void): void;
+        getColumnUpdater(): () => void;
         private buildColumn(columnConfig);
         /**
          * Should be overriden by child class.
@@ -7283,9 +7357,11 @@ declare module api.ui.treegrid {
 }
 declare module api.ui.treegrid {
     class TreeGridItemClickedEvent extends api.event.Event {
+        private node;
         private selection;
-        constructor(selection?: boolean);
+        constructor(node: TreeNode<any>, selection?: boolean);
         hasSelection(): boolean;
+        getTreeNode(): TreeNode<any>;
         static on(handler: (event: TreeGridItemClickedEvent) => void): void;
         static un(handler?: (event: TreeGridItemClickedEvent) => void): void;
     }
@@ -7297,6 +7373,7 @@ declare module api.ui.selector {
         indices?: string[];
         readOnly?: boolean;
         empty?: boolean;
+        disabled?: boolean;
     }
 }
 declare module api.ui.selector {
@@ -7374,6 +7451,9 @@ declare module api.ui.selector {
         protected multipleSelectionListeners: {
             (event: DropdownGridMultipleSelectionEvent): void;
         }[];
+        protected rowCountChangedListeners: {
+            (): void;
+        }[];
         protected multipleSelections: boolean;
         protected config: DropdownGridConfig<OPTION_DISPLAY_VALUE>;
         constructor(config: DropdownGridConfig<OPTION_DISPLAY_VALUE>);
@@ -7407,6 +7487,7 @@ declare module api.ui.selector {
         setTopPx(value: number): void;
         setWidthPx(value: number): void;
         adjustGridHeight(): void;
+        addSelections(selectedOptions: Option<OPTION_DISPLAY_VALUE>[]): void;
         markSelections(selectedOptions: Option<OPTION_DISPLAY_VALUE>[], ignoreEmpty?: boolean): void;
         markReadOnly(selectedOptions: Option<OPTION_DISPLAY_VALUE>[]): void;
         hasActiveRow(): boolean;
@@ -7429,13 +7510,15 @@ declare module api.ui.selector {
         unMultipleSelection(listener: (event: DropdownGridMultipleSelectionEvent) => void): void;
         protected notifyRowSelection(rowSelected: number): void;
         protected notifyMultipleSelection(rowsSelected: number[]): void;
+        onRowCountChanged(listener: () => void): void;
+        unRowCountChanged(listener: () => void): void;
+        notifyRowCountChanged(): void;
     }
 }
 declare module api.ui.selector {
     import TreeNode = api.ui.treegrid.TreeNode;
     import TreeGrid = api.ui.treegrid.TreeGrid;
     class OptionsTreeGrid<OPTION_DISPLAY_VALUE> extends TreeGrid<Option<OPTION_DISPLAY_VALUE>> {
-        static MAX_FETCH_SIZE: number;
         private loader;
         private treeDataHelper;
         private readonlyChecker;
@@ -7447,6 +7530,7 @@ declare module api.ui.selector {
         setReadonlyChecker(checker: (optionToCheck: OPTION_DISPLAY_VALUE) => boolean): void;
         queryScrollable(): api.dom.Element;
         reload(parentNodeData?: Option<OPTION_DISPLAY_VALUE>): wemQ.Promise<void>;
+        expandNode(node?: TreeNode<Option<OPTION_DISPLAY_VALUE>>, expandAll?: boolean): wemQ.Promise<boolean>;
         private initEventHandlers();
         hasChildren(option: Option<OPTION_DISPLAY_VALUE>): boolean;
         getDataId(option: Option<OPTION_DISPLAY_VALUE>): string;
@@ -7476,13 +7560,16 @@ declare module api.ui.selector {
         setReadonlyChecker(checker: (optionToCheck: OPTION_DISPLAY_VALUE) => boolean): void;
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
         setOptions(options: Option<OPTION_DISPLAY_VALUE>[]): void;
+        getSelectedOptions(): Option<OPTION_DISPLAY_VALUE>[];
         protected initGridAndData(): void;
         protected initGridEventListeners(): void;
+        markSelections(selectedOptions: Option<OPTION_DISPLAY_VALUE>[], ignoreEmpty?: boolean): void;
         protected createColumns(): api.ui.grid.GridColumn<any>[];
         getElement(): Element;
         getGrid(): api.ui.grid.Grid<TreeNode<Option<OPTION_DISPLAY_VALUE>>>;
         protected getGridData(): api.ui.grid.DataView<TreeNode<Option<OPTION_DISPLAY_VALUE>>>;
         getOptionByRow(rowIndex: number): Option<OPTION_DISPLAY_VALUE>;
+        getOptionByValue(value: string): Option<OPTION_DISPLAY_VALUE>;
     }
 }
 declare module api.ui.selector {
@@ -7532,6 +7619,8 @@ declare module api.ui.selector {
         navigateToNextRow(): void;
         navigateToPreviousRow(): void;
         markSelections(selectedOptions: Option<OPTION_DISPLAY_VALUE>[], ignoreEmpty?: boolean): void;
+        addSelections(selectedOptions: Option<OPTION_DISPLAY_VALUE>[]): void;
+        onRowCountChanged(listener: () => void): void;
         onRowSelection(listener: (event: DropdownGridRowSelectedEvent) => void): void;
         unRowSelection(listener: (event: DropdownGridRowSelectedEvent) => void): void;
     }
@@ -7559,6 +7648,7 @@ declare module api.ui.selector {
     interface OptionDataHelper<DATA> {
         hasChildren(data: DATA): boolean;
         getDataId(data: DATA): string;
+        isDisabled(data: DATA): boolean;
         isDescendingPath(childOption: DATA, parentOption: DATA): any;
     }
 }
@@ -7586,7 +7676,7 @@ declare module api.ui.selector.list {
         private itemsAddedListeners;
         private itemsRemovedListeners;
         constructor(className?: string);
-        setItems(items: I[]): void;
+        setItems(items: I[], silent?: boolean): void;
         getItems(): I[];
         getItem(id: string): I;
         clearItems(silent?: boolean): void;
@@ -7596,6 +7686,7 @@ declare module api.ui.selector.list {
         private doAddItem(readOnly, items);
         removeItem(item: I): void;
         removeItems(items: I[]): void;
+        replaceItem(item: I, append?: boolean): void;
         getItemCount(): number;
         protected createItemView(item: I, readOnly: boolean): api.dom.Element;
         protected getItemId(item: I): string;
@@ -7714,6 +7805,7 @@ declare module api.ui.selector.combobox {
         setOptions(options: Option<OPTION_DISPLAY_VALUE>[], saveSelection?: boolean): void;
         isInputEmpty(): boolean;
         addOption(option: Option<OPTION_DISPLAY_VALUE>): void;
+        updateOption(option: Option<OPTION_DISPLAY_VALUE>, newOption: Option<OPTION_DISPLAY_VALUE>): void;
         setIgnoreNextFocus(value: boolean): ComboBox<OPTION_DISPLAY_VALUE>;
         isIgnoreNextFocus(): boolean;
         hasOptions(): boolean;
@@ -7825,6 +7917,7 @@ declare module api.ui.selector.combobox {
         getMaximumOccurrences(): number;
         createSelectedOption(option: api.ui.selector.Option<T>): SelectedOption<T>;
         addOption(option: api.ui.selector.Option<T>, silent: boolean, keyCode: number): boolean;
+        updateOption(option: api.ui.selector.Option<T>, newOption: api.ui.selector.Option<T>, silent?: boolean): any;
         removeOption(optionToRemove: api.ui.selector.Option<T>, silent: boolean): any;
         count(): number;
         getSelectedOptions(): SelectedOption<T>[];
@@ -7874,6 +7967,7 @@ declare module api.ui.selector.combobox {
         getMaximumOccurrences(): number;
         createSelectedOption(option: api.ui.selector.Option<T>): SelectedOption<T>;
         addOption(option: api.ui.selector.Option<T>, silent: boolean, keyCode: number): boolean;
+        updateOption(optionToUpdate: api.ui.selector.Option<T>, newOption: api.ui.selector.Option<T>, silent?: boolean): void;
         removeOption(optionToRemove: api.ui.selector.Option<T>, silent?: boolean): void;
         count(): number;
         getSelectedOptions(): SelectedOption<T>[];
@@ -7955,15 +8049,17 @@ declare module api.ui.selector.combobox {
         maximumOccurrencesReached(): boolean;
         getComboBox(): ComboBox<OPTION_DISPLAY_VALUE>;
         addOption(option: Option<OPTION_DISPLAY_VALUE>): void;
+        updateOption(option: Option<OPTION_DISPLAY_VALUE>, displayValue: Object): void;
         selectOption(option: Option<OPTION_DISPLAY_VALUE>, silent?: boolean): void;
+        selectOptionByValue(value: string, silent?: boolean): void;
         hasOptions(): boolean;
         getOptionCount(): number;
         getOptions(): Option<OPTION_DISPLAY_VALUE>[];
         getOptionByValue(value: string): Option<OPTION_DISPLAY_VALUE>;
         getOptionByRow(rowIndex: number): Option<OPTION_DISPLAY_VALUE>;
         countSelected(): number;
-        select(value: OPTION_DISPLAY_VALUE, readOnly?: boolean): void;
-        deselect(value: OPTION_DISPLAY_VALUE): void;
+        select(value: OPTION_DISPLAY_VALUE, readOnly?: boolean, silent?: boolean): void;
+        deselect(value: OPTION_DISPLAY_VALUE, silent?: boolean): void;
         clearCombobox(): void;
         clearSelection(forceClear?: boolean): void;
         removeAllOptions(): void;
@@ -8034,8 +8130,8 @@ declare module api.ui.selector.combobox {
         removeMissingSelectedOptions: boolean;
         skipAutoDropShowOnValueChange: boolean;
         treegridDropdownEnabled: boolean;
-        optionDataHelper: OptionDataHelper<T>;
-        optionDataLoader: OptionDataLoader<T>;
+        optionDataHelper: OptionDataHelper<any>;
+        optionDataLoader: OptionDataLoader<any>;
         setComboBoxName(comboBoxName: string): RichComboBoxBuilder<T>;
         setIdentifierMethod(identifierMethod: string): RichComboBoxBuilder<T>;
         setLoader(loader: api.util.loader.BaseLoader<any, T>): RichComboBoxBuilder<T>;
@@ -8054,8 +8150,8 @@ declare module api.ui.selector.combobox {
         setRemoveMissingSelectedOptions(value: boolean): RichComboBoxBuilder<T>;
         setSkipAutoDropShowOnValueChange(value: boolean): RichComboBoxBuilder<T>;
         setTreegridDropdownEnabled(value: boolean): RichComboBoxBuilder<T>;
-        setOptionDataHelper(value: OptionDataHelper<T>): RichComboBoxBuilder<T>;
-        setOptionDataLoader(value: OptionDataLoader<T>): RichComboBoxBuilder<T>;
+        setOptionDataHelper(value: OptionDataHelper<any>): RichComboBoxBuilder<T>;
+        setOptionDataLoader(value: OptionDataLoader<any>): RichComboBoxBuilder<T>;
         build(): RichComboBox<T>;
     }
 }
@@ -8065,6 +8161,7 @@ declare module api.ui.selector.combobox {
         private size;
         private draggable;
         private removable;
+        private namesAndIconView;
         constructor(builder: RichSelectedOptionViewBuilder<T>);
         resolveIconUrl(content: T): string;
         resolveTitle(content: T): string;
@@ -8073,6 +8170,8 @@ declare module api.ui.selector.combobox {
         protected createActionButtons(content: T): api.dom.Element[];
         protected isEditButtonNeeded(): boolean;
         protected createView(content: T): api.dom.Element;
+        setOption(option: api.ui.selector.Option<T>): any;
+        private setValues(values);
         protected createEditButton(content: T): api.dom.AEl;
         protected createRemoveButton(): api.dom.AEl;
         doRender(): wemQ.Promise<boolean>;
@@ -9045,6 +9144,7 @@ declare module api.ui.image {
 }
 declare module api.ui.security {
     import Principal = api.security.Principal;
+    import User = api.security.User;
     class PrincipalViewer extends api.ui.NamesAndIconViewer<Principal> {
         private removeClickedListeners;
         constructor();
@@ -9056,13 +9156,22 @@ declare module api.ui.security {
         unRemoveClicked(listener: (event: MouseEvent) => void): void;
         notifyRemoveClicked(event: MouseEvent): void;
     }
+    class PrincipalViewerCompact extends api.ui.Viewer<Principal> {
+        private currentUser;
+        constructor();
+        doLayout(principal: Principal): void;
+        setCurrentUser(user: User): void;
+    }
 }
 declare module api.ui.security {
     import Option = api.ui.selector.Option;
     import Principal = api.security.Principal;
     import PrincipalLoader = api.security.PrincipalLoader;
     import SelectedOption = api.ui.selector.combobox.SelectedOption;
-    class PrincipalComboBox extends api.ui.selector.combobox.RichComboBox<Principal> {
+    import BaseSelectedOptionsView = api.ui.selector.combobox.BaseSelectedOptionsView;
+    import SelectedOptionView = api.ui.selector.combobox.SelectedOptionView;
+    import RichComboBox = api.ui.selector.combobox.RichComboBox;
+    class PrincipalComboBox extends RichComboBox<Principal> {
         constructor(builder: PrincipalComboBoxBuilder);
         static create(): PrincipalComboBoxBuilder;
     }
@@ -9071,20 +9180,22 @@ declare module api.ui.security {
         maxOccurrences: number;
         value: string;
         displayMissing: boolean;
+        compactView: boolean;
         setLoader(value: PrincipalLoader): PrincipalComboBoxBuilder;
         setMaxOccurences(value: number): PrincipalComboBoxBuilder;
         setValue(value: string): PrincipalComboBoxBuilder;
         setDisplayMissing(value: boolean): PrincipalComboBoxBuilder;
+        setCompactView(value: boolean): PrincipalComboBoxBuilder;
         build(): PrincipalComboBox;
     }
-    class PrincipalSelectedOptionView extends PrincipalViewer implements api.ui.selector.combobox.SelectedOptionView<Principal> {
+    class PrincipalSelectedOptionView extends PrincipalViewer implements SelectedOptionView<Principal> {
         private option;
         constructor(option: Option<Principal>);
         setEditable(editable: boolean): void;
         setOption(option: api.ui.selector.Option<Principal>): void;
         getOption(): api.ui.selector.Option<Principal>;
     }
-    class PrincipalSelectedOptionsView extends api.ui.selector.combobox.BaseSelectedOptionsView<Principal> {
+    class PrincipalSelectedOptionsView extends BaseSelectedOptionsView<Principal> {
         constructor();
         createSelectedOption(option: Option<Principal>, isEmpty?: boolean): SelectedOption<Principal>;
         makeEmptyOption(id: string): Option<Principal>;
@@ -9092,6 +9203,21 @@ declare module api.ui.security {
     class RemovedPrincipalSelectedOptionView extends PrincipalSelectedOptionView {
         constructor(option: Option<Principal>);
         resolveSubName(object: Principal, relativePath?: boolean): string;
+    }
+    class PrincipalSelectedOptionViewCompact extends PrincipalViewerCompact implements SelectedOptionView<Principal> {
+        private option;
+        constructor(option: Option<Principal>);
+        setEditable(editable: boolean): void;
+        setOption(option: api.ui.selector.Option<Principal>): void;
+        getOption(): api.ui.selector.Option<Principal>;
+        onRemoveClicked(listener: (event: MouseEvent) => void): void;
+        unRemoveClicked(listener: (event: MouseEvent) => void): void;
+    }
+    class PrincipalSelectedOptionsViewCompact extends BaseSelectedOptionsView<Principal> {
+        private currentUser;
+        constructor();
+        private loadCurrentUser();
+        createSelectedOption(option: Option<Principal>, isEmpty?: boolean): SelectedOption<Principal>;
     }
 }
 declare module api.ui.security.acl {
@@ -9109,6 +9235,7 @@ declare module api.ui.security.acl {
         private value;
         private valueChangedListeners;
         constructor();
+        initEventHandlers(): void;
         getValue(): Access;
         setValue(value: Access, silent?: boolean): AccessSelector;
         protected setButtonLabel(value: string): AccessSelector;
@@ -9117,6 +9244,11 @@ declare module api.ui.security.acl {
         onValueChanged(listener: (event: api.ValueChangedEvent) => void): void;
         unValueChanged(listener: (event: api.ValueChangedEvent) => void): void;
         private notifyValueChanged(event);
+        giveFocusToMenu(): boolean;
+        isKeyNext(event: KeyboardEvent): boolean;
+        isKeyPrevious(event: KeyboardEvent): boolean;
+        returnFocusFromMenu(): boolean;
+        focus(): boolean;
     }
 }
 declare module api.ui.security.acl {
@@ -9356,12 +9488,14 @@ declare module api.ui.security.acl {
 }
 declare module api.ui.security.acl {
     import PrincipalKey = api.security.PrincipalKey;
+    import Principal = api.security.Principal;
     class EffectivePermissionMember {
         private userKey;
         private displayName;
         constructor(userKey: PrincipalKey, displayName: string);
         getUserKey(): PrincipalKey;
         getDisplayName(): string;
+        toPrincipal(): Principal;
         static fromJson(json: api.content.json.EffectivePermissionMemberJson): EffectivePermissionMember;
     }
 }
@@ -11144,6 +11278,19 @@ declare module api.util.htmlarea.dialog {
     import Form = api.ui.form.Form;
     import Fieldset = api.ui.form.Fieldset;
     import FormItem = api.ui.form.FormItem;
+    class ModalDialogFormItemBuilder {
+        id: string;
+        label: string;
+        validator: (input: api.dom.FormInputEl) => string;
+        value: string;
+        placeholder: string;
+        inputEl: api.dom.FormItemEl;
+        constructor(id: string, label?: string);
+        setValue(value: string): ModalDialogFormItemBuilder;
+        setPlaceholder(placeholder: string): ModalDialogFormItemBuilder;
+        setValidator(validator: (input: api.dom.FormInputEl) => string): ModalDialogFormItemBuilder;
+        setInputEl(inputEl: api.dom.Element): ModalDialogFormItemBuilder;
+    }
     class ModalDialog extends api.ui.dialog.ModalDialog {
         private fields;
         private validated;
@@ -11151,7 +11298,6 @@ declare module api.util.htmlarea.dialog {
         private mainForm;
         private firstFocusField;
         private submitAction;
-        protected static VALIDATION_CLASS: string;
         static CLASS_NAME: string;
         constructor(editor: HtmlAreaEditor, title: string, cls?: string);
         setSubmitAction(action: api.ui.Action): void;
@@ -11171,7 +11317,8 @@ declare module api.util.htmlarea.dialog {
         protected createFormPanel(formItems: FormItem[]): api.ui.panel.Panel;
         createFieldSet(formItem: FormItem): Fieldset;
         onValidatedFieldValueChanged(formItem: FormItem): void;
-        protected createFormItem(id: string, label: string, validator?: (input: api.dom.FormInputEl) => string, value?: string, inputEl?: api.dom.FormItemEl): FormItem;
+        private createTextInput(placeholder?);
+        protected createFormItem(modalDialogFormItemBuilder: ModalDialogFormItemBuilder): FormItem;
         protected initializeActions(): void;
         protected getFieldById(id: string): api.dom.FormItemEl;
         close(): void;
@@ -11250,7 +11397,7 @@ declare module api.util.htmlarea.dialog {
         private createAnchor();
         private createEmailLink();
         private createLink();
-        protected createFormItemWithPostponedValue(id: string, label: string, getValueFn: Function, validator?: (input: api.dom.FormInputEl) => string): FormItem;
+        protected createFormItemWithPostponedValue(id: string, label: string, getValueFn: Function, validator?: (input: api.dom.FormInputEl) => string, placeholder?: string): FormItem;
     }
 }
 declare module api.util.htmlarea.dialog {
@@ -11554,11 +11701,13 @@ declare module api.util.htmlarea.dialog {
 }
 declare module api.util.htmlarea.dialog {
     import Dropdown = api.ui.selector.dropdown.Dropdown;
+    import Option = api.ui.selector.Option;
     class ImageCroppingSelector extends Dropdown<ImageCroppingOption> {
         constructor();
         private initDropdown();
         private addNoneOption();
         private addCroppingOptions();
+        addCustomScaleOption(value: string): Option<ImageCroppingOption>;
     }
 }
 declare module api.util.htmlarea.dialog {
@@ -11617,6 +11766,8 @@ declare module api.util.htmlarea.dialog {
 declare module api.util.htmlarea.editor {
     class HTMLAreaHelper {
         private static getConvertedImageSrc(imgSrc);
+        private static extractContentIdFromImgSrc(imgSrc);
+        private static extractScaleParamFromImgSrc(imgSrc);
         static prepareImgSrcsInValueForEdit(value: string): string;
         static prepareEditorImageSrcsBeforeSave(editor: HtmlAreaEditor): string;
         static updateImageAlignmentBehaviour(editor: HtmlAreaEditor): void;
@@ -11646,6 +11797,7 @@ declare module api.util.htmlarea.editor {
         private hasActiveDialog;
         private customToolConfig;
         private editableSourceCode;
+        private forcedRootBlock;
         private tools;
         private plugins;
         setEditableSourceCode(value: boolean): HTMLAreaBuilder;
@@ -11669,6 +11821,7 @@ declare module api.util.htmlarea.editor {
         private includeTools(tools);
         private includeTool(tool);
         setTools(tools: any): HTMLAreaBuilder;
+        setForcedRootBlock(el: string): HTMLAreaBuilder;
         private checkRequiredFieldsAreSet();
         createEditor(): wemQ.Promise<HtmlAreaEditor>;
         private getExternalPlugins();
@@ -11736,11 +11889,10 @@ declare module api.form.inputtype.text {
         private applicationKeys;
         private focusListeners;
         private blurListeners;
-        private tools;
         private authRequest;
         private editableSourceCode;
+        private inputConfig;
         constructor(config: api.content.form.inputtype.ContentInputTypeViewContext);
-        private readConfig(inputConfig);
         getValueType(): ValueType;
         newInitialValue(): Value;
         createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
@@ -11759,6 +11911,7 @@ declare module api.form.inputtype.text {
         private resetInputHeight();
         private setStaticInputHeight();
         private getEditor(editorId);
+        isDirty(): boolean;
         private setEditorContent(editorId, property);
         private notInLiveEdit();
         private notifyValueChanged(id, occurrence);
@@ -11783,8 +11936,19 @@ declare module api.form.inputtype.text {
     interface HtmlAreaOccurrenceInfo {
         id: string;
         textAreaWrapper: Element;
+        textAreaEl: api.ui.text.TextArea;
         property: Property;
         hasStickyToolbar: boolean;
+    }
+}
+declare module api.form.inputtype.text {
+    import Event = api.event.Event;
+    class HtmlAreaResizeEvent extends Event {
+        private htmlArea;
+        constructor(htmlArea: HtmlArea);
+        getHtmlArea(): HtmlArea;
+        static on(handler: (event: HtmlAreaResizeEvent) => void): void;
+        static un(handler?: (event: HtmlAreaResizeEvent) => void): void;
     }
 }
 declare module api.site.json {
@@ -13651,6 +13815,7 @@ declare module api.content.json {
         requestedContents: ContentIdBaseItemJson[];
         requiredContents: ContentIdBaseItemJson[];
         containsInvalid: boolean;
+        allPublishable: boolean;
     }
 }
 declare module api.content.json {
@@ -14207,11 +14372,13 @@ declare module api.content.resource.result {
         requestedContents: ContentId[];
         requiredContents: ContentId[];
         containsInvalid: boolean;
+        allPublishable: boolean;
         constructor(builder: Builder);
         getDependants(): ContentId[];
         getRequested(): ContentId[];
         getRequired(): ContentId[];
         isContainsInvalid(): boolean;
+        isAllPublishable(): boolean;
         static fromJson(json: ResolvePublishContentResultJson): ResolvePublishDependenciesResult;
         static create(): Builder;
     }
@@ -14388,7 +14555,7 @@ declare module api.content.resource {
 }
 declare module api.content.resource {
     import ContentType = api.schema.content.ContentType;
-    class MoveContentSummaryLoader extends ContentSummaryPreLoader {
+    class MoveContentSummaryLoader extends ContentSummaryLoader {
         protected request: MoveAllowedTargetsRequest;
         private filterContentPaths;
         private filterContentTypes;
@@ -14754,6 +14921,79 @@ declare module api.content.resource {
     import OrderExpr = api.query.expr.OrderExpr;
     import FieldOrderExpr = api.query.expr.FieldOrderExpr;
     import ContentSummaryJson = api.content.json.ContentSummaryJson;
+    import ContentId = api.content.ContentId;
+    import ContentState = api.schema.content.ContentState;
+    import ContentTypeName = api.schema.content.ContentTypeName;
+    class ContentTreeSelectorQueryRequest extends ContentResourceRequest<ContentTreeSelectorItemJson[], ContentTreeSelectorItem[]> {
+        static DEFAULT_SIZE: number;
+        static MODIFIED_TIME_DESC: FieldOrderExpr;
+        static SCORE_DESC: FieldOrderExpr;
+        static DEFAULT_ORDER: OrderExpr[];
+        private queryExpr;
+        private from;
+        private size;
+        private expand;
+        private content;
+        private inputName;
+        private contentTypeNames;
+        private allowedContentPaths;
+        private relationshipType;
+        private loaded;
+        private results;
+        private parentPath;
+        constructor();
+        setInputName(name: string): void;
+        getInputName(): string;
+        setContent(content: ContentSummary): void;
+        getContent(): ContentSummary;
+        setFrom(from: number): void;
+        getFrom(): number;
+        setSize(size: number): void;
+        getSize(): number;
+        setContentTypeNames(contentTypeNames: string[]): void;
+        setAllowedContentPaths(allowedContentPaths: string[]): void;
+        setRelationshipType(relationshipType: string): void;
+        setQueryExpr(searchString?: string): void;
+        setParentPath(parentPath: ContentPath): void;
+        private createSearchExpression(searchString);
+        getQueryExpr(): api.query.expr.QueryExpr;
+        getRequestPath(): api.rest.Path;
+        isPartiallyLoaded(): boolean;
+        isLoaded(): boolean;
+        resetParams(): void;
+        getParams(): Object;
+        sendAndParse(): wemQ.Promise<ContentTreeSelectorItem[]>;
+        private expandAsString();
+    }
+    class ContentTreeSelectorItemJson {
+        content: ContentSummaryJson;
+        expand: boolean;
+    }
+    class ContentTreeSelectorItem {
+        private content;
+        private expand;
+        constructor(content: ContentSummary, expand: boolean);
+        static fromJson(json: ContentTreeSelectorItemJson): ContentTreeSelectorItem;
+        getContent(): ContentSummary;
+        getId(): string;
+        getContentId(): ContentId;
+        getPath(): ContentPath;
+        getName(): ContentName;
+        getDisplayName(): string;
+        getContentState(): ContentState;
+        hasChildren(): boolean;
+        isValid(): boolean;
+        getIconUrl(): string;
+        getType(): ContentTypeName;
+        isImage(): boolean;
+        isSite(): boolean;
+        getExpand(): boolean;
+    }
+}
+declare module api.content.resource {
+    import OrderExpr = api.query.expr.OrderExpr;
+    import FieldOrderExpr = api.query.expr.FieldOrderExpr;
+    import ContentSummaryJson = api.content.json.ContentSummaryJson;
     import ContentQueryResultJson = api.content.json.ContentQueryResultJson;
     class ContentSelectorQueryRequest extends ContentResourceRequest<ContentQueryResultJson<ContentSummaryJson>, ContentSummary[]> {
         static DEFAULT_SIZE: number;
@@ -15054,6 +15294,47 @@ declare module api.content.resource {
     }
 }
 declare module api.content {
+    import OptionDataLoader = api.ui.selector.OptionDataLoader;
+    import TreeNode = api.ui.treegrid.TreeNode;
+    import OptionDataLoaderData = api.ui.selector.OptionDataLoaderData;
+    import Option = api.ui.selector.Option;
+    import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
+    class ContentSummaryOptionDataLoader implements OptionDataLoader<ContentTreeSelectorItem> {
+        private request;
+        private contentTypeNames;
+        private allowedContentPaths;
+        private relationshipType;
+        constructor(builder?: ContentSummaryOptionDataLoaderBuilder);
+        private initRequest(builder);
+        fetch(node: TreeNode<Option<ContentTreeSelectorItem>>): wemQ.Promise<ContentTreeSelectorItem>;
+        fetchChildren(parentNode: TreeNode<Option<ContentTreeSelectorItem>>, from?: number, size?: number): wemQ.Promise<OptionDataLoaderData<ContentTreeSelectorItem>>;
+        protected createOptionData(data: ContentTreeSelectorItem[]): OptionDataLoaderData<ContentTreeSelectorItem>;
+        checkReadonly(items: ContentTreeSelectorItem[]): wemQ.Promise<string[]>;
+        static create(): ContentSummaryOptionDataLoaderBuilder;
+    }
+    class ContentSummaryOptionDataLoaderBuilder {
+        content: ContentSummary;
+        contentTypeNames: string[];
+        allowedContentPaths: string[];
+        relationshipType: string;
+        setContentTypeNames(contentTypeNames: string[]): ContentSummaryOptionDataLoaderBuilder;
+        setAllowedContentPaths(allowedContentPaths: string[]): ContentSummaryOptionDataLoaderBuilder;
+        setRelationshipType(relationshipType: string): ContentSummaryOptionDataLoaderBuilder;
+        setContent(content: ContentSummary): ContentSummaryOptionDataLoaderBuilder;
+        build(): ContentSummaryOptionDataLoader;
+    }
+}
+declare module api.content {
+    import OptionDataHelper = api.ui.selector.OptionDataHelper;
+    import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
+    class ContentSummaryOptionDataHelper implements OptionDataHelper<ContentTreeSelectorItem> {
+        hasChildren(data: ContentTreeSelectorItem): boolean;
+        getDataId(data: ContentTreeSelectorItem): string;
+        isDescendingPath(childOption: ContentTreeSelectorItem, parentOption: ContentTreeSelectorItem): boolean;
+        isDisabled(data: ContentTreeSelectorItem): boolean;
+    }
+}
+declare module api.content {
     class ContentId implements api.Equitable {
         private value;
         constructor(value: string);
@@ -15349,9 +15630,12 @@ declare module api.content {
 declare module api.content {
     import SelectedOption = api.ui.selector.combobox.SelectedOption;
     import RichComboBox = api.ui.selector.combobox.RichComboBox;
+    import RichComboBoxBuilder = api.ui.selector.combobox.RichComboBoxBuilder;
     import ContentSummaryLoader = api.content.resource.ContentSummaryLoader;
     import ContentQueryResultJson = api.content.json.ContentQueryResultJson;
     import ContentSummaryJson = api.content.json.ContentSummaryJson;
+    import OptionDataLoader = api.ui.selector.OptionDataLoader;
+    import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
     class ContentComboBox extends RichComboBox<ContentSummary> {
         constructor(builder: ContentComboBoxBuilder);
         getLoader(): ContentSummaryLoader;
@@ -15374,7 +15658,7 @@ declare module api.content {
         resolveSubTitle(content: ContentSummary): string;
         protected createEditButton(content: api.content.ContentSummary): api.dom.AEl;
     }
-    class ContentComboBoxBuilder {
+    class ContentComboBoxBuilder extends RichComboBoxBuilder<ContentSummary> {
         name: string;
         maximumOccurrences: number;
         loader: api.util.loader.BaseLoader<ContentQueryResultJson<ContentSummaryJson>, ContentSummary>;
@@ -15389,6 +15673,8 @@ declare module api.content {
         setValue(value: string): ContentComboBoxBuilder;
         setDisplayMissingSelectedOptions(value: boolean): ContentComboBoxBuilder;
         setRemoveMissingSelectedOptions(value: boolean): ContentComboBoxBuilder;
+        setTreegridDropdownEnabled(value: boolean): ContentComboBoxBuilder;
+        setOptionDataLoader(value: OptionDataLoader<ContentTreeSelectorItem>): ContentComboBoxBuilder;
         build(): ContentComboBox;
     }
 }
@@ -17435,6 +17721,35 @@ declare module api.content.form.inputtype {
         parentContentPath: api.content.ContentPath;
     }
 }
+declare module api.content.form.inputtype {
+    import RichComboBox = api.ui.selector.combobox.RichComboBox;
+    import RelationshipTypeName = api.schema.relationshiptype.RelationshipTypeName;
+    import SelectedOption = api.ui.selector.combobox.SelectedOption;
+    import ContentServerChangeItem = api.content.event.ContentServerChangeItem;
+    import SelectedOptionsView = api.ui.selector.combobox.SelectedOptionsView;
+    import BaseInputTypeManagingAdd = api.form.inputtype.support.BaseInputTypeManagingAdd;
+    class ContentInputTypeManagingAdd<RAW_VALUE_TYPE> extends BaseInputTypeManagingAdd<RAW_VALUE_TYPE> {
+        protected config: api.content.form.inputtype.ContentInputTypeViewContext;
+        protected relationshipTypeName: RelationshipTypeName;
+        protected relationshipType: string;
+        protected allowedContentTypes: string[];
+        protected allowedContentPaths: string[];
+        protected contentDeletedListener: (paths: ContentServerChangeItem[], pending?: boolean) => void;
+        constructor(className?: string, config?: api.content.form.inputtype.ContentInputTypeViewContext);
+        protected getContentComboBox(): RichComboBox<any>;
+        protected getContentPath(raw: RAW_VALUE_TYPE): ContentPath;
+        protected getSelectedOptions(): SelectedOption<RAW_VALUE_TYPE>[];
+        protected getSelectedOptionsView(): SelectedOptionsView<RAW_VALUE_TYPE>;
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
+        private handleContentUpdatedEvent();
+        private findSelectedOptionByContentPath(contentPath);
+        private handleContentDeletedEvent();
+    }
+}
 declare module api.content.form.inputtype.upload {
     import Property = api.data.Property;
     import Value = api.data.Value;
@@ -17576,22 +17891,18 @@ declare module api.content.form.inputtype.contentselector {
     import PropertyArray = api.data.PropertyArray;
     import Value = api.data.Value;
     import ValueType = api.data.ValueType;
-    class ContentSelector extends api.form.inputtype.support.BaseInputTypeManagingAdd<api.content.ContentId> {
-        private config;
-        private relationshipTypeName;
+    import ContentInputTypeManagingAdd = api.content.form.inputtype.ContentInputTypeManagingAdd;
+    class ContentSelector extends ContentInputTypeManagingAdd<api.content.ContentSummary> {
         private contentComboBox;
         private draggingIndex;
-        private relationshipType;
-        private allowedContentTypes;
-        private allowedContentPaths;
-        private contentDeletedListener;
+        private isFlat;
         private static contentIdBatch;
         private static loadSummariesResult;
         private static loadSummaries;
         constructor(config?: api.content.form.inputtype.ContentInputTypeViewContext);
         getContentComboBox(): ContentComboBox;
-        private handleContentDeletedEvent();
-        private readConfig(inputConfig);
+        protected getSelectedOptionsView(): ContentSelectedOptionsView;
+        protected getContentPath(raw: api.content.ContentSummary): api.content.ContentPath;
         availableSizeChanged(): void;
         getValueType(): ValueType;
         newInitialValue(): Value;
@@ -17608,6 +17919,11 @@ declare module api.content.form.inputtype.contentselector {
         private updateSelectedOptionIsEditable(selectedOption);
         private refreshSortable();
         protected getNumberOfValids(): number;
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
         giveFocus(): boolean;
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
@@ -17635,6 +17951,7 @@ declare module api.content.form.inputtype.principalselector {
         private saveToSet(principalOption, index);
         private refreshSortable();
         protected getNumberOfValids(): number;
+        static getName(): api.form.InputTypeName;
         giveFocus(): boolean;
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
@@ -17727,29 +18044,22 @@ declare module api.content.form.inputtype.image {
     import PropertyArray = api.data.PropertyArray;
     import Value = api.data.Value;
     import ValueType = api.data.ValueType;
-    import ContentId = api.content.ContentId;
     import ContentSummary = api.content.ContentSummary;
     import ContentComboBox = api.content.form.inputtype.image.ImageContentComboBox;
-    class ImageSelector extends api.form.inputtype.support.BaseInputTypeManagingAdd<ContentId> {
-        private config;
-        private relationshipTypeName;
+    import ContentInputTypeManagingAdd = api.content.form.inputtype.ContentInputTypeManagingAdd;
+    class ImageSelector extends ContentInputTypeManagingAdd<ImageSelectorDisplayValue> {
         private contentComboBox;
         private selectedOptionsView;
         private contentRequestsAllowed;
         private uploader;
         private editContentRequestListeners;
-        private relationshipType;
-        private allowedContentTypes;
-        private allowedContentPaths;
-        private contentDeletedListener;
+        private isFlat;
         constructor(config: api.content.form.inputtype.ContentInputTypeViewContext);
-        private handleContentDeletedEvent();
         getContentComboBox(): ImageContentComboBox;
-        private readConfig(inputConfig);
+        protected getContentPath(raw: ImageSelectorDisplayValue): api.content.ContentPath;
         private updateSelectedItemsIcons();
         getValueType(): ValueType;
         newInitialValue(): Value;
-        private countSelectedOptions();
         private getRemainingOccurrences();
         private createSelectedOptionsView();
         createContentComboBox(maximumOccurrences: number, inputIconUrl: string, relationshipAllowedContentTypes: string[], inputName: string): ContentComboBox;
@@ -17762,6 +18072,11 @@ declare module api.content.form.inputtype.image {
         protected getNumberOfValids(): number;
         giveFocus(): boolean;
         private setContentIdProperty(contentId);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
         onBlur(listener: (event: FocusEvent) => void): void;
@@ -17828,11 +18143,12 @@ declare module api.content.form.inputtype.image {
         getContentSummary(): ContentSummary;
         getId(): string;
         getContentId(): api.content.ContentId;
+        getContentPath(): api.content.ContentPath;
         getImageUrl(): string;
         getLabel(): string;
         getDisplayName(): string;
         getTypeLocaleName(): string;
-        getPath(): string;
+        getPath(): ContentPath;
     }
 }
 declare module api.content.form.inputtype.image {
@@ -17853,6 +18169,7 @@ declare module api.content.form.inputtype.image {
     import ContentQueryResultJson = api.content.json.ContentQueryResultJson;
     import ContentSummaryJson = api.content.json.ContentSummaryJson;
     import BaseLoader = api.util.loader.BaseLoader;
+    import OptionDataLoader = api.ui.selector.OptionDataLoader;
     class ImageContentComboBox extends RichComboBox<ImageSelectorDisplayValue> {
         constructor(builder: ImageContentComboBoxBuilder);
         createOption(value: ContentSummary): Option<ImageSelectorDisplayValue>;
@@ -17865,6 +18182,8 @@ declare module api.content.form.inputtype.image {
         minWidth: number;
         selectedOptionsView: ImageSelectorSelectedOptionsView;
         optionDisplayValueViewer: ImageSelectorViewer;
+        optionDataLoader: OptionDataLoader<any>;
+        treegridDropdownEnabled: boolean;
         value: string;
         setName(value: string): ImageContentComboBoxBuilder;
         setValue(value: string): ImageContentComboBoxBuilder;
@@ -17873,6 +18192,8 @@ declare module api.content.form.inputtype.image {
         setMinWidth(value: number): ImageContentComboBoxBuilder;
         setSelectedOptionsView(value: ImageSelectorSelectedOptionsView): ImageContentComboBoxBuilder;
         setOptionDisplayValueViewer(value: ImageSelectorViewer): ImageContentComboBoxBuilder;
+        setOptionDataLoader(value: OptionDataLoader<any>): ImageContentComboBoxBuilder;
+        setTreegridDropdownEnabled(value: boolean): ImageContentComboBoxBuilder;
         build(): ImageContentComboBox;
     }
 }
@@ -17898,6 +18219,30 @@ declare module api.content.form.inputtype.image {
         setAllowedContentPaths(allowedContentPaths: string[]): Builder;
         setRelationshipType(relationshipType: string): Builder;
         build(): ImageSelectorLoader;
+    }
+}
+declare module api.content {
+    import OptionDataLoaderData = api.ui.selector.OptionDataLoaderData;
+    import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
+    class ImageOptionDataLoader extends ContentSummaryOptionDataLoader {
+        protected createOptionData(data: ContentTreeSelectorItem[]): OptionDataLoaderData<ImageTreeSelectorItem>;
+        static create(): ImageOptionDataLoaderBuilder;
+    }
+    class ImageOptionDataLoaderBuilder extends ContentSummaryOptionDataLoaderBuilder {
+        inputName: string;
+        setInputName(value: string): ImageOptionDataLoaderBuilder;
+        setContentTypeNames(value: string[]): ImageOptionDataLoaderBuilder;
+        setAllowedContentPaths(value: string[]): ImageOptionDataLoaderBuilder;
+        setRelationshipType(value: string): ImageOptionDataLoaderBuilder;
+        setContent(value: ContentSummary): ImageOptionDataLoaderBuilder;
+        build(): ImageOptionDataLoader;
+    }
+    class ImageTreeSelectorItem extends ContentTreeSelectorItem {
+        private imageSelectorDisplayValue;
+        constructor(content: ContentSummary, expand: boolean);
+        getImageUrl(): string;
+        isEmptyContent(): boolean;
+        getContentSummary(): ContentSummary;
     }
 }
 declare module api.content.form.inputtype.tag {
@@ -18062,6 +18407,7 @@ declare module api.content.site.inputtype.siteconfigurator {
         private isContentOrImageOrPrincipalOrComboSelectorInput(inputView);
         show(): void;
         close(): void;
+        isDirty(): boolean;
     }
 }
 declare module api.content.site.inputtype.siteconfigurator {
@@ -18338,6 +18684,34 @@ declare module api.content.form.inputtype.customselector {
         private handleDnDStart(event, ui);
         private handleDnDUpdate(event, ui);
         private updateSelectedOptionStyle();
+    }
+}
+declare module api.issue.event {
+    import NodeServerChangeType = api.event.NodeServerChangeType;
+    class IssueServerEvent extends api.event.NodeServerEvent {
+        constructor(change: IssueServerChange);
+        getType(): NodeServerChangeType;
+        getNodeChange(): IssueServerChange;
+        static is(eventJson: api.event.NodeEventJson): boolean;
+        static fromJson(nodeEventJson: api.event.NodeEventJson): IssueServerEvent;
+    }
+}
+declare module api.issue.event {
+    import NodeServerChange = api.event.NodeServerChange;
+    import NodeEventJson = api.event.NodeEventJson;
+    import NodeServerChangeItem = api.event.NodeServerChangeItem;
+    import NodeEventNodeJson = api.event.NodeEventNodeJson;
+    import NodeServerChangeType = api.event.NodeServerChangeType;
+    class IssueServerChangeItem extends NodeServerChangeItem<string> {
+        issueId: string;
+        constructor(path: string, branch: string, issueId: string);
+        getIssueId(): string;
+        static fromJson(node: NodeEventNodeJson): IssueServerChangeItem;
+    }
+    class IssueServerChange extends NodeServerChange<string> {
+        constructor(type: NodeServerChangeType, changeItems: IssueServerChangeItem[], newPrincipalPaths?: string[]);
+        toString(): string;
+        static fromJson(nodeEventJson: NodeEventJson): IssueServerChange;
     }
 }
 declare module api.aggregation {
@@ -19142,6 +19516,7 @@ declare module api.app.browse.filter {
         private notifyHidePanelButtonPressed();
         private notifyShowResultsButtonPressed();
         updateHitsCounter(hits: number, emptyFilterValue?: boolean): void;
+        updateResultsTitle(allShown: boolean): void;
     }
     class ConstraintSection<T> extends api.dom.DivEl {
         private label;
@@ -19976,7 +20351,7 @@ declare module api.liveedit {
         unselect(): void;
         protected preProcessStyle(style: HighlighterStyle, isEmptyView: boolean): HighlighterStyle;
         private resize(dimensions, style);
-        private generatePath(x, y, w, h, screenW, screenH);
+        private generatePath(x, y, w, h, screenW, screenH, left);
     }
 }
 declare module api.liveedit {
@@ -20353,7 +20728,7 @@ declare module api.liveedit {
         registerComponentView(componentView: ComponentView<Component>, index: number, isNew?: boolean): void;
         unregisterComponentView(componentView: ComponentView<Component>): void;
         getNewItemIndex(): number;
-        addComponentView(componentView: ComponentView<Component>, index: number, isNew?: boolean): void;
+        addComponentView(componentView: ComponentView<Component>, index: number, isNew?: boolean, dragged?: boolean): void;
         removeComponentView(componentView: ComponentView<Component>): void;
         getComponentViews(): ComponentView<Component>[];
         getComponentViewIndex(view: ComponentView<Component>): number;
@@ -20484,7 +20859,7 @@ declare module api.liveedit {
         private createFragment();
         toString(): string;
         replaceWith(replacement: ComponentView<Component>): void;
-        moveToRegion(toRegionView: RegionView, toIndex: number): void;
+        moveToRegion(toRegionView: RegionView, toIndex: number, dragged?: boolean): void;
         onItemViewAdded(listener: (event: ItemViewAddedEvent) => void): void;
         unItemViewAdded(listener: (event: ItemViewAddedEvent) => void): void;
         notifyItemViewAdded(view: ItemView, isNew?: boolean): void;
@@ -20781,9 +21156,11 @@ declare module api.liveedit {
     class ComponentAddedEvent extends api.event.Event {
         private componentView;
         private parentRegionView;
-        constructor(componentView: ComponentView<Component>, regionView: RegionView);
+        private dragged;
+        constructor(componentView: ComponentView<Component>, regionView: RegionView, dragged?: boolean);
         getComponentView(): ComponentView<Component>;
         getParentRegionView(): RegionView;
+        isDragged(): boolean;
         static on(handler: (event: ComponentAddedEvent) => void, contextWindow?: Window): void;
         static un(handler?: (event: ComponentAddedEvent) => void, contextWindow?: Window): void;
     }

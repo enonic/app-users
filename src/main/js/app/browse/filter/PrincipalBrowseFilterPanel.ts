@@ -36,7 +36,8 @@ export class PrincipalBrowseFilterPanel
     protected resetFacets(supressEvent?: boolean, doResetAll?: boolean) {
         this.searchDataAndHandleResponse('', false);
 
-        if (!supressEvent) { // then fire usual reset event with content grid reloading
+        // then fire usual reset event with content grid reloading
+        if (!supressEvent) {
             new BrowseFilterResetEvent().fire();
         }
     }

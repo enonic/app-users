@@ -38,6 +38,7 @@ dependencies {
     include "com.enonic.xp:lib-mustache:${xpVersion}"
     include "com.enonic.xp:lib-io:${xpVersion}"
     include "com.enonic.xp:lib-value:${xpVersion}"
+    include "com.enonic.xp:lib-i18n:${xpVersion}"
     include "com.graphql-java:graphql-java:2.3.0"
     include "com.enonic.lib:graphql:0.1.0"
 }
