@@ -1,6 +1,7 @@
 var graphQl = require('/lib/graphql');
 var userstores = require('userstores');
 var principals = require('principals');
+var types = require('types');
 var graphQlObjectTypes = require('./graphql-types');
 var graphQlEnums = require('./graphql-enums');
 
@@ -61,6 +62,18 @@ exports.query = graphQl.createObjectType({
                 var key = env.args.key;
                 var memberships = env.args.memberships;
                 return principals.getByKeys(key, memberships);
+            }
+        },
+        types: {
+            type: graphQlObjectTypes.TypesType,
+            args: {
+                start: graphQl.GraphQLInt,
+                count: graphQl.GraphQLInt,
+            },
+            resolve: function (env) {
+                var count = env.args.count || Number.MAX_SAFE_INTEGER;
+                var start = env.args.start || 0;
+                return types.list(start, count);
             }
         }
     }

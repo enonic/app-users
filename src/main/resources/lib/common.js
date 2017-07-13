@@ -178,7 +178,8 @@ var queryAll = exports.queryAll = function (params) {
         start: start,
         count: count,
         query: params.query,
-        sort: params.sort
+        sort: params.sort,
+        aggregations: params.aggregations
     });
 
 
@@ -194,7 +195,8 @@ var queryAll = exports.queryAll = function (params) {
         total: queryResult.total,
         start: start,
         count: count,
-        hits: [].concat(hits)
+        hits: [].concat(hits),
+        aggregations: queryResult.aggregations
     };
 };
 

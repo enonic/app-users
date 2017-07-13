@@ -77,8 +77,8 @@ export class ListPrincipalsRequest
         return this.query().then((response: any) => {
             let data = response.principalsConnection;
             return {
-                principals: data.edges.map(edge => this.fromJsonToPrincipal(edge.node)),
-                total: data.totalCount
+                total: data.totalCount,
+                principals: data.edges.map(edge => this.fromJsonToPrincipal(edge.node))
             }
         });
     }
