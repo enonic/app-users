@@ -23,6 +23,8 @@ exports.create = function createUser(params) {
 
     exports.updatePwd(key, common.required(params, 'password'));
 
+    populateMemberships(createdUser);
+
     return createdUser;
 };
 
@@ -36,6 +38,7 @@ exports.update = function updateUser(params) {
             user.displayName = params.displayName;
             user.email = params.email;
             user.login = params.login;
+            user._name = params.login;
             return user;
         }
     });
@@ -44,7 +47,7 @@ exports.update = function updateUser(params) {
 
     principals.updateMemberships(key, params.addMemberships, params.removeMemberships);
 
-    updatedUser['memberships'] = principals.getMemberships(key);
+    populateMemberships(updatedUser);
 
     return updatedUser;
 };
@@ -62,3 +65,7 @@ exports.updatePwd = function (key, pwd) {
         return false;
     }
 };
+
+function populateMemberships(user) {
+    user['memberships'] = principals.getMemberships(user.key || user._id);
+}

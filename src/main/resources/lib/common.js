@@ -113,7 +113,7 @@ exports.extensionFromMimeType = function (mimeType) {
 
 function splitKey(key) {
     var parts = key && key.split(':');
-    var isRole = parts && parts.length === 2 && parts[0] === PrincipalType.ROLE;
+    var isRole = parts && parts.length === 2 && parts[0].toUpperCase() === PrincipalType.ROLE;
     var isUserStore = parts && parts.length === 1;
     if (!isRole && !isUserStore && !(parts && parts.length === 3)) {
         throw "Invalid principal key [" + key + "]";

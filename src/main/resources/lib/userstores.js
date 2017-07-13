@@ -40,7 +40,9 @@ module.exports = {
             query: createUserstoreQuery() + ' AND ' + common.createQueryByField('_name', keys)
         });
         result.hits = result.hits.filter(rolesFilter);
-        result.hits.forEach(calculateAccess);
+        result.hits.forEach(function (hit) {
+            calculateAccess(hit);
+        });
         return common.singleOrArray(result.hits);
     },
     list: function (start, count, sort) {
@@ -51,7 +53,9 @@ module.exports = {
             sort: sort
         });
         result.hits = result.hits.filter(rolesFilter);
-        result.hits.forEach(calculateAccess);
+        result.hits.forEach(function (hit) {
+            calculateAccess(hit);
+        });
         return result;
     },
     create: function (params) {
@@ -66,25 +70,27 @@ module.exports = {
         });
         log.info('\nCreated userStore:\n' + JSON.stringify(createdStore) + '\n');
 
-        var users, groups;
+        var createdUsers, createdGroups;
         if (createdStore) {
 
-            users = common.create({
+            createdUsers = common.create({
                 _parentPath: '/identity/' + createdStore._name,
                 _name: 'users',
                 _permissions: calculateUsersPermissions(params.permissions)
             });
 
-            groups = common.create({
+            createdGroups = common.create({
                 _parentPath: '/identity/' + createdStore._name,
                 _name: 'groups',
                 _permissions: calculateGroupsPermissions(params.permissions)
             });
 
-            log.info('\nCreated users and groups nodes:\n' + users._path + '\n' + groups._path + '\n');
-        }
+            log.info('\nCreated users and groups nodes:\n' + createdUsers._path + '\n' + createdGroups._path + '\n');
 
-        createdStore['idProviderMode'] = calculateIdProviderMode(params.authConfig);
+            createdStore['idProviderMode'] = calculateIdProviderMode(params.authConfig);
+
+            calculateAccess(createdStore, createdUsers, createdGroups);
+        }
 
         return createdStore;
     },
@@ -125,6 +131,8 @@ module.exports = {
         log.info('\nUpdated permissions for: ' + updatedGroups._path + '\n' + JSON.stringify(updatedGroups._permissions) + '\n');
 
         updatedStore['idProviderMode'] = calculateIdProviderMode(params.authConfig);
+
+        calculateAccess(updatedStore, updatedUsers, updatedGroups);
 
         return updatedStore;
     },
@@ -247,12 +255,14 @@ function createUserstoreQuery(path) {
     return '_parentPath="/identity' + (path || '') + '"';
 }
 
-function calculateAccess(userStore) {
+function calculateAccess(userStore, userNode, groupNode) {
+    log.info('Calculate access for: ' + JSON.stringify(userStore) + '\nusers: ' + JSON.stringify(userNode) + '\groups: ' +
+             JSON.stringify(groupNode));
     var isRole = !rolesFilter(userStore);
 
     if (!isRole) {
-        var userNode = common.querySingle('_path="/identity/' + userStore._name + '/users"');
-        var groupNode = common.querySingle('_path="/identity/' + userStore._name + '/groups"');
+        userNode = userNode || common.querySingle('_path="/identity/' + userStore._name + '/users"');
+        groupNode = groupNode || common.querySingle('_path="/identity/' + userStore._name + '/groups"');
 
         var uniques = {};
         var ps = getPrincipals(userStore).concat(getPrincipals(userNode), getPrincipals(groupNode)).filter(function (item) {

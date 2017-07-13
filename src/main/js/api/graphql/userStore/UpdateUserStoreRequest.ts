@@ -2,6 +2,7 @@ import {GraphQlRequest} from '../GraphQlRequest';
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;
 import AuthConfig = api.security.AuthConfig;
+import UserStoreJson = api.security.UserStoreJson;
 
 export class UpdateUserStoreRequest
     extends GraphQlRequest<any, UserStore> {
@@ -33,6 +34,19 @@ export class UpdateUserStoreRequest
                 key
                 displayName
                 description
+                authConfig {
+                    applicationKey
+                    config
+                }
+                idProviderMode,
+                modifiedTime,
+                permissions {
+                    principal {
+                        displayName
+                        key
+                    }
+                    access
+                }
             }
         }`;
     }
@@ -63,7 +77,18 @@ export class UpdateUserStoreRequest
     }
 
     sendAndParse(): wemQ.Promise<UserStore> {
-        return this.mutate().then(json => UserStore.fromJson(json.updateUserStore));
+        return this.mutate().then(json => this.userStorefromJson(json.updateUserStore));
+    }
+
+    userStorefromJson(us: UserStoreJson) {
+        if (!us) {
+            throw `UserStore[${this.userStoreKey.toString()}] not found`;
+        }
+        if (us.authConfig && typeof us.authConfig.config === 'string') {
+            // config is passed as string
+            us.authConfig.config = JSON.parse(<string>us.authConfig.config);
+        }
+        return UserStore.fromJson(us);
     }
 
 }

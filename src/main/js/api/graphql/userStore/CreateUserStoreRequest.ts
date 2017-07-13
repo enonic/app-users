@@ -37,8 +37,21 @@ export class CreateUserStoreRequest
         return `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
             createUserStore(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
                 key
-                path
                 displayName
+                description
+                authConfig {
+                    applicationKey
+                    config
+                }
+                idProviderMode
+                modifiedTime
+                permissions {
+                    principal {
+                        displayName
+                        key
+                    }
+                    access
+                }
             }
         }`;
     }
@@ -69,6 +82,17 @@ export class CreateUserStoreRequest
     }
 
     sendAndParse(): wemQ.Promise<UserStore> {
-        return this.mutate().then(json => UserStore.fromJson(json.createUserStore));
+        return this.mutate().then(json => this.userStorefromJson(json.createUserStore));
+    }
+
+    userStorefromJson(us: UserStoreJson) {
+        if (!us) {
+            throw `UserStore[${this.userStoreKey.toString()}] not found`;
+        }
+        if (us.authConfig && typeof us.authConfig.config === 'string') {
+            // config is passed as string
+            us.authConfig.config = JSON.parse(<string>us.authConfig.config);
+        }
+        return UserStore.fromJson(us);
     }
 }

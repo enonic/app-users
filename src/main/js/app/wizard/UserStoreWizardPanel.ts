@@ -21,7 +21,8 @@ import WizardHeaderWithDisplayNameAndName = api.app.wizard.WizardHeaderWithDispl
 import WizardHeaderWithDisplayNameAndNameBuilder = api.app.wizard.WizardHeaderWithDisplayNameAndNameBuilder;
 import i18n = api.util.i18n;
 
-export class UserStoreWizardPanel extends UserItemWizardPanel<UserStore> {
+export class UserStoreWizardPanel
+    extends UserItemWizardPanel<UserStore> {
 
     private userStoreWizardStepForm: UserStoreWizardStepForm;
 
@@ -158,7 +159,7 @@ export class UserStoreWizardPanel extends UserItemWizardPanel<UserStore> {
                    !this.permissionsWizardStepForm.getPermissions().equals(this.defaultUserStore.getPermissions());
         } else {
             let viewedUserStore = this.assembleViewedUserStore();
-            return !this.getPersistedItem().equals(viewedUserStore);
+            return !persistedUserStore.equals(viewedUserStore);
         }
     }
 

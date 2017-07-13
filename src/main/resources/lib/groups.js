@@ -22,6 +22,8 @@ exports.create = function createGroup(params) {
         principals.addMembers(key, ms);
     }
 
+    populateMembers(createdGroup);
+
     return createdGroup;
 };
 
@@ -42,9 +44,13 @@ exports.update = function updateGroup(params) {
 
     principals.updateMembers(key, params.addMembers, params.removeMembers);
 
-    updatedGroup['member'] = principals.getMembers(key).map(function (member) {
-        return member.key;
-    });
+    populateMembers(updatedGroup);
 
     return updatedGroup;
 };
+
+function populateMembers(group) {
+    group['member'] = principals.getMembers(group.key || group._id).map(function (member) {
+        return member.key;
+    });
+}
