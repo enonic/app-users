@@ -14,8 +14,7 @@ module.exports = {
                 }
             }
         });
-    },
-    Type: common.PrincipalType
+    }
 };
 
 function createTypesQuery() {

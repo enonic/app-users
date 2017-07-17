@@ -1,18 +1,20 @@
 var graphQl = require('/lib/graphql');
+
 var userstores = require('userstores');
 var principals = require('principals');
 var users = require('users');
 var groups = require('groups');
 var roles = require('roles');
-var types = require('./graphql-types');
-var inputs = require('./graphql-inputs');
 
-exports.mutation = graphQl.createObjectType({
+var graphQlObjectTypes = require('../types').objects;
+var graphQlInputTypes = require('../types').inputs;
+
+module.exports = graphQl.createObjectType({
     name: 'Mutation',
     fields: {
         // Principal
         deletePrincipals: {
-            type: graphQl.list(types.PrincipalDeleteType),
+            type: graphQl.list(graphQlObjectTypes.PrincipalDeleteType),
             args: {
                 keys: graphQl.list(graphQl.GraphQLString)
             },
@@ -23,7 +25,7 @@ exports.mutation = graphQl.createObjectType({
 
         // User
         createUser: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -45,7 +47,7 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateUser: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -79,7 +81,7 @@ exports.mutation = graphQl.createObjectType({
 
         // Group
         createGroup: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -97,7 +99,7 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateGroup: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -119,7 +121,7 @@ exports.mutation = graphQl.createObjectType({
 
         // Role
         createRole: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -137,7 +139,7 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateRole: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -159,13 +161,13 @@ exports.mutation = graphQl.createObjectType({
 
         // UserStore
         createUserStore: {
-            type: types.UserStoreType,
+            type: graphQlObjectTypes.UserStoreType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: inputs.AuthConfigInput,
-                permissions: graphQl.list(inputs.UserStoreAccessControlInput)
+                authConfig: graphQlInputTypes.AuthConfigInput,
+                permissions: graphQl.list(graphQlInputTypes.UserStoreAccessControlInput)
             },
             resolve: function (env) {
 
@@ -185,13 +187,13 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateUserStore: {
-            type: types.UserStoreType,
+            type: graphQlObjectTypes.UserStoreType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: inputs.AuthConfigInput,
-                permissions: graphQl.list(inputs.UserStoreAccessControlInput)
+                authConfig: graphQlInputTypes.AuthConfigInput,
+                permissions: graphQl.list(graphQlInputTypes.UserStoreAccessControlInput)
             },
             resolve: function (env) {
 
@@ -211,7 +213,7 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         deleteUserStores: {
-            type: graphQl.list(types.UserStoreDeleteType),
+            type: graphQl.list(graphQlObjectTypes.UserStoreDeleteType),
             args: {
                 keys: graphQl.list(graphQl.GraphQLString)
             },

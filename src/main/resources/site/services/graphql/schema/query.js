@@ -1,11 +1,13 @@
 var graphQl = require('/lib/graphql');
+
 var userstores = require('userstores');
 var principals = require('principals');
 var types = require('types');
-var graphQlObjectTypes = require('./graphql-types');
-var graphQlEnums = require('./graphql-enums');
 
-exports.query = graphQl.createObjectType({
+var graphQlObjectTypes = require('../types').objects;
+var graphQlEnums = require('../types').enums;
+
+module.exports = graphQl.createObjectType({
     name: 'Query',
     fields: {
         userStores: {
@@ -68,7 +70,7 @@ exports.query = graphQl.createObjectType({
             type: graphQlObjectTypes.TypesType,
             args: {
                 start: graphQl.GraphQLInt,
-                count: graphQl.GraphQLInt,
+                count: graphQl.GraphQLInt
             },
             resolve: function (env) {
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;

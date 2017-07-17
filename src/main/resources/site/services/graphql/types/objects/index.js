@@ -1,8 +1,10 @@
 var graphQl = require('/lib/graphql');
-var graphQlEnums = require('./graphql-enums');
-var graphQlConnection = require('./graphql-connection');
-var util = require('./graphql-util');
+
 var principals = require('principals');
+
+var graphQlConnection = require('./connection');
+var graphQlEnums = require('../enums');
+var graphQlUtils = require('../../utils');
 
 var UserItemType = graphQl.createInterfaceType({
     name: 'UserItem',
@@ -253,13 +255,13 @@ exports.PrincipalType = graphQl.createObjectType({
         memberships: {
             type: graphQl.list(graphQl.reference('Principal')),
             resolve: function (env) {
-                return util.toArray(env.source.memberships);
+                return graphQlUtils.toArray(env.source.memberships);
             }
         },
         members: {
             type: graphQl.list(graphQl.GraphQLString),
             resolve: function (env) {
-                return util.toArray(env.source.member);
+                return graphQlUtils.toArray(env.source.member);
             }
         },
         modifiedTime: {
@@ -321,7 +323,7 @@ exports.UserStoreDeleteType = graphQl.createObjectType({
     }
 });
 
-exports.PrincipalConnectionType = graphQlConnection.createConnectionType('PrincipalConnection', exports.PrincipalType);
+exports.PrincipalConnectionType = graphQlConnection.createConnectionType('Principal', exports.PrincipalType);
 
 var BucketType = graphQl.createObjectType({
     name: 'Bucket',

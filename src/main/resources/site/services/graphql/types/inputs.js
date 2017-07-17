@@ -1,5 +1,6 @@
 var graphQl = require('/lib/graphql');
-var graphQlEnums = require('./graphql-enums');
+
+var graphQlEnums = require('./enums');
 
 var PrincipalInput = graphQl.createInputObjectType({
     name: 'PrincipalInput',

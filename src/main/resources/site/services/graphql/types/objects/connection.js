@@ -1,19 +1,20 @@
 var graphQl = require('graphql');
-var graphQlUtil = require('./graphql-util');
+var graphQlUtils = require('../../utils');
+var createAggregationsFiled = require('./aggregations').createAggregationsFiled;
 
 var pageInfoType = graphQl.createObjectType({
     name: 'PageInfo',
     fields: {
         startCursor: {
-            type: graphQl.nonNull(graphQl.GraphQLInt), //TODO Replace by base64
+            type: graphQl.nonNull(graphQl.GraphQLInt),
             resolve: function (env) {
-                return graphQlUtil.toInt(env.source.startCursor);
+                return graphQlUtils.toInt(env.source.startCursor);
             }
         },
         endCursor: {
-            type: graphQl.nonNull(graphQl.GraphQLInt), //TODO Replace by base64
+            type: graphQl.nonNull(graphQl.GraphQLInt),
             resolve: function (env) {
-                return graphQlUtil.toInt(env.source.endCursor);
+                return graphQlUtils.toInt(env.source.endCursor);
             }
         },
         hasNext: {
@@ -24,7 +25,6 @@ var pageInfoType = graphQl.createObjectType({
         }
     }
 });
-
 
 function createEdgeType(name, type) {
     return graphQl.createObjectType({
@@ -37,7 +37,7 @@ function createEdgeType(name, type) {
                 }
             },
             cursor: {
-                type: graphQl.nonNull(graphQl.GraphQLInt), //TODO Replace by base64
+                type: graphQl.nonNull(graphQl.GraphQLInt),
                 resolve: function (env) {
                     return graphQlUtil.toInt(env.source.cursor);
                 }
@@ -45,44 +45,6 @@ function createEdgeType(name, type) {
         }
     });
 }
-
-var BucketType = graphQl.createObjectType({
-    name: 'Bucket',
-    description: 'Aggregated result for specific key',
-    fields: {
-        key: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source.key;
-            }
-        },
-        count: {
-            type: graphQl.GraphQLInt,
-            resolve: function (env) {
-                return env.source.docCount;
-            }
-        }
-    }
-});
-
-var AggregationType = graphQl.createObjectType({
-    name: 'Aggregation',
-    description: 'List of buckets',
-    fields: {
-        name: {
-            type: graphQl.GraphQLString,
-            resolve: function (env) {
-                return env.source.name;
-            }
-        },
-        aggregation: {
-            type: graphQl.list(BucketType),
-            resolve: function (env) {
-                return env.source.aggregation;
-            }
-        }
-    }
-});
 
 exports.createConnectionType = function (name, type) {
     return graphQl.createObjectType({
@@ -108,22 +70,7 @@ exports.createConnectionType = function (name, type) {
                     return edges;
                 }
             },
-            aggregations: {
-                type: graphQl.list(AggregationType),
-                resolve: function (env) {
-                    var aggregations = env.source.aggregations;
-                    var aggs = [];
-                    for (var key in aggregations) {
-                        if (aggregations.hasOwnProperty(key)) {
-                            aggs.push({
-                                name: key,
-                                aggregation: aggregations[key].buckets
-                            });
-                        }
-                    }
-                    return aggs;
-                }
-            },
+            aggregations: createAggregationsFiled(),
             pageInfo: {
                 type: pageInfoType,
                 resolve: function (env) {
@@ -136,4 +83,4 @@ exports.createConnectionType = function (name, type) {
             }
         }
     });
-}
+};
