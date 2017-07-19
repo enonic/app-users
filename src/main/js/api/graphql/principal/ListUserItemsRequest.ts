@@ -12,6 +12,9 @@ import Role = api.security.Role;
 import Group = api.security.Group;
 import User = api.security.User;
 import StringHelper = api.util.StringHelper;
+import UserJson = api.security.UserJson;
+import GroupJson = api.security.GroupJson;
+import RoleJson = api.security.RoleJson;
 
 type RawTypeAggregation = {
     key: string;
@@ -23,20 +26,37 @@ export type TypeAggregation = {
     count: number;
 }
 
-export class ListTypesRequest
+export class ListUserItemsRequest
     extends ListGraphQlRequest<any, any> {
 
     private searchQuery: string;
 
-    setQuery(query: string): ListTypesRequest {
+    setQuery(query: string): ListUserItemsRequest {
         this.searchQuery = query;
         return this;
     }
 
+    getVariables(): { [key: string]: any } {
+        let vars = super.getVariables();
+        if (this.searchQuery) {
+            vars['query'] = this.searchQuery;
+        }
+        return vars;
+    }
+
     getQuery(): string {
-        return `query {
-                    types {
+        return `query($query: String, $start: Int, $count: Int) {
+                    userItemsConnection (query: $query, start: $start, count: $count) {
                         totalCount
+                        edges {
+                            node {
+                                key,
+                                name,
+                                path,
+                                description,
+                                displayName
+                            }
+                        }
                         aggregations {
                             name,
                             aggregation {
@@ -50,8 +70,13 @@ export class ListTypesRequest
 
     sendAndParse(): wemQ.Promise<any> {
         return this.query().then((response: any) => {
-            const data = response.types;
-            return this.fromAggregationToList(data.aggregations[0].aggregation, data.totalCount);
+            const data = response.userItemsConnection;
+            console.log(data);
+            return {
+                total: data.totalCount,
+                userItems: data.edges.map(edge => this.fromJsonToUserItem(edge.node)),
+                aggregations: this.fromAggregationToList(data.aggregations[0].aggregation, data.totalCount),
+            }
         });
     }
 
@@ -70,5 +95,21 @@ export class ListTypesRequest
         }
 
         return list;
+    }
+
+    private fromJsonToUserItem(json: PrincipalJson | UserStoreJson): Principal | UserStore {
+        try {
+            const pKey: PrincipalKey = PrincipalKey.fromString(json.key);
+            if (pKey.isRole()) {
+                return Role.fromJson(<RoleJson>json);
+            } else if (pKey.isGroup()) {
+                return Group.fromJson(<GroupJson>json);
+
+            } else /*if (pKey.isUser())*/ {
+                return User.fromJson(<UserJson>json);
+            }
+        } catch (e) {
+            return UserStore.fromJson(<UserStoreJson>json);
+        }
     }
 }

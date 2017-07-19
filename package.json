@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "description": "Enonix XP - Users App",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "lint": "eslint ."
   },
   "dependencies": {
     "ts-loader": "^2.0.1",
     "typescript": "2.0.10",
     "webpack": "^2.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.2.0"
   }
 }

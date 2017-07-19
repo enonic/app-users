@@ -2,7 +2,7 @@ var graphQl = require('/lib/graphql');
 
 var userstores = require('userstores');
 var principals = require('principals');
-var types = require('types');
+var useritems = require('useritems');
 
 var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
@@ -66,6 +66,20 @@ module.exports = graphQl.createObjectType({
                 return principals.getByKeys(key, memberships);
             }
         },
+        userItemsConnection: {
+            type: graphQlObjectTypes.UserItemConnectionType,
+            args: {
+                query: graphQl.GraphQLString,
+                start: graphQl.GraphQLInt,
+                count: graphQl.GraphQLInt
+            },
+            resolve: function (env) {
+                var query = env.args.query;
+                var count = env.args.count || Number.MAX_SAFE_INTEGER;
+                var start = env.args.start || 0;
+                return useritems.list(query, start, count);
+            }
+        },
         types: {
             type: graphQlObjectTypes.TypesType,
             args: {
@@ -75,7 +89,7 @@ module.exports = graphQl.createObjectType({
             resolve: function (env) {
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
-                return types.list(start, count);
+                return useritems.list(start, count);
             }
         }
     }
