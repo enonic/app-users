@@ -1,7 +1,3 @@
-var graphQl = require('/lib/graphql');
-
-var principals = require('principals');
-
 var graphQlConnection = require('./connection');
 
 var graphQlUserStore = require('./userStore');
@@ -15,6 +11,12 @@ module.exports = {
     PrincipalType: graphQlPrincipal.PrincipalType,
     PrincipalDeleteType: graphQlPrincipal.PrincipalDeleteType,
     TypesType: graphQlTypes.TypesType,
-    PrincipalConnectionType: graphQlConnection.createConnectionType('Principal', graphQlPrincipal.PrincipalType),
-    UserItemConnectionType: graphQlConnection.createConnectionType('UserItem', graphQlUserItemUnion.UserItemUnionType)
+    PrincipalConnectionType: graphQlConnection.createConnectionType(
+        'Principal',
+        graphQlPrincipal.PrincipalType
+    ),
+    UserItemConnectionType: graphQlConnection.createConnectionType(
+        'UserItem',
+        graphQlUserItemUnion.UserItemUnionType
+    )
 };

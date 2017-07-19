@@ -1,23 +1,34 @@
 module.exports = {
     'extends': [
-        'airbnb-base/legacy'
+        'airbnb-base/legacy',
+        'prettier'
     ],
-    'plugins': [],
+    'plugins': [
+        'prettier'
+    ],
     'rules': {
-        'indent': ['error', 4],
         'comma-dangle': ['error', 'never'],
         'no-underscore-dangle': ['off'],
         'func-names': ['off'],
         'max-len': ['error', 120],
         'no-plusplus': ['error', { 'allowForLoopAfterthoughts': true }],
-        'vars-on-top': 'off'
+        'vars-on-top': 'off',
+        'global-require': 'off',
+        'no-use-before-define': ['error', { 'functions': false }],
+        'prettier/prettier': ['error', {
+            'printWidth': 80,
+            'singleQuote': true,
+            'tabWidth': 4
+        }]
     },
     'env': {
         'node': true
     },
     'globals': {
+        'Java': false,
         'resolve': false,
         'log': true,
+        'env': true,
         'app': true
     }
 };

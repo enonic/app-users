@@ -1,8 +1,8 @@
 var common = require('./common');
 
 module.exports = {
-    list: function (query, start, count) {
-        var result =  common.queryAll({
+    list: function(query, start, count) {
+        var result = common.queryAll({
             query: createUserItemsQuery(query),
             start: start,
             count: count,
@@ -33,7 +33,9 @@ function createTextQuery(query) {
 }
 
 function createTypesQuery() {
-    var query = common.PrincipalType.all().map(function (type) { return 'principalType = "' + type + '"'; });
+    var query = common.PrincipalType.all().map(function(type) {
+        return 'principalType = "' + type + '"';
+    });
     query.push('(_parentPath = "/identity" AND _path != "/identity/roles")');
     return '(' + query.join(' OR ') + ')';
 }

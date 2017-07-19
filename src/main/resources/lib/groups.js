@@ -31,10 +31,11 @@ exports.update = function updateGroup(params) {
 
     var updatedGroup = authLib.modifyGroup({
         key: key,
-        editor: function (group) {
-            group.displayName = params.displayName;
-            group.description = params.description;
-            return group;
+        editor: function(group) {
+            var newGroup = group;
+            newGroup.displayName = params.displayName;
+            newGroup.description = params.description;
+            return newGroup;
         }
     });
 
@@ -42,7 +43,7 @@ exports.update = function updateGroup(params) {
 
     principals.updateMembers(key, params.addMembers, params.removeMembers);
 
-    updatedGroup['member'] = principals.getMembers(key).map(function (member) {
+    updatedGroup.member = principals.getMembers(key).map(function(member) {
         return member.key;
     });
 

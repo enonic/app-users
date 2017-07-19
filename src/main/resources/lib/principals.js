@@ -2,17 +2,21 @@ var common = require('./common');
 var authLib = require('/lib/xp/auth');
 
 module.exports = {
-    getByKeys: function (keys, includeMemberships) {
+    getByKeys: function(keys, includeMemberships) {
         // users and groups have their keys as _id, but roles have them stored as key
         var principals = common.queryAll({
-            query: common.createQueryByField('_id', keys) + ' OR ' + common.createQueryByField('key', keys)
+            query:
+                common.createQueryByField('_id', keys) +
+                ' OR ' +
+                common.createQueryByField('key', keys)
         }).hits;
         if (includeMemberships && principals) {
             // principals may be object so make sure we have array
-            [].concat(principals).forEach(function (p) {
+            [].concat(principals).forEach(function(p) {
                 var key = p.key || p._id;
                 if (common.isUser(key)) {
-                    p["memberships"] = module.exports.getMemberships(key);
+                    // eslint-disable-next-line no-param-reassign
+                    p.memberships = module.exports.getMemberships(key);
                 } else if (common.isGroup(key) || common.isRole(key)) {
                     // uncomment to return principals instead of their keys
                     // p["member"] = common.getByIds(p.member);
@@ -21,26 +25,33 @@ module.exports = {
         }
         return common.singleOrArray(principals);
     },
-    getMemberships: function (key) {
+    getMemberships: function(key) {
         return authLib.getMemberships(key);
     },
-    addMemberships: function (key, memberships) {
-        var addMms = [].concat(memberships).map(function (current) {
+    addMemberships: function(key, memberships) {
+        var addMms = [].concat(memberships).map(function(current) {
             module.exports.addMembers(current, key);
             return current;
         });
-        log.info('Added memberships of [' + key + '] in: ' + JSON.stringify(addMms));
+        log.info(
+            'Added memberships of [' + key + '] in: ' + JSON.stringify(addMms)
+        );
         return addMms;
     },
-    removeMemberships: function (key, memberships) {
-        var removeMms = [].concat(memberships).map(function (current) {
+    removeMemberships: function(key, memberships) {
+        var removeMms = [].concat(memberships).map(function(current) {
             module.exports.removeMembers(current, key);
             return current;
         });
-        log.info('Removed memberships of [' + key + '] from: ' + JSON.stringify(removeMms));
+        log.info(
+            'Removed memberships of [' +
+                key +
+                '] from: ' +
+                JSON.stringify(removeMms)
+        );
         return removeMms;
     },
-    updateMemberships: function (key, addMms, removeMms) {
+    updateMemberships: function(key, addMms, removeMms) {
         if (addMms && addMms.length > 0) {
             module.exports.addMemberships(key, addMms);
         }
@@ -48,28 +59,46 @@ module.exports = {
             module.exports.removeMemberships(key, removeMms);
         }
     },
-    getMembers: function (key) {
+    getMembers: function(key) {
         return authLib.getMembers(key);
     },
-    addMembers: function (key, members) {
+    addMembers: function(key, members) {
         try {
             authLib.addMembers(key, members);
-            log.info('Added members to [' + key + ']: ' + JSON.stringify(members));
-            return members;
+            log.info(
+                'Added members to [' + key + ']: ' + JSON.stringify(members)
+            );
         } catch (e) {
-            log.error('Could not add members ' + JSON.stringify(members) + ' to [' + key + ']', e);
+            log.error(
+                'Could not add members ' +
+                    JSON.stringify(members) +
+                    ' to [' +
+                    key +
+                    ']',
+                e
+            );
         }
+        return members;
     },
-    removeMembers: function (key, members) {
+    removeMembers: function(key, members) {
         try {
             authLib.removeMembers(key, members);
-            log.info('Removed members from [' + key + ']: ' + JSON.stringify(members));
-            return members;
+            log.info(
+                'Removed members from [' + key + ']: ' + JSON.stringify(members)
+            );
         } catch (e) {
-            log.error('Could not remove members ' + JSON.stringify(members) + ' from [' + key + ']', e);
+            log.error(
+                'Could not remove members ' +
+                    JSON.stringify(members) +
+                    ' from [' +
+                    key +
+                    ']',
+                e
+            );
         }
+        return members;
     },
-    updateMembers: function (key, addMs, removeMs) {
+    updateMembers: function(key, addMs, removeMs) {
         if (addMs && addMs.length > 0) {
             module.exports.addMembers(key, addMs);
         }
@@ -77,7 +106,7 @@ module.exports = {
             module.exports.removeMembers(key, removeMs);
         }
     },
-    list: function (userStoreKey, types, query, start, count, sort) {
+    list: function(userStoreKey, types, query, start, count, sort) {
         return common.queryAll({
             query: createPrincipalQuery(userStoreKey, types, query),
             start: start,
@@ -85,53 +114,66 @@ module.exports = {
             sort: sort
         });
     },
-    delete: function (keys) {
+    delete: function(keys) {
         // convert keys to paths because userstores and roles
         // can't have custom ids and thus be deleted by keys
         var deletedIds = common.delete(common.keysToPaths(keys));
-        log.info('Delete result for keys ' + JSON.stringify(keys) + ': ' + JSON.stringify(deletedIds));
+        log.info(
+            'Delete result for keys ' +
+                JSON.stringify(keys) +
+                ': ' +
+                JSON.stringify(deletedIds)
+        );
 
-        //TODO: find which keys could not be deleted with reasons instead of returning all
-        keys.forEach(function (key) {
+        // TODO: find which keys could not be deleted with reasons instead of returning all
+        keys.forEach(function(key) {
             var memberships = module.exports.getMemberships(key);
-            log.info('Got memberships for key ' + key + ': ' + JSON.stringify(memberships));
-            module.exports.removeMemberships(key, memberships.map(function (membership) {
-                return membership.key;
-            }));
+            log.info(
+                'Got memberships for key ' +
+                    key +
+                    ': ' +
+                    JSON.stringify(memberships)
+            );
+            module.exports.removeMemberships(
+                key,
+                memberships.map(function(membership) {
+                    return membership.key;
+                })
+            );
         });
 
-        return keys.map(function (key) {
+        return keys.map(function(key) {
             return {
                 key: key,
                 deleted: true,
                 reason: ''
-            }
+            };
         });
     },
     Type: common.PrincipalType
 };
 
 function createPrincipalQuery(userStoreKey, types, query) {
-
-    var q = !!query ? textQuery(query) : '';
+    var q = query ? textQuery(query) : '';
     if (!types) {
         q += (q ? ' AND ' : '') + userStoreQuery(userStoreKey);
     } else {
         var tq = '';
-        types.forEach(function (type, index) {
+        types.forEach(function(type, index) {
             var add;
             switch (type) {
-            case common.PrincipalType.ROLE:
-                add = rolesQuery();
-                break;
-            case common.PrincipalType.GROUP:
-            case common.PrincipalType.USER:
-                add = userStoreQuery(userStoreKey, type);
-                break;
+                case common.PrincipalType.ROLE:
+                    add = rolesQuery();
+                    break;
+                case common.PrincipalType.GROUP:
+                case common.PrincipalType.USER:
+                    add = userStoreQuery(userStoreKey, type);
+                    break;
+                default: // none
             }
             tq += (index > 0 ? ' OR ' : '') + add;
         });
-        q += (q ? ' AND (' + tq + ')' : tq);
+        q += q ? ' AND (' + tq + ')' : tq;
     }
     return q;
 }
@@ -142,9 +184,14 @@ function textQuery(query) {
 }
 
 function rolesQuery() {
-    return '_parentPath="/identity/roles"'
+    return '_parentPath="/identity/roles"';
 }
 
 function userStoreQuery(key, type) {
-    return '(userStoreKey="' + key + '"' + (type ? 'AND principalType="' + type + '")' : ')');
+    return (
+        '(userStoreKey="' +
+        key +
+        '"' +
+        (type ? 'AND principalType="' + type + '")' : ')')
+    );
 }

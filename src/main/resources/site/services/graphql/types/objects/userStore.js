@@ -12,13 +12,13 @@ var UserStoreAccessControlEntryType = graphQl.createObjectType({
     fields: {
         principal: {
             type: graphQl.reference('Principal'),
-            resolve: function (env) {
+            resolve: function(env) {
                 return principals.getByKeys(env.source.principal);
             }
         },
         access: {
             type: graphQlEnums.UserStoreAccessEnum,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.access;
             }
         }
@@ -31,14 +31,14 @@ exports.AuthConfig = graphQl.createObjectType({
     fields: {
         applicationKey: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.applicationKey;
             }
         },
         config: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
-                //TODO: config is not read from db yet, and there's no suitable graphql type for unstructured data
+            resolve: function() {
+                // TODO: config is not read from db yet, and there's no suitable graphql type for unstructured data
                 return JSON.stringify([]);
             }
         }
@@ -52,61 +52,61 @@ exports.UserStoreType = graphQl.createObjectType({
     fields: {
         id: {
             type: graphQl.GraphQLID,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._id;
             }
         },
         key: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._name;
             }
         },
         name: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._name;
             }
         },
         path: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._path;
             }
         },
         displayName: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.displayName;
             }
         },
         description: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.description;
             }
         },
         authConfig: {
             type: exports.AuthConfig,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.idProvider;
             }
         },
         idProviderMode: {
             type: graphQlEnums.IdProviderModeEnum,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.idProviderMode;
             }
         },
         permissions: {
             type: graphQl.list(UserStoreAccessControlEntryType),
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.access;
             }
         },
         modifiedTime: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._timestamp;
             }
         }
@@ -119,19 +119,19 @@ exports.UserStoreDeleteType = graphQl.createObjectType({
     fields: {
         userStoreKey: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.key;
             }
         },
         deleted: {
             type: graphQl.GraphQLBoolean,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.deleted;
             }
         },
         reason: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.reason;
             }
         }

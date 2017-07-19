@@ -32,24 +32,29 @@ exports.update = function updateUser(params) {
 
     var updatedUser = authLib.modifyUser({
         key: key,
-        editor: function (user) {
-            user.displayName = params.displayName;
-            user.email = params.email;
-            user.login = params.login;
-            return user;
+        editor: function(user) {
+            var newUser = user;
+            newUser.displayName = params.displayName;
+            newUser.email = params.email;
+            newUser.login = params.login;
+            return newUser;
         }
     });
 
     log.info('updatedUser: ' + JSON.stringify(updatedUser));
 
-    principals.updateMemberships(key, params.addMemberships, params.removeMemberships);
+    principals.updateMemberships(
+        key,
+        params.addMemberships,
+        params.removeMemberships
+    );
 
-    updatedUser['memberships'] = principals.getMemberships(key);
+    updatedUser.memberships = principals.getMemberships(key);
 
     return updatedUser;
 };
 
-exports.updatePwd = function (key, pwd) {
+exports.updatePwd = function(key, pwd) {
     try {
         authLib.changePassword({
             userKey: key,

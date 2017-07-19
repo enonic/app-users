@@ -55,10 +55,10 @@ export class ListTypesRequest
         });
     }
 
-    private fromAggregationToList(aggregation: RawTypeAggregation[], total: number): TypeAggregation[] {
+    private fromAggregationToList(aggregation: RawTypeAggregation[] = [], total: number): TypeAggregation[] {
         const principalsCount = aggregation.length > 1 ?
                                 aggregation.reduce((prev: number, curr: RawTypeAggregation) => prev + curr.count, 0) :
-                                (aggregation[0].count || 0);
+                                (aggregation[0] && aggregation[0].count || 0);
         const userStoresCount = total - principalsCount;
 
         const list: TypeAggregation[] = aggregation.map(value => {

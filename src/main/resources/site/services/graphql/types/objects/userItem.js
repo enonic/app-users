@@ -6,43 +6,43 @@ module.exports = graphQl.createInterfaceType({
     fields: {
         id: {
             type: graphQl.GraphQLID,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._id;
             }
         },
         key: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.key || env.source._id;
             }
         },
         name: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._name;
             }
         },
         path: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._path;
             }
         },
         displayName: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.displayName;
             }
         },
         description: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.description;
             }
         },
         modifiedTime: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._timestamp;
             }
         }

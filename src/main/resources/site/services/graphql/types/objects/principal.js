@@ -13,19 +13,19 @@ var PrincipalAccessControlEntryType = graphQl.createObjectType({
     fields: {
         principal: {
             type: graphQl.reference('Principal'),
-            resolve: function (env) {
+            resolve: function(env) {
                 return principals.getByKeys(env.source.principal);
             }
         },
         allow: {
             type: graphQl.list(graphQlEnums.PermissionEnum),
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.allow;
             }
         },
         deny: {
             type: graphQl.list(graphQlEnums.PermissionEnum),
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.deny;
             }
         }
@@ -39,85 +39,85 @@ exports.PrincipalType = graphQl.createObjectType({
     fields: {
         id: {
             type: graphQl.GraphQLID,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._id;
             }
         },
         key: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.key || env.source._id;
             }
         },
         name: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._name;
             }
         },
         path: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._path;
             }
         },
         displayName: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.displayName;
             }
         },
         description: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.description;
             }
         },
         principalType: {
             type: graphQlEnums.PrincipalTypeEnum,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.principalType;
             }
         },
         userStoreKey: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.userStoreKey;
             }
         },
         permissions: {
             type: graphQl.list(PrincipalAccessControlEntryType),
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._permissions || [];
             }
         },
         login: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.login;
             }
         },
         email: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.email;
             }
         },
         memberships: {
             type: graphQl.list(graphQl.reference('Principal')),
-            resolve: function (env) {
+            resolve: function(env) {
                 return graphQlUtils.toArray(env.source.memberships);
             }
         },
         members: {
             type: graphQl.list(graphQl.GraphQLString),
-            resolve: function (env) {
+            resolve: function(env) {
                 return graphQlUtils.toArray(env.source.member);
             }
         },
         modifiedTime: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._timestamp;
             }
         }
@@ -130,19 +130,19 @@ exports.PrincipalDeleteType = graphQl.createObjectType({
     fields: {
         principalKey: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.key;
             }
         },
         deleted: {
             type: graphQl.GraphQLBoolean,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.deleted;
             }
         },
         reason: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.reason;
             }
         }

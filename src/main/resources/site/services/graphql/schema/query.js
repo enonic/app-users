@@ -17,7 +17,7 @@ module.exports = graphQl.createObjectType({
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
@@ -29,7 +29,7 @@ module.exports = graphQl.createObjectType({
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString)
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 var key = env.args.key;
                 return userstores.getByKeys(key);
             }
@@ -44,14 +44,21 @@ module.exports = graphQl.createObjectType({
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 var userstore = env.args.userstore || 'system';
                 var types = env.args.types || principals.Type.all();
                 var query = env.args.query;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return principals.list(userstore, types, query, start, count, sort);
+                return principals.list(
+                    userstore,
+                    types,
+                    query,
+                    start,
+                    count,
+                    sort
+                );
             }
         },
         principal: {
@@ -60,7 +67,7 @@ module.exports = graphQl.createObjectType({
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 memberships: graphQl.GraphQLBoolean
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 var key = env.args.key;
                 var memberships = env.args.memberships;
                 return principals.getByKeys(key, memberships);
@@ -73,7 +80,7 @@ module.exports = graphQl.createObjectType({
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 var query = env.args.query;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
@@ -86,7 +93,7 @@ module.exports = graphQl.createObjectType({
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
                 return useritems.list(start, count);
