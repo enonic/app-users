@@ -22,7 +22,6 @@ export class PrincipalTypeAggregationGroupView extends AggregationGroupView {
                 aggregationView.setDisplayNamesMap(displayNameMap);
             });
 
-            console.log(data);
             mask.remove();
         });
     }

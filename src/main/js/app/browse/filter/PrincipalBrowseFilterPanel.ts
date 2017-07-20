@@ -46,23 +46,6 @@ export class PrincipalBrowseFilterPanel
         aggregationGroupViews.forEach(aggregation => aggregation.initialize());
     }
 
-    // private initAggregationGroupView(aggregationGroupViews: AggregationGroupView[]) {
-    //
-    //     let contentQuery: ContentQuery = this.buildAggregationsQuery();
-    //
-    //     new ContentQueryRequest<ContentSummaryJson,ContentSummary>(contentQuery).sendAndParse().then(
-    //         (contentQueryResult: ContentQueryResult<ContentSummary,ContentSummaryJson>) => {
-    //
-    //             this.updateAggregations(contentQueryResult.getAggregations(), false);
-    //             this.updateHitsCounter(contentQueryResult.getMetadata().getTotalHits(), true);
-    //             this.toggleAggregationsVisibility(contentQueryResult.getAggregations());
-    //
-    //             aggregationGroupViews.forEach(aggregation => aggregation.initialize());
-    //         }).catch((reason: any) => {
-    //         api.DefaultErrorHandler.handle(reason);
-    //     }).done();
-    // }
-
     doRefresh() {
         this.searchFacets(true);
     }
@@ -124,25 +107,5 @@ export class PrincipalBrowseFilterPanel
     private initHitsCounter() {
         this.searchDataAndHandleResponse('', false);
     }
-
-    // private toggleAggregationsVisibility(aggregations: Aggregation[]) {
-    //     aggregations.forEach((aggregation: api.aggregation.BucketAggregation) => {
-    //         let aggregationIsEmpty = !aggregation.getBuckets().some((bucket: api.aggregation.Bucket) => {
-    //             if (bucket.docCount > 0) {
-    //                 return true;
-    //             }
-    //         });
-    //
-    //         let aggregationGroupView = aggregation.getName() === ContentBrowseFilterPanel.CONTENT_TYPE_AGGREGATION_NAME
-    //             ? this.contentTypeAggregation
-    //             : this.lastModifiedAggregation;
-    //
-    //         if (aggregationIsEmpty) {
-    //             aggregationGroupView.hide();
-    //         } else {
-    //             aggregationGroupView.show();
-    //         }
-    //     });
-    // }
 
 }

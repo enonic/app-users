@@ -71,7 +71,6 @@ export class ListUserItemsRequest
     sendAndParse(): wemQ.Promise<any> {
         return this.query().then((response: any) => {
             const data = response.userItemsConnection;
-            console.log(data);
             return {
                 total: data.totalCount,
                 userItems: data.edges.map(edge => this.fromJsonToUserItem(edge.node)),
