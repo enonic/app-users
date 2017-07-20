@@ -6,5 +6,6 @@ build/
 *.iml
 *.ipr
 .idea
+.tern-project
 npm-debug.log
 node_modules/

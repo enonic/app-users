@@ -2,6 +2,7 @@ import '../../api.ts';
 
 import Principal = api.security.Principal;
 import UserStore = api.security.UserStore;
+import UserItem = api.security.UserItem;
 
 export enum UserTreeGridItemType {
     USER_STORE,
@@ -142,6 +143,15 @@ export class UserTreeGridItemBuilder {
 
     setType(type: UserTreeGridItemType): UserTreeGridItemBuilder {
         this.type = type;
+        return this;
+    }
+
+    setAny(userItem: UserItem): UserTreeGridItemBuilder {
+        if (userItem instanceof Principal) {
+            return this.setPrincipal(userItem).setType(UserTreeGridItemType.PRINCIPAL);
+        } else if (userItem instanceof UserStore) {
+            return this.setUserStore(userItem).setType(UserTreeGridItemType.USER_STORE);
+        }
         return this;
     }
 

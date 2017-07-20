@@ -1,6 +1,7 @@
 import '../../../api.ts';
 import {UserTreeGridItem} from '../UserTreeGridItem';
-import {ListPrincipalsRequest} from '../../../api/graphql/principal/ListPrincipalsRequest';
+import {PrincipalTypeAggregationGroupView} from './PrincipalTypeAggregationGroupView';
+import {ListUserItemsRequest} from '../../../api/graphql/principal/ListUserItemsRequest';
 import AggregationGroupView = api.aggregation.AggregationGroupView;
 import SearchInputValues = api.query.SearchInputValues;
 import Principal = api.security.Principal;
@@ -15,14 +16,34 @@ import LogicalOperator = api.query.expr.LogicalOperator;
 import LogicalExp = api.query.expr.LogicalExpr;
 import FieldExpr = api.query.expr.FieldExpr;
 import QueryField = api.query.QueryField;
+import i18n = api.util.i18n;
+import Aggregation = api.aggregation.Aggregation;
 
 export class PrincipalBrowseFilterPanel
     extends api.app.browse.filter.BrowseFilterPanel<UserTreeGridItem> {
 
+    static PRINCIPAL_TYPE_AGGREGATION_NAME: string = 'principalTypes';
+    static PRINCIPAL_TYPE_AGGREGATION_DISPLAY_NAME: string = i18n('field.principalTypes');
+
+    private principalTypeAggregation: PrincipalTypeAggregationGroupView;
+
     constructor() {
         super();
 
+        this.initAggregationGroupView([this.principalTypeAggregation]);
         this.initHitsCounter();
+    }
+
+    protected getGroupViews(): api.aggregation.AggregationGroupView[] {
+        this.principalTypeAggregation = new PrincipalTypeAggregationGroupView(
+            PrincipalBrowseFilterPanel.PRINCIPAL_TYPE_AGGREGATION_NAME,
+            PrincipalBrowseFilterPanel.PRINCIPAL_TYPE_AGGREGATION_DISPLAY_NAME);
+
+        return [this.principalTypeAggregation];
+    }
+
+    private initAggregationGroupView(aggregationGroupViews: AggregationGroupView[]) {
+        aggregationGroupViews.forEach(aggregation => aggregation.initialize());
     }
 
     doRefresh() {
@@ -63,21 +84,21 @@ export class PrincipalBrowseFilterPanel
 
     private searchDataAndHandleResponse(searchString: string, fireEvent: boolean = true) {
 
-        new ListPrincipalsRequest()
+        new ListUserItemsRequest()
             .setQuery(searchString)
             .sendAndParse()
             .then((result) => {
-                let principals = result.principals;
+                let userItems = result.userItems;
 
                 if (this.hasConstraint()) {
                     let principalKeys = this.getSelectionItems().map(key => key.getDataId());
-                    principals = principals.filter(principal => principalKeys.some(pr => pr === principal.getKey().toString()));
+                    userItems = userItems.filter(principal => principalKeys.some(pr => pr === principal.getKey().toString()));
                 }
 
                 if (fireEvent) {
-                    new BrowseFilterSearchEvent(principals).fire();
+                    new BrowseFilterSearchEvent(userItems).fire();
                 }
-                this.updateHitsCounter(principals ? principals.length : 0, api.util.StringHelper.isBlank(searchString));
+                this.updateHitsCounter(userItems ? userItems.length : 0, api.util.StringHelper.isBlank(searchString));
             }).catch((reason: any) => {
             api.DefaultErrorHandler.handle(reason);
         }).done();

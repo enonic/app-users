@@ -1,5 +1,6 @@
 import i18n = api.util.i18n;
 declare var CONFIG;
+api.util.i18nInit(CONFIG.messages);
 
 import './api.ts';
 import {UserAppPanel} from './app/UserAppPanel';
@@ -58,6 +59,5 @@ function startApplication() {
 }
 
 window.onload = function () {
-    api.util.i18nInit(CONFIG.messages);
     startApplication();
 };

@@ -39,10 +39,10 @@ export class ListPrincipalsRequest
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }
-        if (!!this.userStoreKey) {
+        if (this.userStoreKey) {
             vars['userstore'] = this.userStoreKey.toString();
         }
-        if (!!this.searchQuery) {
+        if (this.searchQuery) {
             vars['query'] = this.searchQuery;
         }
         return vars;
@@ -77,8 +77,8 @@ export class ListPrincipalsRequest
         return this.query().then((response: any) => {
             let data = response.principalsConnection;
             return {
-                principals: data.edges.map(edge => this.fromJsonToPrincipal(edge.node)),
-                total: data.totalCount
+                total: data.totalCount,
+                principals: data.edges.map(edge => this.fromJsonToPrincipal(edge.node))
             }
         });
     }

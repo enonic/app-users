@@ -22,6 +22,7 @@ import BrowseFilterResetEvent = api.app.browse.filter.BrowseFilterResetEvent;
 import BrowseFilterSearchEvent = api.app.browse.filter.BrowseFilterSearchEvent;
 import i18n = api.util.i18n;
 import ResponsiveRanges = api.ui.responsive.ResponsiveRanges;
+import UserItem = api.security.UserItem;
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -75,8 +76,8 @@ export class UserItemsTreeGrid
 
     private initEventHandlers() {
         BrowseFilterSearchEvent.on((event) => {
-            let items = event.getData().map((principal: Principal) => {
-                return new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
+            const items = event.getData().map((userItem: UserItem) => {
+                return new UserTreeGridItemBuilder().setAny(userItem).build();
             });
             this.filter(items);
             this.notifyLoaded();

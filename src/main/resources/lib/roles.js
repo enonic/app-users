@@ -2,14 +2,13 @@ var common = require('./common');
 var principals = require('./principals');
 
 exports.create = function createRole(params) {
-
     var key = common.required(params, 'key');
     var name = common.nameFromKey(key);
 
     var createdRole = common.create({
         _parentPath: '/identity/roles',
         _name: name,
-        key: key,   //TODO: save key to a separate field because we can't save it as id
+        key: key, // TODO: save key to a separate field because we can't save it as id
         displayName: common.required(params, 'displayName'),
         description: params.description,
         principalType: principals.Type.ROLE
@@ -33,10 +32,11 @@ exports.update = function updateRole(params) {
 
     var updatedRole = common.update({
         key: '/identity/roles/' + common.nameFromKey(key),
-        editor: function (role) {
-            role.displayName = params.displayName;
-            role.description = params.description;
-            return role;
+        editor: function(role) {
+            var newRole = role;
+            newRole.displayName = params.displayName;
+            newRole.description = params.description;
+            return newRole;
         }
     });
 
@@ -50,7 +50,10 @@ exports.update = function updateRole(params) {
 };
 
 function populateMembers(role) {
-    role['member'] = principals.getMembers(role.key || role._id).map(function (member) {
-        return member.key;
-    });
+    // eslint-disable-next-line no-param-reassign
+    role.member = principals
+        .getMembers(role.key || role._id)
+        .map(function(member) {
+            return member.key;
+        });
 }

@@ -33,10 +33,11 @@ exports.update = function updateGroup(params) {
 
     var updatedGroup = authLib.modifyGroup({
         key: key,
-        editor: function (group) {
-            group.displayName = params.displayName;
-            group.description = params.description;
-            return group;
+        editor: function(group) {
+            var newGroup = group;
+            newGroup.displayName = params.displayName;
+            newGroup.description = params.description;
+            return newGroup;
         }
     });
 
@@ -50,7 +51,10 @@ exports.update = function updateGroup(params) {
 };
 
 function populateMembers(group) {
-    group['member'] = principals.getMembers(group.key || group._id).map(function (member) {
-        return member.key;
-    });
+    // eslint-disable-next-line no-param-reassign
+    group.member = principals
+        .getMembers(group.key || group._id)
+        .map(function(member) {
+            return member.key;
+        });
 }

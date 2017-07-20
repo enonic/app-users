@@ -1,30 +1,30 @@
 var graphQl = require('graphql');
-var graphQlUtil = require('./graphql-util');
+var graphQlUtils = require('../../utils');
+var createAggregationsFiled = require('./aggregations').createAggregationsFiled;
 
 var pageInfoType = graphQl.createObjectType({
     name: 'PageInfo',
     fields: {
         startCursor: {
-            type: graphQl.nonNull(graphQl.GraphQLInt), //TODO Replace by base64
-            resolve: function (env) {
-                return graphQlUtil.toInt(env.source.startCursor);
+            type: graphQl.nonNull(graphQl.GraphQLInt),
+            resolve: function(env) {
+                return graphQlUtils.toInt(env.source.startCursor);
             }
         },
         endCursor: {
-            type: graphQl.nonNull(graphQl.GraphQLInt), //TODO Replace by base64
-            resolve: function (env) {
-                return graphQlUtil.toInt(env.source.endCursor);
+            type: graphQl.nonNull(graphQl.GraphQLInt),
+            resolve: function(env) {
+                return graphQlUtils.toInt(env.source.endCursor);
             }
         },
         hasNext: {
             type: graphQl.nonNull(graphQl.GraphQLBoolean),
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source.hasNext;
             }
         }
     }
 });
-
 
 function createEdgeType(name, type) {
     return graphQl.createObjectType({
@@ -32,33 +32,33 @@ function createEdgeType(name, type) {
         fields: {
             node: {
                 type: graphQl.nonNull(type),
-                resolve: function (env) {
+                resolve: function(env) {
                     return env.source.node;
                 }
             },
             cursor: {
-                type: graphQl.nonNull(graphQl.GraphQLInt), //TODO Replace by base64
-                resolve: function (env) {
-                    return graphQlUtil.toInt(env.source.cursor);
+                type: graphQl.nonNull(graphQl.GraphQLInt),
+                resolve: function(env) {
+                    return graphQlUtils.toInt(env.source.cursor);
                 }
             }
         }
     });
 }
 
-exports.createConnectionType = function (name, type) {
+exports.createConnectionType = function(name, type) {
     return graphQl.createObjectType({
         name: name + 'Connection',
         fields: {
             totalCount: {
                 type: graphQl.nonNull(graphQl.GraphQLInt),
-                resolve: function (env) {
+                resolve: function(env) {
                     return env.source.total;
                 }
             },
             edges: {
                 type: graphQl.list(createEdgeType(name, type)),
-                resolve: function (env) {
+                resolve: function(env) {
                     var hits = env.source.hits;
                     var edges = [];
                     for (var i = 0; i < hits.length; i++) {
@@ -70,16 +70,21 @@ exports.createConnectionType = function (name, type) {
                     return edges;
                 }
             },
+            aggregations: createAggregationsFiled(),
             pageInfo: {
                 type: pageInfoType,
-                resolve: function (env) {
+                resolve: function(env) {
                     return {
                         startCursor: env.source.start,
-                        endCursor: env.source.start + (env.source.count == 0 ? 0 : (env.source.count - 1)),
-                        hasNext: (env.source.start + env.source.count) < env.source.total
-                    }
+                        endCursor:
+                            env.source.start +
+                            (env.source.count === 0 ? 0 : env.source.count - 1),
+                        hasNext:
+                            env.source.start + env.source.count <
+                            env.source.total
+                    };
                 }
             }
         }
     });
-}
+};

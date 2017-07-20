@@ -1,29 +1,31 @@
 var graphQl = require('/lib/graphql');
+
 var userstores = require('userstores');
 var principals = require('principals');
 var users = require('users');
 var groups = require('groups');
 var roles = require('roles');
-var types = require('./graphql-types');
-var inputs = require('./graphql-inputs');
 
-exports.mutation = graphQl.createObjectType({
+var graphQlObjectTypes = require('../types').objects;
+var graphQlInputTypes = require('../types').inputs;
+
+module.exports = graphQl.createObjectType({
     name: 'Mutation',
     fields: {
         // Principal
         deletePrincipals: {
-            type: graphQl.list(types.PrincipalDeleteType),
+            type: graphQl.list(graphQlObjectTypes.PrincipalDeleteType),
             args: {
                 keys: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 return principals.delete(env.args.keys);
             }
         },
 
         // User
         createUser: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -32,8 +34,7 @@ exports.mutation = graphQl.createObjectType({
                 password: graphQl.nonNull(graphQl.GraphQLString),
                 memberships: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 return users.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -45,7 +46,7 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateUser: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -54,8 +55,7 @@ exports.mutation = graphQl.createObjectType({
                 addMemberships: graphQl.list(graphQl.GraphQLString),
                 removeMemberships: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 return users.update({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -72,22 +72,21 @@ exports.mutation = graphQl.createObjectType({
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 password: graphQl.nonNull(graphQl.GraphQLString)
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 return users.updatePwd(env.args.key, env.args.password);
             }
         },
 
         // Group
         createGroup: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
                 members: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 return groups.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -97,7 +96,7 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateGroup: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -105,8 +104,7 @@ exports.mutation = graphQl.createObjectType({
                 addMembers: graphQl.list(graphQl.GraphQLString),
                 removeMembers: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 return groups.update({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -119,15 +117,14 @@ exports.mutation = graphQl.createObjectType({
 
         // Role
         createRole: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
                 members: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 return roles.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -137,7 +134,7 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateRole: {
-            type: types.PrincipalType,
+            type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -145,8 +142,7 @@ exports.mutation = graphQl.createObjectType({
                 addMembers: graphQl.list(graphQl.GraphQLString),
                 removeMembers: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 return roles.update({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -159,20 +155,21 @@ exports.mutation = graphQl.createObjectType({
 
         // UserStore
         createUserStore: {
-            type: types.UserStoreType,
+            type: graphQlObjectTypes.UserStoreType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: inputs.AuthConfigInput,
-                permissions: graphQl.list(inputs.UserStoreAccessControlInput)
+                authConfig: graphQlInputTypes.AuthConfigInput,
+                permissions: graphQl.list(
+                    graphQlInputTypes.UserStoreAccessControlInput
+                )
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 var authConfig = env.args.authConfig;
                 if (authConfig) {
                     // parse config as there's no graphql type for it
-                    authConfig.config = JSON.parse(authConfig.config)
+                    authConfig.config = JSON.parse(authConfig.config);
                 }
 
                 return userstores.create({
@@ -185,20 +182,21 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         updateUserStore: {
-            type: types.UserStoreType,
+            type: graphQlObjectTypes.UserStoreType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: inputs.AuthConfigInput,
-                permissions: graphQl.list(inputs.UserStoreAccessControlInput)
+                authConfig: graphQlInputTypes.AuthConfigInput,
+                permissions: graphQl.list(
+                    graphQlInputTypes.UserStoreAccessControlInput
+                )
             },
-            resolve: function (env) {
-
+            resolve: function(env) {
                 var authConfig = env.args.authConfig;
                 if (authConfig) {
                     // parse config as there's no graphql type for it
-                    authConfig.config = JSON.parse(authConfig.config)
+                    authConfig.config = JSON.parse(authConfig.config);
                 }
 
                 return userstores.update({
@@ -211,11 +209,11 @@ exports.mutation = graphQl.createObjectType({
             }
         },
         deleteUserStores: {
-            type: graphQl.list(types.UserStoreDeleteType),
+            type: graphQl.list(graphQlObjectTypes.UserStoreDeleteType),
             args: {
                 keys: graphQl.list(graphQl.GraphQLString)
             },
-            resolve: function (env) {
+            resolve: function(env) {
                 return userstores.delete(env.args.keys);
             }
         }
