@@ -58,8 +58,13 @@ export class CreateUserRequest
         return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String!, $memberships: [String]) {
             createUser(key: $key, displayName: $displayName, email: $email, login: $login, password: $password, memberships: $memberships) {
                 key
-                path
+                login
                 displayName
+                email
+                memberships {
+                    key
+                    displayName
+                }
             }
         }`;
     }

@@ -21,6 +21,8 @@ exports.create = function createRole(params) {
         principals.addMembers(key, members);
     }
 
+    populateMembers(createdRole);
+
     return createdRole;
 };
 
@@ -42,9 +44,16 @@ exports.update = function updateRole(params) {
 
     principals.updateMembers(key, params.addMembers, params.removeMembers);
 
-    updatedRole.member = principals.getMembers(key).map(function(member) {
-        return member.key;
-    });
+    populateMembers(updatedRole);
 
     return updatedRole;
 };
+
+function populateMembers(role) {
+    // eslint-disable-next-line no-param-reassign
+    role.member = principals
+        .getMembers(role.key || role._id)
+        .map(function(member) {
+            return member.key;
+        });
+}

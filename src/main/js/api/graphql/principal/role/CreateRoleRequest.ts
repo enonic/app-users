@@ -43,8 +43,9 @@ export class CreateRoleRequest
         return `mutation ($key: String!, $displayName: String!, $description: String, $members: [String]) {
             createRole(key: $key, displayName: $displayName, description: $description, members: $members) {
                 key
-                path
                 displayName
+                description
+                members
             }
         }`;
     }

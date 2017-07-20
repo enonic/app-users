@@ -23,6 +23,8 @@ exports.create = function createUser(params) {
 
     exports.updatePwd(key, common.required(params, 'password'));
 
+    populateMemberships(createdUser);
+
     return createdUser;
 };
 
@@ -49,7 +51,7 @@ exports.update = function updateUser(params) {
         params.removeMemberships
     );
 
-    updatedUser.memberships = principals.getMemberships(key);
+    populateMemberships(updatedUser);
 
     return updatedUser;
 };
@@ -67,3 +69,8 @@ exports.updatePwd = function(key, pwd) {
         return false;
     }
 };
+
+function populateMemberships(user) {
+    // eslint-disable-next-line no-param-reassign
+    user.memberships = principals.getMemberships(user.key || user._id);
+}
