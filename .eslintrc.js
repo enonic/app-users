@@ -10,7 +10,6 @@ module.exports = {
         'comma-dangle': ['error', 'never'],
         'no-underscore-dangle': ['off'],
         'func-names': ['off'],
-        'max-len': ['error', 120],
         'no-plusplus': ['error', { 'allowForLoopAfterthoughts': true }],
         'vars-on-top': 'off',
         'global-require': 'off',

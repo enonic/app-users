@@ -19,6 +19,17 @@ exports.SortModeEnum = graphQl.createEnumType({
     }
 });
 
+exports.UserItemTypeEnum = graphQl.createEnumType({
+    name: 'UserItemType',
+    description: 'Enumeration of user item types',
+    values: {
+        USER_STORE: 'USER_STORE',
+        USER: 'USER',
+        GROUP: 'GROUP',
+        ROLE: 'ROLE'
+    }
+});
+
 exports.PrincipalTypeEnum = graphQl.createEnumType({
     name: 'PrincipalType',
     description: 'Enumeration of principal types',

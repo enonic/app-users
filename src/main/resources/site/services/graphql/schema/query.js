@@ -76,15 +76,17 @@ module.exports = graphQl.createObjectType({
         userItemsConnection: {
             type: graphQlObjectTypes.UserItemConnectionType,
             args: {
+                types: graphQl.list(graphQlEnums.UserItemTypeEnum),
                 query: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
             resolve: function(env) {
+                var types = env.args.types;
                 var query = env.args.query;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
-                return useritems.list(query, start, count);
+                return useritems.list(types, query, start, count);
             }
         },
         types: {

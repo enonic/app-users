@@ -10,7 +10,7 @@ var BucketType = graphQl.createObjectType({
                 return env.source.key;
             }
         },
-        count: {
+        docCount: {
             type: graphQl.GraphQLInt,
             resolve: function(env) {
                 return env.source.docCount;
@@ -29,7 +29,7 @@ var AggregationType = graphQl.createObjectType({
                 return env.source.name;
             }
         },
-        aggregation: {
+        buckets: {
             type: graphQl.list(BucketType),
             resolve: function(env) {
                 return env.source.aggregation;
