@@ -26,15 +26,14 @@ export class PrincipalBrowseFilterPanel
     extends api.app.browse.filter.BrowseFilterPanel<UserTreeGridItem> {
 
     static PRINCIPAL_TYPE_AGGREGATION_NAME: string = 'principalType';
-    static PRINCIPAL_TYPE_AGGREGATION_DISPLAY_NAME: string = i18n('field.principalTypes');
+    static PRINCIPAL_TYPE_AGGREGATION_DISPLAY_NAME: string = i18n('field.types');
 
     private principalTypeAggregation: PrincipalTypeAggregationGroupView;
 
     constructor() {
         super();
 
-        this.initAggregationGroupView([this.principalTypeAggregation]);
-        this.initHitsCounter();
+        this.initHitsCounter().then(() => this.initAggregationGroupView([this.principalTypeAggregation]));
     }
 
     protected getGroupViews(): api.aggregation.AggregationGroupView[] {
@@ -100,9 +99,9 @@ export class PrincipalBrowseFilterPanel
             .filter(type => type != null);
     }
 
-    private searchDataAndHandleResponse(searchString: string, fireEvent: boolean = true) {
+    private searchDataAndHandleResponse(searchString: string, fireEvent: boolean = true): wemQ.Promise<void> {
 
-        new ListUserItemsRequest()
+        return new ListUserItemsRequest()
             .setTypes(this.getCheckedTypes())
             .setQuery(searchString)
             .sendAndParse()
@@ -121,12 +120,12 @@ export class PrincipalBrowseFilterPanel
                 this.updateHitsCounter(userItems ? userItems.length : 0, api.util.StringHelper.isBlank(searchString));
                 this.toggleAggregationsVisibility(result.aggregations);
             }).catch((reason: any) => {
-            api.DefaultErrorHandler.handle(reason);
-        }).done();
+                api.DefaultErrorHandler.handle(reason);
+            });
     }
 
-    private initHitsCounter() {
-        this.searchDataAndHandleResponse('', false);
+    private initHitsCounter(): wemQ.Promise<void> {
+        return this.searchDataAndHandleResponse('', false);
     }
 
     private toggleAggregationsVisibility(aggregations: Aggregation[]) {
