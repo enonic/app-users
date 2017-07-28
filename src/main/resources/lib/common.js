@@ -5,6 +5,22 @@ var REPO_NAME = 'system-repo';
 var REPO_BRANCH = 'master';
 var MAX_COUNT = 100;
 
+exports.UserItemType = {
+    ROLE: 'ROLE',
+    USER: 'USER',
+    GROUP: 'GROUP',
+    USER_STORE: 'USER_STORE'
+};
+var UserItemType = exports.UserItemType;
+exports.UserItemType.all = function() {
+    return [
+        UserItemType.ROLE,
+        UserItemType.USER,
+        UserItemType.GROUP,
+        UserItemType.USER_STORE
+    ];
+};
+
 exports.PrincipalType = {
     ROLE: 'ROLE',
     USER: 'USER',

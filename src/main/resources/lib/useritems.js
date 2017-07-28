@@ -1,13 +1,13 @@
 var common = require('./common');
 
 module.exports = {
-    list: function(query, start, count) {
+    list: function(types, query, start, count) {
         var result = common.queryAll({
-            query: createUserItemsQuery(query),
+            query: createUserItemsQuery(query, types),
             start: start,
             count: count,
             aggregations: {
-                type: {
+                principalType: {
                     terms: {
                         field: 'principalType'
                     }
@@ -16,11 +16,12 @@ module.exports = {
         });
 
         return result;
-    }
+    },
+    Type: common.UserItemType
 };
 
-function createUserItemsQuery(query) {
-    var q = createTypesQuery();
+function createUserItemsQuery(query, types) {
+    var q = createTypesQuery(types);
     if (query) {
         q = createTextQuery(query) + ' AND ' + q;
     }
@@ -32,10 +33,23 @@ function createTextQuery(query) {
     return '(fulltext(' + q + ') OR ngram(' + q + '))';
 }
 
-function createTypesQuery() {
-    var query = common.PrincipalType.all().map(function(type) {
-        return 'principalType = "' + type + '"';
-    });
-    query.push('(_parentPath = "/identity" AND _path != "/identity/roles")');
+function createTypesQuery(types) {
+    var newTypes = types || common.UserItemType.all();
+    var query = newTypes
+        .map(function(type) {
+            switch (type) {
+                case common.UserItemType.ROLE:
+                case common.UserItemType.GROUP:
+                case common.UserItemType.USER:
+                    return 'principalType = "' + type + '"';
+                case common.UserItemType.USER_STORE:
+                    return '(_parentPath = "/identity" AND _path != "/identity/roles")';
+                default:
+                    return null;
+            }
+        })
+        .filter(function(typeQuery) {
+            return typeQuery != null;
+        });
     return '(' + query.join(' OR ') + ')';
 }

@@ -2,6 +2,9 @@ import UserStoreListResult = api.security.UserStoreListResult;
 import UserStore = api.security.UserStore;
 import UserStoreJson = api.security.UserStoreJson;
 import {ListGraphQlRequest} from '../ListGraphQlRequest';
+import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggregationJson';
+import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
+import {UserItemType} from '../../../app/browse/UserItemType';
 import Principal = api.security.Principal;
 import PrincipalJson = api.security.PrincipalJson;
 import PrincipalListJson = api.security.PrincipalListJson;
@@ -15,29 +18,37 @@ import StringHelper = api.util.StringHelper;
 import UserJson = api.security.UserJson;
 import GroupJson = api.security.GroupJson;
 import RoleJson = api.security.RoleJson;
+import BucketAggregation = api.aggregation.BucketAggregation;
+import BucketAggregationJson = api.aggregation.BucketAggregationJson;
+import UserItem = api.security.UserItem;
 
-type RawTypeAggregation = {
-    key: string;
-    count: number;
-}
-
-export type TypeAggregation = {
-    type: string;
-    count: number;
+type ListUserItemsRequestResult = {
+    total: number,
+    userItems: UserItem[],
+    aggregations: BucketAggregation[]
 }
 
 export class ListUserItemsRequest
     extends ListGraphQlRequest<any, any> {
 
+    private types: UserItemType[];
     private searchQuery: string;
+
+    setTypes(types: UserItemType[]): ListUserItemsRequest {
+        this.types = types;
+        return this;
+    }
 
     setQuery(query: string): ListUserItemsRequest {
         this.searchQuery = query;
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
+    getVariables(): {[key: string]: any} {
         let vars = super.getVariables();
+        if (this.types && this.types.length > 0) {
+            vars['types'] = this.types.map(type => UserItemType[type]);
+        }
         if (this.searchQuery) {
             vars['query'] = this.searchQuery;
         }
@@ -45,8 +56,8 @@ export class ListUserItemsRequest
     }
 
     getQuery(): string {
-        return `query($query: String, $start: Int, $count: Int) {
-                    userItemsConnection (query: $query, start: $start, count: $count) {
+        return `query($types: [UserItemType], $query: String, $start: Int, $count: Int) {
+                    userItemsConnection (types: $types, query: $query, start: $start, count: $count) {
                         totalCount
                         edges {
                             node {
@@ -59,41 +70,38 @@ export class ListUserItemsRequest
                         }
                         aggregations {
                             name,
-                            aggregation {
+                            buckets {
                                 key,
-                                count
+                                docCount
                             }
                         }
                     }
                 }`;
     }
 
-    sendAndParse(): wemQ.Promise<any> {
+    sendAndParse(): wemQ.Promise<ListUserItemsRequestResult> {
         return this.query().then((response: any) => {
             const data = response.userItemsConnection;
-            return {
+            const result: ListUserItemsRequestResult = {
                 total: data.totalCount,
                 userItems: data.edges.map(edge => this.fromJsonToUserItem(edge.node)),
-                aggregations: this.fromAggregationToList(data.aggregations[0].aggregation, data.totalCount),
-            }
+                aggregations: this.froJsonToAggregations(data.aggregations, data.totalCount),
+            };
+
+            return result;
         });
     }
 
-    private fromAggregationToList(aggregation: RawTypeAggregation[], total: number): TypeAggregation[] {
-        const principalsCount = aggregation.length > 1 ?
-                                aggregation.reduce((prev: number, curr: RawTypeAggregation) => prev + curr.count, 0) :
-                                (aggregation[0].count || 0);
-        const userStoresCount = total - principalsCount;
-
-        const list: TypeAggregation[] = aggregation.map(value => {
-            return { type: StringHelper.capitalize(value.key), count: value.count };
-        });
-
-        if (userStoresCount !== 0) {
-            list.push({ type: 'User Store', count: userStoresCount });
+    private froJsonToAggregations(jsons: UserItemBucketAggregationJson[], total: number): BucketAggregation[] {
+        if (!jsons || jsons.length < 1) {
+            return null;
         }
+        const aggregations = jsons.map(json => UserItemAggregationHelper.fromJson(json));
 
-        return list;
+        const typeAggregation = aggregations.filter(agg => agg.getName() === 'principalType')[0];
+        UserItemAggregationHelper.updatePrincipalTypeAggregation(typeAggregation, total);
+
+        return aggregations;
     }
 
     private fromJsonToUserItem(json: PrincipalJson | UserStoreJson): Principal | UserStore {
