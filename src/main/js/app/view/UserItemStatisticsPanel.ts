@@ -5,15 +5,12 @@ import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipal
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
 import ItemDataGroup = api.app.view.ItemDataGroup;
-
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
-
 import PrincipalViewer = api.ui.security.PrincipalViewer;
 import i18n = api.util.i18n;
 
-export class UserItemStatisticsPanel
-    extends ItemStatisticsPanel<UserTreeGridItem> {
+export class UserItemStatisticsPanel extends ItemStatisticsPanel<UserTreeGridItem> {
 
     private userDataContainer: api.dom.DivEl;
 
@@ -76,7 +73,7 @@ export class UserItemStatisticsPanel
         rolesAndGroupsGroup.addDataArray(i18n('field.groups'), []);
         this.userDataContainer.appendChild(rolesAndGroupsGroup);
 
-        new GetPrincipalByKeyRequest(item.getModel().getPrincipal().getKey()).includeUserMemberships(true).sendAndParse().then(
+        new GetPrincipalByKeyRequest(item.getModel().getPrincipal().getKey()).setIncludeMemberships(true).sendAndParse().then(
             (principal: Principal) => {
                 userGroup = new ItemDataGroup(i18n('field.user'), 'user');
                 userGroup.addDataList(i18n('field.email'), principal.asUser().getEmail());
@@ -123,7 +120,7 @@ export class UserItemStatisticsPanel
         this.userDataContainer.appendChild(membersGroup);
 
         new GetPrincipalByKeyRequest(item.getModel().getPrincipal().getKey())
-            .includeUserMemberships(true)
+            .setIncludeMemberships(true)
             .sendAndParse()
             .then((principal: Principal) => {
 

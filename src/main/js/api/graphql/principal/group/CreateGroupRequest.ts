@@ -10,6 +10,7 @@ export class CreateGroupRequest
     private displayName: string;
     private description: string;
     private members: PrincipalKey[] = [];
+    private memberships: PrincipalKey[] = [];
 
     setKey(key: PrincipalKey): CreateGroupRequest {
         this.key = key;
@@ -26,6 +27,11 @@ export class CreateGroupRequest
         return this;
     }
 
+    setMemberships(memberships: PrincipalKey[]): CreateGroupRequest {
+        this.memberships = memberships.slice(0);
+        return this;
+    }
+
     setDescription(value: string): CreateGroupRequest {
         this.description = value;
         return this;
@@ -37,16 +43,18 @@ export class CreateGroupRequest
         vars['displayName'] = this.displayName;
         vars['description'] = this.description;
         vars['members'] = this.members.map(key => key.toString());
+        vars['memberships'] = this.memberships.map(key => key.toString());
         return vars;
     }
 
     getMutation(): string {
-        return `mutation ($key: String!, $displayName: String!, $description: String, $members: [String]) {
-            createGroup(key: $key, displayName: $displayName, description: $description, members: $members) {
+        return `mutation ($key: String!, $displayName: String!, $description: String, $members: [String], memberships: [String]) {
+            createGroup(key: $key, displayName: $displayName, description: $description, members: $members, memberships: $memberships) {
                 key
                 displayName
                 description
                 members
+                memberships
             }
         }`;
     }

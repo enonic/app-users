@@ -30,7 +30,7 @@ export class PrincipalWizardDataLoader {
 
     private loadDataForEdit(params: PrincipalWizardPanelParams): wemQ.Promise<PrincipalWizardDataLoader> {
 
-        return this.loadDataForNew(params).then((loader) => {
+        return this.loadDataForNew(params).then(() => {
 
             return this.loadPrincipalToEdit(params).then((loadedPrincipalToEdit: Principal) => {
 
@@ -43,7 +43,7 @@ export class PrincipalWizardDataLoader {
 
     private loadPrincipalToEdit(params: PrincipalWizardPanelParams): wemQ.Promise<Principal> {
         if (!params.persistedItem && !!params.principalKey) {
-            return new GetPrincipalByKeyRequest(params.principalKey).includeUserMemberships(true).sendAndParse();
+            return new GetPrincipalByKeyRequest(params.principalKey).setIncludeMemberships(true).sendAndParse();
         } else {
             return wemQ(params.persistedItem);
         }

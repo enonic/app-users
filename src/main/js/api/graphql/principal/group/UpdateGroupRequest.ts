@@ -9,6 +9,8 @@ export class UpdateGroupRequest
     private displayName: string;
     private membersToAdd: PrincipalKey[] = [];
     private membersToRemove: PrincipalKey[] = [];
+    private membershipsToAdd: PrincipalKey[] = [];
+    private membershipsToRemove: PrincipalKey[] = [];
     private description: string;
 
     setKey(key: PrincipalKey): UpdateGroupRequest {
@@ -31,6 +33,16 @@ export class UpdateGroupRequest
         return this;
     }
 
+    addMemberships(memberships: PrincipalKey[]): UpdateGroupRequest {
+        this.membershipsToAdd = memberships.slice(0);
+        return this;
+    }
+
+    removeMemberhips(memberships: PrincipalKey[]): UpdateGroupRequest {
+        this.membershipsToRemove = memberships.slice(0);
+        return this;
+    }
+
     setDescription(description: string): UpdateGroupRequest {
         this.description = description;
         return this;
@@ -41,20 +53,23 @@ export class UpdateGroupRequest
 
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;
-        vars['addMembers'] = this.membersToAdd.map((memberKey) => memberKey.toString());
-        vars['removeMembers'] = this.membersToRemove.map((memberKey) => memberKey.toString());
+        vars['addMembers'] = this.membersToAdd.map(key => key.toString());
+        vars['removeMembers'] = this.membersToRemove.map(key => key.toString());
+        vars['addMemberships'] = this.membershipsToAdd.map(key => key.toString());
+        vars['removeMemberships'] = this.membershipsToRemove.map(key => key.toString());
         vars['description'] = this.description;
 
         return vars;
     }
 
     getMutation(): string {
-        return `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String]) {
-            updateGroup(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers) {
+        return `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String], $addMemberships: [String], $removeMemberships: [String]) {
+            updateGroup(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
                 key
                 displayName
                 description
                 members
+                memberships
             }
         }`;
     }
