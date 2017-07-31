@@ -14,10 +14,10 @@ module.exports = {
             // principals may be object so make sure we have array
             [].concat(principals).forEach(function(p) {
                 var key = p.key || p._id;
-                if (common.isUser(key)) {
+                if (common.isUser(key) || common.isGroup(key)) {
                     // eslint-disable-next-line no-param-reassign
                     p.memberships = module.exports.getMemberships(key);
-                } else if (common.isGroup(key) || common.isRole(key)) {
+                } else if (common.isRole(key)) {
                     // uncomment to return principals instead of their keys
                     // p["member"] = common.getByIds(p.member);
                 }

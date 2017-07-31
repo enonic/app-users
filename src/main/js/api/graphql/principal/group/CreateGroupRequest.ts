@@ -48,13 +48,16 @@ export class CreateGroupRequest
     }
 
     getMutation(): string {
-        return `mutation ($key: String!, $displayName: String!, $description: String, $members: [String], memberships: [String]) {
+        return `mutation ($key: String!, $displayName: String!, $description: String, $members: [String], $memberships: [String]) {
             createGroup(key: $key, displayName: $displayName, description: $description, members: $members, memberships: $memberships) {
                 key
                 displayName
                 description
                 members
-                memberships
+                memberships {
+                    key
+                    displayName
+                }
             }
         }`;
     }

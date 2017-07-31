@@ -69,7 +69,10 @@ export class UpdateGroupRequest
                 displayName
                 description
                 members
-                memberships
+                memberships {
+                    key
+                    displayName
+                }
             }
         }`;
     }
