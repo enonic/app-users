@@ -15,14 +15,18 @@ exports.create = function createGroup(params) {
         description: params.description
     });
 
-    log.info('createdGroup: ' + JSON.stringify(createdGroup));
-
     var ms = params.members;
     if (ms && ms.length > 0) {
         principals.addMembers(key, ms);
     }
 
     populateMembers(createdGroup);
+
+    principals.updateMemberships(key, params.memberships);
+
+    populateMemberships(createdGroup);
+
+    log.info('createdGroup: ' + JSON.stringify(createdGroup));
 
     return createdGroup;
 };
@@ -41,11 +45,19 @@ exports.update = function updateGroup(params) {
         }
     });
 
-    log.info('updatedGroup: ' + JSON.stringify(updatedGroup));
-
     principals.updateMembers(key, params.addMembers, params.removeMembers);
 
     populateMembers(updatedGroup);
+
+    principals.updateMemberships(
+        key,
+        params.addMemberships,
+        params.removeMemberships
+    );
+
+    populateMemberships(updatedGroup);
+
+    log.info('updatedGroup: ' + JSON.stringify(updatedGroup));
 
     return updatedGroup;
 };
@@ -57,4 +69,9 @@ function populateMembers(group) {
         .map(function(member) {
             return member.key;
         });
+}
+
+function populateMemberships(group) {
+    // eslint-disable-next-line no-param-reassign
+    group.memberships = principals.getMemberships(group.key || group._id);
 }
