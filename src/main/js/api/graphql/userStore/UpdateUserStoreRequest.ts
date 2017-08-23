@@ -29,7 +29,7 @@ export class UpdateUserStoreRequest
     }
 
     getMutation(): string {
-        return `mutation ($key: String!, $displayName: String!, $description: String!, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
+        return `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
             updateUserStore(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
                 key
                 displayName
