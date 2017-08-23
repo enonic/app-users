@@ -37,6 +37,8 @@ declare module api.util {
         static difference<T>(left: T[], right: T[], equals: (valueLeft: T, valueRight: T) => boolean): T[];
         static intersection<T>(left: T[], right: T[], equals: (valueLeft: T, valueRight: T) => boolean): T[];
         static findElementByFieldValue<T>(array: Array<T>, field: string, value: any): T;
+        static contains(array: Equitable[], el: Equitable): boolean;
+        static filter(array: Equitable[], el: Equitable): Equitable[];
     }
 }
 declare module api.util {
@@ -269,6 +271,7 @@ declare module api.util {
         static isWholeNumber(value: any): boolean;
         static isNumber(value: any): boolean;
         static randomBetween(from: number, to: number): number;
+        static toNumber(value: string): number;
     }
 }
 declare module api.util {
@@ -586,7 +589,7 @@ declare module api {
         static equals(a: Equitable, b: Equitable): boolean;
         static arrayEquals(arrayA: Equitable[], arrayB: Equitable[]): boolean;
         static anyArrayEquals(arrayA: any[], arrayB: any[]): boolean;
-        static mapEquals(mapA: {
+        static objectMapEquals(mapA: {
             [s: string]: Equitable;
         }, mapB: {
             [s: string]: Equitable;
@@ -598,8 +601,6 @@ declare module api {
         static dateEquals(a: Date, b: Date): boolean;
         static anyEquals(a: any, b: any): boolean;
         static objectEquals(a: Object, b: Object): boolean;
-        static contains(array: Equitable[], el: Equitable): boolean;
-        static filter(array: Equitable[], el: Equitable): Equitable[];
         static objectPropertyIterator(object: any, callback: {
             (name: string, property: any, index?: number): void;
         }): void;
@@ -3271,6 +3272,7 @@ declare module api.security {
 declare module api.security {
     interface GroupJson extends PrincipalJson {
         members?: string[];
+        memberships?: PrincipalJson[];
     }
 }
 declare module api.security {
@@ -3313,10 +3315,13 @@ declare module api.security {
 declare module api.security {
     class Group extends Principal {
         private members;
+        private memberships;
         constructor(builder: GroupBuilder);
         getMembers(): PrincipalKey[];
         setMembers(members: PrincipalKey[]): void;
         addMember(member: PrincipalKey): void;
+        getMemberships(): Principal[];
+        setMemberships(memberships: Principal[]): void;
         equals(o: api.Equitable): boolean;
         clone(): Group;
         newBuilder(): GroupBuilder;
@@ -3325,9 +3330,11 @@ declare module api.security {
     }
     class GroupBuilder extends PrincipalBuilder {
         members: PrincipalKey[];
+        memberships: Principal[];
         constructor(source?: Group);
         fromJson(json: api.security.GroupJson): GroupBuilder;
         setMembers(members: PrincipalKey[]): GroupBuilder;
+        setMemberships(memberships: Principal[]): GroupBuilder;
         build(): Group;
     }
 }
@@ -3488,7 +3495,7 @@ declare module api.security {
         private principalKey;
         private includeMemberships;
         constructor(principalKey: PrincipalKey);
-        includeUserMemberships(includeMemberships: boolean): GetPrincipalByKeyRequest;
+        setIncludeMemberships(includeMemberships: boolean): GetPrincipalByKeyRequest;
         getParams(): Object;
         getRequestPath(): api.rest.Path;
         sendAndParse(): wemQ.Promise<Principal>;
@@ -3556,11 +3563,13 @@ declare module api.security {
         private key;
         private displayName;
         private members;
+        private memberships;
         private description;
         constructor();
         setKey(key: PrincipalKey): CreateGroupRequest;
         setDisplayName(displayName: string): CreateGroupRequest;
         setMembers(members: PrincipalKey[]): CreateGroupRequest;
+        setMemberships(memberships: PrincipalKey[]): CreateGroupRequest;
         setDescription(description: string): CreateGroupRequest;
         getParams(): Object;
         getRequestPath(): api.rest.Path;
@@ -3609,12 +3618,16 @@ declare module api.security {
         private displayName;
         private membersToAdd;
         private membersToRemove;
+        private membershipsToAdd;
+        private membershipsToRemove;
         private description;
         constructor();
         setKey(key: PrincipalKey): UpdateGroupRequest;
         setDisplayName(displayName: string): UpdateGroupRequest;
         addMembers(members: PrincipalKey[]): UpdateGroupRequest;
         removeMembers(members: PrincipalKey[]): UpdateGroupRequest;
+        addMemberships(memberships: PrincipalKey[]): UpdateGroupRequest;
+        removeMemberhips(memberships: PrincipalKey[]): UpdateGroupRequest;
         setDescription(description: string): UpdateGroupRequest;
         getParams(): Object;
         getRequestPath(): api.rest.Path;
@@ -4543,8 +4556,9 @@ declare module api.ui {
         trigger(combination: string, action?: string): void;
         reset(): void;
         getActiveBindings(): KeyBinding[];
-        shelveBindings(): void;
-        unshelveBindings(): void;
+        shelveBindings(keyBindings?: KeyBinding[]): void;
+        private getBindingKey(binding);
+        unshelveBindings(keyBindings?: KeyBinding[]): void;
         isActive(keyBinding: KeyBinding): boolean;
         private initializeHelpKey();
         onHelpKeyPressed(listener: (event: ExtendedKeyboardEvent) => void): void;
@@ -4921,7 +4935,7 @@ declare module api.ui {
      * A parent class capable of viewing a given object with names and icon.
      */
     class NamesAndIconViewer<OBJECT> extends api.ui.Viewer<OBJECT> {
-        static EMPTY_DISPLAY_NAME: string;
+        private emptyDisplayName;
         private namesAndIconView;
         private relativePath;
         private size;
@@ -5219,12 +5233,15 @@ declare module api.ui.text {
         private UPPERCASE_CHARS;
         private DIGIT_CHARS;
         constructor();
+        setValue(value: string, silent?: boolean, userInput?: boolean): PasswordGenerator;
         doGetValue(): string;
-        doSetValue(value: string, silent?: boolean): PasswordGenerator;
+        doSetValue(value: string, silent?: boolean, userInput?: boolean): PasswordGenerator;
         getName(): string;
         setName(value: string): PasswordGenerator;
         setPlaceholder(value: string): PasswordGenerator;
         getPlaceholder(): string;
+        private toggleShowLink(locked);
+        reset(): void;
         private assessComplexity(value);
         private generatePassword();
         private isWeak(value);
@@ -6426,6 +6443,7 @@ declare module api.ui.grid {
         setSortable(sortable: boolean): GridColumnBuilder<T>;
         setToolTip(toolTip: string): GridColumnBuilder<T>;
         setWidth(width: number): GridColumnBuilder<T>;
+        setBoundaryWidth(minWidth: number, maxWidth: number): GridColumnBuilder<T>;
         build(): GridColumn<T>;
     }
     class GridColumn<T extends Slick.SlickData> implements Slick.Column<T> {
@@ -6536,6 +6554,7 @@ declare module api.ui.grid {
         dataIdProperty: string;
         autoRenderGridOnDataChanges: boolean;
         checkableRows: boolean;
+        leftAlignedCheckbox: boolean;
         disabledMultipleSelection: boolean;
         dragAndDrop: boolean;
         constructor(source?: GridOptions<T>);
@@ -6580,6 +6599,7 @@ declare module api.ui.grid {
         setDataIdProperty(dataIdProperty: string): GridOptionsBuilder<T>;
         setAutoRenderGridOnDataChanges(autoRenderGridOnDataChanges: boolean): GridOptionsBuilder<T>;
         setCheckableRows(checkableRows: boolean): GridOptionsBuilder<T>;
+        setLeftAlignedCheckbox(leftAlignedCheckbox: boolean): GridOptionsBuilder<T>;
         disableMultipleSelection(disabledMultipleSelection: boolean): GridOptionsBuilder<T>;
         setDragAndDrop(dragAndDrop: boolean): GridOptionsBuilder<T>;
         build(): GridOptions<T>;
@@ -6626,6 +6646,7 @@ declare module api.ui.grid {
         dataIdProperty: string;
         autoRenderGridOnDataChanges: boolean;
         checkableRows: boolean;
+        leftAlignedCheckbox: boolean;
         disabledMultipleSelection: boolean;
         dragAndDrop: boolean;
         constructor(builder: GridOptionsBuilder<T>);
@@ -6670,6 +6691,7 @@ declare module api.ui.grid {
         getDataIdProperty(): string;
         isAutoRenderGridOnDataChanges(): boolean;
         isCheckableRows(): boolean;
+        isLeftAlignedCheckbox(): boolean;
         isMultipleSelectionDisabled(): boolean;
         isDragAndDrop(): boolean;
         setAsyncEditorLoading(asyncEditorLoading: boolean): GridOptions<T>;
@@ -6713,6 +6735,7 @@ declare module api.ui.grid {
         setDataIdProperty(dataIdProperty: string): GridOptions<T>;
         setAutoRenderGridOnDataChanges(autoRenderGridOnDataChanges: boolean): GridOptions<T>;
         setCheckableRows(checkableRows: boolean): GridOptions<T>;
+        setLeftAlignedCheckbox(leftAlignedCheckbox: boolean): GridOptions<T>;
         disableMultipleSelection(disabledMultipleSelection: boolean): GridOptions<T>;
         setDragAndDrop(dragAndDrop: boolean): GridOptions<T>;
     }
@@ -6947,15 +6970,18 @@ declare module api.ui.treegrid {
         private selectionOnClick;
         private interval;
         private idPropertyName;
+        private keyBindings;
         constructor(builder: TreeGridBuilder<DATA>);
         private initSelectorPlugin();
         private initToolbar(showToolbar);
+        private initKeyBindings(builder);
         protected setColumns(columns: GridColumn<TreeNode<DATA>>[], toBegin?: boolean): void;
         getFirstSelectedOrHighlightedNode(): TreeNode<DATA>;
         private onSelectRange(event, navigateFn);
         private initEventListeners(builder);
         private onRenderedHandler(builder);
-        private onRemovedHandler(builder, keyBindings);
+        private bindKeys(builder);
+        private unbindKeys(builder);
         private bindClickEvents();
         private onClickWithShift(event, data);
         private onClickWithCmd(data);
@@ -6965,7 +6991,6 @@ declare module api.ui.treegrid {
         private onRowSelected(data);
         private onRowHighlighted(elem, data);
         private isSelectionNotEmpty();
-        private bindKeys(builder, keyBindings);
         private onUpKeyPress();
         private onDownKeyPress();
         private onLeftKeyPress();
@@ -7268,6 +7293,8 @@ declare module api.ui.treegrid {
         isAutoHeight(): boolean;
         setCheckableRows(checkable: boolean): TreeGridBuilder<NODE>;
         isCheckableRows(): boolean;
+        setLeftAlignedCheckbox(value: boolean): TreeGridBuilder<NODE>;
+        isLeftAlignedCheckbox(): boolean;
         setDragAndDrop(dragAndDrop: boolean): TreeGridBuilder<NODE>;
         isDragAndDrop(): boolean;
         setSelectedCellCssClass(selectedCellCss: string): TreeGridBuilder<NODE>;
@@ -7427,6 +7454,7 @@ declare module api.ui.selector {
 }
 declare module api.ui.selector {
     import Viewer = api.ui.Viewer;
+    import GridColumn = api.ui.grid.GridColumn;
     interface DropdownGridConfig<OPTION_DISPLAY_VALUE> {
         maxHeight?: number;
         width: number;
@@ -7437,6 +7465,7 @@ declare module api.ui.selector {
         isDropdownGrid?: boolean;
         optionDataHelper?: OptionDataHelper<OPTION_DISPLAY_VALUE>;
         optionDataLoader?: OptionDataLoader<OPTION_DISPLAY_VALUE>;
+        createColumns?: GridColumn<OPTION_DISPLAY_VALUE>[];
     }
     class DropdownGrid<OPTION_DISPLAY_VALUE> {
         protected maxHeight: number;
@@ -7461,13 +7490,16 @@ declare module api.ui.selector {
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
         protected initGridAndData(): void;
         reload(): wemQ.Promise<void>;
+        search(searchString: string): wemQ.Promise<void>;
         getElement(): api.dom.Element;
         getGrid(): api.ui.grid.Grid<any>;
+        getOptionDataLoader(): OptionDataLoader<OPTION_DISPLAY_VALUE>;
         protected getGridData(): api.ui.grid.DataView<any>;
         private initCommonGridProps();
         protected initGridEventListeners(): void;
         renderGrid(): void;
         isVisible(): boolean;
+        isTreeGrid(): boolean;
         show(): void;
         hide(): void;
         getSelectedOptionCount(): number;
@@ -7522,14 +7554,17 @@ declare module api.ui.selector {
         private loader;
         private treeDataHelper;
         private readonlyChecker;
-        private isSelfLoading;
         private defaultOption;
+        private isSelfLoading;
         private isDefaultOptionActive;
         constructor(columns: api.ui.grid.GridColumn<any>[], gridOptions: api.ui.grid.GridOptions<any>, loader: OptionDataLoader<OPTION_DISPLAY_VALUE>, treeDataHelper: OptionDataHelper<OPTION_DISPLAY_VALUE>);
+        removeAllOptions(): void;
         setOptions(options: Option<OPTION_DISPLAY_VALUE>[]): void;
+        addOption(option: Option<OPTION_DISPLAY_VALUE>): void;
         setReadonlyChecker(checker: (optionToCheck: OPTION_DISPLAY_VALUE) => boolean): void;
         queryScrollable(): api.dom.Element;
         reload(parentNodeData?: Option<OPTION_DISPLAY_VALUE>): wemQ.Promise<void>;
+        search(searchString: string): wemQ.Promise<void>;
         expandNode(node?: TreeNode<Option<OPTION_DISPLAY_VALUE>>, expandAll?: boolean): wemQ.Promise<boolean>;
         private initEventHandlers();
         hasChildren(option: Option<OPTION_DISPLAY_VALUE>): boolean;
@@ -7540,9 +7575,10 @@ declare module api.ui.selector {
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
         private scrollToDefaultOption(parentNode, startFrom);
         private fetchBatchOfChildren(parentNode);
-        private optionsDataToTreeNodeOption(data);
-        private optionDataToTreeNodeOption(data);
+        createOptions(data: OPTION_DISPLAY_VALUE[]): Option<OPTION_DISPLAY_VALUE>[];
+        private createOption(data);
         private makeEmptyData();
+        private setSelfLoading(value);
         protected handleItemMetadata(row: number): {
             cssClasses: string;
         };
@@ -7557,9 +7593,12 @@ declare module api.ui.selector {
         expandActiveRow(): void;
         collapseActiveRow(): void;
         reload(): wemQ.Promise<void>;
+        search(searchString: string): wemQ.Promise<void>;
         setReadonlyChecker(checker: (optionToCheck: OPTION_DISPLAY_VALUE) => boolean): void;
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
+        removeAllOptions(): void;
         setOptions(options: Option<OPTION_DISPLAY_VALUE>[]): void;
+        addOption(option: Option<OPTION_DISPLAY_VALUE>): void;
         getSelectedOptions(): Option<OPTION_DISPLAY_VALUE>[];
         protected initGridAndData(): void;
         protected initGridEventListeners(): void;
@@ -7593,6 +7632,7 @@ declare module api.ui.selector {
         getDropdownGrid(): DropdownGrid<OPTION_DISPLAY_VALUE>;
         renderDropdownGrid(): void;
         getEmptyDropdown(): api.dom.DivEl;
+        getOptionDataLoader(): OptionDataLoader<OPTION_DISPLAY_VALUE>;
         isDropdownShown(): boolean;
         setOptions(options: Option<OPTION_DISPLAY_VALUE>[], noOptionsText: string): void;
         removeAllOptions(): void;
@@ -7654,10 +7694,15 @@ declare module api.ui.selector {
 }
 declare module api.ui.selector {
     import TreeNode = api.ui.treegrid.TreeNode;
+    import LoadedDataEvent = api.util.loader.event.LoadedDataEvent;
     interface OptionDataLoader<DATA> {
+        search(value: string): wemQ.Promise<DATA[]>;
+        load(values: string[]): wemQ.Promise<DATA[]>;
         fetch(node: TreeNode<Option<DATA>>): wemQ.Promise<DATA>;
         fetchChildren(parentNode: TreeNode<Option<DATA>>, from?: number, size?: number): wemQ.Promise<OptionDataLoaderData<DATA>>;
         checkReadonly(options: DATA[]): wemQ.Promise<string[]>;
+        onLoadedData(listener: (event: LoadedDataEvent<DATA>) => void): any;
+        unLoadedData(listener: (event: LoadedDataEvent<DATA>) => void): any;
     }
     class OptionDataLoaderData<DATA> {
         private data;
@@ -7726,6 +7771,7 @@ declare module api.ui.selector.combobox {
     import Option = api.ui.selector.Option;
     import OptionFilterInputValueChangedEvent = api.ui.selector.OptionFilterInputValueChangedEvent;
     import Viewer = api.ui.Viewer;
+    import GridColumn = api.ui.grid.GridColumn;
     interface ComboBoxConfig<T> {
         iconUrl?: string;
         optionDisplayValueViewer?: Viewer<T>;
@@ -7747,6 +7793,7 @@ declare module api.ui.selector.combobox {
         optionDataHelper?: OptionDataHelper<T>;
         optionDataLoader?: OptionDataLoader<T>;
         onDropdownShownCallback?: () => wemQ.Promise<void>;
+        createColumns?: GridColumn<T>[];
     }
     enum PositionType {
         BELOW = 0,
@@ -7814,6 +7861,7 @@ declare module api.ui.selector.combobox {
         getOptionByValue(value: string): Option<OPTION_DISPLAY_VALUE>;
         getOptionByRow(rowIndex: number): Option<OPTION_DISPLAY_VALUE>;
         setFilterArgs(args: any): void;
+        getOptionDataLoader(): OptionDataLoader<OPTION_DISPLAY_VALUE>;
         protected doGetValue(): string;
         protected doSetValue(value: string, silent?: boolean): void;
         private selectExistingOptions(optionIds);
@@ -8021,6 +8069,7 @@ declare module api.ui.selector.combobox {
     import Viewer = api.ui.Viewer;
     import SelectedOption = api.ui.selector.combobox.SelectedOption;
     import Option = api.ui.selector.Option;
+    import GridColumn = api.ui.grid.GridColumn;
     class RichComboBox<OPTION_DISPLAY_VALUE> extends api.dom.CompositeFormInputEl {
         protected loader: api.util.loader.BaseLoader<any, OPTION_DISPLAY_VALUE>;
         private selectedOptionsView;
@@ -8057,6 +8106,7 @@ declare module api.ui.selector.combobox {
         getOptions(): Option<OPTION_DISPLAY_VALUE>[];
         getOptionByValue(value: string): Option<OPTION_DISPLAY_VALUE>;
         getOptionByRow(rowIndex: number): Option<OPTION_DISPLAY_VALUE>;
+        getOptionDataLoader(): OptionDataLoader<OPTION_DISPLAY_VALUE>;
         countSelected(): number;
         select(value: OPTION_DISPLAY_VALUE, readOnly?: boolean, silent?: boolean): void;
         deselect(value: OPTION_DISPLAY_VALUE, silent?: boolean): void;
@@ -8069,6 +8119,7 @@ declare module api.ui.selector.combobox {
         private isDataGridSelfLoading();
         private loadOptionsAfterShowDropdown();
         private setupLoader();
+        private handleLoadedData(event);
         private createOptions(items);
         getLoader(): api.util.loader.BaseLoader<any, OPTION_DISPLAY_VALUE>;
         setInputIconUrl(url: string): void;
@@ -8132,13 +8183,14 @@ declare module api.ui.selector.combobox {
         treegridDropdownEnabled: boolean;
         optionDataHelper: OptionDataHelper<any>;
         optionDataLoader: OptionDataLoader<any>;
+        createColumns: GridColumn<T>[];
         setComboBoxName(comboBoxName: string): RichComboBoxBuilder<T>;
         setIdentifierMethod(identifierMethod: string): RichComboBoxBuilder<T>;
         setLoader(loader: api.util.loader.BaseLoader<any, T>): RichComboBoxBuilder<T>;
         setSelectedOptionsView(selectedOptionsView: SelectedOptionsView<T>): RichComboBoxBuilder<T>;
         getSelectedOptionsView(): SelectedOptionsView<T>;
         setMaximumOccurrences(maximumOccurrences: number): RichComboBoxBuilder<T>;
-        setOptionDisplayValueViewer(value: Viewer<T>): RichComboBoxBuilder<T>;
+        setOptionDisplayValueViewer(value: Viewer<any>): RichComboBoxBuilder<T>;
         setDelayedInputValueChangedHandling(value: number): RichComboBoxBuilder<T>;
         setNextInputFocusWhenMaxReached(value: boolean): RichComboBoxBuilder<T>;
         setHideComboBoxWhenMaxReached(value: boolean): RichComboBoxBuilder<T>;
@@ -8152,6 +8204,7 @@ declare module api.ui.selector.combobox {
         setTreegridDropdownEnabled(value: boolean): RichComboBoxBuilder<T>;
         setOptionDataHelper(value: OptionDataHelper<any>): RichComboBoxBuilder<T>;
         setOptionDataLoader(value: OptionDataLoader<any>): RichComboBoxBuilder<T>;
+        setCreateColumns(value: GridColumn<T>[]): RichComboBoxBuilder<T>;
         build(): RichComboBox<T>;
     }
 }
@@ -8228,6 +8281,7 @@ declare module api.ui.selector.dropdown {
     import OptionSelectedEvent = api.ui.selector.OptionSelectedEvent;
     import OptionFilterInputValueChangedEvent = api.ui.selector.OptionFilterInputValueChangedEvent;
     import Viewer = api.ui.Viewer;
+    import GridColumn = api.ui.grid.GridColumn;
     interface DropdownConfig<OPTION_DISPLAY_VALUE> {
         iconUrl?: string;
         optionDisplayValueViewer?: Viewer<OPTION_DISPLAY_VALUE>;
@@ -8238,6 +8292,7 @@ declare module api.ui.selector.dropdown {
         skipExpandOnClick?: boolean;
         inputPlaceholderText?: string;
         noOptionsText?: string;
+        createColumns?: GridColumn<OPTION_DISPLAY_VALUE>[];
     }
     class Dropdown<OPTION_DISPLAY_VALUE> extends api.dom.FormInputEl {
         private icon;
@@ -9231,10 +9286,11 @@ declare module api.ui.security.acl {
 }
 declare module api.ui.security.acl {
     class AccessSelector extends api.ui.tab.TabMenu {
-        private static OPTIONS;
+        private options;
         private value;
         private valueChangedListeners;
         constructor();
+        private initOptions();
         initEventHandlers(): void;
         getValue(): Access;
         setValue(value: Access, silent?: boolean): AccessSelector;
@@ -9263,8 +9319,8 @@ declare module api.ui.security.acl {
         private oldValue;
         private valueChangedListeners;
         private enabled;
-        private static OPTIONS;
         constructor();
+        private getOptions();
         setEnabled(enabled: boolean): PermissionSelector;
         isEnabled(): boolean;
         getValue(): {
@@ -9860,15 +9916,19 @@ declare module api.form {
 }
 declare module api.form {
     class ValidationRecording {
-        breaksMinimumOccurrencesArray: ValidationRecordingPath[];
-        breaksMaximumOccurrencesArray: ValidationRecordingPath[];
+        private breaksMinimumOccurrencesArray;
+        private breaksMaximumOccurrencesArray;
+        private additionalValidationRecords;
         breaksMinimumOccurrences(path: ValidationRecordingPath): void;
         breaksMaximumOccurrences(path: ValidationRecordingPath): void;
+        addValidationRecord(path: string, record: AdditionalValidationRecord): void;
         isValid(): boolean;
         isMinimumOccurrencesValid(): boolean;
         isMaximumOccurrencesValid(): boolean;
+        getBreakMinimumOccurrences(): ValidationRecordingPath[];
+        getBreakMaximumOccurrences(): ValidationRecordingPath[];
         flatten(recording: ValidationRecording): void;
-        subtract(recording: ValidationRecording): void;
+        removeRecord(key: string): void;
         /**
          * @param path - path to remove
          * @param strict - whether to match only exact matching paths
@@ -9882,6 +9942,7 @@ declare module api.form {
         containsPathInBreaksMin(path: ValidationRecordingPath): boolean;
         containsPathInBreaksMax(path: ValidationRecordingPath): boolean;
         private exists(path, array);
+        private mapEquals(mapA, mapB);
     }
 }
 declare module api.form {
@@ -9911,7 +9972,7 @@ declare module api.form {
         getDataPath(): api.data.PropertyPath;
         layout(validate?: boolean): wemQ.Promise<void>;
         update(propertyArray: PropertyArray, unchangedOnly?: boolean): wemQ.Promise<void>;
-        hasValidUserInput(): boolean;
+        hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
         onRemoveButtonClicked(listener: (event: RemoveButtonClickedEvent<FormItemOccurrenceView>) => void): void;
         unRemoveButtonClicked(listener: (event: RemoveButtonClickedEvent<FormItemOccurrenceView>) => void): void;
         notifyRemoveButtonClicked(): void;
@@ -10329,7 +10390,6 @@ declare module api.form {
         protected initValidationMessageBlock(): void;
         protected subscribeOnItemEvents(): void;
         private renderSelectionValidationMessage(selectionValidationRecording);
-        private makeMultiselectionNote();
         protected ensureSelectionArrayExists(propertyArraySet: PropertySet): void;
         private addDefaultSelectionToSelectionArray(selectionPropertyArray);
         protected extraValidation(validationRecording: ValidationRecording): void;
@@ -10535,7 +10595,7 @@ declare module api.form {
         refresh(validate?: boolean): void;
         private resolveValidationRecordingPath();
         displayValidationErrors(value: boolean): void;
-        hasValidUserInput(): boolean;
+        hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
         validate(silent?: boolean): ValidationRecording;
         private handleInputValidationRecording(inputRecording, silent?);
         userInputValidityChanged(currentState: boolean): boolean;
@@ -10543,7 +10603,7 @@ declare module api.form {
         onValidityChanged(listener: (event: RecordingValidityChangedEvent) => void): void;
         unValidityChanged(listener: (event: RecordingValidityChangedEvent) => void): void;
         private notifyValidityChanged(event);
-        private renderValidationErrors(recording, additionalValidationRecord);
+        private renderValidationErrors(recording, inputRecording);
         private mayRenderValidationError();
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
@@ -10668,9 +10728,6 @@ declare module api.form {
 declare module api.form {
     class ValidationRecordingViewer extends api.ui.Viewer<ValidationRecording> {
         private list;
-        private minText;
-        private minTextSingle;
-        private maxText;
         constructor();
         doLayout(object: ValidationRecording): void;
         appendValidationMessage(message: string, removeExisting?: boolean): void;
@@ -10748,6 +10805,7 @@ declare module api.form.inputtype {
         isMinimumOccurrencesBreached(): boolean;
         isMaximumOccurrencesBreached(): boolean;
         getAdditionalValidationRecord(): AdditionalValidationRecord;
+        hasAdditionalValidationRecord(): boolean;
         equals(that: InputValidationRecording): boolean;
         validityChanged(other: InputValidationRecording): boolean;
     }
@@ -10778,7 +10836,7 @@ declare module api.form.inputtype {
         unEditContentRequest(listener: (content: api.content.ContentSummary) => void): any;
         giveFocus(): boolean;
         displayValidationErrors(value: boolean): any;
-        hasValidUserInput(): boolean;
+        hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
         validate(silent: boolean): InputValidationRecording;
         onValidityChanged(listener: (event: InputValidityChangedEvent) => void): any;
         unValidityChanged(listener: (event: InputValidityChangedEvent) => void): any;
@@ -10824,7 +10882,7 @@ declare module api.form.inputtype.support {
         private baseInputTypeView;
         private input;
         constructor(config: InputOccurrencesBuilder);
-        hasValidUserInput(): boolean;
+        hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
         moveOccurrence(fromIndex: number, toIndex: number): void;
         getInput(): api.form.Input;
         getAllowedOccurrences(): api.form.Occurrences;
@@ -10860,7 +10918,7 @@ declare module api.form.inputtype.support {
         getDataPath(): api.data.PropertyPath;
         getIndex(): number;
         getInputElement(): api.dom.Element;
-        hasValidUserInput(): boolean;
+        hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
         giveFocus(): boolean;
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
@@ -10915,8 +10973,8 @@ declare module api.form.inputtype.support {
         layout(input: api.form.Input, propertyArray: PropertyArray): wemQ.Promise<void>;
         update(propertyArray: api.data.PropertyArray, unchangedOnly?: boolean): Q.Promise<void>;
         reset(): void;
-        hasValidUserInput(): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
+        hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
+        hasInputElementValidUserInput(inputElement: api.dom.Element, recording?: api.form.inputtype.InputValidationRecording): boolean;
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
         onBlur(listener: (event: FocusEvent) => void): void;
@@ -11156,29 +11214,24 @@ declare module api.content.form.inputtype.checkbox {
         unBlur(listener: (event: FocusEvent) => void): void;
     }
 }
-declare module api.content.form.inputtype.long {
+declare module api.content.form.inputtype.number {
     import BaseInputTypeNotManagingAdd = api.form.inputtype.support.BaseInputTypeNotManagingAdd;
-    import Property = api.data.Property;
-    import Value = api.data.Value;
-    import ValueType = api.data.ValueType;
-    class Long extends BaseInputTypeNotManagingAdd<number> {
+    abstract class NumberInputType extends BaseInputTypeNotManagingAdd<number> {
+        private min;
+        private max;
         constructor(config: api.form.inputtype.InputTypeViewContext);
-        getValueType(): ValueType;
-        newInitialValue(): Value;
-        createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
-        updateInputOccurrenceElement(occurrence: api.dom.Element, property: api.data.Property, unchangedOnly: boolean): void;
-        resetInputOccurrenceElement(occurrence: api.dom.Element): void;
-        valueBreaksRequiredContract(value: Value): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
-        private isValid(value);
+        protected readConfig(config: api.form.inputtype.InputTypeViewContext): void;
+        private getConfigProperty(config, propertyName);
+        protected isValid(value: string, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        private isValidMin(value);
+        private isValidMax(value);
     }
 }
-declare module api.content.form.inputtype.double {
-    import BaseInputTypeNotManagingAdd = api.form.inputtype.support.BaseInputTypeNotManagingAdd;
-    import Property = api.data.Property;
-    import Value = api.data.Value;
+declare module api.content.form.inputtype.number.double {
     import ValueType = api.data.ValueType;
-    class Double extends BaseInputTypeNotManagingAdd<number> {
+    import Value = api.data.Value;
+    import Property = api.data.Property;
+    class Double extends NumberInputType {
         constructor(config: api.form.inputtype.InputTypeViewContext);
         getValueType(): ValueType;
         newInitialValue(): Value;
@@ -11186,8 +11239,23 @@ declare module api.content.form.inputtype.double {
         updateInputOccurrenceElement(occurrence: api.dom.Element, property: api.data.Property, unchangedOnly?: boolean): void;
         resetInputOccurrenceElement(occurrence: api.dom.Element): void;
         valueBreaksRequiredContract(value: Value): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
-        private isValid(value);
+        hasInputElementValidUserInput(inputElement: api.dom.Element, recording?: api.form.inputtype.InputValidationRecording): boolean;
+    }
+}
+declare module api.content.form.inputtype.number.long {
+    import ValueType = api.data.ValueType;
+    import Value = api.data.Value;
+    import Property = api.data.Property;
+    class Long extends NumberInputType {
+        constructor(config: api.form.inputtype.InputTypeViewContext);
+        getValueType(): ValueType;
+        newInitialValue(): Value;
+        createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
+        protected isValid(value: string, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        updateInputOccurrenceElement(occurrence: api.dom.Element, property: api.data.Property, unchangedOnly: boolean): void;
+        resetInputOccurrenceElement(occurrence: api.dom.Element): void;
+        valueBreaksRequiredContract(value: Value): boolean;
+        hasInputElementValidUserInput(inputElement: api.dom.Element, recording?: api.form.inputtype.InputValidationRecording): boolean;
     }
 }
 declare module api.content.form.inputtype.time {
@@ -11291,6 +11359,11 @@ declare module api.util.htmlarea.dialog {
         setValidator(validator: (input: api.dom.FormInputEl) => string): ModalDialogFormItemBuilder;
         setInputEl(inputEl: api.dom.Element): ModalDialogFormItemBuilder;
     }
+    class HtmlAreaModalDialogConfig {
+        editor: HtmlAreaEditor;
+        title: string;
+        cls?: string;
+    }
     class ModalDialog extends api.ui.dialog.ModalDialog {
         private fields;
         private validated;
@@ -11299,7 +11372,7 @@ declare module api.util.htmlarea.dialog {
         private firstFocusField;
         private submitAction;
         static CLASS_NAME: string;
-        constructor(editor: HtmlAreaEditor, title: string, cls?: string);
+        constructor(config: HtmlAreaModalDialogConfig);
         setSubmitAction(action: api.ui.Action): void;
         protected getEditor(): HtmlAreaEditor;
         protected setValidated(): void;
@@ -11322,6 +11395,7 @@ declare module api.util.htmlarea.dialog {
         protected initializeActions(): void;
         protected getFieldById(id: string): api.dom.FormItemEl;
         close(): void;
+        protected initializeConfig(config: HtmlAreaModalDialogConfig): void;
         private initializeListeners();
         private listenEnterKey();
         private isTextInput(element);
@@ -11354,7 +11428,7 @@ declare module api.util.htmlarea.dialog {
         private textFormItem;
         private toolTipFormItem;
         private content;
-        private static tabNames;
+        private tabNames;
         private static contentPrefix;
         private static downloadPrefix;
         private static emailPrefix;
@@ -11385,6 +11459,7 @@ declare module api.util.htmlarea.dialog {
         private createTargetCheckbox(id, isTabSelectedFn);
         protected getMainFormItems(): FormItem[];
         private createDockedPanel();
+        private initTabNames();
         protected initializeActions(): void;
         private createContentSelector(getValueFn, contentTypeNames?);
         private createSelectorFormItem(id, label, contentSelector, addValueValidation?);
@@ -11448,6 +11523,7 @@ declare module api.util.htmlarea.dialog {
         private showProgress();
         private hideUploadMasks();
         private showError(text);
+        protected initializeConfig(params: ImageModalDialogConfig): void;
         protected initializeActions(): void;
         private getCaptionFieldValue();
         private setCaptionFieldValue(value);
@@ -11460,6 +11536,10 @@ declare module api.util.htmlarea.dialog {
         private createImageTag();
         private setImageWidthConstraint();
         private isImageInOriginalSize(image);
+    }
+    class ImageModalDialogConfig extends HtmlAreaModalDialogConfig {
+        config: HtmlAreaImage;
+        content: api.content.ContentSummary;
     }
     class ImageToolbar extends api.ui.toolbar.Toolbar {
         private image;
@@ -11525,10 +11605,10 @@ declare module api.util.htmlarea.dialog {
     import FormView = api.form.FormView;
     import DockedPanel = api.ui.panel.DockedPanel;
     class MacroDockedPanel extends DockedPanel {
-        private static CONFIGURATION_TAB_NAME;
-        private static PREVIEW_TAB_NAME;
-        private static MACRO_FORM_INCOMPLETE_MES;
-        private static PREVIEW_LOAD_ERROR_MESSAGE;
+        private configurationTabName;
+        private previewTabName;
+        private macroFormIncompleteMessage;
+        private previewLoadErrorMessage;
         private configPanel;
         private previewPanel;
         private content;
@@ -11669,26 +11749,30 @@ declare module api.util.htmlarea.dialog {
         private displayValue;
         private widthProportion;
         private heightProportion;
-        constructor(name: string, widthProportion: number, heightProportion: number);
+        constructor(name: string, widthProportion: number, heightProportion: number, displayValue?: string);
         getName(): string;
         getDisplayValue(): string;
         setDisplayValue(value: string): void;
         getProportionString(): string;
+        private makeDisplayValue();
     }
 }
 declare module api.util.htmlarea.dialog {
     import Option = api.ui.selector.Option;
     class ImageCroppingOptions {
-        static SQUARE: ImageCroppingOption;
-        static REGULAR: ImageCroppingOption;
-        static WIDESCREEN: ImageCroppingOption;
-        static CINEMA: ImageCroppingOption;
-        static PORTRAIT: ImageCroppingOption;
-        static TALL: ImageCroppingOption;
-        static SKYSCRAPER: ImageCroppingOption;
-        static getOptions(): Option<ImageCroppingOption>[];
-        static getCroppingOptions(): ImageCroppingOption[];
-        static getOptionByProportion(proportion: string): ImageCroppingOption;
+        private static INSTANCE;
+        private SQUARE;
+        private REGULAR;
+        private WIDESCREEN;
+        private CINEMA;
+        private PORTRAIT;
+        private TALL;
+        private SKYSCRAPER;
+        private NONE;
+        static get(): ImageCroppingOptions;
+        getOptions(): Option<ImageCroppingOption>[];
+        private getCroppingOptions();
+        getOptionByProportion(proportion: string): ImageCroppingOption;
     }
 }
 declare module api.util.htmlarea.dialog {
@@ -11705,7 +11789,6 @@ declare module api.util.htmlarea.dialog {
     class ImageCroppingSelector extends Dropdown<ImageCroppingOption> {
         constructor();
         private initDropdown();
-        private addNoneOption();
         private addCroppingOptions();
         addCustomScaleOption(value: string): Option<ImageCroppingOption>;
     }
@@ -11838,14 +11921,34 @@ declare module api.util.htmlarea.editor {
 }
 declare module api.form.inputtype.text {
     import support = api.form.inputtype.support;
+    import FormInputEl = api.dom.FormInputEl;
+    abstract class TextInputType extends support.BaseInputTypeNotManagingAdd<string> {
+        private maxLength;
+        constructor(config: api.form.inputtype.InputTypeViewContext);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
+        protected initOccurenceListeners(inputEl: FormInputEl): FormInputEl;
+        private updateLengthCounterValue(lengthCounter, newValue);
+        protected isValid(value: string, textInput: FormInputEl, silent?: boolean, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        private isValidMaxLength(value);
+    }
+}
+declare module api.form.inputtype.text {
     import Property = api.data.Property;
     import Value = api.data.Value;
     import ValueType = api.data.ValueType;
-    class TextLine extends support.BaseInputTypeNotManagingAdd<string> {
-        private regexpStr;
+    import FormInputEl = api.dom.FormInputEl;
+    class TextLine extends TextInputType {
         private regexp;
         constructor(config: api.form.inputtype.InputTypeViewContext);
-        private readConfig(inputConfig);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
         getValueType(): ValueType;
         newInitialValue(): Value;
         createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
@@ -11853,17 +11956,18 @@ declare module api.form.inputtype.text {
         resetInputOccurrenceElement(occurrence: api.dom.Element): void;
         availableSizeChanged(): void;
         valueBreaksRequiredContract(value: Value): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
-        private isValid(value, textInput, silent?);
+        hasInputElementValidUserInput(inputElement: FormInputEl, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        protected isValid(value: string, textInput: api.ui.text.TextInput, silent?: boolean, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        private checkRegexpValidation(value, parent, silent);
         static getName(): api.form.InputTypeName;
     }
 }
 declare module api.form.inputtype.text {
-    import support = api.form.inputtype.support;
     import Property = api.data.Property;
     import Value = api.data.Value;
     import ValueType = api.data.ValueType;
-    class TextArea extends support.BaseInputTypeNotManagingAdd<string> {
+    import FormInputEl = api.dom.FormInputEl;
+    class TextArea extends TextInputType {
         constructor(config: api.form.inputtype.InputTypeViewContext);
         getValueType(): ValueType;
         newInitialValue(): Value;
@@ -11872,7 +11976,7 @@ declare module api.form.inputtype.text {
         resetInputOccurrenceElement(occurrence: api.dom.Element): void;
         private newValue(s);
         valueBreaksRequiredContract(value: Value): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
+        hasInputElementValidUserInput(inputElement: FormInputEl, recording?: api.form.inputtype.InputValidationRecording): boolean;
         static getName(): api.form.InputTypeName;
     }
 }
@@ -11949,6 +12053,27 @@ declare module api.form.inputtype.text {
         getHtmlArea(): HtmlArea;
         static on(handler: (event: HtmlAreaResizeEvent) => void): void;
         static un(handler?: (event: HtmlAreaResizeEvent) => void): void;
+    }
+}
+declare module api.security.form.inputtype {
+    interface SecurityInputTypeViewContext extends api.form.inputtype.InputTypeViewContext {
+        formContext: api.security.form.SecurityFormContext;
+        contentPath: api.content.ContentPath;
+    }
+}
+declare module api.security.form {
+    class SecurityFormContext extends api.form.FormContext {
+        private userStore;
+        constructor(builder: SecurityFormContextBuilder);
+        getUserStore(): api.security.UserStore;
+        createInputTypeViewContext(inputTypeConfig: any, parentPropertyPath: api.data.PropertyPath, input: api.form.Input): api.form.inputtype.InputTypeViewContext;
+        private getContentPath();
+        static create(): SecurityFormContextBuilder;
+    }
+    class SecurityFormContextBuilder extends api.form.FormContextBuilder {
+        userStore: api.security.UserStore;
+        setUserStore(value: api.security.UserStore): SecurityFormContextBuilder;
+        build(): SecurityFormContext;
     }
 }
 declare module api.site.json {
@@ -13393,7 +13518,7 @@ declare module api.schema.content {
     import BaseLoader = api.util.loader.BaseLoader;
     import ContentTypeSummaryListJson = api.schema.content.ContentTypeSummaryListJson;
     class ContentTypeSummaryLoader extends BaseLoader<ContentTypeSummaryListJson, ContentTypeSummary> {
-        constructor();
+        constructor(contentId: ContentId);
         filterFn(contentType: ContentTypeSummary): boolean;
     }
 }
@@ -13437,8 +13562,16 @@ declare module api.schema.content {
 }
 declare module api.schema.content {
     class GetAllContentTypesRequest extends ContentTypeResourceRequest<ContentTypeSummaryListJson, ContentTypeSummary[]> {
-        private inlineMixinsToFormItems;
         constructor();
+        getParams(): Object;
+        getRequestPath(): api.rest.Path;
+        sendAndParse(): wemQ.Promise<ContentTypeSummary[]>;
+    }
+}
+declare module api.schema.content {
+    class GetContentTypesByContentRequest extends ContentTypeResourceRequest<ContentTypeSummaryListJson, ContentTypeSummary[]> {
+        private contentId;
+        constructor(content: ContentId);
         getParams(): Object;
         getRequestPath(): api.rest.Path;
         sendAndParse(): wemQ.Promise<ContentTypeSummary[]>;
@@ -13510,7 +13643,13 @@ declare module api.schema.content.inputtype {
         private combobox;
         private context;
         private onContentTypesLoadedHandler;
+        private isContextDependent;
         constructor(context: ContentInputTypeViewContext);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
         getValueType(): ValueType;
         newInitialValue(): Value;
         private createLoader();
@@ -14918,12 +15057,8 @@ declare module api.content.resource {
     }
 }
 declare module api.content.resource {
-    import OrderExpr = api.query.expr.OrderExpr;
     import FieldOrderExpr = api.query.expr.FieldOrderExpr;
-    import ContentSummaryJson = api.content.json.ContentSummaryJson;
-    import ContentId = api.content.ContentId;
-    import ContentState = api.schema.content.ContentState;
-    import ContentTypeName = api.schema.content.ContentTypeName;
+    import OrderExpr = api.query.expr.OrderExpr;
     class ContentTreeSelectorQueryRequest extends ContentResourceRequest<ContentTreeSelectorItemJson[], ContentTreeSelectorItem[]> {
         static DEFAULT_SIZE: number;
         static MODIFIED_TIME_DESC: FieldOrderExpr;
@@ -14956,6 +15091,9 @@ declare module api.content.resource {
         setQueryExpr(searchString?: string): void;
         setParentPath(parentPath: ContentPath): void;
         private createSearchExpression(searchString);
+        getAllowedContentPaths(): string[];
+        getContentTypeNames(): string[];
+        getRelationshipType(): string;
         getQueryExpr(): api.query.expr.QueryExpr;
         getRequestPath(): api.rest.Path;
         isPartiallyLoaded(): boolean;
@@ -14964,30 +15102,6 @@ declare module api.content.resource {
         getParams(): Object;
         sendAndParse(): wemQ.Promise<ContentTreeSelectorItem[]>;
         private expandAsString();
-    }
-    class ContentTreeSelectorItemJson {
-        content: ContentSummaryJson;
-        expand: boolean;
-    }
-    class ContentTreeSelectorItem {
-        private content;
-        private expand;
-        constructor(content: ContentSummary, expand: boolean);
-        static fromJson(json: ContentTreeSelectorItemJson): ContentTreeSelectorItem;
-        getContent(): ContentSummary;
-        getId(): string;
-        getContentId(): ContentId;
-        getPath(): ContentPath;
-        getName(): ContentName;
-        getDisplayName(): string;
-        getContentState(): ContentState;
-        hasChildren(): boolean;
-        isValid(): boolean;
-        getIconUrl(): string;
-        getType(): ContentTypeName;
-        isImage(): boolean;
-        isSite(): boolean;
-        getExpand(): boolean;
     }
 }
 declare module api.content.resource {
@@ -15293,23 +15407,148 @@ declare module api.content.resource {
         sendAndParse(): wemQ.Promise<HasUnpublishedChildrenResult>;
     }
 }
+declare module api.content.resource {
+    import ContentSummaryJson = api.content.json.ContentSummaryJson;
+    import ContentState = api.schema.content.ContentState;
+    import ContentTypeName = api.schema.content.ContentTypeName;
+    class ContentTreeSelectorItemJson {
+        content: ContentSummaryJson;
+        expand: boolean;
+    }
+    class ContentTreeSelectorItem implements Equitable {
+        private content;
+        private expand;
+        constructor(content: ContentSummary, expand: boolean);
+        static fromJson(json: ContentTreeSelectorItemJson): ContentTreeSelectorItem;
+        getContent(): ContentSummary;
+        getId(): string;
+        getContentId(): ContentId;
+        getPath(): ContentPath;
+        getName(): ContentName;
+        getDisplayName(): string;
+        getContentState(): ContentState;
+        hasChildren(): boolean;
+        isValid(): boolean;
+        getIconUrl(): string;
+        getType(): ContentTypeName;
+        isImage(): boolean;
+        isSite(): boolean;
+        getExpand(): boolean;
+        equals(o: api.Equitable): boolean;
+    }
+}
+declare module api.content.resource {
+    class ContentAndStatusTreeSelectorItem extends ContentTreeSelectorItem {
+        private compareStatus;
+        private publishStatus;
+        constructor(content: ContentSummaryAndCompareStatus, expand: boolean);
+        getPublishStatus(): PublishStatus;
+        getCompareStatus(): CompareStatus;
+        equals(o: api.Equitable): boolean;
+    }
+}
+import UriHelper = api.util.UriHelper;
+declare module api.content.util {
+    class ContentIconUrlResolver extends api.icon.IconUrlResolver {
+        private content;
+        private crop;
+        private size;
+        setContent(value: ContentSummary): ContentIconUrlResolver;
+        setSize(value: number): ContentIconUrlResolver;
+        setCrop(value: boolean): ContentIconUrlResolver;
+        resolve(): string;
+        static default(): string;
+    }
+}
+declare module api.content.util {
+    class ContentImageUrlResolver extends api.icon.IconUrlResolver {
+        private contentId;
+        private size;
+        private ts;
+        private scaleWidth;
+        private source;
+        private scale;
+        setContentId(value: ContentId): ContentImageUrlResolver;
+        setSize(value: number): ContentImageUrlResolver;
+        setTimestamp(value: Date): ContentImageUrlResolver;
+        setScaleWidth(value: boolean): ContentImageUrlResolver;
+        setSource(value: boolean): ContentImageUrlResolver;
+        setScale(value: string): ContentImageUrlResolver;
+        resolve(): string;
+    }
+}
+declare module api.content.util {
+    class ContentByPathComparator implements api.Comparator<ContentSummary> {
+        compare(a: ContentSummary, b: ContentSummary): number;
+    }
+}
+declare module api.content.util {
+    import TreeNode = api.ui.treegrid.TreeNode;
+    class ContentNodeByDisplayNameComparator implements api.Comparator<TreeNode<ContentSummaryAndCompareStatus>> {
+        compare(a: TreeNode<ContentSummaryAndCompareStatus>, b: TreeNode<ContentSummaryAndCompareStatus>): number;
+    }
+}
+declare module api.content.util {
+    import TreeNode = api.ui.treegrid.TreeNode;
+    class ContentNodeByModifiedTimeComparator implements api.Comparator<TreeNode<ContentSummaryAndCompareStatus>> {
+        compare(a: TreeNode<ContentSummaryAndCompareStatus>, b: TreeNode<ContentSummaryAndCompareStatus>): number;
+    }
+}
+declare module api.content.util {
+    import ApplicationKey = api.application.ApplicationKey;
+    import ContentTypeSummary = api.schema.content.ContentTypeSummary;
+    class CreateContentFilter {
+        private siteApplicationsAllowed;
+        constructor();
+        siteApplicationsFilter(siteApplicationKeys: ApplicationKey[]): CreateContentFilter;
+        isCreateContentAllowed(parentContent: ContentSummary, contentType: ContentTypeSummary): boolean;
+    }
+}
+declare module api.content.util {
+    class ExtraDataByMixinNameComparator implements api.Comparator<ExtraData> {
+        compare(a: ExtraData, b: ExtraData): number;
+    }
+}
+declare module api.content.util {
+    import TreeNode = api.ui.treegrid.TreeNode;
+    import ContentAndStatusTreeSelectorItem = api.content.resource.ContentAndStatusTreeSelectorItem;
+    import Option = api.ui.selector.Option;
+    class ContentRowFormatter {
+        static nameFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<ContentSummaryAndCompareStatus>): string;
+        static orderFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<ContentSummaryAndCompareStatus>): string;
+        static statusFormatter(row: number, cell: number, value: any, columnDef: any, node: TreeNode<ContentSummaryAndCompareStatus>): string;
+        static statusSelectorFormatter(row: number, cell: number, value: ContentAndStatusTreeSelectorItem, columnDef: any, node: TreeNode<Option<ContentAndStatusTreeSelectorItem>>): string;
+        private static doStatusFormat(data, value);
+        static makeClassName(entry: string): string;
+    }
+}
 declare module api.content {
     import OptionDataLoader = api.ui.selector.OptionDataLoader;
     import TreeNode = api.ui.treegrid.TreeNode;
     import OptionDataLoaderData = api.ui.selector.OptionDataLoaderData;
     import Option = api.ui.selector.Option;
+    import ContentTreeSelectorQueryRequest = api.content.resource.ContentTreeSelectorQueryRequest;
     import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
+    import ContentAndStatusTreeSelectorItem = api.content.resource.ContentAndStatusTreeSelectorItem;
+    import LoadedDataEvent = api.util.loader.event.LoadedDataEvent;
     class ContentSummaryOptionDataLoader implements OptionDataLoader<ContentTreeSelectorItem> {
-        private request;
-        private contentTypeNames;
-        private allowedContentPaths;
-        private relationshipType;
+        protected request: ContentTreeSelectorQueryRequest;
+        private loadStatus;
+        private loadedDataListeners;
         constructor(builder?: ContentSummaryOptionDataLoaderBuilder);
         private initRequest(builder);
+        setContent(content: ContentSummary): void;
+        search(value: string): wemQ.Promise<ContentTreeSelectorItem[]>;
+        load(values: string[]): wemQ.Promise<ContentTreeSelectorItem[]>;
         fetch(node: TreeNode<Option<ContentTreeSelectorItem>>): wemQ.Promise<ContentTreeSelectorItem>;
         fetchChildren(parentNode: TreeNode<Option<ContentTreeSelectorItem>>, from?: number, size?: number): wemQ.Promise<OptionDataLoaderData<ContentTreeSelectorItem>>;
-        protected createOptionData(data: ContentTreeSelectorItem[]): OptionDataLoaderData<ContentTreeSelectorItem>;
-        checkReadonly(items: ContentTreeSelectorItem[]): wemQ.Promise<string[]>;
+        notifyLoadedData(results: ContentTreeSelectorItem[]): void;
+        onLoadedData(listener: (event: LoadedDataEvent<ContentTreeSelectorItem>) => void): void;
+        unLoadedData(listener: (event: LoadedDataEvent<ContentTreeSelectorItem>) => void): void;
+        protected createOptionData(data: ContentAndStatusTreeSelectorItem[], hits: number, totalHits: number): OptionDataLoaderData<ContentTreeSelectorItem>;
+        checkReadonly(items: ContentAndStatusTreeSelectorItem[]): wemQ.Promise<string[]>;
+        private loadItems();
+        private loadStatuses(contents);
         static create(): ContentSummaryOptionDataLoaderBuilder;
     }
     class ContentSummaryOptionDataLoaderBuilder {
@@ -15317,10 +15556,12 @@ declare module api.content {
         contentTypeNames: string[];
         allowedContentPaths: string[];
         relationshipType: string;
+        loadStatus: boolean;
         setContentTypeNames(contentTypeNames: string[]): ContentSummaryOptionDataLoaderBuilder;
         setAllowedContentPaths(allowedContentPaths: string[]): ContentSummaryOptionDataLoaderBuilder;
         setRelationshipType(relationshipType: string): ContentSummaryOptionDataLoaderBuilder;
         setContent(content: ContentSummary): ContentSummaryOptionDataLoaderBuilder;
+        setLoadStatus(value: boolean): ContentSummaryOptionDataLoaderBuilder;
         build(): ContentSummaryOptionDataLoader;
     }
 }
@@ -15379,13 +15620,13 @@ declare module api.content {
 }
 declare module api.content {
     class ContentUnnamed extends ContentName implements api.Equitable {
-        static PRETTY_UNNAMED: string;
         constructor(name: string);
         isUnnamed(): boolean;
         toString(): string;
         equals(o: api.Equitable): boolean;
         static newUnnamed(): ContentUnnamed;
         static prettifyUnnamed(name?: string): string;
+        static getPrettyUnnamed(): string;
     }
 }
 declare module api.content {
@@ -15636,6 +15877,7 @@ declare module api.content {
     import ContentSummaryJson = api.content.json.ContentSummaryJson;
     import OptionDataLoader = api.ui.selector.OptionDataLoader;
     import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
+    import Viewer = api.ui.Viewer;
     class ContentComboBox extends RichComboBox<ContentSummary> {
         constructor(builder: ContentComboBoxBuilder);
         getLoader(): ContentSummaryLoader;
@@ -15666,6 +15908,7 @@ declare module api.content {
         value: string;
         displayMissingSelectedOptions: boolean;
         removeMissingSelectedOptions: boolean;
+        showStatus: boolean;
         setName(value: string): ContentComboBoxBuilder;
         setMaximumOccurrences(maximumOccurrences: number): ContentComboBoxBuilder;
         setLoader(loader: api.util.loader.BaseLoader<ContentQueryResultJson<ContentSummaryJson>, ContentSummary>): ContentComboBoxBuilder;
@@ -15674,6 +15917,8 @@ declare module api.content {
         setDisplayMissingSelectedOptions(value: boolean): ContentComboBoxBuilder;
         setRemoveMissingSelectedOptions(value: boolean): ContentComboBoxBuilder;
         setTreegridDropdownEnabled(value: boolean): ContentComboBoxBuilder;
+        setShowStatus(value: boolean): ContentComboBoxBuilder;
+        setOptionDisplayValueViewer(value: Viewer<any>): ContentComboBoxBuilder;
         setOptionDataLoader(value: OptionDataLoader<ContentTreeSelectorItem>): ContentComboBoxBuilder;
         build(): ContentComboBox;
     }
@@ -15821,68 +16066,6 @@ declare module api.content {
         equals(o: api.Equitable): boolean;
     }
 }
-import UriHelper = api.util.UriHelper;
-declare module api.content.util {
-    class ContentIconUrlResolver extends api.icon.IconUrlResolver {
-        private content;
-        private crop;
-        private size;
-        setContent(value: ContentSummary): ContentIconUrlResolver;
-        setSize(value: number): ContentIconUrlResolver;
-        setCrop(value: boolean): ContentIconUrlResolver;
-        resolve(): string;
-        static default(): string;
-    }
-}
-declare module api.content.util {
-    class ContentImageUrlResolver extends api.icon.IconUrlResolver {
-        private contentId;
-        private size;
-        private ts;
-        private scaleWidth;
-        private source;
-        private scale;
-        setContentId(value: ContentId): ContentImageUrlResolver;
-        setSize(value: number): ContentImageUrlResolver;
-        setTimestamp(value: Date): ContentImageUrlResolver;
-        setScaleWidth(value: boolean): ContentImageUrlResolver;
-        setSource(value: boolean): ContentImageUrlResolver;
-        setScale(value: string): ContentImageUrlResolver;
-        resolve(): string;
-    }
-}
-declare module api.content.util {
-    class ContentByPathComparator implements api.Comparator<ContentSummary> {
-        compare(a: ContentSummary, b: ContentSummary): number;
-    }
-}
-declare module api.content.util {
-    import TreeNode = api.ui.treegrid.TreeNode;
-    class ContentNodeByDisplayNameComparator implements api.Comparator<TreeNode<ContentSummaryAndCompareStatus>> {
-        compare(a: TreeNode<ContentSummaryAndCompareStatus>, b: TreeNode<ContentSummaryAndCompareStatus>): number;
-    }
-}
-declare module api.content.util {
-    import TreeNode = api.ui.treegrid.TreeNode;
-    class ContentNodeByModifiedTimeComparator implements api.Comparator<TreeNode<ContentSummaryAndCompareStatus>> {
-        compare(a: TreeNode<ContentSummaryAndCompareStatus>, b: TreeNode<ContentSummaryAndCompareStatus>): number;
-    }
-}
-declare module api.content.util {
-    import ApplicationKey = api.application.ApplicationKey;
-    import ContentTypeSummary = api.schema.content.ContentTypeSummary;
-    class CreateContentFilter {
-        private siteApplicationsAllowed;
-        constructor();
-        siteApplicationsFilter(siteApplicationKeys: ApplicationKey[]): CreateContentFilter;
-        isCreateContentAllowed(parentContent: ContentSummary, contentType: ContentTypeSummary): boolean;
-    }
-}
-declare module api.content.util {
-    class ExtraDataByMixinNameComparator implements api.Comparator<ExtraData> {
-        compare(a: ExtraData, b: ExtraData): number;
-    }
-}
 declare module api.content.order {
     import ReorderChildContentJson = api.content.json.ReorderChildContentJson;
     class OrderChildMovement {
@@ -16025,6 +16208,221 @@ declare module api.content.image {
         getContentId(): ContentId;
         static on(handler: (event: ImageErrorEvent) => void): void;
         static un(handler?: (event: ImageErrorEvent) => void): void;
+    }
+}
+declare module api.content.image {
+    import ContentAndStatusTreeSelectorItem = api.content.resource.ContentAndStatusTreeSelectorItem;
+    import OptionDataLoaderData = api.ui.selector.OptionDataLoaderData;
+    import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
+    class ImageOptionDataLoader extends ContentSummaryOptionDataLoader {
+        protected createOptionData(data: ContentAndStatusTreeSelectorItem[], hits: number, totalHits: number): OptionDataLoaderData<ImageTreeSelectorItem>;
+        search(value: string): wemQ.Promise<ImageTreeSelectorItem[]>;
+        static create(): ImageOptionDataLoaderBuilder;
+    }
+    class ImageOptionDataLoaderBuilder extends ContentSummaryOptionDataLoaderBuilder {
+        inputName: string;
+        setInputName(value: string): ImageOptionDataLoaderBuilder;
+        setContentTypeNames(value: string[]): ImageOptionDataLoaderBuilder;
+        setAllowedContentPaths(value: string[]): ImageOptionDataLoaderBuilder;
+        setRelationshipType(value: string): ImageOptionDataLoaderBuilder;
+        setContent(value: ContentSummary): ImageOptionDataLoaderBuilder;
+        build(): ImageOptionDataLoader;
+    }
+    class ImageTreeSelectorItem extends ContentTreeSelectorItem {
+        private imageSelectorDisplayValue;
+        constructor(content: ContentSummary, expand: boolean);
+        getImageUrl(): string;
+        isEmptyContent(): boolean;
+        getContentSummary(): ContentSummary;
+        getTypeLocaleName(): string;
+        equals(o: api.Equitable): boolean;
+    }
+}
+declare module api.content.image {
+    import ContentSummary = api.content.ContentSummary;
+    import UploadItem = api.ui.uploader.UploadItem;
+    import ContentTypeName = api.schema.content.ContentTypeName;
+    class ImageSelectorDisplayValue {
+        private uploadItem;
+        private content;
+        private empty;
+        static fromUploadItem(item: UploadItem<ContentSummary>): ImageSelectorDisplayValue;
+        static fromContentSummary(content: ContentSummary): ImageSelectorDisplayValue;
+        static makeEmpty(): ImageSelectorDisplayValue;
+        isEmptyContent(): boolean;
+        setEmpty(value: boolean): ImageSelectorDisplayValue;
+        setUploadItem(item: UploadItem<ContentSummary>): ImageSelectorDisplayValue;
+        setContentSummary(contentSummary: ContentSummary): ImageSelectorDisplayValue;
+        getUploadItem(): UploadItem<ContentSummary>;
+        getContentSummary(): ContentSummary;
+        getId(): string;
+        getContentId(): api.content.ContentId;
+        getContentPath(): api.content.ContentPath;
+        getImageUrl(): string;
+        getIconUrl(): string;
+        getLabel(): string;
+        getDisplayName(): string;
+        getType(): ContentTypeName;
+        getTypeLocaleName(): string;
+        getPath(): ContentPath;
+        equals(o: api.Equitable): boolean;
+    }
+}
+declare module api.content.image {
+    import Option = api.ui.selector.Option;
+    import RichComboBox = api.ui.selector.combobox.RichComboBox;
+    import ContentQueryResultJson = api.content.json.ContentQueryResultJson;
+    import ContentSummaryJson = api.content.json.ContentSummaryJson;
+    import BaseLoader = api.util.loader.BaseLoader;
+    import OptionDataLoader = api.ui.selector.OptionDataLoader;
+    import SelectedOptionsView = api.ui.selector.combobox.SelectedOptionsView;
+    class ImageContentComboBox extends RichComboBox<any> {
+        constructor(builder: ImageContentComboBoxBuilder);
+        createOption(value: ContentSummary): Option<ImageSelectorDisplayValue>;
+        setContent(content: ContentSummary): void;
+        getContent(contentId: ContentId): ContentSummary;
+        getOptionDataLoader(): ImageOptionDataLoader;
+        static create(): ImageContentComboBoxBuilder;
+    }
+    class ImageContentComboBoxBuilder {
+        name: string;
+        maximumOccurrences: number;
+        loader: BaseLoader<ContentQueryResultJson<ContentSummaryJson>, ContentSummary>;
+        minWidth: number;
+        selectedOptionsView: SelectedOptionsView<any>;
+        optionDisplayValueViewer: ImageSelectorViewer;
+        optionDataLoader: OptionDataLoader<any>;
+        treegridDropdownEnabled: boolean;
+        value: string;
+        content: ContentSummary;
+        setContent(value: ContentSummary): ImageContentComboBoxBuilder;
+        setName(value: string): ImageContentComboBoxBuilder;
+        setValue(value: string): ImageContentComboBoxBuilder;
+        setMaximumOccurrences(maximumOccurrences: number): ImageContentComboBoxBuilder;
+        setLoader(loader: BaseLoader<ContentQueryResultJson<ContentSummaryJson>, ContentSummary>): ImageContentComboBoxBuilder;
+        setMinWidth(value: number): ImageContentComboBoxBuilder;
+        setSelectedOptionsView(value: SelectedOptionsView<any>): ImageContentComboBoxBuilder;
+        setOptionDisplayValueViewer(value: ImageSelectorViewer): ImageContentComboBoxBuilder;
+        setOptionDataLoader(value: OptionDataLoader<any>): ImageContentComboBoxBuilder;
+        setTreegridDropdownEnabled(value: boolean): ImageContentComboBoxBuilder;
+        build(): ImageContentComboBox;
+    }
+}
+declare module api.content.image {
+    class ImageSelectorViewer extends api.ui.NamesAndIconViewer<ImageSelectorDisplayValue> {
+        constructor();
+        resolveDisplayName(object: ImageSelectorDisplayValue): string;
+        resolveUnnamedDisplayName(object: ImageSelectorDisplayValue): string;
+        resolveSubName(object: ImageSelectorDisplayValue, relativePath?: boolean): string;
+        resolveIconUrl(object: ImageSelectorDisplayValue): string;
+    }
+}
+declare module api.content.image {
+    import Option = api.ui.selector.Option;
+    import SelectedOption = api.ui.selector.combobox.SelectedOption;
+    class ImageSelectorSelectedOptionsView extends api.ui.selector.combobox.BaseSelectedOptionsView<ImageSelectorDisplayValue> {
+        private numberOfOptionsPerRow;
+        private activeOption;
+        private selection;
+        private toolbar;
+        private editSelectedOptionsListeners;
+        private removeSelectedOptionsListeners;
+        private mouseClickListener;
+        private clickDisabled;
+        constructor();
+        private initAndAppendSelectionToolbar();
+        private addOptionMovedEventHandler();
+        protected handleDnDStop(event: Event, ui: JQueryUI.SortableUIParams): void;
+        private temporarilyDisableClickEvent();
+        removeOption(optionToRemove: Option<ImageSelectorDisplayValue>, silent?: boolean): void;
+        removeSelectedOptions(options: SelectedOption<ImageSelectorDisplayValue>[]): void;
+        createSelectedOption(option: Option<ImageSelectorDisplayValue>): SelectedOption<ImageSelectorDisplayValue>;
+        addOption(option: Option<ImageSelectorDisplayValue>, silent?: boolean, keyCode?: number): boolean;
+        private addNewOption(option, silent, keyCode?);
+        updateUploadedOption(option: Option<ImageSelectorDisplayValue>): void;
+        makeEmptyOption(id: string): Option<ImageSelectorDisplayValue>;
+        private uncheckOthers(option);
+        private removeOptionViewAndRefocus(option);
+        private setActiveOption(option);
+        private updateSelectionToolbarLayout();
+        private getNumberOfEditableOptions();
+        private resetActiveOption();
+        private setOutsideClickListener();
+        private handleOptionViewRendered(option, optionView);
+        private handleOptionViewClicked(option, optionView);
+        private handleOptionViewKeyDownEvent(event, option, optionView);
+        private handleOptionViewChecked(checked, option, optionView);
+        private handleOptionViewImageLoaded(optionView);
+        private isFirstInRow(index);
+        private isLastInRow(index);
+        private isFirst(index);
+        private isLast(index);
+        private notifyRemoveSelectedOptions(option);
+        onRemoveSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
+        unRemoveSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
+        private notifyEditSelectedOptions(option);
+        onEditSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
+        unEditSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
+    }
+}
+declare module api.content.image {
+    class ImageSelectorSelectedOptionView extends api.ui.selector.combobox.BaseSelectedOptionView<ImageSelectorDisplayValue> {
+        private static IMAGE_SIZE;
+        private icon;
+        private label;
+        private check;
+        private progress;
+        private error;
+        private loadMask;
+        private selectionChangeListeners;
+        constructor(option: api.ui.selector.Option<ImageSelectorDisplayValue>);
+        setOption(option: api.ui.selector.Option<ImageSelectorDisplayValue>): void;
+        private updateIconSrc(content);
+        setProgress(value: number): void;
+        doRender(): wemQ.Promise<boolean>;
+        private showProgress();
+        private showSpinner();
+        private showResult();
+        showError(text: string): void;
+        updateProportions(): void;
+        private centerVertically(el, contentHeight);
+        getIcon(): api.dom.ImgEl;
+        getCheckbox(): api.ui.Checkbox;
+        toggleChecked(): void;
+        private notifyChecked(checked);
+        onChecked(listener: {
+            (option: ImageSelectorSelectedOptionView, checked: boolean): void;
+        }): void;
+        unChecked(listener: {
+            (option: ImageSelectorSelectedOptionView, checked: boolean): void;
+        }): void;
+    }
+}
+declare module api.content.image {
+    class SelectionToolbar extends api.dom.DivEl {
+        private editButton;
+        private removeButton;
+        private removableCount;
+        private editableCount;
+        private editClickListeners;
+        private removeClickListeners;
+        constructor();
+        setSelectionCount(removableCount: number, editableCount: number): void;
+        private refreshUI();
+        notifyEditClicked(): void;
+        onEditClicked(listener: {
+            (): void;
+        }): void;
+        unEditClicked(listener: {
+            (): void;
+        }): void;
+        notifyRemoveClicked(): void;
+        onRemoveClicked(listener: {
+            (): void;
+        }): void;
+        unRemoveClicked(listener: {
+            (): void;
+        }): void;
     }
 }
 declare module api.content.page {
@@ -16619,6 +17017,30 @@ declare module api.content.page {
 declare module api.content.page {
     class PageTemplateByDisplayNameComparator implements api.Comparator<PageTemplate> {
         compare(a: PageTemplate, b: PageTemplate): number;
+    }
+}
+declare module api.content.page {
+    import Content = api.content.Content;
+    import ContentJson = api.content.json.ContentJson;
+    class CreatePageTemplateRequest extends PageTemplateResourceRequest<ContentJson, Content> implements PageCUDRequest {
+        private controller;
+        private config;
+        private regions;
+        private displayName;
+        private name;
+        private site;
+        private supports;
+        constructor();
+        setController(controller: api.content.page.DescriptorKey): CreatePageTemplateRequest;
+        setConfig(config: api.data.PropertyTree): CreatePageTemplateRequest;
+        setRegions(value: api.content.page.region.Regions): CreatePageTemplateRequest;
+        setDisplayName(value: string): CreatePageTemplateRequest;
+        setName(value: api.content.ContentName): CreatePageTemplateRequest;
+        setSite(value: ContentPath): CreatePageTemplateRequest;
+        setSupports(...value: api.schema.content.ContentTypeName[]): CreatePageTemplateRequest;
+        getParams(): Object;
+        getRequestPath(): api.rest.Path;
+        sendAndParse(): wemQ.Promise<Content>;
     }
 }
 declare module api.content.page.region {
@@ -17896,10 +18318,16 @@ declare module api.content.form.inputtype.contentselector {
         private contentComboBox;
         private draggingIndex;
         private isFlat;
+        private showStatus;
         private static contentIdBatch;
         private static loadSummariesResult;
         private static loadSummaries;
         constructor(config?: api.content.form.inputtype.ContentInputTypeViewContext);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
         getContentComboBox(): ContentComboBox;
         protected getSelectedOptionsView(): ContentSelectedOptionsView;
         protected getContentPath(raw: api.content.ContentSummary): api.content.ContentPath;
@@ -17919,11 +18347,6 @@ declare module api.content.form.inputtype.contentselector {
         private updateSelectedOptionIsEditable(selectedOption);
         private refreshSortable();
         protected getNumberOfValids(): number;
-        protected readConfig(inputConfig: {
-            [element: string]: {
-                [name: string]: string;
-            }[];
-        }): void;
         giveFocus(): boolean;
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
@@ -17960,93 +18383,12 @@ declare module api.content.form.inputtype.principalselector {
     }
 }
 declare module api.content.form.inputtype.image {
-    class ImageSelectorSelectedOptionView extends api.ui.selector.combobox.BaseSelectedOptionView<ImageSelectorDisplayValue> {
-        private static IMAGE_SIZE;
-        private icon;
-        private label;
-        private check;
-        private progress;
-        private error;
-        private loadMask;
-        private selectionChangeListeners;
-        constructor(option: api.ui.selector.Option<ImageSelectorDisplayValue>);
-        setOption(option: api.ui.selector.Option<ImageSelectorDisplayValue>): void;
-        private updateIconSrc(content);
-        setProgress(value: number): void;
-        doRender(): wemQ.Promise<boolean>;
-        private showProgress();
-        private showSpinner();
-        private showResult();
-        showError(text: string): void;
-        updateProportions(): void;
-        private centerVertically(el, contentHeight);
-        getIcon(): api.dom.ImgEl;
-        getCheckbox(): api.ui.Checkbox;
-        toggleChecked(): void;
-        private notifyChecked(checked);
-        onChecked(listener: {
-            (option: ImageSelectorSelectedOptionView, checked: boolean): void;
-        }): void;
-        unChecked(listener: {
-            (option: ImageSelectorSelectedOptionView, checked: boolean): void;
-        }): void;
-    }
-}
-declare module api.content.form.inputtype.image {
-    import Option = api.ui.selector.Option;
-    import SelectedOption = api.ui.selector.combobox.SelectedOption;
-    class ImageSelectorSelectedOptionsView extends api.ui.selector.combobox.BaseSelectedOptionsView<ImageSelectorDisplayValue> {
-        private numberOfOptionsPerRow;
-        private activeOption;
-        private selection;
-        private toolbar;
-        private editSelectedOptionsListeners;
-        private removeSelectedOptionsListeners;
-        private mouseClickListener;
-        private clickDisabled;
-        constructor();
-        private initAndAppendSelectionToolbar();
-        private addOptionMovedEventHandler();
-        protected handleDnDStop(event: Event, ui: JQueryUI.SortableUIParams): void;
-        private temporarilyDisableClickEvent();
-        removeOption(optionToRemove: Option<ImageSelectorDisplayValue>, silent?: boolean): void;
-        removeSelectedOptions(options: SelectedOption<ImageSelectorDisplayValue>[]): void;
-        createSelectedOption(option: Option<ImageSelectorDisplayValue>): SelectedOption<ImageSelectorDisplayValue>;
-        addOption(option: Option<ImageSelectorDisplayValue>, silent?: boolean, keyCode?: number): boolean;
-        private addNewOption(option, silent, keyCode?);
-        updateUploadedOption(option: Option<ImageSelectorDisplayValue>): void;
-        makeEmptyOption(id: string): Option<ImageSelectorDisplayValue>;
-        private uncheckOthers(option);
-        private removeOptionViewAndRefocus(option);
-        private setActiveOption(option);
-        private updateSelectionToolbarLayout();
-        private getNumberOfEditableOptions();
-        private resetActiveOption();
-        private setOutsideClickListener();
-        private handleOptionViewRendered(option, optionView);
-        private handleOptionViewClicked(option, optionView);
-        private handleOptionViewKeyDownEvent(event, option, optionView);
-        private handleOptionViewChecked(checked, option, optionView);
-        private handleOptionViewImageLoaded(optionView);
-        private isFirstInRow(index);
-        private isLastInRow(index);
-        private isFirst(index);
-        private isLast(index);
-        private notifyRemoveSelectedOptions(option);
-        onRemoveSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
-        unRemoveSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
-        private notifyEditSelectedOptions(option);
-        onEditSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
-        unEditSelectedOptions(listener: (option: SelectedOption<ImageSelectorDisplayValue>[]) => void): void;
-    }
-}
-declare module api.content.form.inputtype.image {
     import PropertyArray = api.data.PropertyArray;
     import Value = api.data.Value;
     import ValueType = api.data.ValueType;
     import ContentSummary = api.content.ContentSummary;
-    import ContentComboBox = api.content.form.inputtype.image.ImageContentComboBox;
     import ContentInputTypeManagingAdd = api.content.form.inputtype.ContentInputTypeManagingAdd;
+    import ImageSelectorDisplayValue = api.content.image.ImageSelectorDisplayValue;
     class ImageSelector extends ContentInputTypeManagingAdd<ImageSelectorDisplayValue> {
         private contentComboBox;
         private selectedOptionsView;
@@ -18055,14 +18397,14 @@ declare module api.content.form.inputtype.image {
         private editContentRequestListeners;
         private isFlat;
         constructor(config: api.content.form.inputtype.ContentInputTypeViewContext);
-        getContentComboBox(): ImageContentComboBox;
+        getContentComboBox(): api.content.image.ImageContentComboBox;
         protected getContentPath(raw: ImageSelectorDisplayValue): api.content.ContentPath;
         private updateSelectedItemsIcons();
         getValueType(): ValueType;
         newInitialValue(): Value;
         private getRemainingOccurrences();
         private createSelectedOptionsView();
-        createContentComboBox(maximumOccurrences: number, inputIconUrl: string, relationshipAllowedContentTypes: string[], inputName: string): ContentComboBox;
+        createContentComboBox(maximumOccurrences: number, inputIconUrl: string, relationshipAllowedContentTypes: string[], inputName: string): api.content.image.ImageContentComboBox;
         layout(input: api.form.Input, propertyArray: PropertyArray): wemQ.Promise<void>;
         private removePropertyWithId(id);
         update(propertyArray: PropertyArray, unchangedOnly?: boolean): wemQ.Promise<void>;
@@ -18092,109 +18434,10 @@ declare module api.content.form.inputtype.image {
     }
 }
 declare module api.content.form.inputtype.image {
-    class SelectionToolbar extends api.dom.DivEl {
-        private editButton;
-        private removeButton;
-        private removableCount;
-        private editableCount;
-        private editClickListeners;
-        private removeClickListeners;
-        constructor();
-        setSelectionCount(removableCount: number, editableCount: number): void;
-        private refreshUI();
-        notifyEditClicked(): void;
-        onEditClicked(listener: {
-            (): void;
-        }): void;
-        unEditClicked(listener: {
-            (): void;
-        }): void;
-        notifyRemoveClicked(): void;
-        onRemoveClicked(listener: {
-            (): void;
-        }): void;
-        unRemoveClicked(listener: {
-            (): void;
-        }): void;
-    }
-}
-declare module api.content.form.inputtype.image {
     class FocusChangedEvent {
         private focused;
         constructor(focused: boolean);
         isFocused(): boolean;
-    }
-}
-declare module api.content.form.inputtype.image {
-    import ContentSummary = api.content.ContentSummary;
-    import UploadItem = api.ui.uploader.UploadItem;
-    class ImageSelectorDisplayValue {
-        private uploadItem;
-        private content;
-        private empty;
-        static fromUploadItem(item: UploadItem<ContentSummary>): ImageSelectorDisplayValue;
-        static fromContentSummary(content: ContentSummary): ImageSelectorDisplayValue;
-        static makeEmpty(): ImageSelectorDisplayValue;
-        isEmptyContent(): boolean;
-        setEmpty(value: boolean): ImageSelectorDisplayValue;
-        setUploadItem(item: UploadItem<ContentSummary>): ImageSelectorDisplayValue;
-        setContentSummary(contentSummary: ContentSummary): ImageSelectorDisplayValue;
-        getUploadItem(): UploadItem<ContentSummary>;
-        getContentSummary(): ContentSummary;
-        getId(): string;
-        getContentId(): api.content.ContentId;
-        getContentPath(): api.content.ContentPath;
-        getImageUrl(): string;
-        getLabel(): string;
-        getDisplayName(): string;
-        getTypeLocaleName(): string;
-        getPath(): ContentPath;
-    }
-}
-declare module api.content.form.inputtype.image {
-    class ImageSelectorViewer extends api.ui.NamesAndIconViewer<ImageSelectorDisplayValue> {
-        constructor();
-        resolveDisplayName(object: ImageSelectorDisplayValue): string;
-        resolveUnnamedDisplayName(object: ImageSelectorDisplayValue): string;
-        resolveSubName(object: ImageSelectorDisplayValue, relativePath?: boolean): string;
-        resolveIconUrl(object: ImageSelectorDisplayValue): string;
-    }
-}
-declare module api.content.form.inputtype.image {
-    import Option = api.ui.selector.Option;
-    import RichComboBox = api.ui.selector.combobox.RichComboBox;
-    import ImageSelectorDisplayValue = api.content.form.inputtype.image.ImageSelectorDisplayValue;
-    import ImageSelectorViewer = api.content.form.inputtype.image.ImageSelectorViewer;
-    import ImageSelectorSelectedOptionsView = api.content.form.inputtype.image.ImageSelectorSelectedOptionsView;
-    import ContentQueryResultJson = api.content.json.ContentQueryResultJson;
-    import ContentSummaryJson = api.content.json.ContentSummaryJson;
-    import BaseLoader = api.util.loader.BaseLoader;
-    import OptionDataLoader = api.ui.selector.OptionDataLoader;
-    class ImageContentComboBox extends RichComboBox<ImageSelectorDisplayValue> {
-        constructor(builder: ImageContentComboBoxBuilder);
-        createOption(value: ContentSummary): Option<ImageSelectorDisplayValue>;
-        static create(): ImageContentComboBoxBuilder;
-    }
-    class ImageContentComboBoxBuilder {
-        name: string;
-        maximumOccurrences: number;
-        loader: BaseLoader<ContentQueryResultJson<ContentSummaryJson>, ContentSummary>;
-        minWidth: number;
-        selectedOptionsView: ImageSelectorSelectedOptionsView;
-        optionDisplayValueViewer: ImageSelectorViewer;
-        optionDataLoader: OptionDataLoader<any>;
-        treegridDropdownEnabled: boolean;
-        value: string;
-        setName(value: string): ImageContentComboBoxBuilder;
-        setValue(value: string): ImageContentComboBoxBuilder;
-        setMaximumOccurrences(maximumOccurrences: number): ImageContentComboBoxBuilder;
-        setLoader(loader: BaseLoader<ContentQueryResultJson<ContentSummaryJson>, ContentSummary>): ImageContentComboBoxBuilder;
-        setMinWidth(value: number): ImageContentComboBoxBuilder;
-        setSelectedOptionsView(value: ImageSelectorSelectedOptionsView): ImageContentComboBoxBuilder;
-        setOptionDisplayValueViewer(value: ImageSelectorViewer): ImageContentComboBoxBuilder;
-        setOptionDataLoader(value: OptionDataLoader<any>): ImageContentComboBoxBuilder;
-        setTreegridDropdownEnabled(value: boolean): ImageContentComboBoxBuilder;
-        build(): ImageContentComboBox;
     }
 }
 declare module api.content.form.inputtype.image {
@@ -18219,30 +18462,6 @@ declare module api.content.form.inputtype.image {
         setAllowedContentPaths(allowedContentPaths: string[]): Builder;
         setRelationshipType(relationshipType: string): Builder;
         build(): ImageSelectorLoader;
-    }
-}
-declare module api.content {
-    import OptionDataLoaderData = api.ui.selector.OptionDataLoaderData;
-    import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
-    class ImageOptionDataLoader extends ContentSummaryOptionDataLoader {
-        protected createOptionData(data: ContentTreeSelectorItem[]): OptionDataLoaderData<ImageTreeSelectorItem>;
-        static create(): ImageOptionDataLoaderBuilder;
-    }
-    class ImageOptionDataLoaderBuilder extends ContentSummaryOptionDataLoaderBuilder {
-        inputName: string;
-        setInputName(value: string): ImageOptionDataLoaderBuilder;
-        setContentTypeNames(value: string[]): ImageOptionDataLoaderBuilder;
-        setAllowedContentPaths(value: string[]): ImageOptionDataLoaderBuilder;
-        setRelationshipType(value: string): ImageOptionDataLoaderBuilder;
-        setContent(value: ContentSummary): ImageOptionDataLoaderBuilder;
-        build(): ImageOptionDataLoader;
-    }
-    class ImageTreeSelectorItem extends ContentTreeSelectorItem {
-        private imageSelectorDisplayValue;
-        constructor(content: ContentSummary, expand: boolean);
-        getImageUrl(): string;
-        isEmptyContent(): boolean;
-        getContentSummary(): ContentSummary;
     }
 }
 declare module api.content.form.inputtype.tag {
@@ -19428,7 +19647,7 @@ declare module api.app.browse {
 }
 declare module api.app.browse {
     class BrowseItemPanel<M extends api.Equitable> extends api.ui.panel.DeckPanel {
-        private itemStatisticsPanel;
+        protected itemStatisticsPanel: api.app.view.ItemStatisticsPanel<M>;
         private items;
         private noSelectionContainer;
         constructor();
@@ -19617,6 +19836,7 @@ declare module api.app.view {
         constructor(className?: string);
         getHeader(): ItemStatisticsHeader<M>;
         setItem(item: api.app.view.ViewItem<M>): void;
+        clearItem(): void;
         getItem(): ViewItem<M>;
     }
 }
@@ -20838,11 +21058,16 @@ declare module api.liveedit {
         private itemViewRemovedListeners;
         private propertyChangedListener;
         private resetListener;
+        protected initOnAdd: boolean;
         static debug: boolean;
+        private keyBinding;
         constructor(builder: ComponentViewBuilder<COMPONENT>);
         private registerComponentListeners(component);
         private unregisterComponentListeners(component);
         private addComponentContextMenuActions(inspectActionRequired);
+        private initKeyBoardBindings();
+        select(clickPosition?: Position, menuPosition?: ItemViewContextMenuPosition, isNew?: boolean, rightClicked?: boolean): void;
+        deselect(silent?: boolean): void;
         remove(): ComponentView<Component>;
         getType(): ComponentItemType;
         setComponent(component: COMPONENT): void;
@@ -20855,7 +21080,7 @@ declare module api.liveedit {
         setMoving(value: boolean): void;
         isMoving(): boolean;
         clone(): ComponentView<Component>;
-        private duplicate(duplicate);
+        protected duplicate(duplicate: COMPONENT): ComponentView<Component>;
         private createFragment();
         toString(): string;
         replaceWith(replacement: ComponentView<Component>): void;
@@ -20870,6 +21095,7 @@ declare module api.liveedit {
         addComponentView(componentView: ComponentView<Component>, index: number): void;
         getRegionView(): RegionView;
         isEmpty(): boolean;
+        private skipInitOnAdd();
         static findParentRegionViewHTMLElement(htmlElement: HTMLElement): HTMLElement;
         private handleDragStart2(event);
         private handleDrag(event);
@@ -20910,6 +21136,7 @@ declare module api.liveedit {
     }
 }
 declare module api.liveedit {
+    import PageModel = api.content.page.PageModel;
     import Component = api.content.page.region.Component;
     import RegionPath = api.content.page.region.RegionPath;
     import ComponentPath = api.content.page.region.ComponentPath;
@@ -20996,6 +21223,7 @@ declare module api.liveedit {
         private registerRegionView(regionView);
         unregisterRegionView(regionView: RegionView): void;
         getRegions(): RegionView[];
+        getModel(): PageModel;
         getFragmentView(): ComponentView<Component>;
         toItemViewArray(): ItemView[];
         hasSelectedView(): boolean;
@@ -21596,6 +21824,7 @@ declare module api.liveedit.text {
         private authRequest;
         private editableSourceCode;
         constructor(builder: TextComponentViewBuilder);
+        private initialize();
         private reInitEditor();
         private getContent();
         private getContentPath();
