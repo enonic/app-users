@@ -221,7 +221,10 @@ function calculateIdProvider(authConfig) {
     if (authConfig) {
         return {
             applicationKey: authConfig.applicationKey,
-            config: authConfig.config || {}
+            config:
+                authConfig.config && authConfig.config.length > 0
+                    ? authConfig.config
+                    : [{}]
         };
     }
     return undefined;
