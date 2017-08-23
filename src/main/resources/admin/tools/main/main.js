@@ -8,8 +8,7 @@ function handleGet() {
         type: 'absolute'
     });
     var graphQlUrl = portal.serviceUrl({
-        service: 'graphql',
-        type: 'absolute'
+        service: 'graphql'
     });
 
     var view = resolve('./main.html');
