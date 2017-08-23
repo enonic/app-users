@@ -84,14 +84,16 @@ module.exports = graphQl.createObjectType({
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                members: graphQl.list(graphQl.GraphQLString)
+                members: graphQl.list(graphQl.GraphQLString),
+                memberships: graphQl.list(graphQl.GraphQLString)
             },
             resolve: function(env) {
                 return groups.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
-                    members: env.args.members
+                    members: env.args.members,
+                    memberships: env.args.memberships
                 });
             }
         },
@@ -102,7 +104,9 @@ module.exports = graphQl.createObjectType({
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
                 addMembers: graphQl.list(graphQl.GraphQLString),
-                removeMembers: graphQl.list(graphQl.GraphQLString)
+                removeMembers: graphQl.list(graphQl.GraphQLString),
+                addMemberships: graphQl.list(graphQl.GraphQLString),
+                removeMemberships: graphQl.list(graphQl.GraphQLString)
             },
             resolve: function(env) {
                 return groups.update({
@@ -110,7 +114,9 @@ module.exports = graphQl.createObjectType({
                     displayName: env.args.displayName,
                     description: env.args.description,
                     addMembers: env.args.addMembers,
-                    removeMembers: env.args.removeMembers
+                    removeMembers: env.args.removeMembers,
+                    addMemberships: env.args.addMemberships,
+                    removeMemberships: env.args.removeMemberships
                 });
             }
         },

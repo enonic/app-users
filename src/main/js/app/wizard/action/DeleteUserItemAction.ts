@@ -48,7 +48,9 @@ export class DeleteUserItemAction extends api.ui.Action {
 
                             if (results && results.length > 0) {
                                 const keys = results.filter(result => result.isDeleted()).map(result => result.getUserStoreKey());
-                                const msg = i18n(`notify.delete.userstore.${keys.length === 1 ? 'single' : 'multiple'}`, keys.join(', '));
+                                const msg = keys.length === 1 ?
+                                            i18n('notify.delete.userstore.single', keys[0]) :
+                                            i18n('notify.delete.userstore.multiple', keys.length);
 
                                 api.notify.showFeedback(msg);
                                 api.security.UserItemDeletedEvent.create().setUserStores([<UserStore>persistedItem]).build().fire();

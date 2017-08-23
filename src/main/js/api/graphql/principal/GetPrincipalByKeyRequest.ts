@@ -21,7 +21,7 @@ export class GetPrincipalByKeyRequest
         this.key = key;
     }
 
-    includeUserMemberships(value: boolean): GetPrincipalByKeyRequest {
+    setIncludeMemberships(value: boolean): GetPrincipalByKeyRequest {
         this.userMemberships = value;
         return this;
     }
@@ -68,6 +68,12 @@ export class GetPrincipalByKeyRequest
                       }`;
             break;
         case PrincipalType.GROUP:
+            fields = `members
+                      memberships {
+                          key
+                          displayName
+                      }`;
+            break;
         case PrincipalType.ROLE:
             fields = `members`;
             break;
