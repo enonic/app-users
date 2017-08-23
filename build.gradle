@@ -23,7 +23,7 @@ apply plugin: 'maven'
 
 app {
     name = project.appName
-    displayName = project.displayName
+    displayName = 'Users'
     vendorName = 'Enonic AS'
     vendorUrl = 'http://enonic.com'
 }
@@ -59,12 +59,6 @@ node {
 ext {
     resourcesDir = file( 'src/main/resources' )
     buildResourcesDir = file( "${buildDir}/resources/main" )
-}
-
-bundle {
-    instruction 'Bundle-Name', 'Admin Users App'
-    instruction 'X-Bundle-Type', 'system'
-    instruction 'X-Source-Paths', "$resourcesDir,$buildResourcesDir"
 }
 
 task webpack( type: NodeTask, dependsOn: npmInstall ) {

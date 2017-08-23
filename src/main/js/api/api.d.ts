@@ -589,7 +589,7 @@ declare module api {
         static equals(a: Equitable, b: Equitable): boolean;
         static arrayEquals(arrayA: Equitable[], arrayB: Equitable[]): boolean;
         static anyArrayEquals(arrayA: any[], arrayB: any[]): boolean;
-        static mapEquals(mapA: {
+        static objectMapEquals(mapA: {
             [s: string]: Equitable;
         }, mapB: {
             [s: string]: Equitable;
@@ -4556,8 +4556,9 @@ declare module api.ui {
         trigger(combination: string, action?: string): void;
         reset(): void;
         getActiveBindings(): KeyBinding[];
-        shelveBindings(): void;
-        unshelveBindings(): void;
+        shelveBindings(keyBindings?: KeyBinding[]): void;
+        private getBindingKey(binding);
+        unshelveBindings(keyBindings?: KeyBinding[]): void;
         isActive(keyBinding: KeyBinding): boolean;
         private initializeHelpKey();
         onHelpKeyPressed(listener: (event: ExtendedKeyboardEvent) => void): void;
@@ -5239,6 +5240,8 @@ declare module api.ui.text {
         setName(value: string): PasswordGenerator;
         setPlaceholder(value: string): PasswordGenerator;
         getPlaceholder(): string;
+        private toggleShowLink(locked);
+        reset(): void;
         private assessComplexity(value);
         private generatePassword();
         private isWeak(value);
@@ -6967,15 +6970,18 @@ declare module api.ui.treegrid {
         private selectionOnClick;
         private interval;
         private idPropertyName;
+        private keyBindings;
         constructor(builder: TreeGridBuilder<DATA>);
         private initSelectorPlugin();
         private initToolbar(showToolbar);
+        private initKeyBindings(builder);
         protected setColumns(columns: GridColumn<TreeNode<DATA>>[], toBegin?: boolean): void;
         getFirstSelectedOrHighlightedNode(): TreeNode<DATA>;
         private onSelectRange(event, navigateFn);
         private initEventListeners(builder);
         private onRenderedHandler(builder);
-        private onRemovedHandler(builder, keyBindings);
+        private bindKeys(builder);
+        private unbindKeys(builder);
         private bindClickEvents();
         private onClickWithShift(event, data);
         private onClickWithCmd(data);
@@ -6985,7 +6991,6 @@ declare module api.ui.treegrid {
         private onRowSelected(data);
         private onRowHighlighted(elem, data);
         private isSelectionNotEmpty();
-        private bindKeys(builder, keyBindings);
         private onUpKeyPress();
         private onDownKeyPress();
         private onLeftKeyPress();
@@ -7485,6 +7490,7 @@ declare module api.ui.selector {
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
         protected initGridAndData(): void;
         reload(): wemQ.Promise<void>;
+        search(searchString: string): wemQ.Promise<void>;
         getElement(): api.dom.Element;
         getGrid(): api.ui.grid.Grid<any>;
         getOptionDataLoader(): OptionDataLoader<OPTION_DISPLAY_VALUE>;
@@ -7552,11 +7558,13 @@ declare module api.ui.selector {
         private isSelfLoading;
         private isDefaultOptionActive;
         constructor(columns: api.ui.grid.GridColumn<any>[], gridOptions: api.ui.grid.GridOptions<any>, loader: OptionDataLoader<OPTION_DISPLAY_VALUE>, treeDataHelper: OptionDataHelper<OPTION_DISPLAY_VALUE>);
+        removeAllOptions(): void;
         setOptions(options: Option<OPTION_DISPLAY_VALUE>[]): void;
         addOption(option: Option<OPTION_DISPLAY_VALUE>): void;
         setReadonlyChecker(checker: (optionToCheck: OPTION_DISPLAY_VALUE) => boolean): void;
         queryScrollable(): api.dom.Element;
         reload(parentNodeData?: Option<OPTION_DISPLAY_VALUE>): wemQ.Promise<void>;
+        search(searchString: string): wemQ.Promise<void>;
         expandNode(node?: TreeNode<Option<OPTION_DISPLAY_VALUE>>, expandAll?: boolean): wemQ.Promise<boolean>;
         private initEventHandlers();
         hasChildren(option: Option<OPTION_DISPLAY_VALUE>): boolean;
@@ -7567,8 +7575,8 @@ declare module api.ui.selector {
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
         private scrollToDefaultOption(parentNode, startFrom);
         private fetchBatchOfChildren(parentNode);
-        private optionsDataToTreeNodeOption(data);
-        private optionDataToTreeNodeOption(data);
+        createOptions(data: OPTION_DISPLAY_VALUE[]): Option<OPTION_DISPLAY_VALUE>[];
+        private createOption(data);
         private makeEmptyData();
         private setSelfLoading(value);
         protected handleItemMetadata(row: number): {
@@ -7585,8 +7593,10 @@ declare module api.ui.selector {
         expandActiveRow(): void;
         collapseActiveRow(): void;
         reload(): wemQ.Promise<void>;
+        search(searchString: string): wemQ.Promise<void>;
         setReadonlyChecker(checker: (optionToCheck: OPTION_DISPLAY_VALUE) => boolean): void;
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
+        removeAllOptions(): void;
         setOptions(options: Option<OPTION_DISPLAY_VALUE>[]): void;
         addOption(option: Option<OPTION_DISPLAY_VALUE>): void;
         getSelectedOptions(): Option<OPTION_DISPLAY_VALUE>[];
@@ -7686,6 +7696,7 @@ declare module api.ui.selector {
     import TreeNode = api.ui.treegrid.TreeNode;
     import LoadedDataEvent = api.util.loader.event.LoadedDataEvent;
     interface OptionDataLoader<DATA> {
+        search(value: string): wemQ.Promise<DATA[]>;
         load(values: string[]): wemQ.Promise<DATA[]>;
         fetch(node: TreeNode<Option<DATA>>): wemQ.Promise<DATA>;
         fetchChildren(parentNode: TreeNode<Option<DATA>>, from?: number, size?: number): wemQ.Promise<OptionDataLoaderData<DATA>>;
@@ -9905,15 +9916,19 @@ declare module api.form {
 }
 declare module api.form {
     class ValidationRecording {
-        breaksMinimumOccurrencesArray: ValidationRecordingPath[];
-        breaksMaximumOccurrencesArray: ValidationRecordingPath[];
+        private breaksMinimumOccurrencesArray;
+        private breaksMaximumOccurrencesArray;
+        private additionalValidationRecords;
         breaksMinimumOccurrences(path: ValidationRecordingPath): void;
         breaksMaximumOccurrences(path: ValidationRecordingPath): void;
+        addValidationRecord(path: string, record: AdditionalValidationRecord): void;
         isValid(): boolean;
         isMinimumOccurrencesValid(): boolean;
         isMaximumOccurrencesValid(): boolean;
+        getBreakMinimumOccurrences(): ValidationRecordingPath[];
+        getBreakMaximumOccurrences(): ValidationRecordingPath[];
         flatten(recording: ValidationRecording): void;
-        subtract(recording: ValidationRecording): void;
+        removeRecord(key: string): void;
         /**
          * @param path - path to remove
          * @param strict - whether to match only exact matching paths
@@ -9927,6 +9942,7 @@ declare module api.form {
         containsPathInBreaksMin(path: ValidationRecordingPath): boolean;
         containsPathInBreaksMax(path: ValidationRecordingPath): boolean;
         private exists(path, array);
+        private mapEquals(mapA, mapB);
     }
 }
 declare module api.form {
@@ -10587,7 +10603,7 @@ declare module api.form {
         onValidityChanged(listener: (event: RecordingValidityChangedEvent) => void): void;
         unValidityChanged(listener: (event: RecordingValidityChangedEvent) => void): void;
         private notifyValidityChanged(event);
-        private renderValidationErrors(recording, additionalValidationRecord);
+        private renderValidationErrors(recording, inputRecording);
         private mayRenderValidationError();
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
@@ -11198,44 +11214,48 @@ declare module api.content.form.inputtype.checkbox {
         unBlur(listener: (event: FocusEvent) => void): void;
     }
 }
-declare module api.content.form.inputtype.long {
+declare module api.content.form.inputtype.number {
     import BaseInputTypeNotManagingAdd = api.form.inputtype.support.BaseInputTypeNotManagingAdd;
-    import Property = api.data.Property;
-    import Value = api.data.Value;
-    import ValueType = api.data.ValueType;
-    class Long extends BaseInputTypeNotManagingAdd<number> {
-        constructor(config: api.form.inputtype.InputTypeViewContext);
-        getValueType(): ValueType;
-        newInitialValue(): Value;
-        createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
-        updateInputOccurrenceElement(occurrence: api.dom.Element, property: api.data.Property, unchangedOnly: boolean): void;
-        resetInputOccurrenceElement(occurrence: api.dom.Element): void;
-        valueBreaksRequiredContract(value: Value): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
-        private isValid(value);
-    }
-}
-declare module api.content.form.inputtype.double {
-    import BaseInputTypeNotManagingAdd = api.form.inputtype.support.BaseInputTypeNotManagingAdd;
-    import Property = api.data.Property;
-    import Value = api.data.Value;
-    import ValueType = api.data.ValueType;
-    class Double extends BaseInputTypeNotManagingAdd<number> {
+    abstract class NumberInputType extends BaseInputTypeNotManagingAdd<number> {
         private min;
         private max;
         constructor(config: api.form.inputtype.InputTypeViewContext);
-        getValueType(): ValueType;
-        newInitialValue(): Value;
         protected readConfig(config: api.form.inputtype.InputTypeViewContext): void;
         private getConfigProperty(config, propertyName);
+        protected isValid(value: string, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        private isValidMin(value);
+        private isValidMax(value);
+    }
+}
+declare module api.content.form.inputtype.number.double {
+    import ValueType = api.data.ValueType;
+    import Value = api.data.Value;
+    import Property = api.data.Property;
+    class Double extends NumberInputType {
+        constructor(config: api.form.inputtype.InputTypeViewContext);
+        getValueType(): ValueType;
+        newInitialValue(): Value;
         createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
         updateInputOccurrenceElement(occurrence: api.dom.Element, property: api.data.Property, unchangedOnly?: boolean): void;
         resetInputOccurrenceElement(occurrence: api.dom.Element): void;
         valueBreaksRequiredContract(value: Value): boolean;
         hasInputElementValidUserInput(inputElement: api.dom.Element, recording?: api.form.inputtype.InputValidationRecording): boolean;
-        private isValid(value, recording?);
-        private isValidMin(value);
-        private isValidMax(value);
+    }
+}
+declare module api.content.form.inputtype.number.long {
+    import ValueType = api.data.ValueType;
+    import Value = api.data.Value;
+    import Property = api.data.Property;
+    class Long extends NumberInputType {
+        constructor(config: api.form.inputtype.InputTypeViewContext);
+        getValueType(): ValueType;
+        newInitialValue(): Value;
+        createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
+        protected isValid(value: string, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        updateInputOccurrenceElement(occurrence: api.dom.Element, property: api.data.Property, unchangedOnly: boolean): void;
+        resetInputOccurrenceElement(occurrence: api.dom.Element): void;
+        valueBreaksRequiredContract(value: Value): boolean;
+        hasInputElementValidUserInput(inputElement: api.dom.Element, recording?: api.form.inputtype.InputValidationRecording): boolean;
     }
 }
 declare module api.content.form.inputtype.time {
@@ -11901,14 +11921,34 @@ declare module api.util.htmlarea.editor {
 }
 declare module api.form.inputtype.text {
     import support = api.form.inputtype.support;
+    import FormInputEl = api.dom.FormInputEl;
+    abstract class TextInputType extends support.BaseInputTypeNotManagingAdd<string> {
+        private maxLength;
+        constructor(config: api.form.inputtype.InputTypeViewContext);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
+        protected initOccurenceListeners(inputEl: FormInputEl): FormInputEl;
+        private updateLengthCounterValue(lengthCounter, newValue);
+        protected isValid(value: string, textInput: FormInputEl, silent?: boolean, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        private isValidMaxLength(value);
+    }
+}
+declare module api.form.inputtype.text {
     import Property = api.data.Property;
     import Value = api.data.Value;
     import ValueType = api.data.ValueType;
-    class TextLine extends support.BaseInputTypeNotManagingAdd<string> {
-        private regexpStr;
+    import FormInputEl = api.dom.FormInputEl;
+    class TextLine extends TextInputType {
         private regexp;
         constructor(config: api.form.inputtype.InputTypeViewContext);
-        private readConfig(inputConfig);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
         getValueType(): ValueType;
         newInitialValue(): Value;
         createInputOccurrenceElement(index: number, property: Property): api.dom.Element;
@@ -11916,17 +11956,18 @@ declare module api.form.inputtype.text {
         resetInputOccurrenceElement(occurrence: api.dom.Element): void;
         availableSizeChanged(): void;
         valueBreaksRequiredContract(value: Value): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
-        private isValid(value, textInput, silent?);
+        hasInputElementValidUserInput(inputElement: FormInputEl, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        protected isValid(value: string, textInput: api.ui.text.TextInput, silent?: boolean, recording?: api.form.inputtype.InputValidationRecording): boolean;
+        private checkRegexpValidation(value, parent, silent);
         static getName(): api.form.InputTypeName;
     }
 }
 declare module api.form.inputtype.text {
-    import support = api.form.inputtype.support;
     import Property = api.data.Property;
     import Value = api.data.Value;
     import ValueType = api.data.ValueType;
-    class TextArea extends support.BaseInputTypeNotManagingAdd<string> {
+    import FormInputEl = api.dom.FormInputEl;
+    class TextArea extends TextInputType {
         constructor(config: api.form.inputtype.InputTypeViewContext);
         getValueType(): ValueType;
         newInitialValue(): Value;
@@ -11935,7 +11976,7 @@ declare module api.form.inputtype.text {
         resetInputOccurrenceElement(occurrence: api.dom.Element): void;
         private newValue(s);
         valueBreaksRequiredContract(value: Value): boolean;
-        hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
+        hasInputElementValidUserInput(inputElement: FormInputEl, recording?: api.form.inputtype.InputValidationRecording): boolean;
         static getName(): api.form.InputTypeName;
     }
 }
@@ -12012,6 +12053,27 @@ declare module api.form.inputtype.text {
         getHtmlArea(): HtmlArea;
         static on(handler: (event: HtmlAreaResizeEvent) => void): void;
         static un(handler?: (event: HtmlAreaResizeEvent) => void): void;
+    }
+}
+declare module api.security.form.inputtype {
+    interface SecurityInputTypeViewContext extends api.form.inputtype.InputTypeViewContext {
+        formContext: api.security.form.SecurityFormContext;
+        contentPath: api.content.ContentPath;
+    }
+}
+declare module api.security.form {
+    class SecurityFormContext extends api.form.FormContext {
+        private userStore;
+        constructor(builder: SecurityFormContextBuilder);
+        getUserStore(): api.security.UserStore;
+        createInputTypeViewContext(inputTypeConfig: any, parentPropertyPath: api.data.PropertyPath, input: api.form.Input): api.form.inputtype.InputTypeViewContext;
+        private getContentPath();
+        static create(): SecurityFormContextBuilder;
+    }
+    class SecurityFormContextBuilder extends api.form.FormContextBuilder {
+        userStore: api.security.UserStore;
+        setUserStore(value: api.security.UserStore): SecurityFormContextBuilder;
+        build(): SecurityFormContext;
     }
 }
 declare module api.site.json {
@@ -13456,7 +13518,7 @@ declare module api.schema.content {
     import BaseLoader = api.util.loader.BaseLoader;
     import ContentTypeSummaryListJson = api.schema.content.ContentTypeSummaryListJson;
     class ContentTypeSummaryLoader extends BaseLoader<ContentTypeSummaryListJson, ContentTypeSummary> {
-        constructor();
+        constructor(contentId: ContentId);
         filterFn(contentType: ContentTypeSummary): boolean;
     }
 }
@@ -13500,8 +13562,16 @@ declare module api.schema.content {
 }
 declare module api.schema.content {
     class GetAllContentTypesRequest extends ContentTypeResourceRequest<ContentTypeSummaryListJson, ContentTypeSummary[]> {
-        private inlineMixinsToFormItems;
         constructor();
+        getParams(): Object;
+        getRequestPath(): api.rest.Path;
+        sendAndParse(): wemQ.Promise<ContentTypeSummary[]>;
+    }
+}
+declare module api.schema.content {
+    class GetContentTypesByContentRequest extends ContentTypeResourceRequest<ContentTypeSummaryListJson, ContentTypeSummary[]> {
+        private contentId;
+        constructor(content: ContentId);
         getParams(): Object;
         getRequestPath(): api.rest.Path;
         sendAndParse(): wemQ.Promise<ContentTypeSummary[]>;
@@ -13573,7 +13643,13 @@ declare module api.schema.content.inputtype {
         private combobox;
         private context;
         private onContentTypesLoadedHandler;
+        private isContextDependent;
         constructor(context: ContentInputTypeViewContext);
+        protected readConfig(inputConfig: {
+            [element: string]: {
+                [name: string]: string;
+            }[];
+        }): void;
         getValueType(): ValueType;
         newInitialValue(): Value;
         private createLoader();
@@ -15015,6 +15091,9 @@ declare module api.content.resource {
         setQueryExpr(searchString?: string): void;
         setParentPath(parentPath: ContentPath): void;
         private createSearchExpression(searchString);
+        getAllowedContentPaths(): string[];
+        getContentTypeNames(): string[];
+        getRelationshipType(): string;
         getQueryExpr(): api.query.expr.QueryExpr;
         getRequestPath(): api.rest.Path;
         isPartiallyLoaded(): boolean;
@@ -15336,7 +15415,7 @@ declare module api.content.resource {
         content: ContentSummaryJson;
         expand: boolean;
     }
-    class ContentTreeSelectorItem {
+    class ContentTreeSelectorItem implements Equitable {
         private content;
         private expand;
         constructor(content: ContentSummary, expand: boolean);
@@ -15355,6 +15434,7 @@ declare module api.content.resource {
         isImage(): boolean;
         isSite(): boolean;
         getExpand(): boolean;
+        equals(o: api.Equitable): boolean;
     }
 }
 declare module api.content.resource {
@@ -15364,6 +15444,7 @@ declare module api.content.resource {
         constructor(content: ContentSummaryAndCompareStatus, expand: boolean);
         getPublishStatus(): PublishStatus;
         getCompareStatus(): CompareStatus;
+        equals(o: api.Equitable): boolean;
     }
 }
 import UriHelper = api.util.UriHelper;
@@ -15457,6 +15538,7 @@ declare module api.content {
         constructor(builder?: ContentSummaryOptionDataLoaderBuilder);
         private initRequest(builder);
         setContent(content: ContentSummary): void;
+        search(value: string): wemQ.Promise<ContentTreeSelectorItem[]>;
         load(values: string[]): wemQ.Promise<ContentTreeSelectorItem[]>;
         fetch(node: TreeNode<Option<ContentTreeSelectorItem>>): wemQ.Promise<ContentTreeSelectorItem>;
         fetchChildren(parentNode: TreeNode<Option<ContentTreeSelectorItem>>, from?: number, size?: number): wemQ.Promise<OptionDataLoaderData<ContentTreeSelectorItem>>;
@@ -16134,6 +16216,7 @@ declare module api.content.image {
     import ContentTreeSelectorItem = api.content.resource.ContentTreeSelectorItem;
     class ImageOptionDataLoader extends ContentSummaryOptionDataLoader {
         protected createOptionData(data: ContentAndStatusTreeSelectorItem[], hits: number, totalHits: number): OptionDataLoaderData<ImageTreeSelectorItem>;
+        search(value: string): wemQ.Promise<ImageTreeSelectorItem[]>;
         static create(): ImageOptionDataLoaderBuilder;
     }
     class ImageOptionDataLoaderBuilder extends ContentSummaryOptionDataLoaderBuilder {
@@ -16152,11 +16235,13 @@ declare module api.content.image {
         isEmptyContent(): boolean;
         getContentSummary(): ContentSummary;
         getTypeLocaleName(): string;
+        equals(o: api.Equitable): boolean;
     }
 }
 declare module api.content.image {
     import ContentSummary = api.content.ContentSummary;
     import UploadItem = api.ui.uploader.UploadItem;
+    import ContentTypeName = api.schema.content.ContentTypeName;
     class ImageSelectorDisplayValue {
         private uploadItem;
         private content;
@@ -16177,8 +16262,10 @@ declare module api.content.image {
         getIconUrl(): string;
         getLabel(): string;
         getDisplayName(): string;
+        getType(): ContentTypeName;
         getTypeLocaleName(): string;
         getPath(): ContentPath;
+        equals(o: api.Equitable): boolean;
     }
 }
 declare module api.content.image {
@@ -20973,10 +21060,14 @@ declare module api.liveedit {
         private resetListener;
         protected initOnAdd: boolean;
         static debug: boolean;
+        private keyBinding;
         constructor(builder: ComponentViewBuilder<COMPONENT>);
         private registerComponentListeners(component);
         private unregisterComponentListeners(component);
         private addComponentContextMenuActions(inspectActionRequired);
+        private initKeyBoardBindings();
+        select(clickPosition?: Position, menuPosition?: ItemViewContextMenuPosition, isNew?: boolean, rightClicked?: boolean): void;
+        deselect(silent?: boolean): void;
         remove(): ComponentView<Component>;
         getType(): ComponentItemType;
         setComponent(component: COMPONENT): void;

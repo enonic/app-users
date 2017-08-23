@@ -7,8 +7,6 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
 
     private path: Path;
 
-    private method: string = 'GET';
-
     constructor() {
         this.path = Path.fromString(window['CONFIG'] && window['CONFIG']['graphQlUrl']);
     }
@@ -23,7 +21,7 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
         }
         let vars = this.getVariables();
         if (vars && Object.keys(vars).length > 0) {
-            params['variables'] = JSON.stringify(vars);
+            params['variables'] = vars;
         }
         return params;
     }
@@ -58,7 +56,7 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
         if (this.validate()) {
 
             let jsonRequest = new JsonRequest<RAW_JSON_TYPE>()
-                .setMethod(this.method)
+                .setMethod('POST')
                 .setParams(this.getParams(query, mutation))
                 .setPath(this.path);
 
