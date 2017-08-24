@@ -2,7 +2,7 @@ var graphQlConnection = require('./connection');
 
 var graphQlUserStore = require('./userStore');
 var graphQlPrincipal = require('./principal');
-var graphQlUserItemUnion = require('./userItemUnion');
+var graphQlUserItem = require('./userItem');
 var graphQlTypes = require('./types');
 
 module.exports = {
@@ -17,6 +17,6 @@ module.exports = {
     ),
     UserItemConnectionType: graphQlConnection.createConnectionType(
         'UserItem',
-        graphQlUserItemUnion.UserItemUnionType
+        graphQlUserItem.UserItemType
     )
 };
