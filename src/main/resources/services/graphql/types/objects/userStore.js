@@ -17,10 +17,7 @@ var UserStoreAccessControlEntryType = graphQl.createObjectType({
             }
         },
         access: {
-            type: graphQlEnums.UserStoreAccessEnum,
-            resolve: function(env) {
-                return env.source.access;
-            }
+            type: graphQlEnums.UserStoreAccessEnum
         }
     }
 });
@@ -30,10 +27,7 @@ exports.AuthConfig = graphQl.createObjectType({
     description: 'Domain representation of auth config for user store',
     fields: {
         applicationKey: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.applicationKey;
-            }
+            type: graphQl.GraphQLString
         },
         config: {
             type: graphQl.GraphQLString,
@@ -75,16 +69,10 @@ exports.UserStoreType = graphQl.createObjectType({
             }
         },
         displayName: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.displayName;
-            }
+            type: graphQl.GraphQLString
         },
         description: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.description;
-            }
+            type: graphQl.GraphQLString
         },
         authConfig: {
             type: exports.AuthConfig,
@@ -93,10 +81,7 @@ exports.UserStoreType = graphQl.createObjectType({
             }
         },
         idProviderMode: {
-            type: graphQlEnums.IdProviderModeEnum,
-            resolve: function(env) {
-                return env.source.idProviderMode;
-            }
+            type: graphQlEnums.IdProviderModeEnum
         },
         permissions: {
             type: graphQl.list(UserStoreAccessControlEntryType),
@@ -124,16 +109,10 @@ exports.UserStoreDeleteType = graphQl.createObjectType({
             }
         },
         deleted: {
-            type: graphQl.GraphQLBoolean,
-            resolve: function(env) {
-                return env.source.deleted;
-            }
+            type: graphQl.GraphQLBoolean
         },
         reason: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.reason;
-            }
+            type: graphQl.GraphQLString
         }
     }
 });
