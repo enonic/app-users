@@ -18,10 +18,7 @@ var pageInfoType = graphQl.createObjectType({
             }
         },
         hasNext: {
-            type: graphQl.nonNull(graphQl.GraphQLBoolean),
-            resolve: function(env) {
-                return env.source.hasNext;
-            }
+            type: graphQl.nonNull(graphQl.GraphQLBoolean)
         }
     }
 });
@@ -31,10 +28,7 @@ function createEdgeType(name, type) {
         name: name + 'Edge',
         fields: {
             node: {
-                type: graphQl.nonNull(type),
-                resolve: function(env) {
-                    return env.source.node;
-                }
+                type: graphQl.nonNull(type)
             },
             cursor: {
                 type: graphQl.nonNull(graphQl.GraphQLInt),

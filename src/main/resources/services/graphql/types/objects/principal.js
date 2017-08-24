@@ -18,16 +18,10 @@ var PrincipalAccessControlEntryType = graphQl.createObjectType({
             }
         },
         allow: {
-            type: graphQl.list(graphQlEnums.PermissionEnum),
-            resolve: function(env) {
-                return env.source.allow;
-            }
+            type: graphQl.list(graphQlEnums.PermissionEnum)
         },
         deny: {
-            type: graphQl.list(graphQlEnums.PermissionEnum),
-            resolve: function(env) {
-                return env.source.deny;
-            }
+            type: graphQl.list(graphQlEnums.PermissionEnum)
         }
     }
 });
@@ -62,28 +56,16 @@ exports.PrincipalType = graphQl.createObjectType({
             }
         },
         displayName: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.displayName;
-            }
+            type: graphQl.GraphQLString
         },
         description: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.description;
-            }
+            type: graphQl.GraphQLString
         },
         principalType: {
-            type: graphQlEnums.PrincipalTypeEnum,
-            resolve: function(env) {
-                return env.source.principalType;
-            }
+            type: graphQlEnums.PrincipalTypeEnum
         },
         userStoreKey: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.userStoreKey;
-            }
+            type: graphQl.GraphQLString
         },
         permissions: {
             type: graphQl.list(PrincipalAccessControlEntryType),
@@ -92,16 +74,10 @@ exports.PrincipalType = graphQl.createObjectType({
             }
         },
         login: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.login;
-            }
+            type: graphQl.GraphQLString
         },
         email: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.email;
-            }
+            type: graphQl.GraphQLString
         },
         memberships: {
             type: graphQl.list(graphQl.reference('Principal')),
@@ -135,16 +111,10 @@ exports.PrincipalDeleteType = graphQl.createObjectType({
             }
         },
         deleted: {
-            type: graphQl.GraphQLBoolean,
-            resolve: function(env) {
-                return env.source.deleted;
-            }
+            type: graphQl.GraphQLBoolean
         },
         reason: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.reason;
-            }
+            type: graphQl.GraphQLString
         }
     }
 });

@@ -5,16 +5,10 @@ var BucketType = graphQl.createObjectType({
     description: 'Aggregated result for specific key',
     fields: {
         key: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.key;
-            }
+            type: graphQl.GraphQLString
         },
         docCount: {
-            type: graphQl.GraphQLInt,
-            resolve: function(env) {
-                return env.source.docCount;
-            }
+            type: graphQl.GraphQLInt
         }
     }
 });
@@ -24,10 +18,7 @@ var AggregationType = graphQl.createObjectType({
     description: 'List of buckets',
     fields: {
         name: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.name;
-            }
+            type: graphQl.GraphQLString
         },
         buckets: {
             type: graphQl.list(BucketType),

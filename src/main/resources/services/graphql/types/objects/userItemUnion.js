@@ -19,22 +19,13 @@ var UserItemUnionAccessControlEntryType = graphQl.createObjectType({
             }
         },
         access: {
-            type: graphQlEnums.UserStoreAccessEnum,
-            resolve: function(env) {
-                return env.source.access;
-            }
+            type: graphQlEnums.UserStoreAccessEnum
         },
         allow: {
-            type: graphQl.list(graphQlEnums.PermissionEnum),
-            resolve: function(env) {
-                return env.source.allow;
-            }
+            type: graphQl.list(graphQlEnums.PermissionEnum)
         },
         deny: {
-            type: graphQl.list(graphQlEnums.PermissionEnum),
-            resolve: function(env) {
-                return env.source.deny;
-            }
+            type: graphQl.list(graphQlEnums.PermissionEnum)
         }
     }
 });
@@ -72,16 +63,10 @@ exports.UserItemUnionType = graphQl.createObjectType({
             }
         },
         displayName: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.displayName;
-            }
+            type: graphQl.GraphQLString
         },
         description: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.description;
-            }
+            type: graphQl.GraphQLString
         },
         permissions: {
             type: graphQl.list(UserItemUnionAccessControlEntryType),
@@ -105,29 +90,17 @@ exports.UserItemUnionType = graphQl.createObjectType({
             }
         },
         idProviderMode: {
-            type: graphQlEnums.IdProviderModeEnum,
-            resolve: function(env) {
-                return env.source.idProviderMode;
-            }
+            type: graphQlEnums.IdProviderModeEnum
         },
         // principal
         userStoreKey: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.userStoreKey;
-            }
+            type: graphQl.GraphQLString
         },
         login: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.login;
-            }
+            type: graphQl.GraphQLString
         },
         email: {
-            type: graphQl.GraphQLString,
-            resolve: function(env) {
-                return env.source.email;
-            }
+            type: graphQl.GraphQLString
         },
         memberships: {
             type: graphQl.list(graphQl.reference('Principal')),
