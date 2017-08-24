@@ -4,7 +4,7 @@ var principals = require('principals');
 
 var graphQlEnums = require('../enums');
 
-var UserItemType = require('./userItem');
+var graphQlUserItem = require('./userItem');
 
 var UserStoreAccessControlEntryType = graphQl.createObjectType({
     name: 'UserStoreAccessControlEntry',
@@ -42,7 +42,7 @@ exports.AuthConfig = graphQl.createObjectType({
 exports.UserStoreType = graphQl.createObjectType({
     name: 'UserStore',
     description: 'Domain representation of a user store',
-    interfaces: [UserItemType],
+    interfaces: [graphQlUserItem.UserItemType],
     fields: {
         id: {
             type: graphQl.GraphQLID,
@@ -97,6 +97,7 @@ exports.UserStoreType = graphQl.createObjectType({
         }
     }
 });
+graphQlUserItem.typeResolverMap.userStoreType = exports.UserStoreType;
 
 exports.UserStoreDeleteType = graphQl.createObjectType({
     name: 'UserStoreDelete',

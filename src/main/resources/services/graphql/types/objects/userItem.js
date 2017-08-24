@@ -1,10 +1,17 @@
 var graphQl = require('/lib/graphql');
 
-module.exports = graphQl.createInterfaceType({
+exports.typeResolverMap = {
+    principalType: null,
+    userStoreType: null
+};
+
+exports.UserItemType = graphQl.createInterfaceType({
     name: 'UserItem',
     description: 'User item is a base entity for every principal or user store',
-    typeResolver: function() {
-        return null;
+    typeResolver: function(source) {
+        return source.principalType
+            ? exports.typeResolverMap.principalType
+            : exports.typeResolverMap.userStoreType;
     },
     fields: {
         id: {

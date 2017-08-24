@@ -5,7 +5,7 @@ var principals = require('principals');
 var graphQlEnums = require('../enums');
 var graphQlUtils = require('../../utils');
 
-var UserItemType = require('./userItem');
+var graphQlUserItem = require('./userItem');
 
 var PrincipalAccessControlEntryType = graphQl.createObjectType({
     name: 'PrincipalAccessControlEntry',
@@ -29,7 +29,7 @@ var PrincipalAccessControlEntryType = graphQl.createObjectType({
 exports.PrincipalType = graphQl.createObjectType({
     name: 'Principal',
     description: 'Domain representation of a principal',
-    interfaces: [UserItemType],
+    interfaces: [graphQlUserItem.UserItemType],
     fields: {
         id: {
             type: graphQl.GraphQLID,
@@ -99,6 +99,7 @@ exports.PrincipalType = graphQl.createObjectType({
         }
     }
 });
+graphQlUserItem.typeResolverMap.principalType = exports.PrincipalType;
 
 exports.PrincipalDeleteType = graphQl.createObjectType({
     name: 'PrincipalDelete',
