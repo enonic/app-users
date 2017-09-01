@@ -1567,6 +1567,7 @@ declare module api.dom {
         private onImgElError(listener);
         isLoaded(): boolean;
         isPlaceholder(): boolean;
+        getHTMLElement(): HTMLImageElement;
     }
 }
 declare module api.dom {
@@ -3181,11 +3182,26 @@ declare module api.security {
 }
 declare module api.security {
     class RoleKeys {
+        private static ROLE_ADMIN;
+        private static ROLE_CMS_ADMIN;
+        private static ROLE_USER_ADMIN;
+        private static ROLE_EVERYONE;
+        private static ROLE_AUTHENTICATED;
+        private static ROLE_CMS_EXPERT;
         static EVERYONE: PrincipalKey;
         static AUTHENTICATED: PrincipalKey;
         static ADMIN: PrincipalKey;
         static CMS_ADMIN: PrincipalKey;
+        static USER_ADMIN: PrincipalKey;
         static CMS_EXPERT: PrincipalKey;
+        private static contentAdminRoles;
+        private static userAdminRoles;
+        private static contentExpertRoles;
+        static isContentAdmin(principalKey: PrincipalKey): boolean;
+        static isUserAdmin(principalKey: PrincipalKey): boolean;
+        static isContentExpert(principalKey: PrincipalKey): boolean;
+        static isAdmin(principalKey: PrincipalKey): boolean;
+        static isEveryone(principalKey: PrincipalKey): boolean;
     }
 }
 declare module api.security {
@@ -3248,6 +3264,8 @@ declare module api.security {
         fromJson(json: api.security.PrincipalJson): PrincipalBuilder;
         setKey(key: PrincipalKey): PrincipalBuilder;
         setModifiedTime(modifiedTime: Date): PrincipalBuilder;
+        setDisplayName(displayName: string): PrincipalBuilder;
+        setDescription(description: string): PrincipalBuilder;
         build(): Principal;
     }
 }
@@ -3385,6 +3403,8 @@ declare module api.security {
         setAuthConfig(authConfig: AuthConfig): UserStoreBuilder;
         setIdProviderMode(idProviderMode: IdProviderMode): UserStoreBuilder;
         setPermissions(permissions: api.security.acl.UserStoreAccessControlList): UserStoreBuilder;
+        setDisplayName(displayName: string): UserStoreBuilder;
+        setDescription(description: string): UserStoreBuilder;
         build(): UserStore;
     }
 }
@@ -4137,6 +4157,9 @@ declare module api.security.auth {
         private message;
         constructor(json: LoginResultJson);
         isAuthenticated(): boolean;
+        isContentAdmin(): boolean;
+        isUserAdmin(): boolean;
+        isContentExpert(): boolean;
         getUser(): api.security.User;
         getPrincipals(): api.security.PrincipalKey[];
         getMessage(): string;
@@ -5069,7 +5092,7 @@ declare module api.ui.button {
         isEnabled(): boolean;
         setLabel(label: string, escapeHtml?: boolean): Button;
         getLabel(): string;
-        setTitle(title: string, forceAction?: boolean): void;
+        setTitle(title: string, forceAction?: boolean): Button;
     }
 }
 declare module api.ui.button {
@@ -6094,6 +6117,7 @@ declare module api.ui.dialog {
         private listOfClickIgnoredElements;
         private onClosedListeners;
         private closeIconCallback;
+        private clickOutsideCallback;
         static debug: boolean;
         constructor(config?: ModalDialogConfig);
         private initConfirmationDialog(confirmation);
@@ -6982,7 +7006,7 @@ declare module api.ui.treegrid {
         private onRenderedHandler(builder);
         private bindKeys(builder);
         private unbindKeys(builder);
-        private bindClickEvents();
+        private bindClickEvents(toggleClickEnabled);
         private onClickWithShift(event, data);
         private onClickWithCmd(data);
         private onExpand(elem, data);
@@ -7068,6 +7092,7 @@ declare module api.ui.treegrid {
          */
         fetchRoot(): wemQ.Promise<DATA[]>;
         private fetchData(parentNode?);
+        fetchDataAndSetNodes(parentNode: TreeNode<DATA>): wemQ.Promise<TreeNode<DATA>[]>;
         dataToTreeNode(data: DATA, parent: TreeNode<DATA>, expandAllowed?: boolean): TreeNode<DATA>;
         dataToTreeNodes(dataArray: DATA[], parent: TreeNode<DATA>, expandAllowed?: boolean): TreeNode<DATA>[];
         filter(dataList: DATA[]): void;
@@ -7080,7 +7105,7 @@ declare module api.ui.treegrid {
         getSelectedNodes(): TreeNode<DATA>[];
         getSelectedDataList(): DATA[];
         setSelectionOnClick(type: SelectionOnClickType): void;
-        reload(parentNodeData?: DATA, idPropertyName?: string): wemQ.Promise<void>;
+        reload(parentNodeData?: DATA, idPropertyName?: string, rememberExpanded?: boolean): wemQ.Promise<void>;
         protected handleError(reason: any, message?: String): void;
         protected hideErrorPanel(): void;
         private reloadNode(parentNode?, expandedNodesDataId?);
@@ -7097,9 +7122,10 @@ declare module api.ui.treegrid {
          * @param stashedParentNode
          */
         appendNode(data: DATA, nextToSelection?: boolean, prepend?: boolean, stashedParentNode?: TreeNode<DATA>): wemQ.Promise<void>;
-        getParentNode(nextToSelection?: boolean, stashedParentNode?: TreeNode<DATA>): TreeNode<DATA>;
+        appendNodeToParent(parentNode: TreeNode<DATA>, data: DATA): void;
+        getParentNode(nextToSelection?: boolean, stashedParentNode?: TreeNode<DATA>, data?: DATA): TreeNode<DATA>;
         insertNode(data: DATA, nextToSelection?: boolean, index?: number, stashedParentNode?: TreeNode<DATA>): wemQ.Promise<void>;
-        private doInsertNodeToParentWithChildren(parentNode, data, root, index, stashedParentNode, isRootParentNode);
+        private doInsertNodeToParentWithChildren(parentNode, data, root, index, stashedParentNode?);
         deleteNodes(dataList: DATA[]): void;
         private deleteRootNodes(root, dataList);
         initData(nodes: TreeNode<DATA>[]): void;
@@ -7108,8 +7134,9 @@ declare module api.ui.treegrid {
         isAllSelected(): boolean;
         isAnySelected(): boolean;
         protected updateExpanded(): void;
-        private updateSelectedNode(node);
+        protected updateSelectedNode(node: TreeNode<DATA>): void;
         collapseNode(node: TreeNode<DATA>, collapseAll?: boolean): void;
+        toggleNode(node: TreeNode<DATA>, all?: boolean): void;
         notifyLoaded(): void;
         onLoaded(listener: () => void): this;
         unLoaded(listener: () => void): this;
@@ -7267,6 +7294,7 @@ declare module api.ui.treegrid {
         private quietErrorHandling;
         private idPropertyName;
         private columnUpdater;
+        private toggleClickEnabled;
         constructor(grid?: TreeGrid<NODE>);
         nodeExtractor(node: any, column: Slick.Column<NODE>): any;
         buildDefaultOptions(): GridOptions<NODE>;
@@ -7314,6 +7342,8 @@ declare module api.ui.treegrid {
         getIdPropertyName(): string;
         setColumnUpdater(columnUpdater: () => void): void;
         getColumnUpdater(): () => void;
+        setToggleClickEnabled(toggleClickEnabled: boolean): TreeGridBuilder<NODE>;
+        isToggleClickEnabled(): boolean;
         private buildColumn(columnConfig);
         /**
          * Should be overriden by child class.
@@ -7575,8 +7605,9 @@ declare module api.ui.selector {
         presetDefaultOption(data: OPTION_DISPLAY_VALUE): void;
         private scrollToDefaultOption(parentNode, startFrom);
         private fetchBatchOfChildren(parentNode);
-        createOptions(data: OPTION_DISPLAY_VALUE[]): Option<OPTION_DISPLAY_VALUE>[];
-        private createOption(data);
+        createOptions(data: OPTION_DISPLAY_VALUE[]): wemQ.Promise<Option<OPTION_DISPLAY_VALUE>[]>;
+        private createOption(data, readonlyIds?);
+        private isOptionReadonly(data, readonlyIds);
         private makeEmptyData();
         private setSelfLoading(value);
         protected handleItemMetadata(row: number): {
@@ -8980,6 +9011,10 @@ declare module api.ui.image {
         private revertCropData;
         private zoomData;
         private revertZoomData;
+        private orientation;
+        private originalOrientation;
+        private rotated;
+        private flippedHor;
         private imgW;
         private imgH;
         private frameW;
@@ -8991,9 +9026,12 @@ declare module api.ui.image {
         private dragMouseDownListener;
         private knobMouseDownListener;
         private stickyToolbar;
+        private topContainer;
         private editCropButton;
         private editFocusButton;
         private editResetButton;
+        private rotateButton;
+        private mirrorButton;
         private uploadButton;
         private editModeListeners;
         private focusPositionChangedListeners;
@@ -9006,13 +9044,20 @@ declare module api.ui.image {
         private maskClickListener;
         private maskHideListener;
         private imageErrorListeners;
+        private orientationListeners;
         private skipNextOutsideClick;
+        private rotateCanvas;
+        private rotateContext;
+        private originalImage;
+        private unorientedImage;
+        private imageMask;
         static debug: boolean;
         constructor(src?: string);
         isElementInsideButtonsContainer(el: HTMLElement): boolean;
         getLastButtonInContainer(): Element;
         remove(): ImageEditor;
         setSrc(src: string): void;
+        private renderSrc(src);
         getSrc(): string;
         getImage(): ImgEl;
         getUploadButton(): api.dom.ButtonEl;
@@ -9058,6 +9103,7 @@ declare module api.ui.image {
         private getOffsetY(e);
         private isImageLoaded();
         private updateImageDimensions(reset?, scale?);
+        private calcImageAndFrameSize();
         private updateFrameHeight();
         private isOutside(event);
         private setShaderVisible(visible);
@@ -9066,6 +9112,20 @@ declare module api.ui.image {
         private WHEEL_PAGE_HEIGHT;
         private normalizeWheel(event);
         private createStickyToolbar();
+        private setToolbarButtonsEnabled(value);
+        private rotate90();
+        private mirrorHorizontal();
+        setOrientation(orientation: number, originalOrientation?: number, render?: boolean, silent?: boolean): void;
+        private renderOrientation(orientation);
+        private resetOrientation();
+        /**
+         * Transform image from orientation 1 to given one
+         * @param image
+         * @param orientation
+         * @param inverse
+         * @returns {string}
+         */
+        private rotateImage(image, orientation, inverse?);
         private updateStickyToolbar();
         private createZoomContainer();
         private isTopEdgeVisible(relativeScrollTop);
@@ -9167,6 +9227,9 @@ declare module api.ui.image {
         onEditModeChanged(listener: (edit: boolean, position: Rect, zoom: Rect, focus: Point) => void): void;
         unEditModeChanged(listener: (edit: boolean, position: Rect, zoom: Rect, focus: Point) => void): void;
         private notifyEditModeChanged(edit, position, zoom, focus);
+        onOrientationChanged(listener: (orientation: number) => void): void;
+        unOrientationChanged(listener: (orientation: number) => void): void;
+        private notifyOrientationChanged(orientation);
         onFocusAutoPositionedChanged(listener: (auto: boolean) => void): void;
         unFocusAutoPositionedChanged(listener: (auto: boolean) => void): void;
         private notifyFocusAutoPositionedChanged(auto);
@@ -9179,9 +9242,9 @@ declare module api.ui.image {
         onCropAutoPositionedChanged(listener: (auto: boolean) => void): void;
         unCropAutoPositionedChanged(listener: (auto: boolean) => void): void;
         private notifyCropAutoPositionedChanged(auto);
-        onCropPositionChanged(listener: (position: Rect) => void): void;
-        unCropPositionChanged(listener: (position: Rect) => void): void;
-        private notifyCropPositionChanged(position);
+        onCropPositionChanged(listener: (crop: Rect, zoom: Rect) => void): void;
+        unCropPositionChanged(listener: (crop: Rect, zoom: Rect) => void): void;
+        private notifyCropPositionChanged(crop, zoom);
         onShaderVisibilityChanged(listener: (auto: boolean) => void): void;
         unShaderVisibilityChanged(listener: (auto: boolean) => void): void;
         private notifyShaderVisibilityChanged(auto);
@@ -9283,19 +9346,21 @@ declare module api.ui.security.acl {
         PUBLISH = 3,
         CUSTOM = 4,
     }
+    interface AccessOption {
+        value: Access;
+        name: string;
+    }
+    const accessOptions: AccessOption[];
 }
 declare module api.ui.security.acl {
     class AccessSelector extends api.ui.tab.TabMenu {
-        private options;
         private value;
         private valueChangedListeners;
         constructor();
-        private initOptions();
         initEventHandlers(): void;
         getValue(): Access;
         setValue(value: Access, silent?: boolean): AccessSelector;
         protected setButtonLabel(value: string): AccessSelector;
-        private findOptionByValue(value);
         showMenu(): void;
         onValueChanged(listener: (event: api.ValueChangedEvent) => void): void;
         unValueChanged(listener: (event: api.ValueChangedEvent) => void): void;
@@ -9512,7 +9577,6 @@ declare module api.ui.security.acl {
         private accessLine;
         private resizeListener;
         private currentUser;
-        private static OPTIONS;
         static debug: boolean;
         constructor(className?: string);
         setCurrentUser(user: User): void;
@@ -9991,7 +10055,7 @@ declare module api.form {
     }
     class FormItemOccurrences<V extends FormItemOccurrenceView> {
         private occurrences;
-        private occurrenceViews;
+        protected occurrenceViews: V[];
         private occurrenceViewContainer;
         private formItem;
         protected propertyArray: PropertyArray;
@@ -10009,6 +10073,7 @@ declare module api.form {
         protected constructOccurrencesForData(): FormItemOccurrence<V>[];
         getAllowedOccurrences(): Occurrences;
         onOccurrenceRendered(listener: (event: OccurrenceRenderedEvent) => void): void;
+        refreshOccurence(index: number): void;
         unOccurrenceRendered(listener: (event: OccurrenceRenderedEvent) => void): void;
         private notifyOccurrenceRendered(occurrence, occurrenceView, validate);
         onOccurrenceAdded(listener: (event: OccurrenceAddedEvent) => void): void;
@@ -10084,6 +10149,7 @@ declare module api.form {
         layout(): wemQ.Promise<void>;
         update(propertyArray: PropertySet, unchangedOnly?: boolean): wemQ.Promise<void>;
         reset(): void;
+        refresh(): void;
         getContext(): FormContext;
         getFormItem(): FormItem;
         getParent(): FormItemOccurrenceView;
@@ -10137,7 +10203,7 @@ declare module api.form {
         protected initOccurrences(): FormSetOccurrences<V>;
         validate(silent?: boolean, viewToSkipValidation?: FormItemOccurrenceView): ValidationRecording;
         broadcastFormSizeChanged(): void;
-        refresh(): void;
+        private refreshButtonsState();
         update(propertySet: api.data.PropertySet, unchangedOnly?: boolean): Q.Promise<void>;
         displayValidationErrors(value: boolean): void;
         setHighlightOnValidityChange(highlight: boolean): void;
@@ -10288,6 +10354,7 @@ declare module api.form {
     class FormItemSetOccurrences extends FormSetOccurrences<FormItemSetOccurrenceView> {
         constructor(config: FormItemSetOccurrencesConfig);
         createNewOccurrenceView(occurrence: FormSetOccurrence<FormItemSetOccurrenceView>): FormItemSetOccurrenceView;
+        refreshOccurence(index: number): void;
     }
 }
 declare module api.form {
@@ -10303,6 +10370,7 @@ declare module api.form {
         private formItemSet;
         constructor(config: FormItemSetOccurrenceViewConfig);
         protected subscribeOnItemEvents(): void;
+        refreshViews(): void;
         validate(silent?: boolean): ValidationRecording;
         protected getFormSet(): FormSet;
         protected getFormItems(): FormItem[];
@@ -10589,10 +10657,11 @@ declare module api.form {
         private getPropertyArray(propertySet);
         update(propertySet: PropertySet, unchangedOnly?: boolean): wemQ.Promise<void>;
         reset(): void;
+        refresh(): void;
         getInputTypeView(): api.form.inputtype.InputTypeView<any>;
         private createInputTypeView();
         broadcastFormSizeChanged(): void;
-        refresh(validate?: boolean): void;
+        private refreshButtonsState(validate?);
         private resolveValidationRecordingPath();
         displayValidationErrors(value: boolean): void;
         hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
@@ -10830,6 +10899,7 @@ declare module api.form.inputtype {
         layout(input: api.form.Input, propertyArray: PropertyArray): wemQ.Promise<void>;
         update(propertyArray: PropertyArray, unchangedOnly?: boolean): wemQ.Promise<void>;
         reset(): any;
+        refresh(): any;
         newInitialValue(): Value;
         isManagingAdd(): boolean;
         onEditContentRequest(listener: (content: api.content.ContentSummary) => void): any;
@@ -10973,6 +11043,7 @@ declare module api.form.inputtype.support {
         layout(input: api.form.Input, propertyArray: PropertyArray): wemQ.Promise<void>;
         update(propertyArray: api.data.PropertyArray, unchangedOnly?: boolean): Q.Promise<void>;
         reset(): void;
+        refresh(): void;
         hasValidUserInput(recording?: api.form.inputtype.InputValidationRecording): boolean;
         hasInputElementValidUserInput(inputElement: api.dom.Element, recording?: api.form.inputtype.InputValidationRecording): boolean;
         onFocus(listener: (event: FocusEvent) => void): void;
@@ -11033,6 +11104,7 @@ declare module api.form.inputtype.support {
          */
         update(propertyArray: PropertyArray, unchangedOnly?: boolean): wemQ.Promise<void>;
         reset(): void;
+        refresh(): void;
         private registerPropertyArray(propertyArray);
         private ensureOccurrenceLimits(propertyArray);
         hasValidUserInput(): boolean;
@@ -11080,6 +11152,7 @@ declare module api.form.inputtype.support {
         layoutProperty(input: api.form.Input, property: Property): wemQ.Promise<void>;
         update(propertyArray: PropertyArray, unchangedOnly?: boolean): wemQ.Promise<void>;
         reset(): void;
+        refresh(): void;
         updateProperty(property: Property, unchangedOnly?: boolean): wemQ.Promise<void>;
         protected registerProperty(property: Property): void;
         protected saveToProperty(value: Value): void;
@@ -12026,6 +12099,7 @@ declare module api.form.inputtype.text {
         hasInputElementValidUserInput(inputElement: api.dom.Element): boolean;
         private removeTooltipFromEditorArea(inputOccurence);
         handleDnDStart(event: Event, ui: JQueryUI.SortableUIParams): void;
+        refresh(): void;
         handleDnDStop(event: Event, ui: JQueryUI.SortableUIParams): void;
         onFocus(listener: (event: FocusEvent) => void): void;
         unFocus(listener: (event: FocusEvent) => void): void;
@@ -13415,6 +13489,7 @@ declare module api.schema.content {
         isMedia(): boolean;
         isVectorMedia(): boolean;
         isShortcut(): boolean;
+        isUnstructured(): boolean;
         static getMediaTypes(): ContentTypeName[];
         isDescendantOfMedia(): boolean;
     }
@@ -13436,6 +13511,7 @@ declare module api.schema.content {
         isPageTemplate(): boolean;
         isImage(): boolean;
         isShortcut(): boolean;
+        isUnstructured(): boolean;
         isFinal(): boolean;
         isAbstract(): boolean;
         isAllowChildContent(): boolean;
@@ -16165,15 +16241,18 @@ declare module api.content.image {
         private imageEditors;
         private editModeListeners;
         private focusAutoPositionedListeners;
+        private focusPositionChangedListeners;
         private cropAutoPositionedListeners;
+        private cropPositionChangedListeners;
+        private orientationChangedListeners;
         private initialWidth;
         private originalHeight;
         private originalWidth;
+        private originalOrientation;
         private static SELECTED_CLASS;
         private static STANDOUT_CLASS;
         constructor(config: api.ui.uploader.MediaUploaderElConfig);
-        private getSizeValue(content, propertyName);
-        setOriginalDimensions(content: api.content.Content): void;
+        setOriginalDimensions(width?: number, height?: number, orientation?: number): void;
         private getProportionalHeight();
         private togglePlaceholder(flag);
         private createImageEditor(value);
@@ -16187,18 +16266,28 @@ declare module api.content.image {
         setFocalPoint(focal: Point): void;
         setCrop(crop: Rect): void;
         setZoom(zoom: Rect): void;
+        setOrientation(orientation: number, originalOrientation?: number): void;
         isFocalPointEditMode(): boolean;
         isCropEditMode(): boolean;
         protected isSameValueUpdateAllowed(): boolean;
         onEditModeChanged(listener: (edit: boolean, crop: Rect, zoom: Rect, focus: Point) => void): void;
         unEditModeChanged(listener: (edit: boolean, crop: Rect, zoom: Rect, focus: Point) => void): void;
         private notifyEditModeChanged(edit, crop, zoom, focus);
+        onCropPositionChanged(listener: (crop: Rect, zoom: Rect) => void): void;
+        unCropPositionChanged(listener: (crop: Rect, zoom: Rect) => void): void;
+        private notifyCropPositionChanged(crop, zoom);
         onCropAutoPositionedChanged(listener: (auto: boolean) => void): void;
         unCropAutoPositionedChanged(listener: (auto: boolean) => void): void;
         private notifyCropAutoPositionedChanged(auto);
+        onFocusPositionChanged(listener: (focus: Point) => void): void;
+        unFocusPositionChanged(listener: (focus: Point) => void): void;
+        private notifyFocusPositionChanged(focus);
         onFocusAutoPositionedChanged(listener: (auto: boolean) => void): void;
         unFocusAutoPositionedChanged(listener: (auto: boolean) => void): void;
         private notifyFocusAutoPositionedChanged(auto);
+        onOrientationChanged(listener: (orientation: number) => void): void;
+        unOrientationChanged(listener: (orientation: number) => void): void;
+        private notifyOrientationChanged(orientation);
     }
 }
 declare module api.content.image {
@@ -18109,6 +18198,7 @@ declare module api.content.form {
         private persistedContent;
         private contentTypeName;
         private formState;
+        private contentUpdatedListeners;
         constructor(builder: ContentFormContextBuilder);
         getSite(): api.content.site.Site;
         getFormState(): FormState;
@@ -18116,6 +18206,7 @@ declare module api.content.form {
         getContentPath(): api.content.ContentPath;
         getParentContentPath(): api.content.ContentPath;
         getPersistedContent(): api.content.Content;
+        updatePersistedContent(content: Content): void;
         getContentTypeName(): api.schema.content.ContentTypeName;
         createInputTypeViewContext(inputTypeConfig: any, parentPropertyPath: PropertyPath, input: api.form.Input): api.form.inputtype.InputTypeViewContext;
         static create(): ContentFormContextBuilder;
@@ -18189,9 +18280,16 @@ declare module api.content.form.inputtype.upload {
         updateProperty(property: api.data.Property, unchangedOnly?: boolean): Q.Promise<void>;
         reset(): void;
         private saveEditDataToProperty(crop, zoom, focus);
+        private saveCropToProperty(crop, zoom, container?);
+        private saveFocusToProperty(focus, container?);
         private getPropertyContainer(property);
         private getFocalPoint(content);
         private getRectFromProperty(content, propertyName);
+        private writeOrientation(content, orientation);
+        private readOrientation(content);
+        private readOriginalOrientation(content);
+        private readSizeValue(content, propertyName);
+        private getMetaProperty(content, propertyName);
         private getMediaProperty(content, propertyName);
         private configEditorsProperties(content);
         validate(silent?: boolean): api.form.inputtype.InputValidationRecording;
@@ -18553,11 +18651,14 @@ declare module api.content.site.inputtype.siteconfigurator {
         private siteConfigFormDisplayedListeners;
         private formContext;
         private formValidityChangedHandler;
+        private configureDialog;
+        private formViewStateOnDialogOpen;
         constructor(option: Option<Application>, siteConfig: SiteConfig, formContext: api.content.form.ContentFormContext);
         doRender(): wemQ.Promise<boolean>;
         setSiteConfig(siteConfig: SiteConfig): void;
         private createEditButton();
-        initAndOpenConfigureDialog(comboBoxToUndoSelectionOnCancel?: SiteConfiguratorComboBox): void;
+        showConfigureDialog(): void;
+        initConfigureDialog(): SiteConfiguratorDialog;
         private revertFormViewToGivenState(formViewStateToRevertTo);
         private undoSelectionOnCancel(comboBoxToUndoSelectionOnCancel);
         private applyTemporaryConfig(tempSiteConfig);
