@@ -58,9 +58,6 @@ export class GroupRoleWizardPanel extends PrincipalWizardPanel {
                 return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
             }
 
-        }).catch((reason) => {
-            DefaultErrorHandler.handle(reason);
-            return <wemQ.Promise<void>>wemQ.resolve(null);
         });
     }
 
