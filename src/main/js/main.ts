@@ -6,6 +6,8 @@ import './api.ts';
 import {UserAppPanel} from './app/UserAppPanel';
 import {ChangeUserPasswordDialog} from './app/wizard/ChangeUserPasswordDialog';
 import {Router} from './app/Router';
+import {ShowNewPrincipalDialogEvent} from './app/browse/ShowNewPrincipalDialogEvent';
+import {NewPrincipalDialog} from './app/create/NewPrincipalDialog';
 
 function getApplication(): api.app.Application {
     let application = new api.app.Application('user-manager', 'Users', 'UM', CONFIG.appIconUrl);
@@ -56,6 +58,11 @@ function startApplication() {
     startLostConnectionDetector();
 
     api.security.event.PrincipalServerEventsHandler.getInstance().start();
+
+    const newPrincipalDialog = new NewPrincipalDialog();
+    ShowNewPrincipalDialogEvent.on((event) => {
+        newPrincipalDialog.setSelection(event.getSelection()).open();
+    });
 }
 
 window.onload = function () {

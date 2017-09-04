@@ -20,7 +20,9 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
     private changePasswordButton: DialogButton;
 
     constructor() {
-        super(i18n('dialog.changePassword.title'));
+        super({
+            title: i18n('dialog.changePassword.title')
+        });
 
         this.getEl().addClass('change-password-dialog');
 
@@ -82,12 +84,12 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
     }
 
     show() {
+        this.password.reset();
         api.dom.Body.get().appendChild(this);
         super.show();
     }
 
     close() {
-        this.password.setValue('');
         super.close();
         this.remove();
     }

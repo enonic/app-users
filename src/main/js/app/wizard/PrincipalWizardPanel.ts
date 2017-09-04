@@ -3,6 +3,7 @@ import {UserItemWizardPanel} from './UserItemWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {Router} from '../Router';
 import {PrincipalWizardDataLoader} from './PrincipalWizardDataLoader';
+import {GraphQlRequest} from '../../api/graphql/GraphQlRequest';
 
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
@@ -188,7 +189,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         }
     }
 
-    protected produceUpdateRequest(viewedPrincipal: Principal): any {
+    protected produceUpdateRequest(viewedPrincipal: Principal): GraphQlRequest<any, Principal> {
         throw new Error('Must be implemented by inheritors');
     }
 

@@ -9,6 +9,7 @@ import Principal = api.security.Principal;
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import WizardStep = api.app.wizard.WizardStep;
 import i18n = api.util.i18n;
+import DefaultErrorHandler = api.DefaultErrorHandler;
 
 export class GroupRoleWizardPanel extends PrincipalWizardPanel {
 
@@ -57,6 +58,9 @@ export class GroupRoleWizardPanel extends PrincipalWizardPanel {
                 return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
             }
 
+        }).catch((reason) => {
+            DefaultErrorHandler.handle(reason);
+            return <wemQ.Promise<void>>wemQ.resolve(null);
         });
     }
 

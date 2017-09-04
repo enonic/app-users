@@ -1,5 +1,5 @@
 import '../api.ts';
-import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './browse/UserTreeGridItem';
+import {UserTreeGridItem, UserTreeGridItemType, UserTreeGridItemBuilder} from './browse/UserTreeGridItem';
 import {UserItemWizardPanel} from './wizard/UserItemWizardPanel';
 import {UserStoreWizardPanel} from './wizard/UserStoreWizardPanel';
 import {PrincipalWizardPanel} from './wizard/PrincipalWizardPanel';
@@ -138,7 +138,7 @@ export class UserAppPanel extends api.app.NavigatedAppPanel<UserTreeGridItem> {
         this.getAppBarTabMenu().deselectNavigationItem();
     }
 
-    protected createBrowsePanel() {
+    protected createBrowsePanel(): UserBrowsePanel {
         return new UserBrowsePanel();
     }
 
@@ -244,9 +244,9 @@ export class UserAppPanel extends api.app.NavigatedAppPanel<UserTreeGridItem> {
         }
 
         return {
-            tabName: tabName,
-            principalType: principalType,
-            principalPath: principalPath
+            tabName,
+            principalType,
+            principalPath
         };
     }
 

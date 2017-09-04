@@ -1,8 +1,10 @@
 import '../../api.ts';
 
 import Principal = api.security.Principal;
+import PrincipalType = api.security.PrincipalType;
 import UserStore = api.security.UserStore;
 import UserItem = api.security.UserItem;
+import i18n = api.util.i18n;
 
 export enum UserTreeGridItemType {
     USER_STORE,
@@ -65,13 +67,13 @@ export class UserTreeGridItem implements api.Equitable {
             return this.principal.getDisplayName();
 
         case UserTreeGridItemType.ROLES:
-            return 'Roles';
+            return i18n('field.roles');
 
         case UserTreeGridItemType.USERS:
-            return 'Users';
+            return i18n('field.users');
 
         case UserTreeGridItemType.GROUPS:
-            return 'Groups';
+            return i18n('field.groups');
 
         }
         return '';
@@ -99,9 +101,28 @@ export class UserTreeGridItem implements api.Equitable {
 
     }
 
+    isUser(): boolean {
+        return this.type === UserTreeGridItemType.USERS;
+    }
+
+    isUserGroup(): boolean {
+        return this.type === UserTreeGridItemType.GROUPS;
+    }
+
+    isUserStore(): boolean {
+        return this.type === UserTreeGridItemType.USER_STORE;
+    }
+
+    isRole(): boolean {
+        return this.type === UserTreeGridItemType.ROLES;
+    }
+
+    isPrincipal(): boolean {
+        return this.type === UserTreeGridItemType.PRINCIPAL;
+    }
+
     hasChildren(): boolean {
-        return (this.type === UserTreeGridItemType.USER_STORE || this.type === UserTreeGridItemType.GROUPS ||
-                this.type === UserTreeGridItemType.ROLES || this.type === UserTreeGridItemType.USERS);
+        return (this.isUser() || this.isUserGroup() || this.isUserStore() || this.isRole());
     }
 
     equals(o: api.Equitable): boolean {
@@ -123,6 +144,19 @@ export class UserTreeGridItem implements api.Equitable {
 
     static fromPrincipal(principal: Principal): UserTreeGridItem {
         return new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
+    }
+
+    static getParentType(principal: Principal): UserTreeGridItemType {
+        switch (principal.getType()) {
+        case PrincipalType.GROUP:
+            return UserTreeGridItemType.GROUPS;
+        case PrincipalType.USER:
+            return UserTreeGridItemType.USERS;
+        case PrincipalType.ROLE:
+            return UserTreeGridItemType.ROLES;
+        default:
+            return null;
+        }
     }
 }
 

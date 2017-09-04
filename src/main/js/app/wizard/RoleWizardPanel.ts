@@ -33,7 +33,7 @@ export class RoleWizardPanel
         steps.push(new WizardStep(i18n('field.role'), descriptionStep));
 
         let principalKey: PrincipalKey = principal ? principal.getKey() : undefined;
-        if (!RoleKeys.EVERYONE.equals(principalKey)) {
+        if (!RoleKeys.isEveryone(principalKey)) {
             let membersStep = this.getMembersWizardStepForm();
             steps.push(new WizardStep(i18n('field.grants'), membersStep));
         }
