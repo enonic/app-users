@@ -1,9 +1,9 @@
 const RelativeErrorsWebpackPlugin = require('./util/relativeErrorsWebpackPlugin');
 
 module.exports = {
-    entry: './src/main/js/main.ts',
+    entry: './src/main/resources/assets/js/main.ts',
     output: {
-        filename: './build/resources/main/assets/app/bundle.js'
+        filename: './build/resources/main/assets/js/bundle.js'
     },
     resolve: {
         extensions: ['.ts', '.js']
