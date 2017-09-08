@@ -15,7 +15,6 @@ function handleGet() {
 
     var params = {
         adminUrl: admin.getBaseUri(),
-        adminAssetsUri: admin.getAssetsUri(),
         assetsUri: portal.assetUrl({
             path: ''
         }),

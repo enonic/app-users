@@ -9,3 +9,4 @@ build/
 .tern-project
 npm-debug.log
 node_modules/
+.xp/

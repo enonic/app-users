@@ -1,1 +1,1 @@
-///<reference path='./api/api.d.ts' />
+///<reference path='../../../.xp/dev/d.ts/admin.d.ts' />
