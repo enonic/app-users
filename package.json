@@ -4,8 +4,7 @@
   "description": "Enonix XP - Users App",
   "scripts": {
     "build": "webpack",
-    "lint": "eslint . --fix",
-    "precommit": "lint-staged"
+    "lint": "eslint . --fix"
   },
   "lint-staged": {
     "src/main/resources/**/*.js": [
@@ -24,7 +23,6 @@
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-prettier": "^2.1.2",
-    "husky": "^0.14.3",
     "lint-staged": "^4.0.2",
     "prettier": "^1.5.3"
   }
