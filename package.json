@@ -2,6 +2,7 @@
   "name": "app-users",
   "version": "1.0.0",
   "description": "Enonix XP - Users App",
+  "license": "GPL-3.0",
   "scripts": {
     "build": "webpack --hide-modules",
     "lint": "run-p -c --aggregate-output lint:*",
