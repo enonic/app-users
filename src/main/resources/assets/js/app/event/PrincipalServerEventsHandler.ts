@@ -48,7 +48,7 @@ export class PrincipalServerEventsHandler {
             console.debug('PrincipalServerEventsHandler: received server event', event);
         }
 
-        if (event.getType() == NodeServerChangeType.DELETE) {
+        if (event.getType() === NodeServerChangeType.DELETE) {
             this.handleUserItemDeleted(this.extractPrincipalIds([event.getNodeChange()]));
         } else {
             // allow some time for the backend to process items before requesting them
@@ -169,7 +169,7 @@ export class PrincipalServerEventsHandler {
         const path = Path.fromString(changeItem.getPath());
         const name = path.getElement(path.getElements().length - 1);
         if (path.hasParent()) {
-            return path.getParentPath().toString() == '/roles' ? 'role:' + name : changeItem.getId();
+            return path.getParentPath().toString() === '/roles' ? 'role:' + name : changeItem.getId();
         }
 
         return name;
