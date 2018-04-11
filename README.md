@@ -1,4 +1,4 @@
-Enonix XP - Users App
+Enonic XP - Users App
 ===
 
 Manage permissions for users, user groups and roles in Enonic XP.
