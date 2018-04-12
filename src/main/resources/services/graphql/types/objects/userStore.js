@@ -1,7 +1,5 @@
 var graphQl = require('/lib/graphql');
 
-var principals = require('principals');
-
 var graphQlEnums = require('../enums');
 
 var graphQlUserItem = require('./userItem');
@@ -32,7 +30,7 @@ exports.AuthConfig = graphQl.createObjectType({
             type: graphQl.GraphQLString,
             resolve: function(env) {
                 return JSON.stringify(env.source.config);
-                //TODO Create object type for property array
+                // TODO Create object type for property array
             }
         }
     }
@@ -55,7 +53,7 @@ exports.UserStoreType = graphQl.createObjectType({
                 return env.source.key || env.source._name;
             }
         },
-        path: { 
+        path: {
             type: graphQl.GraphQLString,
             resolve: function(env) {
                 return '/identity/' + (env.source.key || env.source._name);
@@ -73,8 +71,12 @@ exports.UserStoreType = graphQl.createObjectType({
         idProviderMode: {
             type: graphQlEnums.IdProviderModeEnum,
             resolve: function(env) {
-                var idProviderKey =  env.source.authConfig && env.source.authConfig.applicationKey;
-                return idProviderKey ? userstoresLib.getIdProviderMode(idProviderKey) : null;
+                var idProviderKey =
+                    env.source.authConfig &&
+                    env.source.authConfig.applicationKey;
+                return idProviderKey
+                    ? userstoresLib.getIdProviderMode(idProviderKey)
+                    : null;
             }
         },
         permissions: {

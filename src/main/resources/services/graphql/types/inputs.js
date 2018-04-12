@@ -2,6 +2,7 @@ var graphQl = require('/lib/graphql');
 
 var graphQlEnums = require('./enums');
 
+// eslint-disable-next-line no-unused-vars
 var PrincipalInput = graphQl.createInputObjectType({
     name: 'PrincipalInput',
     description: 'Input definition for principal',

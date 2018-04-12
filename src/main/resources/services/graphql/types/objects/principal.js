@@ -39,13 +39,13 @@ exports.PrincipalType = graphQl.createObjectType({
         },
         name: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._name;
             }
         },
         path: {
             type: graphQl.GraphQLString,
-            resolve: function (env) {
+            resolve: function(env) {
                 return env.source._path;
             }
         },

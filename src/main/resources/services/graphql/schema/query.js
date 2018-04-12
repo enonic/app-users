@@ -12,7 +12,7 @@ module.exports = graphQl.createObjectType({
     fields: {
         userStores: {
             type: graphQl.list(graphQlObjectTypes.UserStoreType),
-            resolve: function(env) {
+            resolve: function() {
                 return userstores.list();
             }
         },
@@ -28,7 +28,7 @@ module.exports = graphQl.createObjectType({
         },
         defaultUserStore: {
             type: graphQlObjectTypes.UserStoreType,
-            resolve: function (env) {
+            resolve: function() {
                 return userstores.getDefault();
             }
         },
@@ -81,7 +81,9 @@ module.exports = graphQl.createObjectType({
                 var keys = env.args.keys;
                 var memberships = env.args.memberships;
                 if (keys.length >= 100) {
-                    throw "Invalid field argument keys: The number of keys must be inferior to 100";
+                    throw new Error(
+                        'Invalid field argument keys: The number of keys must be inferior to 100'
+                    );
                 }
                 return principals.getByKeys(keys, memberships);
             }

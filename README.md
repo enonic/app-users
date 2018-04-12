@@ -1,12 +1,10 @@
 Enonic XP - Users App
 ===
 
-Manage permissions for users, user groups and roles in Enonic XP.
-
 [![Travis Build Status][travis-image]][travis-url]
 [![License][license-image]][license-url]
 
-Core applications for [Enonic XP](https://github.com/enonic/xp).
+Manage permissions for users, user groups and roles in [Enonic XP](https://github.com/enonic/xp).
 
 ## Usage
 
