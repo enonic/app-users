@@ -80,7 +80,6 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
 
     show() {
         this.password.reset();
-        api.dom.Body.get().appendChild(this);
         super.show();
     }
 
