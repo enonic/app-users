@@ -19,7 +19,7 @@ module.exports = {
             displayName: params.displayName,
             description: params.description,
             authConfig: params.authConfig,
-            permissions: params.permissions
+            permissions: params.permissions || []
         });
     },
     update: function(params) {
