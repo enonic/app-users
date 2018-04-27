@@ -33,11 +33,11 @@ export class MembershipsWizardStepForm extends api.app.wizard.WizardStepForm {
 
         const fieldSet = new api.ui.form.Fieldset();
 
-        if (type !== MembershipsType.ROLES) {
-            this.initGroups(fieldSet);
-        }
         if (type !== MembershipsType.GROUPS) {
             this.initRoles(fieldSet);
+        }
+        if (type !== MembershipsType.ROLES) {
+            this.initGroups(fieldSet);
         }
 
         const form = new api.ui.form.Form().add(fieldSet);
