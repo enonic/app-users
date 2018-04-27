@@ -1,4 +1,2 @@
 **/*.js
-!src/main/resources/**/*.js
-src/main/resources/lib/*.js
-src/main/resources/services/graphql/graphql.js
+!src/main/resources/assets/js/**/*.js
