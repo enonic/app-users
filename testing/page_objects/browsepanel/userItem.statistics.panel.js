@@ -4,6 +4,7 @@
 
 const page = require('../page');
 const elements = require('../../libs/elements');
+const appConst = require('../../libs/app_const');
 
 var panel = {
     div: `//div[contains(@id,'UserItemStatisticsPanel')]`,
@@ -15,9 +16,9 @@ var userItemStatisticsPanel = Object.create(page, {
 
     getItemName: {
         value: function () {
-            return this.waitForVisible(`${panel.div}` + `${panel.header}`, 1000).then(()=> {
+            return this.waitForVisible(`${panel.div}` + `${panel.header}`, appConst.TIMEOUT_1).then(() => {
                 return this.getText(`${panel.div}` + `${panel.header}` + `${panel.itemName}`);
-            }).catch((err)=> {
+            }).catch(err => {
                 this.saveScreenshot('err_statistic_item_name');
                 throw new Error('Item name string was not found');
             })
@@ -25,9 +26,9 @@ var userItemStatisticsPanel = Object.create(page, {
     },
     getItemPath: {
         value: function () {
-            return this.waitForVisible(`${panel.div}` + `${panel.header}`, 1000).then(()=> {
+            return this.waitForVisible(`${panel.div}` + `${panel.header}`, appConst.TIMEOUT_2).then(() => {
                 return this.getText(`${panel.div}` + `${panel.header}` + `${panel.itemPath}`);
-            }).catch((err)=> {
+            }).catch((err) => {
                 this.saveScreenshot('err_statistic_item_path');
                 throw new Error('Item path string was not found');
             })
@@ -35,10 +36,10 @@ var userItemStatisticsPanel = Object.create(page, {
         }
     },
     waitForPanelVisible: {
-        value: function (ms) {
-            return this.waitForVisible(`${panel.div}`, ms).then(()=> {
-                return this.waitForSpinnerNotVisible(3000);
-            }).then(()=> {
+        value: function () {
+            return this.waitForVisible(`${panel.div}`, appConst.TIMEOUT_2).then(() => {
+                return this.waitForSpinnerNotVisible(appConst.TIMEOUT_3);
+            }).then(() => {
                 return console.log('user statistics panel is loaded')
             });
         }
