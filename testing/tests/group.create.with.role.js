@@ -12,7 +12,6 @@ const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const groupWizard = require('../page_objects/wizardpanel/group.wizard');
-const confirmationDialog = require("../page_objects/confirmation.dialog");
 const saveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
 
 describe('group.greate.with.role Create a Group with a just created new Role', function () {

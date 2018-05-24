@@ -15,7 +15,7 @@ const appConst = require('../libs/app_const');
 const confirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe('Role - confirm and delete in wizard and in browse panel', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testRole;
 
@@ -23,15 +23,30 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
         () => {
             testRole =
                 userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'test role 2');
-            return testUtils.clickOnRolesFolderAndOpenWizard().then(()=> {
+            return testUtils.clickOnRolesFolderAndOpenWizard().then(() => {
                 return roleWizard.typeData(testRole)
-            }).then(()=> {
+            }).then(() => {
                 return roleWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return roleWizard.clickOnDelete();
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot("role_wizard_confirm_delete1");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogVisible(appConst.TIMEOUT_3),
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
+                    "`Confirmation Dialog` should be displayed");
+            });
+        });
+
+    it('GIVEN existing is opened WHEN `Ctrl+del`  has been pressed THEN Confirmation dialog should appear',
+        () => {
+            return testUtils.findAndSelectItem(testRole.displayName).then(() => {
+                return userBrowsePanel.clickOnEditButton();
+            }).then(() => {
+                return roleWizard.waitForOpened();
+            }).then(() => {
+                return roleWizard.hotKeyDelete();
+            }).then(() => {
+                testUtils.saveScreenshot("role_wizard_shortcut_delete");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
                     "`Confirmation Dialog` should be displayed");
             });
         });
@@ -40,15 +55,15 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
         () => {
             testRole =
                 userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'test role 3');
-            return testUtils.clickOnRolesFolderAndOpenWizard().then(()=> {
+            return testUtils.clickOnRolesFolderAndOpenWizard().then(() => {
                 return roleWizard.typeData(testRole)
-            }).then(()=> {
+            }).then(() => {
                 return roleWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return roleWizard.clickOnDelete();
-            }).then(()=> {
+            }).then(() => {
                 return testUtils.confirmDelete();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("role_deleted_confirmation_mess1");
                 var expectedMessage = appConst.roleDeletedMessage(testRole.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
@@ -56,28 +71,28 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
             });
         });
 
-    it('GIVEN `Role` is selected WHEN Delete button on browse-toolbar has been pressed THEN Confirmation dialog should appear',
+    it('GIVEN `Role` is selected WHEN `Delete` button on browse-toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
             testRole =
                 userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'test role 2');
-            return testUtils.openWizardAndSaveRole(testRole).then(()=> {
+            return testUtils.openWizardAndSaveRole(testRole).then(() => {
                 return testUtils.findAndSelectItem(testRole.displayName);
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.waitForDeleteButtonEnabled();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.clickOnDeleteButton();
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot("role_confirm_delete2");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogVisible(appConst.TIMEOUT_3),
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
                     "`Confirmation Dialog` should be displayed");
             });
         });
 
     it('GIVEN existing role WHEN the role has been deleted in browse panel THEN correct notification should appear',
         () => {
-            return testUtils.selectAndDeleteItem(testRole.displayName).then(()=> {
+            return testUtils.selectAndDeleteItem(testRole.displayName).then(() => {
                 return userBrowsePanel.waitForNotificationMessage();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("role_deleted_notification_mes2");
                 var msg = appConst.roleDeletedMessage(testRole.displayName);
                 assert.strictEqual(result, msg, `'Principal "role:roleName" is deleted' the  message should be displayed`);
@@ -86,7 +101,7 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

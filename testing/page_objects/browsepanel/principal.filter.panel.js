@@ -8,7 +8,7 @@ const appConst = require('../../libs/app_const');
 var panel = {
     container: "//div[contains(@id,'PrincipalBrowseFilterPanel')]",
     clearFilterButton: "//a[contains(@id,'ClearFilterButton')]",
-    searchInput: "//input[contains(@id,'browse.filter.TextSearchField')]",
+    searchInput: "//input[contains(@id,'api.app.browse.filter.TextSearchField')]",
     aggregationGroupView: "//div[contains(@id,'AggregationContainer')]",
     userAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'User (')]]",
     roleAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Role (')]]",
@@ -59,7 +59,27 @@ var browseFilterPanel = Object.create(page, {
     },
     typeSearchText: {
         value: function (text) {
-            return this.typeTextInInput(this.searchTextInput, text).pause(500);
+            return this.typeTextInInput(this.searchTextInput, text).then(() => {
+                this.getTextFromInput(this.searchTextInput).then(result => {
+                    if (!result || 0 === result.length) {
+                        return this.typeTextInInput(this.searchTextInput, text);
+                    }
+                })
+            })
+        }
+    },
+    //the another version for `typeSearchText`
+    typeSearchText1: {
+        value: function (text) {
+            return this.getDisplayedElements(this.searchTextInput).then(result => {
+                return this.getBrowser().elementIdAttribute(result[0].ELEMENT, 'id').then((id) => {
+                    console.log('ID is ' + id.value);
+                    return this.getBrowser().elementIdValue(result[0].ELEMENT, text);
+                }).then(() => {
+                    console.log('Text typed! ');
+                })
+
+            })
         }
     },
     waitForOpened: {
@@ -70,7 +90,7 @@ var browseFilterPanel = Object.create(page, {
     },
     waitForClosed: {
         value: function () {
-            return this.waitForNotVisible(`${panel.container}`, appConst.TIMEOUT_1).catch(error=> {
+            return this.waitForNotVisible(`${panel.container}`, appConst.TIMEOUT_1).catch(error => {
                 this.saveScreenshot('err_filter_panel_close');
                 throw new Error('Filter Panel was not closed');
             });
@@ -83,7 +103,7 @@ var browseFilterPanel = Object.create(page, {
     },
     waitForClearLinkVisible: {
         value: function () {
-            return this.waitForVisible(this.clearFilterLink, appConst.TIMEOUT_2).catch(err=> {
+            return this.waitForVisible(this.clearFilterLink, appConst.TIMEOUT_2).catch(err => {
                 this.saveScreenshot('err_clear_users_filter_panel');
                 throw new Error('Clear link should be visible: ' + err);
             })
