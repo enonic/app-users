@@ -70,7 +70,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
                 return testUtils.saveAndCloseWizard('new-name');
             }).pause(1000).then(()=> {
                 return userStatisticsPanel.getDisplayNameOfRoles();
-            }).then((roles)=> {
+            }).then(roles => {
                 assert.equal(roles.length, 1, 'one role should be present on the statistics panel');
                 assert.equal(roles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
             })

@@ -31,12 +31,11 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
                 return roleWizard.clickOnDelete();
             }).then(() => {
                 testUtils.saveScreenshot("role_wizard_confirm_delete1");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
-                    "`Confirmation Dialog` should be displayed");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
-    it('GIVEN existing is opened WHEN `Ctrl+del`  has been pressed THEN Confirmation dialog should appear',
+    it('GIVEN existing role is opened WHEN `Ctrl+del`  has been pressed THEN Confirmation dialog should appear',
         () => {
             return testUtils.findAndSelectItem(testRole.displayName).then(() => {
                 return userBrowsePanel.clickOnEditButton();
@@ -46,8 +45,7 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
                 return roleWizard.hotKeyDelete();
             }).then(() => {
                 testUtils.saveScreenshot("role_wizard_shortcut_delete");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
-                    "`Confirmation Dialog` should be displayed");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
@@ -66,8 +64,7 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
             }).then(result => {
                 testUtils.saveScreenshot("role_deleted_confirmation_mess1");
                 var expectedMessage = appConst.roleDeletedMessage(testRole.displayName);
-                return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
-                    "Correct notification message should appear");
+                return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage), "Correct notification message should appear");
             });
         });
 
@@ -83,8 +80,7 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
                 return userBrowsePanel.clickOnDeleteButton();
             }).then(() => {
                 testUtils.saveScreenshot("role_confirm_delete2");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
-                    "`Confirmation Dialog` should be displayed");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
