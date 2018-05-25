@@ -125,7 +125,31 @@ var wizardPanel = Object.create(page, {
             this.saveScreenshot(screenshotName);
             throw new Error(errString);
         }
-    }
+    },
+    hotKeySave: {
+        value: function () {
+            return this.getBrowser().status().then(status => {
+                if (status.value.os.name.toLowerCase().includes('wind') || status.value.os.name.toLowerCase().includes('linux')) {
+                    return this.getBrowser().keys(['Control', 's']);
+                }
+                if (status.value.os.name.toLowerCase().includes('mac')) {
+                    return this.getBrowser().keys(['Command', 's']);
+                }
+            })
+        }
+    },
+    hotKeyDelete: {
+        value: function () {
+            return this.getBrowser().status().then(status => {
+                if (status.value.os.name.toLowerCase().includes('wind') || status.value.os.name.toLowerCase().includes('linux')) {
+                    return this.getBrowser().keys(['Control', 'Delete']);
+                }
+                if (status.value.os.name.toLowerCase().includes('mac')) {
+                    return this.getBrowser().keys(['Command', 'Delete']);
+                }
+            })
+        }
+    },
 });
 module.exports = wizardPanel;
 

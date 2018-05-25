@@ -15,7 +15,7 @@ const appConst = require('../libs/app_const');
 const confirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe('`user.delete.spec`:User - confirm and delete it in the wizard and in the browse panel', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
 
@@ -23,16 +23,15 @@ describe('`user.delete.spec`:User - confirm and delete it in the wizard and in t
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(()=> {
+            return testUtils.clickOnSystemOpenUserWizard().then(() => {
                 return userWizard.typeData(testUser);
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.clickOnDelete();
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot("user_wizard_confirm_delete1");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogVisible(appConst.TIMEOUT_3),
-                    "`Confirmation Dialog` should be displayed");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
@@ -40,17 +39,17 @@ describe('`user.delete.spec`:User - confirm and delete it in the wizard and in t
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(()=> {
+            return testUtils.clickOnSystemOpenUserWizard().then(() => {
                 return userWizard.typeData(testUser)
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.clickOnDelete();
-            }).then(()=> {
+            }).then(() => {
                 return testUtils.confirmDelete();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("user_deleted_confirmation_mess1");
-                var expectedMessage = appConst.userDeletedMessage(testUser.displayName);
+                let expectedMessage = appConst.userDeletedMessage(testUser.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
                     `Principal "user:system:userName" is deleted - notification message should appear`);
             });
@@ -60,33 +59,33 @@ describe('`user.delete.spec`:User - confirm and delete it in the wizard and in t
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.addSystemUser(testUser).then(()=> {
+            return testUtils.addSystemUser(testUser).then(() => {
                 return testUtils.findAndSelectItem(testUser.displayName);
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.waitForDeleteButtonEnabled();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.clickOnDeleteButton();
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot("user_confirm_delete2");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogVisible(appConst.TIMEOUT_3),
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
                     "`Confirmation Dialog` should be displayed");
             });
         });
 
     it('GIVEN existing User WHEN the User has been deleted in the browse panel THEN correct notification should appear',
         () => {
-            return testUtils.selectAndDeleteItem(testUser.displayName).then(()=> {
+            return testUtils.selectAndDeleteItem(testUser.displayName).then(() => {
                 return userBrowsePanel.waitForNotificationMessage();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("user_deleted_notification_mes2");
-                var msg = appConst.userDeletedMessage(testUser.displayName);
+                let msg = appConst.userDeletedMessage(testUser.displayName);
                 assert.strictEqual(result, msg, `'Principal "user:system:userName" is deleted' the  message should be displayed`);
             });
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

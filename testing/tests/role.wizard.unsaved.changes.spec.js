@@ -14,7 +14,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 
 describe('Role Wizard and `Save Before Close dialog`', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testrole;
 

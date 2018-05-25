@@ -23,17 +23,17 @@ var panel = {
         displayName => `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
     checkboxByName: function (name) {
         return `${elements.itemByName(name)}` +
-               `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
+            `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
 
     checkboxByDisplayName: function (displayName) {
         return `${elements.itemByDisplayName(displayName)}` +
-               `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
+            `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
 
     expanderIconByName: function (name) {
         return this.rowByName(name) +
-               `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
+            `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
 
     },
     closeItemTabButton: function (name) {
@@ -42,7 +42,7 @@ var panel = {
 }
 var userBrowsePanel = Object.create(page, {
 
-    /////////Getters
+    //Getters
     selectionToggler: {
         get: function () {
             return `${panel.container}` + `${panel.selectionToggler}`
@@ -79,18 +79,17 @@ var userBrowsePanel = Object.create(page, {
             return `${panel.toolbar}/*[contains(@id, 'ActionButton') and child::span[text()='Delete']]`;
         }
     },
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     waitForPanelVisible: {
         value: function (ms) {
-            return this.waitForVisible(`${panel.toolbar}`, ms).catch(err=> {
+            return this.waitForVisible(`${panel.toolbar}`, ms).catch(err => {
                 throw new Error('User browse panel was not loaded in ' + ms);
             });
         }
     },
     isItemDisplayed: {
         value: function (itemName) {
-            return this.waitForVisible(`${panel.rowByName(itemName)}`, 1000).catch((err)=> {
+            return this.waitForVisible(`${panel.rowByName(itemName)}`, 1000).catch((err) => {
                 console.log("item is not displayed:" + itemName);
                 this.saveScreenshot('err_find_' + itemName)
                 return false;
@@ -99,7 +98,7 @@ var userBrowsePanel = Object.create(page, {
     },
     waitForItemNotDisplayed: {
         value: function (itemName) {
-            return this.waitForNotVisible(`${panel.rowByName(itemName)}`, 1000).catch((err)=> {
+            return this.waitForNotVisible(`${panel.rowByName(itemName)}`, 1000).catch((err) => {
                 console.log("item is still displayed:" + itemName);
                 return false;
             });
@@ -107,7 +106,7 @@ var userBrowsePanel = Object.create(page, {
     },
     waitForFolderUsersVisible: {
         value: function () {
-            return this.waitForVisible(`${panel.rowByName('users')}`, 1000).catch(()=> {
+            return this.waitForVisible(`${panel.rowByName('users')}`, 1000).catch(() => {
                 console.log("element is not visible: row with Users");
                 throw new Error(`element was not found! Users folder was not found! `);
             });
@@ -115,11 +114,11 @@ var userBrowsePanel = Object.create(page, {
     },
     waitForUsersGridLoaded: {
         value: function (ms) {
-            return this.waitForVisible(`${panel.grid}`, ms).then(()=> {
+            return this.waitForVisible(`${panel.grid}`, ms).then(() => {
                 return this.waitForSpinnerNotVisible(3000);
-            }).then(()=> {
+            }).then(() => {
                 return console.log('user browse panel is loaded')
-            }).catch(err=> {
+            }).catch(err => {
                 throw new Error('users browse panel was not loaded in ' + ms);
             });
         }
@@ -131,9 +130,9 @@ var userBrowsePanel = Object.create(page, {
     },
     clickOnHideFilterButton: {
         value: function () {
-            return this.waitForVisible(this.hideFilterPanelButton, appConst.TIMEOUT_3).then(()=> {
+            return this.waitForVisible(this.hideFilterPanelButton, appConst.TIMEOUT_3).then(() => {
                 return this.doClick(this.hideFilterPanelButton);
-            }).catch(err=> {
+            }).catch(err => {
                 this.saveScreenshot('err_click_on_hide_filter_button');
                 throw new Error(err);
             })
@@ -142,25 +141,25 @@ var userBrowsePanel = Object.create(page, {
     },
     clickOnAppHomeButton: {
         value: function () {
-            return this.doClick(this.appHomeButton).pause(500).catch((err)=> {
+            return this.doClick(this.appHomeButton).pause(500).catch((err) => {
                 throw new Error('err: AppHome button ' + err);
             })
         }
     },
     clickOnNewButton: {
         value: function () {
-            return this.waitForEnabled(this.newButton, appConst.TIMEOUT_3).then(()=> {
+            return this.waitForEnabled(this.newButton, appConst.TIMEOUT_3).then(() => {
                 return this.doClick(this.newButton);
-            }).catch((err)=> {
+            }).catch((err) => {
                 throw new Error('New button is not enabled! ' + err);
             })
         }
     },
     clickOnEditButton: {
         value: function () {
-            return this.waitForEnabled(this.editButton, appConst.TIMEOUT_3).then(()=> {
+            return this.waitForEnabled(this.editButton, appConst.TIMEOUT_3).then(() => {
                 return this.doClick(this.editButton);
-            }).catch((err)=> {
+            }).catch((err) => {
                 this.saveScreenshot('err_browsepanel_edit');
                 throw new Error('Edit button is not enabled! ' + err);
             })
@@ -168,9 +167,9 @@ var userBrowsePanel = Object.create(page, {
     },
     clickOnDeleteButton: {
         value: function () {
-            return this.waitForEnabled(this.deleteButton, appConst.TIMEOUT_3).then(()=> {
+            return this.waitForEnabled(this.deleteButton, appConst.TIMEOUT_3).then(() => {
                 return this.doClick(this.deleteButton);
-            }).catch((err)=> {
+            }).catch((err) => {
                 this.saveScreenshot('err_browsepanel_delete');
                 throw new Error('Delete button should be enabled! ' + err);
             })
@@ -194,7 +193,7 @@ var userBrowsePanel = Object.create(page, {
     },
     waitForDeleteButtonEnabled: {
         value: function () {
-            return this.waitForEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err=> {
+            return this.waitForEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
                 return this.doCatch('err_delete_button_state', err);
             });
         }
@@ -223,11 +222,11 @@ var userBrowsePanel = Object.create(page, {
     clickOnRowByName: {
         value: function (name) {
             var nameXpath = panel.rowByName(name);
-            return this.waitForVisible(nameXpath, appConst.TIMEOUT_3).then(()=> {
+            return this.waitForVisible(nameXpath, appConst.TIMEOUT_3).then(() => {
                 return this.doClick(nameXpath);
-            }).pause(500).catch((err)=> {
+            }).pause(500).catch((err) => {
                 this.saveScreenshot('err_find_' + name);
-                throw Error('Row with the name ' + name + ' was not found')
+                throw Error('Row with the name ' + name + ' was not found.  ' + err);
             })
         }
     },
@@ -235,7 +234,7 @@ var userBrowsePanel = Object.create(page, {
         value: function (name) {
             var nameXpath = panel.rowByName(name);
             return this.waitForVisible(nameXpath, appConst.TIMEOUT_3)
-                .catch((err)=> {
+                .catch((err) => {
                     this.saveScreenshot('err_find_' + name);
                     throw Error('Row with the name ' + name + ' is not visible after ' + 3000 + 'ms')
                 })
@@ -244,9 +243,9 @@ var userBrowsePanel = Object.create(page, {
     clickCheckboxAndSelectRowByDisplayName: {
         value: function (displayName) {
             var displayNameXpath = panel.checkboxByDisplayName(displayName);
-            return this.waitForVisible(displayNameXpath, 2000).then(()=> {
+            return this.waitForVisible(displayNameXpath, 2000).then(() => {
                 return this.doClick(displayNameXpath);
-            }).catch((err)=> {
+            }).catch((err) => {
                 this.saveScreenshot('err_find_item');
                 throw Error('Row with the displayName ' + displayName + ' was not found')
             })
@@ -255,9 +254,9 @@ var userBrowsePanel = Object.create(page, {
     doClickOnCloseTabButton: {
         value: function (displayName) {
             let closeIcon = `${panel.closeItemTabButton(displayName)}`;
-            return this.waitForVisible(closeIcon).then(()=> {
+            return this.waitForVisible(closeIcon).then(() => {
                 return this.doClick(closeIcon);
-            }).catch(err=> {
+            }).catch(err => {
                 this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
                 throw new Error('itemTabButton was not found! ' + displayName + '  ' + err);
             })
@@ -267,23 +266,23 @@ var userBrowsePanel = Object.create(page, {
     doClickOnCloseTabAndWaitGrid: {
         value: function (displayName) {
             let closeIcon = `${panel.closeItemTabButton(displayName)}`;
-            return this.waitForVisible(closeIcon).then(()=> {
+            return this.waitForVisible(closeIcon).then(() => {
                 return this.doClick(closeIcon);
-            }).catch((err)=> {
+            }).catch((err) => {
                 throw new Error('itemTabButton was not found!' + displayName);
-            }).pause(300).then(()=> {
+            }).pause(300).then(() => {
                 return saveBeforeCloseDialog.isDialogPresent(1000);
-            }).then((result)=> {
+            }).then((result) => {
                 if (result) {
-                    this.saveScreenshot('err_save_close_item').then(()=> {
+                    this.saveScreenshot('err_save_close_item').then(() => {
                         console.log('save before close dialog must not be present');
                         throw new Error('`Save Before Close` dialog should not appear when try to close the ' + displayName);
                     });
 
                 }
-            }).then(()=> {
+            }).then(() => {
                 return this.waitForSpinnerNotVisible(1000);
-            }).then(()=> {
+            }).then(() => {
                 return this.waitForUsersGridLoaded(2000);
             })
         }
@@ -304,7 +303,7 @@ var userBrowsePanel = Object.create(page, {
         value: function () {
             let selector = `${panel.container}` + `${panel.selectionToggler}`;
             return this.getBrowser().waitUntil(function () {
-                return this.getAttribute(selector, 'class').then(result=> {
+                return this.getAttribute(selector, 'class').then(result => {
                     return result.includes('any-selected');
                 })
             }, 3000, 'expected style not present after 3s');
@@ -320,7 +319,7 @@ var userBrowsePanel = Object.create(page, {
     isSelectionTogglerVisible: {
         value: function () {
             let selector = `${panel.container}` + `${panel.selectionToggler}`;
-            return this.getAttribute(selector, 'class').then(result=> {
+            return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('any-selected');
             });
         }
@@ -345,6 +344,35 @@ var userBrowsePanel = Object.create(page, {
             }).pause(400).catch(() => {
                 this.saveScreenshot(`err_find_${displayName}`);
                 throw Error(`Row with the name ${displayName} was not found`);
+            })
+        }
+    },
+    hotKeyNew: {
+        value: function () {
+            return this.getBrowser().status().then(status => {
+                if (status.value.os.name.toLowerCase().includes('wind') || status.value.os.name.toLowerCase().includes('linux')) {
+                    return this.getBrowser().keys(['Control', 'Alt', 'n']);
+                }
+                if (status.value.os.name.toLowerCase().includes('mac')) {
+                    return this.getBrowser().keys(['Command', 'Alt', 'n']);
+                }
+            })
+        }
+    },
+    hotKeyEdit: {
+        value: function () {
+            return this.getBrowser().keys(['F4']);
+        }
+    },
+    hotKeyDelete: {
+        value: function () {
+            return this.getBrowser().status().then(status => {
+                if (status.value.os.name.toLowerCase().includes('wind') || status.value.os.name.toLowerCase().includes('linux')) {
+                    return this.getBrowser().keys(['Control', 'Delete']);
+                }
+                if (status.value.os.name.toLowerCase().includes('mac')) {
+                    return this.getBrowser().keys(['Command', 'Delete']);
+                }
             })
         }
     },

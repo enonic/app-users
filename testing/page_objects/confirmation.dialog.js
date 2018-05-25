@@ -1,7 +1,8 @@
 /**
  * Created  on 6/29/2017.
  */
-const page = require('./page')
+const page = require('./page');
+const appConst = require('../libs/app_const');
 const dialog = {
     container: `//div[contains(@id,'ConfirmationDialog')]`,
     yesButton: `//button[contains(@id,'DialogButton') and child::span[text()='Yes']]`,
@@ -35,9 +36,9 @@ var confirmationDialog = Object.create(page, {
             })
         }
     },
-    waitForDialogVisible: {
-        value: function (ms) {
-            return this.waitForVisible(`${dialog.container}`, ms);
+    waitForDialogLoaded: {
+        value: function () {
+            return this.waitForVisible(`${dialog.container}`, appConst.TIMEOUT_3);
         }
     },
     waitForDialogClosed: {

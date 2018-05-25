@@ -15,7 +15,7 @@ const appConst = require('../libs/app_const');
 const confirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe('`group.delete.spec`: confirm and delete it in the wizard and in the browse panel', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testGroup;
 
@@ -24,16 +24,15 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
             this.bail(1);
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup)
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.clickOnDelete();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("group_wizard_confirm_delete1");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogVisible(appConst.TIMEOUT_3),
-                    "`Confirmation Dialog` should be displayed");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
@@ -41,15 +40,15 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
         () => {
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 3');
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup)
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.clickOnDelete();
-            }).then(()=> {
+            }).then(() => {
                 return testUtils.confirmDelete();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("group_deleted_confirmation_mess1");
                 var expectedMessage = appConst.groupDeletedMessage(testGroup.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
@@ -61,24 +60,23 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
         () => {
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
-            return testUtils.openWizardAndSaveGroup(testGroup).then(()=> {
+            return testUtils.openWizardAndSaveGroup(testGroup).then(() => {
                 return testUtils.findAndSelectItem(testGroup.displayName);
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.waitForDeleteButtonEnabled();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.clickOnDeleteButton();
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot("group_confirm_delete2");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogVisible(appConst.TIMEOUT_3),
-                    "`Confirmation Dialog` should be displayed");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
     it('GIVEN existing group WHEN the group has been deleted in browse panel THEN correct notification should appear',
         () => {
-            return testUtils.selectAndDeleteItem(testGroup.displayName).then(()=> {
+            return testUtils.selectAndDeleteItem(testGroup.displayName).then(() => {
                 return userBrowsePanel.waitForNotificationMessage();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("group_deleted_notification_mes2");
                 var msg = appConst.groupDeletedMessage(testGroup.displayName);
                 assert.strictEqual(result, msg, 'expected notification message should be displayed');
@@ -87,7 +85,7 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });
