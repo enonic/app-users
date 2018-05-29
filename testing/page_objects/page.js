@@ -59,9 +59,15 @@ Page.prototype.doClick = function (selector) {
         throw Error(err.message + ` ` + selector);
     })
 };
-
+//TODO workaround for issue in WebdriverIO
 Page.prototype.typeTextInInput = function (selector, text) {
-    return this.getBrowser().setValue(selector, text).catch(err => {
+    return this.getBrowser().setValue(selector, text).then(() => {
+        return this.getTextFromInput(selector).then(result => {
+            if (!result || 0 === result.length) {
+                return this.getBrowser().setValue(selector, text);
+            }
+        })
+    }).catch(err => {
         throw new Error('text was not set in the input ' + err);
     })
 };
