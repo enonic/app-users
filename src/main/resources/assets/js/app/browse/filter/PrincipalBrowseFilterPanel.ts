@@ -1,6 +1,6 @@
 import '../../../api.ts';
 import {UserTreeGridItem} from '../UserTreeGridItem';
-import {ListUserItemsRequest} from '../../../api/graphql/principal/ListUserItemsRequest';
+import {ListUserItemsRequest, ListUserItemsRequestResult} from '../../../api/graphql/principal/ListUserItemsRequest';
 import {UserItemType} from '../UserItemType';
 import {PrincipalBrowseSearchData} from './PrincipalBrowseSearchData';
 import {ListTypesRequest} from '../../../api/graphql/principal/ListTypesRequest';
@@ -25,7 +25,16 @@ export class PrincipalBrowseFilterPanel
     constructor() {
         super();
 
+        this.fetchAndUpdateAggregations();
         this.initHitsCounter();
+    }
+
+    private initHitsCounter() {
+        new ListUserItemsRequest().sendAndParse().then((result: ListUserItemsRequestResult) => {
+            this.updateHitsCounter(result.userItems ? result.userItems.length : 0, true);
+        }).catch((reason: any) => {
+            api.DefaultErrorHandler.handle(reason);
+        });
     }
 
     protected getGroupViews(): api.aggregation.AggregationGroupView[] {
@@ -38,42 +47,36 @@ export class PrincipalBrowseFilterPanel
     }
 
     doRefresh(): wemQ.Promise<void> {
-        return this.searchFacets(true);
+        if (!this.isFilteredOrConstrained()) {
+            return this.resetFacets(true);
+        }
+
+        return this.refreshDataAndHandleResponse();
     }
 
     protected doSearch(): wemQ.Promise<void> {
-        return this.searchFacets();
+        if (!this.isFilteredOrConstrained()) {
+            return this.reset();
+        }
+
+        return this.searchDataAndHandleResponse();
     }
 
     protected resetFacets(suppressEvent?: boolean, doResetAll?: boolean): wemQ.Promise<void> {
-        const notify = this.hasSelectedAggregations();
+        return new ListUserItemsRequest().sendAndParse().then((result: ListUserItemsRequestResult) => {
+            return this.fetchAndUpdateAggregations().then(() => {
+                const userItems = result.userItems;
+                this.updateHitsCounter(userItems ? userItems.length : 0, true);
+                this.toggleAggregationsVisibility(result.aggregations);
 
-        // then fire usual reset event with content grid reloading
-        if (!suppressEvent && !notify) {
-            new BrowseFilterResetEvent().fire();
-        }
-
-        return this.searchDataAndHandleResponse('', notify);
-    }
-
-    private searchFacets(isRefresh: boolean = false): wemQ.Promise<void> {
-        let values = this.getSearchInputValues();
-        let searchText = values.getTextSearchFieldValue();
-        if (!searchText && !this.hasConstraint()) {
-            return this.handleEmptyFilterInput(isRefresh).then(() => {
-                return this.fetchAndUpdateAggregations();
+                // then fire usual reset event with content grid reloading
+                if (!suppressEvent) {
+                    new BrowseFilterResetEvent().fire();
+                }
             });
-        }
-
-        return this.searchDataAndHandleResponse(searchText);
-    }
-
-    private handleEmptyFilterInput(isRefresh: boolean): wemQ.Promise<void> {
-        const hasSelectedAggregations = this.hasSelectedAggregations();
-        if (isRefresh || hasSelectedAggregations) {
-            return this.resetFacets(isRefresh);
-        }
-        return this.reset();
+        }).catch((reason: any) => {
+            api.DefaultErrorHandler.handle(reason);
+        });
     }
 
     private hasSelectedAggregations(): boolean {
@@ -90,36 +93,57 @@ export class PrincipalBrowseFilterPanel
             .filter(type => type != null);
     }
 
-    private searchDataAndHandleResponse(searchString: string, fireEvent: boolean = true): wemQ.Promise<void> {
+    private searchDataAndHandleResponse(): wemQ.Promise<void> {
+        const types: UserItemType[] = this.getCheckedTypes();
+        const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
 
-        const types = this.getCheckedTypes();
-
-        return new ListUserItemsRequest()
-            .setTypes(types)
-            .setQuery(searchString)
-            .sendAndParse()
-            .then((result) => {
-                let userItems = result.userItems;
-
-                if (this.hasConstraint()) {
-                    let principalKeys = this.getSelectionItems().map(key => key.getDataId());
-                    userItems = userItems.filter(principal => principalKeys.some(pr => pr === principal.getKey().toString()));
-                }
-
-                if (fireEvent) {
-                    new BrowseFilterSearchEvent(new PrincipalBrowseSearchData(searchString, types, userItems)).fire();
-                }
-
-                this.updateAggregations(result.aggregations, !!searchString);
-                this.updateHitsCounter(userItems ? userItems.length : 0, api.util.StringHelper.isBlank(searchString));
-                this.toggleAggregationsVisibility(result.aggregations);
+        return new ListUserItemsRequest().setTypes(types).setQuery(searchString).sendAndParse()
+            .then((result: ListUserItemsRequestResult) => {
+                this.handleDataSearchResult(result, types, searchString);
             }).catch((reason: any) => {
                 api.DefaultErrorHandler.handle(reason);
             });
     }
 
-    private initHitsCounter(): wemQ.Promise<void> {
-        return this.searchDataAndHandleResponse('', false);
+    private refreshDataAndHandleResponse(): wemQ.Promise<void> {
+        const types: UserItemType[] = this.getCheckedTypes();
+        const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
+
+        return new ListUserItemsRequest().setTypes(types).setQuery(searchString).sendAndParse()
+            .then((result: ListUserItemsRequestResult) => {
+                if (result.userItems.length > 0) {
+                    this.handleDataSearchResult(result, types, searchString);
+                } else {
+                    this.handleNoSearchResultOnRefresh();
+                }
+            }).catch((reason: any) => {
+                api.DefaultErrorHandler.handle(reason);
+            });
+    }
+
+    private handleDataSearchResult(result: ListUserItemsRequestResult, types: UserItemType[], searchString: string) {
+        this.fetchAndUpdateAggregations().then(() => {
+            let userItems = result.userItems;
+
+            if (this.hasConstraint()) {
+                const principalKeys = this.getSelectionItems().map(key => key.getDataId());
+                userItems = userItems.filter(principal => principalKeys.some(pr => pr === principal.getKey().toString()));
+            }
+
+            new BrowseFilterSearchEvent(new PrincipalBrowseSearchData(searchString, types, userItems)).fire();
+
+            this.updateHitsCounter(userItems ? userItems.length : 0, api.util.StringHelper.isBlank(searchString));
+            this.toggleAggregationsVisibility(result.aggregations);
+        });
+    }
+
+    private handleNoSearchResultOnRefresh() {
+        if (this.hasSearchStringSet()) { // if still no result and search text is set remove last modified facet
+            this.deselectAll();
+            return this.searchDataAndHandleResponse();
+        }
+
+        return this.reset();
     }
 
     private toggleAggregationsVisibility(aggregations: Aggregation[]) {
@@ -148,7 +172,6 @@ export class PrincipalBrowseFilterPanel
         this.initPrincipalTypeBuckets(aggregations);
 
         super.updateAggregations(aggregations, doUpdateAll);
-
     }
 
     private getPrincipalTypeDisplayName(key: string) {
