@@ -16,7 +16,7 @@ import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggreg
 import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
 import {UserItemType} from '../../../app/browse/UserItemType';
 
-type ListUserItemsRequestResult = {
+export type ListUserItemsRequestResult = {
     total: number,
     userItems: UserItem[],
     aggregations: BucketAggregation[]
