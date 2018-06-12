@@ -93,16 +93,16 @@ export class SaveUserStoreRequest
     }
 
     sendAndParse(): wemQ.Promise<UserStore> {
-        return this.mutate().then(json => this.userStorefromJson(json.updateUserStore, json.error));
+        return this.mutate().then(json => this.userStorefromJson(json[this.mutationType], json.error));
     }
 
     userStorefromJson(us: UserStoreJson, error: string) {
         if (error) {
             throw new Error(error);
+        } else if (!us) {
+            throw new Error(`UserStore [${this.userStoreKey.toString()}] not found`);
         }
-        if (!us) {
-            throw new Error(`UserStore[${this.userStoreKey.toString()}] not found`);
-        }
+
         if (us.authConfig && typeof us.authConfig.config === 'string') {
             us.authConfig.config = JSON.parse(<string>us.authConfig.config);
         }
