@@ -98,7 +98,7 @@ export class SaveUserStoreRequest
 
     userStorefromJson(us: UserStoreJson, error: string) {
         if (error) {
-            throw new Error(error);
+            throw new api.Exception(error);
         } else if (!us) {
             throw new Error(`UserStore [${this.userStoreKey.toString()}] not found`);
         }
