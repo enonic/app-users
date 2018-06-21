@@ -16,19 +16,19 @@ app {
 }
 
 dependencies {
-    compile "${group}:portal-api:${version}"
-    include "${group}:lib-admin:${version}"
-    include "${group}:lib-mustache:${version}"
-    include "${group}:lib-portal:${version}"
-    include "${group}:lib-node:${version}"
-    include "${group}:lib-auth:${version}"
-    include "${group}:lib-io:${version}"
-    include "${group}:lib-value:${version}"
-    include "${group}:lib-i18n:${version}"
+    compile "${group}:portal-api:${xpVersion}"
+    include "${group}:lib-admin:${xpVersion}"
+    include "${group}:lib-mustache:${xpVersion}"
+    include "${group}:lib-portal:${xpVersion}"
+    include "${group}:lib-node:${xpVersion}"
+    include "${group}:lib-auth:${xpVersion}"
+    include "${group}:lib-io:${xpVersion}"
+    include "${group}:lib-value:${xpVersion}"
+    include "${group}:lib-i18n:${xpVersion}"
     include "com.graphql-java:graphql-java:2.3.0"
     include "com.enonic.lib:graphql:0.5.2"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    testCompile "${group}:testing:${version}"
+    testCompile "${group}:testing:${xpVersion}"
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
 }
