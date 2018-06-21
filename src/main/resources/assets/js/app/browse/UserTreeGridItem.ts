@@ -1,5 +1,4 @@
 import '../../api.ts';
-
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import UserStore = api.security.UserStore;
@@ -85,7 +84,7 @@ export class UserTreeGridItem implements api.Equitable {
             return this.userStore.getKey().toString();
 
         case UserTreeGridItemType.PRINCIPAL:
-            return this.principal.getKey().toString();
+            return this.principal.getKey().toString().toLowerCase();
 
         case UserTreeGridItemType.GROUPS:
             return this.userStore.getKey().toString() + '/groups';

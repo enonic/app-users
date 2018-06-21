@@ -53,16 +53,20 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         return toolbar;
     }
 
+    protected getWizardNameValue(): string {
+        return this.getPersistedItem() ? this.getPersistedItem().getKey().getId() : '';
+    }
+
     protected createWizardHeader(): WizardHeaderWithDisplayNameAndName {
         let wizardHeader = new WizardHeaderWithDisplayNameAndNameBuilder().build();
 
-        let existing = this.getPersistedItem();
+        const existing = this.getPersistedItem();
+        const name = this.getWizardNameValue();
+
         let displayName = '';
-        let name = '';
 
         if (existing) {
             displayName = existing.getDisplayName();
-            name = existing.getKey().getId();
 
             wizardHeader.disableNameInput();
             wizardHeader.setAutoGenerationEnabled(false);

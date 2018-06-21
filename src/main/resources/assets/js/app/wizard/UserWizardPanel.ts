@@ -7,6 +7,7 @@ import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {CreateUserRequest} from '../../api/graphql/principal/user/CreateUserRequest';
 import {UpdateUserRequest} from '../../api/graphql/principal/user/UpdateUserRequest';
 import UserBuilder = api.security.UserBuilder;
+import User = api.security.User;
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
@@ -114,6 +115,10 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
             return principal;
         });
+    }
+
+    protected getWizardNameValue(): string {
+        return this.getPersistedItem() ? (<User>this.getPersistedItem()).getLogin() : '';
     }
 
     produceCreateUserRequest(): CreateUserRequest {
