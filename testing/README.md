@@ -15,6 +15,7 @@ Run tests for app-admin-home.
 go to '/testing' folder and run:
   1. `gradle testUsersApp'
   2. `gradle testUsersAppLocally'
+  3.  --project-cache-dir d:/cache
 
 ### Reporting
 
