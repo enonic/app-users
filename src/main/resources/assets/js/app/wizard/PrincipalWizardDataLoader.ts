@@ -1,7 +1,6 @@
 import '../../api.ts';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
-
 import Principal = api.security.Principal;
 
 export class PrincipalWizardDataLoader {
@@ -39,7 +38,7 @@ export class PrincipalWizardDataLoader {
 
     private loadPrincipalToEdit(params: PrincipalWizardPanelParams): wemQ.Promise<Principal> {
         if (!params.persistedItem && !!params.principalKey) {
-            return new GetPrincipalByKeyRequest(params.principalKey).setIncludeMemberships(true).sendAndParse();
+            return new GetPrincipalByKeyRequest(params.principalKey).sendAndParse();
         } else {
             return wemQ(params.persistedItem);
         }

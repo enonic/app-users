@@ -14,16 +14,10 @@ export class GetPrincipalByKeyRequest
     extends GraphQlRequest<any, Principal> {
 
     private key: PrincipalKey;
-    private userMemberships: boolean = false;
 
     constructor(key: PrincipalKey) {
         super();
         this.key = key;
-    }
-
-    setIncludeMemberships(value: boolean): GetPrincipalByKeyRequest {
-        this.userMemberships = value;
-        return this;
     }
 
     getVariables(): { [key: string]: any } {
@@ -31,13 +25,12 @@ export class GetPrincipalByKeyRequest
         if (this.key) {
             vars['key'] = this.key.toString();
         }
-        vars['memberships'] = this.userMemberships;
         return vars;
     }
 
     getQuery(): string {
-        return `query ($key: String!, $memberships: Boolean) {
-                    principal (key: $key, memberships: $memberships) {
+        return `query ($key: String!) {
+                    principal (key: $key) {
                         key
                         name
                         path

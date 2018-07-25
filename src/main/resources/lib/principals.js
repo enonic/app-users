@@ -2,7 +2,7 @@ var common = require('./common');
 var authLib = require('/lib/xp/auth');
 
 module.exports = {
-    getByKeys: function(keys, includeMemberships) {
+    getByKeys: function (keys) {
         var noKeys = keys == null || (keys instanceof Array && keys.length === 0);
 
         // users and groups have their keys as _id, but roles have them stored as key
@@ -12,19 +12,6 @@ module.exports = {
                 ' OR ' +
                 common.createQueryByField('key', keys)
         }).hits;
-        if (includeMemberships && principals) {
-            // principals may be object so make sure we have array
-            [].concat(principals).forEach(function(p) {
-                var key = p.key || p._id;
-                if (common.isUser(key) || common.isGroup(key)) {
-                    // eslint-disable-next-line no-param-reassign
-                    p.memberships = module.exports.getMemberships(key);
-                } else if (common.isRole(key)) {
-                    // uncomment to return principals instead of their keys
-                    // p["member"] = common.getByIds(p.member);
-                }
-            });
-        }
 
         return keys instanceof Array ? principals : common.singleOrArray(principals);
     },

@@ -62,30 +62,26 @@ module.exports = graphQl.createObjectType({
         principal: {
             type: graphQlObjectTypes.PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                memberships: graphQl.GraphQLBoolean
+                key: graphQl.nonNull(graphQl.GraphQLString)
             },
             resolve: function(env) {
                 var key = env.args.key;
-                var memberships = env.args.memberships;
-                return principals.getByKeys(key, memberships);
+                return principals.getByKeys(key);
             }
         },
         principals: {
             type: graphQl.list(graphQlObjectTypes.PrincipalType),
             args: {
-                keys: graphQl.nonNull(graphQl.list(graphQl.GraphQLString)),
-                memberships: graphQl.GraphQLBoolean
+                keys: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
             },
             resolve: function(env) {
                 var keys = env.args.keys;
-                var memberships = env.args.memberships;
                 if (keys.length >= 100) {
                     throw new Error(
                         'Invalid field argument keys: The number of keys must be inferior to 100'
                     );
                 }
-                return principals.getByKeys(keys, memberships);
+                return principals.getByKeys(keys);
             }
         },
         userItemsConnection: {

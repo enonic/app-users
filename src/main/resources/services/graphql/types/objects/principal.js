@@ -76,7 +76,8 @@ exports.PrincipalType = graphQl.createObjectType({
         memberships: {
             type: graphQl.list(graphQl.reference('Principal')),
             resolve: function(env) {
-                return graphQlUtils.toArray(env.source.memberships);
+                var key = env.source.key || env.source._id;
+                return graphQlUtils.toArray(principals.getMemberships(key));
             }
         },
         members: {
