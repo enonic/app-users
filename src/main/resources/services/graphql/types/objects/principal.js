@@ -13,7 +13,7 @@ var PrincipalAccessControlEntryType = graphQl.createObjectType({
     fields: {
         principal: {
             type: graphQl.reference('Principal'),
-            resolve: function(env) {
+            resolve: function (env) {
                 return principals.getByKeys(env.source.principal);
             }
         },
@@ -33,19 +33,19 @@ exports.PrincipalType = graphQl.createObjectType({
     fields: {
         key: {
             type: graphQl.GraphQLString,
-            resolve: function(env) {
+            resolve: function (env) {
                 return env.source.key || env.source._id;
             }
         },
         name: {
             type: graphQl.GraphQLString,
-            resolve: function(env) {
+            resolve: function (env) {
                 return env.source._name;
             }
         },
         path: {
             type: graphQl.GraphQLString,
-            resolve: function(env) {
+            resolve: function (env) {
                 return env.source._path;
             }
         },
@@ -63,7 +63,7 @@ exports.PrincipalType = graphQl.createObjectType({
         },
         permissions: {
             type: graphQl.list(PrincipalAccessControlEntryType),
-            resolve: function(env) {
+            resolve: function (env) {
                 return env.source._permissions || [];
             }
         },
@@ -75,20 +75,25 @@ exports.PrincipalType = graphQl.createObjectType({
         },
         memberships: {
             type: graphQl.list(graphQl.reference('Principal')),
-            resolve: function(env) {
+            args: {
+                transitive: graphQl.GraphQLBoolean
+            },
+            resolve: function (env) {
                 var key = env.source.key || env.source._id;
-                return graphQlUtils.toArray(principals.getMemberships(key));
+                var transitive = env.args.transitive;
+                log.info('Principal.memberships: transitive=' + transitive);
+                return graphQlUtils.toArray(principals.getMemberships(key, transitive));
             }
         },
         members: {
             type: graphQl.list(graphQl.GraphQLString),
-            resolve: function(env) {
+            resolve: function (env) {
                 return graphQlUtils.toArray(env.source.member);
             }
         },
         modifiedTime: {
             type: graphQl.GraphQLString,
-            resolve: function(env) {
+            resolve: function (env) {
                 return env.source._timestamp;
             }
         }
@@ -102,7 +107,7 @@ exports.PrincipalDeleteType = graphQl.createObjectType({
     fields: {
         principalKey: {
             type: graphQl.GraphQLString,
-            resolve: function(env) {
+            resolve: function (env) {
                 return env.source.key;
             }
         },

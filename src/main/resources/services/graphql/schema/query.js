@@ -12,7 +12,7 @@ module.exports = graphQl.createObjectType({
     fields: {
         userStores: {
             type: graphQl.list(graphQlObjectTypes.UserStoreType),
-            resolve: function() {
+            resolve: function () {
                 return userstores.list();
             }
         },
@@ -21,14 +21,14 @@ module.exports = graphQl.createObjectType({
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var key = env.args.key;
                 return userstores.getByKey(key);
             }
         },
         defaultUserStore: {
             type: graphQlObjectTypes.UserStoreType,
-            resolve: function() {
+            resolve: function () {
                 return userstores.getDefault();
             }
         },
@@ -42,7 +42,7 @@ module.exports = graphQl.createObjectType({
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var userstore = env.args.userstore || 'system';
                 var types = env.args.types || principals.Type.all();
                 var query = env.args.query;
@@ -62,9 +62,9 @@ module.exports = graphQl.createObjectType({
         principal: {
             type: graphQlObjectTypes.PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString)
+                key: graphQl.nonNull(graphQl.GraphQLString),
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var key = env.args.key;
                 return principals.getByKeys(key);
             }
@@ -74,7 +74,7 @@ module.exports = graphQl.createObjectType({
             args: {
                 keys: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var keys = env.args.keys;
                 if (keys.length >= 100) {
                     throw new Error(
@@ -92,7 +92,7 @@ module.exports = graphQl.createObjectType({
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var types = env.args.types;
                 var query = env.args.query;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
@@ -106,7 +106,7 @@ module.exports = graphQl.createObjectType({
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
                 return useritems.list(start, count);

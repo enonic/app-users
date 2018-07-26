@@ -15,8 +15,8 @@ module.exports = {
 
         return keys instanceof Array ? principals : common.singleOrArray(principals);
     },
-    getMemberships: function(key) {
-        return authLib.getMemberships(key);
+    getMemberships: function (key, transitive) {
+        return authLib.getMemberships(key, transitive);
     },
     addMemberships: function(key, memberships) {
         var addMms = [].concat(memberships).map(function(current) {

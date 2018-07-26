@@ -14,10 +14,16 @@ export class GetPrincipalByKeyRequest
     extends GraphQlRequest<any, Principal> {
 
     private key: PrincipalKey;
+    private transitive: boolean;
 
     constructor(key: PrincipalKey) {
         super();
         this.key = key;
+    }
+
+    setTransitiveMemberships(flag: boolean): GetPrincipalByKeyRequest {
+        this.transitive = flag;
+        return this;
     }
 
     getVariables(): { [key: string]: any } {
@@ -25,11 +31,12 @@ export class GetPrincipalByKeyRequest
         if (this.key) {
             vars['key'] = this.key.toString();
         }
+        vars['transitive'] = this.transitive;
         return vars;
     }
 
     getQuery(): string {
-        return `query ($key: String!) {
+        return `query ($key: String!, $transitive: Boolean) {
                     principal (key: $key) {
                         key
                         name
@@ -55,7 +62,7 @@ export class GetPrincipalByKeyRequest
         case PrincipalType.USER:
             fields = `email
                       login
-                      memberships {
+                      memberships (transitive: $transitive) {
                           key
                           displayName
                           description
@@ -63,7 +70,7 @@ export class GetPrincipalByKeyRequest
             break;
         case PrincipalType.GROUP:
             fields = `members
-                      memberships {
+                      memberships (transitive: $transitive) {
                           key
                           displayName
                           description
