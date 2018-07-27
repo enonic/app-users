@@ -1,14 +1,14 @@
 /**
  * Created on 19.09.2017.
  */
-var wizard = require('../page');
-var elements = require('../../libs/elements');
-var comboBox = {
+const wizard = require('../page');
+const elements = require('../../libs/elements');
+const comboBox = {
     div: `//div[contains(@id,'LoaderComboBox')]`,
     optionFilterInput: `${elements.COMBO_BOX_OPTION_FILTER_INPUT}`,
     optionDisplayName: "//div[@class='slick-viewport']" + `${elements.H6_DISPLAY_NAME}`,
 };
-var loaderComboBox = Object.create(wizard, {
+const loaderComboBox = Object.create(wizard, {
 
     optionFilterInput: {
         get: function () {
@@ -30,7 +30,6 @@ var loaderComboBox = Object.create(wizard, {
             return this.waitForVisible(panelDiv + `${elements.slickRowByDisplayName(displayName)}`, 2000)
         }
     },
-
     waitForListExpanded: {
         value: function (panelDiv) {
             return this.waitForVisible(panelDiv + `${elements.SLICK_ROW}`, 1000)
@@ -43,7 +42,6 @@ var loaderComboBox = Object.create(wizard, {
             });
         }
     }
-
 });
 module.exports = loaderComboBox;
 

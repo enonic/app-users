@@ -14,7 +14,7 @@ const appConst = require('../libs/app_const');
 const groupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
 
 describe('`group.save.statistics.panel`: Save a Group and check the info in the Statistics Panel', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let groupWithRoleAndMember;
     let testGroup;
@@ -22,13 +22,13 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
         () => {
             groupWithRoleAndMember =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', ['Super User'], ['Users App']);
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(groupWithRoleAndMember);
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitForNotificationMessage();
-            }).then(result=> {
+            }).then(result => {
                 testUtils.saveScreenshot("group_is_saved");
                 expect(result).to.equal(appConst.GROUP_WAS_CREATED);
             })
@@ -36,15 +36,15 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
 
     it('WHEN existing group is opened THEN description, role and members should be present',
         () => {
-            return testUtils.findAndSelectItem(groupWithRoleAndMember.displayName).then(()=> {
+            return testUtils.findAndSelectItem(groupWithRoleAndMember.displayName).then(() => {
                 return userBrowsePanel.clickOnEditButton();
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitForOpened();
-            }).then(()=> {
+            }).then(() => {
                 return expect(groupWizard.getDescription()).to.eventually.be.equal(groupWithRoleAndMember.description);
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.getRoles();
-            }).then((roles)=> {
+            }).then(roles => {
                 expect(roles[0]).to.equal(appConst.roles.USERS_APP);
             })
         });
@@ -52,73 +52,75 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
     it('GIVEN `Group` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN Group should be searchable',
         () => {
             testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', null, null);
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup);
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
-            }).then(()=> {
+            }).then(() => {
                 return testUtils.typeNameInFilterPanel(testGroup.displayName);
-            }).then(()=> {
+            }).then(() => {
                 return expect(userBrowsePanel.isItemDisplayed(testGroup.displayName)).to.eventually.be.true;
             })
         });
 
     it(`GIVEN existing 'group' WHEN new role has been added THEN the role should be present on the wizard page`, () => {
-        return testUtils.findAndSelectItem(testGroup.displayName).then(()=> {
+        return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
-        }).then(()=> {
+        }).then(() => {
             return groupWizard.waitForOpened();
-        }).then(()=> groupWizard.filterOptionsAndAddRole(appConst.roles.USERS_APP)).then(()=>groupWizard.waitAndClickOnSave()).then(()=> {
-            return groupWizard.getRoles();
-        }).then((roles)=> {
+        }).then(() => groupWizard.filterOptionsAndAddRole(appConst.roles.USERS_APP)).then(() => groupWizard.waitAndClickOnSave()).then(
+            () => {
+                return groupWizard.getRoles();
+            }).then(roles => {
             expect(roles[0]).to.equal(appConst.roles.USERS_APP);
         })
     });
 
     it(`GIVEN existing 'group' WHEN new member has been added THEN the member should be present on the wizard page`, () => {
-        return testUtils.findAndSelectItem(testGroup.displayName).then(()=> {
+        return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
-        }).then(()=> {
+        }).then(() => {
             return groupWizard.waitForOpened();
-        }).then(()=> groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME)).then(
-            ()=>groupWizard.waitAndClickOnSave()).then(()=> {
+        }).then(() => groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME)).then(
+            () => groupWizard.waitAndClickOnSave()).then(() => {
             return groupWizard.getMembers();
-        }).then((members)=> {
+        }).then(members => {
             expect(members[0]).to.equal(appConst.SUPER_USER_DISPLAY_NAME);
         })
     });
 
     it(`GIVEN existing 'Group' with a member and role WHEN it has been selected THEN correct info should be present in the 'statistics panel'`,
         () => {
-            return testUtils.findAndSelectItem(testGroup.displayName).then(()=> {
+            return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
                 return groupStatisticsPanel.getDisplayNameOfMembers();
-            }).then((members)=> {
+            }).then((members) => {
                 expect(members[0]).to.equal(appConst.SUPER_USER_DISPLAY_NAME);
-            }).then(()=> {
+            }).then(() => {
                 return groupStatisticsPanel.getDisplayNameOfRoles();
-            }).then(roles=> {
+            }).then(roles => {
                 expect(roles[0]).to.equal(appConst.roles.USERS_APP);
             })
         });
 
     it(`GIVEN existing 'group' with the selected role is opened WHEN role has been removed THEN the role should not be present on the wizard page`,
         () => {
-            return testUtils.findAndSelectItem(testGroup.displayName).then(()=> {
+            return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
                 return userBrowsePanel.clickOnEditButton();
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitForOpened();
-            }).pause(400).then(()=> groupWizard.removeRole(appConst.roles.USERS_APP)).then(()=>groupWizard.waitAndClickOnSave()).then(()=> {
-                return groupWizard.getRoles();
-            }).then((roles)=> {
+            }).pause(400).then(() => groupWizard.removeRole(appConst.roles.USERS_APP)).then(() => groupWizard.waitAndClickOnSave()).then(
+                () => {
+                    return groupWizard.getRoles();
+                }).then(roles => {
                 expect(roles.length).to.equal(0);
             })
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

@@ -63,8 +63,9 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
                 return testUtils.confirmDelete();
             }).then(result => {
                 testUtils.saveScreenshot("role_deleted_confirmation_mess1");
-                var expectedMessage = appConst.roleDeletedMessage(testRole.displayName);
-                return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage), "Correct notification message should appear");
+                let expectedMessage = appConst.roleDeletedMessage(testRole.displayName);
+                return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
+                    "Correct notification message should appear");
             });
         });
 
@@ -90,7 +91,7 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
                 return userBrowsePanel.waitForNotificationMessage();
             }).then(result => {
                 testUtils.saveScreenshot("role_deleted_notification_mes2");
-                var msg = appConst.roleDeletedMessage(testRole.displayName);
+                let msg = appConst.roleDeletedMessage(testRole.displayName);
                 assert.strictEqual(result, msg, `'Principal "role:roleName" is deleted' the  message should be displayed`);
             });
         });

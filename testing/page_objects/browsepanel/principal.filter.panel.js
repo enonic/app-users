@@ -5,7 +5,7 @@
 const page = require('../page');
 const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-var panel = {
+const panel = {
     container: "//div[contains(@id,'PrincipalBrowseFilterPanel')]",
     clearFilterButton: "//a[contains(@id,'ClearFilterButton')]",
     searchInput: "//input[contains(@id,'api.app.browse.filter.TextSearchField')]",
@@ -15,7 +15,7 @@ var panel = {
     storeAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'User Store (')]]",
     userAggregationItems: "//div[contains(@id,'BucketView')]//div[contains(@id,'Checkbox') ]/label",
 };
-var browseFilterPanel = Object.create(page, {
+const browseFilterPanel = Object.create(page, {
 
     clearFilterLink: {
         get: function () {
@@ -41,19 +41,19 @@ var browseFilterPanel = Object.create(page, {
     },
     clickOnUserAggregation: {
         value: function () {
-            let userSelector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.userAggregationCheckbox}` + '/label'
+            let userSelector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.userAggregationCheckbox}` + '/label';
             return this.doClick(userSelector);
         }
     },
     clickOnRoleAggregation: {
         value: function () {
-            let userSelector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.roleAggregationCheckbox}` + '/label'
+            let userSelector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.roleAggregationCheckbox}` + '/label';
             return this.doClick(userSelector);
         }
     },
     clickOnStoreAggregation: {
         value: function () {
-            let userSelector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.storeAggregationCheckbox}` + '/label'
+            let userSelector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.storeAggregationCheckbox}` + '/label';
             return this.doClick(userSelector);
         }
     },

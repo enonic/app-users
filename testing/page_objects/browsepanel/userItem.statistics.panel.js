@@ -6,13 +6,13 @@ const page = require('../page');
 const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
-var panel = {
+const panel = {
     div: `//div[contains(@id,'UserItemStatisticsPanel')]`,
     header: `//div[contains(@id,'ItemStatisticsHeader')]`,
     itemName: `//h1[@class='title']`,
     itemPath: `//h4[@class='path']`,
-}
-var userItemStatisticsPanel = Object.create(page, {
+};
+const userItemStatisticsPanel = Object.create(page, {
 
     getItemName: {
         value: function () {

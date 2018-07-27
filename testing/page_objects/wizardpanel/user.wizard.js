@@ -6,7 +6,7 @@ const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const loaderComboBox = require('../inputs/loaderComboBox');
 
-var panel = {
+const panel = {
     container: `//div[contains(@id,'UserWizardPanel')]`,
     emailInput: `//input[@type = 'email']`,
     groupOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]" + `${loaderComboBox.optionFilterInput}`,
@@ -19,7 +19,7 @@ var panel = {
     changePasswordButton: `//button[contains(@class,'change-password-button')]`,
 };
 
-var userWizard = Object.create(wizard, {
+const userWizard = Object.create(wizard, {
 
     deleteButton: {
         get: function () {
@@ -162,7 +162,6 @@ var userWizard = Object.create(wizard, {
                 if (user.roles != null) {
                     return this.clickOnRolesAndGroupsLink();
                 }
-                return;
             }).pause(300).then(()=> {
                 if (user.roles != null) {
                     return this.addRoles(user.roles);
@@ -182,7 +181,6 @@ var userWizard = Object.create(wizard, {
                 if (user.roles != null) {
                     return this.clickOnRolesAndGroupsLink();
                 }
-                return;
             }).pause(300).then(()=> {
                 if (user.roles != null) {
                     return this.addRoles(user.roles);

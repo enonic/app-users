@@ -14,39 +14,38 @@ const roleWizard = require('../page_objects/wizardpanel/role.wizard');
 const newPrincipalDialog = require('../page_objects/browsepanel/new.principal.dialog');
 
 describe('New Principal dialog specification', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let ITEMS_NUMBER = 4;
 
     it('GIVEN `NewPrincipal` dialog is opened WHEN `Cancel` button(top) has been pressed  THEN the dialog should be closed',
         () => {
-            return userBrowsePanel.clickOnNewButton().then(()=> {
+            return userBrowsePanel.clickOnNewButton().then(() => {
                 return newPrincipalDialog.waitForOpened();
-            }).then(()=> {
+            }).then(() => {
                 return newPrincipalDialog.clickOnCancelButtonTop();
-            }).then(()=> {
+            }).then(() => {
                 return expect(newPrincipalDialog.waitForClosed()).to.eventually.be.true;
             })
         });
 
     it(`GIVEN users grid is opened WHEN 'New' button has been clicked THEN modal dialog should appear with 4 items`,
         () => {
-            return userBrowsePanel.clickOnNewButton().then(()=> {
+            return userBrowsePanel.clickOnNewButton().then(() => {
                 return newPrincipalDialog.waitForOpened();
-            }).then(()=> {
+            }).then(() => {
                 return newPrincipalDialog.getHeaderText();
-            }).then(result=> {
+            }).then(result => {
                 assert.equal(result, 'Create New', 'Correct header should be displayed');
-            }).waitForVisible(newPrincipalDialog.cancelButton).then(result=> {
+            }).waitForVisible(newPrincipalDialog.cancelButton).then(result => {
                 assert.isTrue(result, '`Cancel` button should be present');
-            }).then(()=> {
-                return newPrincipalDialog.getNumberOfItems()
-                then(result=> {
-                    assert.equal(result, ITEMS_NUMBER, '`User` item should be present on the dialog');
-                })
-            }).then(()=> {
+            }).then(() => {
+                return newPrincipalDialog.getNumberOfItems();
+            }).then(result => {
+                assert.equal(result, ITEMS_NUMBER, '4 items to select should be present on the dialog');
+            }).then(() => {
                 return newPrincipalDialog.getItemNames()
-            }).then((items)=> {
+            }).then(items => {
                 assert.equal(items[0], appConst.USER, '`User` item should be present on the dialog');
                 assert.equal(items[1], appConst.USER_GROUP, '`User Group` item should be present on the dialog');
                 assert.equal(items[2], appConst.USER_STORE, '`User Store` item should be present on the dialog');
@@ -56,15 +55,15 @@ describe('New Principal dialog specification', function () {
 
     it(`GIVEN 'System store' is selected WHEN 'New' button has been clicked THEN modal dialog should appear with 2 items`,
         () => {
-            return userBrowsePanel.clickOnRowByName('/system').waitForEnabled(userBrowsePanel.newButton).then(()=> {
+            return userBrowsePanel.clickOnRowByName('/system').waitForEnabled(userBrowsePanel.newButton).then(() => {
                 return userBrowsePanel.clickOnNewButton()
-            }).then(()=> {
+            }).then(() => {
                 return newPrincipalDialog.waitForOpened();
-            }).waitForVisible(newPrincipalDialog.header).then(result=> {
+            }).waitForVisible(newPrincipalDialog.header).then(result => {
                 assert.isTrue(result, 'description input should be present');
-            }).then(()=> {
+            }).then(() => {
                 return newPrincipalDialog.getItemNames()
-            }).then((items)=> {
+            }).then((items) => {
                 assert.equal(items[0], appConst.USER, '`User` item should be present on the dialog');
                 assert.equal(items[1], appConst.USER_GROUP, '`User Group` item should be present on the dialog');
             })
@@ -72,11 +71,11 @@ describe('New Principal dialog specification', function () {
 
     it(`GIVEN 'Roles' folder is selected WHEN 'New' button has been clicked THEN Role Wizard should be loaded`,
         () => {
-            return userBrowsePanel.clickOnRowByName('roles').waitForEnabled(userBrowsePanel.newButton).then(()=> {
-                return userBrowsePanel.clickOnNewButton()
-            }).then(()=> {
+            return userBrowsePanel.clickOnRowByName('roles').waitForEnabled(userBrowsePanel.newButton).then(() => {
+                return userBrowsePanel.clickOnNewButton();
+            }).then(() => {
                 return roleWizard.waitForOpened();
-            }).waitForVisible(roleWizard.descriptionInput).then(result=> {
+            }).waitForVisible(roleWizard.descriptionInput).then(result => {
                 assert.isTrue(result, 'Role Wizard should be loaded');
             })
         });
@@ -87,7 +86,7 @@ describe('New Principal dialog specification', function () {
     afterEach(() => {
         return testUtils.doCloseUsersApp();
     });
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     })
 });

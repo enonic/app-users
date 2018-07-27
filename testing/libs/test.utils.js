@@ -84,7 +84,7 @@ module.exports = {
                 return launcherPanel.clickOnUsersLink();
             } else {
                 console.log("Login Page is opened, type a password and name...");
-                return this.doLoginAndSClickOnUsersLink(userName, password);
+                return this.doLoginAndClickOnUsersLink(userName, password);
             }
         }).then(() => {
             return this.doSwitchToUsersApp();
@@ -95,7 +95,7 @@ module.exports = {
         });
     },
 
-    doLoginAndSClickOnUsersLink: function (userName, password) {
+    doLoginAndClickOnUsersLink: function (userName, password) {
         return loginPage.doLogin(userName, password).pause(500).then(() => {
             return homePage.waitForXpTourVisible(appConst.TIMEOUT_3);
         }).then((result) => {
@@ -293,8 +293,8 @@ module.exports = {
         }).pause(300);
     },
     saveScreenshot: function (name) {
-        var path = require('path')
-        var screenshotsDir = path.join(__dirname, '/../build/screenshots/');
+        let path = require('path');
+        let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
         return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
             return console.log('screenshot saved ' + name);
         }).catch(err => {

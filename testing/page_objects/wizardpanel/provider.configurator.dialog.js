@@ -2,10 +2,10 @@
  * Created on 20.03.2018.
  */
 
-var page = require('../page');
-var elements = require('../../libs/elements');
-var appConst = require('../../libs/app_const');
-var xpath = {
+const page = require('../page');
+const elements = require('../../libs/elements');
+const appConst = require('../../libs/app_const');
+const xpath = {
     container: `//div[contains(@id,'SiteConfiguratorDialog')]`,
     domainInput: "//input[contains(@id,'TextInput') and contains(@name,'appDomain')]",
     clientIdInput: "//input[contains(@id,'TextInput') and contains(@name,'appClientId')]",
@@ -18,7 +18,7 @@ var xpath = {
     permissionsTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Permissions')]]"
 
 };
-var idProviderConfiguratorDialog = Object.create(page, {
+const idProviderConfiguratorDialog = Object.create(page, {
 
     applyButton: {
         get: function () {
@@ -56,11 +56,9 @@ var idProviderConfiguratorDialog = Object.create(page, {
             return this.isVisible(this.domainInput);
         }
     },
-
-
     typeInDomainInput: {
         value: function (domain) {
-            return this.typeTextInInput(this.domainInput, domain).pause(200).catch(err=> {
+            return this.typeTextInInput(this.domainInput, domain).pause(200).catch(err => {
                 this.saveScreenshot('err_type_domainInput');
                 throw new Error(err);
             })
@@ -68,7 +66,7 @@ var idProviderConfiguratorDialog = Object.create(page, {
     },
     typeInClientIdInput: {
         value: function (clientId) {
-            return this.typeTextInInput(this.clientIdInput, clientId).pause(200).catch(err=> {
+            return this.typeTextInInput(this.clientIdInput, clientId).pause(200).catch(err => {
                 this.saveScreenshot('err_type_clientIdInput');
                 throw new Error(err);
             });
@@ -76,7 +74,7 @@ var idProviderConfiguratorDialog = Object.create(page, {
     },
     typeInClientSecretInput: {
         value: function (text) {
-            return this.typeTextInInput(this.clientSecretInput, text).pause(200).catch(err=> {
+            return this.typeTextInInput(this.clientSecretInput, text).pause(200).catch(err => {
                 this.saveScreenshot('err_type_secretInput');
                 throw new Error(err);
             })
@@ -85,23 +83,23 @@ var idProviderConfiguratorDialog = Object.create(page, {
     doFillRequiredInputs: {
         value: function (domain, clientId, clientSecret) {
             let editButton = xpath.selectedProviderView + elements.EDIT_ICON;
-            return this.doClick(xpath.permissionsTabItem).then(()=> {
+            return this.doClick(xpath.permissionsTabItem).then(() => {
                 return this.doClick(xpath.userStoreTabItem);
-            }).pause(1000).then(()=> {
+            }).pause(1000).then(() => {
                 return this.waitForVisible(editButton, 3000);
-            }).then((result)=> {
+            }).then(result => {
                 return this.doClick(editButton);
-            }).then(()=> {
+            }).then(() => {
                 return this.waitForDialogOpened();
-            }).then(()=> {
+            }).then(() => {
                 return this.typeInDomainInput(domain);
-            }).then(()=> {
+            }).then(() => {
                 return this.typeInClientIdInput(clientId);
-            }).then(()=> {
+            }).then(() => {
                 return this.typeInClientSecretInput(clientSecret);
-            }).then(()=> {
+            }).then(() => {
                 return this.clickOnApplyButton();
-            }).then(()=> {
+            }).then(() => {
                 return this.waitForClosed();
             }).pause(500);
         }
@@ -128,7 +126,7 @@ var idProviderConfiguratorDialog = Object.create(page, {
     },
     waitForClosed: {
         value: function () {
-            return this.waitForNotVisible(`${xpath.container}`, appConst.TIMEOUT_3).catch(error=> {
+            return this.waitForNotVisible(`${xpath.container}`, appConst.TIMEOUT_3).catch(error => {
                 throw new Error('ID Provider config Dialog was not closed');
             });
         }
