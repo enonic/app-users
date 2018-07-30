@@ -7,6 +7,9 @@ import {Router} from '../Router';
 import {UserStoreWizardDataLoader} from './UserStoreWizardDataLoader';
 import {CreateUserStoreRequest} from '../../api/graphql/userStore/CreateUserStoreRequest';
 import {UpdateUserStoreRequest} from '../../api/graphql/userStore/UpdateUserStoreRequest';
+import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
+import {UserItemDeletedEvent} from '../event/UserItemDeletedEvent';
+import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
 import UserStore = api.security.UserStore;
 import UserStoreKey = api.security.UserStoreKey;
 import UserStoreBuilder = api.security.UserStoreBuilder;
@@ -121,7 +124,7 @@ export class UserStoreWizardPanel
         return this.produceCreateUserStoreRequest().sendAndParse().then((userStore: UserStore) => {
 
             api.notify.showFeedback('User store was created');
-            new api.security.UserItemCreatedEvent(null, userStore).fire();
+            new UserItemCreatedEvent(null, userStore).fire();
 
             return userStore;
         });
@@ -136,7 +139,7 @@ export class UserStoreWizardPanel
     updatePersistedItem(): wemQ.Promise<UserStore> {
         return this.produceUpdateUserStoreRequest(this.assembleViewedUserStore()).sendAndParse().then((userStore: UserStore) => {
             api.notify.showFeedback('User store was updated');
-            new api.security.UserItemUpdatedEvent(null, userStore).fire();
+            new UserItemUpdatedEvent(null, userStore).fire();
 
             return userStore;
         });
@@ -183,7 +186,7 @@ export class UserStoreWizardPanel
 
     private listenToUserItemEvents() {
 
-        let principalCreatedHandler = (event: api.security.UserItemCreatedEvent) => {
+        let principalCreatedHandler = (event: UserItemCreatedEvent) => {
             if (!this.getPersistedItem()) { // skip if user store is not persisted yet
                 return;
             }
@@ -197,7 +200,7 @@ export class UserStoreWizardPanel
             }
         };
 
-        let principalDeletedHandler = (event: api.security.UserItemDeletedEvent) => {
+        let principalDeletedHandler = (event: UserItemDeletedEvent) => {
             // skip if user store is not persisted yet or if anything except users or roles was deleted
             if (!this.getPersistedItem() || !event.getPrincipals()) {
                 return;
@@ -208,12 +211,12 @@ export class UserStoreWizardPanel
             });
         };
 
-        api.security.UserItemCreatedEvent.on(principalCreatedHandler);
-        api.security.UserItemDeletedEvent.on(principalDeletedHandler);
+        UserItemCreatedEvent.on(principalCreatedHandler);
+        UserItemDeletedEvent.on(principalDeletedHandler);
 
         this.onClosed(() => {
-            api.security.UserItemCreatedEvent.un(principalCreatedHandler);
-            api.security.UserItemDeletedEvent.un(principalDeletedHandler);
+            UserItemCreatedEvent.un(principalCreatedHandler);
+            UserItemDeletedEvent.un(principalDeletedHandler);
         });
 
     }

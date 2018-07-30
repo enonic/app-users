@@ -6,6 +6,7 @@ import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardSte
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {CreateUserRequest} from '../../api/graphql/principal/user/CreateUserRequest';
 import {UpdateUserRequest} from '../../api/graphql/principal/user/UpdateUserRequest';
+import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import UserBuilder = api.security.UserBuilder;
 import User = api.security.User;
 import Principal = api.security.Principal;
@@ -104,7 +105,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
             this.decorateDeletedAction(principal.getKey());
 
-            new api.security.UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
+            new UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
 
             api.notify.showFeedback(i18n('notify.create.user'));
             this.notifyPrincipalNamed(principal);

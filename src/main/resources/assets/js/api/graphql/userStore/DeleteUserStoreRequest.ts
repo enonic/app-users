@@ -1,7 +1,7 @@
 import {GraphQlRequest} from '../GraphQlRequest';
-import DeleteUserStoreResult = api.security.DeleteUserStoreResult;
+import {DeleteUserStoreResult} from './DeleteUserStoreResult';
+import {DeleteUserStoreResultJson} from './DeleteUserStoreResultJson';
 import UserStoreKey = api.security.UserStoreKey;
-import DeleteUserStoreResultJson = api.security.DeleteUserStoreResultJson;
 
 type DeleteUserStoresResult = {
     deleteUserStores: DeleteUserStoreResultJson[]
