@@ -3,6 +3,7 @@ var graphQl = require('/lib/graphql');
 var userstores = require('userstores');
 var principals = require('principals');
 var useritems = require('useritems');
+var repositories = require('repositories');
 
 var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
@@ -110,6 +111,19 @@ module.exports = graphQl.createObjectType({
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
                 return useritems.list(start, count);
+            }
+        },
+        repository: {
+            type: graphQlObjectTypes.RepositoryType,
+            args: {
+                id: graphQl.nonNull(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                if (!principals.isAdmin()) {
+                    throw new Error('User is not logged in or has no admin rights');
+                }
+                var id = env.args.id;
+                return repositories.getById(id);
             }
         }
     }

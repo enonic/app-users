@@ -5,14 +5,13 @@ var REPO_NAME = 'system-repo';
 var REPO_BRANCH = 'master';
 var MAX_COUNT = 100;
 
-exports.UserItemType = {
+var UserItemType = exports.UserItemType = {
     ROLE: 'ROLE',
     USER: 'USER',
     GROUP: 'GROUP',
     USER_STORE: 'USER_STORE'
 };
-var UserItemType = exports.UserItemType;
-exports.UserItemType.all = function() {
+exports.UserItemType.all = function () {
     return [
         UserItemType.ROLE,
         UserItemType.USER,
@@ -21,17 +20,16 @@ exports.UserItemType.all = function() {
     ];
 };
 
-exports.PrincipalType = {
+var PrincipalType = exports.PrincipalType = {
     ROLE: 'ROLE',
     USER: 'USER',
     GROUP: 'GROUP'
 };
-var PrincipalType = exports.PrincipalType;
-exports.PrincipalType.all = function() {
+exports.PrincipalType.all = function () {
     return [PrincipalType.ROLE, PrincipalType.USER, PrincipalType.GROUP];
 };
 
-exports.singleOrArray = function(value) {
+exports.singleOrArray = function (value) {
     return value && value.length === 1 ? value[0] : value;
 };
 
@@ -41,7 +39,7 @@ function isString(str) {
 
 exports.isString = isString;
 
-exports.refresh = function() {
+exports.refresh = function () {
     newConnection().refresh('SEARCH');
 };
 
@@ -56,7 +54,7 @@ exports.required = function (params, name, skipTrimming) {
     return value;
 };
 
-exports.default = function(params, name, defaultValue) {
+exports.default = function (params, name, defaultValue) {
     var value = params[name];
     if (value === undefined || value === null) {
         return defaultValue;
@@ -64,16 +62,16 @@ exports.default = function(params, name, defaultValue) {
     return value;
 };
 
-exports.getByIds = function(ids) {
+exports.getByIds = function (ids) {
     return newConnection().get(ids);
 };
 
-exports.delete = function(ids) {
+exports.delete = function (ids) {
     return newConnection().delete(ids);
 };
 
-exports.keysToPaths = function(keys) {
-    return keys.map(function(key) {
+exports.keysToPaths = function (keys) {
+    return keys.map(function (key) {
         if (isUserStore(key)) {
             return '/identity/' + userStoreFromKey(key);
         }
@@ -100,27 +98,23 @@ exports.keysToPaths = function(keys) {
     });
 };
 
-function isUser(key) {
+exports.isUser = function isUser(key) {
     return exports.typeFromKey(key).toUpperCase() === PrincipalType.USER;
-}
-exports.isUser = isUser;
+};
 
-function isGroup(key) {
+exports.isGroup = function isGroup(key) {
     return exports.typeFromKey(key).toUpperCase() === PrincipalType.GROUP;
-}
-exports.isGroup = isGroup;
+};
 
-function isRole(key) {
+exports.isRole = function isRole(key) {
     return exports.typeFromKey(key).toUpperCase() === PrincipalType.ROLE;
-}
-exports.isRole = isRole;
+};
 
-function isUserStore(key) {
+exports.isUserStore = function isUserStore(key) {
     return splitKey(key).length === 1;
-}
-exports.isUserStore = isUserStore;
+};
 
-exports.createQueryByField = function(field, values) {
+exports.createQueryByField = function (field, values) {
     if (!values || !field) {
         return null;
     }
@@ -138,7 +132,7 @@ function serializeValue(value) {
     return typeof value === 'string' ? '"' + value + '"' : value;
 }
 
-exports.extensionFromMimeType = function(mimeType) {
+exports.extensionFromMimeType = function (mimeType) {
     var ext = '';
     if (mimeType.indexOf('image/png') > -1) {
         ext = '.png';
@@ -168,7 +162,7 @@ function splitKey(key) {
     return parts;
 }
 
-function userStoreFromKey(key) {
+exports.userStoreFromKey = function userStoreFromKey(key) {
     var parts = splitKey(key);
     if (parts[0].toUpperCase() === PrincipalType.ROLE) {
         throw new Error(
@@ -176,26 +170,23 @@ function userStoreFromKey(key) {
         );
     }
     return parts.length === 1 ? parts[0] : parts[1];
-}
-exports.userStoreFromKey = userStoreFromKey;
+};
 
-function nameFromKey(key) {
+exports.nameFromKey = function nameFromKey(key) {
     var parts = splitKey(key);
     if (parts.length === 1) {
         throw new Error("Key don't have name [" + key + ']');
     }
     return parts[0].toUpperCase() !== PrincipalType.ROLE ? parts[2] : parts[1];
-}
-exports.nameFromKey = nameFromKey;
+};
 
-function typeFromKey(key) {
+exports.typeFromKey = function typeFromKey(key) {
     var parts = splitKey(key);
     if (parts.length === 1) {
         throw new Error("Key don't have type [" + key + ']');
     }
     return parts[0];
-}
-exports.typeFromKey = typeFromKey;
+};
 
 exports.prettifyName = function (text) {
     return namePrettyfier.create(text);
@@ -219,7 +210,7 @@ exports.update = function (params) {
     return newConnection().modify(params);
 };
 
-function queryAll(params) {
+exports.queryAll = function queryAll(params) {
     var start = params.start || 0;
     var count = params.count || MAX_COUNT;
 
@@ -234,7 +225,7 @@ function queryAll(params) {
 
     var hits = [];
     if (queryResult.count > 0) {
-        var ids = queryResult.hits.map(function(hit) {
+        var ids = queryResult.hits.map(function (hit) {
             return hit.id;
         });
         hits = repoConn.get(ids);
@@ -247,8 +238,7 @@ function queryAll(params) {
         hits: [].concat(hits),
         aggregations: queryResult.aggregations
     };
-}
-exports.queryAll = queryAll;
+};
 
 function newConnection() {
     return nodeLib.connect({

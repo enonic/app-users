@@ -4,6 +4,7 @@ var graphQlUserStore = require('./userStore');
 var graphQlPrincipal = require('./principal');
 var graphQlUserItem = require('./userItem');
 var graphQlTypes = require('./types');
+var graphQlRepository = require('./repository');
 
 module.exports = {
     UserStoreType: graphQlUserStore.UserStoreType,
@@ -18,5 +19,6 @@ module.exports = {
     UserItemConnectionType: graphQlConnection.createConnectionType(
         'UserItem',
         graphQlUserItem.UserItemType
-    )
+    ),
+    RepositoryType: graphQlRepository.Repository
 };
