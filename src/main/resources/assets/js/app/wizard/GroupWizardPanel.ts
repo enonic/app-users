@@ -5,6 +5,7 @@ import {GroupMembersWizardStepForm} from './GroupMembersWizardStepForm';
 import {CreateGroupRequest} from '../../api/graphql/principal/group/CreateGroupRequest';
 import {UpdateGroupRequest} from '../../api/graphql/principal/group/UpdateGroupRequest';
 import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardStepForm';
+import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import GroupBuilder = api.security.GroupBuilder;
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
@@ -52,7 +53,7 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
         return this.produceCreateGroupRequest().sendAndParse().then((principal: Principal) => {
 
             api.notify.showFeedback(i18n('notify.create.group'));
-            new api.security.UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
+            new UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 
             (<PrincipalLoader>this.getMembersWizardStepForm().getLoader()).skipPrincipal(principal.getKey());

@@ -1,5 +1,5 @@
 import {GraphQlRequest} from '../GraphQlRequest';
-import DeletePrincipalResult = api.security.DeletePrincipalResult;
+import {DeletePrincipalResult} from './DeletePrincipalResult';
 import PrincipalKey = api.security.PrincipalKey;
 
 export class DeletePrincipalRequest
