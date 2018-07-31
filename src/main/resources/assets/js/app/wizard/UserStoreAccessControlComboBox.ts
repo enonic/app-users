@@ -5,9 +5,9 @@ import UserStoreAccessControlEntryLoader = api.security.acl.UserStoreAccessContr
 import SelectedOptionEvent = api.ui.selector.combobox.SelectedOptionEvent;
 import SelectedOptionView = api.ui.selector.combobox.SelectedOptionView;
 import SelectedOptionsView = api.ui.selector.combobox.SelectedOptionsView;
-import UserStoreAccessControlEntryViewer = api.ui.security.acl.UserStoreAccessControlEntryViewer;
-import UserStoreAccessControlEntryView = api.ui.security.acl.UserStoreAccessControlEntryView;
-import UserStoreAccessControlListView = api.ui.security.acl.UserStoreAccessControlListView;
+import {UserStoreAccessControlEntryViewer} from './UserStoreAccessControlEntryViewer';
+import {UserStoreAccessControlEntryView} from './UserStoreAccessControlEntryView';
+import {UserStoreAccessControlListView} from './UserStoreAccessControlListView';
 
 export class UserStoreAccessControlComboBox
     extends api.ui.selector.combobox.RichComboBox<UserStoreAccessControlEntry> {
