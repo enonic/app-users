@@ -123,7 +123,6 @@ const userWizard = Object.create(wizard, {
             return this.isVisible(this.groupOptionsFilterInput);
         }
     },
-
     isRoleOptionsFilterInputDisplayed: {
         value: function () {
             return this.clickOnRolesAndGroupsLink().pause(300).then(()=> {
@@ -218,7 +217,7 @@ const userWizard = Object.create(wizard, {
 
     waitForOpened: {
         value: function () {
-            return this.waitForVisible(this.displayNameInput, 3000).catch((err)=> {
+            return this.waitForVisible(this.displayNameInput, appConst.TIMEOUT_3).catch((err) => {
                 throw new Error('User Wizard is not loaded! ' + err);
             });
         }
@@ -247,7 +246,7 @@ const userWizard = Object.create(wizard, {
                 return loaderComboBox.waitForOptionVisible(`${panel.container}`, roleDisplayName);
             }).then(()=> {
                 return loaderComboBox.clickOnOption(`${panel.container}`, roleDisplayName);
-            }).catch((err)=> {
+            }).pause(300).catch(err => {
                 throw new Error('Error when selecting the role-option: ' + roleDisplayName + ' ' + err);
             })
         }
