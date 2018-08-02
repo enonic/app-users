@@ -14,6 +14,7 @@ import {GroupWizardPanel} from './wizard/GroupWizardPanel';
 import {GetUserStoreByKeyRequest} from '../api/graphql/userStore/GetUserStoreByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../api/graphql/principal/GetPrincipalByKeyRequest';
 import {PrincipalNamedEvent} from './event/PrincipalNamedEvent';
+import NavigatedAppPanel = api.app.NavigatedAppPanel;
 import AppBarTabMenuItem = api.app.bar.AppBarTabMenuItem;
 import AppBarTabMenuItemBuilder = api.app.bar.AppBarTabMenuItemBuilder;
 import AppBarTabId = api.app.bar.AppBarTabId;
@@ -33,7 +34,8 @@ interface PrincipalData {
     principalType: PrincipalType;
 }
 
-export class UserAppPanel extends api.app.NavigatedAppPanel<UserTreeGridItem> {
+export class UserAppPanel
+    extends NavigatedAppPanel<UserTreeGridItem> {
 
     private mask: api.ui.mask.LoadMask;
 

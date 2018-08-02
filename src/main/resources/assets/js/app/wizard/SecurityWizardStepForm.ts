@@ -1,11 +1,9 @@
 import '../../api.ts';
-
+import {UserStoreAccessControlComboBox} from './UserStoreAccessControlComboBox';
 import UserStoreAccessControlList = api.security.acl.UserStoreAccessControlList;
-import UserStoreAccessControlComboBox = api.ui.security.acl.UserStoreAccessControlComboBox;
 import UserStore = api.security.UserStore;
 import FormItemBuilder = api.ui.form.FormItemBuilder;
 import Validators = api.ui.form.Validators;
-
 import DivEl = api.dom.DivEl;
 import i18n = api.util.i18n;
 
