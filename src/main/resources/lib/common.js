@@ -192,29 +192,31 @@ exports.prettifyName = function (text) {
     return namePrettyfier.create(text);
 };
 
-exports.querySingle = function (query) {
+exports.querySingle = function (query, repo) {
     var results = queryAll({
         start: 0,
         count: 1,
         query: query
-    });
+    }, repo);
 
     return results.total === 1 ? results.hits[0] : null;
 };
 
-exports.create = function (params) {
-    return newConnection().create(params);
+exports.create = function (params, repo) {
+    return newConnection(repo).create(params);
 };
 
-exports.update = function (params) {
-    return newConnection().modify(params);
+exports.update = function (params, repo) {
+    return newConnection(repo).modify(params);
 };
 
-exports.queryAll = function queryAll(params) {
+exports.queryAll = function queryAll(params, repo) {
     var start = params.start || 0;
     var count = params.count || MAX_COUNT;
 
-    var repoConn = newConnection();
+    log.info('[' + repo + '] queryAll: ' + JSON.stringify(params));
+
+    var repoConn = newConnection(repo);
     var queryResult = repoConn.query({
         start: start,
         count: count,
@@ -240,9 +242,9 @@ exports.queryAll = function queryAll(params) {
     };
 };
 
-function newConnection() {
+function newConnection(repo) {
     return nodeLib.connect({
-        repoId: REPO_NAME,
+        repoId: repo || REPO_NAME,
         branch: REPO_BRANCH
     });
 }

@@ -1,8 +1,10 @@
 import Path = api.rest.Path;
 import JsonRequest = api.rest.JsonRequest;
 import StringHelper = api.util.StringHelper;
+import HttpRequest = api.rest.HttpRequest;
 
-export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE> {
+export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE>
+    implements HttpRequest<PARSED_TYPE> {
 
     private path: Path;
 

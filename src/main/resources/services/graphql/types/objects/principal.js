@@ -81,7 +81,6 @@ exports.PrincipalType = graphQl.createObjectType({
             resolve: function (env) {
                 var key = env.source.key || env.source._id;
                 var transitive = env.args.transitive;
-                log.info('Principal.memberships: transitive=' + transitive);
                 return graphQlUtils.toArray(principals.getMemberships(key, transitive));
             }
         },

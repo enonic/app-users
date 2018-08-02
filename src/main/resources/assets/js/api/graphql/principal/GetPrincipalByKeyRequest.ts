@@ -36,7 +36,7 @@ export class GetPrincipalByKeyRequest
     }
 
     getQuery(): string {
-        return `query ($key: String!, $transitive: Boolean) {
+        return `query (${this.getParamsByKey(this.key)}) {
                     principal (key: $key) {
                         key
                         name
@@ -54,6 +54,14 @@ export class GetPrincipalByKeyRequest
                         }
                     }
                 }`;
+    }
+
+    private getParamsByKey(key: PrincipalKey): string {
+        const params = ['$key: String!'];
+        if (!key.isRole()) {
+            params.push('$transitive: Boolean');
+        }
+        return params.join(', ');
     }
 
     private getFieldsByKey(key: PrincipalKey): string {

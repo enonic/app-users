@@ -40,22 +40,27 @@ var nodeWithPathExists = function (repoConnection, path) {
 };
 
 var createAllNodesInPath = function (repoConn, path) {
-    var parentPath = '/';
-    path.slice(1).split('/').forEach(function (part, index) {
-        var futureParent = parentPath + (index > 0 ? '/' : '') + part;
-        var nodeExist = nodeWithPathExists(repoConn, futureParent);
-        if (nodeExist) {
-            log.info('Node [' + futureParent + '] exist.');
-        } else {
-            log.info('Creating node [' + part + '] at [' + parentPath + ']...');
-            repoConn.create({
-                _name: part,
-                _parentPath: parentPath,
-                _permissions: ROOT_PERMISSIONS
-            });
-        }
-        parentPath = futureParent;
+    var parentPath = '';
+    path.slice(1).split('/').forEach(function (part) {
+        var totalPath = parentPath + '/' + part;
+        createNodeWithPath(repoConn, part, parentPath);
+        parentPath = totalPath;
     });
+};
+
+var createNodeWithPath = function (repoConn, name, parentPath) {
+    var totalPath = parentPath + '/' + name;
+    var nodeExist = nodeWithPathExists(repoConn, totalPath);
+    if (nodeExist) {
+        log.info('Node [' + totalPath + '] exist.');
+    } else {
+        log.info('Creating node [' + name + '] at [' + parentPath + ']...');
+        repoConn.create({
+            _name: name,
+            _parentPath: parentPath,
+            _permissions: ROOT_PERMISSIONS
+        });
+    }
 };
 
 var createNodes = function () {
@@ -64,16 +69,20 @@ var createNodes = function () {
         branch: 'master'
     });
 
-    var nodesExist = nodeWithPathExists(repoConn, REPORTS_PATH);
+    createNodesWithPath(repoConn, REPORTS_PATH);
+
+    repoConn.refresh('SEARCH');
+};
+
+var createNodesWithPath = function (repoConn, path) {
+    var nodesExist = nodeWithPathExists(repoConn, path);
 
     if (nodesExist) {
-        log.info('Nodes [' + REPORTS_PATH + '] exist.');
+        log.info('Nodes [' + path + '] exist.');
         return;
     }
 
-    createAllNodesInPath(repoConn, REPORTS_PATH);
-
-    repoConn.refresh('SEARCH');
+    createAllNodesInPath(repoConn, path);
 };
 
 var doInitialize = function () {

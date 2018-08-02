@@ -125,6 +125,23 @@ module.exports = graphQl.createObjectType({
                 var id = env.args.id;
                 return repositories.getById(id);
             }
+        },
+        repositories: {
+            type: graphQl.list(graphQlObjectTypes.RepositoryType),
+            args: {
+                start: graphQl.GraphQLInt,
+                count: graphQl.GraphQLInt,
+                sort: graphQlEnums.SortModeEnum
+            },
+            resolve: function (env) {
+                if (!principals.isAdmin()) {
+                    throw new Error('User is not logged in or has no admin rights');
+                }
+                var start = env.args.start;
+                var count = env.args.count;
+                var sort = env.args.sort;
+                return repositories.list(start, count, sort);
+            }
         }
     }
 });

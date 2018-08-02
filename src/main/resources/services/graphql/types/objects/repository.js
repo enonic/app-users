@@ -9,6 +9,12 @@ exports.Repository = graphQl.createObjectType({
             resolve: function (env) {
                 return env.source._id;
             }
+        },
+        name: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source._name;
+            }
         }
     }
 });
