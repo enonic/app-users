@@ -14,7 +14,7 @@ import {GroupWizardPanel} from './wizard/GroupWizardPanel';
 import {GetUserStoreByKeyRequest} from '../api/graphql/userStore/GetUserStoreByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../api/graphql/principal/GetPrincipalByKeyRequest';
 import {PrincipalNamedEvent} from './event/PrincipalNamedEvent';
-import {NavigatedAppPanel} from './NavigatedAppPanel';
+import NavigatedAppPanel = api.app.NavigatedAppPanel;
 import AppBarTabMenuItem = api.app.bar.AppBarTabMenuItem;
 import AppBarTabMenuItemBuilder = api.app.bar.AppBarTabMenuItemBuilder;
 import AppBarTabId = api.app.bar.AppBarTabId;
