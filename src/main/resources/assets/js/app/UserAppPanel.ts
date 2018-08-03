@@ -1,5 +1,5 @@
 import '../api.ts';
-import {UserTreeGridItem, UserTreeGridItemType, UserTreeGridItemBuilder} from './browse/UserTreeGridItem';
+import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './browse/UserTreeGridItem';
 import {UserItemWizardPanel} from './wizard/UserItemWizardPanel';
 import {UserStoreWizardPanel} from './wizard/UserStoreWizardPanel';
 import {PrincipalWizardPanel} from './wizard/PrincipalWizardPanel';
@@ -13,7 +13,8 @@ import {UserWizardPanel} from './wizard/UserWizardPanel';
 import {GroupWizardPanel} from './wizard/GroupWizardPanel';
 import {GetUserStoreByKeyRequest} from '../api/graphql/userStore/GetUserStoreByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../api/graphql/principal/GetPrincipalByKeyRequest';
-
+import {PrincipalNamedEvent} from './event/PrincipalNamedEvent';
+import NavigatedAppPanel = api.app.NavigatedAppPanel;
 import AppBarTabMenuItem = api.app.bar.AppBarTabMenuItem;
 import AppBarTabMenuItemBuilder = api.app.bar.AppBarTabMenuItemBuilder;
 import AppBarTabId = api.app.bar.AppBarTabId;
@@ -21,7 +22,6 @@ import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
 import UserStore = api.security.UserStore;
-import ShowBrowsePanelEvent = api.app.ShowBrowsePanelEvent;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
 
@@ -34,7 +34,8 @@ interface PrincipalData {
     principalType: PrincipalType;
 }
 
-export class UserAppPanel extends api.app.NavigatedAppPanel<UserTreeGridItem> {
+export class UserAppPanel
+    extends NavigatedAppPanel<UserTreeGridItem> {
 
     private mask: api.ui.mask.LoadMask;
 
@@ -303,7 +304,7 @@ export class UserAppPanel extends api.app.NavigatedAppPanel<UserTreeGridItem> {
 
         let wizard = this.resolvePrincipalWizardPanel(wizardParams);
 
-        wizard.onPrincipalNamed((event: api.security.PrincipalNamedEvent) => {
+        wizard.onPrincipalNamed((event: PrincipalNamedEvent) => {
             this.handlePrincipalNamedEvent(event);
         });
 
@@ -405,7 +406,7 @@ export class UserAppPanel extends api.app.NavigatedAppPanel<UserTreeGridItem> {
     }
 
     private handlePrincipalNamedEvent(event: api.event.Event) {
-        let e = <api.security.PrincipalNamedEvent>event;
+        let e = <PrincipalNamedEvent>event;
         let wizard = e.getWizard();
         let tabMenuItem = this.getAppBarTabMenu().getNavigationItemById(wizard.getTabId());
         // update tab id so that new wizard for the same content type can be created

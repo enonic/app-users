@@ -1,6 +1,5 @@
-
 import i18n = api.util.i18n;
-import SecurityFormContext = api.security.form.SecurityFormContext;
+import {SecurityFormContext} from './SecurityFormContext';
 
 export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
 

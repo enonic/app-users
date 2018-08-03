@@ -1,7 +1,7 @@
-import UserStoreListResult = api.security.UserStoreListResult;
 import UserStore = api.security.UserStore;
 import UserStoreJson = api.security.UserStoreJson;
 import {ListGraphQlRequest} from '../ListGraphQlRequest';
+import {UserStoreListResult} from './UserStoreListResult';
 
 export class ListUserStoresRequest
     extends ListGraphQlRequest<UserStoreListResult, UserStore[]> {

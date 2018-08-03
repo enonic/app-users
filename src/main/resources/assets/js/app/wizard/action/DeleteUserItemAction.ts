@@ -1,11 +1,12 @@
 import '../../../api.ts';
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
 import {DeleteUserStoreRequest} from '../../../api/graphql/userStore/DeleteUserStoreRequest';
+import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
+import {DeleteUserStoreResult} from '../../../api/graphql/userStore/DeleteUserStoreResult';
+import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
 import UserStore = api.security.UserStore;
 import Principal = api.security.Principal;
 import UserItem = api.security.UserItem;
-import DeletePrincipalResult = api.security.DeletePrincipalResult;
-import DeleteUserStoreResult = api.security.DeleteUserStoreResult;
 import i18n = api.util.i18n;
 
 export class DeleteUserItemAction extends api.ui.Action {
@@ -34,7 +35,7 @@ export class DeleteUserItemAction extends api.ui.Action {
                                 const msg = i18n(`notify.delete.principal.${keys.length === 1 ? 'single' : 'multiple'}`, keys.join(', '));
 
                                 api.notify.showFeedback(msg);
-                                api.security.UserItemDeletedEvent.create().setPrincipals([<Principal>persistedItem]).build().fire();
+                                UserItemDeletedEvent.create().setPrincipals([<Principal>persistedItem]).build().fire();
                             }
                         });
                 } else {
@@ -51,7 +52,7 @@ export class DeleteUserItemAction extends api.ui.Action {
                                             i18n('notify.delete.userstore.multiple', keys.length);
 
                                 api.notify.showFeedback(msg);
-                                api.security.UserItemDeletedEvent.create().setUserStores([<UserStore>persistedItem]).build().fire();
+                                UserItemDeletedEvent.create().setUserStores([<UserStore>persistedItem]).build().fire();
                             }
                         });
                 }
