@@ -62,8 +62,8 @@ exports.default = function (params, name, defaultValue) {
     return value;
 };
 
-exports.getByIds = function (ids) {
-    return newConnection().get(ids);
+exports.getByIds = function (ids, repo) {
+    return newConnection(repo).get(ids);
 };
 
 exports.delete = function (ids) {

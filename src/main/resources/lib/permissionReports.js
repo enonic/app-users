@@ -19,6 +19,10 @@ var deleteReports = function (ids) {
     return common.delete(ids);
 };
 
+var get = function (ids) {
+    return common.getByIds(ids, initLib.REPO_NAME)
+};
+
 var generate = function (principalKey, repositoryKeys) {
 
     log.info('Generate: pKey=' + principalKey + ', rKeys=' + JSON.stringify(repositoryKeys));
@@ -60,7 +64,7 @@ var generateReport = function (nodeId, pKey, uKey) {
         description: 'Report task for userStore[' + uKey + '] and principal[' + pKey + ']',
         task: function (nodeId, pKey, uKey) {
             return function () {
-                var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.\n';
+                var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
                 var memKeys;
                 if (common.isRole(pKey)) {
                     memKeys = [pKey]
@@ -69,16 +73,11 @@ var generateReport = function (nodeId, pKey, uKey) {
                         return m.key;
                     });
                 }
-                log.info('Membership keys for principal[' + pKey + ']: ' + JSON.stringify(memKeys));
 
-                var nodes = queryUserStoreNodes(uKey, memKeys);
-                log.info('Userstore nodes having permissions for above keys: ' + JSON.stringify(nodes.map(function (n) {
-                    return n._path
-                })));
-
-                nodes.forEach(function (node) {
-                    report += generateReportLine(node, memKeys);
+                queryUserStoreNodes(uKey, memKeys).forEach(function (node) {
+                    report += '\n' + generateReportLine(node, memKeys);
                 });
+
                 var updatedNode = common.update({
                     key: nodeId,
                     editor: function (node) {
@@ -129,13 +128,13 @@ var generateReportLine = function (node, memKeys) {
             });
             var line = cols.join(',');
             lines.push(line);
-            log.info('Generated line for principal[' + perm.principal + '] from permissions' + JSON.stringify(perm.allow) + ': ' + line);
         }
     }
     return lines.join('\n');
 };
 
 module.exports = {
+    get: get,
     list: list,
     delete: deleteReports,
     generate: generate

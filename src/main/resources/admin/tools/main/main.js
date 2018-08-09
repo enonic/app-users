@@ -20,7 +20,10 @@ function handleGet() {
         xpVersion: app.version,
         messages: admin.getPhrases(),
         launcherPath: admin.getLauncherPath(),
-        launcherUrl: admin.getLauncherUrl()
+        launcherUrl: admin.getLauncherUrl(),
+        reportServiceUrl: portal.serviceUrl({
+            service: 'permissionReport'
+        })
     };
 
     return {
