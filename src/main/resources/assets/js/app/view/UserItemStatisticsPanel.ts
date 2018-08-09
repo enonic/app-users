@@ -3,6 +3,7 @@ import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincipalsByKeysRequest';
 import {RepositoryComboBox} from '../report/RepositoryComboBox';
+import {GeneratePermissionsReport} from '../../api/graphql/report/GeneratePermissionsReport';
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
 import ItemDataGroup = api.app.view.ItemDataGroup;
@@ -175,7 +176,13 @@ export class UserItemStatisticsPanel
             .setEnabled(false)
             .addClass('generate large')
             .onClicked(() => {
-                console.log('send request to generate report');
+                new GeneratePermissionsReport()
+                    .setPrincipalKey(principal.getKey())
+                    .setRepositoryKeys(reportsCombo.getSelectedValues())
+                    .sendAndParse()
+                    .then(ids => {
+                        console.log('Generate reports task ids: ' + ids);
+                    });
             });
         reportsGroup.appendChild(genButton);
 

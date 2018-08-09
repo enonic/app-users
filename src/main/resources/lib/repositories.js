@@ -11,7 +11,6 @@ exports.list = function (start, count, sort) {
         count: count,
         sort: sort
     });
-    log.info('Repo query result: ' + JSON.stringify(queryResult));
     return queryResult.hits;
 };
 

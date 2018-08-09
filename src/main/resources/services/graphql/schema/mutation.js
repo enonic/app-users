@@ -1,10 +1,11 @@
 var graphQl = require('/lib/graphql');
 
-var userstores = require('userstores');
-var principals = require('principals');
-var users = require('users');
-var groups = require('groups');
-var roles = require('roles');
+var userstores = require('/lib/userstores');
+var principals = require('/lib/principals');
+var users = require('/lib/users');
+var groups = require('/lib/groups');
+var roles = require('/lib/roles');
+var permissionReports = require('/lib/permissionReports');
 
 var graphQlObjectTypes = require('../types').objects;
 var graphQlInputTypes = require('../types').inputs;
@@ -221,6 +222,36 @@ module.exports = graphQl.createObjectType({
             },
             resolve: function(env) {
                 return userstores.delete(env.args.keys);
+            }
+        },
+
+        // permissionsReport
+        generatePermissionReports: {
+            type: graphQlObjectTypes.GeneratePermissionReportType,
+            args: {
+                principalKey: graphQl.nonNull(graphQl.GraphQLString),
+                repositoryKeys: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                if (!principals.isAdmin()) {
+                    throw new Error('User is not logged in or has no admin rights');
+                }
+                var pKey = env.args.principalKey;
+                var rKeys = env.args.repositoryKeys;
+                return permissionReports.generate(pKey, rKeys);
+            }
+        },
+        deletePermissionReports: {
+            type: graphQl.list(graphQlObjectTypes.GeneratePermissionReportType),
+            args: {
+                ids: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                if (!principals.isAdmin()) {
+                    throw new Error('User is not logged in or has no admin rights');
+                }
+                var ids = env.args.ids;
+                return permissionReports.delete(ids);
             }
         }
     }

@@ -2,7 +2,7 @@ var repoLib = require('/lib/xp/repo');
 var nodeLib = require('/lib/xp/node');
 var contextLib = require('/lib/xp/context');
 
-var REPO_NAME = 'com.enonic.xp.app.users';
+var REPO_NAME = exports.REPO_NAME = 'com.enonic.xp.app.users';
 var REPORTS_PATH = '/reports/permissions';
 var ROOT_PERMISSIONS = [
     {

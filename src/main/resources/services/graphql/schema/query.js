@@ -1,9 +1,10 @@
 var graphQl = require('/lib/graphql');
 
-var userstores = require('userstores');
-var principals = require('principals');
-var useritems = require('useritems');
-var repositories = require('repositories');
+var userstores = require('/lib/userstores');
+var principals = require('/lib/principals');
+var useritems = require('/lib/useritems');
+var repositories = require('/lib/repositories');
+var permissionReports = require('/lib/permissionReports');
 
 var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
@@ -141,6 +142,27 @@ module.exports = graphQl.createObjectType({
                 var count = env.args.count;
                 var sort = env.args.sort;
                 return repositories.list(start, count, sort);
+            }
+        },
+        permissionReports: {
+            type: graphQl.list(graphQlObjectTypes.PermissionReportType),
+            args: {
+                principalKey: graphQl.GraphQLString,
+                userStoreKey: graphQl.GraphQLString,
+                start: graphQl.GraphQLInt,
+                count: graphQl.GraphQLInt,
+                sort: graphQlEnums.SortModeEnum
+            },
+            resolve: function (env) {
+                if (!principals.isAdmin()) {
+                    throw new Error('User is not logged in or has no admin rights');
+                }
+                var principalKey = env.args.principalKey;
+                var userStoreKey = env.args.userStoreKey;
+                var start = env.args.start;
+                var count = env.args.count;
+                var sort = env.args.sort;
+                return permissionReports.list(principalKey, userStoreKey, start, count, sort);
             }
         }
     }

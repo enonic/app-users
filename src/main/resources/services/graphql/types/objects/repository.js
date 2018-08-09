@@ -1,6 +1,6 @@
 var graphQl = require('/lib/graphql');
 
-exports.Repository = graphQl.createObjectType({
+exports.RepositoryType = graphQl.createObjectType({
     name: 'Repository',
     description: 'Domain representation of a repository',
     fields: {

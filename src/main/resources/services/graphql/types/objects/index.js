@@ -5,6 +5,7 @@ var graphQlPrincipal = require('./principal');
 var graphQlUserItem = require('./userItem');
 var graphQlTypes = require('./types');
 var graphQlRepository = require('./repository');
+var graphQlPermissionReport = require('./permissionReport');
 
 module.exports = {
     UserStoreType: graphQlUserStore.UserStoreType,
@@ -20,5 +21,7 @@ module.exports = {
         'UserItem',
         graphQlUserItem.UserItemType
     ),
-    RepositoryType: graphQlRepository.Repository
+    RepositoryType: graphQlRepository.RepositoryType,
+    PermissionReportType: graphQlPermissionReport.PermissionReportType,
+    GeneratePermissionReportType: graphQlPermissionReport.GeneratePermissionReportType
 };

@@ -39,8 +39,8 @@ function isString(str) {
 
 exports.isString = isString;
 
-exports.refresh = function () {
-    newConnection().refresh('SEARCH');
+exports.refresh = function (repo) {
+    newConnection(repo).refresh('SEARCH');
 };
 
 exports.required = function (params, name, skipTrimming) {
@@ -213,8 +213,6 @@ exports.update = function (params, repo) {
 exports.queryAll = function queryAll(params, repo) {
     var start = params.start || 0;
     var count = params.count || MAX_COUNT;
-
-    log.info('[' + repo + '] queryAll: ' + JSON.stringify(params));
 
     var repoConn = newConnection(repo);
     var queryResult = repoConn.query({
