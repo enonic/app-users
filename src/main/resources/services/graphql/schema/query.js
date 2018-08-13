@@ -157,8 +157,8 @@ module.exports = graphQl.createObjectType({
                 sort: graphQlEnums.SortModeEnum
             },
             resolve: function (env) {
-                if (!principals.isAdmin()) {
-                    throw new Error('User is not logged in or has no admin rights');
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
                 }
                 var principalKey = env.args.principalKey;
                 var userStoreKey = env.args.userStoreKey;
