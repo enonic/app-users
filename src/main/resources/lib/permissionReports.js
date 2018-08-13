@@ -50,17 +50,23 @@ var generateReport = function (nodeId, principalKey, repositoryId) {
         task: function () {
             var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
 
-            var membershipKeys;
-            if (common.isRole(principalKey)) {
-                membershipKeys = [principalKey]
-            } else {
-                membershipKeys = principals.getMemberships(principalKey, true).map(function (m) {
+            var principalKeys = [principalKey];
+            if (!common.isRole(principalKey)) {
+                var membershipKeys = principals.getMemberships(principalKey, true).map(function (m) {
                     return m.key;
                 });
+                principalKeys = principalKeys.concat(membershipKeys);
             }
+            if (common.isUser(principalKey)) {
+                principalKeys.push('role:system.everyone');
+                if (principalKey != 'user:system:anonymous') {
+                    principalKeys.push('role:system.authenticated');
+                }
+            }
+            log.info('Principal keys: ' + JSON.stringify(principalKeys));
 
-            queryRepositoryNodes(repositoryId, membershipKeys).forEach(function (node) {
-                report += '\n' + generateReportLine(node, membershipKeys);
+            queryRepositoryNodes(repositoryId, principalKeys).forEach(function (node) {
+                report += '\n' + generateReportLine(node, principalKeys);
             });
 
             var updatedNode = common.update({
@@ -76,44 +82,26 @@ var generateReport = function (nodeId, principalKey, repositoryId) {
     });
 };
 
-var queryRepositoryNodes = function (repositoryId, membershipKeys) {
+var queryRepositoryNodes = function (repositoryId, principalKeys) {
     var filters = {
         hasValue: {
-            field: "_permissions.principal",
-            values: membershipKeys
+            field: "_permissions.read",
+            values: principalKeys
         }
     };
 
     var repoConn = common.newConnection(repositoryId);
-    var nodeHits = repoConn.query({
-        count: 10, //TODO Batch
+    return repoConn.query({
+        count: 1024, //TODO Batch
         query: '',
-        //filters: filters //TODO
-    }).hits;
-
-    return nodeHits.map(function (nodeHit) {
-        log.info('nodeId:' + nodeHit.id);
+        filters: filters
+    }).hits.map(function (nodeHit) {
         var node = repoConn.get(nodeHit.id);
-
-        log.info('node:' + JSON.stringify(node, null, 2));
-        if (node) {
-
-            var hasReadAccess = node._permissions.some(function (permission) {
-                return membershipKeys.indexOf(permission.principal) !== -1
-                       && permission.allow.indexOf('READ') !== -1
-                       && permission.deny.indexOf('READ') === -1
-            });
-            log.info('hasReadAccess:' + hasReadAccess);
-            if (hasReadAccess) {
-                return {
-                    _path: node._path,
-                    _permissions: node._permissions
-                };
-            }
-        }
-        return null;
-    }).filter(function (node) {
-        return !!node;
+        log.info('node:' + node._path);
+        return {
+            _path: node._path,
+            _permissions: node._permissions
+        };
     });
 };
 

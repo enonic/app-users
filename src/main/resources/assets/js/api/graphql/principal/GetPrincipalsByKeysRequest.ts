@@ -41,7 +41,7 @@ export class GetPrincipalsByKeysRequest
     }
 
     getQuery(): string {
-        return `query ($keys: [String]!, $transitive: Boolean) {
+        return `query ($keys: [String]!` + this.getDynamicVariables() + `) {
                     principals (keys: $keys) {
                         key
                         name
@@ -61,6 +61,10 @@ export class GetPrincipalsByKeysRequest
                         }
                     }
                 }`;
+    }
+
+    private getDynamicVariables() {
+        return this.includeMemberships ? '' : '';
     }
 
     private getMembershipsField() {

@@ -42,7 +42,7 @@ export class GetPrincipalByKeyRequest
     }
 
     getQuery(): string {
-        return `query (${this.getParamsByKey(this.key)}) {
+        return `query (${this.getParamsByKey(this.key, this.includeMemberships)}) {
                     principal (key: $key) {
                         key
                         name
@@ -62,9 +62,9 @@ export class GetPrincipalByKeyRequest
                 }`;
     }
 
-    private getParamsByKey(key: PrincipalKey): string {
+    private getParamsByKey(key: PrincipalKey, includeMemberships: boolean): string {
         const params = ['$key: String!'];
-        if (!key.isRole()) {
+        if (includeMemberships && !key.isRole()) {
             params.push('$transitive: Boolean');
         }
         return params.join(', ');
