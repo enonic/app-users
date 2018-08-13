@@ -231,15 +231,15 @@ module.exports = graphQl.createObjectType({
             type: graphQlObjectTypes.GeneratePermissionReportType,
             args: {
                 principalKey: graphQl.nonNull(graphQl.GraphQLString),
-                repositoryKeys: graphQl.list(graphQl.GraphQLString)
+                repositoryIds: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
             },
             resolve: function (env) {
                 if (!authLib.isAdmin()) {
                     throw new Error('You don\'t have permission to access this resource');
                 }
-                var pKey = env.args.principalKey;
-                var rKeys = env.args.repositoryKeys;
-                return permissionReports.generate(pKey, rKeys);
+                var principalKey = env.args.principalKey;
+                var repositoryIds = env.args.repositoryIds;
+                return permissionReports.generate(principalKey, repositoryIds);
             }
         },
         deletePermissionReports: {

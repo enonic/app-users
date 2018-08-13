@@ -246,3 +246,4 @@ function newConnection(repo) {
         branch: REPO_BRANCH
     });
 }
+exports.newConnection = newConnection;

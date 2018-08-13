@@ -5,7 +5,7 @@ export class GeneratePermissionsReport
     extends GraphQlRequest<any, string[]> {
 
     private principalKey: PrincipalKey;
-    private repositoryKeys: String[] = [];
+    private repositoryIds: String[] = [];
 
     setPrincipalKey(value: PrincipalKey): GeneratePermissionsReport {
         this.principalKey = value;
@@ -13,13 +13,13 @@ export class GeneratePermissionsReport
     }
 
     setRepositoryKeys(value: String[]): GeneratePermissionsReport {
-        this.repositoryKeys = value;
+        this.repositoryIds = value;
         return this;
     }
 
     getQuery(): string {
-        return `mutation ($principalKey: String!, $repositoryKeys: [String]!) {
-            generatePermissionReports(principalKey: $principalKey, repositoryKeys: $repositoryKeys) {
+        return `mutation ($principalKey: String!, $repositoryIds: [String]!) {
+            generatePermissionReports(principalKey: $principalKey, repositoryIds: $repositoryIds) {
                 ids
             }
         }`;
@@ -28,7 +28,7 @@ export class GeneratePermissionsReport
     getVariables(): { [p: string]: any } {
         const vars = super.getVariables();
         vars['principalKey'] = this.principalKey.toString();
-        vars['repositoryKeys'] = this.repositoryKeys;
+        vars['repositoryIds'] = this.repositoryIds;
         return vars;
     }
 

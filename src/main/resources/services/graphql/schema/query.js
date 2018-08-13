@@ -151,7 +151,7 @@ module.exports = graphQl.createObjectType({
             type: graphQl.list(graphQlObjectTypes.PermissionReportType),
             args: {
                 principalKey: graphQl.GraphQLString,
-                userStoreKey: graphQl.GraphQLString,
+                repositoryId: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
@@ -161,11 +161,11 @@ module.exports = graphQl.createObjectType({
                     throw new Error('You don\'t have permission to access this resource');
                 }
                 var principalKey = env.args.principalKey;
-                var userStoreKey = env.args.userStoreKey;
+                var repositoryId = env.args.repositoryId;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return permissionReports.list(principalKey, userStoreKey, start, count, sort);
+                return permissionReports.list(principalKey, repositoryId, start, count, sort);
             }
         }
     }
