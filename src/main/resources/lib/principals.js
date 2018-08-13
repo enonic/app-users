@@ -1,18 +1,6 @@
 var common = require('./common');
 var authLib = require('/lib/xp/auth');
 
-var Roles = {
-    ADMIN: 'system.admin',
-    EVERYONE: 'system.everyone',
-    AUTHENTICATED: 'system.authenticated',
-    ADMIN_LOGIN: 'system.admin.login',
-    USER_MANAGER_APP: 'system.user.app',
-    USER_MANAGER_ADMIN: 'system.user.admin',
-    CONTENT_MANAGER_APP: 'cms.cm.app',
-    CONTENT_MANAGER_EXPERT: 'cms.expert',
-    CONTENT_MANAGER_ADMIN: 'cms.admin'
-};
-
 module.exports = {
     getByKeys: function (keys) {
         var noKeys = keys == null || (keys instanceof Array && keys.length === 0);
@@ -119,16 +107,7 @@ module.exports = {
             }            
         });
     },
-    Type: common.PrincipalType,
-    isAdmin: function () {
-        return authLib.hasRole(Roles.ADMIN);
-    },
-    isContentAdmin: function () {
-        return authLib.hasRole(Roles.CONTENT_MANAGER_ADMIN);
-    },
-    isUserAdmin: function () {
-        return authLib.hasRole(Roles.USER_MANAGER_ADMIN);
-    }
+    Type: common.PrincipalType    
 };
 
 function createPrincipalQuery(userStoreKey, types, query) {

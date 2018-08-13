@@ -4,9 +4,9 @@ exports.getById = function (id) {
     return common.getByIds(id)
 };
 
-exports.list = function (start, count, sort) {
+exports.list = function (search, start, count, sort) {
     var queryResult = common.queryAll({
-        query: createRepoQuery(),
+        query: createRepoQuery(search),
         start: start,
         count: count,
         sort: sort
@@ -14,6 +14,6 @@ exports.list = function (start, count, sort) {
     return queryResult.hits;
 };
 
-function createRepoQuery() {
-    return '_parentPath="/repository"';
+function createRepoQuery(search) {
+    return '_parentPath="/repository"' + (search ? ' AND ngram("_name","' + search + '")' : '');
 }
