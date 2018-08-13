@@ -62,7 +62,7 @@ class ReportProgressItem
         this.progress = new api.ui.ProgressBar(Math.random() * 100);
         this.downloadLink = new api.dom.AEl('download').setUrl(item.getUrl(), '_blank');
         this.downloadLink.getEl().setText(i18n('action.report.download')).setAttribute('download',
-            `Report_${item.getPrincipalKey().getId()}_in_ ${item.getUserStoreKey().toString()}.csv`);
+            `Report_${item.getPrincipalDisplayName()}_in_ ${item.getUserStoreKey().toString()}.csv`);
 
         this.appendChildren(name, this.progress, this.downloadLink);
     }

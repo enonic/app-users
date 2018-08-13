@@ -188,7 +188,6 @@ export class UserItemStatisticsPanel
                     .setRepositoryKeys(repos.map(repo => repo.getId()))
                     .sendAndParse()
                     .then(reports => {
-                        console.log('Generate permission report result: ', reports);
                         reports.forEach(report => {
                             // might have been added by progress listener if it happened before
                             if (!reportsProgress.getItem(report.getId())) {

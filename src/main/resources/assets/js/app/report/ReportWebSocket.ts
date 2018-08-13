@@ -109,7 +109,6 @@ export class ReportWebSocket {
     }
 
     private handleSocketEvent(event: any) {
-        console.log('Received socket event: ', event);
         // only progress currently
         this.notifyReportProgress(event);
     }
