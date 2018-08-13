@@ -3,6 +3,7 @@ var nodeLib = require('/lib/xp/node');
 var contextLib = require('/lib/xp/context');
 
 var REPO_NAME = 'com.enonic.xp.app.users';
+exports.REPO_NAME = REPO_NAME;
 var ROOT_PERMISSIONS = [
     {
         principal: 'role:system.admin',
