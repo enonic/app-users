@@ -6,8 +6,8 @@ export class ListRepositoriesRequest
     private searchQuery: string;
 
     getQuery(): string {
-        return `query($start: Int, $count: Int, $sort: SortMode) {
-            repositories(start: $start, count: $count, sort: $sort) {
+        return `query($query: String, $start: Int, $count: Int, $sort: SortMode) {
+            repositories(query: $query, start: $start, count: $count, sort: $sort) {
                 id,
                 name
             }
@@ -22,7 +22,7 @@ export class ListRepositoriesRequest
     getVariables(): { [p: string]: any } {
         const vars = super.getVariables();
         if (!api.util.StringHelper.isEmpty(this.searchQuery)) {
-            vars['search'] = this.searchQuery;
+            vars['query'] = this.searchQuery;
         }
         return vars;
     }

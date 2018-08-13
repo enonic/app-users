@@ -12,6 +12,7 @@ import {Router} from './app/Router';
 import {ShowNewPrincipalDialogEvent} from './app/browse/ShowNewPrincipalDialogEvent';
 import {NewPrincipalDialog} from './app/create/NewPrincipalDialog';
 import {PrincipalServerEventsHandler} from './app/event/PrincipalServerEventsHandler';
+import {ReportWebSocket} from './app/report/ReportWebSocket';
 
 function getApplication(): api.app.Application {
     let application = new api.app.Application('user-manager', 'Users', 'UM', CONFIG.appIconUrl);
@@ -62,6 +63,7 @@ function startApplication() {
     startLostConnectionDetector();
 
     PrincipalServerEventsHandler.getInstance().start();
+    ReportWebSocket.getInstance().connect();
 
     const newPrincipalDialog = new NewPrincipalDialog();
     ShowNewPrincipalDialogEvent.on((event) => {

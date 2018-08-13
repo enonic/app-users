@@ -23,6 +23,12 @@ exports.PermissionReportType = graphQl.createObjectType({
                 return env.source.userStoreKey;
             }
         },
+        taskId: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.taskId;
+            }
+        },
         url: {
             type: graphQl.GraphQLString,
             resolve: function (env) {
@@ -32,19 +38,6 @@ exports.PermissionReportType = graphQl.createObjectType({
                         id: env.source._id
                     }
                 });
-            }
-        }
-    }
-});
-
-exports.GeneratePermissionReportType = graphQl.createObjectType({
-    name: 'GeneratePermissionReport',
-    description: 'Result of generating permission reports',
-    fields: {
-        ids: {
-            type: graphQl.list(graphQl.GraphQLString),
-            resolve: function (env) {
-                return env.source.ids;
             }
         }
     }

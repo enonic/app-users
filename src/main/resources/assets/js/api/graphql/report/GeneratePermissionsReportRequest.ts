@@ -1,18 +1,19 @@
 import {GraphQlRequest} from '../GraphQlRequest';
+import {Report} from '../../../app/report/Report';
 import PrincipalKey = api.security.PrincipalKey;
 
-export class GeneratePermissionsReport
-    extends GraphQlRequest<any, string[]> {
+export class GeneratePermissionsReportRequest
+    extends GraphQlRequest<any, Report[]> {
 
     private principalKey: PrincipalKey;
     private repositoryKeys: String[] = [];
 
-    setPrincipalKey(value: PrincipalKey): GeneratePermissionsReport {
+    setPrincipalKey(value: PrincipalKey): GeneratePermissionsReportRequest {
         this.principalKey = value;
         return this;
     }
 
-    setRepositoryKeys(value: String[]): GeneratePermissionsReport {
+    setRepositoryKeys(value: String[]): GeneratePermissionsReportRequest {
         this.repositoryKeys = value;
         return this;
     }
@@ -20,7 +21,10 @@ export class GeneratePermissionsReport
     getQuery(): string {
         return `mutation ($principalKey: String!, $repositoryKeys: [String]!) {
             generatePermissionReports(principalKey: $principalKey, repositoryKeys: $repositoryKeys) {
-                ids
+                id,
+                taskId,
+                principalKey,
+                userStoreKey
             }
         }`;
     }
@@ -32,7 +36,7 @@ export class GeneratePermissionsReport
         return vars;
     }
 
-    sendAndParse(): wemQ.Promise<string[]> {
-        return this.query().then(response => response.generatePermissionReports.ids);
+    sendAndParse(): wemQ.Promise<Report[]> {
+        return this.query().then(response => response.generatePermissionReports.map(Report.fromJson));
     }
 }

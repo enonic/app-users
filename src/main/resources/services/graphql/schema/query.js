@@ -130,6 +130,7 @@ module.exports = graphQl.createObjectType({
         repositories: {
             type: graphQl.list(graphQlObjectTypes.RepositoryType),
             args: {
+                query: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
@@ -141,14 +142,15 @@ module.exports = graphQl.createObjectType({
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return repositories.list(start, count, sort);
+                var query = env.args.query;
+                return repositories.list(query, start, count, sort);
             }
         },
         permissionReports: {
             type: graphQl.list(graphQlObjectTypes.PermissionReportType),
             args: {
                 principalKey: graphQl.GraphQLString,
-                userStoreKey: graphQl.GraphQLString,
+                userStoreKeys: graphQl.list(graphQl.GraphQLString),
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
@@ -158,11 +160,11 @@ module.exports = graphQl.createObjectType({
                     throw new Error('User is not logged in or has no admin rights');
                 }
                 var principalKey = env.args.principalKey;
-                var userStoreKey = env.args.userStoreKey;
+                var userStoreKeys = env.args.userStoreKeys;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return permissionReports.list(principalKey, userStoreKey, start, count, sort);
+                return permissionReports.list(principalKey, userStoreKeys, start, count, sort);
             }
         }
     }
