@@ -13,11 +13,17 @@ export class GetPrincipalsByKeysRequest
     extends GraphQlRequest<any, Principal[]> {
 
     private keys: PrincipalKey[];
+    private includeMemberships: boolean = false;
     private transitive: boolean;
 
     constructor(keys: PrincipalKey[]) {
         super();
         this.keys = keys;
+    }
+
+    setIncludeMemberships(value: boolean): GetPrincipalsByKeysRequest {
+        this.includeMemberships = value;
+        return this;
     }
 
     setTransitiveMemberships(flag: boolean): GetPrincipalsByKeysRequest {
@@ -44,11 +50,7 @@ export class GetPrincipalsByKeysRequest
                         displayName
                         email
                         login
-                        members
-                        memberships (transitive: $transitive) {
-                            key
-                            displayName
-                        }
+                        members` + this.getMembershipsField() + `
                         permissions {
                             principal {
                                 key
@@ -59,6 +61,14 @@ export class GetPrincipalsByKeysRequest
                         }
                     }
                 }`;
+    }
+
+    private getMembershipsField() {
+        return this.includeMemberships ? `
+            memberships (transitive: $transitive) {
+                key
+                displayName
+            }` : ``;
     }
 
     sendAndParse(): wemQ.Promise<Principal[]> {

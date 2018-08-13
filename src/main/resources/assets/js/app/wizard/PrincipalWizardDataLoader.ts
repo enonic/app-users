@@ -38,7 +38,7 @@ export class PrincipalWizardDataLoader {
 
     private loadPrincipalToEdit(params: PrincipalWizardPanelParams): wemQ.Promise<Principal> {
         if (!params.persistedItem && !!params.principalKey) {
-            return new GetPrincipalByKeyRequest(params.principalKey).sendAndParse();
+            return new GetPrincipalByKeyRequest(params.principalKey).setIncludeMemberships(true).sendAndParse();
         } else {
             return wemQ(params.persistedItem);
         }

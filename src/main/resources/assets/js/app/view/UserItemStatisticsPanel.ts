@@ -97,7 +97,7 @@ export class UserItemStatisticsPanel
 
         const addedGroups = [mainGroup, rolesAndGroupsGroup];
 
-        return new GetPrincipalByKeyRequest(principal.getKey()).sendAndParse().then((p: Principal) => {
+        return new GetPrincipalByKeyRequest(principal.getKey()).setIncludeMemberships(true).sendAndParse().then((p: Principal) => {
             const user = p.asUser();
             mainGroup.addDataList(i18n('field.email'), user.getEmail());
 
@@ -129,7 +129,7 @@ export class UserItemStatisticsPanel
 
         const addedGroups = [mainGroup, membersGroup, this.createReportGroup(principal)];
 
-        return new GetPrincipalByKeyRequest(principal.getKey()).sendAndParse().then((p: Principal) => {
+        return new GetPrincipalByKeyRequest(principal.getKey()).setIncludeMemberships(true).sendAndParse().then((p: Principal) => {
             const group = principal.isGroup() ? p.asGroup() : p.asRole();
 
             if (principal.isGroup()) {
