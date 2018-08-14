@@ -15,6 +15,7 @@ import User = api.security.User;
 import PrincipalViewer = api.ui.security.PrincipalViewer;
 import i18n = api.util.i18n;
 import RoleKeys = api.security.RoleKeys;
+import DivEl = api.dom.DivEl;
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel<UserTreeGridItem> {
@@ -197,7 +198,16 @@ export class UserItemStatisticsPanel
                     });
             });
 
-        reportsGroup.addDataElements(i18n('field.repository.select'), [reportsCombo, reportsProgress, genButton]);
+        const comboAndButton = new DivEl();
+        comboAndButton.appendChildren<api.dom.Element>(reportsCombo, genButton);
+
+        reportsGroup.addDataElements(i18n('field.repository.select'), [comboAndButton]);
+        const generatedReports = reportsGroup.addDataElements(i18n('field.report.generated'), [reportsProgress]);
+        generatedReports.setVisible(false);
+
+        const handleReportsChanged = () => generatedReports.setVisible(reportsProgress.getItemCount() > 0);
+        reportsProgress.onItemsRemoved(handleReportsChanged);
+        reportsProgress.onItemsAdded(handleReportsChanged);
 
         return reportsGroup;
     }
