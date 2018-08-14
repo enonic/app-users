@@ -96,7 +96,7 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
 
             var nodeProcessCount = 0;
             reportProgressToSocket(reportNode, 0);
-            taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length});
+            taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
 
             var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
             nodes.forEach(function (node) {
@@ -104,8 +104,12 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
 
                 nodeProcessCount++;
                 reportProgressToSocket(reportNode, nodeProcessCount * 100 / nodes.length);
-                taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length});
+                taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
             });
+
+            reportProgressToSocket(reportNode, 100);
+            taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
+
 
             var updatedNode = common.update({
                 key: reportNode._id,
