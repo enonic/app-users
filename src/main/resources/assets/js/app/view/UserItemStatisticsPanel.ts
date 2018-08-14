@@ -3,7 +3,8 @@ import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincipalsByKeysRequest';
 import {RepositoryComboBox} from '../report/RepositoryComboBox';
-import {GeneratePermissionsReport} from '../../api/graphql/report/GeneratePermissionsReport';
+import {GeneratePermissionsReportRequest} from '../../api/graphql/report/GeneratePermissionsReportRequest';
+import {ReportProgressList} from '../report/ReportProgressList';
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
 import ItemDataGroup = api.app.view.ItemDataGroup;
@@ -169,22 +170,34 @@ export class UserItemStatisticsPanel
                 genButton.setEnabled(false);
             }
         });
-        reportsGroup.addDataElements(i18n('field.repository.select'), [reportsCombo]);
+
+        const reportsProgress = new ReportProgressList(principal.getKey());
 
         const genButton = new api.ui.button.Button(i18n('action.report.generate'));
         genButton
             .setEnabled(false)
             .addClass('generate large')
             .onClicked(() => {
-                new GeneratePermissionsReport()
+                const repos = reportsCombo.getSelectedDisplayValues();
+                repos.forEach(repo => {
+                    reportsCombo.deselect(repo);
+                });
+
+                new GeneratePermissionsReportRequest()
                     .setPrincipalKey(principal.getKey())
-                    .setRepositoryKeys(reportsCombo.getSelectedValues())
+                    .setRepositoryKeys(repos.map(repo => repo.getId()))
                     .sendAndParse()
-                    .then(ids => {
-                        console.log('Generate reports task ids: ' + ids);
+                    .then(reports => {
+                        reports.forEach(report => {
+                            // might have been added by progress listener if it happened before
+                            if (!reportsProgress.getItem(report.getId())) {
+                                reportsProgress.addItem(report);
+                            }
+                        });
                     });
             });
-        reportsGroup.appendChild(genButton);
+
+        reportsGroup.addDataElements(i18n('field.repository.select'), [reportsCombo, reportsProgress, genButton]);
 
         return reportsGroup;
     }

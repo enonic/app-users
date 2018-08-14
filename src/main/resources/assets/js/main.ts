@@ -12,6 +12,8 @@ import {Router} from './app/Router';
 import {ShowNewPrincipalDialogEvent} from './app/browse/ShowNewPrincipalDialogEvent';
 import {NewPrincipalDialog} from './app/create/NewPrincipalDialog';
 import {PrincipalServerEventsHandler} from './app/event/PrincipalServerEventsHandler';
+import {ReportWebSocket} from './app/report/ReportWebSocket';
+import {Report} from './app/report/Report';
 
 function getApplication(): api.app.Application {
     let application = new api.app.Application('user-manager', 'Users', 'UM', CONFIG.appIconUrl);
@@ -63,11 +65,21 @@ function startApplication() {
 
     PrincipalServerEventsHandler.getInstance().start();
 
+    const socket = ReportWebSocket.getInstance();
+    socket.connect();
+    socket.onReportProgress(progressListener);
+
     const newPrincipalDialog = new NewPrincipalDialog();
     ShowNewPrincipalDialogEvent.on((event) => {
         newPrincipalDialog.setSelection(event.getSelection()).open();
     });
 }
+
+const progressListener = (report: Report, progress: number) => {
+    if (progress >= 100) {
+        api.notify.NotifyManager.get().showSuccess(i18n('notify.report.finished', report.getPrincipalDisplayName()));
+    }
+};
 
 const renderListener = () => {
     startApplication();

@@ -22,6 +22,5 @@ module.exports = {
         graphQlUserItem.UserItemType
     ),
     RepositoryType: graphQlRepository.RepositoryType,
-    PermissionReportType: graphQlPermissionReport.PermissionReportType,
-    GeneratePermissionReportType: graphQlPermissionReport.GeneratePermissionReportType
+    PermissionReportType: graphQlPermissionReport.PermissionReportType
 };

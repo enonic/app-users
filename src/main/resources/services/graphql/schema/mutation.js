@@ -228,7 +228,7 @@ module.exports = graphQl.createObjectType({
 
         // permissionsReport
         generatePermissionReports: {
-            type: graphQlObjectTypes.GeneratePermissionReportType,
+            type: graphQl.list(graphQlObjectTypes.PermissionReportType),
             args: {
                 principalKey: graphQl.nonNull(graphQl.GraphQLString),
                 repositoryIds: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
@@ -243,7 +243,7 @@ module.exports = graphQl.createObjectType({
             }
         },
         deletePermissionReports: {
-            type: graphQl.list(graphQlObjectTypes.GeneratePermissionReportType),
+            type: graphQl.GraphQLInt,
             args: {
                 ids: graphQl.list(graphQl.GraphQLString)
             },

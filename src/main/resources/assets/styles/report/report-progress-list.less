@@ -1,0 +1,31 @@
+.report-progress-list {
+  .report-progress-item {
+    display: flex;
+    align-items: stretch;
+    line-height: 20px;
+    font-size: 14px;
+    margin-bottom: 10px !important;
+
+    span.title {
+      min-width: 100px;
+    }
+
+    .progress-bar {
+      flex: 1;
+    }
+
+    .download {
+      flex: 1;
+      display: none;
+    }
+
+    &.ready {
+      .progress-bar {
+        display: none;
+      }
+      .download {
+        display: block;
+      }
+    }
+  }
+}
