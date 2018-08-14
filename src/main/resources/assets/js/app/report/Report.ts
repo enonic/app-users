@@ -6,8 +6,8 @@ export class Report
     private id: string;
     private taskId: string;
     private principalKey: PrincipalKey;
+    private princpalDisplayName: string;
     private repositoryId: string;
-    private report: string;
     private url: string;
 
     getId(): string {
@@ -18,16 +18,16 @@ export class Report
         return this.principalKey;
     }
 
+    getPrincipalDisplayName(): string {
+        return this.princpalDisplayName;
+    }
+
     getRepositoryId(): string {
         return this.repositoryId;
     }
 
     getTaskId(): string {
         return this.taskId;
-    }
-
-    getReport(): string {
-        return this.report;
     }
 
     getUrl(): string {
@@ -45,7 +45,7 @@ export class Report
         r.repositoryId = json.repositoryId;
         r.url = json.url;
         r.taskId = json.taskId;
-        r.report = json.report;
+        r.princpalDisplayName = json.principalDisplayName;
         return r;
     }
 }

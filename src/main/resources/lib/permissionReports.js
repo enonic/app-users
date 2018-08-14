@@ -1,6 +1,7 @@
 var taskLib = require('/lib/xp/task');
 var eventLib = require('/lib/xp/event');
 var portalLib = require('/lib/xp/portal');
+var authLib = require('/lib/xp/auth');
 var initLib = require('/lib/init');
 var principals = require('./principals');
 var common = require('./common');
@@ -29,11 +30,13 @@ var get = function (ids) {
 var generate = function (principalKey, repositoryIds) {
 
     log.info('Generate: principalKey=' + principalKey + ', repositoryIds=' + JSON.stringify(repositoryIds));
+    var principal = authLib.getPrincipal(principalKey);
 
     var reports = repositoryIds.map(function (repositoryId) {
         var node = common.create({
             _parentPath: '/reports/permissions',
             principalKey: principalKey,
+            principalDisplayName: principal.displayName,
             repositoryId: repositoryId
         }, initLib.REPO_NAME);
         

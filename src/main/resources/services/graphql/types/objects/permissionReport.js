@@ -17,6 +17,12 @@ exports.PermissionReportType = graphQl.createObjectType({
                 return env.source.principalKey;
             }
         },
+        principalDisplayName: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.principalDisplayName;
+            }
+        },
         repositoryId: {
             type: graphQl.GraphQLString,
             resolve: function (env) {
