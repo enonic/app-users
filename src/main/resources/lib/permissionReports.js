@@ -20,7 +20,10 @@ var list = function (principalKey, repositoryIds, start, count, sort) {
 };
 
 var deleteReports = function (ids) {
-    return common.delete(ids).length;
+    log.info('Deleting: ' + JSON.stringify(ids));
+    var result = common.delete(ids, initLib.REPO_NAME);
+    log.info('Delete reports: ' + JSON.stringify(result));
+    return result.length;
 };
 
 var get = function (ids) {
@@ -52,6 +55,7 @@ var generate = function (principalKey, repositoryIds) {
             _id: node._id,
             taskId: taskId,
             principalKey: principalKey,
+            principalDisplayName: node.principalDisplayName,
             repositoryId: repositoryId,
             url: node.url
         }
@@ -107,17 +111,18 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
                 taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
             });
 
-            reportProgressToSocket(reportNode, 100);
-            taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
-
-
             var updatedNode = common.update({
                 key: reportNode._id,
                 editor: function (node) {
                     node.report = report;
+                    node.finished = new Date();
                     return node;
                 }
             }, initLib.REPO_NAME);
+
+            reportProgressToSocket(updatedNode, 100);
+            taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
+
             log.info('Generated report for repository [' + repositoryId + ']: ' + report);
 
         }

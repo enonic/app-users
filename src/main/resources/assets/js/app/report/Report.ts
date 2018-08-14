@@ -6,8 +6,9 @@ export class Report
     private id: string;
     private taskId: string;
     private principalKey: PrincipalKey;
-    private princpalDisplayName: string;
+    private principalDisplayName: string;
     private repositoryId: string;
+    private finished: Date;
     private url: string;
 
     getId(): string {
@@ -19,7 +20,7 @@ export class Report
     }
 
     getPrincipalDisplayName(): string {
-        return this.princpalDisplayName;
+        return this.principalDisplayName;
     }
 
     getRepositoryId(): string {
@@ -34,6 +35,10 @@ export class Report
         return this.url;
     }
 
+    getFinished(): Date {
+        return this.finished;
+    }
+
     equals(other: Report): boolean {
         return this.id === other.id;
     }
@@ -45,7 +50,8 @@ export class Report
         r.repositoryId = json.repositoryId;
         r.url = json.url;
         r.taskId = json.taskId;
-        r.princpalDisplayName = json.principalDisplayName;
+        r.principalDisplayName = json.principalDisplayName;
+        r.finished = json.finished ? new Date(json.finished) : undefined;
         return r;
     }
 }

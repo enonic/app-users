@@ -1,7 +1,6 @@
 import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {Report} from '../../../app/report/Report';
 import PrincipalKey = api.security.PrincipalKey;
-import UserStoreKey = api.security.UserStoreKey;
 
 export class ListReportsRequest
     extends ListGraphQlRequest<any, Report[]> {
@@ -15,6 +14,8 @@ export class ListReportsRequest
                 url,
                 taskId,
                 principalKey,
+                finished,
+                principalDisplayName,
                 repositoryId
             }
         }`;

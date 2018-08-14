@@ -35,6 +35,12 @@ exports.PermissionReportType = graphQl.createObjectType({
                 return env.source.taskId;
             }
         },
+        finished: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.finished;
+            }
+        },
         url: {
             type: graphQl.GraphQLString,
             resolve: function (env) {

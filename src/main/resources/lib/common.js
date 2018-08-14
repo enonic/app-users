@@ -66,8 +66,8 @@ exports.getByIds = function (ids, repo) {
     return newConnection(repo).get(ids);
 };
 
-exports.delete = function (ids) {
-    return newConnection().delete(ids);
+exports.delete = function (ids, repo) {
+    return newConnection(repo).delete(ids);
 };
 
 exports.keysToPaths = function (keys) {
@@ -246,4 +246,5 @@ function newConnection(repo) {
         branch: REPO_BRANCH
     });
 }
+
 exports.newConnection = newConnection;

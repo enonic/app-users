@@ -25,6 +25,7 @@ export class GeneratePermissionsReportRequest
                 url,
                 taskId,
                 principalKey,
+                principalDisplayName,
                 repositoryId
             }
         }`;
