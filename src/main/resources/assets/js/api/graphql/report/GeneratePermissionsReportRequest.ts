@@ -22,6 +22,7 @@ export class GeneratePermissionsReportRequest
         return `mutation ($principalKey: String!, $repositoryIds: [String]!) {
             generatePermissionReports(principalKey: $principalKey, repositoryIds: $repositoryIds) {
                 id,
+                url,
                 taskId,
                 principalKey,
                 repositoryId
