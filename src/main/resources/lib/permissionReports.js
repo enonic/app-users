@@ -39,8 +39,8 @@ var generate = function (principalKey, repositoryIds) {
             principalDisplayName: principal.displayName,
             repositoryId: repositoryId
         }, initLib.REPO_NAME);
-        
-        
+
+
         node.url = portalLib.serviceUrl({
             service: 'permissionReport',
             params: {
@@ -93,7 +93,7 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
             log.info('Principal keys: ' + JSON.stringify(principalKeys));
 
             var nodes = queryRepositoryNodes(repositoryId, principalKeys);
-            
+
             var nodeProcessCount = 0;
             reportProgressToSocket(reportNode, 0);
             taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length});
@@ -144,19 +144,27 @@ var queryRepositoryNodes = function (repositoryId, principalKeys) {
 };
 
 var generateReportLine = function (node, memKeys) {
-    var lines = [];
+
+    var allow = {};
+    var deny = {};
     for (var i = 0; i < node._permissions.length; i++) {
         var perm = node._permissions[i];
         if (memKeys.indexOf(perm.principal) >= 0) {
-            var cols = [node._path];
             PERMISSIONS.forEach(function (pt) {
-                cols.push(perm.allow.indexOf(pt) >= 0 ? 'X' : '')
+                if (perm.allow.indexOf(pt) !== -1) {
+                    allow[pt] = true;
+                }
+                if (perm.deny.indexOf(pt) !== -1) {
+                    deny[pt] = true;
+                }
             });
-            var line = cols.join(',');
-            lines.push(line);
         }
     }
-    return lines.join('\n');
+    var line = [node._path];
+    PERMISSIONS.forEach(function (pt) {
+        line.push(allow[pt] && !deny[pt] ? 'X' : '');
+    });
+    return line.join(',');
 };
 
 module.exports = {
