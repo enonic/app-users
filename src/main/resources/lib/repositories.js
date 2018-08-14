@@ -4,9 +4,9 @@ exports.getById = function (id) {
     return common.getByIds(id)
 };
 
-exports.list = function (query, start, count, sort) {
+exports.list = function (search, start, count, sort) {
     var queryResult = common.queryAll({
-        query: createRepoQuery(query),
+        query: createRepoQuery(search),
         start: start,
         count: count,
         sort: sort
@@ -14,10 +14,6 @@ exports.list = function (query, start, count, sort) {
     return queryResult.hits;
 };
 
-function createRepoQuery(query) {
-    var q = '_parentPath="/repository"';
-    if (!!query) {
-        q += ' AND fulltext(\'_name\', \'' + query + '\', \'AND\')'
-    }
-    return q;
+function createRepoQuery(search) {
+    return '_parentPath="/repository"' + (search ? ' AND ngram("_name","' + search + '")' : '');
 }

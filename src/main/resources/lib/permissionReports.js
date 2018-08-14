@@ -8,11 +8,9 @@ var common = require('./common');
 var PERMISSIONS = ['READ', 'CREATE', 'MODIFY', 'DELETE', 'PUBLISH', 'READ_PERMISSIONS', 'WRITE_PERMISSIONS'];
 var PROGRESS_EVENT = 'reportProgress';
 
-var list = function (principalKey, userStoreKeys, start, count, sort) {
-    log.info('List repositories: pKey=' + principalKey + ', uKeys=' + JSON.stringify(userStoreKeys) + ', start=' + start + ', count=' +
-             count + ', sort=' + sort);
+var list = function (principalKey, repositoryIds, start, count, sort) {
     var queryResult = common.queryAll({
-        query: createRepoQuery(principalKey, userStoreKeys),
+        query: createRepoQuery(principalKey, repositoryIds),
         start: start,
         count: count,
         sort: sort
@@ -28,61 +26,37 @@ var get = function (ids) {
     return common.getByIds(ids, initLib.REPO_NAME)
 };
 
-var generate = function (principalKey, repositoryKeys) {
+var generate = function (principalKey, repositoryIds) {
 
-    log.info('Generate: pKey=' + principalKey + ', rKeys=' + JSON.stringify(repositoryKeys));
+    log.info('Generate: principalKey=' + principalKey + ', repositoryIds=' + JSON.stringify(repositoryIds));
 
-    var userStoreKeys = repositoryKeys.reduce(function (prev, curr) {
-        return prev.concat(queryUserStores(curr));
-    }, []);
-
-    log.info('Generate: uKeys=' + JSON.stringify(userStoreKeys));
-
-    var reports = userStoreKeys.map(function (uKey) {
+    var reports = repositoryIds.map(function (repositoryId) {
         var node = common.create({
             _parentPath: '/reports/permissions',
             principalKey: principalKey,
-            userStoreKey: uKey
+            repositoryId: repositoryId
         }, initLib.REPO_NAME);
-
+        
+        
         node.url = portalLib.serviceUrl({
             service: 'permissionReport',
             params: {
                 id: node._id
             }
         });
-
-        var taskId = generateReport(node, principalKey, uKey);
-
+        var taskId = generateReport(node, principalKey, repositoryId);
         return {
             _id: node._id,
             taskId: taskId,
             principalKey: principalKey,
-            userStoreKey: uKey,
+            repositoryId: repositoryId,
             url: node.url
         }
     });
-    common.refresh(initLib.REPO_NAME);
 
     log.info('Generate: results=' + JSON.stringify(reports));
 
     return reports;
-};
-
-module.exports = {
-    get: get,
-    list: list,
-    delete: deleteReports,
-    generate: generate,
-    PROGRESS_EVENT: PROGRESS_EVENT
-};
-
-var queryUserStores = function (repoKey) {
-    return common.queryAll({
-        query: '_parentPath="/identity" AND _name!="roles"'
-    }, repoKey).hits.map(function (hit) {
-        return hit._name;
-    });
 };
 
 var reportProgressToSocket = function (reportNode, progress) {
@@ -96,75 +70,73 @@ var reportProgressToSocket = function (reportNode, progress) {
     });
 };
 
-var generateReport = function (node, pKey, uKey) {
+var generateReport = function (reportNode, principalKey, repositoryId) {
     return taskLib.submit({
-        description: 'Report task for userStore[' + uKey + '] and principal[' + pKey + ']',
-        task: function (reportNode, pKey, uKey) {
-            return function () {
-                reportProgressToSocket(reportNode, 0);
-                taskLib.progress({info: 'Querying principal memberships', value: 0});
-
-                var memKeys;
-                if (common.isRole(pKey)) {
-                    memKeys = [pKey]
-                } else {
-                    memKeys = principals.getMemberships(pKey, true).map(function (m) {
-                        return m.key;
-                    });
-                }
-
-                reportProgressToSocket(reportNode, 10);
-                taskLib.progress({info: 'Finding nodes accessible by memberships', value: 10});
-
-                var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
-                queryUserStoreNodes(uKey, memKeys).forEach(function (node, index, nodes) {
-                    var progress = 80 * (index + 1) / nodes.length;
-                    reportProgressToSocket(reportNode, progress);
-                    taskLib.progress({info: 'Generating report for [' + node._name + ']', value: progress});
-
-                    report += '\n' + generateReportLine(node, memKeys);
+        description: 'Report task for repository [' + repositoryId + '] and principal [' + principalKey + ']',
+        task: function () {
+            var principalKeys = [principalKey];
+            if (!common.isRole(principalKey)) {
+                var membershipKeys = principals.getMemberships(principalKey, true).map(function (m) {
+                    return m.key;
                 });
-
-                reportProgressToSocket(reportNode, 90);
-                taskLib.progress({info: 'Persisting report', value: 90});
-
-                common.update({
-                    key: reportNode._id,
-                    editor: function (node) {
-                        node.report = report;
-                        return node;
-                    }
-                }, initLib.REPO_NAME);
-
-                log.info('Generated report for userStore [' + uKey + ']: ' + report);
-                reportProgressToSocket(reportNode, 100);
-                taskLib.progress({info: 'Report for userStore [' + uKey + '] complete.', value: 100});
+                principalKeys = principalKeys.concat(membershipKeys);
             }
-        }(node, pKey, uKey)
+            if (common.isUser(principalKey)) {
+                principalKeys.push('role:system.everyone');
+                if (principalKey != 'user:system:anonymous') {
+                    principalKeys.push('role:system.authenticated');
+                }
+            }
+            log.info('Principal keys: ' + JSON.stringify(principalKeys));
+
+            var nodes = queryRepositoryNodes(repositoryId, principalKeys);
+            
+            var nodeProcessCount = 0;
+            reportProgressToSocket(reportNode, 0);
+            taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length});
+
+            var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
+            nodes.forEach(function (node) {
+                report += '\n' + generateReportLine(node, principalKeys);
+
+                nodeProcessCount++;
+                reportProgressToSocket(reportNode, nodeProcessCount * 100 / nodes.length);
+                taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length});
+            });
+
+            var updatedNode = common.update({
+                key: reportNode._id,
+                editor: function (node) {
+                    node.report = report;
+                    return node;
+                }
+            }, initLib.REPO_NAME);
+            log.info('Generated report for repository [' + repositoryId + ']: ' + report);
+
+        }
     });
 };
 
-var queryUserStoreNodes = function (uKey, memKeys, repoKey) {
-    //var query = '_parentPath IN ("/identity/' + uKey + '/users","/identity/' + uKey + '/groups") AND _permissions.principal IN ("' + memKeys.join('","') + '")';
-
-    var query = '_parentPath IN ("/identity/' + uKey + '/users","/identity/' + uKey + '/groups")';
-    var filter = {
+var queryRepositoryNodes = function (repositoryId, principalKeys) {
+    var filters = {
         hasValue: {
-            field: "_permissions.principal",
-            values: memKeys
+            field: "_permissions.read",
+            values: principalKeys
         }
     };
-    var result = common.queryAll({
-        query: query,
-        filters: filter,
-        explain: true
-    }, repoKey);
 
-    //TODO: filtering by membershipKeys here, since query filter doesn't work !!!
-    return result.hits.filter(function (hit) {
-        return hit._permissions.some(function (perm) {
-            return perm.allow && perm.allow.length > 0 && memKeys.indexOf(perm.principal) >= 0;
-        })
+    var repoConn = common.newConnection(repositoryId);
+    return repoConn.query({
+        count: 1024, //TODO Batch
+        query: '',
+        filters: filters
+    }).hits.map(function (nodeHit) {
+        var node = repoConn.get(nodeHit.id);
+        log.info('node:' + node._path);
+        return {
+            _path: node._path,
+            _permissions: node._permissions
+        };
     });
 };
 
@@ -184,14 +156,21 @@ var generateReportLine = function (node, memKeys) {
     return lines.join('\n');
 };
 
-function createRepoQuery(principalKey, userStoreKeys) {
+module.exports = {
+    get: get,
+    list: list,
+    delete: deleteReports,
+    generate: generate,
+    PROGRESS_EVENT: PROGRESS_EVENT
+};
+
+function createRepoQuery(principalKey, repositoryIds) {
     var q = '_parentPath="/reports/permissions"';
     if (!!principalKey) {
         q += ' AND principalKey="' + principalKey + '"';
     }
-    if (!!userStoreKeys) {
-        q += ' AND userStoreKey IN ["' + userStoreKeys.join('","') + '"]';
+    if (!!repositoryIds) {
+        q += ' AND repositoryId IN ["' + repositoryIds.join('","') + '"]';
     }
-    log.info('Repo list query: ' + q);
     return q;
 }

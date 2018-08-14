@@ -1,3 +1,17 @@
+var authLib = require('/lib/xp/auth');
+
+var Roles = {
+    ADMIN: 'system.admin',
+    EVERYONE: 'system.everyone',
+    AUTHENTICATED: 'system.authenticated',
+    ADMIN_LOGIN: 'system.admin.login',
+    USER_MANAGER_APP: 'system.user.app',
+    USER_MANAGER_ADMIN: 'system.user.admin',
+    CONTENT_MANAGER_APP: 'cms.cm.app',
+    CONTENT_MANAGER_EXPERT: 'cms.expert',
+    CONTENT_MANAGER_ADMIN: 'cms.admin'
+};
+
 function required(params, name) {
     var value = params[name];
     if (value === undefined) {
@@ -120,4 +134,8 @@ exports.deleteUserStores = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DeleteUserStoresHandler');
     bean.userStoreKeys = __.toScriptValue(required(params, 'keys'));
     return __.toNativeObject(bean.deleteUserStores());
+};
+
+exports.isAdmin = function() {
+    return authLib.hasRole(Roles.ADMIN);
 };

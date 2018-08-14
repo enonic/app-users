@@ -1,13 +1,12 @@
 import Equitable = api.Equitable;
 import PrincipalKey = api.security.PrincipalKey;
-import UserStoreKey = api.security.UserStoreKey;
 
 export class Report
     implements Equitable {
     private id: string;
     private taskId: string;
     private principalKey: PrincipalKey;
-    private userStoreKey: UserStoreKey;
+    private repositoryId: string;
     private report: string;
     private url: string;
 
@@ -19,8 +18,8 @@ export class Report
         return this.principalKey;
     }
 
-    getUserStoreKey(): UserStoreKey {
-        return this.userStoreKey;
+    getRepositoryId(): string {
+        return this.repositoryId;
     }
 
     getTaskId(): string {
@@ -43,7 +42,7 @@ export class Report
         const r = new Report();
         r.id = json.id || json._id;
         r.principalKey = json.principalKey ? PrincipalKey.fromString(json.principalKey) : null;
-        r.userStoreKey = json.userStoreKey ? UserStoreKey.fromString(json.userStoreKey) : null;
+        r.repositoryId = json.repositoryId;
         r.url = json.url;
         r.taskId = json.taskId;
         r.report = json.report;

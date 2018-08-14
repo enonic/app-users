@@ -17,10 +17,10 @@ exports.PermissionReportType = graphQl.createObjectType({
                 return env.source.principalKey;
             }
         },
-        userStoreKey: {
+        repositoryId: {
             type: graphQl.GraphQLString,
             resolve: function (env) {
-                return env.source.userStoreKey;
+                return env.source.repositoryId;
             }
         },
         taskId: {

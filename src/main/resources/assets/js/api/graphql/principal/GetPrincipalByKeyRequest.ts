@@ -14,11 +14,17 @@ export class GetPrincipalByKeyRequest
     extends GraphQlRequest<any, Principal> {
 
     private key: PrincipalKey;
+    private includeMemberships: boolean = false;
     private transitive: boolean;
 
     constructor(key: PrincipalKey) {
         super();
         this.key = key;
+    }
+
+    setIncludeMemberships(value: boolean): GetPrincipalByKeyRequest {
+        this.includeMemberships = value;
+        return this;
     }
 
     setTransitiveMemberships(flag: boolean): GetPrincipalByKeyRequest {
@@ -36,14 +42,14 @@ export class GetPrincipalByKeyRequest
     }
 
     getQuery(): string {
-        return `query (${this.getParamsByKey(this.key)}) {
+        return `query (${this.getParamsByKey(this.key, this.includeMemberships)}) {
                     principal (key: $key) {
                         key
                         name
                         path
                         description
                         displayName
-                        ${this.getFieldsByKey(this.key)}
+                        ${this.getFieldsByKey(this.key, this.includeMemberships)}
                         permissions {
                             principal {
                                 key
@@ -56,39 +62,39 @@ export class GetPrincipalByKeyRequest
                 }`;
     }
 
-    private getParamsByKey(key: PrincipalKey): string {
+    private getParamsByKey(key: PrincipalKey, includeMemberships: boolean): string {
         const params = ['$key: String!'];
-        if (!key.isRole()) {
+        if (includeMemberships && !key.isRole()) {
             params.push('$transitive: Boolean');
         }
         return params.join(', ');
     }
 
-    private getFieldsByKey(key: PrincipalKey): string {
+    private getFieldsByKey(key: PrincipalKey, includeMemberships: boolean): string {
         let fields = '';
         switch (key.getType()) {
         case PrincipalType.USER:
             fields = `email
-                      login
-                      memberships (transitive: $transitive) {
-                          key
-                          displayName
-                          description
-                      }`;
+                      login` + this.getMembershipsField(includeMemberships);
             break;
         case PrincipalType.GROUP:
-            fields = `members
-                      memberships (transitive: $transitive) {
-                          key
-                          displayName
-                          description
-                      }`;
+            fields = `members` + this.getMembershipsField(includeMemberships);
             break;
         case PrincipalType.ROLE:
             fields = `members`;
             break;
         }
         return fields;
+    }
+
+    private getMembershipsField(includeMemberships: boolean) {
+        console.log('test');
+        return includeMemberships ? `
+            memberships (transitive: $transitive) {
+                key
+                displayName
+                description
+            }` : ``;
     }
 
     sendAndParse(): wemQ.Promise<Principal> {

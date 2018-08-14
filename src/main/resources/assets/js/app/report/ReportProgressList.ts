@@ -9,11 +9,11 @@ import {ListReportsRequest} from '../../api/graphql/report/ListReportsRequest';
 export class ReportProgressList
     extends ListBox<Report> {
 
-    constructor(principalKey: PrincipalKey, userStoreKeys?: UserStoreKey[]) {
+    constructor(principalKey: PrincipalKey, repositoryIds?: string[]) {
         super('report-progress-list');
         const socket = ReportWebSocket.getInstance();
 
-        this.loadExistingReports(principalKey, userStoreKeys);
+        this.loadExistingReports(principalKey, repositoryIds);
 
         socket.onReportProgress((report: Report, progress: number) => {
             let view = <ReportProgressItem> this.getItemView(report);
@@ -38,10 +38,10 @@ export class ReportProgressList
         return item.getId();
     }
 
-    private loadExistingReports(principalKey: PrincipalKey, userStoreKeys?: UserStoreKey[]) {
+    private loadExistingReports(principalKey: PrincipalKey, repositoryIds?: string[]) {
         new ListReportsRequest()
             .setPrincipalKey(principalKey)
-            .setUserStoreKeys(userStoreKeys)
+            .setRepositoryIds(repositoryIds)
             .sendAndParse()
             .then(reports => this.addItems(reports));
     }
@@ -55,14 +55,14 @@ class ReportProgressItem
     constructor(item: Report) {
         super('report-progress-item');
         const name = new api.dom.SpanEl('title');
-        name.setHtml(item.getUserStoreKey().getId());
+        name.setHtml(item.getRepositoryId());
 
         this.setReportReady(item.getTaskId() === undefined);
 
         this.progress = new api.ui.ProgressBar(Math.random() * 100);
         this.downloadLink = new api.dom.AEl('download').setUrl(item.getUrl(), '_blank');
         this.downloadLink.getEl().setText(i18n('action.report.download')).setAttribute('download',
-            `Report_${item.getPrincipalKey().getId()}_in_ ${item.getUserStoreKey().toString()}.csv`);
+            `Report_${item.getPrincipalKey().getId()}_in_ ${item.getRepositoryId()}.csv`);
 
         this.appendChildren(name, this.progress, this.downloadLink);
     }

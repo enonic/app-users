@@ -6,16 +6,16 @@ import UserStoreKey = api.security.UserStoreKey;
 export class ListReportsRequest
     extends ListGraphQlRequest<any, Report[]> {
     private principalKey: PrincipalKey;
-    private userStoreKeys: UserStoreKey[];
+    private repositoryIds: string[];
 
     getQuery(): string {
-        return `query($principalKey: String, $userStoreKeys: [String], $start: Int, $count: Int, $sort: SortMode) {
-            permissionReports(principalKey: $principalKey, userStoreKeys: $userStoreKeys, start: $start, count: $count, sort: $sort) {
+        return `query($principalKey: String, $repositoryIds: [String], $start: Int, $count: Int, $sort: SortMode) {
+            permissionReports(principalKey: $principalKey, repositoryIds: $repositoryIds, start: $start, count: $count, sort: $sort) {
                 id,
                 url,
                 taskId,
                 principalKey,
-                userStoreKey
+                repositoryId
             }
         }`;
     }
@@ -25,8 +25,8 @@ export class ListReportsRequest
         return this;
     }
 
-    setUserStoreKeys(keys: UserStoreKey[]): ListReportsRequest {
-        this.userStoreKeys = keys;
+    setRepositoryIds(repositoryIds: string[]): ListReportsRequest {
+        this.repositoryIds = repositoryIds;
         return this;
     }
 
@@ -35,8 +35,8 @@ export class ListReportsRequest
         if (!!this.principalKey) {
             vars['principalKey'] = this.principalKey.toString();
         }
-        if (!!this.userStoreKeys) {
-            vars['userStoreKeys'] = this.userStoreKeys.map(key => key.toString());
+        if (!!this.repositoryIds) {
+            vars['repositoryIds'] = this.repositoryIds;
         }
         return vars;
     }

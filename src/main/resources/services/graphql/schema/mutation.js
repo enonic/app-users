@@ -1,4 +1,5 @@
 var graphQl = require('/lib/graphql');
+var authLib = require('/lib/auth');
 
 var userstores = require('/lib/userstores');
 var principals = require('/lib/principals');
@@ -230,15 +231,15 @@ module.exports = graphQl.createObjectType({
             type: graphQl.list(graphQlObjectTypes.PermissionReportType),
             args: {
                 principalKey: graphQl.nonNull(graphQl.GraphQLString),
-                repositoryKeys: graphQl.list(graphQl.GraphQLString)
+                repositoryIds: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
             },
             resolve: function (env) {
-                if (!principals.isAdmin()) {
-                    throw new Error('User is not logged in or has no admin rights');
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
                 }
-                var pKey = env.args.principalKey;
-                var rKeys = env.args.repositoryKeys;
-                return permissionReports.generate(pKey, rKeys);
+                var principalKey = env.args.principalKey;
+                var repositoryIds = env.args.repositoryIds;
+                return permissionReports.generate(principalKey, repositoryIds);
             }
         },
         deletePermissionReports: {
@@ -247,8 +248,8 @@ module.exports = graphQl.createObjectType({
                 ids: graphQl.list(graphQl.GraphQLString)
             },
             resolve: function (env) {
-                if (!principals.isAdmin()) {
-                    throw new Error('User is not logged in or has no admin rights');
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
                 }
                 var ids = env.args.ids;
                 return permissionReports.delete(ids);
