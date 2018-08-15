@@ -8,6 +8,7 @@ var common = require('./common');
 
 var PERMISSIONS = ['READ', 'CREATE', 'MODIFY', 'DELETE', 'PUBLISH', 'READ_PERMISSIONS', 'WRITE_PERMISSIONS'];
 var PROGRESS_EVENT = 'reportProgress';
+var DOWNLOAD_EVENT = 'reportDownload';
 
 var list = function (principalKey, repositoryIds, start, count, sort) {
     var queryResult = common.queryAll({
@@ -181,7 +182,8 @@ module.exports = {
     list: list,
     delete: deleteReports,
     generate: generate,
-    PROGRESS_EVENT: PROGRESS_EVENT
+    PROGRESS_EVENT: PROGRESS_EVENT,
+    DOWNLOAD_EVENT: DOWNLOAD_EVENT
 };
 
 function createRepoQuery(principalKey, repositoryIds) {

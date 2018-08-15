@@ -15,6 +15,10 @@ exports.get = function (req) {
     } else {
         var id = req.params.id;
         var report = permissionReports.get(id);
+        if (report) {
+            var data = JSON.stringify({report: report, type: permissionReports.DOWNLOAD_EVENT});
+            webSocketLib.sendToGroup(REPORT_GROUP, data);
+        }
         return {
             contentType: 'text/csv',
             status: report ? 200 : 404,
@@ -49,7 +53,7 @@ eventLib.listener({
         var reportNode = JSON.parse(event.data.report);
         var progress = event.data.progress;
 
-        var data = JSON.stringify({report: reportNode, progress: progress});
+        var data = JSON.stringify({report: reportNode, progress: progress, type: permissionReports.PROGRESS_EVENT});
         webSocketLib.sendToGroup(REPORT_GROUP, data);
     }
 });

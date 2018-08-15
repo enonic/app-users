@@ -1,6 +1,7 @@
 import ListBox = api.ui.selector.list.ListBox;
 import i18n = api.util.i18n;
 import PrincipalKey = api.security.PrincipalKey;
+import DateHelper = api.util.DateHelper;
 import {Report} from './Report';
 import {ReportWebSocket} from './ReportWebSocket';
 import {ListReportsRequest} from '../../api/graphql/report/ListReportsRequest';
@@ -29,22 +30,27 @@ export class ReportProgressList
                 view.setReportReady(true);
             }
         });
+
+        socket.onReportDownload((report: Report) => this.deleteReport(report));
     }
 
     protected createItemView(item: Report, readOnly: boolean): ReportProgressItem {
         const view = new ReportProgressItem(item);
-        view.onDeleteClicked(report => {
-            new DeleteReportsRequest([report.getId()]).sendAndParse().then(count => {
-                if (count === 1) {
-                    this.removeItem(report);
-                }
-            });
-        });
+        view.onDeleteClicked(report => this.deleteReport(report));
         return view;
     }
 
     protected getItemId(item: Report): string {
         return item.getId();
+    }
+
+    private deleteReport(report: Report): wemQ.Promise<boolean> {
+        return new DeleteReportsRequest([report.getId()]).sendAndParse().then(count => {
+            if (count === 1) {
+                this.removeItem(report);
+            }
+            return count === 1;
+        });
     }
 
     private loadExistingReports(principalKey: PrincipalKey, repositoryIds?: string[]) {
@@ -90,7 +96,7 @@ class ReportProgressItem
     }
 
     public setFinished(date: Date) {
-        this.timestamp.setHtml(!!date ? date.toISOString() : '');
+        this.timestamp.setHtml(!!date ? `${DateHelper.formatDate(date)} ${DateHelper.formatTime(date.getHours(), date.getMinutes())}` : '');
     }
 
     public setReportReady(value: boolean) {

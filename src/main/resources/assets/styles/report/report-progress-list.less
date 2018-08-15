@@ -2,12 +2,12 @@
   .report-progress-item {
     display: flex;
     align-items: stretch;
-    line-height: 20px;
+    line-height: 22px;
     font-size: 14px;
-    margin-bottom: 10px !important;
+    margin: 0 8px 10px !important;
 
     span.title {
-      min-width: 180px;
+      flex: 1;
       margin-right: 10px;
     }
 
@@ -17,8 +17,8 @@
 
     .timestamp {
       flex: 1;
-      text-align: center;
       display: none;
+      color: @admin-font-gray2;
     }
 
     .download, .delete {

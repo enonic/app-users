@@ -12,6 +12,7 @@ export class ReportWebSocket {
     private disconnectTimeoutHandle: number;
     private connected: boolean;
     private progressListeners: { (report: Report, progress: number): void }[] = [];
+    private downloadListeners: { (report: Report): void }[] = [];
 
     constructor(reconnectIntervalSeconds: number = 5) {
         this.ws = null;
@@ -110,11 +111,18 @@ export class ReportWebSocket {
 
     private handleSocketEvent(event: any) {
         // only progress currently
-        this.notifyReportProgress(event);
+        switch (event.type) {
+        case 'reportProgress':
+            this.notifyReportProgress(Report.fromJson(event.report), event.progress);
+            break;
+        case 'reportDownload':
+            this.notifyReportDownload(Report.fromJson(event.report));
+            break;
+        }
     }
 
-    private notifyReportProgress(event: any) {
-        this.progressListeners.forEach(l => l(Report.fromJson(event.report), event.progress));
+    private notifyReportProgress(report: Report, progress: number) {
+        this.progressListeners.forEach(l => l(report, progress));
     }
 
     public onReportProgress(listener: (report: Report, progress: number) => void) {
@@ -123,5 +131,17 @@ export class ReportWebSocket {
 
     public unReportProgress(listener: (report: Report, progress: number) => void) {
         this.progressListeners = this.progressListeners.filter(curr => curr !== listener);
+    }
+
+    private notifyReportDownload(report: Report) {
+        this.downloadListeners.forEach(l => l(report));
+    }
+
+    public onReportDownload(listener: (report: Report) => void) {
+        this.downloadListeners.push(listener);
+    }
+
+    public unReportDownload(listener: (report: Report) => void) {
+        this.downloadListeners = this.downloadListeners.filter(curr => curr !== listener);
     }
 }
