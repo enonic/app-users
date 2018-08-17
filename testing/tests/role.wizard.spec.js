@@ -46,7 +46,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
             }).then(() => {
                 return roleWizard.waitForErrorNotificationMessage();
             }).then(result => {
-                let msg = `Principal [` + testRole.displayName + `] could not be created. A principal with that name already exists`
+                let msg = `Principal [` + testRole.displayName + `] could not be created. A principal with that name already exists`;
                 assert.strictEqual(result, msg, 'expected notification message should be displayed');
             })
         });
@@ -59,7 +59,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
         }).then(() => roleWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME)).then(() => roleWizard.waitAndClickOnSave()).then(
             () => {
                 return roleWizard.getMembers();
-            }).then((members) => {
+            }).then(members => {
             expect(members[0]).to.equal(appConst.SUPER_USER_DISPLAY_NAME);
         })
     });
@@ -94,7 +94,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
                 return testUtils.saveAndCloseWizard(testRole.displayName);
             }).then(() => {
                 return roleStatisticsPanel.getDisplayNameOfMembers();
-            }).then((members) => {
+            }).then(members => {
                 expect(members.length).to.equal(0);
             })
         });

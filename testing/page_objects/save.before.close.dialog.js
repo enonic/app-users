@@ -7,7 +7,7 @@ const dialog = {
     yesButton: `//button[contains(@id,'DialogButton') and child::span[text()='Yes']]`,
     noButton: `//div[@class='dialog-buttons']//button/span[text()='No']`,
 };
-var saveBeforeCloseDialog = Object.create(page, {
+const saveBeforeCloseDialog = Object.create(page, {
 
     warningMessage: {
         get: function () {

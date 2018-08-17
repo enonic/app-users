@@ -1,12 +1,13 @@
 /**
  * Created by on 6/26/2017.
  */
-var page = require('./page');
-var panel = {
+const page = require('./page');
+const appConst = require('../libs/app_const');
+const panel = {
     container: `//div[contains(@class,'launcher-main-container')]`
 };
 
-var launcherPanel = Object.create(page, {
+const launcherPanel = Object.create(page, {
     /**
      * define elements
      */
@@ -39,7 +40,7 @@ var launcherPanel = Object.create(page, {
 
     clickOnUsersLink: {
         value: function () {
-            return this.waitForVisible(this.usersLink, 2000).then(()=> {
+            return this.waitForVisible(this.usersLink, appConst.TIMEOUT_3).then(() => {
                 return this.doClick(this.usersLink).catch(err=> {
                     console.log('err when click on Users link' + err);
                     throw new Error(err);
@@ -49,7 +50,7 @@ var launcherPanel = Object.create(page, {
     },
     clickOnLogoutLink: {
         value: function () {
-            return this.waitForVisible(this.logoutLink, 2000).then(()=> {
+            return this.waitForVisible(this.logoutLink, appConst.TIMEOUT_3).then(() => {
                 return this.doClick(this.logoutLink).catch(err=> {
                     console.log('err when click on Log Out link' + err);
                     throw new Error(err);
@@ -58,9 +59,9 @@ var launcherPanel = Object.create(page, {
         }
     },
     waitForPanelVisible: {
-        value: function (ms) {
-            return this.waitForVisible(`${panel.container}`, ms).catch((err)=> {
-                console.log('launcher panel is not opened ')
+        value: function () {
+            return this.waitForVisible(`${panel.container}`, appConst.TIMEOUT_3).catch(err => {
+                console.log('launcher panel is not loaded ');
                 return false;
             })
         }

@@ -2,10 +2,10 @@
  * Created on 24.10.2017.
  */
 
-var page = require('../page');
-var elements = require('../../libs/elements');
-var appConst = require('../../libs/app_const');
-var dialog = {
+const page = require('../page');
+const elements = require('../../libs/elements');
+const appConst = require('../../libs/app_const');
+const dialog = {
     container: `//div[contains(@id,'ChangeUserPasswordDialog')]`,
     passwordInput: "//input[contains(@id,'PasswordInput')]",
     changePasswordButton: `//button[contains(@id,'DialogButton') and child::span[text()='Change Password']]`,
@@ -14,7 +14,7 @@ var dialog = {
     generatePasswordLink: `//a[text()='Generate']`,
     userPath: `//h6[@class='user-path']`,
 };
-var changeUserPasswordDialog = Object.create(page, {
+const changeUserPasswordDialog = Object.create(page, {
 
     passwordInput: {
         get: function () {
@@ -48,7 +48,6 @@ var changeUserPasswordDialog = Object.create(page, {
             return `${dialog.container}` + `${dialog.userPath}`;
         }
     },
-
     isPasswordInputDisplayed: {
         value: function () {
             return this.isVisible(this.passwordInput);
@@ -61,7 +60,7 @@ var changeUserPasswordDialog = Object.create(page, {
     },
     isHideLinkDisplayed: {
         value: function () {
-            return this.getAttribute(this.showPasswordLink, 'data-i18n').then(result=> {
+            return this.getAttribute(this.showPasswordLink, 'data-i18n').then(result => {
                 return result.includes('Hide')
             });
         }
@@ -74,7 +73,7 @@ var changeUserPasswordDialog = Object.create(page, {
 
     clickOnChangePasswordButton: {
         value: function () {
-            return this.doClick(this.changePasswordButton).then(()=> {
+            return this.doClick(this.changePasswordButton).then(() => {
                 return this.waitForNotVisible(`${dialog.container}`, appConst.TIMEOUT_3);
             });
         }
@@ -94,7 +93,6 @@ var changeUserPasswordDialog = Object.create(page, {
             return this.getTextFromElements(this.userPath);
         }
     },
-
 
     waitForDialogVisible: {
         value: function (ms) {
@@ -124,8 +122,8 @@ var changeUserPasswordDialog = Object.create(page, {
     },
     waitForClosed: {
         value: function () {
-            return this.waitForNotVisible(`${dialog.container}`, appConst.TIMEOUT_3).catch(error=> {
-                throw new Error('Change Pasword Dialog was not closed');
+            return this.waitForNotVisible(`${dialog.container}`, appConst.TIMEOUT_3).catch(error => {
+                throw new Error('Change Password Dialog was not closed ' + error);
             });
         }
     },

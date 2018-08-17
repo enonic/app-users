@@ -1,7 +1,8 @@
 import '../../api.ts';
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
+import {SetUserPasswordRequest} from './SetUserPasswordRequest';
+import {PasswordGenerator} from './PasswordGenerator';
 import Principal = api.security.Principal;
-import PasswordGenerator = api.ui.text.PasswordGenerator;
 import DialogButton = api.ui.dialog.DialogButton;
 import FormItemBuilder = api.ui.form.FormItemBuilder;
 import Validators = api.ui.form.Validators;
@@ -61,7 +62,7 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
     private initializeActions() {
 
         this.changePasswordButton = this.addAction(new api.ui.Action(i18n('action.changePassword'), '').onExecuted(() => {
-            new api.security.SetUserPasswordRequest().setKey(this.principal.getKey()).setPassword(
+            new SetUserPasswordRequest().setKey(this.principal.getKey()).setPassword(
                 this.password.getValue()).sendAndParse().then((result) => {
                 api.notify.showFeedback(i18n('notify.change.password'));
                 this.close();

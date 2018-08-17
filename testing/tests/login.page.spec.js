@@ -10,7 +10,7 @@ const testUtils = require('../libs/test.utils');
 describe('Login Page specification', function () {
 
     this.timeout(17000);
-    var client = webDriverHelper.setupBrowser();
+    webDriverHelper.setupBrowser();
 
     it('check login page', () => {
         return loginPage.getTitle().then(function (title) {

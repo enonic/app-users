@@ -5,15 +5,15 @@ const page = require('../page');
 const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
-var menuXpath = {
+const menuXpath = {
     container: `//ul[contains(@id,'TreeGridContextMenu')]`,
     contextMenuItems: `//li[contains(@id,'MenuItem')]`,
     deleteMenuItem: `//li[contains(@id,'MenuItem') and text()='Delete']`,
     editMenuItem: `//li[contains(@id,'MenuItem') and text()='Edit']`,
     newMenuItem: `//li[contains(@id,'MenuItem') and text()='New...']`,
 
-}
-var gridContextMenu = Object.create(page, {
+};
+const gridContextMenu = Object.create(page, {
 
     waitForContextMenuVisible: {
         value: function () {
@@ -23,7 +23,6 @@ var gridContextMenu = Object.create(page, {
             });
         }
     },
-
     waitForDeleteMenuItemDisabled: {
         value: function () {
             return this.getBrowser().waitUntil(()=> {
@@ -38,7 +37,6 @@ var gridContextMenu = Object.create(page, {
             });
         }
     },
-
     isEditMenuItemDisabled: {
         value: function () {
             return this.getAttribute(`${menuXpath.editMenuItem}`, 'class').then(result=> {
@@ -70,7 +68,7 @@ var gridContextMenu = Object.create(page, {
     clickOnMenuItem: {
         value: function (itemName) {
             //TODO finish it 
-            var nameXpath = menuXpath.itemByName(itemName);
+            let nameXpath = menuXpath.itemByName(itemName);
             return this.waitForVisible(nameXpath, appConst.TIMEOUT_3).then(()=> {
                 return this.doClick(nameXpath);
             }).pause(500).catch((err)=> {

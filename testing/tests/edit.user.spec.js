@@ -40,7 +40,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
             }).then(()=> {
                 testUtils.saveScreenshot('edit_user_wizard4');
                 return userStatisticsPanel.getDisplayNameOfRoles();
-            }).then((roles)=> {
+            }).then(roles => {
                 assert.equal(roles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
                 assert.equal(roles[1], appConst.roles.USERS_ADMINISTRATOR,
                     '`Content Manager Administrator` role should be present on the panel');
@@ -78,7 +78,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
 
     it('GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail-should be present on the statistics panel',
         () => {
-            let newEmail = userItemsBuilder.generateEmail(testUser.displayName)
+            let newEmail = userItemsBuilder.generateEmail(testUser.displayName);
             return testUtils.selectUserAndOpenWizard(testUser.displayName).then(()=> {
                 return userWizard.clearEmailInput();
             }).then(()=> {
@@ -89,7 +89,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
                 return userBrowsePanel.clickOnAppHomeButton();
             }).then(()=> {
                 return userStatisticsPanel.getEmail();
-            }).then((email)=> {
+            }).then(email => {
                 assert.equal(email[0], newEmail, 'email should be updated on the statistics panel as well');
             })
         });

@@ -9,7 +9,7 @@ const xpTourDialog = {
 const home = {
     container: `div[class*='home-main-container']`
 };
-var homePage = Object.create(page, {
+const homePage = Object.create(page, {
 
     closeXpTourButton: {
         get: function () {
@@ -18,7 +18,7 @@ var homePage = Object.create(page, {
     },
     waitForXpTourVisible: {
         value: function (ms) {
-            return this.waitForVisible(`${xpTourDialog.container}`, ms).catch(err=> {
+            return this.waitForVisible(`${xpTourDialog.container}`, ms).catch(err => {
                 return false;
             })
         }
@@ -30,7 +30,7 @@ var homePage = Object.create(page, {
     },
     doCloseXpTourDialog: {
         value: function () {
-            return this.doClick(this.closeXpTourButton).catch(err=> {
+            return this.doClick(this.closeXpTourButton).catch(err => {
                 this.saveScreenshot("err_close_xp_tour");
                 throw new Error("err when close the XpTour dialog " + err);
             })

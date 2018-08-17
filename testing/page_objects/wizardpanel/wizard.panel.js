@@ -9,8 +9,8 @@ const wizard = {
     displayNameInput: `//input[contains(@name,'displayName')]`,
     saveButton: `//button[contains(@id,'ActionButton') and child::span[text()='Save']]`,
     deleteButton: `//button[contains(@id,'ActionButton') and child::span[text()='Delete']]`,
-}
-var wizardPanel = Object.create(page, {
+};
+const wizardPanel = Object.create(page, {
 
     displayNameInput: {
         get: function () {
@@ -64,9 +64,9 @@ var wizardPanel = Object.create(page, {
     },
     waitAndClickOnSave: {
         value: function () {
-            return this.waitForSaveButtonEnabled().then((result)=> {
+            return this.waitForSaveButtonEnabled().then((result) => {
                 return this.doClick(this.saveButton);
-            }).pause(400).catch(err=> {
+            }).pause(400).catch(err => {
                 throw new Error(`Save button is not enabled!` + err);
             })
         }
@@ -74,7 +74,7 @@ var wizardPanel = Object.create(page, {
 
     clickOnDelete: {
         value: function () {
-            return this.doClick(this.deleteButton).catch(err=> {
+            return this.doClick(this.deleteButton).catch(err => {
                 console.log(err);
                 this.saveScreenshot('err_delete_wizard');
                 throw new Error('Error when Delete button has been clicked ' + err);
@@ -84,9 +84,9 @@ var wizardPanel = Object.create(page, {
     isItemInvalid: {
         value: function (displayName) {
             let selector = elements.tabItemByDisplayName(displayName);
-            return this.getBrowser().getAttribute(selector, 'class').then(result=> {
+            return this.getBrowser().getAttribute(selector, 'class').then(result => {
                 return result.includes("invalid");
-            }).catch(err=> {
+            }).catch(err => {
                 throw new Error('tabItem: ' + err);
             });
         }
@@ -94,13 +94,13 @@ var wizardPanel = Object.create(page, {
     waitUntilInvalidIconAppears: {
         value: function (displayName) {
             let selector = elements.tabItemByDisplayName(displayName);
-            return this.getBrowser().waitUntil(()=> {
-                return this.getBrowser().getAttribute(selector, 'class').then(result=> {
+            return this.getBrowser().waitUntil(() => {
+                return this.getBrowser().getAttribute(selector, 'class').then(result => {
                     return result.includes('invalid');
                 });
-            }, 3000).then(()=> {
+            }, 3000).then(() => {
                 return true;
-            }).catch((err)=> {
+            }).catch(err => {
                 this.saveScreenshot(itemBuilders.generateRandomName("err_icon"));
                 throw new Error('group-wizard:invalid-icon should be displayed');
             });
@@ -109,13 +109,13 @@ var wizardPanel = Object.create(page, {
     waitUntilInvalidIconDisappears: {
         value: function (displayName) {
             let selector = elements.tabItemByDisplayName(displayName);
-            return this.getBrowser().waitUntil(()=> {
-                return this.getBrowser().getAttribute(selector, 'class').then(result=> {
+            return this.getBrowser().waitUntil(() => {
+                return this.getBrowser().getAttribute(selector, 'class').then(result => {
                     return !result.includes('invalid');
                 })
-            }, 2000).then(()=> {
+            }, 2000).then(() => {
                 return true;
-            }).catch((err)=> {
+            }).catch(err => {
                 throw new Error(err);
             });
         }

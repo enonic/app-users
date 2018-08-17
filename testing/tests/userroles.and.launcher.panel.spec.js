@@ -27,43 +27,40 @@ describe('Checks links on Launcher Panel when an user has various roles', functi
             let permissions = ['Administration Console Login', 'Content Manager App'];
             userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, password, userItemsBuilder.generateEmail(userName), permissions);
-            return testUtils.navigateToUsersApp().then(()=> {
+            return testUtils.navigateToUsersApp().then(() => {
                 return testUtils.clickOnSystemOpenUserWizard();
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.typeData(testUser);
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
-            }).then(()=> {
+            }).then(() => {
                 return testUtils.typeNameInFilterPanel(userName);
-            }).then(()=> {
+            }).then(() => {
                 return assert.eventually.isTrue(userBrowsePanel.isItemDisplayed(userName), 'user should be present in the grid');
             })
         });
-
-    //TODO uncomment the test when the related bug will be fixed
     //Verifies the  https://github.com/enonic/xp-apps/issues/690
-    it.skip(
-        'WHEN the user is logged in AND the user has no Administrator-role THEN `Applications` and `Users` links must not be present on the launcher panel',
+    it('WHEN the user is logged in AND the user has no Administrator-role THEN `Applications` and `Users` links must not be present on the launcher panel',
         () => {
-            return testUtils.doCloseUsersApp().then(()=> {
+            return testUtils.doCloseUsersApp().then(() => {
                 return launcherPanel.clickOnLogoutLink();
-            }).then(()=> {
+            }).then(() => {
                 return loginPage.doLogin(userName, password);
-            }).then(()=> {
+            }).then(() => {
                 return launcherPanel.waitForPanelVisible();
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot("user_has_no_admin");
                 return assert.eventually.isFalse(launcherPanel.isApplicationsLinkDisplayed(),
                     'Applications link should not be displayed, because the user has no Admin-role');
-            }).then((result)=> {
+            }).then(result => {
                 return assert.eventually.isFalse(launcherPanel.isUsersLinkDisplayed(),
                     'Users link should not be displayed, because the user has no Admin-role');
             })
         });
 
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

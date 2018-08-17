@@ -5,11 +5,11 @@
  *
  */
 const chai = require('chai');
-var should = require('chai').should;
+const should = require('chai').should;
 chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
-var webDriverHelper = require('../libs/WebDriverHelper');
+const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const userStoreWizard = require('../page_objects/wizardpanel/userstore.wizard');
@@ -28,13 +28,13 @@ describe('User Store, provider-dialog specification', function () {
             let testStore =
                 userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store', 'First Selenium App',
                     null);
-            return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(()=> {
+            return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(() => {
                 return userStoreWizard.typeData(testStore);
-            }).then(()=> {
+            }).then(() => {
                 return userStoreWizard.waitForSaveButtonDisabled();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
-            }).pause(300).then(()=> {
+            }).pause(300).then(() => {
                 testUtils.saveScreenshot('id_provider_save_before_close_present1');
                 return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog should appear");
@@ -46,13 +46,13 @@ describe('User Store, provider-dialog specification', function () {
             let testStore =
                 userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store', 'First Selenium App',
                     null);
-            return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(()=> {
+            return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(() => {
                 return userStoreWizard.typeData(testStore);
-            }).pause(1000).then(()=> {
+            }).pause(1000).then(() => {
                 return providerDialog.doFillRequiredInputs('domain', 'id', 'secret');
-            }).then(()=> {
+            }).then(() => {
                 return userStoreWizard.isItemInvalid(testStore.displayName);
-            }).then((result)=> {
+            }).then(result => {
                 testUtils.saveScreenshot('user_store_is_getting_valid');
                 assert.isFalse(result, 'Red icon should not be present at the wizard');
             })
@@ -64,22 +64,22 @@ describe('User Store, provider-dialog specification', function () {
             let testStore =
                 userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store', 'First Selenium App',
                     null);
-            return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(()=> {
+            return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(() => {
                 return userStoreWizard.typeData(testStore);
-            }).pause(1000).then(()=> {
+            }).pause(1000).then(() => {
                 return providerDialog.doFillRequiredInputs('domain', 'id', 'secret');
-            }).then(()=> {
+            }).then(() => {
                 return userStoreWizard.waitAndClickOnSave();
-            }).pause(1000).then(()=> {
+            }).pause(1000).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
-            }).pause(500).then(()=> {
+            }).pause(500).then(() => {
                 return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog should not appear");
             })
         });
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

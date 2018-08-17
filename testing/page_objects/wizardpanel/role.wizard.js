@@ -1,16 +1,16 @@
 /**
  * Created on 12.09.2017.
  */
-var wizard = require('./wizard.panel');
-var elements = require('../../libs/elements');
-var appConst = require('../../libs/app_const');
+const wizard = require('./wizard.panel');
+const elements = require('../../libs/elements');
+const appConst = require('../../libs/app_const');
 const loaderComboBox = require('../inputs/loaderComboBox');
 
-var panel = {
+const panel = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
     memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + `${loaderComboBox.optionFilterInput}`,
 };
-var roleWizard = Object.create(wizard, {
+const roleWizard = Object.create(wizard, {
 
     descriptionInput: {
         get: function () {
@@ -60,7 +60,7 @@ var roleWizard = Object.create(wizard, {
     },
     getMembers: {
         value: function () {
-            let selectedOptions = `${panel.container}` + `${elements.PRINCIPAL_SELECTED_OPTION}` + `${elements.H6_DISPLAY_NAME}`
+            let selectedOptions = `${panel.container}` + `${elements.PRINCIPAL_SELECTED_OPTION}` + `${elements.H6_DISPLAY_NAME}`;
             return this.getTextFromElements(selectedOptions).catch((err) => {
                 throw new Error('Error when getting text from elements ')
             });
@@ -74,7 +74,7 @@ var roleWizard = Object.create(wizard, {
     removeMember: {
         value: function (displayName) {
             let selector = `${panel.container}` + `${elements.selectedPrincipalByDisplayName(displayName)}` + `${elements.REMOVE_ICON}`;
-            return this.doClick(selector).catch((err) => {
+            return this.doClick(selector).catch(err => {
                 this.saveScreenshot('err_remove_member');
                 throw new Error('Remove-icon for the role ' + displayName + ' ' + 'was not found on the  wizard page');
             }).pause(500);

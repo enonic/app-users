@@ -6,7 +6,7 @@ const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const loaderComboBox = require('../inputs/loaderComboBox');
 
-var panel = {
+const panel = {
     container: `//div[contains(@id,'UserWizardPanel')]`,
     emailInput: `//input[@type = 'email']`,
     groupOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]" + `${loaderComboBox.optionFilterInput}`,
@@ -19,7 +19,7 @@ var panel = {
     changePasswordButton: `//button[contains(@class,'change-password-button')]`,
 };
 
-var userWizard = Object.create(wizard, {
+const userWizard = Object.create(wizard, {
 
     deleteButton: {
         get: function () {
@@ -123,7 +123,6 @@ var userWizard = Object.create(wizard, {
             return this.isVisible(this.groupOptionsFilterInput);
         }
     },
-
     isRoleOptionsFilterInputDisplayed: {
         value: function () {
             return this.clickOnRolesAndGroupsLink().pause(300).then(()=> {
@@ -162,7 +161,6 @@ var userWizard = Object.create(wizard, {
                 if (user.roles != null) {
                     return this.clickOnRolesAndGroupsLink();
                 }
-                return;
             }).pause(300).then(()=> {
                 if (user.roles != null) {
                     return this.addRoles(user.roles);
@@ -182,7 +180,6 @@ var userWizard = Object.create(wizard, {
                 if (user.roles != null) {
                     return this.clickOnRolesAndGroupsLink();
                 }
-                return;
             }).pause(300).then(()=> {
                 if (user.roles != null) {
                     return this.addRoles(user.roles);
@@ -220,7 +217,7 @@ var userWizard = Object.create(wizard, {
 
     waitForOpened: {
         value: function () {
-            return this.waitForVisible(this.displayNameInput, 3000).catch((err)=> {
+            return this.waitForVisible(this.displayNameInput, appConst.TIMEOUT_3).catch((err) => {
                 throw new Error('User Wizard is not loaded! ' + err);
             });
         }
@@ -249,7 +246,7 @@ var userWizard = Object.create(wizard, {
                 return loaderComboBox.waitForOptionVisible(`${panel.container}`, roleDisplayName);
             }).then(()=> {
                 return loaderComboBox.clickOnOption(`${panel.container}`, roleDisplayName);
-            }).catch((err)=> {
+            }).pause(300).catch(err => {
                 throw new Error('Error when selecting the role-option: ' + roleDisplayName + ' ' + err);
             })
         }

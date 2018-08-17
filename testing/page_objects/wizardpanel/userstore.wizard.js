@@ -1,7 +1,7 @@
 const wizard = require('./wizard.panel');
 const elements = require('../../libs/elements');
 const loaderComboBox = require('../inputs/loaderComboBox');
-var panel = {
+const panel = {
     container: `//div[contains(@id,'UserStoreWizardPanel')]`,
     providerFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='ID Provider']]" +
                          `${loaderComboBox.optionFilterInput}`,
@@ -17,7 +17,7 @@ var panel = {
     removeProviderIcon: `//a[contains(@class,'remove')]`,
 
 };
-var userStoreWizard = Object.create(wizard, {
+const userStoreWizard = Object.create(wizard, {
 
     descriptionInput: {
         get: function () {
@@ -63,7 +63,7 @@ var userStoreWizard = Object.create(wizard, {
     addPrincipals: {
         value: function (principalDisplayNames) {
             let result = Promise.resolve();
-            principalDisplayNames.forEach((displayName)=> {
+            principalDisplayNames.forEach((displayName) => {
                 result = result.then(() => this.filterOptionsAndSelectPermission(displayName));
             });
             return result;
@@ -73,7 +73,7 @@ var userStoreWizard = Object.create(wizard, {
         value: function (entryDisplayName) {
             let selector = `${panel.selectedAcEntryByDisplayName(entryDisplayName)}` + `${panel.aceAccessSelector}`;
             let menu = `${panel.aceAccessSelector}`;
-            return this.doClick(selector).pause(300).then(()=> {
+            return this.doClick(selector).pause(300).then(() => {
                 //return this.getDisplayedElements(menu);
             })
         }
@@ -81,7 +81,7 @@ var userStoreWizard = Object.create(wizard, {
     isAceMenuOptionsExpanded: {
         value: function (entryDisplayName) {
             let selector = `${panel.selectedAcEntryByDisplayName(entryDisplayName)}` + `${panel.aceAccessSelector}`;
-            return this.getAttribute(selector, 'class').then(result=> {
+            return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('expanded');
             })
         }
@@ -95,13 +95,13 @@ var userStoreWizard = Object.create(wizard, {
         value: function (userstore) {
             return this.typeDisplayName(userstore.displayName).then(() => {
                 return this.typeDescription(userstore.description);
-            }).pause(500).then(()=> {
+            }).pause(500).then(() => {
                 if (userstore.permissions != null) {
-                    return this.clickOnPermissionsTabItem().then(()=> {
+                    return this.clickOnPermissionsTabItem().then(() => {
                         return this.addPrincipals(userstore.permissions);
                     })
                 }
-            }).then(()=> {
+            }).then(() => {
                 if (userstore.providerName != null) {
                     return this.filterOptionsAndSelectIdProvider(userstore.providerName);
                 }
@@ -117,15 +117,14 @@ var userStoreWizard = Object.create(wizard, {
         value: function () {
             return this.doClick(this.removeProviderIcon).pause(300);
         }
-
     },
     filterOptionsAndSelectIdProvider: {
         value: function (providerName) {
-            return this.typeTextInInput(`${panel.providerFilterInput}`, providerName).pause(400).then(()=> {
+            return this.typeTextInInput(`${panel.providerFilterInput}`, providerName).pause(400).then(() => {
                 return loaderComboBox.waitForOptionVisible(`${panel.container}`, providerName);
-            }).then(()=> {
+            }).then(() => {
                 return loaderComboBox.clickOnOption(`${panel.container}`, providerName);
-            }).catch((err)=> {
+            }).catch(err => {
                 this.saveScreenshot('err_id_provider');
                 throw new Error('Error when selecting the ID Provider: ' + providerName + ' ' + err);
             })
@@ -133,11 +132,11 @@ var userStoreWizard = Object.create(wizard, {
     },
     filterOptionsAndSelectPermission: {
         value: function (permissionDisplayName) {
-            return this.typeTextInInput(`${panel.permissionsFilterInput}`, permissionDisplayName).pause(400).then(()=> {
+            return this.typeTextInInput(`${panel.permissionsFilterInput}`, permissionDisplayName).pause(400).then(() => {
                 return loaderComboBox.waitForOptionVisible(`${panel.container}`, permissionDisplayName);
-            }).then(()=> {
+            }).then(() => {
                 return loaderComboBox.clickOnOption(`${panel.container}`, permissionDisplayName);
-            }).catch((err)=> {
+            }).catch(err => {
                 throw new Error('Error when selecting the ACL-entry: ' + permissionDisplayName + ' ' + err);
             })
         }
@@ -180,16 +179,16 @@ var userStoreWizard = Object.create(wizard, {
     getPermissions: {
         value: function () {
             let items = `${panel.container}` + `${panel.aclList}` + `${elements.H6_DISPLAY_NAME}`;
-            return this.waitForVisible(`${panel.aclList}`, 1000).catch((err)=> {
+            return this.waitForVisible(`${panel.aclList}`, 1000).catch((err) => {
                 throw new Error('ACL-list is not present on the page!');
-            }).then(()=> {
+            }).then(() => {
                 return this.isVisible(items);
-            }).then((result)=> {
+            }).then(result => {
                 if (!result) {
                     return [];
                 }
                 return this.getTextFromElements(items)
-            }).catch((err)=> {
+            }).catch(err => {
                 return [];
             })
         }
@@ -218,9 +217,9 @@ var userStoreWizard = Object.create(wizard, {
     clickOnDelete: {
         value: function () {
             let deleteSelector = `${panel.container}` + `${wizard.deleteButton}`;
-            return this.waitForDeleteButtonEnabled().then(result=> {
+            return this.waitForDeleteButtonEnabled().then(result => {
                 return this.doClick(deleteSelector);
-            }).catch(err=> {
+            }).catch(err => {
                 console.log(err);
                 this.doCatch('err_delete_in_userstore_wizard', 'Error when Delete button has been clicked ');
             });

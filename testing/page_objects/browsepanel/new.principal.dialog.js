@@ -2,14 +2,14 @@
  * Created on 31.08.2017.
  */
 
-var page = require('../page');
-var elements = require('../../libs/elements');
-var dialog = {
+const page = require('../page');
+const elements = require('../../libs/elements');
+const dialog = {
     container: `//div[contains(@id,'NewPrincipalDialog')]`,
     itemViewer: `//div[contains(@id,'UserTypesTreeGridItemViewer')]`,
     header: `//h2[@class='title']`,
 };
-var newPrincipalDialog = Object.create(page, {
+const newPrincipalDialog = Object.create(page, {
 
     header: {
         get: function () {

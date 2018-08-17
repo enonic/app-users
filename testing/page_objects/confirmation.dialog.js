@@ -8,7 +8,7 @@ const dialog = {
     yesButton: `//button[contains(@id,'DialogButton') and child::span[text()='Yes']]`,
     noButton: `//div[@class='dialog-buttons']//button/span[text()='No']`
 };
-var confirmationDialog = Object.create(page, {
+const confirmationDialog = Object.create(page, {
 
     warningMessage: {
         get: function () {

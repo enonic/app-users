@@ -4,6 +4,7 @@ import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {RoleMembersWizardStepForm} from './RoleMembersWizardStepForm';
 import {CreateRoleRequest} from '../../api/graphql/principal/role/CreateRoleRequest';
 import {UpdateRoleRequest} from '../../api/graphql/principal/role/UpdateRoleRequest';
+import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import RoleBuilder = api.security.RoleBuilder;
 
 import Principal = api.security.Principal;
@@ -43,7 +44,7 @@ export class RoleWizardPanel
         return this.produceCreateRoleRequest().sendAndParse().then((principal: Principal) => {
 
             api.notify.showFeedback(i18n('notify.create.role'));
-            new api.security.UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
+            new UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 
             return principal;

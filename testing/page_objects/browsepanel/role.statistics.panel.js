@@ -1,20 +1,18 @@
 /**
  * Created  on 06.10.2017.
  */
-
-
 const itemStatistic = require('./userItem.statistics.panel');
 const elements = require('../../libs/elements');
 
-var panel = {
+const panel = {
     div: `//div[contains(@id,'UserItemStatisticsPanel')]`,
     header: `//div[contains(@id,'ItemStatisticsHeader')]`,
     itemName: `//h1[@class='title']`,
     itemPath: `//h4[@class='path']`,
     membersDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]`,
     memberList: `//ul[@class='data-list' and child::li[text()='Members']]`
-}
-var roleStatisticsPanel = Object.create(itemStatistic, {
+};
+const roleStatisticsPanel = Object.create(itemStatistic, {
 
     getDisplayNameOfMembers: {
         value: function () {

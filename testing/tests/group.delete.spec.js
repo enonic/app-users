@@ -50,7 +50,7 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
                 return testUtils.confirmDelete();
             }).then(result => {
                 testUtils.saveScreenshot("group_deleted_confirmation_mess1");
-                var expectedMessage = appConst.groupDeletedMessage(testGroup.displayName);
+                let expectedMessage = appConst.groupDeletedMessage(testGroup.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
                     "Correct notification message should appear");
             });
@@ -78,7 +78,7 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
                 return userBrowsePanel.waitForNotificationMessage();
             }).then(result => {
                 testUtils.saveScreenshot("group_deleted_notification_mes2");
-                var msg = appConst.groupDeletedMessage(testGroup.displayName);
+                let msg = appConst.groupDeletedMessage(testGroup.displayName);
                 assert.strictEqual(result, msg, 'expected notification message should be displayed');
             });
         });

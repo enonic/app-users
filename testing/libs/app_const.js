@@ -2,7 +2,7 @@
  * Created  on 15.09.2017.
  */
 module.exports = Object.freeze({
-    //waitforTimeout
+    //waitForTimeout
     TIMEOUT_3: 3000,
     TIMEOUT_2: 2000,
     TIMEOUT_1: 1000,
