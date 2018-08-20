@@ -88,7 +88,6 @@ export class GetPrincipalByKeyRequest
     }
 
     private getMembershipsField(includeMemberships: boolean) {
-        console.log('test');
         return includeMemberships ? `
             memberships (transitive: $transitive) {
                 key

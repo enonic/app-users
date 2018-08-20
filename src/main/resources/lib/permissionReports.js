@@ -44,13 +44,13 @@ var generate = function (principalKey, repositoryIds) {
             repositoryId: repositoryId
         }, initLib.REPO_NAME);
 
-
-        node.url = portalLib.serviceUrl({
+        var url = portalLib.serviceUrl({
             service: 'permissionReport',
             params: {
                 id: node._id
             }
         });
+        
         var taskId = generateReport(node, principalKey, repositoryId);
         return {
             _id: node._id,
@@ -58,7 +58,7 @@ var generate = function (principalKey, repositoryIds) {
             principalKey: principalKey,
             principalDisplayName: node.principalDisplayName,
             repositoryId: repositoryId,
-            url: node.url
+            url: url
         }
     });
 
