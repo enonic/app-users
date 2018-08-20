@@ -11,19 +11,23 @@ import ItemDataGroup = api.app.view.ItemDataGroup;
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
-import User = api.security.User;
 import PrincipalViewer = api.ui.security.PrincipalViewer;
 import i18n = api.util.i18n;
 import RoleKeys = api.security.RoleKeys;
 import DivEl = api.dom.DivEl;
+import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel<UserTreeGridItem> {
 
     private userDataContainer: api.dom.DivEl;
 
+    private isAdminPromise: wemQ.Promise<boolean>;
+
     constructor() {
         super('principal-item-statistics-panel');
+
+        this.isAdminPromise = new IsAuthenticatedRequest().sendAndParse().then(result => this.isAdmin(result.getPrincipals()));
 
         this.userDataContainer = new api.dom.DivEl('user-data-container');
         this.appendChild(this.userDataContainer);
@@ -109,16 +113,18 @@ export class UserItemStatisticsPanel
             const groups = user.getMemberships().filter(el => el.isGroup()).map(el => this.createPrincipalViewer(el));
             rolesAndGroupsGroup.addDataElements(i18n('field.groups'), groups);
 
-            if (this.isAdmin(user)) {
-                addedGroups.push(this.createReportGroup(principal));
-            }
+            return this.isAdminPromise.then(isAdmin => {
+                if (isAdmin) {
+                    addedGroups.push(this.createReportGroup(principal));
+                }
+                return addedGroups;
+            });
 
-            return addedGroups;
         });
     }
 
-    private isAdmin(user: User): boolean {
-        return user.getMemberships().some(mship => mship.getKey().equals(RoleKeys.ADMIN));
+    private isAdmin(principals: PrincipalKey[]): boolean {
+        return principals.some(pKey => pKey.equals(RoleKeys.ADMIN));
     }
 
     private createGroupOrRoleMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): wemQ.Promise<ItemDataGroup[]> {
