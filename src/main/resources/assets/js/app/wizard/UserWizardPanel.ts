@@ -76,7 +76,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
                         .setQuestion(i18n('dialog.principal.update'))
                         .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal.clone()))
                         .setNoCallback(() => { /* empty */ })
-                        .show();
+                        .open();
                 }
 
                 return wemQ<void>(null);

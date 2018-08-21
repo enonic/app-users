@@ -76,12 +76,8 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
     }
 
     open() {
-        super.open();
-    }
-
-    show() {
         this.password.reset();
-        super.show();
+        super.open();
     }
 
     close() {

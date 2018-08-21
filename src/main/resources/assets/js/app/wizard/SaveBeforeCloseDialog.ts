@@ -35,9 +35,9 @@ export class SaveBeforeCloseDialog extends ModalDialog {
         this.getCancelAction().setMnemonic('c');
     }
 
-    show() {
+    open() {
         api.dom.Body.get().appendChild(this);
-        super.show();
+        super.open();
     }
 
     close() {

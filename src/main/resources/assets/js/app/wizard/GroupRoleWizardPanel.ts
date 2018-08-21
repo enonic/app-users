@@ -47,7 +47,7 @@ export class GroupRoleWizardPanel extends PrincipalWizardPanel {
                         .setQuestion(i18n('dialog.principal.update'))
                         .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null))
                         .setNoCallback(() => { /* empty */ })
-                        .show();
+                        .open();
                 }
 
                 return wemQ<void>(null);
