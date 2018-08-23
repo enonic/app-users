@@ -1,8 +1,8 @@
-var gulp = require('gulp');
+const gulp = require('gulp');
 const selenium = require('selenium-standalone');
 const mocha = require('gulp-mocha');
-var runSequence = require('run-sequence');
-var allure = require("mocha-allure-reporter");
+const runSequence = require('run-sequence');
+const allure = require("mocha-allure-reporter");
 
 gulp.task('selenium', function (done) {
     return selenium.install(
