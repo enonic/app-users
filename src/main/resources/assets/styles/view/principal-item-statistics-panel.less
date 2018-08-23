@@ -87,6 +87,60 @@
         }
       }
 
+      &.reports {
+        flex-direction: column;
+
+        .rich-combobox {
+          display: inline-block;
+
+          .loader-combobox {
+            width: 300px;
+
+            .options-container {
+              .slick-row {
+                height: 40px;
+
+                .slick-cell {
+                  height: 40px;
+                  padding: 12px 0 12px 12px;
+
+                  &.slick-cell-checkboxsel {
+                    padding: 12px 12px 12px 0;
+
+                    label {
+                      background-position: right center;
+                    }
+                  }
+                }
+              }
+            }
+
+            &.followed-by-options {
+              margin-bottom: 20px;
+            }
+          }
+          .selected-options {
+            .selected-option {
+              height: auto;
+              padding: 8px 32px 8px 8px;
+
+              a.remove {
+                right: 8px;
+              }
+            }
+          }
+        }
+
+        .report-progress-list {
+          margin-top: 20px;
+        }
+
+        button.generate {
+          vertical-align: top;
+          margin-left: 20px;
+        }
+      }
+
     }
   }
 }

@@ -1,8 +1,11 @@
 var graphQl = require('/lib/graphql');
+var authLib = require('/lib/auth');
 
-var userstores = require('userstores');
-var principals = require('principals');
-var useritems = require('useritems');
+var userstores = require('/lib/userstores');
+var principals = require('/lib/principals');
+var useritems = require('/lib/useritems');
+var repositories = require('/lib/repositories');
+var permissionReports = require('/lib/permissionReports');
 
 var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
@@ -12,7 +15,7 @@ module.exports = graphQl.createObjectType({
     fields: {
         userStores: {
             type: graphQl.list(graphQlObjectTypes.UserStoreType),
-            resolve: function() {
+            resolve: function () {
                 return userstores.list();
             }
         },
@@ -21,14 +24,14 @@ module.exports = graphQl.createObjectType({
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var key = env.args.key;
                 return userstores.getByKey(key);
             }
         },
         defaultUserStore: {
             type: graphQlObjectTypes.UserStoreType,
-            resolve: function() {
+            resolve: function () {
                 return userstores.getDefault();
             }
         },
@@ -42,7 +45,7 @@ module.exports = graphQl.createObjectType({
                 count: graphQl.GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var userstore = env.args.userstore || 'system';
                 var types = env.args.types || principals.Type.all();
                 var query = env.args.query;
@@ -63,29 +66,25 @@ module.exports = graphQl.createObjectType({
             type: graphQlObjectTypes.PrincipalType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
-                memberships: graphQl.GraphQLBoolean
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var key = env.args.key;
-                var memberships = env.args.memberships;
-                return principals.getByKeys(key, memberships);
+                return principals.getByKeys(key);
             }
         },
         principals: {
             type: graphQl.list(graphQlObjectTypes.PrincipalType),
             args: {
-                keys: graphQl.nonNull(graphQl.list(graphQl.GraphQLString)),
-                memberships: graphQl.GraphQLBoolean
+                keys: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var keys = env.args.keys;
-                var memberships = env.args.memberships;
                 if (keys.length >= 100) {
                     throw new Error(
                         'Invalid field argument keys: The number of keys must be inferior to 100'
                     );
                 }
-                return principals.getByKeys(keys, memberships);
+                return principals.getByKeys(keys);
             }
         },
         userItemsConnection: {
@@ -96,7 +95,7 @@ module.exports = graphQl.createObjectType({
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var types = env.args.types;
                 var query = env.args.query;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
@@ -110,10 +109,63 @@ module.exports = graphQl.createObjectType({
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
                 return useritems.list(start, count);
+            }
+        },
+        repository: {
+            type: graphQlObjectTypes.RepositoryType,
+            args: {
+                id: graphQl.nonNull(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
+                }
+                var id = env.args.id;
+                return repositories.getById(id);
+            }
+        },
+        repositories: {
+            type: graphQl.list(graphQlObjectTypes.RepositoryType),
+            args: {
+                query: graphQl.GraphQLString,
+                start: graphQl.GraphQLInt,
+                count: graphQl.GraphQLInt,
+                sort: graphQlEnums.SortModeEnum
+            },
+            resolve: function (env) {
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
+                }
+                var query = env.args.query;
+                var start = env.args.start;
+                var count = env.args.count;
+                var sort = env.args.sort;
+                return repositories.list(query, start, count, sort);
+            }
+        },
+        permissionReports: {
+            type: graphQl.list(graphQlObjectTypes.PermissionReportType),
+            args: {
+                principalKey: graphQl.GraphQLString,
+                repositoryIds: graphQl.list(graphQl.GraphQLString),
+                start: graphQl.GraphQLInt,
+                count: graphQl.GraphQLInt,
+                sort: graphQlEnums.SortModeEnum
+            },
+            resolve: function (env) {
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
+                }
+                var principalKey = env.args.principalKey;
+                var repositoryIds = env.args.repositoryIds;
+                var start = env.args.start;
+                var count = env.args.count;
+                var sort = env.args.sort;
+                return permissionReports.list(principalKey, repositoryIds, start, count, sort);
             }
         }
     }

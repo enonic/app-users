@@ -1,10 +1,12 @@
 var graphQl = require('/lib/graphql');
+var authLib = require('/lib/auth');
 
-var userstores = require('userstores');
-var principals = require('principals');
-var users = require('users');
-var groups = require('groups');
-var roles = require('roles');
+var userstores = require('/lib/userstores');
+var principals = require('/lib/principals');
+var users = require('/lib/users');
+var groups = require('/lib/groups');
+var roles = require('/lib/roles');
+var permissionReports = require('/lib/permissionReports');
 
 var graphQlObjectTypes = require('../types').objects;
 var graphQlInputTypes = require('../types').inputs;
@@ -221,6 +223,36 @@ module.exports = graphQl.createObjectType({
             },
             resolve: function(env) {
                 return userstores.delete(env.args.keys);
+            }
+        },
+
+        // permissionsReport
+        generatePermissionReports: {
+            type: graphQl.list(graphQlObjectTypes.PermissionReportType),
+            args: {
+                principalKey: graphQl.nonNull(graphQl.GraphQLString),
+                repositoryIds: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
+            },
+            resolve: function (env) {
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
+                }
+                var principalKey = env.args.principalKey;
+                var repositoryIds = env.args.repositoryIds;
+                return permissionReports.generate(principalKey, repositoryIds);
+            }
+        },
+        deletePermissionReports: {
+            type: graphQl.GraphQLInt,
+            args: {
+                ids: graphQl.list(graphQl.GraphQLString)
+            },
+            resolve: function (env) {
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
+                }
+                var ids = env.args.ids;
+                return permissionReports.delete(ids);
             }
         }
     }

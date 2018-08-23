@@ -1,0 +1,38 @@
+.report-progress-list {
+  .report-progress-item {
+    display: flex;
+    align-items: stretch;
+    line-height: 22px;
+    font-size: 14px;
+    margin: 0 8px 10px !important;
+
+    span.title {
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .progress-bar {
+      flex: 1;
+    }
+
+    .timestamp {
+      flex: 1;
+      display: none;
+      color: @admin-font-gray2;
+    }
+
+    .download, .delete {
+      display: none;
+      margin: 0 5px;
+    }
+
+    &.ready {
+      .progress-bar {
+        display: none;
+      }
+      .timestamp, .download, .delete {
+        display: block;
+      }
+    }
+  }
+}

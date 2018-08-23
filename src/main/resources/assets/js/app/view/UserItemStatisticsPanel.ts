@@ -2,20 +2,32 @@ import '../../api.ts';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincipalsByKeysRequest';
+import {RepositoryComboBox} from '../report/RepositoryComboBox';
+import {GeneratePermissionsReportRequest} from '../../api/graphql/report/GeneratePermissionsReportRequest';
+import {ReportProgressList} from '../report/ReportProgressList';
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
 import ItemDataGroup = api.app.view.ItemDataGroup;
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
+import PrincipalKey = api.security.PrincipalKey;
 import PrincipalViewer = api.ui.security.PrincipalViewer;
 import i18n = api.util.i18n;
+import RoleKeys = api.security.RoleKeys;
+import DivEl = api.dom.DivEl;
+import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
 
-export class UserItemStatisticsPanel extends ItemStatisticsPanel<UserTreeGridItem> {
+export class UserItemStatisticsPanel
+    extends ItemStatisticsPanel<UserTreeGridItem> {
 
     private userDataContainer: api.dom.DivEl;
 
+    private isAdminPromise: wemQ.Promise<boolean>;
+
     constructor() {
         super('principal-item-statistics-panel');
+
+        this.isAdminPromise = new IsAuthenticatedRequest().sendAndParse().then(result => this.isAdmin(result.getPrincipals()));
 
         this.userDataContainer = new api.dom.DivEl('user-data-container');
         this.appendChild(this.userDataContainer);
@@ -89,6 +101,8 @@ export class UserItemStatisticsPanel extends ItemStatisticsPanel<UserTreeGridIte
         const rolesAndGroupsGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'memberships');
         this.userDataContainer.appendChild(rolesAndGroupsGroup);
 
+        const addedGroups = [mainGroup, rolesAndGroupsGroup];
+
         return new GetPrincipalByKeyRequest(principal.getKey()).setIncludeMemberships(true).sendAndParse().then((p: Principal) => {
             const user = p.asUser();
             mainGroup.addDataList(i18n('field.email'), user.getEmail());
@@ -96,45 +110,111 @@ export class UserItemStatisticsPanel extends ItemStatisticsPanel<UserTreeGridIte
             const roles = user.getMemberships().filter(el => el.isRole()).map(el => this.createPrincipalViewer(el));
             rolesAndGroupsGroup.addDataElements(i18n('field.roles'), roles);
 
-            let groups = p.asUser().getMemberships().filter(el => el.isGroup()).map(el => this.createPrincipalViewer(el));
+            const groups = user.getMemberships().filter(el => el.isGroup()).map(el => this.createPrincipalViewer(el));
             rolesAndGroupsGroup.addDataElements(i18n('field.groups'), groups);
 
-            return [mainGroup, rolesAndGroupsGroup];
+            return this.isAdminPromise.then(isAdmin => {
+                if (isAdmin) {
+                    addedGroups.push(this.createReportGroup(principal));
+                }
+                return addedGroups;
+            });
+
         });
     }
 
-    createGroupOrRoleMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): wemQ.Promise<ItemDataGroup[]> {
+    private isAdmin(principals: PrincipalKey[]): boolean {
+        return principals.some(pKey => pKey.equals(RoleKeys.ADMIN));
+    }
+
+    private createGroupOrRoleMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): wemQ.Promise<ItemDataGroup[]> {
         mainGroup.appendChild(new api.dom.DivEl('description').setHtml(principal.getDescription()));
         this.userDataContainer.appendChild(mainGroup);
-
-        let rolesGroup;
-        if (principal.isGroup()) {
-            rolesGroup = new ItemDataGroup(i18n('field.roles'), 'roles');
-            this.userDataContainer.appendChild(rolesGroup);
-        }
 
         let membersGroup;
         membersGroup = new ItemDataGroup(i18n('field.members'), 'members');
         this.userDataContainer.appendChild(membersGroup);
 
+        const addedGroups = [mainGroup, membersGroup, this.createReportGroup(principal)];
+
         return new GetPrincipalByKeyRequest(principal.getKey()).setIncludeMemberships(true).sendAndParse().then((p: Principal) => {
             const group = principal.isGroup() ? p.asGroup() : p.asRole();
 
             if (principal.isGroup()) {
+                const rolesGroup = new ItemDataGroup(i18n('field.roles'), 'roles');
+                this.userDataContainer.appendChild(rolesGroup);
                 rolesGroup.addDataElements(null, p.asGroup().getMemberships().map(el => this.createPrincipalViewer(el)));
+                addedGroups.splice(1, 0, rolesGroup);
             }
 
             const membersKeys = group.getMembers().slice(0, 100);
-            const hasNoMembers = !membersKeys || membersKeys.length === 0;
-
-            const createMetadataGroups = () => (principal.isGroup() ? [mainGroup, rolesGroup, membersGroup] : [mainGroup, membersGroup]);
-
-            return hasNoMembers ?
-                   wemQ(createMetadataGroups()) :
-                   new GetPrincipalsByKeysRequest(membersKeys).sendAndParse()
-                       .then((results: Principal[]) => {
-                           membersGroup.addDataElements(null, results.map(el => this.createPrincipalViewer(el)));
-                        }).then(createMetadataGroups);
+            return this.getMembersByKeys(membersKeys).then((results) => {
+                membersGroup.addDataElements(null, results.map(el => this.createPrincipalViewer(el)));
+                return addedGroups;
+            });
         });
+    }
+
+    private getMembersByKeys(keys: PrincipalKey[]): wemQ.Promise<Principal[]> {
+        if (!keys || keys.length === 0) {
+            return wemQ([]);
+        } else {
+            return new GetPrincipalsByKeysRequest(keys).sendAndParse();
+        }
+    }
+
+    private createReportGroup(principal: Principal): ItemDataGroup {
+        const reportsGroup = new ItemDataGroup(i18n('field.report'), 'reports');
+
+        const reportsCombo = new RepositoryComboBox();
+        reportsCombo.onOptionSelected(event => {
+            if (!genButton.isEnabled()) {
+                genButton.setEnabled(true);
+            }
+        });
+        reportsCombo.onOptionDeselected(event => {
+            if (reportsCombo.getSelectedValues().length === 0) {
+                genButton.setEnabled(false);
+            }
+        });
+
+        const reportsProgress = new ReportProgressList(principal.getKey());
+
+        const genButton = new api.ui.button.Button(i18n('action.report.generate'));
+        genButton
+            .setEnabled(false)
+            .addClass('generate large')
+            .onClicked(() => {
+                const repos = reportsCombo.getSelectedDisplayValues();
+                repos.forEach(repo => {
+                    reportsCombo.deselect(repo);
+                });
+
+                new GeneratePermissionsReportRequest()
+                    .setPrincipalKey(principal.getKey())
+                    .setRepositoryKeys(repos.map(repo => repo.getId()))
+                    .sendAndParse()
+                    .then(reports => {
+                        reports.forEach(report => {
+                            // might have been added by progress listener if it happened before
+                            if (!reportsProgress.getItem(report.getId())) {
+                                reportsProgress.addItem(report);
+                            }
+                        });
+                    });
+            });
+
+        const comboAndButton = new DivEl();
+        comboAndButton.appendChildren<api.dom.Element>(reportsCombo, genButton);
+
+        reportsGroup.addDataElements(i18n('field.repository.select'), [comboAndButton]);
+        const generatedReports = reportsGroup.addDataElements(i18n('field.report.generated'), [reportsProgress]);
+        generatedReports.setVisible(false);
+
+        const handleReportsChanged = () => generatedReports.setVisible(reportsProgress.getItemCount() > 0);
+        reportsProgress.onItemsRemoved(handleReportsChanged);
+        reportsProgress.onItemsAdded(handleReportsChanged);
+
+        return reportsGroup;
     }
 }

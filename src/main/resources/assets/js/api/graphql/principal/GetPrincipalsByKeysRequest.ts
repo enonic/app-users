@@ -13,7 +13,8 @@ export class GetPrincipalsByKeysRequest
     extends GraphQlRequest<any, Principal[]> {
 
     private keys: PrincipalKey[];
-    private userMemberships: boolean = false;
+    private includeMemberships: boolean = false;
+    private transitive: boolean;
 
     constructor(keys: PrincipalKey[]) {
         super();
@@ -21,7 +22,12 @@ export class GetPrincipalsByKeysRequest
     }
 
     setIncludeMemberships(value: boolean): GetPrincipalsByKeysRequest {
-        this.userMemberships = value;
+        this.includeMemberships = value;
+        return this;
+    }
+
+    setTransitiveMemberships(flag: boolean): GetPrincipalsByKeysRequest {
+        this.transitive = flag;
         return this;
     }
 
@@ -30,13 +36,13 @@ export class GetPrincipalsByKeysRequest
         if (this.keys) {
             vars['keys'] = this.keys.map(principalKey => principalKey.toString());
         }
-        vars['memberships'] = this.userMemberships;
+        vars['transitive'] = this.transitive;
         return vars;
     }
 
     getQuery(): string {
-        return `query ($keys: [String]!, $memberships: Boolean) {
-                    principals (keys: $keys, memberships: $memberships) {
+        return `query ($keys: [String]!` + this.getDynamicVariables() + `) {
+                    principals (keys: $keys) {
                         key
                         name
                         path
@@ -44,11 +50,7 @@ export class GetPrincipalsByKeysRequest
                         displayName
                         email
                         login
-                        members
-                        memberships {
-                            key
-                            displayName
-                        }
+                        members` + this.getMembershipsField() + `
                         permissions {
                             principal {
                                 key
@@ -59,6 +61,18 @@ export class GetPrincipalsByKeysRequest
                         }
                     }
                 }`;
+    }
+
+    private getDynamicVariables() {
+        return this.includeMemberships ? '' : '';
+    }
+
+    private getMembershipsField() {
+        return this.includeMemberships ? `
+            memberships (transitive: $transitive) {
+                key
+                displayName
+            }` : ``;
     }
 
     sendAndParse(): wemQ.Promise<Principal[]> {

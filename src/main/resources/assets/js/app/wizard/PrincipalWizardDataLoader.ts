@@ -1,7 +1,6 @@
 import '../../api.ts';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
-
 import Principal = api.security.Principal;
 
 export class PrincipalWizardDataLoader {
