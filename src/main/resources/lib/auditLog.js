@@ -38,7 +38,8 @@ var notifyEvent = function (itemKeys, action, extra) {
                         action: action,
                         extra: extra
                     }
-                })
+                }),
+                date: new Date()
             })
         }
     })
