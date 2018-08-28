@@ -103,15 +103,12 @@ export class UserItemStatisticsPanel
 
         const addedGroups = [mainGroup, rolesAndGroupsGroup];
 
-        return new GetPrincipalByKeyRequest(principal.getKey()).setIncludeMemberships(true).sendAndParse().then((p: Principal) => {
+        return this.fetchPrincipal(principal.getKey()).then((p: Principal) => {
             const user = p.asUser();
+            const mems = user.getMemberships();
             mainGroup.addDataList(i18n('field.email'), user.getEmail());
-
-            const roles = user.getMemberships().filter(el => el.isRole()).map(el => this.createPrincipalViewer(el));
-            rolesAndGroupsGroup.addDataElements(i18n('field.roles'), roles);
-
-            const groups = user.getMemberships().filter(el => el.isGroup()).map(el => this.createPrincipalViewer(el));
-            rolesAndGroupsGroup.addDataElements(i18n('field.groups'), groups);
+            this.appendTransitiveSwitch(principal.getKey(), rolesAndGroupsGroup, mems.length === 0);
+            this.appendRolesAndGroups(mems, rolesAndGroupsGroup);
 
             return this.isAdminPromise.then(isAdmin => {
                 if (isAdmin) {
@@ -137,13 +134,17 @@ export class UserItemStatisticsPanel
 
         const addedGroups = [mainGroup, membersGroup, this.createReportGroup(principal)];
 
-        return new GetPrincipalByKeyRequest(principal.getKey()).setIncludeMemberships(true).sendAndParse().then((p: Principal) => {
-            const group = principal.isGroup() ? p.asGroup() : p.asRole();
+        return this.fetchPrincipal(principal.getKey()).then((p: Principal) => {
+            const group = p.isGroup() ? p.asGroup() : p.asRole();
 
-            if (principal.isGroup()) {
-                const rolesGroup = new ItemDataGroup(i18n('field.roles'), 'roles');
+            if (p.isGroup()) {
+                const mems = p.asGroup().getMemberships();
+                const rolesGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'memberships');
+                this.appendTransitiveSwitch(principal.getKey(), rolesGroup, mems.length === 0);
                 this.userDataContainer.appendChild(rolesGroup);
-                rolesGroup.addDataElements(null, p.asGroup().getMemberships().map(el => this.createPrincipalViewer(el)));
+
+                this.appendRolesAndGroups(mems, rolesGroup);
+
                 addedGroups.splice(1, 0, rolesGroup);
             }
 
@@ -216,5 +217,35 @@ export class UserItemStatisticsPanel
         reportsProgress.onItemsAdded(handleReportsChanged);
 
         return reportsGroup;
+    }
+
+    private appendRolesAndGroups(memberships: api.security.Principal[], group: ItemDataGroup) {
+        const roleViews = memberships.filter(el => el.isRole()).map(el => this.createPrincipalViewer(el));
+        group.addDataElements(i18n('field.roles'), roleViews);
+
+        const groupViews = memberships.filter(el => el.isGroup()).map(el => this.createPrincipalViewer(el));
+        group.addDataElements(i18n('field.groups'), groupViews);
+    }
+
+    private fetchPrincipal(pKey: PrincipalKey, transitiveMemberships?: boolean) {
+        return new GetPrincipalByKeyRequest(pKey)
+            .setIncludeMemberships(true)
+            .setTransitiveMemberships(transitiveMemberships)
+            .sendAndParse();
+    }
+
+    private appendTransitiveSwitch(pKey: PrincipalKey, dataGroup: api.app.view.ItemDataGroup, disabled?: boolean) {
+        const transitiveSwitch = new api.ui.CheckboxBuilder()
+            .setLabelText(i18n('field.transitiveMemberships'))
+            .build().setDisabled(disabled);
+        transitiveSwitch.addClass('transitive-switch');
+        transitiveSwitch.onValueChanged(event => {
+            this.fetchPrincipal(pKey, 'true' === event.getNewValue()).then(updatedP => {
+                const updatedMems = (updatedP.isGroup() ? updatedP.asGroup() : updatedP.asUser()).getMemberships();
+                dataGroup.clearList();
+                this.appendRolesAndGroups(updatedMems, dataGroup);
+            }).catch(api.DefaultErrorHandler.handle);
+        });
+        dataGroup.getHeader().appendChild(transitiveSwitch);
     }
 }
