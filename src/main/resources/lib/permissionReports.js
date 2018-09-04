@@ -52,6 +52,7 @@ var generate = function (principalKey, repositoryIds) {
         });
         
         var taskId = generateReport(node, principalKey, repositoryId);
+
         return {
             _id: node._id,
             taskId: taskId,
@@ -82,30 +83,24 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
     return taskLib.submit({
         description: 'Report task for repository [' + repositoryId + '] and principal [' + principalKey + ']',
         task: function () {
-            var principalKeys = [principalKey];
-            if (!common.isRole(principalKey)) {
-                var membershipKeys = principals.getMemberships(principalKey, true).map(function (m) {
-                    return m.key;
-                });
-                principalKeys = principalKeys.concat(membershipKeys);
-            }
-            if (common.isUser(principalKey)) {
-                principalKeys.push('role:system.everyone');
-                if (principalKey != 'user:system:anonymous') {
-                    principalKeys.push('role:system.authenticated');
-                }
-            }
+            var principalKeys = getPrincipalKeys(principalKey);
+            var isSystemAdmin = hasSystemAdminRole(principalKeys);
+            var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
+            var nodes = queryRepositoryNodes(repositoryId, filters);
             log.info('Principal keys: ' + JSON.stringify(principalKeys));
-
-            var nodes = queryRepositoryNodes(repositoryId, principalKeys);
 
             var nodeProcessCount = 0;
             reportProgressToSocket(reportNode, 0);
             taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
 
             var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
+
             nodes.forEach(function (node) {
-                report += '\n' + generateReportLine(node, principalKeys);
+                if (isSystemAdmin) {
+                    report += '\n' + generateSystemAdminReportLine(node);
+                } else {
+                    report += '\n' + generateReportLine(node, principalKeys);
+                }
 
                 nodeProcessCount++;
                 reportProgressToSocket(reportNode, nodeProcessCount * 100 / nodes.length);
@@ -125,20 +120,33 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
             taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
 
             log.info('Generated report for repository [' + repositoryId + ']: ' + report);
-
         }
     });
 };
 
-var queryRepositoryNodes = function (repositoryId, principalKeys) {
-    var filters = {
-        hasValue: {
-            field: "_permissions.read",
-            values: principalKeys
-        }
-    };
+function getPrincipalKeys(principalKey) {
+    var principalKeys = [principalKey];
 
+    if (!common.isRole(principalKey)) {
+        var membershipKeys = principals.getMemberships(principalKey, true).map(function (m) {
+            return m.key;
+        });
+        principalKeys = principalKeys.concat(membershipKeys);
+    }
+
+    if (common.isUser(principalKey)) {
+        principalKeys.push('role:system.everyone');
+        if (principalKey != 'user:system:anonymous') {
+            principalKeys.push('role:system.authenticated');
+        }
+    }
+
+    return principalKeys;
+}
+
+var queryRepositoryNodes = function (repositoryId, filters) {
     var repoConn = common.newConnection(repositoryId);
+
     return repoConn.query({
         count: 1024, //TODO Batch
         query: '',
@@ -152,6 +160,21 @@ var queryRepositoryNodes = function (repositoryId, principalKeys) {
         };
     });
 };
+
+function makeRepoNodesQueryFilters(principalKeys) {
+    return {
+        hasValue: {
+            field: "_permissions.read",
+            values: principalKeys
+        }
+    }
+}
+
+function hasSystemAdminRole(principalKeys) {
+    return principalKeys.some(function (principalKey) {
+        return common.isSystemAdmin(principalKey);
+    })
+}
 
 var generateReportLine = function (node, memKeys) {
 
@@ -174,6 +197,16 @@ var generateReportLine = function (node, memKeys) {
     PERMISSIONS.forEach(function (pt) {
         line.push(allow[pt] && !deny[pt] ? 'X' : '');
     });
+    return line.join(',');
+};
+
+var generateSystemAdminReportLine = function (node) {
+    var line = [node._path];
+
+    PERMISSIONS.forEach(function () {
+        line.push('X');
+    });
+
     return line.join(',');
 };
 
