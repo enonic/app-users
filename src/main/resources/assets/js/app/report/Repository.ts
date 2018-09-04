@@ -4,6 +4,7 @@ export class Repository
     implements Equitable {
     private id: string;
     private name: string;
+    private branches: string[];
 
     getId(): string {
         return this.id;
@@ -11,6 +12,10 @@ export class Repository
 
     getName(): string {
         return this.name;
+    }
+
+    getBranches(): string[] {
+        return this.branches;
     }
 
     equals(other: Repository): boolean {
@@ -21,6 +26,7 @@ export class Repository
         const r = new Repository();
         r.id = json.id;
         r.name = json.name;
+        r.branches = json.branches;
         return r;
     }
 }
