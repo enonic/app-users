@@ -1,4 +1,5 @@
 var graphQl = require('/lib/graphql');
+var graphQlUtils = require('../../utils');
 
 exports.RepositoryType = graphQl.createObjectType({
     name: 'Repository',
@@ -14,6 +15,12 @@ exports.RepositoryType = graphQl.createObjectType({
             type: graphQl.GraphQLString,
             resolve: function (env) {
                 return env.source._name;
+            }
+        },
+        branches: {
+            type: graphQl.list(graphQl.GraphQLString),
+            resolve: function (env) {
+                return graphQlUtils.toArray(env.source.branches);
             }
         }
     }

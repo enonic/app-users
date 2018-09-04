@@ -9,7 +9,8 @@ export class ListRepositoriesRequest
         return `query($query: String, $start: Int, $count: Int, $sort: SortMode) {
             repositories(query: $query, start: $start, count: $count, sort: $sort) {
                 id,
-                name
+                name,
+                branches
             }
         }`;
     }
