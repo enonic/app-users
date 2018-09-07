@@ -16,13 +16,13 @@ exports.get = function (req) {
         var id = req.params.id;
         var report = permissionReports.get(id);
         if (report) {
-            var data = JSON.stringify({report: report, type: permissionReports.DOWNLOAD_EVENT});
+            var data = JSON.stringify({report: report.node, type: permissionReports.DOWNLOAD_EVENT});
             webSocketLib.sendToGroup(REPORT_GROUP, data);
         }
         return {
             contentType: 'text/csv',
             status: report ? 200 : 404,
-            body: report ? report.report : 'Not found'
+            body: report ? report.file : 'Not found'
         };
     }
 };

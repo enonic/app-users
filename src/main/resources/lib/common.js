@@ -67,6 +67,13 @@ exports.getByIds = function (ids, repo) {
     return newConnection(repo).get(ids);
 };
 
+exports.getBinary = function (id, repo, reference) {
+    return newConnection(repo).getBinary({
+        key: id,
+        binaryReference: reference
+    });
+};
+
 exports.delete = function (ids, repo) {
     return newConnection(repo).delete(ids);
 };
