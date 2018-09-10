@@ -4,6 +4,7 @@ var namePrettyfier = Java.type('com.enonic.xp.name.NamePrettyfier');
 var REPO_NAME = 'system-repo';
 var REPO_BRANCH = 'master';
 var MAX_COUNT = 100;
+var SYSTEM_ADMIN = 'role:system.admin';
 
 var UserItemType = exports.UserItemType = {
     ROLE: 'ROLE',
@@ -66,6 +67,13 @@ exports.getByIds = function (ids, repo) {
     return newConnection(repo).get(ids);
 };
 
+exports.getBinary = function (id, repo, reference) {
+    return newConnection(repo).getBinary({
+        key: id,
+        binaryReference: reference
+    });
+};
+
 exports.delete = function (ids, repo) {
     return newConnection(repo).delete(ids);
 };
@@ -113,6 +121,10 @@ exports.isRole = function isRole(key) {
 exports.isUserStore = function isUserStore(key) {
     return splitKey(key).length === 1;
 };
+
+exports.isSystemAdmin = function isSystemAdmin(key) {
+    return key === SYSTEM_ADMIN;
+}
 
 exports.createQueryByField = function (field, values) {
     if (!values || !field) {
