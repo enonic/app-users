@@ -219,11 +219,26 @@ export class UserItemStatisticsPanel
         return reportsGroup;
     }
 
-    private appendRolesAndGroups(memberships: api.security.Principal[], group: ItemDataGroup) {
-        const roleViews = memberships.filter(el => el.isRole()).map(el => this.createPrincipalViewer(el));
-        group.addDataElements(i18n('field.roles'), roleViews);
+    private isRole(principal: api.security.Principal): boolean {
+        return principal.isRole();
+    }
 
-        const groupViews = memberships.filter(el => el.isGroup()).map(el => this.createPrincipalViewer(el));
+    private isGroup(principal: api.security.Principal): boolean {
+        return principal.isGroup();
+    }
+
+    private getMembershipViews(memberships: api.security.Principal[], membershipCheck: (p: api.security.Principal) => boolean) {
+        return memberships
+            .sort((item1, item2) => Number(item1.getDisplayName() > item2.getDisplayName()))
+            .filter(el => membershipCheck(el))
+            .map(el => this.createPrincipalViewer(el));
+    }
+
+    private appendRolesAndGroups(memberships: api.security.Principal[], group: ItemDataGroup) {
+        const roleViews = this.getMembershipViews(memberships, this.isRole);
+        const groupViews = this.getMembershipViews(memberships, this.isGroup);
+
+        group.addDataElements(i18n('field.roles'), roleViews);
         group.addDataElements(i18n('field.groups'), groupViews);
     }
 
