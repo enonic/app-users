@@ -240,10 +240,10 @@ exports.queryAll = function queryAll(params, repo) {
     };
 };
 
-function newConnection(repo) {
+function newConnection(repo, branch) {
     return nodeLib.connect({
         repoId: repo || REPO_NAME,
-        branch: REPO_BRANCH
+        branch: branch || REPO_BRANCH
     });
 }
 

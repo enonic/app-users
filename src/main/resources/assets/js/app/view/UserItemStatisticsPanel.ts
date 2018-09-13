@@ -186,6 +186,7 @@ export class UserItemStatisticsPanel
             .setEnabled(false)
             .addClass('generate large')
             .onClicked(() => {
+                const branches = reportsCombo.getSelectedBranches();
                 const repos = reportsCombo.getSelectedDisplayValues();
                 repos.forEach(repo => {
                     reportsCombo.deselect(repo);
@@ -194,6 +195,7 @@ export class UserItemStatisticsPanel
                 new GeneratePermissionsReportRequest()
                     .setPrincipalKey(principal.getKey())
                     .setRepositoryKeys(repos.map(repo => repo.getId()))
+                    .setBranches(branches)
                     .sendAndParse()
                     .then(reports => {
                         reports.forEach(report => {
