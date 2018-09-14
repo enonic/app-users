@@ -16,7 +16,8 @@ export class ListReportsRequest
                 principalKey,
                 finished,
                 principalDisplayName,
-                repositoryId
+                repositoryId,
+                reportBranch
             }
         }`;
     }

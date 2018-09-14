@@ -31,17 +31,19 @@ var get = function (ids) {
     return common.getByIds(ids, initLib.REPO_NAME)
 };
 
-var generate = function (principalKey, repositoryIds) {
+var generate = function (principalKey, repositoryIds, branches) {
 
     log.info('Generate: principalKey=' + principalKey + ', repositoryIds=' + JSON.stringify(repositoryIds));
     var principal = authLib.getPrincipal(principalKey);
 
-    var reports = repositoryIds.map(function (repositoryId) {
+    var reports = repositoryIds.map(function (repositoryId, index) {
+        var branch = branches[index];
         var node = common.create({
             _parentPath: '/reports/permissions',
             principalKey: principalKey,
             principalDisplayName: principal.displayName,
-            repositoryId: repositoryId
+            repositoryId: repositoryId,
+            reportBranch: branch
         }, initLib.REPO_NAME);
 
         var url = portalLib.serviceUrl({
@@ -50,14 +52,15 @@ var generate = function (principalKey, repositoryIds) {
                 id: node._id
             }
         });
-        
-        var taskId = generateReport(node, principalKey, repositoryId);
+
+        var taskId = generateReport(node, principalKey, repositoryId, branch);
         return {
             _id: node._id,
             taskId: taskId,
             principalKey: principalKey,
             principalDisplayName: node.principalDisplayName,
             repositoryId: repositoryId,
+            reportBranch: node.reportBranch,
             url: url
         }
     });
@@ -78,7 +81,7 @@ var reportProgressToSocket = function (reportNode, progress) {
     });
 };
 
-var generateReport = function (reportNode, principalKey, repositoryId) {
+var generateReport = function (reportNode, principalKey, repositoryId, branch) {
     return taskLib.submit({
         description: 'Report task for repository [' + repositoryId + '] and principal [' + principalKey + ']',
         task: function () {
@@ -97,7 +100,7 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
             }
             log.info('Principal keys: ' + JSON.stringify(principalKeys));
 
-            var nodes = queryRepositoryNodes(repositoryId, principalKeys);
+            var nodes = queryRepositoryNodes(repositoryId, principalKeys, branch);
 
             var nodeProcessCount = 0;
             reportProgressToSocket(reportNode, 0);
@@ -130,7 +133,7 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
     });
 };
 
-var queryRepositoryNodes = function (repositoryId, principalKeys) {
+var queryRepositoryNodes = function (repositoryId, principalKeys, branch) {
     var filters = {
         hasValue: {
             field: "_permissions.read",
@@ -138,7 +141,7 @@ var queryRepositoryNodes = function (repositoryId, principalKeys) {
         }
     };
 
-    var repoConn = common.newConnection(repositoryId);
+    var repoConn = common.newConnection(repositoryId, branch);
     return repoConn.query({
         count: 1024, //TODO Batch
         query: '',

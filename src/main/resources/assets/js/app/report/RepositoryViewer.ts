@@ -8,6 +8,7 @@ export class RepositoryViewer
     constructor(className?: string) {
         super('repository-viewer' + (!!className ? ' ' + className : ''));
         this.namesView = new api.app.NamesView();
+        this.namesView.addClass('repository-viewer-names-view');
         this.appendChild(this.namesView);
     }
 
