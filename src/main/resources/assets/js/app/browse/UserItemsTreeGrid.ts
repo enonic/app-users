@@ -147,27 +147,17 @@ export class UserItemsTreeGrid
     }
 
     private loadParentNode(principal: api.security.Principal, userStore: api.security.UserStore): wemQ.Promise<TreeNode<UserTreeGridItem>> {
-        let deferred = wemQ.defer<TreeNode<UserTreeGridItem>>();
-        let parentNode = this.getParentNode(true);
+        const userStoreId = userStore.getKey().getId();
 
-        if (!parentNode.getData() && !principal.isRole()) { // No parent selected
-            const userStoreId = userStore.getKey().getId();
-            parentNode = parentNode.getChildren().filter(node => node.getDataId() === userStoreId)[0] || parentNode;
-        }
+        const userStoreNode = this.getRoot().getCurrentRoot().getChildren().filter(node => node.getDataId() === userStoreId)[0];
 
-        this.fetchDataAndSetNodes(parentNode).then(() => {
+        return this.fetchDataAndSetNodes(userStoreNode).then(() => {
             const parentItemType = UserTreeGridItem.getParentType(principal);
 
-            if (parentNode.getData() && parentNode.getData().getType() === parentItemType) {
-                deferred.resolve(parentNode);
-            } else {
-                parentNode = parentNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0] || parentNode;
+            const parentNode = userStoreNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0];
 
-                this.fetchDataAndSetNodes(parentNode).then(() => deferred.resolve(parentNode));
-            }
+            return this.fetchDataAndSetNodes(parentNode).then(() => parentNode);
         });
-
-        return deferred.promise;
     }
 
     appendUserNode(principal: api.security.Principal, userStore: api.security.UserStore, parentOfSameType?: boolean) {
