@@ -29,16 +29,18 @@ var get = function (ids) {
     return common.getByIds(ids, initLib.REPO_NAME)
 };
 
-var generate = function (principalKey, repositoryIds) {
+var generate = function (principalKey, repositoryIds, branches) {
 
     var principal = authLib.getPrincipal(principalKey);
 
-    var reports = repositoryIds.map(function (repositoryId) {
+    var reports = repositoryIds.map(function (repositoryId, index) {
+        var branch = branches[index];
         var node = common.create({
             _parentPath: '/reports/permissions',
             principalKey: principalKey,
             principalDisplayName: principal.displayName,
-            repositoryId: repositoryId
+            repositoryId: repositoryId,
+            reportBranch: branch
         }, initLib.REPO_NAME);
 
         var url = portalLib.serviceUrl({
@@ -47,15 +49,15 @@ var generate = function (principalKey, repositoryIds) {
                 id: node._id
             }
         });
-        
-        var taskId = generateReport(node, principalKey, repositoryId);
 
+        var taskId = generateReport(node, principalKey, repositoryId, branch);
         return {
             _id: node._id,
             taskId: taskId,
             principalKey: principalKey,
             principalDisplayName: node.principalDisplayName,
             repositoryId: repositoryId,
+            reportBranch: node.reportBranch,
             url: url
         }
     });
@@ -74,14 +76,14 @@ var reportProgressToSocket = function (reportNode, progress) {
     });
 };
 
-var generateReport = function (reportNode, principalKey, repositoryId) {
+var generateReport = function (reportNode, principalKey, repositoryId, branch) {
     return taskLib.submit({
         description: 'Report task for repository [' + repositoryId + '] and principal [' + principalKey + ']',
         task: function () {
             var principalKeys = getPrincipalKeys(principalKey);
             var isSystemAdmin = hasSystemAdminRole(principalKeys);
             var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
-            var nodes = queryRepositoryNodes(repositoryId, filters);
+            var nodes = queryRepositoryNodes(repositoryId, branch, filters);
 
             var nodeProcessCount = 0;
             reportProgressToSocket(reportNode, 0);
@@ -136,8 +138,8 @@ function getPrincipalKeys(principalKey) {
     return principalKeys;
 }
 
-var queryRepositoryNodes = function (repositoryId, filters) {
-    var repoConn = common.newConnection(repositoryId);
+var queryRepositoryNodes = function (repositoryId, branch, filters) {
+    var repoConn = common.newConnection(repositoryId, branch);
 
     return repoConn.query({
         count: 1024, //TODO Batch

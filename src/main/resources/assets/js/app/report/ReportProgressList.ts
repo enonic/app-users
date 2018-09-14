@@ -72,7 +72,7 @@ class ReportProgressItem
     constructor(item: Report) {
         super('report-progress-item');
         const name = new api.dom.SpanEl('title');
-        name.setHtml(item.getRepositoryId());
+        name.setHtml(`${item.getRepositoryId()} (${item.getReportBranch()})`);
 
         this.setReportReady(item.getTaskId() === undefined);
 

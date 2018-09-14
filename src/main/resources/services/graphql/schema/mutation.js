@@ -231,7 +231,8 @@ module.exports = graphQl.createObjectType({
             type: graphQl.list(graphQlObjectTypes.PermissionReportType),
             args: {
                 principalKey: graphQl.nonNull(graphQl.GraphQLString),
-                repositoryIds: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
+                repositoryIds: graphQl.nonNull(graphQl.list(graphQl.GraphQLString)),
+                branches: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
             },
             resolve: function (env) {
                 if (!authLib.isAdmin()) {
@@ -239,7 +240,8 @@ module.exports = graphQl.createObjectType({
                 }
                 var principalKey = env.args.principalKey;
                 var repositoryIds = env.args.repositoryIds;
-                return permissionReports.generate(principalKey, repositoryIds);
+                var branches = env.args.branches;
+                return permissionReports.generate(principalKey, repositoryIds, branches);
             }
         },
         deletePermissionReports: {

@@ -64,7 +64,7 @@ export class GetPrincipalsByKeysRequest
     }
 
     private getDynamicVariables() {
-        return this.includeMemberships ? '' : '';
+        return this.includeMemberships ? ', $transitive: Boolean' : '';
     }
 
     private getMembershipsField() {
@@ -72,7 +72,7 @@ export class GetPrincipalsByKeysRequest
             memberships (transitive: $transitive) {
                 key
                 displayName
-            }` : ``;
+            }` : '';
     }
 
     sendAndParse(): wemQ.Promise<Principal[]> {
