@@ -21,9 +21,7 @@ var list = function (principalKey, repositoryIds, start, count, sort) {
 };
 
 var deleteReports = function (ids) {
-    log.info('Deleting: ' + JSON.stringify(ids));
     var result = common.delete(ids, initLib.REPO_NAME);
-    log.info('Delete reports: ' + JSON.stringify(result));
     return result.length;
 };
 
@@ -33,7 +31,6 @@ var get = function (ids) {
 
 var generate = function (principalKey, repositoryIds) {
 
-    log.info('Generate: principalKey=' + principalKey + ', repositoryIds=' + JSON.stringify(repositoryIds));
     var principal = authLib.getPrincipal(principalKey);
 
     var reports = repositoryIds.map(function (repositoryId) {
@@ -63,8 +60,6 @@ var generate = function (principalKey, repositoryIds) {
         }
     });
 
-    log.info('Generate: results=' + JSON.stringify(reports));
-
     return reports;
 };
 
@@ -87,7 +82,6 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
             var isSystemAdmin = hasSystemAdminRole(principalKeys);
             var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
             var nodes = queryRepositoryNodes(repositoryId, filters);
-            log.info('Principal keys: ' + JSON.stringify(principalKeys));
 
             var nodeProcessCount = 0;
             reportProgressToSocket(reportNode, 0);
@@ -118,8 +112,6 @@ var generateReport = function (reportNode, principalKey, repositoryId) {
 
             reportProgressToSocket(updatedNode, 100);
             taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
-
-            log.info('Generated report for repository [' + repositoryId + ']: ' + report);
         }
     });
 };
@@ -153,7 +145,6 @@ var queryRepositoryNodes = function (repositoryId, filters) {
         filters: filters
     }).hits.map(function (nodeHit) {
         var node = repoConn.get(nodeHit.id);
-        log.info('node:' + node._path);
         return {
             _path: node._path,
             _permissions: node._permissions
