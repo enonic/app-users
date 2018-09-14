@@ -25,7 +25,13 @@ var deleteReports = function (ids) {
 };
 
 var get = function (ids) {
-    return common.getByIds(ids, initLib.REPO_NAME)
+    var reportNode = common.getByIds(ids, initLib.REPO_NAME);
+    var reportFile = common.getBinary(ids, initLib.REPO_NAME, 'report');
+
+    return {
+        node: reportNode,
+        file: reportFile
+    }
 };
 
 var generate = function (principalKey, repositoryIds, branches) {
@@ -68,40 +74,62 @@ var generateReport = function (reportNode, principalKey, repositoryId, branch) {
     return taskLib.submit({
         description: 'Report task for repository [' + repositoryId + '] and principal [' + principalKey + ']',
         task: function () {
-            var principalKeys = getPrincipalKeys(principalKey);
-            var isSystemAdmin = hasSystemAdminRole(principalKeys);
-            var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
-            var nodes = queryRepositoryNodes(repositoryId, branch, filters);
-
-            var nodeProcessCount = 0;
-            taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
-
-            var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
-
-            nodes.forEach(function (node) {
-                if (isSystemAdmin) {
-                    report += '\n' + generateSystemAdminReportLine(node);
-                } else {
-                    report += '\n' + generateReportLine(node, principalKeys);
+            try {
+                var tempFile = generateReportCSVFile(principalKey, repositoryId, branch);
+                var binary = convertFileToBinary(tempFile);
+                updateNodeWithBinary(reportNode._id, binary);
+            } finally {
+                if (tempFile) {
+                    tempFile.delete();
                 }
-
-                nodeProcessCount++;
-                taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
-            });
-
-            common.update({
-                key: reportNode._id,
-                editor: function (node) {
-                    node.report = report;
-                    node.finished = new Date();
-                    return node;
-                }
-            }, initLib.REPO_NAME);
-
-            taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
+            }
         }
     });
 };
+
+function generateReportCSVFile(principalKey, repositoryId, branch) {
+    var principalKeys = getPrincipalKeys(principalKey);
+    var isSystemAdmin = hasSystemAdminRole(principalKeys);
+    var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
+    var nodes = queryRepositoryNodes(repositoryId, branch, filters);
+
+    var nodeProcessCount = 0;
+    taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
+
+    var reportLine = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
+    var tempFile = Java.type('java.io.File').createTempFile("perm-report-", ".csv");
+    var Files = Java.type('com.google.common.io.Files');
+    var charset = Java.type('java.nio.charset.Charset').forName("UTF-8");
+    Files.append(reportLine, tempFile, charset);
+
+    nodes.forEach(function (node) {
+        reportLine = '\n' + (isSystemAdmin ? generateSystemAdminReportLine(node) : generateReportLine(node, principalKeys));
+        Files.append(reportLine, tempFile, charset);
+
+        nodeProcessCount++;
+        taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
+    });
+
+    taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
+
+    return tempFile;
+}
+
+function convertFileToBinary(file) {
+    var BinaryWrapper = Java.type('com.enonic.xp.app.users.BinaryWrapper');
+    return BinaryWrapper.wrap(file.getAbsolutePath());
+}
+
+function updateNodeWithBinary(id, binary) {
+    return common.update({
+        key: id,
+        editor: function (node) {
+            node.report = binary;
+            node.finished = new Date();
+            return node;
+        }
+    }, initLib.REPO_NAME);
+}
 
 function getPrincipalKeys(principalKey) {
     var principalKeys = [principalKey];

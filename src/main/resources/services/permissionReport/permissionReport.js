@@ -7,6 +7,6 @@ exports.get = function (req) {
     return {
         contentType: 'text/csv',
         status: report ? 200 : 404,
-        body: report ? report.report : 'Not found'
+        body: report ? report.file : 'Not found'
     };
 };
