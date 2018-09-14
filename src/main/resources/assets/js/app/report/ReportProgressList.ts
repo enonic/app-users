@@ -2,36 +2,74 @@ import ListBox = api.ui.selector.list.ListBox;
 import i18n = api.util.i18n;
 import PrincipalKey = api.security.PrincipalKey;
 import DateHelper = api.util.DateHelper;
+import TaskEvent = api.task.TaskEvent;
+import TaskEventType = api.task.TaskEventType;
 import {Report} from './Report';
-import {ReportWebSocket} from './ReportWebSocket';
 import {ListReportsRequest} from '../../api/graphql/report/ListReportsRequest';
 import {DeleteReportsRequest} from '../../api/graphql/report/DeleteReportsRequest';
+import {GetReportRequest} from '../../api/graphql/report/GetReportRequest';
 
 export class ReportProgressList
     extends ListBox<Report> {
 
     constructor(principalKey: PrincipalKey, repositoryIds?: string[]) {
         super('report-progress-list');
-        const socket = ReportWebSocket.getInstance();
 
         this.loadExistingReports(principalKey, repositoryIds);
+        this.handlePermReportsTaskEvents();
+    }
 
-        socket.onReportProgress((report: Report, progress: number) => {
-            let view = <ReportProgressItem> this.getItemView(report);
-            if (!view) {
-                this.addItem(report);   // report has not yet been added but the progress has already started
-                view = <ReportProgressItem> this.getItemView(report);
-            }
+    private handlePermReportsTaskEvents() {
+        const handler = this.handleTaskEvent.bind(this);
 
-            if (progress < 100) {
-                view.setProgress(progress);
-            } else {
-                view.setFinished(report.getFinished());
-                view.setReportReady(true);
-            }
+        TaskEvent.on(handler);
+
+        this.onRemoved(() => {
+            TaskEvent.un(handler);
         });
+    }
 
-        socket.onReportDownload((report: Report) => this.deleteReport(report));
+    private handleTaskEvent(event: TaskEvent) {
+        if (event.getTaskInfo().getDescription().indexOf('Report task') < 0) {
+            return;
+        }
+
+        const view: ReportProgressItem = this.getItemViewByTaskEvent(event);
+
+        if (!view) {
+            return;
+        }
+
+        if (event.getEventType() === TaskEventType.UPDATED) {
+            const taskProgress: api.task.TaskProgress = event.getTaskInfo().getProgress();
+            const progress: number = taskProgress.getCurrent() * 100 / taskProgress.getTotal();
+            view.setProgress(progress);
+
+            return;
+        }
+
+        if (event.getEventType() === TaskEventType.FINISHED) {
+            view.setReportReady(true);
+
+            new GetReportRequest(view.getItem().getId()).sendAndParse().then((report: Report) => {
+                view.setFinished(report.getFinished());
+            });
+
+            api.notify.NotifyManager.get().showSuccess(i18n('notify.report.finished', view.getItem().getPrincipalDisplayName()));
+
+            return;
+        }
+    }
+
+    private getItemViewByTaskEvent(event: TaskEvent): ReportProgressItem {
+        const eventTaskId: string = event.getTaskInfo().getId().toString();
+        const items = this.getItems().filter((item: Report) => item.getTaskId() === eventTaskId);
+
+        if (items.length === 0) {
+            return null;
+        }
+
+        return <ReportProgressItem>this.getItemView(items[0]);
     }
 
     protected createItemView(item: Report, readOnly: boolean): ReportProgressItem {
@@ -68,6 +106,7 @@ class ReportProgressItem
     private readonly timestamp: api.dom.Element;
     private readonly progress: api.ui.ProgressBar;
     private deleteClickListeners: { (item: Report): void }[] = [];
+    private item: Report;
 
     constructor(item: Report) {
         super('report-progress-item');
@@ -76,6 +115,7 @@ class ReportProgressItem
 
         this.setReportReady(item.getTaskId() === undefined);
 
+        this.item = item;
         this.progress = new api.ui.ProgressBar();
 
         this.timestamp = new api.dom.SpanEl('timestamp');
@@ -84,11 +124,16 @@ class ReportProgressItem
         const downloadLink = new api.dom.AEl('download').setUrl(item.getUrl(), '_blank');
         downloadLink.getEl().setText(i18n('action.report.download')).setAttribute('download',
             `Report_${item.getPrincipalDisplayName()}_in_${item.getRepositoryId()}.csv`);
+        downloadLink.onClicked(event => this.notifyDeleteClicked(item));
 
         const deleteLink = new api.dom.AEl('delete');
         deleteLink.setHtml(i18n('action.delete')).onClicked(event => this.notifyDeleteClicked(item));
 
         this.appendChildren(name, this.progress, this.timestamp, downloadLink, deleteLink);
+    }
+
+    public getItem(): Report {
+        return this.item;
     }
 
     public setProgress(value: number) {
