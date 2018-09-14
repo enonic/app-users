@@ -167,6 +167,19 @@ module.exports = graphQl.createObjectType({
                 var sort = env.args.sort;
                 return permissionReports.list(principalKey, repositoryIds, start, count, sort);
             }
+        },
+        permissionReport: {
+            type: graphQlObjectTypes.PermissionReportType,
+            args: {
+                id: graphQl.GraphQLString,
+            },
+            resolve: function (env) {
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
+                }
+                var id = env.args.id;
+                return permissionReports.get(id);
+            }
         }
     }
 });

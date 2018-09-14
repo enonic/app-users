@@ -1,5 +1,4 @@
 var taskLib = require('/lib/xp/task');
-var eventLib = require('/lib/xp/event');
 var portalLib = require('/lib/xp/portal');
 var authLib = require('/lib/xp/auth');
 var initLib = require('/lib/init');
@@ -65,17 +64,6 @@ var generate = function (principalKey, repositoryIds, branches) {
     return reports;
 };
 
-var reportProgressToSocket = function (reportNode, progress) {
-    eventLib.send({
-        type: PROGRESS_EVENT,
-        distributed: false,
-        data: {
-            report: JSON.stringify(reportNode),
-            progress: progress
-        }
-    });
-};
-
 var generateReport = function (reportNode, principalKey, repositoryId, branch) {
     return taskLib.submit({
         description: 'Report task for repository [' + repositoryId + '] and principal [' + principalKey + ']',
@@ -86,7 +74,6 @@ var generateReport = function (reportNode, principalKey, repositoryId, branch) {
             var nodes = queryRepositoryNodes(repositoryId, branch, filters);
 
             var nodeProcessCount = 0;
-            reportProgressToSocket(reportNode, 0);
             taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
 
             var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
@@ -99,11 +86,10 @@ var generateReport = function (reportNode, principalKey, repositoryId, branch) {
                 }
 
                 nodeProcessCount++;
-                reportProgressToSocket(reportNode, nodeProcessCount * 100 / nodes.length);
                 taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
             });
 
-            var updatedNode = common.update({
+            common.update({
                 key: reportNode._id,
                 editor: function (node) {
                     node.report = report;
@@ -112,7 +98,6 @@ var generateReport = function (reportNode, principalKey, repositoryId, branch) {
                 }
             }, initLib.REPO_NAME);
 
-            reportProgressToSocket(updatedNode, 100);
             taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
         }
     });
