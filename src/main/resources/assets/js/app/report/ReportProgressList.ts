@@ -62,7 +62,8 @@ export class ReportProgressList
     }
 
     private getItemViewByTaskEvent(event: TaskEvent): ReportProgressItem {
-        const items = this.getItems().filter((item: Report) => item.getTaskId() === event.getTaskInfo().getId().toString());
+        const eventTaskId: string = event.getTaskInfo().getId().toString();
+        const items = this.getItems().filter((item: Report) => item.getTaskId() === eventTaskId);
 
         if (items.length === 0) {
             return null;
