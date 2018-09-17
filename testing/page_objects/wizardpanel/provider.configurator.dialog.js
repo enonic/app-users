@@ -6,7 +6,7 @@ const page = require('../page');
 const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const xpath = {
-    container: `//div[contains(@id,'SiteConfiguratorDialog')]`,
+    container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
     domainInput: "//input[contains(@id,'TextInput') and contains(@name,'appDomain')]",
     clientIdInput: "//input[contains(@id,'TextInput') and contains(@name,'appClientId')]",
     clientSecretInput: "//input[contains(@id,'TextInput') and contains(@name,'appSecret')]",
