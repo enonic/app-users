@@ -4,8 +4,8 @@ const loaderComboBox = require('../inputs/loaderComboBox');
 const panel = {
     container: `//div[contains(@id,'UserStoreWizardPanel')]`,
     providerFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='ID Provider']]" +
-                         `${loaderComboBox.optionFilterInput}`,
-    permissionsFilterInput: `//div[contains(@id,'UserStoreAccessControlComboBox')]` + `${loaderComboBox.optionFilterInput}`,
+                         `${loaderComboBox.optionsFilterInput}`,
+    permissionsFilterInput: `//div[contains(@id,'UserStoreAccessControlComboBox')]` + `${loaderComboBox.optionsFilterInput}`,
     permissionsLink: `//li[child::a[text()='Permissions']]`,
     aclList: `//ul[contains(@class,'access-control-list')]`,
     aceAccessSelector: `//div[contains(@id,'UserStoreAccessSelector')]`,

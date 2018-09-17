@@ -9,8 +9,8 @@ const loaderComboBox = require('../inputs/loaderComboBox');
 const panel = {
     container: `//div[contains(@id,'UserWizardPanel')]`,
     emailInput: `//input[@type = 'email']`,
-    groupOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]" + `${loaderComboBox.optionFilterInput}`,
-    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + `${loaderComboBox.optionFilterInput}`,
+    groupOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]" + `${loaderComboBox.optionsFilterInput}`,
+    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + `${loaderComboBox.optionsFilterInput}`,
     rolesGroupLink: `//li[child::a[text()='Roles & Groups']]`,
     passwordGenerator: `//div[contains(@id,'PasswordGenerator')]`,
     showPasswordLink: `//a[@data-i18n='Show']`,

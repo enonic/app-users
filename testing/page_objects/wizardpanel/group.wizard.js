@@ -8,8 +8,8 @@ const loaderComboBox = require('../inputs/loaderComboBox');
 
 const panel = {
     container: `//div[contains(@id,'GroupWizardPanel')]`,
-    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + `${loaderComboBox.optionFilterInput}`,
-    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + `${loaderComboBox.optionFilterInput}`,
+    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + `${loaderComboBox.optionsFilterInput}`,
+    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + `${loaderComboBox.optionsFilterInput}`,
     rolesLink: `//li[child::a[text()='Roles']]`,
     membersLink: `//li[child::a[text()='Members']]`,
     membersStepForm: `//div[contains(@id,'GroupMembersWizardStepForm')]`,
