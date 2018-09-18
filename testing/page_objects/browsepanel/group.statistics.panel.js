@@ -10,9 +10,9 @@ const panel = {
     itemName: `//h1[@class='title']`,
     itemPath: `//h4[@class='path']`,
     membersDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]`,
-    rolesDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles']]`,
+    rolesAndGroupDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]`,
     memberList: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]//ul[@class='data-list']`,
-    roleList: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles']]//ul[@class='data-list']`
+    roleList: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list']`
 };
 const groupStatisticsPanel = Object.create(itemStatistic, {
 
@@ -37,7 +37,7 @@ const groupStatisticsPanel = Object.create(itemStatistic, {
     getDisplayNameOfRoles: {
         value: function () {
             let items = `${panel.div}` + `${panel.roleList}` + `${elements.H6_DISPLAY_NAME}`;
-            return this.waitForVisible(`${panel.rolesDataGroup}`, 1000).then((result) => {
+            return this.waitForVisible(`${panel.rolesAndGroupDataGroup}`, 1000).then((result) => {
                 if (!result) {
                     throw new Error('Roles data-group is not present on the page!');
                 }
@@ -55,4 +55,3 @@ const groupStatisticsPanel = Object.create(itemStatistic, {
     },
 });
 module.exports = groupStatisticsPanel;
-
