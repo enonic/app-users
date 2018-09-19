@@ -30,7 +30,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             return testUtils.findAndSelectItem('su').then(() => {
                 return userStatisticsPanel.selectRepository('cms-repo');
             }).then(() => {
-                testUtils.saveScreenshot('generate_report_button_is_enabled');
+                testUtils.saveScreenshot('generate_report_button_getting_enabled');
                 return userStatisticsPanel.waitForGenerateButtonEnabled();
             }).then(result => {
                 assert.isTrue(result, '`Generate Report` button should be enabled now');
@@ -42,7 +42,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             return testUtils.findAndSelectItem('su').then(() => {
                 return userStatisticsPanel.selectRepository('cms-repo');
             }).then(() => {
-                testUtils.saveScreenshot('generate_report_button_is_enabled');
+                testUtils.saveScreenshot('generate_report_button_should_be_enabled');
                 return userStatisticsPanel.waitForGenerateButtonEnabled();
             }).then(() => {
                 return userStatisticsPanel.clickOnGenerateReportButton();
@@ -51,10 +51,11 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             }).then(message => {
                 assert.strictEqual(message, appConst.permissionsReportMessage('Super User'), `Correct notification message should appear`);
             }).then(() => {
+                testUtils.saveScreenshot('report_should_be_present');
                 return userStatisticsPanel.getReportTitles();
             }).then(result => {
                 assert.isTrue(result.length == 1, 'One report should be present on the page');
-                assert.isTrue(result[0] === 'cms-repo', 'expected title of the report should be displayed');
+                assert.isTrue(result[0] === 'cms-repo (master)', 'expected title of the report should be displayed');
             })
 
 
