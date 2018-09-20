@@ -56,9 +56,25 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             }).then(result => {
                 assert.isTrue(result.length == 1, 'One report should be present on the page');
                 assert.isTrue(result[0] === 'cms-repo (master)', 'expected title of the report should be displayed');
+            }).then(() => {
+                return userStatisticsPanel.getReportDate('cms-repo (master)');
+            }).then(result => {
+                let currentDate = new Date().getDate();
+                assert.isTrue(result[0].includes(currentDate), 'correct date of the report should be displayed');
+
             })
+        });
 
-
+    it('GIVEN existing report for `Super User` WHEN  `Delete` link has been pressed THEN the report should not be displayed',
+        () => {
+            return testUtils.findAndSelectItem('su').then(() => {
+                return userStatisticsPanel.clickOnDeleteReportLink('cms-repo (master)');
+            }).then(() => {
+                testUtils.saveScreenshot('report_is_deleted');
+                return userStatisticsPanel.getNumberOfReports();
+            }).then(result => {
+                assert.isTrue(result == 0, 'Report should not be present on `Statistics Panel`');
+            })
         });
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

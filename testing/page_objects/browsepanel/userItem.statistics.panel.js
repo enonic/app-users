@@ -16,6 +16,9 @@ const panel = {
     repoOptionsFilterInput: +`${loaderComboBox.optionsFilterInput}`,
     generateButton: `//button[contains(@id,'Button') and child::span[text()='Generate report']]`,
     reportItem: `//ul[contains(@class,'data-list') and child::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]`,
+    reportByTitle: function (title) {
+        return `//li[contains(@id,'ReportProgressItem') and child::span[contains(.,'${title}')]]`
+    },
 };
 const userItemStatisticsPanel = Object.create(page, {
 
@@ -95,9 +98,32 @@ const userItemStatisticsPanel = Object.create(page, {
     },
     getReportTitles: {
         value: function () {
-            return this.getText(panel.reportItem + `//span[@class='title']`).then(result=>{
+            return this.getText(panel.reportItem + `//span[@class='title']`).then(result => {
                 return [].concat(result);
             })
+        }
+    },
+    getReportDate: {
+        value: function (title) {
+            return this.getText(panel.reportByTitle(title) + `//span[@class='timestamp']`).then(result => {
+                return [].concat(result);
+            })
+        }
+    },
+    clickOnDeleteReportLink: {
+        value: function (title) {
+            let deleteLink = panel.reportByTitle(title) + `//a[@class='delete']`;
+            return this.waitForVisible(deleteLink, appConst.TIMEOUT_1).catch(err => {
+                this.saveScreenshot('err_report_not_found');
+                throw new Error('Report was not found! ' + err);
+            }).then(() => {
+                return this.doClick(deleteLink);
+            }).pause(400);
+        }
+    },
+    getNumberOfReports: {
+        value: function () {
+            return this.numberOfElements(panel.reportItem);
         }
     }
 });
