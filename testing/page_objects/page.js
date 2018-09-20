@@ -14,7 +14,7 @@ Page.prototype.numberOfElements = function (selector) {
         return res.value.filter(el => {
             return this.getBrowser().elementIdDisplayed(el.ELEMENT);
         })
-    }).then((result) => {
+    }).then(result => {
         return Object.keys(result).length;
     });
 };
@@ -153,7 +153,9 @@ Page.prototype.getAttribute = function (selector, attributeName) {
 };
 
 Page.prototype.waitForNotificationMessage = function () {
-    return this.getBrowser().waitForVisible(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3).then(() => {
+    return this.getBrowser().waitForVisible(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3).catch(err => {
+        throw new Error('Error when wait for notification message: ' + err);
+    }).then(() => {
         return this.getBrowser().getText(`//div[@class='notification-content']/span`);
     })
 };
