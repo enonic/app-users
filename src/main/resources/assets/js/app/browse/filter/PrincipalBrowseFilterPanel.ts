@@ -158,7 +158,10 @@ export class PrincipalBrowseFilterPanel
     }
 
     private fetchAndUpdateAggregations(): wemQ.Promise<void> {
+        const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
+
         return new ListTypesRequest()
+            .setQuery(searchString)
             .sendAndParse()
             .then((typeAggregation) => {
                 this.updateAggregations([typeAggregation], true);
@@ -179,7 +182,8 @@ export class PrincipalBrowseFilterPanel
             case 'user': return i18n('field.user');
             case 'group': return i18n('field.group');
             case 'role': return i18n('field.role');
-            case 'user store': return i18n('field.userStore');
+        case 'user_store':
+            return i18n('field.userStore');
             default: StringHelper.capitalize(name);
         }
     }

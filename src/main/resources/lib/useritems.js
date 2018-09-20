@@ -15,10 +15,31 @@ module.exports = {
             }
         });
 
+        processUserStoreAggregation(result);
+
         return result;
     },
     Type: common.UserItemType
 };
+
+function processUserStoreAggregation(result) {
+    if (!result || !result.aggregations || !result.aggregations.principalType || !result.aggregations.principalType.buckets) {
+        return;
+    }
+
+    var aggregationBuckets = result.aggregations.principalType.buckets;
+
+    var principalsCount = 0;
+    aggregationBuckets.forEach(function (bucket) {
+        principalsCount += bucket.docCount;
+    });
+
+    var userStoresCount = result.total - principalsCount;
+
+    if (userStoresCount > 0) {
+        aggregationBuckets.push({key: 'user_store', docCount: '' + userStoresCount});
+    }
+}
 
 function createUserItemsQuery(query, types) {
     var q = createTypesQuery(types);

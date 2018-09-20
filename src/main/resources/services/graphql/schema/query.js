@@ -106,13 +106,15 @@ module.exports = graphQl.createObjectType({
         types: {
             type: graphQlObjectTypes.TypesType,
             args: {
+                query: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
             resolve: function (env) {
+                var query = env.args.query;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
-                return useritems.list(start, count);
+                return useritems.list(null, query, start, count);
             }
         },
         repository: {
