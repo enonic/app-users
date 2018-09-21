@@ -14,10 +14,14 @@ const panel = {
     itemPath: `//h4[@class='path']`,
     reportDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Report']]`,
     repoOptionsFilterInput: +`${loaderComboBox.optionsFilterInput}`,
+    reportSelectedOptionsView: `//div[contains(@id,'ReportSelectedOptionsView')]`,
     generateButton: `//button[contains(@id,'Button') and child::span[text()='Generate report']]`,
     reportItem: `//ul[contains(@class,'data-list') and child::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]`,
     reportByTitle: function (title) {
         return `//li[contains(@id,'ReportProgressItem') and child::span[contains(.,'${title}')]]`
+    },
+    repositoryBranchOption: function (name) {
+        return `//div[@class='slick-viewport']//div[contains(@class,'slick-cell') and child::div[contains(@id,'DefaultOptionDisplayValueViewer') and contains(.,'${name}')]]`
     },
 };
 const userItemStatisticsPanel = Object.create(page, {
@@ -124,6 +128,26 @@ const userItemStatisticsPanel = Object.create(page, {
     getNumberOfReports: {
         value: function () {
             return this.numberOfElements(panel.reportItem);
+        }
+    },
+    //Generate Report - clicks on dropDown handle and selects draft/master
+    clickOnDropDownHandleAndSelectBranch: {
+        value: function (optionName) {
+            let dropDownHandle = panel.reportSelectedOptionsView + elements.DROP_DOWN_HANDLE;
+            return this.waitForVisible(dropDownHandle).catch(err => {
+                this.saveScreenshot('err_report_dropdown_handle');
+                throw new Error('Report Selected Option, dropDown handle was not found!');
+            }).then(() => {
+                return this.doClick(dropDownHandle);
+            }).then(() => {
+                let optionSelector = panel.reportSelectedOptionsView + panel.repositoryBranchOption(optionName);
+                return this.waitForVisible(optionSelector).catch(err => {
+                    this.saveScreenshot('err_report_dropdown_options');
+                    throw new Error('Report Selected Option was not found !' + optionName + "  " + err);
+                }).then(() => {
+                    return this.doClick(optionSelector);
+                }).pause(300);
+            })
         }
     }
 });

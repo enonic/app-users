@@ -13,6 +13,8 @@ const userStatisticsPanel = require('../page_objects/browsepanel/user.statistics
 describe('`permissions.report.spec`: Generate Report data specification ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
+    let REPO_TITLE_MASTER = 'cms-repo (master)';
+    let REPO_TITLE_DRAFT = 'cms-repo (draft)';
 
     it('GIVEN `Super User` is selected WHEN repository is not selected on the statistic panel THEN `Generate Report` button should be disabled',
         () => {
@@ -57,7 +59,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
                 assert.isTrue(result.length == 1, 'One report should be present on the page');
                 assert.isTrue(result[0] === 'cms-repo (master)', 'expected title of the report should be displayed');
             }).then(() => {
-                return userStatisticsPanel.getReportDate('cms-repo (master)');
+                return userStatisticsPanel.getReportDate(REPO_TITLE_MASTER);
             }).then(result => {
                 let currentDate = new Date().getDate();
                 assert.isTrue(result[0].includes(currentDate), 'correct date of the report should be displayed');
@@ -68,7 +70,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
     it('GIVEN existing report for `Super User` WHEN  `Delete` link has been pressed THEN the report should not be displayed',
         () => {
             return testUtils.findAndSelectItem('su').then(() => {
-                return userStatisticsPanel.clickOnDeleteReportLink('cms-repo (master)');
+                return userStatisticsPanel.clickOnDeleteReportLink(REPO_TITLE_MASTER);
             }).then(() => {
                 testUtils.saveScreenshot('report_is_deleted');
                 return userStatisticsPanel.getNumberOfReports();
@@ -76,6 +78,34 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
                 assert.isTrue(result == 0, 'Report should not be present on `Statistics Panel`');
             })
         });
+
+    it('GIVEN `Super User` is selected WHEN `draft` option has been selected AND`Generate Report` button pressed THEN new report should be created',
+        () => {
+            return testUtils.findAndSelectItem('su').then(() => {
+                return userStatisticsPanel.selectRepository('cms-repo');
+            }).then(() => {
+                return userStatisticsPanel.clickOnDropDownHandleAndSelectBranch('draft');
+            }).then(() => {
+                return userStatisticsPanel.clickOnGenerateReportButton();
+            }).then(() => {
+                return userStatisticsPanel.waitForNotificationMessage();
+            }).then(message => {
+                assert.strictEqual(message, appConst.permissionsReportMessage('Super User'), `Correct notification message should appear`);
+            }).then(() => {
+                testUtils.saveScreenshot('report_draft_should_be_present');
+                return userStatisticsPanel.getReportTitles();
+            }).then(result => {
+                assert.isTrue(result.length == 1, 'One report should be present on the page');
+                assert.isTrue(result[0] === REPO_TITLE_DRAFT, 'expected title of the report should be displayed');
+            }).then(() => {
+                return userStatisticsPanel.getReportDate(REPO_TITLE_DRAFT);
+            }).then(result => {
+                let currentDate = new Date().getDate();
+                assert.isTrue(result[0].includes(currentDate), 'correct date of the report should be displayed');
+
+            })
+        });
+
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
