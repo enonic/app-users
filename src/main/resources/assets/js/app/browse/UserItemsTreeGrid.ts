@@ -148,12 +148,10 @@ export class UserItemsTreeGrid
 
     private loadParentNode(principal: api.security.Principal, userStore: api.security.UserStore): wemQ.Promise<TreeNode<UserTreeGridItem>> {
         let deferred = wemQ.defer<TreeNode<UserTreeGridItem>>();
-        let parentNode = this.getParentNode(true);
+        let parentNode = this.getRoot().getCurrentRoot();
 
-        if (!parentNode.getData() && !principal.isRole()) { // No parent selected
-            const userStoreId = userStore.getKey().getId();
-            parentNode = parentNode.getChildren().filter(node => node.getDataId() === userStoreId)[0] || parentNode;
-        }
+        const userStoreId = userStore.getKey().getId();
+        parentNode = parentNode.getChildren().filter(node => node.getDataId() === userStoreId)[0] || parentNode;
 
         this.fetchDataAndSetNodes(parentNode).then(() => {
             const parentItemType = UserTreeGridItem.getParentType(principal);
