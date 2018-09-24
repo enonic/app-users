@@ -63,7 +63,7 @@ export class AuthApplicationSelectedOptionView
         header.appendChild(namesAndIconView);
 
         this.appendChild(header);
-        if (this.application.getAuthForm().getFormItems().length == 0) {
+        if (this.application.getAuthForm().getFormItems().length === 0) {
             this.setEditable(false);
         }
 
@@ -93,7 +93,7 @@ export class AuthApplicationSelectedOptionView
 
     initAndOpenConfigureDialog(comboBoxToUndoSelectionOnCancel?: AuthApplicationComboBox) {
 
-        if (this.application.getAuthForm().getFormItems().length == 0) {
+        if (this.application.getAuthForm().getFormItems().length === 0) {
             return;
         }
 
