@@ -7,6 +7,7 @@ import {UpdateGroupRequest} from '../../api/graphql/principal/group/UpdateGroupR
 import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardStepForm';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import GroupBuilder = api.security.GroupBuilder;
+import Group = api.security.Group;
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import PrincipalLoader = api.security.PrincipalLoader;
@@ -113,20 +114,26 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
     }
 
     assembleViewedItem(): Principal {
-        return <Principal>new GroupBuilder(this.getPersistedItem().asGroup())
+        const persistedGroup: Group = this.getPersistedItem().asGroup();
+        // group might be a member of other group, but that is not reflected in group wizard
+        const groupMemberships: any = persistedGroup.getMemberships().filter((principal: Principal) => principal.isGroup());
+
+        return <Principal>new GroupBuilder(persistedGroup)
             .setMembers(this.getMembersWizardStepForm().getMembers().map(el => el.getKey()))
-            .setMemberships(this.membershipsWizardStepForm.getMemberships())
+            .setMemberships(this.membershipsWizardStepForm.getMemberships().concat(groupMemberships))
             .setDisplayName(this.getWizardHeader().getDisplayName())
             .setDescription(this.getDescriptionWizardStepForm().getDescription())
             .build();
     }
 
     isPersistedEqualsViewed(): boolean {
-        const persistedPrincipal = this.getPersistedItem().asGroup();
-        const viewedPrincipal = this.assembleViewedItem().asGroup();
+        const persistedPrincipal: Group = this.getPersistedItem().asGroup();
+        const viewedPrincipal: Group = this.assembleViewedItem().asGroup();
         // Group/User order can be different for viewed and persisted principal
         viewedPrincipal.getMembers().sort((a, b) => a.getId().localeCompare(b.getId()));
         persistedPrincipal.getMembers().sort((a, b) => a.getId().localeCompare(b.getId()));
+        viewedPrincipal.getMemberships().sort((a, b) => a.getKey().getId().localeCompare(b.getKey().getId()));
+        persistedPrincipal.getMemberships().sort((a, b) => a.getKey().getId().localeCompare(b.getKey().getId()));
 
         return viewedPrincipal.equals(persistedPrincipal);
     }
