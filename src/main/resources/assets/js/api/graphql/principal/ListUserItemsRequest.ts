@@ -78,21 +78,21 @@ export class ListUserItemsRequest
             const result: ListUserItemsRequestResult = {
                 total: data.totalCount,
                 userItems: data.edges.map(edge => this.fromJsonToUserItem(edge.node)),
-                aggregations: this.froJsonToAggregations(data.aggregations, data.totalCount),
+                aggregations: this.fromJsonToAggregations(data.aggregations),
             };
 
             return result;
         });
     }
 
-    private froJsonToAggregations(jsons: UserItemBucketAggregationJson[], total: number): BucketAggregation[] {
+    private fromJsonToAggregations(jsons: UserItemBucketAggregationJson[]): BucketAggregation[] {
         if (!jsons || jsons.length < 1) {
             return null;
         }
         const aggregations = jsons.map(json => UserItemAggregationHelper.fromJson(json));
 
         const typeAggregation = aggregations.filter(agg => agg.getName() === 'principalType')[0];
-        UserItemAggregationHelper.updatePrincipalTypeAggregation(typeAggregation, total);
+        UserItemAggregationHelper.updatePrincipalTypeAggregation(typeAggregation);
 
         return aggregations;
     }
