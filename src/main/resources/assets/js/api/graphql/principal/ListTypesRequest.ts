@@ -13,9 +13,19 @@ export class ListTypesRequest
         return this;
     }
 
+    getVariables(): { [key: string]: any } {
+        let vars = super.getVariables();
+
+        if (this.searchQuery) {
+            vars['query'] = this.searchQuery;
+        }
+
+        return vars;
+    }
+
     getQuery(): string {
-        return `query {
-                    types {
+        return `query ($query: String, $start: Int, $count: Int) {
+                    types (query: $query, start: $start, count: $count) {
                         totalCount
                         aggregations {
                             name,
@@ -31,11 +41,11 @@ export class ListTypesRequest
     sendAndParse(): wemQ.Promise<BucketAggregation> {
         return this.query().then((response: any) => {
             const data = response.types;
-            return this.froJsonToAggregation(data.aggregations, data.totalCount);
+            return this.fromJsonToAggregation(data.aggregations);
         });
     }
 
-    private froJsonToAggregation(jsons: UserItemBucketAggregationJson[], total: number): BucketAggregation {
+    private fromJsonToAggregation(jsons: UserItemBucketAggregationJson[]): BucketAggregation {
         if (!jsons || jsons.length < 1) {
             return null;
         }
@@ -43,7 +53,7 @@ export class ListTypesRequest
         const typeJson = jsons.filter(json => json.name === 'principalType')[0];
 
         const typeAggregation = typeJson ? UserItemAggregationHelper.fromJson(typeJson) : new BucketAggregation('principalType');
-        UserItemAggregationHelper.updatePrincipalTypeAggregation(typeAggregation, total);
+        UserItemAggregationHelper.updatePrincipalTypeAggregation(typeAggregation);
 
         return typeAggregation;
     }

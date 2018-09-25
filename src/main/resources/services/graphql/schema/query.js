@@ -106,13 +106,15 @@ module.exports = graphQl.createObjectType({
         types: {
             type: graphQlObjectTypes.TypesType,
             args: {
+                query: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
             resolve: function (env) {
+                var query = env.args.query;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
-                return useritems.list(start, count);
+                return useritems.list(null, query, start, count);
             }
         },
         repository: {
@@ -166,6 +168,19 @@ module.exports = graphQl.createObjectType({
                 var count = env.args.count;
                 var sort = env.args.sort;
                 return permissionReports.list(principalKey, repositoryIds, start, count, sort);
+            }
+        },
+        permissionReport: {
+            type: graphQlObjectTypes.PermissionReportType,
+            args: {
+                id: graphQl.GraphQLString,
+            },
+            resolve: function (env) {
+                if (!authLib.isAdmin()) {
+                    throw new Error('You don\'t have permission to access this resource');
+                }
+                var id = env.args.id;
+                return permissionReports.get(id);
             }
         }
     }

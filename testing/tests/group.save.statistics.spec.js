@@ -70,7 +70,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
             return groupWizard.waitForOpened();
-        }).then(() => groupWizard.filterOptionsAndAddRole(appConst.roles.USERS_APP)).then(() => groupWizard.waitAndClickOnSave()).then(
+        }).then(() => groupWizard.filterOptionsAndAddRole(appConst.roles.USERS_APP)).pause(500).then(() => groupWizard.waitAndClickOnSave()).then(
             () => {
                 return groupWizard.getRoles();
             }).then(roles => {
@@ -95,7 +95,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
         () => {
             return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
                 return groupStatisticsPanel.getDisplayNameOfMembers();
-            }).then((members) => {
+            }).then(members => {
                 expect(members[0]).to.equal(appConst.SUPER_USER_DISPLAY_NAME);
             }).then(() => {
                 return groupStatisticsPanel.getDisplayNameOfRoles();

@@ -35,6 +35,9 @@ module.exports = Object.freeze({
         USERS_ADMINISTRATOR: 'Users Administrator',
         EVERYONE: 'Everyone'
     },
+    permissionsReportMessage: function (displayName) {
+        return `A new permission report for ${displayName} is ready for download.`
+    },
     principalExistsMessage: function (displayName) {
         return `Principal [${displayName}] could not be created. A principal with that name already exists`
     },

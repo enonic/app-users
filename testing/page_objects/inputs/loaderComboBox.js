@@ -1,18 +1,17 @@
 /**
  * Created on 19.09.2017.
  */
-const wizard = require('../page');
+const page = require('../page');
 const elements = require('../../libs/elements');
-const comboBox = {
-    div: `//div[contains(@id,'LoaderComboBox')]`,
-    optionFilterInput: `${elements.COMBO_BOX_OPTION_FILTER_INPUT}`,
+const xpath = {
+    container: `//div[contains(@id,'LoaderComboBox')]`,
     optionDisplayName: "//div[@class='slick-viewport']" + `${elements.H6_DISPLAY_NAME}`,
 };
-const loaderComboBox = Object.create(wizard, {
+const loaderComboBox = Object.create(page, {
 
-    optionFilterInput: {
+    optionsFilterInput: {
         get: function () {
-            return `${comboBox.div}` + `${comboBox.optionFilterInput}`;
+            return `${xpath.container}` + elements.COMBO_BOX_OPTION_FILTER_INPUT;
         }
     },
     typeTextInOptionFilterInput: {
@@ -38,10 +37,26 @@ const loaderComboBox = Object.create(wizard, {
     getOptionDisplayNames: {
         value: function (panelDiv) {
             return this.waitForListExpanded(panelDiv).then(()=> {
-                return this.getTextFromElements(panelDiv + `${comboBox.optionDisplayName}`)
+                return this.getTextFromElements(panelDiv + `${xpath.optionDisplayName}`)
             });
         }
-    }
+    },
+    typeTextAndSelectOption: {
+        value: function (optionDisplayName, xpath) {
+            let optionSelector = elements.slickRowByDisplayName(optionDisplayName);
+            if (xpath === undefined) {
+                xpath = '';
+            }
+            return this.getDisplayedElements(xpath + this.optionsFilterInput).then(result => {
+                return this.getBrowser().elementIdValue(result[0].ELEMENT, optionDisplayName);
+            }).pause(1000).then(() => {
+                return this.doClick(optionSelector).catch(err => {
+                    this.saveScreenshot('err_clicking_on_option');
+                    throw new Error('Error when clicking on the option in loadercombobox!' + optionDisplayName + " " + err);
+                }).pause(500);
+            })
+        }
+    },
 });
 module.exports = loaderComboBox;
 

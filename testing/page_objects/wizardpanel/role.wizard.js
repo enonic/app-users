@@ -8,7 +8,7 @@ const loaderComboBox = require('../inputs/loaderComboBox');
 
 const panel = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
-    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + `${loaderComboBox.optionFilterInput}`,
+    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + `${loaderComboBox.optionsFilterInput}`,
 };
 const roleWizard = Object.create(wizard, {
 

@@ -10,6 +10,7 @@ export class Report
     private repositoryId: string;
     private finished: Date;
     private url: string;
+    private reportBranch: string;
 
     getId(): string {
         return this.id;
@@ -39,6 +40,10 @@ export class Report
         return this.finished;
     }
 
+    getReportBranch(): string {
+        return this.reportBranch;
+    }
+
     equals(other: Report): boolean {
         return this.id === other.id;
     }
@@ -52,6 +57,7 @@ export class Report
         r.taskId = json.taskId;
         r.principalDisplayName = json.principalDisplayName;
         r.finished = json.finished ? new Date(json.finished) : undefined;
+        r.reportBranch = json.reportBranch;
         return r;
     }
 }

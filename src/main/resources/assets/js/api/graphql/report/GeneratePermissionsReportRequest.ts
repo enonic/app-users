@@ -7,6 +7,7 @@ export class GeneratePermissionsReportRequest
 
     private principalKey: PrincipalKey;
     private repositoryIds: String[] = [];
+    private branches: String[] = [];
 
     setPrincipalKey(value: PrincipalKey): GeneratePermissionsReportRequest {
         this.principalKey = value;
@@ -18,15 +19,21 @@ export class GeneratePermissionsReportRequest
         return this;
     }
 
+    setBranches(value: String[]): GeneratePermissionsReportRequest {
+        this.branches = value;
+        return this;
+    }
+
     getQuery(): string {
-        return `mutation ($principalKey: String!, $repositoryIds: [String]!) {
-            generatePermissionReports(principalKey: $principalKey, repositoryIds: $repositoryIds) {
+        return `mutation ($principalKey: String!, $repositoryIds: [String]!, $branches: [String]!) {
+            generatePermissionReports(principalKey: $principalKey, repositoryIds: $repositoryIds, branches: $branches) {
                 id,
                 url,
                 taskId,
                 principalKey,
                 principalDisplayName,
-                repositoryId
+                repositoryId,
+                reportBranch
             }
         }`;
     }
@@ -35,6 +42,7 @@ export class GeneratePermissionsReportRequest
         const vars = super.getVariables();
         vars['principalKey'] = this.principalKey.toString();
         vars['repositoryIds'] = this.repositoryIds;
+        vars['branches'] = this.branches;
         return vars;
     }
 
