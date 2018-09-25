@@ -190,7 +190,7 @@ export class UserAppPanel
     private handleNew(event: NewPrincipalEvent) {
         let userItem = event.getPrincipals()[0];
         let data: PrincipalData = this.resolvePrincipalData(userItem);
-        let tabId = AppBarTabId.forNew(data.tabName);
+        let tabId = AppBarTabId.forNew(data.principalPath);
         let tabMenuItem = this.getAppBarTabMenu().getNavigationItemById(tabId);
 
         if (tabMenuItem != null) {
