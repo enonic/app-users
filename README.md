@@ -3,6 +3,7 @@ Enonic XP - Users App
 
 [![Travis Build Status][travis-image]][travis-url]
 [![License][license-image]][license-url]
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/98a3593d448f4cb29d165048609434dd)](https://www.codacy.com/app/enonic/app-users?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=enonic/app-users&amp;utm_campaign=Badge_Grade)
 
 Manage permissions for users, user groups and roles in [Enonic XP](https://github.com/enonic/xp).
 
