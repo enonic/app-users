@@ -5,6 +5,7 @@ import Option = api.ui.selector.Option;
 import SelectedOption = api.ui.selector.combobox.SelectedOption;
 import BaseSelectedOptionsView = api.ui.selector.combobox.BaseSelectedOptionsView;
 import ApplicationConfigProvider = api.form.inputtype.appconfig.ApplicationConfigProvider;
+import FormContext = api.form.FormContext;
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 
 export class AuthApplicationSelectedOptionsView
@@ -18,13 +19,13 @@ export class AuthApplicationSelectedOptionsView
 
     private afterOptionCreatedListeners: { (): void }[] = [];
 
-    private formContext: api.content.form.ContentFormContext;
+    private formContext: FormContext;
 
     private items: AuthApplicationSelectedOptionView[] = [];
 
     private readOnly: boolean;
 
-    constructor(applicationConfigProvider: ApplicationConfigProvider, formContext: api.content.form.ContentFormContext, readOnly: boolean) {
+    constructor(applicationConfigProvider: ApplicationConfigProvider, formContext: FormContext, readOnly: boolean) {
         super();
         this.readOnly = readOnly;
         this.applicationConfigProvider = applicationConfigProvider;
