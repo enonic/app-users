@@ -62,7 +62,7 @@ function startApplication() {
     new ChangeUserPasswordDialog();
     application.setLoaded(true);
 
-    let serverEventsListener = new api.app.ServerEventsListener([application]);
+    let serverEventsListener = new api.event.ServerEventsListener([application]);
     serverEventsListener.start();
 
     startLostConnectionDetector();
