@@ -98,6 +98,19 @@ export class ReportProgressList
             .sendAndParse()
             .then(reports => this.addItems(reports));
     }
+
+    public setReportGenerated(report: Report) {
+        const view: ReportProgressItem = <ReportProgressItem>this.getItemView(report);
+
+        if (view.isReportReady()) {
+            return;
+        }
+
+        view.setReportReady(true);
+        view.setFinished(report.getFinished());
+
+        api.notify.NotifyManager.get().showSuccess(i18n('notify.report.finished', view.getItem().getPrincipalDisplayName()));
+    }
 }
 
 class ReportProgressItem
@@ -146,6 +159,10 @@ class ReportProgressItem
 
     public setReportReady(value: boolean) {
         this.toggleClass('ready', value);
+    }
+
+    public isReportReady(): boolean {
+        return this.hasClass('ready');
     }
 
     private notifyDeleteClicked(item: Report): any {
