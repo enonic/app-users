@@ -1,8 +1,8 @@
 import Principal = api.security.Principal;
 import UserStoreAccessControlEntry = api.security.acl.UserStoreAccessControlEntry;
 import UserStoreAccess = api.security.acl.UserStoreAccess;
-import UserStoreAccessSelector = api.ui.security.acl.UserStoreAccessSelector;
 import ValueChangedEvent = api.ValueChangedEvent;
+import {UserStoreAccessSelector} from './UserStoreAccessSelector';
 
 export class UserStoreAccessControlEntryView
     extends api.ui.security.PrincipalViewer {
