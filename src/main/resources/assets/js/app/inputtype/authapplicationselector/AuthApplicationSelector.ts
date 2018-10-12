@@ -9,8 +9,17 @@ import ApplicationKey = api.application.ApplicationKey;
 import ApplicationConfig = api.application.ApplicationConfig;
 import SelectedOptionEvent = api.ui.selector.combobox.SelectedOptionEvent;
 import ApplicationConfigProvider = api.form.inputtype.appconfig.ApplicationConfigProvider;
+import InputTypeViewContext = api.form.inputtype.InputTypeViewContext;
+import FormContext = api.form.FormContext;
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 import {AuthApplicationComboBox} from './AuthApplicationComboBox';
+
+export interface AuthApplicationSelectorConfig
+    extends InputTypeViewContext {
+
+    formContext: FormContext;
+
+}
 
 export class AuthApplicationSelector
     extends api.form.inputtype.support.BaseInputTypeManagingAdd {
@@ -19,11 +28,11 @@ export class AuthApplicationSelector
 
     private applicationConfigProvider: ApplicationConfigProvider;
 
-    private formContext: api.content.form.ContentFormContext;
+    private formContext: FormContext;
 
     private readOnly: boolean;
 
-    constructor(config: api.content.form.inputtype.ContentInputTypeViewContext) {
+    constructor(config: AuthApplicationSelectorConfig) {
         super('application-configurator');
         this.readConfig(config.inputConfig);
         this.formContext = config.formContext;

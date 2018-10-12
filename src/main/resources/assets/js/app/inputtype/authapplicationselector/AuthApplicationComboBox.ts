@@ -4,6 +4,7 @@ import ApplicationViewer = api.application.ApplicationViewer;
 import FormView = api.form.FormView;
 import SelectedOption = api.ui.selector.combobox.SelectedOption;
 import ApplicationConfigProvider = api.form.inputtype.appconfig.ApplicationConfigProvider;
+import FormContext = api.form.FormContext;
 import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 
@@ -13,7 +14,7 @@ export class AuthApplicationComboBox
     private authApplicationSelectedOptionsView: AuthApplicationSelectedOptionsView;
 
     constructor(maxOccurrences: number, applicationConfigProvider: ApplicationConfigProvider,
-                formContext: api.content.form.ContentFormContext, value: string, readOnly: boolean) {
+                formContext: FormContext, value: string, readOnly: boolean) {
 
         let builder = new api.ui.selector.combobox.RichComboBoxBuilder<Application>();
         // tslint:disable-next-line:max-line-length
