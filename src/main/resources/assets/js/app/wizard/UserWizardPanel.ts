@@ -151,13 +151,13 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     produceUpdateRequest(viewedPrincipal: Principal): UpdateUserRequest {
-        const user = viewedPrincipal.asUser();
+        const user = <User>viewedPrincipal;
         const key = user.getKey();
         const displayName = user.getDisplayName();
         const email = user.getEmail();
         const login = user.getLogin();
 
-        const oldMemberships = this.getPersistedItem().asUser().getMemberships().map(value => value.getKey());
+        const oldMemberships = (<User>this.getPersistedItem()).getMemberships().map(value => value.getKey());
         const newMemberships = user.getMemberships().map(value => value.getKey());
         const addMemberships = ArrayHelper.difference(newMemberships, oldMemberships, (a, b) => (a.toString() === b.toString()));
         const removeMemberships = ArrayHelper.difference(oldMemberships, newMemberships, (a, b) => (a.toString() === b.toString()));
@@ -174,7 +174,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     assembleViewedItem(): Principal {
         const wizardHeader = this.getWizardHeader();
         wizardHeader.normalizeNames();
-        return <Principal>new UserBuilder(this.getPersistedItem() ? this.getPersistedItem().asUser() : null)
+        return <Principal>new UserBuilder(this.getPersistedItem() ? <User>this.getPersistedItem() : null)
             .setEmail(this.userEmailWizardStepForm.getEmail())
             .setLogin(wizardHeader.getName())
             .setMemberships(this.membershipsWizardStepForm.getMemberships())
@@ -212,8 +212,8 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     isPersistedEqualsViewed(): boolean {
-        let persistedPrincipal = this.getPersistedItem().asUser();
-        let viewedPrincipal = this.assembleViewedItem().asUser();
+        const persistedPrincipal = (<User>this.getPersistedItem());
+        const viewedPrincipal = (<User>this.assembleViewedItem());
         // Group/User order can be different for viewed and persisted principal
         viewedPrincipal.getMemberships().sort((a, b) => {
             return a.getKey().toString().localeCompare(b.getKey().toString());

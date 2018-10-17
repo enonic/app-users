@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {GroupMembersWizardStepForm} from './GroupMembersWizardStepForm';
@@ -88,17 +87,17 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
     }
 
     produceUpdateRequest(viewedPrincipal:Principal):UpdateGroupRequest {
-        const group = viewedPrincipal.asGroup();
+        const group = <Group>viewedPrincipal;
         const key = group.getKey();
         const displayName = group.getDisplayName();
         const description = group.getDescription();
 
-        const oldMembers = this.getPersistedItem().asGroup().getMembers();
+        const oldMembers = (<Group>this.getPersistedItem()).getMembers();
         const newMembers = group.getMembers();
         const addMembers = ArrayHelper.difference(newMembers, oldMembers, (a, b) => (a.toString() === b.toString()));
         const removeMembers = ArrayHelper.difference(oldMembers, newMembers, (a, b) => (a.toString() === b.toString()));
 
-        const oldMemberships = this.getPersistedItem().asGroup().getMemberships().map(value => value.getKey());
+        const oldMemberships = (<Group>this.getPersistedItem()).getMemberships().map(value => value.getKey());
         const newMemberships = group.getMemberships().map(value => value.getKey());
         const addMemberships = ArrayHelper.difference(newMemberships, oldMemberships, (a, b) => (a.toString() === b.toString()));
         const removeMemberships = ArrayHelper.difference(oldMemberships, newMemberships, (a, b) => (a.toString() === b.toString()));
@@ -114,7 +113,7 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
     }
 
     assembleViewedItem(): Principal {
-        const persistedGroup: Group = this.getPersistedItem().asGroup();
+        const persistedGroup: Group = (<Group>this.getPersistedItem());
         // group might be a member of other group, but that is not reflected in group wizard
         const groupMemberships: any = persistedGroup.getMemberships().filter((principal: Principal) => principal.isGroup());
 
@@ -127,8 +126,8 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
     }
 
     isPersistedEqualsViewed(): boolean {
-        const persistedPrincipal: Group = this.getPersistedItem().asGroup();
-        const viewedPrincipal: Group = this.assembleViewedItem().asGroup();
+        const persistedPrincipal: Group = (<Group>this.getPersistedItem());
+        const viewedPrincipal: Group = (<Group>this.assembleViewedItem());
         // Group/User order can be different for viewed and persisted principal
         viewedPrincipal.getMembers().sort((a, b) => a.getId().localeCompare(b.getId()));
         persistedPrincipal.getMembers().sort((a, b) => a.getId().localeCompare(b.getId()));

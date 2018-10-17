@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincipalsByKeysRequest';
@@ -16,6 +15,9 @@ import i18n = api.util.i18n;
 import RoleKeys = api.security.RoleKeys;
 import DivEl = api.dom.DivEl;
 import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
+import Group = api.security.Group;
+import User = api.security.User;
+import Role = api.security.Role;
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel<UserTreeGridItem> {
@@ -104,7 +106,7 @@ export class UserItemStatisticsPanel
         const addedGroups = [mainGroup, rolesAndGroupsGroup];
 
         return this.fetchPrincipal(principal.getKey()).then((p: Principal) => {
-            const user = p.asUser();
+            const user = <User>p;
             const mems = user.getMemberships();
             mainGroup.addDataList(i18n('field.email'), user.getEmail());
             this.appendTransitiveSwitch(principal.getKey(), rolesAndGroupsGroup, mems.length === 0);
@@ -135,10 +137,8 @@ export class UserItemStatisticsPanel
         const addedGroups = [mainGroup, membersGroup, this.createReportGroup(principal)];
 
         return this.fetchPrincipal(principal.getKey()).then((p: Principal) => {
-            const group = p.isGroup() ? p.asGroup() : p.asRole();
-
             if (p.isGroup()) {
-                const mems = p.asGroup().getMemberships();
+                const mems = (<Group>p).getMemberships();
                 const rolesGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'memberships');
                 this.appendTransitiveSwitch(principal.getKey(), rolesGroup, mems.length === 0);
                 this.userDataContainer.appendChild(rolesGroup);
@@ -148,7 +148,7 @@ export class UserItemStatisticsPanel
                 addedGroups.splice(1, 0, rolesGroup);
             }
 
-            const membersKeys = group.getMembers().slice(0, 100);
+            const membersKeys = (<Group | Role>p).getMembers().slice(0, 100);
             return this.getMembersByKeys(membersKeys).then((results) => {
                 membersGroup.addDataElements(null, results.map(el => this.createPrincipalViewer(el)));
                 return addedGroups;
@@ -258,9 +258,9 @@ export class UserItemStatisticsPanel
         transitiveSwitch.addClass('transitive-switch');
         transitiveSwitch.onValueChanged(event => {
             this.fetchPrincipal(pKey, 'true' === event.getNewValue()).then(updatedP => {
-                const updatedMems = (updatedP.isGroup() ? updatedP.asGroup() : updatedP.asUser()).getMemberships();
+                const updatedMemberships = (<Group | User>updatedP).getMemberships();
                 dataGroup.clearList();
-                this.appendRolesAndGroups(updatedMems, dataGroup);
+                this.appendRolesAndGroups(updatedMemberships, dataGroup);
             }).catch(api.DefaultErrorHandler.handle);
         });
         dataGroup.getHeader().appendChild(transitiveSwitch);

@@ -5,6 +5,7 @@ import EmailInput = api.ui.text.EmailInput;
 import FormItemBuilder = api.ui.form.FormItemBuilder;
 import Validators = api.ui.form.Validators;
 import i18n = api.util.i18n;
+import User = api.security.User;
 
 export class UserEmailWizardStepForm
     extends api.app.wizard.WizardStepForm {
@@ -46,7 +47,7 @@ export class UserEmailWizardStepForm
     }
 
     layout(principal: Principal) {
-        let user = principal.asUser();
+        let user = (<User>principal);
         if (user) {
             this.email.setValue(user.getEmail());
             this.email.setName(user.getEmail());

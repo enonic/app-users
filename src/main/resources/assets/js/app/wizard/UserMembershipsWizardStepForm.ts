@@ -1,5 +1,4 @@
 import '../../api.ts';
-
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalLoader = api.security.PrincipalLoader;
@@ -9,6 +8,7 @@ import FormItemBuilder = api.ui.form.FormItemBuilder;
 import PrincipalComboBox = api.ui.security.PrincipalComboBox;
 
 import i18n = api.util.i18n;
+import User = api.security.User;
 
 export class UserMembershipsWizardStepForm extends api.app.wizard.WizardStepForm {
 
@@ -65,13 +65,13 @@ export class UserMembershipsWizardStepForm extends api.app.wizard.WizardStepForm
     private selectMembership(): void {
         if (!!this.principal && this.groupsLoaded && this.rolesLoaded) {
 
-            let groups = this.principal.asUser().getMemberships().filter((el) => {
+            let groups = (<User>this.principal).getMemberships().filter((el) => {
                 return el.isGroup();
             }).map((el) => {
                 return el.getKey().toString();
             });
 
-            let roles = this.principal.asUser().getMemberships().filter((el) => {
+            let roles = (<User>this.principal).getMemberships().filter((el) => {
                 return el.isRole();
             }).map((el) => {
                 return el.getKey().toString();
