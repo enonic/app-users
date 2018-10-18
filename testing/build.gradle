@@ -144,7 +144,7 @@ task startSelenium {
 }
 
 task startSeleniumDaemon(type: com.github.psxpaul.task.ExecFork) {
-    commandLine = "${resDir}${File.separator}selenium-server.bat"
+    commandLine = "${resDir}${File.separator}selenium-server.sh"
     standardOutput = "$buildDir/daemon.log"
     errorOutput = "$buildDir/daemon-error.log"
 }
