@@ -1,8 +1,7 @@
-import '../../api.ts';
 import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
+import {UserStore} from '../principal/UserStore';
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
-import UserStore = api.security.UserStore;
 import PrincipalKey = api.security.PrincipalKey;
 
 export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Principal> {

@@ -5,8 +5,7 @@ import {CreateGroupRequest} from '../../api/graphql/principal/group/CreateGroupR
 import {UpdateGroupRequest} from '../../api/graphql/principal/group/UpdateGroupRequest';
 import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardStepForm';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
-import GroupBuilder = api.security.GroupBuilder;
-import Group = api.security.Group;
+import {Group, GroupBuilder} from '../principal/Group';
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import PrincipalLoader = api.security.PrincipalLoader;

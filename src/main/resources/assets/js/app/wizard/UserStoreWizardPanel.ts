@@ -1,21 +1,18 @@
-import '../../api.ts';
+import {Router} from '../Router';
 import {UserItemWizardPanel} from './UserItemWizardPanel';
 import {SecurityWizardStepForm} from './SecurityWizardStepForm';
 import {UserStoreWizardPanelParams} from './UserStoreWizardPanelParams';
 import {UserStoreWizardStepForm} from './UserStoreWizardStepForm';
-import {Router} from '../Router';
 import {UserStoreWizardDataLoader} from './UserStoreWizardDataLoader';
 import {CreateUserStoreRequest} from '../../api/graphql/userStore/CreateUserStoreRequest';
 import {UpdateUserStoreRequest} from '../../api/graphql/userStore/UpdateUserStoreRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {UserItemDeletedEvent} from '../event/UserItemDeletedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
-import UserStore = api.security.UserStore;
-import UserStoreKey = api.security.UserStoreKey;
-import UserStoreBuilder = api.security.UserStoreBuilder;
-
+import {UserStore, UserStoreBuilder} from '../principal/UserStore';
 import WizardStep = api.app.wizard.WizardStep;
 import i18n = api.util.i18n;
+import UserStoreKey = api.security.UserStoreKey;
 
 export class UserStoreWizardPanel
     extends UserItemWizardPanel<UserStore> {
@@ -229,7 +226,7 @@ export class UserStoreWizardPanel
         }
     }
 
-    private establishDeleteActionState(key: api.security.UserStoreKey) {
+    private establishDeleteActionState(key: UserStoreKey) {
         if (key) {
             UserStore.checkOnDeletable(key).then((result: boolean) => {
                 this.wizardActions.getDeleteAction().setEnabled(result);

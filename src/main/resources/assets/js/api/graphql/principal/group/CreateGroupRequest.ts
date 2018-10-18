@@ -1,7 +1,7 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
-import Group = api.security.Group;
+import {Group} from '../../../../app/principal/Group';
+import {GroupJson} from '../../../../app/principal/GroupJson';
 import PrincipalKey = api.security.PrincipalKey;
-import GroupJson = api.security.GroupJson;
 
 export class CreateGroupRequest
     extends GraphQlRequest<any, Group> {

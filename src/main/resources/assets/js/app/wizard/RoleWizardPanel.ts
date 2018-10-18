@@ -5,15 +5,12 @@ import {RoleMembersWizardStepForm} from './RoleMembersWizardStepForm';
 import {CreateRoleRequest} from '../../api/graphql/principal/role/CreateRoleRequest';
 import {UpdateRoleRequest} from '../../api/graphql/principal/role/UpdateRoleRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
-import RoleBuilder = api.security.RoleBuilder;
-
+import {Role, RoleBuilder} from '../principal/Role';
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import RoleKeys = api.security.RoleKeys;
-
 import WizardStep = api.app.wizard.WizardStep;
 import i18n = api.util.i18n;
-import Role = api.security.Role;
 
 export class RoleWizardPanel
     extends GroupRoleWizardPanel {

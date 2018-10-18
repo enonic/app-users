@@ -1,5 +1,7 @@
 import i18n = api.util.i18n;
+import AuthConfig = api.security.AuthConfig;
 import {SecurityFormContext} from './SecurityFormContext';
+import {UserStore} from '../principal/UserStore';
 
 export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
 
@@ -11,7 +13,7 @@ export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
         super();
     }
 
-    layout(userStore: api.security.UserStore): wemQ.Promise<void> {
+    layout(userStore: UserStore): wemQ.Promise<void> {
 
         this.formView = this.createFormView(userStore);
 
@@ -36,7 +38,7 @@ export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
         });
     }
 
-    private createFormView(userStore?: api.security.UserStore): api.form.FormView {
+    private createFormView(userStore?: UserStore): api.form.FormView {
         let isSystemUserStore = (!!userStore && userStore.getKey().isSystem()).toString();
         let formBuilder = new api.form.FormBuilder().
             addFormItem(new api.form.InputBuilder().
@@ -76,12 +78,12 @@ export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
         return this.formView.validate(silent);
     }
 
-    getAuthConfig(): api.security.AuthConfig {
+    getAuthConfig(): AuthConfig {
         let authConfigPropertySet = this.propertySet.getPropertySet('authConfig');
         if (authConfigPropertySet) {
             let applicationKey = api.application.ApplicationKey.fromString(authConfigPropertySet.getString('applicationKey'));
             let config = new api.data.PropertyTree(authConfigPropertySet.getPropertySet('config'));
-            return api.security.AuthConfig.create().
+            return AuthConfig.create().
                 setApplicationKey(applicationKey).
                 setConfig(config).
                 build();

@@ -1,8 +1,7 @@
-import '../../api.ts';
 import {UserStoreWizardPanelParams} from './UserStoreWizardPanelParams';
 import {GetUserStoreByKeyRequest} from '../../api/graphql/userStore/GetUserStoreByKeyRequest';
 import {GetDefaultUserStoreRequest} from '../../api/graphql/userStore/GetDefaultUserStoreRequest';
-import UserStore = api.security.UserStore;
+import {UserStore} from '../principal/UserStore';
 
 export class UserStoreWizardDataLoader {
 

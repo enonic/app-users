@@ -1,5 +1,5 @@
-import UserStoreAccessControlEntry = api.security.acl.UserStoreAccessControlEntry;
 import PrincipalType = api.security.PrincipalType;
+import {UserStoreAccessControlEntry} from '../access/UserStoreAccessControlEntry';
 
 export class UserStoreAccessControlEntryViewer
     extends api.ui.NamesAndIconViewer<UserStoreAccessControlEntry> {

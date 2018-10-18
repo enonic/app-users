@@ -6,8 +6,8 @@ import FormItemBuilder = api.ui.form.FormItemBuilder;
 import PrincipalComboBox = api.ui.security.PrincipalComboBox;
 import Fieldset = api.ui.form.Fieldset;
 import i18n = api.util.i18n;
-import Group = api.security.Group;
-import User = api.security.User;
+import {User} from '../principal/User';
+import {Group} from '../principal/Group';
 
 export enum MembershipsType {
     GROUPS,

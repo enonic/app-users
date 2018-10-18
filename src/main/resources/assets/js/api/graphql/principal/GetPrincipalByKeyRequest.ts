@@ -1,13 +1,13 @@
 import {GraphQlRequest} from '../GraphQlRequest';
+import {User} from '../../../app/principal/User';
+import {Group} from '../../../app/principal/Group';
+import {Role} from '../../../app/principal/Role';
+import {UserJson} from '../../../app/principal/UserJson';
+import {GroupJson} from '../../../app/principal/GroupJson';
+import {RoleJson} from '../../../app/principal/RoleJson';
 import PrincipalKey = api.security.PrincipalKey;
 import Principal = api.security.Principal;
 import PrincipalJson = api.security.PrincipalJson;
-import Role = api.security.Role;
-import RoleJson = api.security.RoleJson;
-import Group = api.security.Group;
-import GroupJson = api.security.GroupJson;
-import User = api.security.User;
-import UserJson = api.security.UserJson;
 import PrincipalType = api.security.PrincipalType;
 
 export class GetPrincipalByKeyRequest

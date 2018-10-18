@@ -1,4 +1,6 @@
-import '../../api.ts';
+import {Role} from '../principal/Role';
+import {Group} from '../principal/Group';
+import Principal = api.security.Principal;
 import i18n = api.util.i18n;
 
 export class PrincipalDescriptionWizardStepForm extends api.app.wizard.WizardStepForm {
@@ -32,9 +34,9 @@ export class PrincipalDescriptionWizardStepForm extends api.app.wizard.WizardSte
         this.appendChild(formView);
     }
 
-    layout(principal: api.security.Principal) {
-        if (api.ObjectHelper.iFrameSafeInstanceOf(principal, api.security.Role)
-            || api.ObjectHelper.iFrameSafeInstanceOf(principal, api.security.Group)) {
+    layout(principal: Principal) {
+        if (api.ObjectHelper.iFrameSafeInstanceOf(principal, Role)
+            || api.ObjectHelper.iFrameSafeInstanceOf(principal, Group)) {
             let description = principal.getDescription();
             this.description.setValue(!!description ? description : '');
         } else {

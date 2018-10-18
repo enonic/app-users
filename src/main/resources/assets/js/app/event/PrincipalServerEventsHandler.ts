@@ -1,14 +1,14 @@
 import NodeServerChangeType = api.event.NodeServerChangeType;
 import Path = api.rest.Path;
 import Principal = api.security.Principal;
-import UserStore = api.security.UserStore;
 import PrincipalServerEvent = api.security.event.PrincipalServerEvent;
 import PrincipalServerChange = api.security.event.PrincipalServerChange;
 import PrincipalServerChangeItem = api.security.event.PrincipalServerChangeItem;
-import UserStoreKey = api.security.UserStoreKey;
 import PrincipalKey = api.security.PrincipalKey;
+import UserStoreKey = api.security.UserStoreKey;
 import {GetUserStoreByKeyRequest} from '../../api/graphql/userStore/GetUserStoreByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
+import {UserStore} from '../principal/UserStore';
 
 /**
  * Class that listens to server events and fires UI events

@@ -1,5 +1,5 @@
-import UserStore = api.security.UserStore;
 import Principal = api.security.Principal;
+import {UserStore} from '../principal/UserStore';
 
 export class UserItemDeletedEvent
     extends api.event.Event {

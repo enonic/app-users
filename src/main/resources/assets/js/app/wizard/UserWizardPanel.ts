@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {PrincipalWizardPanel} from './PrincipalWizardPanel';
 import {UserEmailWizardStepForm} from './UserEmailWizardStepForm';
 import {UserPasswordWizardStepForm} from './UserPasswordWizardStepForm';
@@ -7,8 +6,7 @@ import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {CreateUserRequest} from '../../api/graphql/principal/user/CreateUserRequest';
 import {UpdateUserRequest} from '../../api/graphql/principal/user/UpdateUserRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
-import UserBuilder = api.security.UserBuilder;
-import User = api.security.User;
+import {User, UserBuilder} from '../principal/User';
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;

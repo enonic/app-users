@@ -1,6 +1,6 @@
 import {PrincipalMembersWizardStepForm} from './PrincipalMembersWizardStepForm';
+import {Group} from '../principal/Group';
 import PrincipalKey = api.security.PrincipalKey;
-import Group = api.security.Group;
 
 export class GroupMembersWizardStepForm extends PrincipalMembersWizardStepForm {
 

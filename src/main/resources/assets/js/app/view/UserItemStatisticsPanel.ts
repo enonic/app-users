@@ -4,6 +4,9 @@ import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincip
 import {RepositoryComboBox} from '../report/RepositoryComboBox';
 import {GeneratePermissionsReportRequest} from '../../api/graphql/report/GeneratePermissionsReportRequest';
 import {ReportProgressList} from '../report/ReportProgressList';
+import {User} from '../principal/User';
+import {Group} from '../principal/Group';
+import {Role} from '../principal/Role';
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
 import ItemDataGroup = api.app.view.ItemDataGroup;
@@ -15,9 +18,6 @@ import i18n = api.util.i18n;
 import RoleKeys = api.security.RoleKeys;
 import DivEl = api.dom.DivEl;
 import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
-import Group = api.security.Group;
-import User = api.security.User;
-import Role = api.security.Role;
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel<UserTreeGridItem> {

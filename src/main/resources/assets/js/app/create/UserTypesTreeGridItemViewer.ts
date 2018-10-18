@@ -1,9 +1,8 @@
-import '../../api.ts';
 import {UserTypeTreeGridItem} from './UserTypeTreeGridItem';
-import UserStore = api.security.UserStore;
-import User = api.security.User;
-import Group = api.security.Group;
-import Role = api.security.Role;
+import {UserStore} from '../principal/UserStore';
+import {User} from '../principal/User';
+import {Group} from '../principal/Group';
+import {Role} from '../principal/Role';
 
 export class UserTypesTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTypeTreeGridItem> {
 

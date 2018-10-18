@@ -1,5 +1,5 @@
 import TabMenuItemBuilder = api.ui.tab.TabMenuItemBuilder;
-import UserStoreAccess = api.security.acl.UserStoreAccess;
+import {UserStoreAccess} from '../access/UserStoreAccess';
 
 interface UserStoreAccessSelectorOption {
     value: UserStoreAccess;

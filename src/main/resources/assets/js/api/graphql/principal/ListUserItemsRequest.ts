@@ -1,20 +1,20 @@
-import UserStore = api.security.UserStore;
-import UserStoreJson = api.security.UserStoreJson;
 import Principal = api.security.Principal;
 import PrincipalJson = api.security.PrincipalJson;
 import PrincipalKey = api.security.PrincipalKey;
-import Role = api.security.Role;
-import Group = api.security.Group;
-import User = api.security.User;
-import UserJson = api.security.UserJson;
-import GroupJson = api.security.GroupJson;
-import RoleJson = api.security.RoleJson;
 import BucketAggregation = api.aggregation.BucketAggregation;
 import UserItem = api.security.UserItem;
+import {User} from '../../../app/principal/User';
+import {Group} from '../../../app/principal/Group';
+import {Role} from '../../../app/principal/Role';
+import {UserJson} from '../../../app/principal/UserJson';
+import {GroupJson} from '../../../app/principal/GroupJson';
+import {RoleJson} from '../../../app/principal/RoleJson';
 import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggregationJson';
 import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
 import {UserItemType} from '../../../app/browse/UserItemType';
+import {UserStore} from '../../../app/principal/UserStore';
+import {UserStoreJson} from '../../../app/principal/UserStoreJson';
 
 export type ListUserItemsRequestResult = {
     total: number,

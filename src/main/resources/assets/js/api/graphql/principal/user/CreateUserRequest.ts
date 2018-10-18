@@ -1,7 +1,7 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
-import User = api.security.User;
+import {User} from '../../../../app/principal/User';
+import {UserJson} from '../../../../app/principal/UserJson';
 import PrincipalKey = api.security.PrincipalKey;
-import UserJson = api.security.UserJson;
 
 export class CreateUserRequest
     extends GraphQlRequest<any, User> {

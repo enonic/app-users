@@ -1,4 +1,3 @@
-import '../api.ts';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './browse/UserTreeGridItem';
 import {UserItemWizardPanel} from './wizard/UserItemWizardPanel';
 import {UserStoreWizardPanel} from './wizard/UserStoreWizardPanel';
@@ -14,6 +13,7 @@ import {GroupWizardPanel} from './wizard/GroupWizardPanel';
 import {GetUserStoreByKeyRequest} from '../api/graphql/userStore/GetUserStoreByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../api/graphql/principal/GetPrincipalByKeyRequest';
 import {PrincipalNamedEvent} from './event/PrincipalNamedEvent';
+import {UserStore} from './principal/UserStore';
 import NavigatedAppPanel = api.app.NavigatedAppPanel;
 import AppBarTabMenuItem = api.app.bar.AppBarTabMenuItem;
 import AppBarTabMenuItemBuilder = api.app.bar.AppBarTabMenuItemBuilder;
@@ -21,9 +21,9 @@ import AppBarTabId = api.app.bar.AppBarTabId;
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
-import UserStore = api.security.UserStore;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
+import UserStoreKey = api.security.UserStoreKey;
 
 interface PrincipalData {
 
@@ -63,7 +63,7 @@ export class UserAppPanel
                         ]).fire();
                     });
             } else if (id && this.isValidUserStoreKey(id)) {
-                new GetUserStoreByKeyRequest(api.security.UserStoreKey.fromString(id)).sendAndParse().done((userStore: UserStore) => {
+                new GetUserStoreByKeyRequest(UserStoreKey.fromString(id)).sendAndParse().done((userStore: UserStore) => {
                     new EditPrincipalEvent([
                         new UserTreeGridItemBuilder().setUserStore(userStore).setType(
                             UserTreeGridItemType.USER_STORE).build()
@@ -84,7 +84,7 @@ export class UserAppPanel
 
     private isValidPrincipalKey(value: string): boolean {
         try {
-            api.security.PrincipalKey.fromString(value);
+            PrincipalKey.fromString(value);
             return true;
         } catch (e) {
             return false;
@@ -93,7 +93,7 @@ export class UserAppPanel
 
     private isValidUserStoreKey(value: string): boolean {
         try {
-            api.security.UserStoreKey.fromString(value);
+            UserStoreKey.fromString(value);
             return true;
         } catch (e) {
             return false;
