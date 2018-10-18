@@ -20,6 +20,7 @@ plugins {
     id 'com.enonic.defaults' version '1.0.3'
     id 'com.moowork.node' version '0.13'
     id 'com.moowork.gulp' version '0.13'
+    id 'com.github.psxpaul.execfork' version '0.1.8'
 
 }
 
@@ -48,6 +49,7 @@ ext {
     deployDir = "$distroDir${File.separator}home${File.separator}deploy"
     allureResultsDir = "allure-results"
     testDataDir = "$projectDir${File.separator}test-data${File.separator}common-config"
+    resDir = "$projectDir${File.separator}test-data"
     xpHome = "$distroDir${File.separator}home"
     configDir = "$xpHome${File.separator}config"
     appDir = "$projectDir${File.separator}test-data${File.separator}test-applications"
@@ -130,6 +132,23 @@ tasks.withType( Test ) {
     }
 }
 
+task startSelenium {
+    doFirst {
+        println 'Selenium server is starting!!!!!!!!!'
+        println "-Dwebdriver.chrome.driver=${resDir}${File.separator}chromedriver.exe"
+        javaexec {
+            main = "-jar";
+            args = ["-Dwebdriver.chrome.driver=${resDir}${File.separator}chromedriver.exe", "${resDir}${File.separator}selenium-server-standalone-3.4.0.jar"]
+        }
+    }
+}
+
+task startSeleniumDaemon(type: com.github.psxpaul.task.ExecFork) {
+    commandLine = "${resDir}${File.separator}selenium-server.bat"
+    standardOutput = "$buildDir/daemon.log"
+    errorOutput = "$buildDir/daemon-error.log"
+}
+
 task testUsersApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
@@ -139,10 +158,11 @@ task testUsersApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps
     finalizedBy stopServer
 }
 
-task testUsersAppLocally( type: GulpTask, dependsOn: [npmInstall] ) {
+task testUsersAppLocally( type: GulpTask, dependsOn: [npmInstall, startSeleniumDaemon] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
     args = ['test']
+    startSeleniumDaemon.mustRunAfter npmInstall
 }
 
 repositories {
