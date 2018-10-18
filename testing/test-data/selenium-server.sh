@@ -36,7 +36,7 @@ init() {
 }
 
 run() {
-    java  -jar test-data/selenium-server-standalone-3.4.0.jar -Dwebdriver.chrome.driver=test-data/chromedriver
+    java -Dwebdriver.chrome.driver=test-data/chromedriver -jar test-data/selenium-server-standalone-3.4.0.jar
 }
 
 main() {
