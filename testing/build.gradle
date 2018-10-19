@@ -75,7 +75,11 @@ dependencies {
     compile "com.enonic.xp:core-api:$xpVersion"
     distro "com.enonic.xp:distro:$xpVersion@zip"
 }
-
+task ensureScreenshotsDirectory {
+    doLast {
+        mkdir screenshotsDir
+    }
+}
 task deleteFolders( type: Delete ) {
     delete unpackDir, screenshotsDir, reportsDir
 }
@@ -138,19 +142,20 @@ task startSelenium {
         println "-Dwebdriver.chrome.driver=${resDir}${File.separator}chromedriver.exe"
         javaexec {
             main = "-jar";
-            args = ["-Dwebdriver.chrome.driver=${resDir}${File.separator}chromedriver.exe", "${resDir}${File.separator}selenium-server-standalone-3.4.0.jar"]
+            args =
+                ["-Dwebdriver.chrome.driver=${resDir}${File.separator}chromedriver.exe", "${resDir}${File.separator}selenium-server-standalone-3.4.0.jar"]
         }
     }
 }
 
-task startSeleniumDaemon(type: com.github.psxpaul.task.ExecFork) {
+task startSeleniumDaemon( type: com.github.psxpaul.task.ExecFork ) {
     println 'Selenium server is starting!!!!!!!!!'
     commandLine = "${resDir}${File.separator}selenium-server.sh"
     standardOutput = "${buildDir}${File.separator}selenium-daemon.log"
     errorOutput = "${buildDir}${File.separator}selenium-daemon-error.log"
 }
 
-task testUsersApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps, startSeleniumDaemon] ) {
+task testUsersApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps, ensureScreenshotsDirectory, startSeleniumDaemon] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
     args = ['test']
@@ -160,7 +165,7 @@ task testUsersApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps
     finalizedBy stopServer
 }
 
-task testUsersAppLocally( type: GulpTask, dependsOn: [npmInstall, startSeleniumDaemon] ) {
+task testUsersAppLocally( type: GulpTask, dependsOn: [npmInstall, ensureScreenshotsDirectory, startSeleniumDaemon] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
     args = ['test']
