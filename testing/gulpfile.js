@@ -30,21 +30,18 @@ gulp.task('selenium', function (done) {
 gulp.task('mocha', function () {
     return gulp
         .src('tests/**/**.js', {read: false})
-        .pipe(mocha(
-            {
-                reporter: 'mocha-allure-reporter',
-                reporterOptions: {
-                    allure: {
-                        outputDir: '/build/testoutput/',
-                        targetDir: '/build/allure-results'
-                    }
-                },
-            }
-        )).pipe(gulp.dest('./build/screenshots'));
+        .pipe(mocha())
+        .once('error', err => {
+            console.error(err);
+            process.exit(1);
+        })
+        .once('end', () => {
+            process.exit();
+        }).pipe(gulp.dest('./build/screenshots'));
 });
 
 gulp.task('test', function (callback) {
-    return runSequence( 'mocha', function () {
+    return runSequence('mocha', function () {
         //selenium.child.kill();
         console.log("Tests ara finished!!##############################################");
         callback();
