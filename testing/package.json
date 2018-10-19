@@ -9,10 +9,10 @@
   },
   "devDependencies": {
     "assert": "^1.3.0",
-    "gulp": "^3.9.1",
+    "gulp": "3.9.1",
     "gulp-mocha": "5.0.0",
     "selenium-standalone": "6.15.3",
-    "webdriverio": "4.13.2",
+    "webdriverio": "4.12.0",
     "chai": "^3.5.0",
     "run-sequence": "2.1.0",
     "mocha-allure-reporter": "1.4.0",
