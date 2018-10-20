@@ -1,5 +1,6 @@
 const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const path = require('path');
@@ -29,13 +30,17 @@ module.exports = {
                 test: /\.less$/,
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
-                    publicPath: '../../',
+                    publicPath: '../',
                     use: [
                         {loader: 'css-loader', options: {sourceMap: !isProd, importLoaders: 1}},
                         {loader: 'postcss-loader', options: {sourceMap: !isProd}},
                         {loader: 'less-loader', options: {sourceMap: !isProd}}
                     ]
                 })
+            },
+            {
+                test: /\.(eot|woff|woff2|ttf)$|icomoon.svg/,
+                use: 'file-loader?name=fonts/[name].[ext]'
             }
         ]
     },

@@ -4,6 +4,7 @@ import PrincipalKey = api.security.PrincipalKey;
 import DateHelper = api.util.DateHelper;
 import TaskEvent = api.task.TaskEvent;
 import TaskEventType = api.task.TaskEventType;
+import DivEl = api.dom.DivEl;
 import {Report} from './Report';
 import {ListReportsRequest} from '../../api/graphql/report/ListReportsRequest';
 import {DeleteReportsRequest} from '../../api/graphql/report/DeleteReportsRequest';
@@ -103,33 +104,42 @@ export class ReportProgressList
 class ReportProgressItem
     extends api.dom.LiEl {
 
-    private readonly timestamp: api.dom.Element;
-    private readonly progress: api.ui.ProgressBar;
+    private timestamp: api.dom.Element;
+    private progress: api.ui.ProgressBar;
     private deleteClickListeners: { (item: Report): void }[] = [];
     private item: Report;
 
     constructor(item: Report) {
         super('report-progress-item');
-        const name = new api.dom.SpanEl('title');
-        name.setHtml(`${item.getRepositoryId()} (${item.getReportBranch()})`);
-
-        this.setReportReady(item.getTaskId() === undefined);
-
         this.item = item;
-        this.progress = new api.ui.ProgressBar();
 
-        this.timestamp = new api.dom.SpanEl('timestamp');
+        this.addElements();
+        this.setReportReady(item.getTaskId() === undefined);
         this.setFinished(item.getFinished());
+    }
 
-        const downloadLink = new api.dom.AEl('download').setUrl(item.getUrl(), '_blank');
-        downloadLink.getEl().setText(i18n('action.report.download')).setAttribute('download',
-            `Report_${item.getPrincipalDisplayName()}_in_${item.getRepositoryId()}.csv`);
-        downloadLink.onClicked(event => this.notifyDeleteClicked(item));
+    private addElements() {
+        this.progress = new api.ui.ProgressBar();
+        this.timestamp = new api.dom.SpanEl('timestamp');
+
+        const name = new api.dom.SpanEl('title');
+        name.setHtml(`${this.item.getRepositoryId()} (${this.item.getReportBranch()})`);
+
+        const downloadLink = new api.dom.AEl('download').setUrl(this.item.getUrl(), '_blank');
+        downloadLink.appendChild(new api.dom.SpanEl().setHtml(i18n('action.report.download'))).getEl().setAttribute('download',
+            `Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`);
+        downloadLink.onClicked(event => this.notifyDeleteClicked(this.item));
 
         const deleteLink = new api.dom.AEl('delete');
-        deleteLink.setHtml(i18n('action.delete')).onClicked(event => this.notifyDeleteClicked(item));
+        deleteLink.appendChild(new api.dom.SpanEl().setHtml(i18n('action.delete'))).onClicked(event => this.notifyDeleteClicked(this.item));
 
-        this.appendChildren(name, this.progress, this.timestamp, downloadLink, deleteLink);
+        const reportdata: DivEl = new DivEl('reportdata');
+        reportdata.appendChildren(name, this.progress, this.timestamp);
+
+        const buttons: DivEl = new DivEl('buttons');
+        buttons.appendChildren(downloadLink, deleteLink);
+
+        this.appendChildren(reportdata, buttons);
     }
 
     public getItem(): Report {
