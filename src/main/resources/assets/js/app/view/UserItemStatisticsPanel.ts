@@ -4,6 +4,8 @@ import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincip
 import {RepositoryComboBox} from '../report/RepositoryComboBox';
 import {GeneratePermissionsReportRequest} from '../../api/graphql/report/GeneratePermissionsReportRequest';
 import {ReportProgressList} from '../report/ReportProgressList';
+import {Report} from '../report/Report';
+import {GetReportRequest} from '../../api/graphql/report/GetReportRequest';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
@@ -198,11 +200,15 @@ export class UserItemStatisticsPanel
                     .setBranches(branches)
                     .sendAndParse()
                     .then(reports => {
-                        reports.forEach(report => {
-                            // might have been added by progress listener if it happened before
-                            if (!reportsProgress.getItem(report.getId())) {
-                                reportsProgress.addItem(report);
-                            }
+                        reports.forEach((report: Report) => {
+                            reportsProgress.addItem(report);
+
+                            // checking if reports already generated
+                            new GetReportRequest(report.getId()).sendAndParse().then((r: Report) => {
+                                if (!!r.getFinished()) {
+                                    reportsProgress.setReportGenerated(r);
+                                }
+                            }).catch(api.DefaultErrorHandler.handle);
                         });
                     });
             });
