@@ -1,7 +1,6 @@
-import '../../api.ts';
 import {UserStoreAccessControlComboBox} from './UserStoreAccessControlComboBox';
-import UserStoreAccessControlList = api.security.acl.UserStoreAccessControlList;
-import UserStore = api.security.UserStore;
+import {UserStore} from '../principal/UserStore';
+import {UserStoreAccessControlList} from '../access/UserStoreAccessControlList';
 import FormItemBuilder = api.ui.form.FormItemBuilder;
 import Validators = api.ui.form.Validators;
 import DivEl = api.dom.DivEl;
@@ -78,7 +77,7 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
     }
 
     getPermissions(): UserStoreAccessControlList {
-        return new api.security.acl.UserStoreAccessControlList(this.comboBox.getSelectedDisplayValues());
+        return new UserStoreAccessControlList(this.comboBox.getSelectedDisplayValues());
     }
 
 }

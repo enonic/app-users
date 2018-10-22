@@ -4,8 +4,8 @@ import FormView = api.form.FormView;
 import Application = api.application.Application;
 import ApplicationKey = api.application.ApplicationKey;
 import ApplicationConfig = api.application.ApplicationConfig;
-import ContentFormContext = api.content.form.ContentFormContext;
 import ApplicationConfiguratorDialog = api.form.inputtype.appconfig.ApplicationConfiguratorDialog;
+import FormContext = api.form.FormContext;
 import {AuthApplicationComboBox} from './AuthApplicationComboBox';
 
 export class AuthApplicationSelectedOptionView
@@ -19,7 +19,7 @@ export class AuthApplicationSelectedOptionView
 
     private applicationConfigFormDisplayedListeners: { (applicationKey: ApplicationKey): void }[] = [];
 
-    private formContext: ContentFormContext;
+    private formContext: FormContext;
 
     private formValidityChangedHandler: { (event: api.form.FormValidityChangedEvent): void };
 
@@ -27,7 +27,7 @@ export class AuthApplicationSelectedOptionView
 
     constructor(option: Option<Application>,
                 applicationConfig: ApplicationConfig,
-                formContext: ContentFormContext,
+                formContext: FormContext,
                 readOnly: boolean = false) {
 
         super(option);

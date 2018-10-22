@@ -1,21 +1,21 @@
-import '../../api.ts';
 import Principal = api.security.Principal;
-
 import EmailInput = api.ui.text.EmailInput;
 import FormItemBuilder = api.ui.form.FormItemBuilder;
 import Validators = api.ui.form.Validators;
 import i18n = api.util.i18n;
+import UserStoreKey = api.security.UserStoreKey;
+import {User} from '../principal/User';
 
 export class UserEmailWizardStepForm
     extends api.app.wizard.WizardStepForm {
 
     private email: EmailInput;
 
-    private userStoreKey: api.security.UserStoreKey;
+    private userStoreKey: UserStoreKey;
 
     private isSystemUser: boolean;
 
-    constructor(userStoreKey: api.security.UserStoreKey, isSystemUser: boolean) {
+    constructor(userStoreKey: UserStoreKey, isSystemUser: boolean) {
         super();
 
         this.userStoreKey = userStoreKey;
@@ -46,7 +46,7 @@ export class UserEmailWizardStepForm
     }
 
     layout(principal: Principal) {
-        let user = principal.asUser();
+        let user = (<User>principal);
         if (user) {
             this.email.setValue(user.getEmail());
             this.email.setName(user.getEmail());

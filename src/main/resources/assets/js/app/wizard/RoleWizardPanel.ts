@@ -5,12 +5,10 @@ import {RoleMembersWizardStepForm} from './RoleMembersWizardStepForm';
 import {CreateRoleRequest} from '../../api/graphql/principal/role/CreateRoleRequest';
 import {UpdateRoleRequest} from '../../api/graphql/principal/role/UpdateRoleRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
-import RoleBuilder = api.security.RoleBuilder;
-
+import {Role, RoleBuilder} from '../principal/Role';
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import RoleKeys = api.security.RoleKeys;
-
 import WizardStep = api.app.wizard.WizardStep;
 import i18n = api.util.i18n;
 
@@ -62,11 +60,11 @@ export class RoleWizardPanel
     }
 
     produceUpdateRequest(viewedPrincipal: Principal): UpdateRoleRequest {
-        let role = viewedPrincipal.asRole();
+        let role = (<Role>viewedPrincipal);
         let key = role.getKey();
         let displayName = role.getDisplayName();
         let description = role.getDescription();
-        let oldMembers = this.getPersistedItem().asRole().getMembers();
+        let oldMembers = (<Role>this.getPersistedItem()).getMembers();
         let oldMembersIds = oldMembers.map(el => el.getId());
         let newMembers = role.getMembers();
         let newMembersIds = newMembers.map(el => el.getId());
@@ -78,7 +76,7 @@ export class RoleWizardPanel
     }
 
     assembleViewedItem(): Principal {
-        return <Principal>new RoleBuilder(this.getPersistedItem().asRole()).setMembers(
+        return new RoleBuilder(<Role>this.getPersistedItem()).setMembers(
             this.getMembersWizardStepForm().getMembers().map((el) => {
                 return el.getKey();
             })).setDisplayName(this.getWizardHeader().getDisplayName()).setDescription(
@@ -86,8 +84,8 @@ export class RoleWizardPanel
     }
 
     isPersistedEqualsViewed(): boolean {
-        let persistedPrincipal = this.getPersistedItem().asRole();
-        let viewedPrincipal = this.assembleViewedItem().asRole();
+        let persistedPrincipal = (<Role>this.getPersistedItem());
+        let viewedPrincipal = (<Role>this.assembleViewedItem());
         // Group/User order can be different for viewed and persisted principal
         viewedPrincipal.getMembers().sort((a, b) => {
             return a.getId().localeCompare(b.getId());

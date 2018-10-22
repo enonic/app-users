@@ -1,10 +1,8 @@
-import '../../api.ts';
 import Principal = api.security.Principal;
 import PrincipalKey = api.security.PrincipalKey;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalLoader = api.security.PrincipalLoader;
 import FormItemBuilder = api.ui.form.FormItemBuilder;
-
 import PrincipalComboBox = api.ui.security.PrincipalComboBox;
 import i18n = api.util.i18n;
 

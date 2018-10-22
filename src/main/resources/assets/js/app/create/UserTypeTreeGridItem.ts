@@ -1,7 +1,6 @@
-import '../../api.ts';
 import UserItem = api.security.UserItem;
-import User = api.security.User;
-import Group = api.security.Group;
+import {User} from '../principal/User';
+import {Group} from '../principal/Group';
 
 export class UserTypeTreeGridItem implements api.Equitable {
 

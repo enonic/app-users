@@ -12,7 +12,7 @@ public final class ServerInstance
 {
     private final static String LAUNCHER_CLASS = "com.enonic.xp.launcher.impl.LauncherImpl";
 
-    private final static String[] LAUNCHER_ARGS = {"clean"};
+    private final static String[] LAUNCHER_ARGS = {"clean", "-Dmapper.allow_dots_in_name=true"};
 
     private File installDir;
 
@@ -44,7 +44,8 @@ public final class ServerInstance
         }
         catch ( InvocationTargetException e )
         {
-            System.out.println( e.getMessage() );
+            System.out.println( "ERROR when try to create 'New Instance' of LauncherImpl" + e.getMessage() + "  " + e );
+            e.printStackTrace();
         }
         this.instance.getClass().getMethod( "start" ).invoke( this.instance );
 

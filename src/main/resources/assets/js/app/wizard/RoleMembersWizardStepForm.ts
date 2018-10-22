@@ -1,6 +1,5 @@
-import '../../api.ts';
 import {PrincipalMembersWizardStepForm} from './PrincipalMembersWizardStepForm';
-
+import {Role} from '../principal/Role';
 import PrincipalKey = api.security.PrincipalKey;
 
 export class RoleMembersWizardStepForm extends PrincipalMembersWizardStepForm {
@@ -10,6 +9,6 @@ export class RoleMembersWizardStepForm extends PrincipalMembersWizardStepForm {
     }
 
     getPrincipalMembers(): PrincipalKey[] {
-        return this.getPrincipal().asRole().getMembers();
+        return (<Role>this.getPrincipal()).getMembers();
     }
 }

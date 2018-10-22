@@ -1,5 +1,5 @@
-import UserStoreAccessControlEntry = api.security.acl.UserStoreAccessControlEntry;
 import {UserStoreAccessControlEntryView} from './UserStoreAccessControlEntryView';
+import {UserStoreAccessControlEntry} from '../access/UserStoreAccessControlEntry';
 
 export class UserStoreAccessControlListView
     extends api.ui.selector.list.ListBox<UserStoreAccessControlEntry> {

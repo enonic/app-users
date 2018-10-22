@@ -1,7 +1,7 @@
 import PrincipalKey = api.security.PrincipalKey;
-import UserJson = api.security.UserJson;
-import User = api.security.User;
 import SecurityResourceRequest = api.security.SecurityResourceRequest;
+import {UserJson} from '../principal/UserJson';
+import {User} from '../principal/User';
 
 export class SetUserPasswordRequest
     extends SecurityResourceRequest<UserJson, User> {

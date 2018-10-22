@@ -1,5 +1,5 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
-import Group = api.security.Group;
+import {Group} from '../../../../app/principal/Group';
 import PrincipalKey = api.security.PrincipalKey;
 
 export class UpdateGroupRequest

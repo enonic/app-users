@@ -1,6 +1,6 @@
-import UserStore = api.security.UserStore;
-import UserStoreJson = api.security.UserStoreJson;
 import {GraphQlRequest} from '../GraphQlRequest';
+import {UserStore} from '../../../app/principal/UserStore';
+import {UserStoreJson} from '../../../app/principal/UserStoreJson';
 
 export class GetDefaultUserStoreRequest
     extends GraphQlRequest<any, UserStore> {

@@ -1,4 +1,3 @@
-import '../../api.ts';
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalLoader = api.security.PrincipalLoader;
@@ -7,6 +6,8 @@ import FormItemBuilder = api.ui.form.FormItemBuilder;
 import PrincipalComboBox = api.ui.security.PrincipalComboBox;
 import Fieldset = api.ui.form.Fieldset;
 import i18n = api.util.i18n;
+import {User} from '../principal/User';
+import {Group} from '../principal/Group';
 
 export enum MembershipsType {
     GROUPS,
@@ -104,9 +105,9 @@ export class MembershipsWizardStepForm extends api.app.wizard.WizardStepForm {
 
     getMembershipsFromPrincipal(): Principal[] {
         if (this.principal && this.principal.isUser()) {
-            return this.principal.asUser().getMemberships();
+            return (<User>this.principal).getMemberships();
         } else if (this.principal && this.principal.isGroup()) {
-            return this.principal.asGroup().getMemberships();
+            return (<Group>this.principal).getMemberships();
         } else {
             return [];
         }
