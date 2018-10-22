@@ -11,6 +11,11 @@ import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
 import UserStoreKey = api.security.UserStoreKey;
 
+export type ListPrincipalsResult = {
+    total: number;
+    principals: Principal[];
+};
+
 export class ListPrincipalsRequest
     extends ListGraphQlRequest<any, any> {
 
@@ -72,9 +77,9 @@ export class ListPrincipalsRequest
                 }`;
     }
 
-    sendAndParse(): wemQ.Promise<any> {
+    sendAndParse(): wemQ.Promise<ListPrincipalsResult> {
         return this.query().then((response: any) => {
-            let data = response.principalsConnection;
+            const data = response.principalsConnection;
             return {
                 total: data.totalCount,
                 principals: data.edges.map(edge => this.fromJsonToPrincipal(edge.node))

@@ -1,11 +1,10 @@
-import Principal = api.security.Principal;
 import UserItem = api.security.UserItem;
 import AuthConfig = api.security.AuthConfig;
 import IdProviderMode = api.security.IdProviderMode;
 import PrincipalType = api.security.PrincipalType;
 import UserItemBuilder = api.security.UserItemBuilder;
 import UserStoreKey = api.security.UserStoreKey;
-import {ListPrincipalsRequest} from '../../api/graphql/principal/ListPrincipalsRequest';
+import {ListPrincipalsRequest, ListPrincipalsResult} from '../../api/graphql/principal/ListPrincipalsRequest';
 import {UserStoreAccessControlList} from '../access/UserStoreAccessControlList';
 import {UserStoreJson} from './UserStoreJson';
 
@@ -38,23 +37,15 @@ export class UserStore
     }
 
     isDeletable(): wemQ.Promise<boolean> {
-        let deferred = wemQ.defer<boolean>();
-        new ListPrincipalsRequest().setUserStoreKey(this.getKey()).setTypes([PrincipalType.USER, PrincipalType.GROUP]).sendAndParse().then(
-            (principals: Principal[]) => {
-                if (principals.length > 0) {
-                    deferred.resolve(false);
-                } else {
-                    deferred.resolve(true);
-                }
-            }).catch((reason: any) => {
-            api.DefaultErrorHandler.handle(reason);
-            deferred.resolve(false);
-        }).done();
-        return deferred.promise;
+        return new ListPrincipalsRequest()
+            .setUserStoreKey(this.getKey())
+            .setTypes([PrincipalType.USER, PrincipalType.GROUP])
+            .sendAndParse()
+            .then((result: ListPrincipalsResult) => (result.total === 0));
     }
 
     static checkOnDeletable(key: UserStoreKey): wemQ.Promise<boolean> {
-        return key ? UserStore.create().setKey(key.toString()).build().isDeletable() : null;
+        return key ? UserStore.create().setKey(key.toString()).build().isDeletable() : wemQ(false);
     }
 
     getKey(): UserStoreKey {

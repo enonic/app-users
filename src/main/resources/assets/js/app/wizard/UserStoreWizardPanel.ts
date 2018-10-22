@@ -230,7 +230,7 @@ export class UserStoreWizardPanel
         if (key) {
             UserStore.checkOnDeletable(key).then((result: boolean) => {
                 this.wizardActions.getDeleteAction().setEnabled(result);
-            });
+            }).catch(api.DefaultErrorHandler.handle).done();
         }
     }
 
