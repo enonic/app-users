@@ -125,12 +125,12 @@ class ReportProgressItem
         const name = new api.dom.SpanEl('title');
         name.setHtml(`${this.item.getRepositoryId()} (${this.item.getReportBranch()})`);
 
-        const downloadLink = new api.dom.AEl('download').setUrl(this.item.getUrl(), '_blank');
+        const downloadLink = new api.dom.AEl('icon-report-download').setUrl(this.item.getUrl(), '_blank').addClass('icon-download');
         downloadLink.appendChild(new api.dom.SpanEl().setHtml(i18n('action.report.download'))).getEl().setAttribute('download',
             `Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`);
         downloadLink.onClicked(event => this.notifyDeleteClicked(this.item));
 
-        const deleteLink = new api.dom.AEl('delete');
+        const deleteLink = new api.dom.AEl('icon-report-delete').addClass('icon-close');
         deleteLink.appendChild(new api.dom.SpanEl().setHtml(i18n('action.delete'))).onClicked(event => this.notifyDeleteClicked(this.item));
 
         const reportdata: DivEl = new DivEl('reportdata');

@@ -29,7 +29,7 @@
     .buttons {
       display: flex;
 
-      .download, .delete {
+      .icon-report-download, .icon-report-delete {
         display: none;
         margin: 0 5px;
       }
@@ -39,7 +39,7 @@
       flex-direction: column;
 
       .buttons {
-        .download, .delete {
+        .icon-report-download, .icon-report-delete {
           text-decoration: none;
 
           span {
@@ -51,13 +51,11 @@
           }
         }
 
-        .download {
-          .icon-download();
+        .icon-report-download {
           margin: 5px 5px 0 0;
         }
 
-        .delete {
-          .icon-close ();
+        .icon-report-delete {
           margin-top: 4px;
         }
       }
@@ -67,7 +65,7 @@
       .progress-bar {
         display: none;
       }
-      .timestamp, .download, .delete {
+      .timestamp, .icon-report-download, .icon-report-delete {
         display: block;
       }
     }
