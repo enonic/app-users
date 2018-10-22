@@ -1,14 +1,14 @@
-import UserStore = api.security.UserStore;
-import UserStoreJson = api.security.UserStoreJson;
-import UserStoreKey = api.security.UserStoreKey;
 import {GraphQlRequest} from '../GraphQlRequest';
+import {UserStore} from '../../../app/principal/UserStore';
+import {UserStoreJson} from '../../../app/principal/UserStoreJson';
+import UserStoreKey = api.security.UserStoreKey;
 
 export class GetUserStoreByKeyRequest
     extends GraphQlRequest<any, UserStore> {
 
     private key: UserStoreKey;
 
-    constructor(key: api.security.UserStoreKey) {
+    constructor(key: UserStoreKey) {
         super();
         this.key = key;
     }

@@ -1,26 +1,21 @@
-import '../../api.ts';
 import {UserTypeTreeGridItem, UserTypeTreeGridItemBuilder} from './UserTypeTreeGridItem';
 import {UserItemTypesRowFormatter} from './UserItemTypesRowFormatter';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItemBuilder, UserTreeGridItemType} from '../browse/UserTreeGridItem';
 import {ListUserStoresRequest} from '../../api/graphql/userStore/ListUserStoresRequest';
+import {UserStore, UserStoreBuilder} from '../principal/UserStore';
+import {User, UserBuilder} from '../principal/User';
+import {Group, GroupBuilder} from '../principal/Group';
+import {Role, RoleBuilder} from '../principal/Role';
 import TreeGrid = api.ui.treegrid.TreeGrid;
 import TreeNode = api.ui.treegrid.TreeNode;
 import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
 import PrincipalKey = api.security.PrincipalKey;
-import UserStore = api.security.UserStore;
 import PrincipalType = api.security.PrincipalType;
-import UserStoreKey = api.security.UserStoreKey;
-import UserStoreBuilder = api.security.UserStoreBuilder;
-import UserBuilder = api.security.UserBuilder;
-import GroupBuilder = api.security.GroupBuilder;
-import RoleBuilder = api.security.RoleBuilder;
-import i18n = api.util.i18n;
-import Role = api.security.Role;
-import User = api.security.User;
-import Group = api.security.Group;
 import ResponsiveManager = api.ui.responsive.ResponsiveManager;
 import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
+import i18n = api.util.i18n;
+import UserStoreKey = api.security.UserStoreKey;
 
 export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
 

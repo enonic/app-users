@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {UserBrowseToolbar} from './UserBrowseToolbar';
 import {UserTreeGridItem, UserTreeGridItemType} from './UserTreeGridItem';
@@ -7,12 +6,12 @@ import {UserTreeGridActions} from './UserTreeGridActions';
 import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
+import {UserStore} from '../principal/UserStore';
 import TreeNode = api.ui.treegrid.TreeNode;
 import BrowseItem = api.app.browse.BrowseItem;
 import PrincipalType = api.security.PrincipalType;
-import i18n = api.util.i18n;
-import UserStore = api.security.UserStore;
 import Principal = api.security.Principal;
+import i18n = api.util.i18n;
 
 export class UserBrowsePanel
     extends api.app.browse.BrowsePanel<UserTreeGridItem> {

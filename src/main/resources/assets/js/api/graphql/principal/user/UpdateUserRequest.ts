@@ -1,5 +1,5 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
-import User = api.security.User;
+import {User} from '../../../../app/principal/User';
 import PrincipalKey = api.security.PrincipalKey;
 
 export class UpdateUserRequest

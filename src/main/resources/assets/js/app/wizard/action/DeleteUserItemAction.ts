@@ -1,10 +1,9 @@
-import '../../../api.ts';
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
 import {DeleteUserStoreRequest} from '../../../api/graphql/userStore/DeleteUserStoreRequest';
 import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
 import {DeleteUserStoreResult} from '../../../api/graphql/userStore/DeleteUserStoreResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
-import UserStore = api.security.UserStore;
+import {UserStore} from '../../principal/UserStore';
 import Principal = api.security.Principal;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;

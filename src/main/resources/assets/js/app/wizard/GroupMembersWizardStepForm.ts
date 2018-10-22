@@ -1,6 +1,5 @@
-import '../../api.ts';
 import {PrincipalMembersWizardStepForm} from './PrincipalMembersWizardStepForm';
-
+import {Group} from '../principal/Group';
 import PrincipalKey = api.security.PrincipalKey;
 
 export class GroupMembersWizardStepForm extends PrincipalMembersWizardStepForm {
@@ -10,6 +9,6 @@ export class GroupMembersWizardStepForm extends PrincipalMembersWizardStepForm {
     }
 
     getPrincipalMembers(): PrincipalKey[] {
-        return this.getPrincipal().asGroup().getMembers();
+        return (<Group>this.getPrincipal()).getMembers();
     }
 }

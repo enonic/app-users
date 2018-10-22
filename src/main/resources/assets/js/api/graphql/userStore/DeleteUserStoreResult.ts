@@ -1,5 +1,5 @@
-import UserStoreKey = api.security.UserStoreKey;
 import {DeleteUserStoreResultJson} from './DeleteUserStoreResultJson';
+import UserStoreKey = api.security.UserStoreKey;
 
 export class DeleteUserStoreResult {
 

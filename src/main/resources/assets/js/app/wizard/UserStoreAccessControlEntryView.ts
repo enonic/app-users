@@ -1,8 +1,8 @@
 import Principal = api.security.Principal;
-import UserStoreAccessControlEntry = api.security.acl.UserStoreAccessControlEntry;
-import UserStoreAccess = api.security.acl.UserStoreAccess;
-import UserStoreAccessSelector = api.ui.security.acl.UserStoreAccessSelector;
 import ValueChangedEvent = api.ValueChangedEvent;
+import {UserStoreAccessSelector} from './UserStoreAccessSelector';
+import {UserStoreAccessControlEntry} from '../access/UserStoreAccessControlEntry';
+import {UserStoreAccess} from '../access/UserStoreAccess';
 
 export class UserStoreAccessControlEntryView
     extends api.ui.security.PrincipalViewer {
@@ -70,8 +70,7 @@ export class UserStoreAccessControlEntryView
     }
 
     public getUserStoreAccessControlEntry(): UserStoreAccessControlEntry {
-        let ace = new UserStoreAccessControlEntry(this.ace.getPrincipal(), this.ace.getAccess());
-        return ace;
+        return new UserStoreAccessControlEntry(this.ace.getPrincipal(), this.ace.getAccess());
     }
 
     doLayout(object: Principal) {

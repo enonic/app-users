@@ -1,7 +1,7 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
-import Role = api.security.Role;
+import {Role} from '../../../../app/principal/Role';
+import {RoleJson} from '../../../../app/principal/RoleJson';
 import PrincipalKey = api.security.PrincipalKey;
-import RoleJson = api.security.RoleJson;
 
 export class CreateRoleRequest
     extends GraphQlRequest<any, Role> {
