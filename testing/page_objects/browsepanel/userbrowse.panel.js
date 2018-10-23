@@ -23,17 +23,17 @@ const panel = {
         displayName => `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
     checkboxByName: function (name) {
         return `${elements.itemByName(name)}` +
-            `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
+               `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
 
     checkboxByDisplayName: function (displayName) {
         return `${elements.itemByDisplayName(displayName)}` +
-            `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
+               `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
 
     expanderIconByName: function (name) {
         return this.rowByName(name) +
-            `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
+               `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
 
     },
     closeItemTabButton: function (name) {
@@ -119,7 +119,7 @@ const userBrowsePanel = Object.create(page, {
             }).then(() => {
                 return console.log('user browse panel is loaded')
             }).catch(err => {
-                throw new Error('users browse panel was not loaded in ' + ms);
+                throw new Error('users browse panel was not loaded in: ' + ms);
             });
         }
     },
@@ -283,7 +283,7 @@ const userBrowsePanel = Object.create(page, {
             }).then(() => {
                 return this.waitForSpinnerNotVisible(1000);
             }).then(() => {
-                return this.waitForUsersGridLoaded(2000);
+                return this.waitForUsersGridLoaded(appConst.TIMEOUT_3);
             })
         }
     },

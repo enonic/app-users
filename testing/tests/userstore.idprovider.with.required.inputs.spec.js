@@ -73,6 +73,7 @@ describe('User Store, provider-dialog specification', function () {
             }).pause(1000).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
             }).pause(500).then(() => {
+                testUtils.saveScreenshot("userstore_wizard_modal_dialog_should_be_closed");
                 return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog should not appear");
             })
