@@ -142,7 +142,7 @@ class ReportProgressItem
         downloadLink
             .appendChild(new api.dom.SpanEl().setHtml(i18n('action.report.download')))
             .getEl()
-            .setAttribute('download',`Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`)
+            .setAttribute('download', `Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`);
         downloadLink.onClicked(event => this.notifyDeleteClicked(this.item));
 
         const deleteLink = new api.dom.AEl('icon-report-delete icon-close');
