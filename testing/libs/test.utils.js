@@ -227,9 +227,9 @@ module.exports = {
     openWizardAndSaveUserStore: function (userStoreData) {
         return this.clickOnNewOpenUserStoreWizard().then(() => {
             return userStoreWizard.typeData(userStoreData)
-        }).then(() => {
+        }).pause(300).then(() => {
             return userStoreWizard.waitAndClickOnSave()
-        }).pause(700);
+        }).pause(400);
     },
     openWizardAndSaveRole: function (role) {
         return this.clickOnRolesFolderAndOpenWizard().then(() => {

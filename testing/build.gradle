@@ -136,36 +136,25 @@ tasks.withType( Test ) {
     }
 }
 
-task startSelenium {
-    doFirst {
-        println 'Selenium server is starting!!!!!!!!!'
-        println "-Dwebdriver.chrome.driver=${resDir}${File.separator}chromedriver.exe"
-        javaexec {
-            main = "-jar";
-            args =
-                ["-Dwebdriver.chrome.driver=${resDir}${File.separator}chromedriver.exe", "${resDir}${File.separator}selenium-server-standalone-3.4.0.jar"]
-        }
-    }
-}
-
 task startSeleniumDaemon( type: com.github.psxpaul.task.ExecFork ) {
-    println 'Selenium server is starting!!!!!!!!!'
-    commandLine = "${resDir}${File.separator}selenium-server.sh"
+    println 'Selenium server is starting!'
+    commandLine = "${resDir}${File.separator}selenium-server.bat"
     standardOutput = "${buildDir}${File.separator}selenium-daemon.log"
     errorOutput = "${buildDir}${File.separator}selenium-daemon-error.log"
 }
 
-task testUsersApp( type: GulpTask, dependsOn: [npmInstall, startServer, copyApps, ensureScreenshotsDirectory, startSeleniumDaemon] ) {
+task testUsersApp( type: NpmTask, dependsOn: [npmInstall, startServer, copyApps, startSeleniumDaemon, ensureScreenshotsDirectory] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
     args = ['test']
     startServer.mustRunAfter npmInstall
     copyApps.mustRunAfter startServer
     startSeleniumDaemon.mustRunAfter copyApps
+    ensureScreenshotsDirectory.mustRunAfter startSeleniumDaemon
     finalizedBy stopServer
 }
 
-task testUsersAppLocally( type: GulpTask, dependsOn: [npmInstall, ensureScreenshotsDirectory, startSeleniumDaemon] ) {
+task testUsersAppLocally( type: NpmTask, dependsOn: [npmInstall, ensureScreenshotsDirectory, startSeleniumDaemon] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
     args = ['test']
