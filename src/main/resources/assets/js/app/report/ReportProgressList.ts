@@ -138,21 +138,26 @@ class ReportProgressItem
         const name = new api.dom.SpanEl('title');
         name.setHtml(`${this.item.getRepositoryId()} (${this.item.getReportBranch()})`);
 
-        const downloadLink = new api.dom.AEl('icon-report-download').setUrl(this.item.getUrl(), '_blank').addClass('icon-download');
-        downloadLink.appendChild(new api.dom.SpanEl().setHtml(i18n('action.report.download'))).getEl().setAttribute('download',
-            `Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`);
+        const downloadLink = new api.dom.AEl('icon-report-download icon-download').setUrl(this.item.getUrl(), '_blank');
+        downloadLink
+            .appendChild(new api.dom.SpanEl().setHtml(i18n('action.report.download')))
+            .getEl()
+            .setAttribute('download',`Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`)
         downloadLink.onClicked(event => this.notifyDeleteClicked(this.item));
 
-        const deleteLink = new api.dom.AEl('icon-report-delete').addClass('icon-close');
-        deleteLink.appendChild(new api.dom.SpanEl().setHtml(i18n('action.delete'))).onClicked(event => this.notifyDeleteClicked(this.item));
+        const deleteLink = new api.dom.AEl('icon-report-delete icon-close');
+        deleteLink
+            .appendChild(new api.dom.SpanEl().setHtml(i18n('action.delete')))
+            .onClicked(event => this.notifyDeleteClicked(this.item));
 
         const reportdata: DivEl = new DivEl('reportdata');
-        reportdata.appendChildren(name, this.progress, this.timestamp);
 
         const buttons: DivEl = new DivEl('buttons');
         buttons.appendChildren(downloadLink, deleteLink);
 
-        this.appendChildren(reportdata, buttons);
+        reportdata.appendChildren(name, this.progress, this.timestamp, buttons);
+
+        this.appendChildren(reportdata);
     }
 
     public getItem(): Report {
