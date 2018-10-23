@@ -30,8 +30,11 @@
       display: flex;
 
       .icon-report-download, .icon-report-delete {
-        display: none;
         margin: 0 5px;
+
+        &:before {
+          display: none;
+        }
       }
     }
 
@@ -47,6 +50,7 @@
           }
 
           &::before {
+            display: inline;
             font-size: 18px;
           }
         }
