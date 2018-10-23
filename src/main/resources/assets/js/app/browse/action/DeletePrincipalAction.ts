@@ -1,4 +1,3 @@
-import '../../../api.ts';
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
@@ -6,7 +5,9 @@ import {DeleteUserStoreRequest} from '../../../api/graphql/userStore/DeleteUserS
 import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
 import {DeleteUserStoreResult} from '../../../api/graphql/userStore/DeleteUserStoreResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
+import {UserStore} from '../../principal/UserStore';
 import Action = api.ui.Action;
+import Principal = api.security.Principal;
 import i18n = api.util.i18n;
 
 export class DeletePrincipalAction
@@ -31,14 +32,14 @@ export class DeletePrincipalAction
                 });
 
                 let principalKeys = principalItems.filter((userItem) => {
-                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, api.security.Principal);
-                }).map((principal: api.security.Principal) => {
+                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, Principal);
+                }).map((principal: Principal) => {
                     return principal.getKey();
                 });
 
                 let userStoreKeys = userStoreItems.filter((userItem) => {
-                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, api.security.UserStore);
-                }).map((userStore: api.security.UserStore) => {
+                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, UserStore);
+                }).map((userStore: UserStore) => {
                     return userStore.getKey();
                 });
 

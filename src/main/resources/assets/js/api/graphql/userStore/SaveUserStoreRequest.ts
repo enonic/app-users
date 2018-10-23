@@ -1,9 +1,10 @@
 import {GraphQlRequest} from '../GraphQlRequest';
-import UserStore = api.security.UserStore;
-import UserStoreKey = api.security.UserStoreKey;
+import {UserStore} from '../../../app/principal/UserStore';
+import {UserStoreAccessControlList} from '../../../app/access/UserStoreAccessControlList';
+import {UserStoreAccess} from '../../../app/access/UserStoreAccess';
+import {UserStoreJson} from '../../../app/principal/UserStoreJson';
 import AuthConfig = api.security.AuthConfig;
-import UserStoreJson = api.security.UserStoreJson;
-import UserStoreAccess = api.security.acl.UserStoreAccess;
+import UserStoreKey = api.security.UserStoreKey;
 
 export type SaveMutation = 'updateUserStore' | 'createUserStore';
 
@@ -14,7 +15,7 @@ export class SaveUserStoreRequest
     private displayName: string;
     private description: string;
     private authConfig: AuthConfig;
-    private permissions: api.security.acl.UserStoreAccessControlList;
+    private permissions: UserStoreAccessControlList;
 
     private mutationType: SaveMutation;
 
@@ -87,7 +88,7 @@ export class SaveUserStoreRequest
         return this;
     }
 
-    setPermissions(permissions: api.security.acl.UserStoreAccessControlList): SaveUserStoreRequest {
+    setPermissions(permissions: UserStoreAccessControlList): SaveUserStoreRequest {
         this.permissions = permissions;
         return this;
     }

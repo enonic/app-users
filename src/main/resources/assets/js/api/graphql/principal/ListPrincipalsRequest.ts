@@ -1,12 +1,20 @@
 import {ListGraphQlRequest} from '../ListGraphQlRequest';
+import {User} from '../../../app/principal/User';
+import {Group} from '../../../app/principal/Group';
+import {Role} from '../../../app/principal/Role';
+import {UserJson} from '../../../app/principal/UserJson';
+import {GroupJson} from '../../../app/principal/GroupJson';
+import {RoleJson} from '../../../app/principal/RoleJson';
 import Principal = api.security.Principal;
 import PrincipalJson = api.security.PrincipalJson;
 import PrincipalType = api.security.PrincipalType;
-import UserStoreKey = api.security.UserStoreKey;
 import PrincipalKey = api.security.PrincipalKey;
-import Role = api.security.Role;
-import Group = api.security.Group;
-import User = api.security.User;
+import UserStoreKey = api.security.UserStoreKey;
+
+export type ListPrincipalsResult = {
+    total: number;
+    principals: Principal[];
+};
 
 export class ListPrincipalsRequest
     extends ListGraphQlRequest<any, any> {
@@ -69,9 +77,9 @@ export class ListPrincipalsRequest
                 }`;
     }
 
-    sendAndParse(): wemQ.Promise<any> {
+    sendAndParse(): wemQ.Promise<ListPrincipalsResult> {
         return this.query().then((response: any) => {
-            let data = response.principalsConnection;
+            const data = response.principalsConnection;
             return {
                 total: data.totalCount,
                 principals: data.edges.map(edge => this.fromJsonToPrincipal(edge.node))
@@ -82,13 +90,13 @@ export class ListPrincipalsRequest
     private fromJsonToPrincipal(json: PrincipalJson): Principal {
         let pKey: PrincipalKey = PrincipalKey.fromString(json.key);
         if (pKey.isRole()) {
-            return Role.fromJson(<api.security.RoleJson>json);
+            return Role.fromJson(<RoleJson>json);
 
         } else if (pKey.isGroup()) {
-            return Group.fromJson(<api.security.GroupJson>json);
+            return Group.fromJson(<GroupJson>json);
 
         } else if (pKey.isUser()) {
-            return User.fromJson(<api.security.UserJson>json);
+            return User.fromJson(<UserJson>json);
         }
     }
 }

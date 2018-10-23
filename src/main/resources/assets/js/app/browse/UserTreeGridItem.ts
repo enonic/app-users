@@ -1,9 +1,8 @@
-import '../../api.ts';
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
-import UserStore = api.security.UserStore;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
+import {UserStore} from '../principal/UserStore';
 
 export enum UserTreeGridItemType {
     USER_STORE,

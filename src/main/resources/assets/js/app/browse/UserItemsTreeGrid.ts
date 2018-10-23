@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {UserTreeGridActions} from './UserTreeGridActions';
 import {EditPrincipalEvent} from './EditPrincipalEvent';
@@ -8,20 +7,19 @@ import {ListPrincipalsRequest} from '../../api/graphql/principal/ListPrincipalsR
 import {PrincipalBrowseSearchData} from './filter/PrincipalBrowseSearchData';
 import {UserItemType} from './UserItemType';
 import {ListUserItemsRequest} from '../../api/graphql/principal/ListUserItemsRequest';
+import {UserStore} from '../principal/UserStore';
 import TreeGrid = api.ui.treegrid.TreeGrid;
 import TreeNode = api.ui.treegrid.TreeNode;
 import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
 import TreeGridContextMenu = api.ui.treegrid.TreeGridContextMenu;
-
 import Principal = api.security.Principal;
-import UserStore = api.security.UserStore;
 import PrincipalType = api.security.PrincipalType;
-import UserStoreKey = api.security.UserStoreKey;
 import BrowseFilterResetEvent = api.app.browse.filter.BrowseFilterResetEvent;
 import BrowseFilterSearchEvent = api.app.browse.filter.BrowseFilterSearchEvent;
 import ResponsiveRanges = api.ui.responsive.ResponsiveRanges;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
+import UserStoreKey = api.security.UserStoreKey;
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -111,7 +109,7 @@ export class UserItemsTreeGrid
         return this.treeGridActions;
     }
 
-    updateUserNode(principal: api.security.Principal, userStore: api.security.UserStore) {
+    updateUserNode(principal: Principal, userStore: UserStore) {
         if (!principal && !userStore) {
             return;
         }
@@ -146,7 +144,7 @@ export class UserItemsTreeGrid
         super.deleteNodes(userTreeGridItemsToDelete);
     }
 
-    private loadParentNode(principal: api.security.Principal, userStore: api.security.UserStore): wemQ.Promise<TreeNode<UserTreeGridItem>> {
+    private loadParentNode(principal: Principal, userStore: UserStore): wemQ.Promise<TreeNode<UserTreeGridItem>> {
         const rootNode = this.getRoot().getCurrentRoot();
         const userStoreId = userStore.getKey().getId();
 
@@ -161,7 +159,7 @@ export class UserItemsTreeGrid
         });
     }
 
-    appendUserNode(principal: api.security.Principal, userStore: api.security.UserStore, parentOfSameType?: boolean) {
+    appendUserNode(principal: Principal, userStore: UserStore, parentOfSameType?: boolean) {
         if (!principal) { // UserStore type
 
             const userTreeGridItem = new UserTreeGridItemBuilder().setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build();

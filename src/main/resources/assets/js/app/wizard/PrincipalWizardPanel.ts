@@ -1,4 +1,3 @@
-import '../../api.ts';
 import {UserItemWizardPanel} from './UserItemWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {Router} from '../Router';
@@ -6,9 +5,9 @@ import {PrincipalWizardDataLoader} from './PrincipalWizardDataLoader';
 import {GraphQlRequest} from '../../api/graphql/GraphQlRequest';
 import {PrincipalNamedEvent} from '../event/PrincipalNamedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
+import {UserStore} from '../principal/UserStore';
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
-import UserStore = api.security.UserStore;
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
 import WizardStep = api.app.wizard.WizardStep;
 import i18n = api.util.i18n;
