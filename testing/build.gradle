@@ -21,7 +21,6 @@ plugins {
     id 'com.moowork.node' version '0.13'
     id 'com.moowork.gulp' version '0.13'
     id 'com.github.psxpaul.execfork' version '0.1.8'
-
 }
 
 group = 'com.enonic.xp.js_testing'
@@ -34,7 +33,6 @@ configurations {
 apply plugin: 'com.enonic.defaults'
 apply plugin: 'com.moowork.node'
 apply plugin: 'com.moowork.gulp'
-apply plugin: "jacoco"
 
 enonic {
     publishRepo = 'inhouse'
@@ -138,7 +136,7 @@ tasks.withType( Test ) {
 
 task startSeleniumDaemon( type: com.github.psxpaul.task.ExecFork ) {
     println 'Selenium server is starting!'
-    commandLine = "${resDir}${File.separator}selenium-server.bat"
+    commandLine = "${resDir}${File.separator}selenium-server.sh"
     standardOutput = "${buildDir}${File.separator}selenium-daemon.log"
     errorOutput = "${buildDir}${File.separator}selenium-daemon-error.log"
 }
