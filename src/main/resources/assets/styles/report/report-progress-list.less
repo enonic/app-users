@@ -4,33 +4,67 @@
     align-items: stretch;
     line-height: 22px;
     font-size: 14px;
-    margin: 0 8px 10px !important;
+    margin: 0 8px 10px 0px !important;
 
-    span.title {
-      flex: 1;
-      margin-right: 10px;
+    .reportdata {
+      display: flex;
+      flex-grow: 1;
+
+      span.title {
+        flex: 1;
+        margin-right: 10px;
+      }
+
+      .progress-bar {
+        flex: 1;
+      }
+
+      .timestamp {
+        flex: 1;
+        display: none;
+        color: @admin-font-gray2;
+      }
     }
 
-    .progress-bar {
-      flex: 1;
+    .buttons {
+      display: flex;
+
+      .icon-report-download, .icon-report-delete {
+        margin: 0 5px;
+        color: @admin-dark-gray;
+        line-height: 22px;
+
+        &:before {
+          display: none;
+        }
+      }
     }
 
-    .timestamp {
-      flex: 1;
-      display: none;
-      color: @admin-font-gray2;
-    }
+    @media screen and (max-width: 1024px) {
+      flex-direction: column;
 
-    .download, .delete {
-      display: none;
-      margin: 0 5px;
+      .buttons {
+        .icon-report-download, .icon-report-delete {
+          text-decoration: none;
+
+          span {
+            display: none;
+          }
+
+          &::before {
+            display: inline;
+            font-size: 18px;
+          }
+        }
+
+      }
     }
 
     &.ready {
       .progress-bar {
         display: none;
       }
-      .timestamp, .download, .delete {
+      .timestamp, .icon-report-download, .icon-report-delete {
         display: block;
       }
     }
