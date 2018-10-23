@@ -4,29 +4,42 @@ import PrincipalKey = api.security.PrincipalKey;
 import DateHelper = api.util.DateHelper;
 import TaskEvent = api.task.TaskEvent;
 import TaskEventType = api.task.TaskEventType;
+import NodeServerChangeType = api.event.NodeServerChangeType;
 import DivEl = api.dom.DivEl;
 import {Report} from './Report';
 import {ListReportsRequest} from '../../api/graphql/report/ListReportsRequest';
 import {DeleteReportsRequest} from '../../api/graphql/report/DeleteReportsRequest';
 import {GetReportRequest} from '../../api/graphql/report/GetReportRequest';
+import {ReportServerEvent} from '../event/ReportServerEvent';
+import {ReportServerChangeItem} from '../event/ReportServerChange';
 
 export class ReportProgressList
     extends ListBox<Report> {
 
+    private principalKey: PrincipalKey;
+
+    private repositoryIds?: string[];
+
     constructor(principalKey: PrincipalKey, repositoryIds?: string[]) {
         super('report-progress-list');
 
-        this.loadExistingReports(principalKey, repositoryIds);
-        this.handlePermReportsTaskEvents();
+        this.principalKey = principalKey;
+        this.repositoryIds = repositoryIds;
+
+        this.loadExistingReports();
+        this.handlePermReportsEvents();
     }
 
-    private handlePermReportsTaskEvents() {
-        const handler = this.handleTaskEvent.bind(this);
+    private handlePermReportsEvents() {
+        const taskEventsHandler = this.handleTaskEvent.bind(this);
+        const reportEventsHandler = this.handleReportEvent.bind(this);
 
-        TaskEvent.on(handler);
+        TaskEvent.on(taskEventsHandler);
+        ReportServerEvent.on(reportEventsHandler);
 
         this.onRemoved(() => {
-            TaskEvent.un(handler);
+            TaskEvent.un(taskEventsHandler);
+            ReportServerEvent.un(reportEventsHandler);
         });
     }
 
@@ -48,18 +61,6 @@ export class ReportProgressList
 
             return;
         }
-
-        if (event.getEventType() === TaskEventType.FINISHED) {
-            view.setReportReady(true);
-
-            new GetReportRequest(view.getItem().getId()).sendAndParse().then((report: Report) => {
-                view.setFinished(report.getFinished());
-            });
-
-            api.notify.NotifyManager.get().showSuccess(i18n('notify.report.finished', view.getItem().getPrincipalDisplayName()));
-
-            return;
-        }
     }
 
     private getItemViewByTaskEvent(event: TaskEvent): ReportProgressItem {
@@ -71,6 +72,45 @@ export class ReportProgressList
         }
 
         return <ReportProgressItem>this.getItemView(items[0]);
+    }
+
+    private handleReportEvent(event: ReportServerEvent) {
+        if (event.getType() === NodeServerChangeType.DELETE) {
+            this.handleReportDeleteEvent(event);
+
+            return;
+        }
+
+        // listening update to know when report generation was finished and generated report was set to report node
+        if (event.getType() === NodeServerChangeType.UPDATE) {
+            this.handleReportUpdatedEvent(event);
+
+            return;
+        }
+    }
+
+    private handleReportDeleteEvent(event: ReportServerEvent) {
+        event.getNodeChange().getChangeItems().forEach((item: ReportServerChangeItem) => {
+            const deletedReport: Report = this.getItem(item.getId());
+
+            if (!!deletedReport) {
+                this.removeItem(deletedReport);
+            }
+        });
+    }
+
+    private handleReportUpdatedEvent(event: ReportServerEvent) {
+        event.getNodeChange().getChangeItems().forEach((item: ReportServerChangeItem) => {
+            new GetReportRequest(item.getId()).sendAndParse().then((report: Report) => {
+                if (report.getPrincipalKey().equals(this.principalKey)) {
+                    if (!this.getItem(item.getId())) {
+                        this.addItem(report);
+                    } else {
+                        this.setReportGenerated(report);
+                    }
+                }
+            });
+        });
     }
 
     protected createItemView(item: Report, readOnly: boolean): ReportProgressItem {
@@ -92,15 +132,15 @@ export class ReportProgressList
         });
     }
 
-    private loadExistingReports(principalKey: PrincipalKey, repositoryIds?: string[]) {
+    private loadExistingReports() {
         new ListReportsRequest()
-            .setPrincipalKey(principalKey)
-            .setRepositoryIds(repositoryIds)
+            .setPrincipalKey(this.principalKey)
+            .setRepositoryIds(this.repositoryIds)
             .sendAndParse()
             .then(reports => this.addItems(reports));
     }
 
-    public setReportGenerated(report: Report) {
+    private setReportGenerated(report: Report) {
         const view: ReportProgressItem = <ReportProgressItem>this.getItemView(report);
 
         if (view.isReportReady()) {
@@ -142,7 +182,7 @@ class ReportProgressItem
         downloadLink
             .appendChild(new api.dom.SpanEl().setHtml(i18n('action.report.download')))
             .getEl()
-            .setAttribute('download',`Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`)
+            .setAttribute('download', `Report_${this.item.getPrincipalDisplayName()}_in_${this.item.getRepositoryId()}.csv`);
         downloadLink.onClicked(event => this.notifyDeleteClicked(this.item));
 
         const deleteLink = new api.dom.AEl('icon-report-delete icon-close');

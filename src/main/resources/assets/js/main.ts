@@ -18,6 +18,7 @@ import {Router} from './app/Router';
 import {ShowNewPrincipalDialogEvent} from './app/browse/ShowNewPrincipalDialogEvent';
 import {NewPrincipalDialog} from './app/create/NewPrincipalDialog';
 import {PrincipalServerEventsHandler} from './app/event/PrincipalServerEventsHandler';
+import {UsersServerEventsListener} from './app/event/UsersServerEventsListener';
 
 function getApplication(): api.app.Application {
     let application = new api.app.Application('user-manager', 'Users', 'UM', CONFIG.appIconUrl);
@@ -48,10 +49,10 @@ function startLostConnectionDetector() {
 
 function startApplication() {
 
-    let application: api.app.Application = getApplication();
-    let appBar = new api.app.bar.TabbedAppBar(application);
+    const application: api.app.Application = getApplication();
+    const appBar = new api.app.bar.TabbedAppBar(application);
     appBar.setHomeIconAction();
-    let appPanel = new UserAppPanel(appBar, application.getPath());
+    const appPanel = new UserAppPanel(appBar, application.getPath());
 
     body.appendChild(appBar);
     body.appendChild(appPanel);
@@ -62,7 +63,7 @@ function startApplication() {
     new ChangeUserPasswordDialog();
     application.setLoaded(true);
 
-    let serverEventsListener = new api.event.ServerEventsListener([application]);
+    const serverEventsListener = new UsersServerEventsListener([application]);
     serverEventsListener.start();
 
     startLostConnectionDetector();

@@ -19,7 +19,8 @@ export class GetReportRequest
                 principalKey,
                 finished,
                 principalDisplayName,
-                repositoryId
+                repositoryId,
+                reportBranch
             }
         }`;
     }
