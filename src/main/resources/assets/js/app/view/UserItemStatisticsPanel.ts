@@ -37,18 +37,13 @@ export class UserItemStatisticsPanel
     }
 
     setItem(item: ViewItem<UserTreeGridItem>) {
-        let currentItem = this.getItem();
+        const currentItem = this.getItem();
+
+        if (item.getModel().getType() === UserTreeGridItemType.PRINCIPAL) {
+            this.populatePrincipalViewItem(item);
+        }
 
         if (!currentItem || !currentItem.equals(item)) {
-
-            switch (item.getModel().getType()) {
-            case UserTreeGridItemType.PRINCIPAL:
-                this.populatePrincipalViewItem(item);
-                break;
-            default:
-
-            }
-
             this.userDataContainer.removeChildren();
 
             this.appendMetadata(item);

@@ -16,9 +16,9 @@ const panel = {
     repoOptionsFilterInput: +`${loaderComboBox.optionsFilterInput}`,
     reportSelectedOptionsView: `//div[contains(@id,'ReportSelectedOptionsView')]`,
     generateButton: `//button[contains(@id,'Button') and child::span[text()='Generate report']]`,
-    reportItem: `//ul[contains(@class,'data-list') and child::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]`,
+    reportItem: `//ul[contains(@class,'data-list') and descendant::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]`,
     reportByTitle: function (title) {
-        return `//li[contains(@id,'ReportProgressItem') and child::span[contains(.,'${title}')]]`
+        return `//li[contains(@id,'ReportProgressItem') and descendant::span[contains(.,'${title}')]]`
     },
     repositoryBranchOption: function (name) {
         return `//div[@class='slick-viewport']//div[contains(@class,'slick-cell') and child::div[contains(@id,'DefaultOptionDisplayValueViewer') and contains(.,'${name}')]]`
@@ -102,21 +102,26 @@ const userItemStatisticsPanel = Object.create(page, {
     },
     getReportTitles: {
         value: function () {
-            return this.getText(panel.reportItem + `//span[@class='title']`).then(result => {
+            return this.getText(panel.reportItem + `//span[@class='title']`).catch(err => {
+                this.saveScreenshot('err_getting_text_report_item');
+                throw new Error('Error when getting title of report item!' + err);
+            }).then(result => {
                 return [].concat(result);
             })
         }
     },
     getReportDate: {
         value: function (title) {
-            return this.getText(panel.reportByTitle(title) + `//span[@class='timestamp']`).then(result => {
+            return this.getText(panel.reportByTitle(title) + `//span[@class='timestamp']`).catch(err=>{
+                throw  new Error("Error when try to find report by title " + err);
+            }).then(result => {
                 return [].concat(result);
             })
         }
     },
     clickOnDeleteReportLink: {
         value: function (title) {
-            let deleteLink = panel.reportByTitle(title) + `//a[@class='delete']`;
+            let deleteLink = panel.reportByTitle(title) + `//a[contains(@class,'icon-report-delete')]`;
             return this.waitForVisible(deleteLink, appConst.TIMEOUT_1).catch(err => {
                 this.saveScreenshot('err_report_not_found');
                 throw new Error('Report was not found! ' + err);
