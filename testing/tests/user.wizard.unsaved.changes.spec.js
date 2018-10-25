@@ -32,7 +32,7 @@ describe('User Wizard and `Save Before Close dialog`', function () {
 
     it('WHEN the user has been saved THEN the user should be present in the grid',
         () => {
-            this.bail(true);
+            //this.bail(true);
             let userName = userItemsBuilder.generateRandomName('user');
             let roles = [appConst.roles.CM_ADMIN, appConst.roles.USERS_ADMINISTRATOR];
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), roles);

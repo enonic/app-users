@@ -31,7 +31,7 @@ describe('Role Wizard and `Save Before Close dialog`', function () {
 
     it('WHEN new role has been added THEN the group should be present in the grid',
         () => {
-            this.bail(true);
+            //this.bail(true);
             let roleName = userItemsBuilder.generateRandomName('role');
             testrole = userItemsBuilder.buildRole(roleName, 'description', null);
             return testUtils.openWizardAndSaveRole(testrole).then(()=> {

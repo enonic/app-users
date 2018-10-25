@@ -91,7 +91,6 @@ const userBrowsePanel = Object.create(page, {
         value: function (itemName) {
             return this.waitForVisible(`${panel.rowByName(itemName)}`, 1000).catch((err) => {
                 console.log("item is not displayed:" + itemName);
-                this.saveScreenshot('err_find_' + itemName);
                 return false;
             });
         }

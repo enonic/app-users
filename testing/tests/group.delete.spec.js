@@ -21,7 +21,7 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
 
     it('GIVEN `Group` is saved WHEN Delete button on toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
-            this.bail(1);
+            //this.bail(1);
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
