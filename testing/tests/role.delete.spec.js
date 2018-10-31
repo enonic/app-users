@@ -19,6 +19,22 @@ describe('Role - confirm and delete in wizard and in browse panel', function () 
     webDriverHelper.setupBrowser();
     let testRole;
 
+    it('GIVEN role has been saved WHEN `App home` button has been clicked and `Roles` folder expanded THEN new role should be present',
+        () => {
+            let roleName = userItemsBuilder.generateRandomName('role');
+            return testUtils.clickOnRolesFolderAndOpenWizard().then(() => {
+                return roleWizard.typeDisplayName(roleName);
+            }).then(() => {
+                return roleWizard.waitAndClickOnSave();
+            }).then(() => {
+                return userBrowsePanel.clickOnAppHomeButton();
+            }).then(() => {
+                return userBrowsePanel.clickOnExpanderIcon("roles");
+            }).then(() => {
+                return assert.eventually.isTrue(userBrowsePanel.isItemDisplayed(roleName), 'new role should be present in the grid');
+            });
+        });
+
     it('GIVEN `Role` is saved in wizard WHEN Delete button on wizard-toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
             testRole =

@@ -141,9 +141,9 @@ const userBrowsePanel = Object.create(page, {
     },
     clickOnAppHomeButton: {
         value: function () {
-            return this.doClick(this.appHomeButton).pause(500).catch(err => {
+            return this.doClick(this.appHomeButton).catch(err => {
                 throw new Error('err: AppHome button ' + err);
-            })
+            }).pause(500);
         }
     },
     clickOnNewButton: {
