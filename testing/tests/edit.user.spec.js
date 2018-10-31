@@ -85,7 +85,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
                 return userWizard.typeEmail(newEmail);
             }).then(()=> {
                 return userWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).pause(1000).then(()=> {
                 return userBrowsePanel.clickOnAppHomeButton();
             }).then(()=> {
                 return userStatisticsPanel.getEmail();
