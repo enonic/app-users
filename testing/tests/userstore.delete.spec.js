@@ -25,7 +25,7 @@ describe('User Store confirm and delete in wizard and in browse panel', function
                 return userStoreWizard.typeData(userStore)
             }).then(() => {
                 return userStoreWizard.waitAndClickOnSave();
-            }).then(() => {
+            }).pause(200).then(() => {
                 return userStoreWizard.clickOnDelete();
             }).then(() => {
                 testUtils.saveScreenshot("userstore_wizard_confirm_delete1");
@@ -40,7 +40,7 @@ describe('User Store confirm and delete in wizard and in browse panel', function
                 return userStoreWizard.typeData(userStore)
             }).then(() => {
                 return userStoreWizard.waitAndClickOnSave();
-            }).then(() => {
+            }).pause(200).then(() => {
                 return userStoreWizard.clickOnDelete();
             }).then(() => {
                 return testUtils.confirmDelete();
