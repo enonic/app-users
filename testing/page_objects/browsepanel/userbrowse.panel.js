@@ -89,7 +89,7 @@ const userBrowsePanel = Object.create(page, {
     },
     isItemDisplayed: {
         value: function (itemName) {
-            return this.waitForVisible(`${panel.rowByName(itemName)}`, 1000).catch((err) => {
+            return this.waitForVisible(`${panel.rowByName(itemName)}`, 1000).catch(err => {
                 console.log("item is not displayed:" + itemName);
                 return false;
             });
@@ -97,7 +97,7 @@ const userBrowsePanel = Object.create(page, {
     },
     waitForItemNotDisplayed: {
         value: function (itemName) {
-            return this.waitForNotVisible(`${panel.rowByName(itemName)}`, 1000).catch((err) => {
+            return this.waitForNotVisible(`${panel.rowByName(itemName)}`, 1000).catch(err => {
                 console.log("item is still displayed:" + itemName);
                 return false;
             });
@@ -118,6 +118,7 @@ const userBrowsePanel = Object.create(page, {
             }).then(() => {
                 return console.log('user browse panel is loaded')
             }).catch(err => {
+                this.saveScreenshot("err_load_grid");
                 throw new Error('users browse panel was not loaded in: ' + ms);
             });
         }
@@ -140,7 +141,7 @@ const userBrowsePanel = Object.create(page, {
     },
     clickOnAppHomeButton: {
         value: function () {
-            return this.doClick(this.appHomeButton).pause(500).catch((err) => {
+            return this.doClick(this.appHomeButton).pause(500).catch(err => {
                 throw new Error('err: AppHome button ' + err);
             })
         }
@@ -267,11 +268,11 @@ const userBrowsePanel = Object.create(page, {
             let closeIcon = `${panel.closeItemTabButton(displayName)}`;
             return this.waitForVisible(closeIcon).then(() => {
                 return this.doClick(closeIcon);
-            }).catch((err) => {
+            }).catch(err => {
                 throw new Error('itemTabButton was not found!' + displayName);
             }).pause(300).then(() => {
                 return saveBeforeCloseDialog.isDialogPresent(1000);
-            }).then((result) => {
+            }).then(result => {
                 if (result) {
                     this.saveScreenshot('err_save_close_item').then(() => {
                         console.log('save before close dialog must not be present');

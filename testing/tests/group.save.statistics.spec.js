@@ -54,7 +54,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', null, null);
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup);
-            }).then(() => {
+            }).pause(400).then(() => {
                 return groupWizard.waitAndClickOnSave();
             }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);

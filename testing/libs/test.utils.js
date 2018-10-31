@@ -234,7 +234,7 @@ module.exports = {
     openWizardAndSaveRole: function (role) {
         return this.clickOnRolesFolderAndOpenWizard().then(() => {
             return roleWizard.typeData(role)
-        }).then(() => {
+        }).pause(500).then(() => {
             return this.saveAndCloseWizard(role.displayName)
         }).pause(500);
     },

@@ -17,7 +17,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it.skip(`GIVEN user browse panel is opened WHEN 'Ctrl+Alt+n' has been pressed THEN New Principal Dialog should appear`, () => {
+    it(`GIVEN user browse panel is opened WHEN 'Ctrl+Alt+n' has been pressed THEN New Principal Dialog should appear`, () => {
         return userBrowsePanel.hotKeyNew().then(() => {
             return newPrincipalDialog.waitForOpened()
         }).then(result => {
