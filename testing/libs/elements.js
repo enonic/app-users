@@ -33,4 +33,5 @@ module.exports = Object.freeze({
     },
     REMOVE_ICON: `//a[@class='remove']`,
     EDIT_ICON: `//a[@class='edit']`,
+    CHECKBOX:`//div[contains(@id,'api.ui.Checkbox')]`
 });
