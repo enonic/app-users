@@ -197,6 +197,10 @@ class UserStoreACESelectedOptionsView
                            index: number) => selectedOption.setIndex(index));
     }
 
+    refreshSortable() {
+        return;
+    }
+
     private notifySelectedOptionRemoved(removed: SelectedOptionEvent<UserStoreAccessControlEntry>) {
         this.selectedOptionRemovedListeners.forEach((listener) => {
             listener(removed);
