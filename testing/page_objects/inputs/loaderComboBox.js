@@ -26,7 +26,7 @@ const loaderComboBox = Object.create(page, {
     },
     waitForOptionVisible: {
         value: function (panelDiv, displayName) {
-            return this.waitForVisible(panelDiv + `${elements.slickRowByDisplayName(displayName)}`, 2000)
+            return this.waitForVisible(panelDiv + `${elements.slickRowByDisplayName(displayName)}`, 3000)
         }
     },
     waitForListExpanded: {
