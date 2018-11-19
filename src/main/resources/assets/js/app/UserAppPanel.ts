@@ -112,16 +112,16 @@ export class UserAppPanel
                     tabMenuItem.setLabel(name, !<string>event.getNewValue());
                 }
             });
-
-            wizardPanel.onLockChanged(value => {
-                value ? tabMenuItem.lock() : tabMenuItem.unlock();
-            });
         });
 
         //tabMenuItem.markInvalid(!wizardPanel.getPersistedItem().isValid());
 
         wizardPanel.onValidityChanged((event: api.ValidityChangedEvent) => {
             tabMenuItem.markInvalid(!wizardPanel.isValid());
+        });
+
+        wizardPanel.onLockChanged(value => {
+            value ? tabMenuItem.lock() : tabMenuItem.unlock();
         });
     }
 
