@@ -100,7 +100,7 @@ export class UserAppPanel
         }
     }
 
-    addWizardPanel(tabMenuItem: api.app.bar.AppBarTabMenuItem, wizardPanel: api.app.wizard.WizardPanel<any>) {
+    addWizardPanel(tabMenuItem: api.app.bar.AppBarTabMenuItem, wizardPanel: UserItemWizardPanel<any>) {
         super.addWizardPanel(tabMenuItem, wizardPanel);
 
         wizardPanel.onRendered(() => {
@@ -111,6 +111,10 @@ export class UserAppPanel
                     let name = <string>event.getNewValue() || this.getPrettyNameForWizardPanel(wizardPanel);
                     tabMenuItem.setLabel(name, !<string>event.getNewValue());
                 }
+            });
+
+            wizardPanel.onLockChanged(value => {
+                value ? tabMenuItem.lock() : tabMenuItem.unlock();
             });
         });
 

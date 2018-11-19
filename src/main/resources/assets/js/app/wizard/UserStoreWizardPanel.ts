@@ -118,8 +118,10 @@ export class UserStoreWizardPanel
     }
 
     persistNewItem(): wemQ.Promise<UserStore> {
+        this.lock();
         return this.produceCreateUserStoreRequest().sendAndParse().then((userStore: UserStore) => {
 
+            this.unlock();
             api.notify.showFeedback('User store was created');
             new UserItemCreatedEvent(null, userStore).fire();
 
@@ -134,7 +136,9 @@ export class UserStoreWizardPanel
     }
 
     updatePersistedItem(): wemQ.Promise<UserStore> {
+        this.lock();
         return this.produceUpdateUserStoreRequest(this.assembleViewedUserStore()).sendAndParse().then((userStore: UserStore) => {
+            this.unlock();
             api.notify.showFeedback('User store was updated');
             new UserItemUpdatedEvent(null, userStore).fire();
 
