@@ -20,6 +20,10 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     protected params: UserItemWizardPanelParams<USER_ITEM_TYPE>;
 
+    private locked: boolean;
+
+    private lockChangedListeners: { (value: boolean): void }[] = [];
+
     constructor(params: UserItemWizardPanelParams<USER_ITEM_TYPE>) {
 
         super(params);
@@ -32,6 +36,12 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
         this.onValidityChanged(() => {
             this.wizardActions.getSaveAction().setEnabled(this.isValid());
+        });
+
+        this.onShown(() => {
+            if (this.locked) {
+                this.lock();
+            }
         });
 
     }
@@ -158,6 +168,19 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         return this.getParams().persistedDisplayName;
     }
 
+    lock() {
+        this.locked = true;
+        this.formMask.show();
+        this.notifyLockChanged(this.locked);
+    }
+
+    unlock() {
+        this.locked = false;
+
+        this.formMask.hide();
+        this.notifyLockChanged(this.locked);
+    }
+
     saveChanges(): wemQ.Promise<USER_ITEM_TYPE> {
         if (this.isRendered()) {
             this.getWizardHeader().normalizeNames();
@@ -238,5 +261,21 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     isNewChanged(): boolean {
         throw new Error('Must be implemented by inheritors');
+    }
+
+    onLockChanged(listener: (value: boolean) => void) {
+        this.lockChangedListeners.push(listener);
+    }
+
+    unLockChanged(listener: (value: boolean) => void) {
+        this.lockChangedListeners = this.lockChangedListeners.filter((curr: (value: boolean) => void) => {
+            return listener !== curr;
+        });
+    }
+
+    private notifyLockChanged(value: boolean) {
+        this.lockChangedListeners.forEach((listener: (value: boolean) => void) => {
+            listener(value);
+        });
     }
 }
