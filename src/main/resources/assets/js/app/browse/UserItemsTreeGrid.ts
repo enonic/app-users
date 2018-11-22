@@ -146,17 +146,27 @@ export class UserItemsTreeGrid
 
     private loadParentNode(principal: Principal, userStore: UserStore): wemQ.Promise<TreeNode<UserTreeGridItem>> {
         const rootNode = this.getRoot().getCurrentRoot();
-        const userStoreId = userStore.getKey().getId();
 
-        const userStoreNode = rootNode.getChildren().filter(node => node.getDataId() === userStoreId)[0] || rootNode;
+        if (principal.isRole()) {
 
-        return this.fetchDataAndSetNodes(userStoreNode).then(() => {
-            const parentItemType = UserTreeGridItem.getParentType(principal);
+            const rolesNode = rootNode.getChildren()
+                .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
 
-            const parentNode = userStoreNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0];
+            if (rolesNode) {
+                return this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode);
+            }
+        } else {
+            const userStoreId = userStore.getKey().getId();
+            const userStoreNode = rootNode.getChildren().filter(node => node.getDataId() === userStoreId)[0] || rootNode;
 
-            return this.fetchDataAndSetNodes(parentNode).then(() => parentNode);
-        });
+            return this.fetchDataAndSetNodes(userStoreNode).then(() => {
+                const parentItemType = UserTreeGridItem.getParentType(principal);
+
+                const parentNode = userStoreNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0];
+
+                return this.fetchDataAndSetNodes(parentNode).then(() => parentNode);
+            });
+        }
     }
 
     appendUserNode(principal: Principal, userStore: UserStore, parentOfSameType?: boolean) {
