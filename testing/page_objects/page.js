@@ -10,7 +10,7 @@ Page.prototype.getBrowser = function () {
 };
 
 Page.prototype.numberOfElements = function (selector) {
-    return this.getBrowser().elements(selector).then((res) => {
+    return this.getBrowser().elements(selector).then(res => {
         return res.value.filter(el => {
             return this.getBrowser().elementIdDisplayed(el.ELEMENT);
         })
@@ -41,10 +41,10 @@ Page.prototype.waitForVisible = function (selector, ms) {
 Page.prototype.waitForNotVisible = function (selector, ms) {
     return this.getBrowser().waitForVisible(selector, ms, true);
 };
-Page.prototype.waitForSpinnerNotVisible = function (ms) {
-    return this.getBrowser().waitForVisible(`//div[@class='spinner']`, ms, true).catch(function (err) {
+Page.prototype.waitForSpinnerNotVisible = function () {
+    return this.getBrowser().waitForVisible(`//div[@class='spinner']`, appConst.TIMEOUT_4, true).catch(err => {
         console.log('spinner is still visible after a the interval ');
-        throw Error('spinner is still visible after a the interval ' + ` ` + ms);
+        throw Error('spinner is still visible after a the interval ' + ` ` + appConst.TIMEOUT_3);
     })
 };
 
@@ -119,7 +119,7 @@ Page.prototype.getDisplayedElements = function (selector) {
 
 Page.prototype.getTextFromElements = function (selector) {
     let json = [];
-    return this.getBrowser().elements(selector).then((result) => {
+    return this.getBrowser().elements(selector).then(result => {
         result.value.forEach((val) => {
             json.push(this.getBrowser().elementIdText(val.ELEMENT));
         });
@@ -174,7 +174,7 @@ Page.prototype.waitForErrorNotificationMessage = function () {
     })
 };
 Page.prototype.doRightClick = function (selector) {
-    return this.getBrowser().element(selector).then((result) => {
+    return this.getBrowser().element(selector).then(result => {
         return this.getBrowser().rightClick(selector, 0, 0);
     }).catch(function (err) {
         throw Error(err.message + ` ` + selector);

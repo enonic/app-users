@@ -48,13 +48,13 @@ module.exports = {
             console.log('filter panel is opened, typing the text: ' + name);
             return filterPanel.typeSearchText(name);
         }).pause(300).then(() => {
-            return browsePanel.waitForSpinnerNotVisible(appConst.TIMEOUT_3);
+            return browsePanel.waitForSpinnerNotVisible();
         });
     },
     selectAndDeleteItem: function (name) {
         return this.findAndSelectItem(name).pause(500).then(() => {
             return browsePanel.waitForDeleteButtonEnabled();
-        }).then((result) => {
+        }).then(result => {
             return browsePanel.clickOnDeleteButton();
         }).then(() => {
             return confirmationDialog.waitForDialogLoaded();
@@ -88,7 +88,7 @@ module.exports = {
             }
         }).then(() => {
             return this.doSwitchToUsersApp();
-        }).catch((err) => {
+        }).catch(err => {
             console.log('tried to navigate to Users app, but: ' + err);
             this.saveScreenshot("err_navigate_to_users" + itemBuilder.generateRandomNumber());
             throw new Error('error when navigate to Users app ' + err);
@@ -98,7 +98,7 @@ module.exports = {
     doLoginAndClickOnUsersLink: function (userName, password) {
         return loginPage.doLogin(userName, password).pause(500).then(() => {
             return homePage.waitForXpTourVisible(appConst.TIMEOUT_3);
-        }).then((result) => {
+        }).then(result => {
             if (result) {
                 console.log('xp-tour dialog is present, closing it... ');
                 return homePage.doCloseXpTourDialog();
@@ -114,8 +114,8 @@ module.exports = {
         console.log('testUtils:switching to users app...');
         return webDriverHelper.browser.getTabIds().then(tabs => {
             let prevPromise = Promise.resolve(false);
-            tabs.some((tabId) => {
-                prevPromise = prevPromise.then((isUsers) => {
+            tabs.some(tabId => {
+                prevPromise = prevPromise.then(isUsers => {
                     if (!isUsers) {
                         return this.switchAndCheckTitle(tabId, "Users - Enonic XP Admin");
                     }
@@ -123,6 +123,8 @@ module.exports = {
                 });
             });
             return prevPromise;
+        }).then(() => {
+            return browsePanel.waitForSpinnerNotVisible();
         }).then(() => {
             return browsePanel.waitForUsersGridLoaded(appConst.TIMEOUT_3);
         });
@@ -132,7 +134,7 @@ module.exports = {
         return webDriverHelper.browser.getTabIds().then(tabs => {
             let prevPromise = Promise.resolve(false);
             tabs.some((tabId) => {
-                prevPromise = prevPromise.then((isHome) => {
+                prevPromise = prevPromise.then(isHome => {
                     if (!isHome) {
                         return this.switchAndCheckTitle(webDriverHelper.browser, tabId, "Enonic XP Home");
                     }
@@ -198,7 +200,7 @@ module.exports = {
     selectRoleAndOpenWizard: function (displayName) {
         return this.findAndSelectItem(displayName).then(() => {
             return browsePanel.waitForEditButtonEnabled();
-        }).then((result) => {
+        }).then(result => {
             if (!result) {
                 throw new Error('`Edit` button is disabled!');
             }
@@ -210,7 +212,7 @@ module.exports = {
     selectGroupAndOpenWizard: function (displayName) {
         return this.findAndSelectItem(displayName).then(() => {
             return browsePanel.waitForEditButtonEnabled();
-        }).then((result) => {
+        }).then(result => {
             if (!result) {
                 throw new Error('`Edit` button is disabled!');
             }
@@ -227,8 +229,10 @@ module.exports = {
     openWizardAndSaveUserStore: function (userStoreData) {
         return this.clickOnNewOpenUserStoreWizard().then(() => {
             return userStoreWizard.typeData(userStoreData)
-        }).pause(500).then(() => {
+        }).pause(400).then(() => {
             return userStoreWizard.waitAndClickOnSave()
+        }).then(() => {
+            return userStoreWizard.waitForSpinnerNotVisible()
         }).pause(400);
     },
     openWizardAndSaveRole: function (role) {

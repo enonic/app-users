@@ -55,7 +55,7 @@ const userItemStatisticsPanel = Object.create(page, {
     waitForPanelVisible: {
         value: function () {
             return this.waitForVisible(`${panel.div}`, appConst.TIMEOUT_2).then(() => {
-                return this.waitForSpinnerNotVisible(appConst.TIMEOUT_3);
+                return this.waitForSpinnerNotVisible();
             }).then(() => {
                 return console.log('user statistics panel is loaded')
             });
@@ -112,7 +112,7 @@ const userItemStatisticsPanel = Object.create(page, {
     },
     getReportDate: {
         value: function (title) {
-            return this.getText(panel.reportByTitle(title) + `//span[@class='timestamp']`).catch(err=>{
+            return this.getText(panel.reportByTitle(title) + `//span[@class='timestamp']`).catch(err => {
                 throw  new Error("Error when try to find report by title " + err);
             }).then(result => {
                 return [].concat(result);

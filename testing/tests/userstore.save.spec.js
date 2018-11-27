@@ -72,10 +72,9 @@ describe('User Store spec - save and edit', function () {
                 return userStoreWizard.waitAndClickOnSave();
             }).pause(1000).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testStore.displayName);
-            }).pause(500)
-                .then(() => userBrowsePanel.isItemDisplayed(testStore.displayName)).then(result => {
-                    assert.isTrue(result, 'new user store should be present in the grid');
-                })
+            }).then(() => userBrowsePanel.isItemDisplayed(testStore.displayName)).then(result => {
+                assert.isTrue(result, 'new user store should be present in the grid');
+            })
         });
 
     it(`GIVEN existing 'User Store' WHEN it has been selected and opened THEN correct description should be present`, () => {

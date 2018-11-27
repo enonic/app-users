@@ -66,9 +66,9 @@ const wizardPanel = Object.create(page, {
         value: function () {
             return this.waitForSaveButtonEnabled().then(() => {
                 return this.doClick(this.saveButton);
-            }).pause(600).catch(err => {
-                throw new Error(`Save button is not enabled!` + err);
-            })
+            }).catch(err => {
+                throw new Error(`Error when Save button has been clicked!` + err);
+            }).pause(800);
         }
     },
 

@@ -114,7 +114,7 @@ const userBrowsePanel = Object.create(page, {
     waitForUsersGridLoaded: {
         value: function (ms) {
             return this.waitForVisible(`${panel.grid}`, ms).then(() => {
-                return this.waitForSpinnerNotVisible(3000);
+                return this.waitForSpinnerNotVisible();
             }).then(() => {
                 return console.log('user browse panel is loaded')
             }).catch(err => {
@@ -281,7 +281,7 @@ const userBrowsePanel = Object.create(page, {
 
                 }
             }).then(() => {
-                return this.waitForSpinnerNotVisible(1000);
+                return this.waitForSpinnerNotVisible();
             }).then(() => {
                 return this.waitForUsersGridLoaded(appConst.TIMEOUT_3);
             })
