@@ -13,7 +13,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const confirmationDialog = require("../page_objects/confirmation.dialog");
 
-describe('User Store confirm and delete in wizard and in browse panel', function () {
+describe('Confirm and delete `User Store` in wizard and in browse panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let userStore;
@@ -25,7 +25,9 @@ describe('User Store confirm and delete in wizard and in browse panel', function
                 return userStoreWizard.typeData(userStore)
             }).then(() => {
                 return userStoreWizard.waitAndClickOnSave();
-            }).pause(200).then(() => {
+            }).then(() => {
+                return userStoreWizard.waitForSpinnerNotVisible();
+            }).pause(1200).then(() => {
                 return userStoreWizard.clickOnDelete();
             }).then(() => {
                 testUtils.saveScreenshot("userstore_wizard_confirm_delete1");
@@ -40,7 +42,9 @@ describe('User Store confirm and delete in wizard and in browse panel', function
                 return userStoreWizard.typeData(userStore)
             }).then(() => {
                 return userStoreWizard.waitAndClickOnSave();
-            }).pause(200).then(() => {
+            }).then(() => {
+                return userStoreWizard.waitForSpinnerNotVisible();
+            }).pause(900).then(() => {
                 return userStoreWizard.clickOnDelete();
             }).then(() => {
                 return testUtils.confirmDelete();
@@ -57,7 +61,7 @@ describe('User Store confirm and delete in wizard and in browse panel', function
             userStore = userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store3');
             return testUtils.openWizardAndSaveUserStore(userStore).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userStore.displayName);
-            }).pause(1000).then(() => {
+            }).then(() => {
                 return testUtils.findAndSelectItem(userStore.displayName);
             }).then(() => {
                 return userBrowsePanel.waitForDeleteButtonEnabled();

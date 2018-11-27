@@ -1,8 +1,5 @@
 /**
  * Created on 29/06/2017.
- * verifies:
- * xp-apps#205 (Save Before Close issue) https://github.com/enonic/xp-apps/issues/205
- *
  */
 const chai = require('chai');
 const should = require('chai').should;
@@ -60,7 +57,7 @@ describe('User Store spec - save and edit', function () {
                     assert.isTrue(result, 'new user store should be present in the grid');
                 })
         });
-    //verifies the xp-apps#205 (Save Before Close issue)
+
     it(`GIVEN User Store wizard is opened WHEN data and permissions have been typed and 'Save' button pressed AND the wizard has been closed THEN 'Save Before' dialog should not be displayed`,
         () => {
             let permissions = ['Everyone', 'Users App'];
@@ -70,6 +67,8 @@ describe('User Store spec - save and edit', function () {
                 return userStoreWizard.typeData(testStore);
             }).then(() => {
                 return userStoreWizard.waitAndClickOnSave();
+            }).then(()=>{
+                return userStoreWizard.waitForSpinnerNotVisible();
             }).pause(1000).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testStore.displayName);
             }).then(() => userBrowsePanel.isItemDisplayed(testStore.displayName)).then(result => {

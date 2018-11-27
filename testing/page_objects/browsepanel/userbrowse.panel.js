@@ -266,7 +266,9 @@ const userBrowsePanel = Object.create(page, {
     doClickOnCloseTabAndWaitGrid: {
         value: function (displayName) {
             let closeIcon = `${panel.closeItemTabButton(displayName)}`;
-            return this.waitForVisible(closeIcon).then(() => {
+            return this.waitForVisible(closeIcon).then(()=>{
+                return this.waitForEnabled(closeIcon);
+            }).then(() => {
                 return this.doClick(closeIcon);
             }).catch(err => {
                 throw new Error('itemTabButton was not found!' + displayName);

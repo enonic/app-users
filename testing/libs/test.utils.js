@@ -233,7 +233,7 @@ module.exports = {
             return userStoreWizard.waitAndClickOnSave()
         }).then(() => {
             return userStoreWizard.waitForSpinnerNotVisible()
-        }).pause(400);
+        }).pause(1200);
     },
     openWizardAndSaveRole: function (role) {
         return this.clickOnRolesFolderAndOpenWizard().then(() => {
