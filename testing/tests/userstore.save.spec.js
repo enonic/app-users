@@ -69,7 +69,7 @@ describe('User Store spec - save and edit', function () {
                 return userStoreWizard.waitAndClickOnSave();
             }).then(()=>{
                 return userStoreWizard.waitForSpinnerNotVisible();
-            }).pause(1000).then(() => {
+            }).pause(1500).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testStore.displayName);
             }).then(() => userBrowsePanel.isItemDisplayed(testStore.displayName)).then(result => {
                 assert.isTrue(result, 'new user store should be present in the grid');

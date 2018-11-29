@@ -271,7 +271,8 @@ const userBrowsePanel = Object.create(page, {
             }).then(() => {
                 return this.doClick(closeIcon);
             }).catch(err => {
-                throw new Error('itemTabButton was not found!' + displayName);
+                this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
+                throw new Error('itemTabButton was not found!' + displayName +"  "+ err);
             }).pause(300).then(() => {
                 return saveBeforeCloseDialog.isDialogPresent(1000);
             }).then(result => {
