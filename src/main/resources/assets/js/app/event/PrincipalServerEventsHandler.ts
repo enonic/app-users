@@ -125,6 +125,9 @@ export class PrincipalServerEventsHandler {
         case NodeServerChangeType.UPDATE:
             this.handleUserItemUpdated(principal, userStore);
             break;
+        case NodeServerChangeType.UPDATE_PERMISSIONS:
+            this.handleUserItemUpdated(principal, userStore);
+            break;
         }
     }
 
