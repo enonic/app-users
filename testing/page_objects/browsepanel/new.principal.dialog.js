@@ -32,7 +32,7 @@ const newPrincipalDialog = Object.create(page, {
     clickOnItem: {
         value: function (itemName) {
             let selector = `${dialog.itemViewer}` + `${elements.itemByDisplayName(itemName)}`;
-            return this.waitForVisible(selector, 2000).then(()=> {
+            return this.waitForVisible(selector, 4000).then(()=> {
                 return this.doClick(selector);
             })
         }

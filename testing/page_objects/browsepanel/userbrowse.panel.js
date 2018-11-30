@@ -243,7 +243,7 @@ const userBrowsePanel = Object.create(page, {
     clickCheckboxAndSelectRowByDisplayName: {
         value: function (displayName) {
             let displayNameXpath = panel.checkboxByDisplayName(displayName);
-            return this.waitForVisible(displayNameXpath, 2000).then(() => {
+            return this.waitForVisible(displayNameXpath, appConst.TIMEOUT_2).then(() => {
                 return this.doClick(displayNameXpath);
             }).catch(err => {
                 this.saveScreenshot('err_find_item');
@@ -266,13 +266,13 @@ const userBrowsePanel = Object.create(page, {
     doClickOnCloseTabAndWaitGrid: {
         value: function (displayName) {
             let closeIcon = `${panel.closeItemTabButton(displayName)}`;
-            return this.waitForVisible(closeIcon).then(()=>{
+            return this.waitForVisible(closeIcon).then(() => {
                 return this.waitForEnabled(closeIcon);
             }).then(() => {
                 return this.doClick(closeIcon);
             }).catch(err => {
                 this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
-                throw new Error('itemTabButton was not found!' + displayName +"  "+ err);
+                throw new Error('itemTabButton was not found!' + displayName + "  " + err);
             }).pause(300).then(() => {
                 return saveBeforeCloseDialog.isDialogPresent(1000);
             }).then(result => {
@@ -281,7 +281,6 @@ const userBrowsePanel = Object.create(page, {
                         console.log('save before close dialog must not be present');
                         throw new Error('`Save Before Close` dialog should not appear when try to close the ' + displayName);
                     });
-
                 }
             }).then(() => {
                 return this.waitForSpinnerNotVisible();
@@ -309,7 +308,7 @@ const userBrowsePanel = Object.create(page, {
                 return this.getAttribute(selector, 'class').then(result => {
                     return result.includes('any-selected');
                 })
-            }, 3000, 'expected style not present after 3s');
+            }, appConst.TIMEOUT_3, 'expected style not present after 3s');
         }
     },
     clickOnSelectionToggler: {
@@ -342,7 +341,7 @@ const userBrowsePanel = Object.create(page, {
     rightClickOnRowByDisplayName: {
         value: function (displayName) {
             const selector = panel.rowByDisplayName(displayName);
-            return this.waitForVisible(selector, 3000).then(() => {
+            return this.waitForVisible(selector, appConst.TIMEOUT_3).then(() => {
                 return this.doRightClick(selector);
             }).pause(400).catch(() => {
                 this.saveScreenshot(`err_find_${displayName}`);

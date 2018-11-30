@@ -27,7 +27,7 @@ module.exports = {
             return browsePanel.waitForRowByNameVisible(name);
         }).pause(400).then(() => {
             return browsePanel.clickOnRowByName(name);
-        });
+        }).pause(1000);
     },
     openFilterPanel: function () {
         return browsePanel.clickOnSearchButton().then(() => {
