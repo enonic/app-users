@@ -2,15 +2,10 @@ import '../../api.ts';
 import {UserItemTypesTreeGrid} from './UserItemTypesTreeGrid';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-
 import i18n = api.util.i18n;
-import LoadMask = api.ui.mask.LoadMask;
 import ResponsiveManager = api.ui.responsive.ResponsiveManager;
 
 export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
-
-    protected loadMask: LoadMask;
-
     private grid: UserItemTypesTreeGrid;
 
     private pathEl: api.dom.PEl;
@@ -26,32 +21,25 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
 
         this.initEventHandlers();
 
-        this.appendElementsToDialog();
-
         api.dom.Body.get().appendChild(this);
     }
 
     private initElements() {
-        this.initUserItemTypesTreeGrid();
-        this.initLoadMask();
-    }
-
-    private initUserItemTypesTreeGrid() {
         this.grid = new UserItemTypesTreeGrid();
-    }
-
-    private initLoadMask() {
-        this.loadMask = new LoadMask(this);
-    }
-
-    private appendElementsToDialog() {
-        this.getContentPanel().appendChild(this.grid);
-        this.getContentPanel().getParentElement().appendChild(this.loadMask);
     }
 
     private initEventHandlers() {
         this.grid.onDataChanged(() => ResponsiveManager.fireResizeEvent());
         NewPrincipalEvent.on(() => this.isVisible() && this.close());
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered) => {
+            this.addCancelButtonToBottom();
+            this.getContentPanel().appendChild(this.grid);
+
+            return rendered;
+        });
     }
 
     setSelection(selection: UserTreeGridItem[]): NewPrincipalDialog {
@@ -69,6 +57,7 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
         this.grid.reload(null, null, false);
         this.grid.getGrid().resizeCanvas();
         super.open();
+        this.getCancelButton().giveFocus();
     }
 
     close() {
