@@ -123,6 +123,7 @@ export class PrincipalServerEventsHandler {
             this.handleUserItemCreated(principal, userStore);
             break;
         case NodeServerChangeType.UPDATE:
+        case NodeServerChangeType.UPDATE_PERMISSIONS:
             this.handleUserItemUpdated(principal, userStore);
             break;
         }
