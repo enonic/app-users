@@ -2,12 +2,10 @@ import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincipalsByKeysRequest';
 import {RepositoryComboBox} from '../report/RepositoryComboBox';
-import {GeneratePermissionsReportRequest} from '../../api/graphql/report/GeneratePermissionsReportRequest';
-import {ReportProgressList} from '../report/ReportProgressList';
-import {Report} from '../report/Report';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
+import {Repository} from '../report/Repository';
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
 import ItemDataGroup = api.app.view.ItemDataGroup;
@@ -18,6 +16,7 @@ import PrincipalViewer = api.ui.security.PrincipalViewer;
 import i18n = api.util.i18n;
 import RoleKeys = api.security.RoleKeys;
 import DivEl = api.dom.DivEl;
+import Path = api.rest.Path;
 import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
 
 export class UserItemStatisticsPanel
@@ -26,6 +25,8 @@ export class UserItemStatisticsPanel
     private userDataContainer: api.dom.DivEl;
 
     private isAdminPromise: wemQ.Promise<boolean>;
+
+    private reportServicePath: string;
 
     constructor() {
         super('principal-item-statistics-panel');
@@ -175,8 +176,6 @@ export class UserItemStatisticsPanel
             }
         });
 
-        const reportsProgress = new ReportProgressList(principal.getKey());
-
         const genButton = new api.ui.button.Button(i18n('action.report.generate'));
         genButton
             .setEnabled(false)
@@ -184,36 +183,48 @@ export class UserItemStatisticsPanel
             .onClicked(() => {
                 const branches = reportsCombo.getSelectedBranches();
                 const repos = reportsCombo.getSelectedDisplayValues();
-                repos.forEach(repo => {
+                repos.forEach((repo: Repository, index: number) => {
                     reportsCombo.deselect(repo);
+                    this.downloadReport(principal, repo, branches[index]);
                 });
-
-                new GeneratePermissionsReportRequest()
-                    .setPrincipalKey(principal.getKey())
-                    .setRepositoryKeys(repos.map(repo => repo.getId()))
-                    .setBranches(branches)
-                    .sendAndParse()
-                    .then(reports => {
-                        reports.forEach((report: Report) => {
-                            if (!reportsProgress.getItem(report.getId())) { // might be already added by report event
-                                reportsProgress.addItem(report);
-                            }
-                        });
-                    });
             });
 
         const comboAndButton = new DivEl();
         comboAndButton.appendChildren<api.dom.Element>(reportsCombo, genButton);
 
         reportsGroup.addDataElements(i18n('field.repository.select'), [comboAndButton]);
-        const generatedReports = reportsGroup.addDataElements(i18n('field.report.generated'), [reportsProgress]);
-        generatedReports.setVisible(false);
-
-        const handleReportsChanged = () => generatedReports.setVisible(reportsProgress.getItemCount() > 0);
-        reportsProgress.onItemsRemoved(handleReportsChanged);
-        reportsProgress.onItemsAdded(handleReportsChanged);
 
         return reportsGroup;
+    }
+
+    private downloadReport(principal: Principal, repo: Repository, branch: string) {
+        const params: { [name: string]: any } = {
+            principalKey: principal.getKey().toString(),
+            repositoryId: repo.getId(),
+            branch: branch
+        };
+        const uri: string = api.util.UriHelper.appendUrlParams(this.getReportServicePath(), params);
+        const reportName: string = `perm-report-${repo.getName()}(${branch}).csv`;
+
+        this.clickFakeElementForReportDownload(uri, reportName);
+    }
+
+    private getReportServicePath(): string {
+        if (!this.reportServicePath) {
+            this.reportServicePath = Path.fromString(window['CONFIG'] && window['CONFIG']['reportServiceUrl']).toString();
+        }
+
+        return this.reportServicePath;
+    }
+
+    private clickFakeElementForReportDownload(uri: string, fileName: string) {
+        const element: HTMLElement = document.createElement('a');
+        element.setAttribute('href', uri);
+        element.setAttribute('download', fileName);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
     }
 
     private isRole(principal: api.security.Principal): boolean {

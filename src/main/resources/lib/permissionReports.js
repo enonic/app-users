@@ -1,107 +1,30 @@
-var taskLib = require('/lib/xp/task');
-var portalLib = require('/lib/xp/portal');
-var authLib = require('/lib/xp/auth');
-var initLib = require('/lib/init');
 var principals = require('./principals');
 var common = require('./common');
 
 var PERMISSIONS = ['READ', 'CREATE', 'MODIFY', 'DELETE', 'PUBLISH', 'READ_PERMISSIONS', 'WRITE_PERMISSIONS'];
-var PROGRESS_EVENT = 'reportProgress';
-var DOWNLOAD_EVENT = 'reportDownload';
 
-var list = function (principalKey, repositoryIds, start, count, sort) {
-    var queryResult = common.queryAll({
-        query: createRepoQuery(principalKey, repositoryIds),
-        start: start,
-        count: count,
-        sort: sort
-    }, initLib.REPO_NAME);
-    return queryResult.hits;
-};
+function generateReport(principalKey, repositoryId, branch) {
+    var principalKeys = getPrincipalKeys(principalKey);
+    var isSystemAdmin = hasSystemAdminRole(principalKeys);
+    var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
+    var nodes = queryRepositoryNodes(repositoryId, branch, filters);
 
-var deleteReports = function (ids) {
-    var result = common.delete(ids, initLib.REPO_NAME);
-    return result.length;
-};
+    var reportLine = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
+    var tempFile = Java.type('java.io.File').createTempFile("perm-report-", ".csv");
+    var Files = Java.type('com.google.common.io.Files');
+    var charset = Java.type('java.nio.charset.Charset').forName("UTF-8");
+    Files.append(reportLine, tempFile, charset);
 
-var get = function (ids) {
-    return common.getByIds(ids, initLib.REPO_NAME)
-};
-
-var generate = function (principalKey, repositoryIds, branches) {
-
-    var principal = authLib.getPrincipal(principalKey);
-
-    var reports = repositoryIds.map(function (repositoryId, index) {
-        var branch = branches[index];
-        var node = common.create({
-            _parentPath: '/reports/permissions',
-            principalKey: principalKey,
-            principalDisplayName: principal.displayName,
-            repositoryId: repositoryId,
-            reportBranch: branch
-        }, initLib.REPO_NAME);
-
-        var url = portalLib.serviceUrl({
-            service: 'permissionReport',
-            params: {
-                id: node._id
-            }
-        });
-
-        var taskId = generateReport(node, principalKey, repositoryId, branch);
-        return {
-            _id: node._id,
-            taskId: taskId,
-            principalKey: principalKey,
-            principalDisplayName: node.principalDisplayName,
-            repositoryId: repositoryId,
-            reportBranch: node.reportBranch,
-            url: url
-        }
+    nodes.forEach(function (node) {
+        reportLine = '\n' + (isSystemAdmin ? generateSystemAdminReportLine(node) : generateReportLine(node, principalKeys));
+        Files.append(reportLine, tempFile, charset);
     });
 
-    return reports;
-};
+    var bytes = Files.toByteArray(tempFile);
+    tempFile.delete();
 
-var generateReport = function (reportNode, principalKey, repositoryId, branch) {
-    return taskLib.submit({
-        description: 'Report task for repository [' + repositoryId + '] and principal [' + principalKey + ']',
-        task: function () {
-            var principalKeys = getPrincipalKeys(principalKey);
-            var isSystemAdmin = hasSystemAdminRole(principalKeys);
-            var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
-            var nodes = queryRepositoryNodes(repositoryId, branch, filters);
-
-            var nodeProcessCount = 0;
-            taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
-
-            var report = 'Path, Read, Create, Modify, Delete, Publish, ReadPerm., WritePerm.';
-
-            nodes.forEach(function (node) {
-                if (isSystemAdmin) {
-                    report += '\n' + generateSystemAdminReportLine(node);
-                } else {
-                    report += '\n' + generateReportLine(node, principalKeys);
-                }
-
-                nodeProcessCount++;
-                taskLib.progress({info: 'Generating permissions report', current: nodeProcessCount, total: nodes.length || 1});
-            });
-
-            common.update({
-                key: reportNode._id,
-                editor: function (node) {
-                    node.report = report;
-                    node.finished = new Date();
-                    return node;
-                }
-            }, initLib.REPO_NAME);
-
-            taskLib.progress({info: 'Generating permissions report', current: nodes.length || 1, total: nodes.length || 1});
-        }
-    });
-};
+    return bytes;
+}
 
 function getPrincipalKeys(principalKey) {
     var principalKeys = [principalKey];
@@ -189,21 +112,5 @@ var generateSystemAdminReportLine = function (node) {
 };
 
 module.exports = {
-    get: get,
-    list: list,
-    delete: deleteReports,
-    generate: generate,
-    PROGRESS_EVENT: PROGRESS_EVENT,
-    DOWNLOAD_EVENT: DOWNLOAD_EVENT
+    generateReport: generateReport
 };
-
-function createRepoQuery(principalKey, repositoryIds) {
-    var q = '_parentPath="/reports/permissions"';
-    if (!!principalKey) {
-        q += ' AND principalKey="' + principalKey + '"';
-    }
-    if (!!repositoryIds) {
-        q += ' AND repositoryId IN ["' + repositoryIds.join('","') + '"]';
-    }
-    return q;
-}
