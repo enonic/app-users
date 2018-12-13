@@ -5,7 +5,6 @@ var userstores = require('/lib/userstores');
 var principals = require('/lib/principals');
 var useritems = require('/lib/useritems');
 var repositories = require('/lib/repositories');
-var permissionReports = require('/lib/permissionReports');
 
 var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
@@ -147,40 +146,6 @@ module.exports = graphQl.createObjectType({
                 var count = env.args.count;
                 var sort = env.args.sort;
                 return repositories.list(query, start, count, sort);
-            }
-        },
-        permissionReports: {
-            type: graphQl.list(graphQlObjectTypes.PermissionReportType),
-            args: {
-                principalKey: graphQl.GraphQLString,
-                repositoryIds: graphQl.list(graphQl.GraphQLString),
-                start: graphQl.GraphQLInt,
-                count: graphQl.GraphQLInt,
-                sort: graphQlEnums.SortModeEnum
-            },
-            resolve: function (env) {
-                if (!authLib.isAdmin()) {
-                    throw new Error('You don\'t have permission to access this resource');
-                }
-                var principalKey = env.args.principalKey;
-                var repositoryIds = env.args.repositoryIds;
-                var start = env.args.start;
-                var count = env.args.count;
-                var sort = env.args.sort;
-                return permissionReports.list(principalKey, repositoryIds, start, count, sort);
-            }
-        },
-        permissionReport: {
-            type: graphQlObjectTypes.PermissionReportType,
-            args: {
-                id: graphQl.GraphQLString,
-            },
-            resolve: function (env) {
-                if (!authLib.isAdmin()) {
-                    throw new Error('You don\'t have permission to access this resource');
-                }
-                var id = env.args.id;
-                return permissionReports.get(id);
             }
         }
     }
