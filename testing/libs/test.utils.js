@@ -229,8 +229,10 @@ module.exports = {
     openWizardAndSaveUserStore: function (userStoreData) {
         return this.clickOnNewOpenUserStoreWizard().then(() => {
             return userStoreWizard.typeData(userStoreData)
-        }).pause(400).then(() => {
-            return userStoreWizard.waitAndClickOnSave()
+        }).pause(500).then(() => {
+            return userStoreWizard.waitAndClickOnSave();
+        }).then(()=>{
+            return userStoreWizard.waitForSpinnerVisible()
         }).then(() => {
             return userStoreWizard.waitForSpinnerNotVisible()
         }).pause(1200);

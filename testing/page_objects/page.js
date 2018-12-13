@@ -47,7 +47,12 @@ Page.prototype.waitForSpinnerNotVisible = function () {
         throw Error('spinner is still visible after a the interval ' + ` ` + appConst.TIMEOUT_3);
     })
 };
-
+Page.prototype.waitForSpinnerVisible = function () {
+    return this.getBrowser().waitForVisible(`//div[@class='spinner']`, appConst.TIMEOUT_3).catch(err => {
+        console.log('spinner should be visible in 3 sec');
+        throw Error('spinner should visible in 3 sec ' + ` ` + appConst.TIMEOUT_3);
+    })
+};
 Page.prototype.isSpinnerVisible = function () {
     return this.getBrowser().isVisible(`//div[@class='spinner']`);
 };

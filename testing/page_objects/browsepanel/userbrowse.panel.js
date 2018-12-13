@@ -267,7 +267,7 @@ const userBrowsePanel = Object.create(page, {
         value: function (displayName) {
             let closeIcon = `${panel.closeItemTabButton(displayName)}`;
             return this.waitForVisible(closeIcon).then(() => {
-                return this.waitForEnabled(closeIcon);
+                return this.waitForEnabled(closeIcon, appConst.TIMEOUT_4);
             }).then(() => {
                 return this.doClick(closeIcon);
             }).catch(err => {
