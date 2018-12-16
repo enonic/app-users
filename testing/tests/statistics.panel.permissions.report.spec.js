@@ -39,7 +39,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             });
         });
 
-    it('GIVEN `Super User` is selected WHEN `Generate Report` button has been pressed THEN new report should be created',
+    it.skip('GIVEN `Super User` is selected WHEN `Generate Report` button has been pressed THEN new report should be created',
         () => {
             return testUtils.findAndSelectItem('su').then(() => {
                 return userStatisticsPanel.selectRepository('cms-repo');
@@ -67,7 +67,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             })
         });
 
-    it('GIVEN existing report for `Super User` WHEN  `Delete` link has been pressed THEN the report should not be displayed',
+    it.skip('GIVEN existing report for `Super User` WHEN  `Delete` link has been pressed THEN the report should not be displayed',
         () => {
             return testUtils.findAndSelectItem('su').then(() => {
                 return userStatisticsPanel.clickOnDeleteReportLink(REPO_TITLE_MASTER);
@@ -79,7 +79,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             })
         });
 
-    it('GIVEN `Super User` is selected WHEN `draft` option has been selected AND`Generate Report` button pressed THEN new report should be created',
+    it.skip('GIVEN `Super User` is selected WHEN `draft` option has been selected AND`Generate Report` button pressed THEN new report should be created',
         () => {
             return testUtils.findAndSelectItem('su').then(() => {
                 return userStatisticsPanel.selectRepository('cms-repo');
