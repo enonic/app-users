@@ -12,7 +12,7 @@ export class ListUserStoresRequest
                 key,
                 displayName,
                 description,
-                authConfig {
+                idProviderConfig {
                     applicationKey
                     config
                 }
@@ -35,9 +35,9 @@ export class ListUserStoresRequest
     }
 
     userStorefromJson(userstore: UserStoreJson) {
-        if (userstore.authConfig && typeof userstore.authConfig.config === 'string') {
+        if (userstore.idProviderConfig && typeof userstore.idProviderConfig.config === 'string') {
             // config is passed as string
-            userstore.authConfig.config = JSON.parse(<string>userstore.authConfig.config);
+            userstore.idProviderConfig.config = JSON.parse(<string>userstore.idProviderConfig.config);
         }
         return UserStore.fromJson(userstore);
     }

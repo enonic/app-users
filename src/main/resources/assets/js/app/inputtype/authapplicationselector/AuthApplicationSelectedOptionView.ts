@@ -63,7 +63,7 @@ export class AuthApplicationSelectedOptionView
         header.appendChild(namesAndIconView);
 
         this.appendChild(header);
-        if (this.application.getAuthForm().getFormItems().length === 0) {
+        if (this.application.getIdProviderForm().getFormItems().length === 0) {
             this.setEditable(false);
         }
 
@@ -93,7 +93,7 @@ export class AuthApplicationSelectedOptionView
 
     initAndOpenConfigureDialog(comboBoxToUndoSelectionOnCancel?: AuthApplicationComboBox) {
 
-        if (this.application.getAuthForm().getFormItems().length === 0) {
+        if (this.application.getIdProviderForm().getFormItems().length === 0) {
             return;
         }
 
@@ -156,7 +156,7 @@ export class AuthApplicationSelectedOptionView
     }
 
     private createFormView(applicationConfig: ApplicationConfig): FormView {
-        let formView = new FormView(this.formContext, this.application.getAuthForm(), applicationConfig.getConfig());
+        let formView = new FormView(this.formContext, this.application.getIdProviderForm(), applicationConfig.getConfig());
         formView.addClass('site-form');
 
         formView.onLayoutFinished(() => {

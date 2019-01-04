@@ -1,5 +1,5 @@
 import UserItem = api.security.UserItem;
-import AuthConfig = api.security.AuthConfig;
+import IdProviderConfig = api.security.IdProviderConfig;
 import IdProviderMode = api.security.IdProviderMode;
 import PrincipalType = api.security.PrincipalType;
 import UserItemBuilder = api.security.UserItemBuilder;
@@ -11,7 +11,7 @@ import {UserStoreJson} from './UserStoreJson';
 export class UserStore
     extends UserItem {
 
-    private authConfig: AuthConfig;
+    private idProviderConfig: IdProviderConfig;
 
     private idProviderMode: IdProviderMode;
 
@@ -19,13 +19,13 @@ export class UserStore
 
     constructor(builder: UserStoreBuilder) {
         super(builder);
-        this.authConfig = builder.authConfig;
+        this.idProviderConfig = builder.idProviderConfig;
         this.idProviderMode = builder.idProviderMode;
         this.permissions = builder.permissions || new UserStoreAccessControlList();
     }
 
-    getAuthConfig(): AuthConfig {
-        return this.authConfig;
+    getIdProviderConfig(): IdProviderConfig {
+        return this.idProviderConfig;
     }
 
     getIdProviderMode(): IdProviderMode {
@@ -60,7 +60,8 @@ export class UserStore
         let other = <UserStore> o;
 
         return super.equals(other) &&
-               ((!this.authConfig && !other.authConfig) || (this.authConfig && this.authConfig.equals(other.authConfig))) &&
+               ((!this.idProviderConfig && !other.idProviderConfig) ||
+                (this.idProviderConfig && this.idProviderConfig.equals(other.idProviderConfig))) &&
                this.permissions.equals(other.permissions);
     }
 
@@ -84,7 +85,7 @@ export class UserStore
 export class UserStoreBuilder
     extends UserItemBuilder {
 
-    authConfig: AuthConfig;
+    idProviderConfig: IdProviderConfig;
 
     idProviderMode: IdProviderMode;
 
@@ -94,7 +95,7 @@ export class UserStoreBuilder
         if (source) {
             super(source);
             this.idProviderMode = source.getIdProviderMode();
-            this.authConfig = !!source.getAuthConfig() ? source.getAuthConfig().clone() : null;
+            this.idProviderConfig = !!source.getIdProviderConfig() ? source.getIdProviderConfig().clone() : null;
             this.permissions = !!source.getPermissions() ? source.getPermissions().clone() : null;
         }
     }
@@ -102,7 +103,7 @@ export class UserStoreBuilder
     fromJson(json: UserStoreJson): UserStoreBuilder {
         super.fromJson(json);
         this.key = new UserStoreKey(json.key);
-        this.authConfig = json.authConfig ? AuthConfig.fromJson(json.authConfig) : null;
+        this.idProviderConfig = json.idProviderConfig ? IdProviderConfig.fromJson(json.idProviderConfig) : null;
         this.idProviderMode = json.idProviderMode ? IdProviderMode[json.idProviderMode] : null;
         this.permissions = json.permissions ? UserStoreAccessControlList.fromJson(json.permissions) : null;
         return this;
@@ -113,8 +114,8 @@ export class UserStoreBuilder
         return this;
     }
 
-    setAuthConfig(authConfig: AuthConfig): UserStoreBuilder {
-        this.authConfig = authConfig;
+    setIdProviderConfig(idProviderConfig: IdProviderConfig): UserStoreBuilder {
+        this.idProviderConfig = idProviderConfig;
         return this;
     }
 

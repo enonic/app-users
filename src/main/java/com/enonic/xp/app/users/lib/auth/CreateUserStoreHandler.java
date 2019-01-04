@@ -1,8 +1,8 @@
 package com.enonic.xp.app.users.lib.auth;
 
 import com.enonic.xp.script.ScriptValue;
-import com.enonic.xp.security.AuthConfig;
 import com.enonic.xp.security.CreateUserStoreParams;
+import com.enonic.xp.security.IdProviderConfig;
 import com.enonic.xp.security.UserStore;
 import com.enonic.xp.security.UserStoreKey;
 import com.enonic.xp.security.acl.UserStoreAccessControlList;
@@ -16,7 +16,7 @@ public final class CreateUserStoreHandler
 
     private String description;
 
-    private AuthConfig authConfig;
+    private IdProviderConfig idProviderConfig;
 
     private UserStoreAccessControlList permissions;
 
@@ -35,9 +35,9 @@ public final class CreateUserStoreHandler
         this.description = description;
     }
 
-    public void setAuthConfig( final ScriptValue authConfig )
+    public void setIdProviderConfig( final ScriptValue idProviderConfig )
     {
-        this.authConfig = authConfig == null ? null : ScriptValueToAuthConfigTranslator.translate( authConfig );
+        this.idProviderConfig = idProviderConfig == null ? null : ScriptValueToIdProviderConfigTranslator.translate( idProviderConfig );
     }
 
     public void setPermissions( final ScriptValue permissions )
@@ -54,7 +54,7 @@ public final class CreateUserStoreHandler
             key( UserStoreKey.from( name ) ).
             displayName( displayName ).
             description( description ).
-            authConfig( authConfig ).
+            idProviderConfig( idProviderConfig ).
             permissions( permissions ).
             build();
         final UserStore userStore = securityService.get().createUserStore( params );

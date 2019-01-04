@@ -12,7 +12,7 @@ export class GetDefaultUserStoreRequest
                 displayName
                 description
                 idProviderMode
-                authConfig {
+                idProviderConfig {
                     applicationKey
                     config
                 }
@@ -35,9 +35,9 @@ export class GetDefaultUserStoreRequest
         if (!us || Object.keys(us).length === 0) {
             return null;
         }
-        if (us.authConfig && typeof us.authConfig.config === 'string') {
+        if (us.idProviderConfig && typeof us.idProviderConfig.config === 'string') {
             // config is passed as string
-            us.authConfig.config = JSON.parse(<string>us.authConfig.config);
+            us.idProviderConfig.config = JSON.parse(<string>us.idProviderConfig.config);
         }
         return UserStore.fromJson(us);
     }

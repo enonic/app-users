@@ -6,7 +6,7 @@ exports.modifyUserStore = function () {
         key: 'myUserStore',
         displayName: 'User store test',
         description: 'User store used for testing',
-        authConfig: {
+        idProviderConfig: {
             applicationKey: 'com.enonic.app.test',
             config: [
                 {
@@ -80,7 +80,7 @@ exports.modifyUserStore = function () {
             var newUserStore = userStore;
             newUserStore.displayName = 'User store test';
             newUserStore.description = 'User store used for testing';
-            newUserStore.authConfig = {
+            newUserStore.idProviderConfig = {
                 applicationKey: 'com.enonic.app.test',
                 config: [
                     {
@@ -177,7 +177,7 @@ exports.modifyUserStoreWithNullValues = function () {
         key: 'myUserStore',
         editor: function (userStore) {
             userStore.description = null;
-            userStore.authConfig = null;
+            userStore.idProviderConfig = null;
             return userStore;
         }
     });

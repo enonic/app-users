@@ -29,8 +29,8 @@ exports.UserStoreAccessControlInput = graphQl.createInputObjectType({
     }
 });
 
-exports.AuthConfigInput = graphQl.createInputObjectType({
-    name: 'AuthConfigInput',
+exports.IdProviderConfigInput = graphQl.createInputObjectType({
+    name: 'IdProviderConfigInput',
     description: 'Input definition for user store auth config',
     fields: {
         applicationKey: {

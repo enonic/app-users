@@ -7,19 +7,19 @@ import com.enonic.xp.data.PropertyTree;
 import com.enonic.xp.data.ValueTypes;
 import com.enonic.xp.script.serializer.MapGenerator;
 import com.enonic.xp.script.serializer.MapSerializable;
-import com.enonic.xp.security.AuthConfig;
+import com.enonic.xp.security.IdProviderConfig;
 
-public final class AuthConfigMapper
+public final class IdProviderConfigMapper
     implements MapSerializable
 {
-    private final AuthConfig value;
+    private final IdProviderConfig value;
 
-    public AuthConfigMapper( final AuthConfig value )
+    public IdProviderConfigMapper( final IdProviderConfig value )
     {
         this.value = value;
     }
 
-    private void serialize( final MapGenerator gen, final AuthConfig value )
+    private void serialize( final MapGenerator gen, final IdProviderConfig value )
     {
         gen.value( "applicationKey", value.getApplicationKey().getName() );
         serializeConfig( gen, value.getConfig() );

@@ -72,6 +72,8 @@ public final class ModifyUserStoreHandler
     {
         target.displayName = value.getMember( "displayName" ).getValue().toString();
         target.description = value.getMember( "description" ) == null ? null : value.getMember( "description" ).getValue().toString();
-        target.authConfig = value.getMember( "authConfig" ) == null ? null : ScriptValueToAuthConfigTranslator.translate( value.getMember( "authConfig" ) );
+        target.idProviderConfig = value.getMember( "idProviderConfig" ) == null
+            ? null
+            : ScriptValueToIdProviderConfigTranslator.translate( value.getMember( "idProviderConfig" ) );
     }
 }

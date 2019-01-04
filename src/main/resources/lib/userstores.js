@@ -18,7 +18,7 @@ module.exports = {
             name: common.prettifyName(name),
             displayName: params.displayName,
             description: params.description,
-            authConfig: params.authConfig,
+            idProviderConfig: params.idProviderConfig,
             permissions: params.permissions || []
         });
     },
@@ -31,7 +31,7 @@ module.exports = {
                 var newUserStore = userStore;
                 newUserStore.displayName = params.displayName;
                 newUserStore.description = params.description;
-                newUserStore.authConfig = params.authConfig;
+                newUserStore.idProviderConfig = params.idProviderConfig;
                 return newUserStore;
             },
             permissions: params.permissions || []

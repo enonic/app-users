@@ -146,9 +146,19 @@ export class UserStoreWizardPanel
         });
     }
 
+    isNewChanged(): boolean {
+        const wizardHeader = this.getWizardHeader();
+        const idProviderConfig = this.userStoreWizardStepForm.getIdProviderConfig();
+        return wizardHeader.getName() !== '' ||
+               wizardHeader.getDisplayName() !== '' ||
+               !api.ObjectHelper.stringEquals(this.userStoreWizardStepForm.getDescription(), this.defaultUserStore.getDescription()) ||
+               !(!idProviderConfig || idProviderConfig.equals(this.defaultUserStore.getIdProviderConfig())) ||
+               !this.permissionsWizardStepForm.getPermissions().equals(this.defaultUserStore.getPermissions());
+    }
+
     private assembleViewedUserStore(): UserStore {
-        return <UserStore>new UserStoreBuilder().setAuthConfig(
-            this.userStoreWizardStepForm.getAuthConfig()).setPermissions(this.permissionsWizardStepForm.getPermissions()).setKey(
+        return <UserStore>new UserStoreBuilder().setIdProviderConfig(
+            this.userStoreWizardStepForm.getIdProviderConfig()).setPermissions(this.permissionsWizardStepForm.getPermissions()).setKey(
             this.getPersistedItem().getKey().toString()).setDisplayName(this.getWizardHeader().getDisplayName()).setDescription(
             this.userStoreWizardStepForm.getDescription()).build();
     }
@@ -159,29 +169,14 @@ export class UserStoreWizardPanel
         let key = new UserStoreKey(wizardHeader.getName());
         let name = wizardHeader.getDisplayName();
         let description = this.userStoreWizardStepForm.getDescription();
-        let authConfig = this.userStoreWizardStepForm.getAuthConfig();
+        let idProviderConfig = this.userStoreWizardStepForm.getIdProviderConfig();
         let permissions = this.permissionsWizardStepForm.getPermissions();
 
         return new CreateUserStoreRequest()
             .setDisplayName(name)
             .setKey(key)
             .setDescription(description)
-            .setAuthConfig(authConfig)
-            .setPermissions(permissions);
-    }
-
-    private produceUpdateUserStoreRequest(viewedUserStore: UserStore): UpdateUserStoreRequest {
-        let key = this.getPersistedItem().getKey();
-        let name = viewedUserStore.getDisplayName();
-        let description = viewedUserStore.getDescription();
-        let authConfig = viewedUserStore.getAuthConfig();
-        let permissions = viewedUserStore.getPermissions();
-
-        return new UpdateUserStoreRequest()
-            .setKey(key)
-            .setDisplayName(name)
-            .setDescription(description)
-            .setAuthConfig(authConfig)
+            .setIdProviderConfig(idProviderConfig)
             .setPermissions(permissions);
     }
 
@@ -243,14 +238,19 @@ export class UserStoreWizardPanel
         return viewedPrincipal.equals(this.getPersistedItem());
     }
 
-    isNewChanged(): boolean {
-        const wizardHeader = this.getWizardHeader();
-        const authConfig = this.userStoreWizardStepForm.getAuthConfig();
-        return wizardHeader.getName() !== '' ||
-               wizardHeader.getDisplayName() !== '' ||
-               !api.ObjectHelper.stringEquals(this.userStoreWizardStepForm.getDescription(), this.defaultUserStore.getDescription()) ||
-               !(!authConfig || authConfig.equals(this.defaultUserStore.getAuthConfig())) ||
-               !this.permissionsWizardStepForm.getPermissions().equals(this.defaultUserStore.getPermissions());
+    private produceUpdateUserStoreRequest(viewedUserStore: UserStore): UpdateUserStoreRequest {
+        let key = this.getPersistedItem().getKey();
+        let name = viewedUserStore.getDisplayName();
+        let description = viewedUserStore.getDescription();
+        let idProviderConfig = viewedUserStore.getIdProviderConfig();
+        let permissions = viewedUserStore.getPermissions();
+
+        return new UpdateUserStoreRequest()
+            .setKey(key)
+            .setDisplayName(name)
+            .setDescription(description)
+            .setIdProviderConfig(idProviderConfig)
+            .setPermissions(permissions);
     }
 
     saveChanges(): wemQ.Promise<UserStore> {

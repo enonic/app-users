@@ -1,5 +1,5 @@
 import i18n = api.util.i18n;
-import AuthConfig = api.security.AuthConfig;
+import IdProviderConfig = api.security.IdProviderConfig;
 import {SecurityFormContext} from './SecurityFormContext';
 import {UserStore} from '../principal/UserStore';
 
@@ -38,6 +38,21 @@ export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
         });
     }
 
+    getIdProviderConfig(): IdProviderConfig {
+        let idProviderConfigPropertySet = this.propertySet.getPropertySet('idProviderConfig');
+        if (idProviderConfigPropertySet) {
+            let applicationKey = api.application.ApplicationKey.fromString(idProviderConfigPropertySet.getString('applicationKey'));
+            let config = new api.data.PropertyTree(idProviderConfigPropertySet.getPropertySet('config'));
+            return IdProviderConfig.create().setApplicationKey(applicationKey).setConfig(config).build();
+        }
+
+        return null;
+    }
+
+    public validate(silent?: boolean): api.form.ValidationRecording {
+        return this.formView.validate(silent);
+    }
+
     private createFormView(userStore?: UserStore): api.form.FormView {
         let isSystemUserStore = (!!userStore && userStore.getKey().isSystem()).toString();
         let formBuilder = new api.form.FormBuilder().
@@ -49,8 +64,7 @@ export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
                 setInputTypeConfig({}).
                 setMaximizeUIInputWidth(true).
                 build()).
-            addFormItem(new api.form.InputBuilder().
-                setName('authConfig').
+            addFormItem(new api.form.InputBuilder().setName('idProviderConfig').
                 setInputType(new api.form.InputTypeName('AuthApplicationSelector', false)).
                 setLabel(i18n('field.idProvider')).
                 setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build()).
@@ -61,35 +75,17 @@ export class UserStoreWizardStepForm extends api.app.wizard.WizardStepForm {
         this.propertySet = new api.data.PropertyTree().getRoot();
         if (userStore) {
             this.propertySet.addString('description', userStore.getDescription());
-            let authConfig = userStore.getAuthConfig();
-            if (authConfig) {
-                let authConfigPropertySet = new api.data.PropertySet();
-                authConfigPropertySet.addString('applicationKey', authConfig.getApplicationKey().toString());
-                authConfigPropertySet.addPropertySet('config', authConfig.getConfig().getRoot());
-                this.propertySet.addPropertySet('authConfig', authConfigPropertySet);
+            let idProviderConfig = userStore.getIdProviderConfig();
+            if (idProviderConfig) {
+                let idProviderConfigPropertySet = new api.data.PropertySet();
+                idProviderConfigPropertySet.addString('applicationKey', idProviderConfig.getApplicationKey().toString());
+                idProviderConfigPropertySet.addPropertySet('config', idProviderConfig.getConfig().getRoot());
+                this.propertySet.addPropertySet('idProviderConfig', idProviderConfigPropertySet);
             }
         }
 
         const context = SecurityFormContext.create().setUserStore(userStore).build();
         return new api.form.FormView(context, formBuilder.build(), this.propertySet);
-    }
-
-    public validate(silent?: boolean): api.form.ValidationRecording {
-        return this.formView.validate(silent);
-    }
-
-    getAuthConfig(): AuthConfig {
-        let authConfigPropertySet = this.propertySet.getPropertySet('authConfig');
-        if (authConfigPropertySet) {
-            let applicationKey = api.application.ApplicationKey.fromString(authConfigPropertySet.getString('applicationKey'));
-            let config = new api.data.PropertyTree(authConfigPropertySet.getPropertySet('config'));
-            return AuthConfig.create().
-                setApplicationKey(applicationKey).
-                setConfig(config).
-                build();
-        }
-
-        return null;
     }
 
     getDescription(): string {

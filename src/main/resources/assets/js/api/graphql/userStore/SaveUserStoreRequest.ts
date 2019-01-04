@@ -3,7 +3,7 @@ import {UserStore} from '../../../app/principal/UserStore';
 import {UserStoreAccessControlList} from '../../../app/access/UserStoreAccessControlList';
 import {UserStoreAccess} from '../../../app/access/UserStoreAccess';
 import {UserStoreJson} from '../../../app/principal/UserStoreJson';
-import AuthConfig = api.security.AuthConfig;
+import IdProviderConfig = api.security.IdProviderConfig;
 import UserStoreKey = api.security.UserStoreKey;
 
 export type SaveMutation = 'updateUserStore' | 'createUserStore';
@@ -14,7 +14,7 @@ export class SaveUserStoreRequest
     private userStoreKey: UserStoreKey;
     private displayName: string;
     private description: string;
-    private authConfig: AuthConfig;
+    private idProviderConfig: IdProviderConfig;
     private permissions: UserStoreAccessControlList;
 
     private mutationType: SaveMutation;
@@ -25,9 +25,9 @@ export class SaveUserStoreRequest
     }
 
     getVariables(): Object {
-        const authConfig = this.authConfig ? {
-            applicationKey: this.authConfig.getApplicationKey().toString(),
-            config: this.authConfig.getConfig() ? JSON.stringify(this.authConfig.getConfig().toJson()) : null
+        const idProviderConfig = this.idProviderConfig ? {
+            applicationKey: this.idProviderConfig.getApplicationKey().toString(),
+            config: this.idProviderConfig.getConfig() ? JSON.stringify(this.idProviderConfig.getConfig().toJson()) : null
         } : null;
 
         const createAccess = p => ({principal: p.getPrincipal().getKey().toString(), access: UserStoreAccess[p.getAccess()]});
@@ -37,7 +37,7 @@ export class SaveUserStoreRequest
         vars['key'] = this.userStoreKey.toString();
         vars['displayName'] = this.displayName;
         vars['description'] = this.description;
-        vars['authConfig'] = authConfig;
+        vars['idProviderConfig'] = idProviderConfig;
         vars['permissions'] = permissions;
 
         return vars;
@@ -45,12 +45,12 @@ export class SaveUserStoreRequest
 
     // tslint:disable max-line-length
     getMutation(): string {
-        return `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
-            ${this.mutationType}(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
+        return `mutation ($key: String!, $displayName: String!, $description: String, $idProviderConfig: IdProviderConfigInput, $permissions: [UserStoreAccessControlInput]) {
+            ${this.mutationType}(key: $key, displayName: $displayName, description: $description, idProviderConfig: $idProviderConfig, permissions: $permissions) {
                 key
                 displayName
                 description
-                authConfig {
+                idProviderConfig {
                     applicationKey
                     config
                 }
@@ -83,8 +83,8 @@ export class SaveUserStoreRequest
         return this;
     }
 
-    setAuthConfig(authConfig: AuthConfig): SaveUserStoreRequest {
-        this.authConfig = authConfig;
+    setIdProviderConfig(idProviderConfig: IdProviderConfig): SaveUserStoreRequest {
+        this.idProviderConfig = idProviderConfig;
         return this;
     }
 
@@ -104,8 +104,8 @@ export class SaveUserStoreRequest
             throw new Error(`UserStore [${this.userStoreKey.toString()}] not found`);
         }
 
-        if (us.authConfig && typeof us.authConfig.config === 'string') {
-            us.authConfig.config = JSON.parse(<string>us.authConfig.config);
+        if (us.idProviderConfig && typeof us.idProviderConfig.config === 'string') {
+            us.idProviderConfig.config = JSON.parse(<string>us.idProviderConfig.config);
         }
         return UserStore.fromJson(us);
     }

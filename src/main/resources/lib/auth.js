@@ -89,7 +89,7 @@ exports.defaultPermissions = function () {
  * @param {string} name User store name.
  * @param {string} [params.displayName] User store display name.
  * @param {string} [params.description] User store  description.
- * @param {object} [params.authConfig] ID Provider configuration.
+ * @param {object} [params.idProviderConfig] ID Provider configuration.
  * @param {object} [params.permissions] User store permissions.
  */
 exports.createUserStore = function (params) {
@@ -98,7 +98,7 @@ exports.createUserStore = function (params) {
     bean.name = required(params, 'name');
     bean.displayName = nullOrValue(params.displayName);
     bean.description = nullOrValue(params.description);
-    bean.authConfig = __.toScriptValue(params.authConfig);
+    bean.idProviderConfig = __.toScriptValue(params.idProviderConfig);
     bean.permissions = __.toScriptValue(params.permissions);
 
     return __.toNativeObject(bean.createUserStore());

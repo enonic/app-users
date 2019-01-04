@@ -2,7 +2,7 @@ package com.enonic.xp.app.users.lib.auth;
 
 import com.enonic.xp.script.serializer.MapGenerator;
 import com.enonic.xp.script.serializer.MapSerializable;
-import com.enonic.xp.security.AuthConfig;
+import com.enonic.xp.security.IdProviderConfig;
 import com.enonic.xp.security.UserStore;
 
 public final class UserStoreMapper
@@ -20,15 +20,15 @@ public final class UserStoreMapper
         gen.value( "key", value.getKey() );
         gen.value( "displayName", value.getDisplayName() );
         gen.value( "description", value.getDescription() );
-        serializeAuthConfig( gen, value.getAuthConfig() );
+        serializeIdProviderConfig( gen, value.getIdProviderConfig() );
     }
 
-    private void serializeAuthConfig( final MapGenerator gen, final AuthConfig value )
+    private void serializeIdProviderConfig( final MapGenerator gen, final IdProviderConfig value )
     {
         if ( value != null )
         {
-            gen.map( "authConfig" );
-            new AuthConfigMapper( value ).serialize( gen );
+            gen.map( "idProviderConfig" );
+            new IdProviderConfigMapper( value ).serialize( gen );
             gen.end();
         }
     }

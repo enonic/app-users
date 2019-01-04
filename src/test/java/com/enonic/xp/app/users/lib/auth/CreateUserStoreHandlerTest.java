@@ -46,9 +46,9 @@ public class CreateUserStoreHandlerTest
         assertNotNull( params );
         assertEquals( "User store test", params.getDisplayName() );
         assertEquals( "User store used for testing", params.getDescription() );
-        assertEquals( "com.enonic.app.test", params.getAuthConfig().getApplicationKey().toString() );
-        assertEquals( "App Title", params.getAuthConfig().getConfig().getString( "title" ) );
-        assertEquals( "noreply@example.com", params.getAuthConfig().getConfig().getSet( "forgotPassword" ).getString( "email" ) );
+        assertEquals( "com.enonic.app.test", params.getIdProviderConfig().getApplicationKey().toString() );
+        assertEquals( "App Title", params.getIdProviderConfig().getConfig().getString( "title" ) );
+        assertEquals( "noreply@example.com", params.getIdProviderConfig().getConfig().getSet( "forgotPassword" ).getString( "email" ) );
         final UserStoreAccessControlEntry entry =
             params.getUserStorePermissions().getEntry( PrincipalKey.from( "group:myUserStore:group" ) );
         assertNotNull( entry );

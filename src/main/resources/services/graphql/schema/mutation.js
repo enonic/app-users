@@ -166,23 +166,23 @@ module.exports = graphQl.createObjectType({
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: graphQlInputTypes.AuthConfigInput,
+                idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
                 permissions: graphQl.list(
                     graphQlInputTypes.UserStoreAccessControlInput
                 )
             },
             resolve: function(env) {
-                var authConfig = env.args.authConfig;
-                if (authConfig) {
+                var idProviderConfig = env.args.idProviderConfig;
+                if (idProviderConfig) {
                     // parse config as there's no graphql type for it
-                    authConfig.config = JSON.parse(authConfig.config);
+                    idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
                 return userstores.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
-                    authConfig: authConfig,
+                    idProviderConfig: idProviderConfig,
                     permissions: env.args.permissions
                 });
             }
@@ -193,23 +193,23 @@ module.exports = graphQl.createObjectType({
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: graphQlInputTypes.AuthConfigInput,
+                idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
                 permissions: graphQl.list(
                     graphQlInputTypes.UserStoreAccessControlInput
                 )
             },
             resolve: function(env) {
-                var authConfig = env.args.authConfig;
-                if (authConfig) {
+                var idProviderConfig = env.args.idProviderConfig;
+                if (idProviderConfig) {
                     // parse config as there's no graphql type for it
-                    authConfig.config = JSON.parse(authConfig.config);
+                    idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
                 return userstores.update({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
-                    authConfig: authConfig,
+                    idProviderConfig: idProviderConfig,
                     permissions: env.args.permissions
                 });
             }

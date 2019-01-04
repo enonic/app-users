@@ -10,16 +10,16 @@ import com.enonic.xp.data.ValueFactory;
 import com.enonic.xp.data.ValueType;
 import com.enonic.xp.data.ValueTypes;
 import com.enonic.xp.script.ScriptValue;
-import com.enonic.xp.security.AuthConfig;
+import com.enonic.xp.security.IdProviderConfig;
 
-public final class ScriptValueToAuthConfigTranslator
+public final class ScriptValueToIdProviderConfigTranslator
 {
-    public static AuthConfig translate( final ScriptValue value )
+    public static IdProviderConfig translate( final ScriptValue value )
     {
         final ApplicationKey key =
             value.hasMember( "applicationKey" ) ? ApplicationKey.from( value.getMember( "applicationKey" ).getValue().toString() ) : null;
         final PropertyTree config = value.hasMember( "config" ) ? mapConfig( value.getMember( "config" ).getArray() ) : null;
-        return AuthConfig.create().
+        return IdProviderConfig.create().
             applicationKey( key ).
             config( config ).
             build();

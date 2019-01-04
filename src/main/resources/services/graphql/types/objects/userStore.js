@@ -19,8 +19,8 @@ var UserStoreAccessControlEntryType = graphQl.createObjectType({
     }
 });
 
-exports.AuthConfig = graphQl.createObjectType({
-    name: 'AuthConfig',
+exports.IdProviderConfig = graphQl.createObjectType({
+    name: 'IdProviderConfig',
     description: 'Domain representation of auth config for user store',
     fields: {
         applicationKey: {
@@ -65,15 +65,15 @@ exports.UserStoreType = graphQl.createObjectType({
         description: {
             type: graphQl.GraphQLString
         },
-        authConfig: {
-            type: exports.AuthConfig
+        idProviderConfig: {
+            type: exports.IdProviderConfig
         },
         idProviderMode: {
             type: graphQlEnums.IdProviderModeEnum,
             resolve: function(env) {
                 var idProviderKey =
-                    env.source.authConfig &&
-                    env.source.authConfig.applicationKey;
+                    env.source.idProviderConfig &&
+                    env.source.idProviderConfig.applicationKey;
                 return idProviderKey
                     ? userstoresLib.getIdProviderMode(idProviderKey)
                     : null;

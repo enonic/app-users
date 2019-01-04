@@ -9,7 +9,7 @@ function createAndAssert(params) {
         key: 'myUserStore',
         displayName: 'User store test',
         description: 'User store used for testing',
-        authConfig: {
+        idProviderConfig: {
             applicationKey: 'com.enonic.app.test',
             config: [
                 {
@@ -85,7 +85,7 @@ exports.createUserStore = function () {
         name: 'myUserStore',
         displayName: 'User store test',
         description: 'User store used for testing',
-        authConfig: {
+        idProviderConfig: {
             applicationKey: 'com.enonic.app.test',
             config: [
                 {
