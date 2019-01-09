@@ -23,8 +23,8 @@ describe('User Store, provider-dialog specification', function () {
     webDriverHelper.setupBrowser();
 
 
-    it(`GIVEN User Store wizard is opened AND idProvider has been selected WHEN Provider has required inputs THEN 'Save' button should be disabled AND 'Save Before' dialog should appear when 'Close' has been clicked`,
-        () => {
+    it(`GIVEN User Store wizard is opened AND application has been selected WHEN Provider has required inputs THEN 'Save' button should be disabled AND 'Save Before' dialog should appear when 'Close' has been clicked`,
+        () = > {
             let testStore =
                 userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store', 'First Selenium App',
                     null);
@@ -35,14 +35,14 @@ describe('User Store, provider-dialog specification', function () {
             }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
             }).pause(300).then(() => {
-                testUtils.saveScreenshot('id_provider_save_before_close_present1');
+        testUtils.saveScreenshot('application_save_before_close_present1');
                 return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog should appear");
             })
         });
 
-    it(`GIVEN idProvider dialog is opened WHEN required inputs in Provider-dialog are filled THEN the User Store is getting valid`,
-        () => {
+    it(`GIVEN application dialog is opened WHEN required inputs in Provider-dialog are filled THEN the User Store is getting valid`,
+        () = > {
             let testStore =
                 userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store', 'First Selenium App',
                     null);

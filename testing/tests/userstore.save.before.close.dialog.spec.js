@@ -50,7 +50,7 @@ describe('User Store and Save Before Close dialog', function () {
             return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(()=> {
                 return userStoreWizard.typeData(testStore);
             }).then(()=> {
-                testUtils.saveScreenshot("id_provider_should_be_selected");
+        testUtils.saveScreenshot("application_should_be_selected");
                 return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
             }).pause(700).then(()=> {
                 return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogPresent(),

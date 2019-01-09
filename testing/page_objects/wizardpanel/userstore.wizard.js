@@ -3,7 +3,7 @@ const elements = require('../../libs/elements');
 const loaderComboBox = require('../inputs/loaderComboBox');
 const panel = {
     container: `//div[contains(@id,'UserStoreWizardPanel')]`,
-    providerFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='ID Provider']]" +
+    providerFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='Application']]" +
                          `${loaderComboBox.optionsFilterInput}`,
     permissionsFilterInput: `//div[contains(@id,'UserStoreAccessControlComboBox')]` + `${loaderComboBox.optionsFilterInput}`,
     permissionsLink: `//li[child::a[text()='Permissions']]`,
@@ -118,15 +118,15 @@ const userStoreWizard = Object.create(wizard, {
             return this.doClick(this.removeProviderIcon).pause(300);
         }
     },
-    filterOptionsAndSelectIdProvider: {
+    filterOptionsAndSelectApplication: {
         value: function (providerName) {
             return this.typeTextInInput(`${panel.providerFilterInput}`, providerName).pause(400).then(() => {
                 return loaderComboBox.waitForOptionVisible(`${panel.container}`, providerName);
             }).then(() => {
                 return loaderComboBox.clickOnOption(`${panel.container}`, providerName);
             }).catch(err => {
-                this.saveScreenshot('err_id_provider');
-                throw new Error('Error when selecting the ID Provider: ' + providerName + ' ' + err);
+                this.saveScreenshot('err_application');
+            throw new Error('Error when selecting the application: ' + providerName + ' ' + err);
             })
         }
     },

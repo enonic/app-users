@@ -289,12 +289,12 @@ export class UserAppPanel
 
     private handlePrincipalNew(tabId: AppBarTabId, data: PrincipalData, userStore: UserStore, userItem: UserTreeGridItem) {
         if (data.principalType === PrincipalType.USER && !this.areUsersEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.create').toLowerCase(),
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.create').toLowerCase(),
                 i18n('field.users').toLowerCase()));
             return;
         }
         if (data.principalType === PrincipalType.GROUP && !this.areGroupsEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.create').toLowerCase(),
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.create').toLowerCase(),
                 i18n('field.groups').toLowerCase()));
             return;
         }
@@ -362,11 +362,11 @@ export class UserAppPanel
         let principalType = principal.getType();
 
         if (PrincipalType.USER === principalType && !this.areUsersEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.edit').toLowerCase(), i18n('field.users').toLowerCase()));
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.edit').toLowerCase(), i18n('field.users').toLowerCase()));
             return;
 
         } else if (PrincipalType.GROUP === principalType && !this.areGroupsEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.edit').toLowerCase(), i18n('field.groups').toLowerCase()));
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.edit').toLowerCase(), i18n('field.groups').toLowerCase()));
             return;
 
         } else {

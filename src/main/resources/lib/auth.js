@@ -51,7 +51,7 @@ exports.getUserStores = function () {
  * Returns a string representation of the ID provider mode.
  *
  * @param {object} params JSON parameters.
- * @param {string} params.key Application key of the ID Provider.
+ * @param {string} params.key Application key of the ID Provider application.
  * @returns {string} The ID provider mode.
  */
 exports.getIdProviderMode = function (params) {
