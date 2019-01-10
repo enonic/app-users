@@ -31,10 +31,10 @@ function nullOrValue(value) {
  * @param {string} params.key IdProvider key.
  * @returns {object} the user store specified, or null if it doesn't exist.
  */
-exports.getUserStore = function (params) {
-    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetUserStoreHandler');
-    bean.userStoreKey = required(params, 'key');
-    return __.toNativeObject(bean.getUserStore());
+exports.getIdProvider = function (params) {
+    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProviderHandler');
+    bean.idProviderKey = required(params, 'key');
+    return __.toNativeObject(bean.getIdProvider());
 };
 
 /**
@@ -42,9 +42,9 @@ exports.getUserStore = function (params) {
  *
  * @returns {object[]} Array of user stores.
  */
-exports.getUserStores = function () {
-    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetUserStoresHandler');
-    return __.toNativeObject(bean.getUserStores());
+exports.getIdProviders = function () {
+    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProvidersHandler');
+    return __.toNativeObject(bean.getIdProviders());
 };
 
 /**
@@ -69,7 +69,7 @@ exports.getIdProviderMode = function (params) {
  */
 exports.getPermissions = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetPermissionsHandler');
-    bean.userStoreKey = required(params, 'key');
+    bean.idProviderKey = required(params, 'key');
     return __.toNativeObject(bean.getPermissions());
 };
 
@@ -93,7 +93,7 @@ exports.defaultPermissions = function () {
  * @param {object} [params.permissions] User store permissions.
  */
 exports.createIdProvider = function (params) {
-    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.CreateUserStoreHandler');
+    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.CreateIdProviderHandler');
 
     bean.name = required(params, 'name');
     bean.displayName = nullOrValue(params.displayName);
@@ -113,14 +113,14 @@ exports.createIdProvider = function (params) {
  * @param {object} [params.permissions] User store permissions.
  * @returns {object} The updated user store.
  */
-exports.modifyUserStore = function (params) {
-    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.ModifyUserStoreHandler');
+exports.modifyIdProvider = function (params) {
+    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.ModifyIdProviderHandler');
 
-    bean.userStoreKey = required(params, 'key');
+    bean.idProviderKey = required(params, 'key');
     bean.editor = __.toScriptValue(required(params, 'editor'));
     bean.permissions = __.toScriptValue(params.permissions);
 
-    return __.toNativeObject(bean.modifyUserStore());
+    return __.toNativeObject(bean.modifyIdProvider());
 };
 
 /**
@@ -130,10 +130,10 @@ exports.modifyUserStore = function (params) {
  * @param {string} params.keys Array of user store keys to delete.
  * @returns {object} the user stores specified, or null if it doesn't exist.
  */
-exports.deleteUserStores = function (params) {
-    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DeleteUserStoresHandler');
-    bean.userStoreKeys = __.toScriptValue(required(params, 'keys'));
-    return __.toNativeObject(bean.deleteUserStores());
+exports.deleteIdProviders = function (params) {
+    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DeleteIdProvidersHandler');
+    bean.idProviderKeys = __.toScriptValue(required(params, 'keys'));
+    return __.toNativeObject(bean.deleteIdProviders());
 };
 
 exports.isAdmin = function() {

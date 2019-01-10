@@ -11,8 +11,8 @@ public final class DefaultPermissionsHandler
 {
     public List<IdProviderAccessControlEntryMapper> defaultPermissions()
     {
-        final IdProviderAccessControlList userStorePermissions = securityService.get().getDefaultIdProviderPermissions();
-        return mapUserStorePermissions( userStorePermissions );
+        final IdProviderAccessControlList idProviderPermissions = securityService.get().getDefaultIdProviderPermissions();
+        return mapIdProviderPermissions( idProviderPermissions );
     }
 
     @Override

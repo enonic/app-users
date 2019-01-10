@@ -18,17 +18,17 @@ public abstract class AbstractPermissionsHandler
 {
     protected Supplier<SecurityService> securityService;
 
-    public List<IdProviderAccessControlEntryMapper> mapUserStorePermissions( final IdProviderAccessControlList userStorePermissions )
+    public List<IdProviderAccessControlEntryMapper> mapIdProviderPermissions( final IdProviderAccessControlList idProviderPermissions )
     {
-        final Principals principals = securityService.get().getPrincipals( userStorePermissions.getAllPrincipals() );
+        final Principals principals = securityService.get().getPrincipals( idProviderPermissions.getAllPrincipals() );
         return principals.stream().
-            map( ( principal ) -> new IdProviderAccessControlEntryMapper( principal, getAccess( principal, userStorePermissions ) ) ).
+            map( ( principal ) -> new IdProviderAccessControlEntryMapper( principal, getAccess( principal, idProviderPermissions ) ) ).
             collect( Collectors.toList() );
     }
 
-    private IdProviderAccess getAccess( final Principal principal, final IdProviderAccessControlList userStoreAccessControlList )
+    private IdProviderAccess getAccess( final Principal principal, final IdProviderAccessControlList idProviderAccessControlList )
     {
-        for ( IdProviderAccessControlEntry entry : userStoreAccessControlList )
+        for ( IdProviderAccessControlEntry entry : idProviderAccessControlList )
         {
             if ( entry.getPrincipal().equals( principal.getKey() ) )
             {

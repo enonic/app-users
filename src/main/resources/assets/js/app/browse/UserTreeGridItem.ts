@@ -14,7 +14,7 @@ export enum UserTreeGridItemType {
 
 export class UserTreeGridItem implements api.Equitable {
 
-    private userStore: IdProvider;
+    private idProvider: IdProvider;
 
     private principal: Principal;
 
@@ -23,7 +23,7 @@ export class UserTreeGridItem implements api.Equitable {
     private modifiedTime: Date;
 
     constructor(builder: UserTreeGridItemBuilder) {
-        this.userStore = builder.userStore;
+        this.idProvider = builder.idProvider;
         this.principal = builder.principal;
         this.type = builder.type;
 
@@ -32,12 +32,12 @@ export class UserTreeGridItem implements api.Equitable {
         }
     }
 
-    static fromUserStore(userStore: IdProvider): UserTreeGridItem {
-        return new UserTreeGridItemBuilder().setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build();
+    static fromIdProvider(idProvider: IdProvider): UserTreeGridItem {
+        return new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USER_STORE).build();
     }
 
-    setUserStore(userStore: IdProvider) {
-        this.userStore = userStore;
+    setIdProvider(idProvider: IdProvider) {
+        this.idProvider = idProvider;
     }
 
     setPrincipal(principal: Principal) {
@@ -59,7 +59,7 @@ export class UserTreeGridItem implements api.Equitable {
     getItemDisplayName(): string {
         switch (this.type) {
         case UserTreeGridItemType.USER_STORE:
-            return this.userStore.getDisplayName();
+            return this.idProvider.getDisplayName();
 
         case UserTreeGridItemType.PRINCIPAL:
             return this.principal.getDisplayName();
@@ -80,19 +80,19 @@ export class UserTreeGridItem implements api.Equitable {
     getDataId(): string {
         switch (this.type) {
         case UserTreeGridItemType.USER_STORE:
-            return this.userStore.getKey().toString();
+            return this.idProvider.getKey().toString();
 
         case UserTreeGridItemType.PRINCIPAL:
             return this.principal.getKey().toString().toLowerCase();
 
         case UserTreeGridItemType.GROUPS:
-            return this.userStore.getKey().toString() + '/groups';
+            return this.idProvider.getKey().toString() + '/groups';
 
         case UserTreeGridItemType.ROLES:
             return '/roles';
 
         case UserTreeGridItemType.USERS:
-            return this.userStore.getKey().toString() + '/users';
+            return this.idProvider.getKey().toString() + '/users';
         default:
             return '';
         }
@@ -107,7 +107,7 @@ export class UserTreeGridItem implements api.Equitable {
         return this.type === UserTreeGridItemType.GROUPS;
     }
 
-    isUserStore(): boolean {
+    isIdProvider(): boolean {
         return this.type === UserTreeGridItemType.USER_STORE;
     }
 
@@ -120,7 +120,7 @@ export class UserTreeGridItem implements api.Equitable {
     }
 
     hasChildren(): boolean {
-        return (this.isUser() || this.isUserGroup() || this.isUserStore() || this.isRole());
+        return (this.isUser() || this.isUserGroup() || this.isIdProvider() || this.isRole());
     }
 
     equals(o: api.Equitable): boolean {
@@ -129,15 +129,15 @@ export class UserTreeGridItem implements api.Equitable {
         }
 
         let other = <UserTreeGridItem> o;
-        return this.principal === other.getPrincipal() && this.userStore === other.getUserStore();
+        return this.principal === other.getPrincipal() && this.idProvider === other.getIdProvider();
     }
 
     static create(): UserTreeGridItemBuilder {
         return new UserTreeGridItemBuilder();
     }
 
-    getUserStore(): IdProvider {
-        return this.userStore;
+    getIdProvider(): IdProvider {
+        return this.idProvider;
     }
 
     static fromPrincipal(principal: Principal): UserTreeGridItem {
@@ -159,12 +159,12 @@ export class UserTreeGridItem implements api.Equitable {
 }
 
 export class UserTreeGridItemBuilder {
-    userStore: IdProvider;
+    idProvider: IdProvider;
     principal: Principal;
     type: UserTreeGridItemType;
 
-    setUserStore(userStore: IdProvider): UserTreeGridItemBuilder {
-        this.userStore = userStore;
+    setIdProvider(idProvider: IdProvider): UserTreeGridItemBuilder {
+        this.idProvider = idProvider;
         return this;
     }
 
@@ -182,7 +182,7 @@ export class UserTreeGridItemBuilder {
         if (userItem instanceof Principal) {
             return this.setPrincipal(userItem).setType(UserTreeGridItemType.PRINCIPAL);
         } else if (userItem instanceof IdProvider) {
-            return this.setUserStore(userItem).setType(UserTreeGridItemType.USER_STORE);
+            return this.setIdProvider(userItem).setType(UserTreeGridItemType.USER_STORE);
         }
         return this;
     }

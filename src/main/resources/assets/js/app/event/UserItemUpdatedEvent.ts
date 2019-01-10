@@ -5,20 +5,20 @@ export class UserItemUpdatedEvent
     extends api.event.Event {
 
     private principal: Principal;
-    private userStore: IdProvider;
+    private idProvider: IdProvider;
 
-    constructor(principal: Principal, userStore: IdProvider) {
+    constructor(principal: Principal, idProvider: IdProvider) {
         super();
         this.principal = principal;
-        this.userStore = userStore;
+        this.idProvider = idProvider;
     }
 
     public getPrincipal(): Principal {
         return this.principal;
     }
 
-    public getUserStore(): IdProvider {
-        return this.userStore;
+    public getIdProvider(): IdProvider {
+        return this.idProvider;
     }
 
     static on(handler: (event: UserItemUpdatedEvent) => void) {

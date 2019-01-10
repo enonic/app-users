@@ -4,8 +4,8 @@ import {SecurityWizardStepForm} from './SecurityWizardStepForm';
 import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
 import {IdProviderWizardStepForm} from './IdProviderWizardStepForm';
 import {IdProviderWizardDataLoader} from './IdProviderWizardDataLoader';
-import {CreateIdProviderRequest} from '../../api/graphql/userStore/CreateIdProviderRequest';
-import {UpdateIdProviderRequest} from '../../api/graphql/userStore/UpdateIdProviderRequest';
+import {CreateIdProviderRequest} from '../../api/graphql/idProvider/CreateIdProviderRequest';
+import {UpdateIdProviderRequest} from '../../api/graphql/idProvider/UpdateIdProviderRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {UserItemDeletedEvent} from '../event/UserItemDeletedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
@@ -17,11 +17,11 @@ import IdProviderKey = api.security.IdProviderKey;
 export class IdProviderWizardPanel
     extends UserItemWizardPanel<IdProvider> {
 
-    private userStoreWizardStepForm: IdProviderWizardStepForm;
+    private idProviderWizardStepForm: IdProviderWizardStepForm;
 
     private permissionsWizardStepForm: SecurityWizardStepForm;
 
-    private defaultUserStore: IdProvider;
+    private defaultIdProvider: IdProvider;
 
     public static debug: boolean = false;
 
@@ -54,10 +54,10 @@ export class IdProviderWizardPanel
     createSteps(persistedItem: IdProvider): WizardStep[] {
         let steps: WizardStep[] = [];
 
-        this.userStoreWizardStepForm = new IdProviderWizardStepForm();
+        this.idProviderWizardStepForm = new IdProviderWizardStepForm();
         this.permissionsWizardStepForm = new SecurityWizardStepForm();
 
-        steps.push(new WizardStep(i18n('field.userStore'), this.userStoreWizardStepForm));
+        steps.push(new WizardStep(i18n('field.idProvider'), this.idProviderWizardStepForm));
         steps.push(new WizardStep(i18n('field.permissions'), this.permissionsWizardStepForm));
 
         return steps;
@@ -68,7 +68,7 @@ export class IdProviderWizardPanel
     }
 
     getUserItemType(): string {
-        return i18n('field.userStore');
+        return i18n('field.idProvider');
     }
 
     doLayout(persistedIdProvider: IdProvider): wemQ.Promise<void> {
@@ -85,42 +85,57 @@ export class IdProviderWizardPanel
 
     persistNewItem(): wemQ.Promise<IdProvider> {
         this.lock();
-        return this.produceCreateUserStoreRequest().sendAndParse().then((userStore: IdProvider) => {
+        return this.produceCreateIdProviderRequest().sendAndParse().then((idProvider: IdProvider) => {
 
             this.unlock();
             api.notify.showFeedback('User store was created');
-            new UserItemCreatedEvent(null, userStore).fire();
+            new UserItemCreatedEvent(null, idProvider).fire();
 
-            return userStore;
+            return idProvider;
         });
     }
 
-    postPersistNewItem(userStore: IdProvider): wemQ.Promise<IdProvider> {
-        Router.setHash('edit/' + userStore.getKey());
+    postPersistNewItem(idProvider: IdProvider): wemQ.Promise<IdProvider> {
+        Router.setHash('edit/' + idProvider.getKey());
 
-        return wemQ(userStore);
+        return wemQ(idProvider);
     }
 
     updatePersistedItem(): wemQ.Promise<IdProvider> {
         this.lock();
-        return this.produceUpdateUserStoreRequest(this.assembleViewedUserStore()).sendAndParse().then((userStore: IdProvider) => {
+        return this.produceUpdateIdProviderRequest(this.assembleViewedIdProvider()).sendAndParse().then((idProvider: IdProvider) => {
             this.unlock();
             api.notify.showFeedback('User store was updated');
-            new UserItemUpdatedEvent(null, userStore).fire();
+            new UserItemUpdatedEvent(null, idProvider).fire();
 
-            return userStore;
+            return idProvider;
         });
     }
 
     saveChanges(): wemQ.Promise<IdProvider> {
         if (this.isRendered()) {
-            if (!this.userStoreWizardStepForm.isValid()) {
+            if (!this.idProviderWizardStepForm.isValid()) {
                 return wemQ.fcall(() => {
                     throw i18n('notify.invalid.idProviderConfig');
                 });
             }
         }
         return super.saveChanges();
+    }
+
+    isNewChanged(): boolean {
+        const wizardHeader = this.getWizardHeader();
+        const idProviderConfig = this.idProviderWizardStepForm.getIdProviderConfig();
+        return wizardHeader.getName() !== '' ||
+               wizardHeader.getDisplayName() !== '' ||
+               !api.ObjectHelper.stringEquals(this.idProviderWizardStepForm.getDescription(), this.defaultIdProvider.getDescription()) ||
+               !(!idProviderConfig || idProviderConfig.equals(this.defaultIdProvider.getIdProviderConfig())) ||
+               !this.permissionsWizardStepForm.getPermissions().equals(this.defaultIdProvider.getPermissions());
+    }
+
+    isPersistedEqualsViewed(): boolean {
+        const viewedPrincipal = this.assembleViewedIdProvider();
+        return viewedPrincipal.equals(this.getPersistedItem());
     }
 
     protected doLoadData(): Q.Promise<IdProvider> {
@@ -133,45 +148,43 @@ export class IdProviderWizardPanel
                 if (IdProviderWizardPanel.debug) {
                     console.debug('IdProviderWizardPanel.doLoadData: loaded data', loader);
                 }
-                if (loader.userStore) {
+                if (loader.idProvider) {
                     this.formState.setIsNew(false);
-                    this.setPersistedItem(loader.userStore);
-                    this.establishDeleteActionState(loader.userStore.getKey());
+                    this.setPersistedItem(loader.idProvider);
+                    this.establishDeleteActionState(loader.idProvider.getKey());
                 }
-                this.defaultUserStore = loader.defaultUserStore;
-                return loader.userStore;
+                this.defaultIdProvider = loader.defaultIdProvider;
+                return loader.idProvider;
             });
-    }
-
-    isNewChanged(): boolean {
-        const wizardHeader = this.getWizardHeader();
-        const idProviderConfig = this.userStoreWizardStepForm.getIdProviderConfig();
-        return wizardHeader.getName() !== '' ||
-               wizardHeader.getDisplayName() !== '' ||
-               !api.ObjectHelper.stringEquals(this.userStoreWizardStepForm.getDescription(), this.defaultUserStore.getDescription()) ||
-               !(!idProviderConfig || idProviderConfig.equals(this.defaultUserStore.getIdProviderConfig())) ||
-               !this.permissionsWizardStepForm.getPermissions().equals(this.defaultUserStore.getPermissions());
     }
 
     protected doLayoutPersistedItem(persistedItem: IdProvider): Q.Promise<void> {
 
         if (!!persistedItem) {
             this.getWizardHeader().setDisplayName(persistedItem.getDisplayName());
-            this.userStoreWizardStepForm.layout(persistedItem);
-            this.permissionsWizardStepForm.layout(persistedItem, this.defaultUserStore);
+            this.idProviderWizardStepForm.layout(persistedItem);
+            this.permissionsWizardStepForm.layout(persistedItem, this.defaultIdProvider);
         } else {
-            this.userStoreWizardStepForm.layout(this.defaultUserStore);
-            this.permissionsWizardStepForm.layoutReadOnly(this.defaultUserStore);
+            this.idProviderWizardStepForm.layout(this.defaultIdProvider);
+            this.permissionsWizardStepForm.layoutReadOnly(this.defaultIdProvider);
         }
 
         return wemQ<void>(null);
     }
 
-    private assembleViewedUserStore(): IdProvider {
+    protected updateHash() {
+        if (this.getPersistedItem()) {
+            Router.setHash('edit/' + this.getPersistedItem().getKey());
+        } else {
+            Router.setHash('new/');
+        }
+    }
+
+    private assembleViewedIdProvider(): IdProvider {
         return <IdProvider>new IdProviderBuilder().setIdProviderConfig(
-            this.userStoreWizardStepForm.getIdProviderConfig()).setPermissions(this.permissionsWizardStepForm.getPermissions()).setKey(
+            this.idProviderWizardStepForm.getIdProviderConfig()).setPermissions(this.permissionsWizardStepForm.getPermissions()).setKey(
             this.getPersistedItem().getKey().toString()).setDisplayName(this.getWizardHeader().getDisplayName()).setDescription(
-            this.userStoreWizardStepForm.getDescription()).build();
+            this.idProviderWizardStepForm.getDescription()).build();
     }
 
     private listenToUserItemEvents() {
@@ -182,10 +195,10 @@ export class IdProviderWizardPanel
             }
 
             let principal = event.getPrincipal();
-            let isCreatedInCurrentUserStore = !!principal && (principal.isUser() || principal.isGroup())
-                                              && event.getUserStore().getKey().equals(this.getPersistedItem().getKey());
+            let isCreatedInCurrentIdProvider = !!principal && (principal.isUser() || principal.isGroup())
+                                               && event.getIdProvider().getKey().equals(this.getPersistedItem().getKey());
 
-            if (isCreatedInCurrentUserStore) {
+            if (isCreatedInCurrentIdProvider) {
                 this.wizardActions.getDeleteAction().setEnabled(false);
             }
         };
@@ -211,21 +224,13 @@ export class IdProviderWizardPanel
 
     }
 
-    protected updateHash() {
-        if (this.getPersistedItem()) {
-            Router.setHash('edit/' + this.getPersistedItem().getKey());
-        } else {
-            Router.setHash('new/');
-        }
-    }
-
-    private produceCreateUserStoreRequest(): CreateIdProviderRequest {
+    private produceCreateIdProviderRequest(): CreateIdProviderRequest {
         let wizardHeader = this.getWizardHeader();
         wizardHeader.normalizeNames();
         let key = new IdProviderKey(wizardHeader.getName());
         let name = wizardHeader.getDisplayName();
-        let description = this.userStoreWizardStepForm.getDescription();
-        let idProviderConfig = this.userStoreWizardStepForm.getIdProviderConfig();
+        let description = this.idProviderWizardStepForm.getDescription();
+        let idProviderConfig = this.idProviderWizardStepForm.getIdProviderConfig();
         let permissions = this.permissionsWizardStepForm.getPermissions();
 
         return new CreateIdProviderRequest()
@@ -236,11 +241,6 @@ export class IdProviderWizardPanel
             .setPermissions(permissions);
     }
 
-    isPersistedEqualsViewed(): boolean {
-        const viewedPrincipal = this.assembleViewedUserStore();
-        return viewedPrincipal.equals(this.getPersistedItem());
-    }
-
     private establishDeleteActionState(key: IdProviderKey) {
         if (key) {
             IdProvider.checkOnDeletable(key).then((result: boolean) => {
@@ -249,12 +249,12 @@ export class IdProviderWizardPanel
         }
     }
 
-    private produceUpdateUserStoreRequest(viewedUserStore: IdProvider): UpdateIdProviderRequest {
+    private produceUpdateIdProviderRequest(viewedIdProvider: IdProvider): UpdateIdProviderRequest {
         let key = this.getPersistedItem().getKey();
-        let name = viewedUserStore.getDisplayName();
-        let description = viewedUserStore.getDescription();
-        let idProviderConfig = viewedUserStore.getIdProviderConfig();
-        let permissions = viewedUserStore.getPermissions();
+        let name = viewedIdProvider.getDisplayName();
+        let description = viewedIdProvider.getDescription();
+        let idProviderConfig = viewedIdProvider.getIdProviderConfig();
+        let permissions = viewedIdProvider.getPermissions();
 
         return new UpdateIdProviderRequest()
             .setKey(key)

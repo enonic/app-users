@@ -8,7 +8,7 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
 
     persistedType: PrincipalType;
 
-    userStore: IdProvider;
+    idProvider: IdProvider;
 
     parentOfSameType: boolean;
 
@@ -24,8 +24,8 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
         return this;
     }
 
-    setUserStore(value: IdProvider): PrincipalWizardPanelParams {
-        this.userStore = value;
+    setIdProvider(value: IdProvider): PrincipalWizardPanelParams {
+        this.idProvider = value;
         return this;
     }
 

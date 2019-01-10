@@ -1,6 +1,6 @@
 export interface DeleteIdProviderResultJson {
 
-    userStoreKey: string;
+    idProviderKey: string;
 
     deleted: boolean;
 

@@ -52,7 +52,7 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
         return this.produceCreateGroupRequest().sendAndParse().then((principal: Principal) => {
 
             api.notify.showFeedback(i18n('notify.create.group'));
-            new UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
+            new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 
             (<PrincipalLoader>this.getMembersWizardStepForm().getLoader()).skipPrincipal(principal.getKey());
@@ -64,7 +64,7 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
     produceCreateGroupRequest(): CreateGroupRequest {
         const wizardHeader = this.getWizardHeader();
         wizardHeader.normalizeNames();
-        const key = PrincipalKey.ofGroup(this.getUserStore().getKey(), wizardHeader.getName());
+        const key = PrincipalKey.ofGroup(this.getIdProvider().getKey(), wizardHeader.getName());
         const name = wizardHeader.getDisplayName();
         const members = this.getMembersWizardStepForm().getMembers().map(el => el.getKey());
         const description = this.getDescriptionWizardStepForm().getDescription();

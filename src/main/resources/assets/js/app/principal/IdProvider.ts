@@ -38,7 +38,7 @@ export class IdProvider
 
     isDeletable(): wemQ.Promise<boolean> {
         return new ListPrincipalsRequest()
-            .setUserStoreKey(this.getKey())
+            .setIdProviderKey(this.getKey())
             .setTypes([PrincipalType.USER, PrincipalType.GROUP])
             .sendAndParse()
             .then((result: ListPrincipalsResult) => (result.total === 0));

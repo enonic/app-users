@@ -5,16 +5,16 @@ var DEFAULT_KEY = 'default';
 
 module.exports = {
     getByKey: function(key) {
-        return authLib.getUserStore({key : key});
+        return authLib.getIdProvider({key: key});
     },
-    list: authLib.getUserStores,
+    list: authLib.getIdProviders,
     getDefault: function () {
         return {key: 'default'};
     },
     create: function(params) {
         var name = common.required(params, 'key');
 
-        return authLib.createUserStore({
+        return authLib.createIdProvider({
             name: common.prettifyName(name),
             displayName: params.displayName,
             description: params.description,
@@ -25,20 +25,20 @@ module.exports = {
     update: function(params) {
         var key = common.required(params, 'key');
 
-        return authLib.modifyUserStore({
+        return authLib.modifyIdProvider({
             key: key,
-            editor: function (userStore) {
-                var newUserStore = userStore;
-                newUserStore.displayName = params.displayName;
-                newUserStore.description = params.description;
-                newUserStore.idProviderConfig = params.idProviderConfig;
-                return newUserStore;
+            editor: function (idProvider) {
+                var newIdProvider = idProvider;
+                newIdProvider.displayName = params.displayName;
+                newIdProvider.description = params.description;
+                newIdProvider.idProviderConfig = params.idProviderConfig;
+                return newIdProvider;
             },
             permissions: params.permissions || []
         });
     },
     delete: function(keys) {
-        return authLib.deleteUserStores({keys: keys});
+        return authLib.deleteIdProviders({keys: keys});
     },
     getIdProviderMode: function(applicationKey) {
         return authLib.getIdProviderMode({key:applicationKey});

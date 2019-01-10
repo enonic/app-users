@@ -21,7 +21,7 @@ export class GetIdProviderByKeyRequest
 
     getQuery(): string {
         return `query($key: String!) {
-            userStore(key: $key) {
+            idProvider(key: $key) {
                 key
                 displayName
                 description
@@ -42,10 +42,10 @@ export class GetIdProviderByKeyRequest
     }
 
     sendAndParse(): wemQ.Promise<IdProvider> {
-        return this.query().then(result => this.userStorefromJson(result.userStore));
+        return this.query().then(result => this.idProviderfromJson(result.idProvider));
     }
 
-    userStorefromJson(us: IdProviderJson): IdProvider {
+    idProviderfromJson(us: IdProviderJson): IdProvider {
         if (!us || Object.keys(us).length === 0) {
             return null;
         }

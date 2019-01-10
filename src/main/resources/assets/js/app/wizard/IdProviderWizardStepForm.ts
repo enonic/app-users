@@ -14,9 +14,9 @@ export class IdProviderWizardStepForm
         super();
     }
 
-    layout(userStore: IdProvider): wemQ.Promise<void> {
+    layout(idProvider: IdProvider): wemQ.Promise<void> {
 
-        this.formView = this.createFormView(userStore);
+        this.formView = this.createFormView(idProvider);
 
         return this.formView.layout().then(() => {
 
@@ -54,8 +54,8 @@ export class IdProviderWizardStepForm
         return this.formView.validate(silent);
     }
 
-    private createFormView(userStore?: IdProvider): api.form.FormView {
-        let isSystemUserStore = (!!userStore && userStore.getKey().isSystem()).toString();
+    private createFormView(idProvider?: IdProvider): api.form.FormView {
+        let isSystemIdProvider = (!!idProvider && idProvider.getKey().isSystem()).toString();
         let formBuilder = new api.form.FormBuilder().
             addFormItem(new api.form.InputBuilder().
                 setName('description').
@@ -64,18 +64,17 @@ export class IdProviderWizardStepForm
                 setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build()).
                 setInputTypeConfig({}).
                 setMaximizeUIInputWidth(true).
-                build()).
-            addFormItem(new api.form.InputBuilder().setName('idProviderConfig').
-                setInputType(new api.form.InputTypeName('AuthApplicationSelector', false)).setLabel(i18n('field.application')).
-                setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build()).
-                setInputTypeConfig({readOnly: [{value: isSystemUserStore}]}).
+                build()).addFormItem(new api.form.InputBuilder().setName('idProviderConfig').setInputType(
+            new api.form.InputTypeName('AuthApplicationSelector', false)).setLabel(i18n('field.application')).setOccurrences(
+            new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build()).setInputTypeConfig(
+            {readOnly: [{value: isSystemIdProvider}]}).
                 setMaximizeUIInputWidth(true).
                 build());
 
         this.propertySet = new api.data.PropertyTree().getRoot();
-        if (userStore) {
-            this.propertySet.addString('description', userStore.getDescription());
-            let idProviderConfig = userStore.getIdProviderConfig();
+        if (idProvider) {
+            this.propertySet.addString('description', idProvider.getDescription());
+            let idProviderConfig = idProvider.getIdProviderConfig();
             if (idProviderConfig) {
                 let idProviderConfigPropertySet = new api.data.PropertySet();
                 idProviderConfigPropertySet.addString('applicationKey', idProviderConfig.getApplicationKey().toString());
@@ -84,7 +83,7 @@ export class IdProviderWizardStepForm
             }
         }
 
-        const context = SecurityFormContext.create().setUserStore(userStore).build();
+        const context = SecurityFormContext.create().setIdProvider(idProvider).build();
         return new api.form.FormView(context, formBuilder.build(), this.propertySet);
     }
 

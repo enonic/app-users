@@ -4,7 +4,7 @@ import {DeleteIdProviderResultJson} from './DeleteIdProviderResultJson';
 import IdProviderKey = api.security.IdProviderKey;
 
 type DeleteIdProvidersResult = {
-    deleteUserStores: DeleteIdProviderResultJson[]
+    deleteIdProviders: DeleteIdProviderResultJson[]
 };
 
 export class DeleteIdProviderRequest
@@ -25,8 +25,8 @@ export class DeleteIdProviderRequest
 
     getMutation() {
         return `mutation ($keys: [String]!) {
-            deleteUserStores(keys: $keys) {
-                userStoreKey
+            deleteIdProviders(keys: $keys) {
+                idProviderKey
                 deleted
                 reason
             }
@@ -35,7 +35,7 @@ export class DeleteIdProviderRequest
 
     sendAndParse(): wemQ.Promise<DeleteIdProviderResult[]> {
         return this.mutate().then((response: DeleteIdProvidersResult) => {
-            return response.deleteUserStores.map(DeleteIdProviderResult.fromJson);
+            return response.deleteIdProviders.map(DeleteIdProviderResult.fromJson);
         });
     }
 

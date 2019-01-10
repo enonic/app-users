@@ -1,7 +1,7 @@
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
-import {DeleteIdProviderRequest} from '../../../api/graphql/userStore/DeleteIdProviderRequest';
+import {DeleteIdProviderRequest} from '../../../api/graphql/idProvider/DeleteIdProviderRequest';
 import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
-import {DeleteIdProviderResult} from '../../../api/graphql/userStore/DeleteIdProviderResult';
+import {DeleteIdProviderResult} from '../../../api/graphql/idProvider/DeleteIdProviderResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
 import {IdProvider} from '../../principal/IdProvider';
 import Principal = api.security.Principal;
@@ -51,7 +51,7 @@ export class DeleteUserItemAction extends api.ui.Action {
                                             i18n('notify.delete.userstore.multiple', keys.length);
 
                                 api.notify.showFeedback(msg);
-                                UserItemDeletedEvent.create().setUserStores([<IdProvider>persistedItem]).build().fire();
+                                UserItemDeletedEvent.create().setIdProviders([<IdProvider>persistedItem]).build().fire();
                             }
                         });
                 }

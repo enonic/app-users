@@ -3,13 +3,13 @@ import IdProviderKey = api.security.IdProviderKey;
 
 export class DeleteIdProviderResult {
 
-    private userStoreKey: IdProviderKey;
+    private idProviderKey: IdProviderKey;
     private deleted: boolean;
     private reason: string;
 
     static fromJson(json: DeleteIdProviderResultJson): DeleteIdProviderResult {
         let result = new DeleteIdProviderResult();
-        result.userStoreKey = IdProviderKey.fromString(json.userStoreKey);
+        result.idProviderKey = IdProviderKey.fromString(json.idProviderKey);
         result.deleted = json.deleted;
         result.reason = json.reason;
         return result;
@@ -24,6 +24,6 @@ export class DeleteIdProviderResult {
     }
 
     getIdProviderKey(): IdProviderKey {
-        return this.userStoreKey;
+        return this.idProviderKey;
     }
 }

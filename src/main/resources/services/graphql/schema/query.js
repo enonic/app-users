@@ -12,14 +12,14 @@ var graphQlEnums = require('../types').enums;
 module.exports = graphQl.createObjectType({
     name: 'Query',
     fields: {
-        userStores: {
-            type: graphQl.list(graphQlObjectTypes.UserStoreType),
+        idProviders: {
+            type: graphQl.list(graphQlObjectTypes.idProviderType),
             resolve: function () {
                 return userstores.list();
             }
         },
-        userStore: {
-            type: graphQlObjectTypes.UserStoreType,
+        idProvider: {
+            type: graphQlObjectTypes.idProviderType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString)
             },
@@ -28,8 +28,8 @@ module.exports = graphQl.createObjectType({
                 return userstores.getByKey(key);
             }
         },
-        defaultUserStore: {
-            type: graphQlObjectTypes.UserStoreType,
+        defaultidProvider: {
+            type: graphQlObjectTypes.idProviderType,
             resolve: function () {
                 return userstores.getDefault();
             }

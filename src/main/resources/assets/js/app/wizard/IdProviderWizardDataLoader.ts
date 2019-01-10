@@ -1,16 +1,16 @@
 import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
-import {GetIdProviderByKeyRequest} from '../../api/graphql/userStore/GetIdProviderByKeyRequest';
-import {GetDefaultIdProviderRequest} from '../../api/graphql/userStore/GetDefaultIdProviderRequest';
+import {GetIdProviderByKeyRequest} from '../../api/graphql/idProvider/GetIdProviderByKeyRequest';
+import {GetDefaultIdProviderRequest} from '../../api/graphql/idProvider/GetDefaultIdProviderRequest';
 import {IdProvider} from '../principal/IdProvider';
 
 export class IdProviderWizardDataLoader {
 
-    userStore: IdProvider;
+    idProvider: IdProvider;
 
-    defaultUserStore: IdProvider;
+    defaultIdProvider: IdProvider;
 
     loadData(params: IdProviderWizardPanelParams): wemQ.Promise<IdProviderWizardDataLoader> {
-        if (!params.persistedItem && !params.userStoreKey) {
+        if (!params.persistedItem && !params.idProviderKey) {
             return this.loadDataForNew();
         } else {
             return this.loadDataForEdit(params);
@@ -21,9 +21,9 @@ export class IdProviderWizardDataLoader {
 
         return this.loadDataForNew().then((loader) => {
 
-            return this.loadUserStoreToEdit(params).then((loadedUserStoreToEdit: IdProvider) => {
+            return this.loadIdProviderToEdit(params).then((loadedIdProviderToEdit: IdProvider) => {
 
-                this.userStore = loadedUserStoreToEdit;
+                this.idProvider = loadedIdProviderToEdit;
 
                 return this;
             });
@@ -32,23 +32,23 @@ export class IdProviderWizardDataLoader {
 
     private loadDataForNew(): wemQ.Promise<IdProviderWizardDataLoader> {
 
-        return this.loadDefaultUserStore().then((defaultUserStore: IdProvider) => {
+        return this.loadDefaultIdProvider().then((defaultIdProvider: IdProvider) => {
 
-            this.defaultUserStore = defaultUserStore;
+            this.defaultIdProvider = defaultIdProvider;
 
             return this;
         });
     }
 
-    private loadUserStoreToEdit(params: IdProviderWizardPanelParams): wemQ.Promise<IdProvider> {
-        if (!params.persistedItem && !!params.userStoreKey) {
-            return new GetIdProviderByKeyRequest(params.userStoreKey).sendAndParse();
+    private loadIdProviderToEdit(params: IdProviderWizardPanelParams): wemQ.Promise<IdProvider> {
+        if (!params.persistedItem && !!params.idProviderKey) {
+            return new GetIdProviderByKeyRequest(params.idProviderKey).sendAndParse();
         } else {
             return wemQ(params.persistedItem);
         }
     }
 
-    private loadDefaultUserStore(): wemQ.Promise<IdProvider> {
+    private loadDefaultIdProvider(): wemQ.Promise<IdProvider> {
         return new GetDefaultIdProviderRequest().sendAndParse();
     }
 

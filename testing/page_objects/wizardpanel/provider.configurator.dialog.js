@@ -84,7 +84,7 @@ const idProviderConfiguratorDialog = Object.create(page, {
         value: function (domain, clientId, clientSecret) {
             let editButton = xpath.selectedProviderView + elements.EDIT_ICON;
             return this.doClick(xpath.permissionsTabItem).then(() => {
-                return this.doClick(xpath.userStoreTabItem);
+                return this.doClick(xpath.idProviderTabItem);
             }).pause(1000).then(() => {
                 return this.waitForVisible(editButton, 3000);
             }).then(result => {

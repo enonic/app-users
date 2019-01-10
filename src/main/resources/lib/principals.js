@@ -81,9 +81,9 @@ module.exports = {
             module.exports.removeMembers(key, removeMs);
         }
     },
-    list: function(userStoreKey, types, query, start, count, sort) {
+    list: function (idProviderKey, types, query, start, count, sort) {
         return common.queryAll({
-            query: createPrincipalQuery(userStoreKey, types, query),
+            query: createPrincipalQuery(idProviderKey, types, query),
             start: start,
             count: count,
             sort: sort
@@ -110,10 +110,10 @@ module.exports = {
     Type: common.PrincipalType    
 };
 
-function createPrincipalQuery(userStoreKey, types, query) {
+function createPrincipalQuery(idProviderKey, types, query) {
     var q = query ? textQuery(query) : '';
     if (!types) {
-        q += (q ? ' AND ' : '') + userStoreQuery(userStoreKey);
+        q += (q ? ' AND ' : '') + idProviderQuery(idProviderKey);
     } else {
         var tq = '';
         types.forEach(function(type, index) {
@@ -124,7 +124,7 @@ function createPrincipalQuery(userStoreKey, types, query) {
                     break;
                 case common.PrincipalType.GROUP:
                 case common.PrincipalType.USER:
-                    add = userStoreQuery(userStoreKey, type);
+                    add = idProviderQuery(idProviderKey, type);
                     break;
                 default: // none
             }
@@ -144,9 +144,9 @@ function rolesQuery() {
     return '_parentPath="/identity/roles"';
 }
 
-function userStoreQuery(key, type) {
+function idProviderQuery(key, type) {
     return (
-        '(userStoreKey="' +
+        '(idProviderKey="' +
         key +
         '"' +
         (type ? 'AND principalType="' + type + '")' : ')')

@@ -6,12 +6,12 @@ import {IdProviderJson} from '../../../app/principal/IdProviderJson';
 import IdProviderConfig = api.security.IdProviderConfig;
 import IdProviderKey = api.security.IdProviderKey;
 
-export type SaveMutation = 'updateUserStore' | 'createIdProvider';
+export type SaveMutation = 'updateIdProvider' | 'createIdProvider';
 
 export class SaveIdProviderRequest
     extends GraphQlRequest<any, IdProvider> {
 
-    private userStoreKey: IdProviderKey;
+    private idProviderKey: IdProviderKey;
     private displayName: string;
     private description: string;
     private idProviderConfig: IdProviderConfig;
@@ -34,7 +34,7 @@ export class SaveIdProviderRequest
         const permissions = this.permissions ? this.permissions.getEntries().map(createAccess) : null;
 
         const vars = super.getVariables();
-        vars['key'] = this.userStoreKey.toString();
+        vars['key'] = this.idProviderKey.toString();
         vars['displayName'] = this.displayName;
         vars['description'] = this.description;
         vars['idProviderConfig'] = idProviderConfig;
@@ -68,8 +68,8 @@ export class SaveIdProviderRequest
 
     // tslint:enable max-line-length
 
-    setKey(userStoreKey: IdProviderKey): SaveIdProviderRequest {
-        this.userStoreKey = userStoreKey;
+    setKey(idProviderKey: IdProviderKey): SaveIdProviderRequest {
+        this.idProviderKey = idProviderKey;
         return this;
     }
 
@@ -94,14 +94,14 @@ export class SaveIdProviderRequest
     }
 
     sendAndParse(): wemQ.Promise<IdProvider> {
-        return this.mutate().then(json => this.userStorefromJson(json[this.mutationType], json.error));
+        return this.mutate().then(json => this.idProviderfromJson(json[this.mutationType], json.error));
     }
 
-    userStorefromJson(us: IdProviderJson, error: string) {
+    idProviderfromJson(us: IdProviderJson, error: string) {
         if (error) {
             throw new api.Exception(error);
         } else if (!us) {
-            throw new Error(`UserStore [${this.userStoreKey.toString()}] not found`);
+            throw new Error(`IdProvider [${this.idProviderKey.toString()}] not found`);
         }
 
         if (us.idProviderConfig && typeof us.idProviderConfig.config === 'string') {

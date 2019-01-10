@@ -8,7 +8,7 @@ export class ListIdProvidersRequest
 
     getQuery(): string {
         return `query {
-            userStores {
+            idProviders {
                 key,
                 displayName,
                 description,
@@ -30,11 +30,11 @@ export class ListIdProvidersRequest
 
     sendAndParse(): wemQ.Promise<IdProvider[]> {
         return this.query().then((response: IdProviderListResult) => {
-            return response.userStores.map(this.userStorefromJson);
+            return response.idProviders.map(this.idProviderfromJson);
         });
     }
 
-    userStorefromJson(idprovider: IdProviderJson) {
+    idProviderfromJson(idprovider: IdProviderJson) {
         if (idprovider.idProviderConfig && typeof idprovider.idProviderConfig.config === 'string') {
             // config is passed as string
             idprovider.idProviderConfig.config = JSON.parse(<string>idprovider.idProviderConfig.config);

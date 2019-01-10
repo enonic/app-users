@@ -10,7 +10,7 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
 
     private inheritance: DivEl;
     private comboBox: IdProviderAccessControlComboBox;
-    private userStore: IdProvider;
+    private idProvider: IdProvider;
 
     constructor() {
         super('security-wizard-step-form');
@@ -41,18 +41,18 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
 
     }
 
-    layout(userStore: IdProvider, defaultUserStore: IdProvider) {
-        this.userStore = userStore;
+    layout(idProvider: IdProvider, defaultIdProvider: IdProvider) {
+        this.idProvider = idProvider;
 
         this.comboBox.clearSelection();
 
-        if (defaultUserStore) {
-            defaultUserStore.getPermissions().getEntries().forEach((item) => {
+        if (defaultIdProvider) {
+            defaultIdProvider.getPermissions().getEntries().forEach((item) => {
                 this.comboBox.select(item, true);
             });
         }
 
-        userStore.getPermissions().getEntries().forEach((item) => {
+        idProvider.getPermissions().getEntries().forEach((item) => {
             if (!this.comboBox.isSelected(item)) {
                 this.comboBox.select(item);
             }
@@ -60,11 +60,11 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
 
     }
 
-    layoutReadOnly(userStore: IdProvider) {
-        this.userStore = userStore;
+    layoutReadOnly(idProvider: IdProvider) {
+        this.idProvider = idProvider;
 
         this.comboBox.clearSelection();
-        userStore.getPermissions().getEntries().forEach((item) => {
+        idProvider.getPermissions().getEntries().forEach((item) => {
             if (!this.comboBox.isSelected(item)) {
                 this.comboBox.select(item, true);
             }

@@ -73,13 +73,13 @@ exports.delete = function (ids, repo) {
 
 exports.keysToPaths = function (keys) {
     return keys.map(function (key) {
-        if (isUserStore(key)) {
-            return '/identity/' + userStoreFromKey(key);
+        if (isIdProvider(key)) {
+            return '/identity/' + idProviderFromKey(key);
         }
         if (isUser(key)) {
             return (
                 '/identity/' +
-                userStoreFromKey(key) +
+                idProviderFromKey(key) +
                 '/users/' +
                 nameFromKey(key)
             );
@@ -87,7 +87,7 @@ exports.keysToPaths = function (keys) {
         if (isGroup(key)) {
             return (
                 '/identity/' +
-                userStoreFromKey(key) +
+                idProviderFromKey(key) +
                 '/groups/' +
                 nameFromKey(key)
             );
@@ -111,7 +111,7 @@ exports.isRole = function isRole(key) {
     return exports.typeFromKey(key).toUpperCase() === PrincipalType.ROLE;
 };
 
-exports.isUserStore = function isUserStore(key) {
+exports.isIdProvider = function isIdProvider(key) {
     return splitKey(key).length === 1;
 };
 
@@ -160,18 +160,18 @@ function splitKey(key) {
         parts &&
         parts.length === 2 &&
         parts[0].toUpperCase() === PrincipalType.ROLE;
-    var isUserStoreType = parts && parts.length === 1;
-    if (!isRoleType && !isUserStoreType && !(parts && parts.length === 3)) {
+    var isIdProviderType = parts && parts.length === 1;
+    if (!isRoleType && !isIdProviderType && !(parts && parts.length === 3)) {
         throw new Error('Invalid principal key [' + key + ']');
     }
     return parts;
 }
 
-exports.userStoreFromKey = function userStoreFromKey(key) {
+exports.idProviderFromKey = function idProviderFromKey(key) {
     var parts = splitKey(key);
     if (parts[0].toUpperCase() === PrincipalType.ROLE) {
         throw new Error(
-            "Principal keys of type role can't have userStore [" + key + ']'
+            "Principal keys of type role can't have idprovider [" + key + ']'
         );
     }
     return parts.length === 1 ? parts[0] : parts[1];

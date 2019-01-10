@@ -66,8 +66,8 @@ export class UserBrowsePanel
     private bindServerEventListeners() {
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
-        serverHandler.onUserItemCreated((principal: Principal, userStore: IdProvider, sameTypeParent?: boolean) => {
-            this.treeGrid.appendUserNode(principal, userStore, sameTypeParent);
+        serverHandler.onUserItemCreated((principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => {
+            this.treeGrid.appendUserNode(principal, idProvider, sameTypeParent);
             this.setRefreshOfFilterRequired();
 
             /*
@@ -79,8 +79,8 @@ export class UserBrowsePanel
             }
         });
 
-        serverHandler.onUserItemUpdated((principal: Principal, userStore: IdProvider) => {
-            this.treeGrid.updateUserNode(principal, userStore);
+        serverHandler.onUserItemUpdated((principal: Principal, idProvider: IdProvider) => {
+            this.treeGrid.updateUserNode(principal, idProvider);
         });
 
         serverHandler.onUserItemDeleted((ids: string[]) => {

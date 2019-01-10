@@ -20,7 +20,7 @@ export class ListPrincipalsRequest
     extends ListGraphQlRequest<any, any> {
 
     private types: PrincipalType[];
-    private userStoreKey: IdProviderKey;
+    private idProviderKey: IdProviderKey;
     private searchQuery: string;
 
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
@@ -28,8 +28,8 @@ export class ListPrincipalsRequest
         return this;
     }
 
-    setUserStoreKey(key: IdProviderKey): ListPrincipalsRequest {
-        this.userStoreKey = key;
+    setIdProviderKey(key: IdProviderKey): ListPrincipalsRequest {
+        this.idProviderKey = key;
         return this;
     }
 
@@ -43,8 +43,8 @@ export class ListPrincipalsRequest
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }
-        if (this.userStoreKey) {
-            vars['userstore'] = this.userStoreKey.toString();
+        if (this.idProviderKey) {
+            vars['userstore'] = this.idProviderKey.toString();
         }
         if (this.searchQuery) {
             vars['query'] = this.searchQuery;

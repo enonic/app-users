@@ -15,7 +15,7 @@ public final class DeleteIdProviderResultMapper
 
     private void serialize( final MapGenerator gen, final DeleteIdProviderResult value )
     {
-        gen.value( "userStoreKey", value.getUserStoreKey().toString() );
+        gen.value( "idProviderKey", value.getIdProviderKey().toString() );
         gen.value( "deleted", value.isDeleted() );
         gen.value( "reason", value.getReason() );
     }

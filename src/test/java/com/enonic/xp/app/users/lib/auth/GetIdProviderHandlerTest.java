@@ -27,7 +27,7 @@ public class GetIdProviderHandlerTest
         Mockito.when( securityService.getIdProvider( IdProviderKey.from( "myUserStore" ) ) ).thenReturn(
             TestDataFixtures.getTestUserStore() );
 
-        runFunction( "/com/enonic/xp/app/users/lib/auth/getUserStore-test.js", "getUserStore" );
+        runFunction( "/com/enonic/xp/app/users/lib/auth/getUserStore-test.js", "getIdProvider" );
     }
 
     @Test

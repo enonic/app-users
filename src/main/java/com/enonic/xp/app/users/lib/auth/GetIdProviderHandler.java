@@ -6,16 +6,16 @@ import com.enonic.xp.security.IdProviderKey;
 public final class GetIdProviderHandler
     extends AbstractIdProviderHandler
 {
-    private IdProviderKey userStoreKey;
+    private IdProviderKey idProviderKey;
 
-    public void setUserStoreKey( final String userStoreKey )
+    public void setIdProviderKey( final String idProviderKey )
     {
-        this.userStoreKey = IdProviderKey.from( userStoreKey );
+        this.idProviderKey = IdProviderKey.from( idProviderKey );
     }
 
-    public IdProviderMapper getUserStore()
+    public IdProviderMapper getIdProvider()
     {
-        final IdProvider userStore = securityService.get().getIdProvider( userStoreKey );
-        return userStore == null ? null : new IdProviderMapper( userStore );
+        final IdProvider idProvider = securityService.get().getIdProvider( idProviderKey );
+        return idProvider == null ? null : new IdProviderMapper( idProvider );
     }
 }

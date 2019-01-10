@@ -15,14 +15,14 @@ module.exports = {
             }
         });
 
-        processUserStoreAggregation(result);
+        processIdProviderAggregation(result);
 
         return result;
     },
     Type: common.UserItemType
 };
 
-function processUserStoreAggregation(result) {
+function processIdProviderAggregation(result) {
     if (!result || !result.aggregations || !result.aggregations.principalType || !result.aggregations.principalType.buckets) {
         return;
     }
@@ -34,10 +34,10 @@ function processUserStoreAggregation(result) {
         principalsCount += bucket.docCount;
     });
 
-    var userStoresCount = result.total - principalsCount;
+    var idProvidersCount = result.total - principalsCount;
 
-    if (userStoresCount > 0) {
-        aggregationBuckets.push({key: 'user_store', docCount: '' + userStoresCount});
+    if (idProvidersCount > 0) {
+        aggregationBuckets.push({key: 'user_store', docCount: '' + idProvidersCount});
     }
 }
 

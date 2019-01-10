@@ -6,20 +6,20 @@ export class UserItemDeletedEvent
 
     private principals: Principal[];
 
-    private userStores: IdProvider[];
+    private idProviders: IdProvider[];
 
     constructor(builder: UserItemDeletedEventBuilder) {
         super();
         this.principals = builder.principals;
-        this.userStores = builder.userStores;
+        this.idProviders = builder.idProviders;
     }
 
     public getPrincipals(): Principal[] {
         return this.principals;
     }
 
-    public getUserStores(): IdProvider[] {
-        return this.userStores;
+    public getIdProviders(): IdProvider[] {
+        return this.idProviders;
     }
 
     public static create(): UserItemDeletedEventBuilder {
@@ -39,15 +39,15 @@ export class UserItemDeletedEventBuilder {
 
     principals: Principal[];
 
-    userStores: IdProvider[];
+    idProviders: IdProvider[];
 
     setPrincipals(principals: Principal[]): UserItemDeletedEventBuilder {
         this.principals = principals;
         return this;
     }
 
-    setUserStores(userStores: IdProvider[]): UserItemDeletedEventBuilder {
-        this.userStores = userStores;
+    setIdProviders(idProviders: IdProvider[]): UserItemDeletedEventBuilder {
+        this.idProviders = idProviders;
         return this;
     }
 

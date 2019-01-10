@@ -11,21 +11,21 @@ import com.enonic.xp.security.acl.IdProviderAccessControlList;
 public final class GetPermissionsHandler
     extends AbstractPermissionsHandler
 {
-    private IdProviderKey userStoreKey;
+    private IdProviderKey idProviderKey;
 
-    public void setUserStoreKey( final String userStoreKey )
+    public void setIdProviderKey( final String idProviderKey )
     {
-        this.userStoreKey = IdProviderKey.from( userStoreKey );
+        this.idProviderKey = IdProviderKey.from( idProviderKey );
     }
 
     public List<IdProviderAccessControlEntryMapper> getPermissions()
     {
-        final IdProvider userStore = securityService.get().getIdProvider( userStoreKey );
+        final IdProvider idProvider = securityService.get().getIdProvider( idProviderKey );
 
-        if ( userStore != null )
+        if ( idProvider != null )
         {
-            final IdProviderAccessControlList userStorePermissions = securityService.get().getIdProviderPermissions( userStoreKey );
-            return mapUserStorePermissions( userStorePermissions );
+            final IdProviderAccessControlList idProviderPermissions = securityService.get().getIdProviderPermissions( idProviderKey );
+            return mapIdProviderPermissions( idProviderPermissions );
         }
 
         return null;

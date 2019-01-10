@@ -9,21 +9,21 @@ import com.enonic.xp.security.IdProviderKey;
 public final class DeleteIdProvidersHandler
     extends AbstractIdProviderHandler
 {
-    private ScriptValue userStoreKeys;
+    private ScriptValue idProviderKeys;
 
-    public void setUserStoreKeys( final ScriptValue userStoreKeys )
+    public void setIdProviderKeys( final ScriptValue idProviderKeys )
     {
-        this.userStoreKeys = userStoreKeys;
+        this.idProviderKeys = idProviderKeys;
     }
 
-    public List<DeleteIdProviderResultMapper> deleteUserStores()
+    public List<DeleteIdProviderResultMapper> deleteIdProviders()
     {
-        return userStoreKeys.getArray( String.class ).stream().map( key -> {
-            final IdProviderKey userStoreKey = IdProviderKey.from( key );
-            final DeleteIdProviderResult.Builder result = DeleteIdProviderResult.create( userStoreKey );
+        return idProviderKeys.getArray( String.class ).stream().map( key -> {
+            final IdProviderKey idProviderKey = IdProviderKey.from( key );
+            final DeleteIdProviderResult.Builder result = DeleteIdProviderResult.create( idProviderKey );
             try
             {
-                securityService.get().deleteIdProvider( userStoreKey );
+                securityService.get().deleteIdProvider( idProviderKey );
                 result.deleted( true );
             }
             catch ( Exception e )

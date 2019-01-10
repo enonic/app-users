@@ -7,7 +7,7 @@ export class GetDefaultIdProviderRequest
 
     getQuery(): string {
         return `query {
-            defaultUserStore {
+            defaultIdProvider {
                 key
                 displayName
                 description
@@ -28,10 +28,10 @@ export class GetDefaultIdProviderRequest
     }
 
     sendAndParse(): wemQ.Promise<IdProvider> {
-        return this.query().then(result => this.userStorefromJson(result.defaultUserStore));
+        return this.query().then(result => this.idProviderfromJson(result.defaultIdProvider));
     }
 
-    userStorefromJson(us: IdProviderJson): IdProvider {
+    idProviderfromJson(us: IdProviderJson): IdProvider {
         if (!us || Object.keys(us).length === 0) {
             return null;
         }

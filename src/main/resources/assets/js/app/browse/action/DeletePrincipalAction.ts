@@ -1,9 +1,9 @@
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
-import {DeleteIdProviderRequest} from '../../../api/graphql/userStore/DeleteIdProviderRequest';
+import {DeleteIdProviderRequest} from '../../../api/graphql/idProvider/DeleteIdProviderRequest';
 import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
-import {DeleteIdProviderResult} from '../../../api/graphql/userStore/DeleteIdProviderResult';
+import {DeleteIdProviderResult} from '../../../api/graphql/idProvider/DeleteIdProviderResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
 import {IdProvider} from '../../principal/IdProvider';
 import Action = api.ui.Action;
@@ -26,9 +26,9 @@ export class DeletePrincipalAction
                     return userItem.getPrincipal();
                 });
 
-                let userStoreItems = grid.getSelectedDataList().filter(
+                let idProviderItems = grid.getSelectedDataList().filter(
                     userItem => UserTreeGridItemType.USER_STORE === userItem.getType()).map((userItem: UserTreeGridItem) => {
-                    return userItem.getUserStore();
+                    return userItem.getIdProvider();
                 });
 
                 let principalKeys = principalItems.filter((userItem) => {
@@ -37,10 +37,10 @@ export class DeletePrincipalAction
                     return principal.getKey();
                 });
 
-                let userStoreKeys = userStoreItems.filter((userItem) => {
+                let idProviderKeys = idProviderItems.filter((userItem) => {
                     return api.ObjectHelper.iFrameSafeInstanceOf(userItem, IdProvider);
-                }).map((userStore: IdProvider) => {
-                    return userStore.getKey();
+                }).map((idProvider: IdProvider) => {
+                    return idProvider.getKey();
                 });
 
                 if (principalKeys && principalKeys.length > 0) {
@@ -61,14 +61,14 @@ export class DeletePrincipalAction
                         });
                 }
 
-                if (userStoreKeys && userStoreKeys.length > 0) {
+                if (idProviderKeys && idProviderKeys.length > 0) {
                     new DeleteIdProviderRequest()
-                        .setKeys(userStoreKeys)
+                        .setKeys(idProviderKeys)
                         .sendAndParse()
                         .done((results: DeleteIdProviderResult[]) => {
                             if (results && results.length > 0) {
                                 api.notify.showFeedback(i18n('notify.delete.userstore.single', results[0].getIdProviderKey()));
-                                UserItemDeletedEvent.create().setUserStores(userStoreItems).build().fire();
+                                UserItemDeletedEvent.create().setIdProviders(idProviderItems).build().fire();
                             }
                         });
 

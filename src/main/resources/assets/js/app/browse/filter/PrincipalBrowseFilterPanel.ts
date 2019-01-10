@@ -183,7 +183,7 @@ export class PrincipalBrowseFilterPanel
             case 'group': return i18n('field.group');
             case 'role': return i18n('field.role');
         case 'user_store':
-            return i18n('field.userStore');
+            return i18n('field.idProvider');
             default: StringHelper.capitalize(name);
         }
     }

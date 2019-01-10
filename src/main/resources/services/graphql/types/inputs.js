@@ -16,15 +16,15 @@ var PrincipalInput = graphQl.createInputObjectType({
     }
 });
 
-exports.UserStoreAccessControlInput = graphQl.createInputObjectType({
-    name: 'UserStoreAccessControlInput',
+exports.idProviderAccessControlInput = graphQl.createInputObjectType({
+    name: 'idProviderAccessControlInput',
     description: 'Input definition for user store access control entry',
     fields: {
         principal: {
             type: graphQl.nonNull(graphQl.GraphQLString)
         },
         access: {
-            type: graphQl.nonNull(graphQlEnums.UserStoreAccessEnum)
+            type: graphQl.nonNull(graphQlEnums.idProviderAccessEnum)
         }
     }
 });

@@ -4,6 +4,6 @@ export class UpdateIdProviderRequest
     extends SaveIdProviderRequest {
 
     constructor() {
-        super('updateUserStore');
+        super('updateIdProvider');
     }
 }

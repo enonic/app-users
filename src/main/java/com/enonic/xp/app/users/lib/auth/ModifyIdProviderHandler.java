@@ -11,15 +11,15 @@ import com.enonic.xp.security.acl.IdProviderAccessControlList;
 public final class ModifyIdProviderHandler
     extends AbstractIdProviderHandler
 {
-    private IdProviderKey userStoreKey;
+    private IdProviderKey idProviderKey;
 
     private ScriptValue editor;
 
     private IdProviderAccessControlList permissions;
 
-    public void setUserStoreKey( final String userStoreKey )
+    public void setIdProviderKey( final String idProviderKey )
     {
-        this.userStoreKey = IdProviderKey.from( userStoreKey );
+        this.idProviderKey = IdProviderKey.from( idProviderKey );
     }
 
     public void setEditor( final ScriptValue editor )
@@ -33,20 +33,20 @@ public final class ModifyIdProviderHandler
             ? null : ScriptValueToIdProviderAccessControlListTranslator.translate( permissions, this::isPrincipalExists );
     }
 
-    public IdProviderMapper getUserStore()
+    public IdProviderMapper getIdProvider()
     {
-        final IdProvider userStore = securityService.get().getIdProvider( userStoreKey );
-        return userStore == null ? null : new IdProviderMapper( userStore );
+        final IdProvider idProvider = securityService.get().getIdProvider( idProviderKey );
+        return idProvider == null ? null : new IdProviderMapper( idProvider );
     }
 
-    public IdProviderMapper modifyUserStore()
+    public IdProviderMapper modifyIdProvider()
     {
-        final IdProvider userStore = securityService.get().getIdProvider( userStoreKey );
+        final IdProvider idProvider = securityService.get().getIdProvider( idProviderKey );
 
-        if ( userStore != null )
+        if ( idProvider != null )
         {
             final UpdateIdProviderParams params = UpdateIdProviderParams.create().
-                key( userStoreKey ).
+                key( idProviderKey ).
                 editor( createEditor() ).
                 permissions( permissions ).
                 build();
@@ -62,12 +62,12 @@ public final class ModifyIdProviderHandler
             final ScriptValue value = editor.call( new IdProviderMapper( edit.source ) );
             if ( value != null )
             {
-                updateUserStore( edit, value );
+                updateIdProvider( edit, value );
             }
         };
     }
 
-    private void updateUserStore( final EditableIdProvider target, final ScriptValue value )
+    private void updateIdProvider( final EditableIdProvider target, final ScriptValue value )
     {
         target.displayName = value.getMember( "displayName" ).getValue().toString();
         target.description = value.getMember( "description" ) == null ? null : value.getMember( "description" ).getValue().toString();

@@ -4,7 +4,7 @@ import com.enonic.xp.security.IdProviderKey;
 
 public class DeleteIdProviderResult
 {
-    private IdProviderKey userStoreKey;
+    private IdProviderKey idProviderKey;
 
     private boolean deleted;
 
@@ -12,14 +12,14 @@ public class DeleteIdProviderResult
 
     private DeleteIdProviderResult( final Builder builder )
     {
-        userStoreKey = builder.userStoreKey;
+        idProviderKey = builder.idProviderKey;
         deleted = builder.deleted;
         reason = builder.reason;
     }
 
-    public static Builder create( final IdProviderKey userStoreKey )
+    public static Builder create( final IdProviderKey idProviderKey )
     {
-        return new Builder( userStoreKey );
+        return new Builder( idProviderKey );
     }
 
     public boolean isDeleted()
@@ -37,14 +37,14 @@ public class DeleteIdProviderResult
         return new Builder();
     }
 
-    public IdProviderKey getUserStoreKey()
+    public IdProviderKey getIdProviderKey()
     {
-        return userStoreKey;
+        return idProviderKey;
     }
 
     public static class Builder
     {
-        private IdProviderKey userStoreKey;
+        private IdProviderKey idProviderKey;
 
         private boolean deleted;
 
@@ -54,14 +54,14 @@ public class DeleteIdProviderResult
         {
         }
 
-        private Builder( final IdProviderKey userStoreKey )
+        private Builder( final IdProviderKey idProviderKey )
         {
-            this.userStoreKey = userStoreKey;
+            this.idProviderKey = idProviderKey;
         }
 
-        public Builder userStoreKey( final IdProviderKey userStoreKey )
+        public Builder idProviderKey( final IdProviderKey idProviderKey )
         {
-            this.userStoreKey = userStoreKey;
+            this.idProviderKey = idProviderKey;
             return this;
         }
 

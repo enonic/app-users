@@ -36,7 +36,7 @@ exports.IdProviderConfig = graphQl.createObjectType({
     }
 });
 
-exports.UserStoreType = graphQl.createObjectType({
+exports.idProviderType = graphQl.createObjectType({
     name: 'IdProvider',
     description: 'Domain representation of a user store',
     interfaces: [graphQlUserItem.UserItemType],
@@ -93,13 +93,13 @@ exports.UserStoreType = graphQl.createObjectType({
         }
     }
 });
-graphQlUserItem.typeResolverMap.userStoreType = exports.UserStoreType;
+graphQlUserItem.typeResolverMap.idProviderType = exports.idProviderType;
 
-exports.UserStoreDeleteType = graphQl.createObjectType({
-    name: 'UserStoreDelete',
-    description: 'Result of a userStore delete operation',
+exports.idProviderDeleteType = graphQl.createObjectType({
+    name: 'idProviderDelete',
+    description: 'Result of a idProvider delete operation',
     fields: {
-        userStoreKey: {
+        idProviderKey: {
             type: graphQl.GraphQLString
         },
         deleted: {

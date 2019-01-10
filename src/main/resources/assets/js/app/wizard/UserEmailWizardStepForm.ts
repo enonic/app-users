@@ -11,16 +11,16 @@ export class UserEmailWizardStepForm
 
     private email: EmailInput;
 
-    private userStoreKey: IdProviderKey;
+    private idProviderKey: IdProviderKey;
 
     private isSystemUser: boolean;
 
-    constructor(userStoreKey: IdProviderKey, isSystemUser: boolean) {
+    constructor(idProviderKey: IdProviderKey, isSystemUser: boolean) {
         super();
 
-        this.userStoreKey = userStoreKey;
+        this.idProviderKey = idProviderKey;
         this.email = new EmailInput();
-        this.email.setIdProviderKey(this.userStoreKey);
+        this.email.setIdProviderKey(this.idProviderKey);
         this.isSystemUser = isSystemUser;
 
         let emailFormItem = new FormItemBuilder(this.email).setLabel(i18n('field.email')).setValidator(Validators.required).build();

@@ -56,7 +56,7 @@ public final class CreateIdProviderHandler
             idProviderConfig( idProviderConfig ).
             permissions( permissions ).
             build();
-        final IdProvider userStore = securityService.get().createIdProvider( params );
-        return userStore == null ? null : new IdProviderMapper( userStore );
+        final IdProvider idProvider = securityService.get().createIdProvider( params );
+        return idProvider == null ? null : new IdProviderMapper( idProvider );
     }
 }

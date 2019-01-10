@@ -5,7 +5,7 @@ export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
 
     tabId: api.app.bar.AppBarTabId;
 
-    userStoreKey: IdProviderKey;
+    idProviderKey: IdProviderKey;
 
     persistedPath: string;
 
@@ -23,8 +23,8 @@ export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
         return this;
     }
 
-    setUserStoreKey(value: IdProviderKey): UserItemWizardPanelParams<USER_ITEM_TYPE> {
-        this.userStoreKey = value;
+    setIdProviderKey(value: IdProviderKey): UserItemWizardPanelParams<USER_ITEM_TYPE> {
+        this.idProviderKey = value;
         return this;
     }
 
@@ -39,6 +39,6 @@ export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
     }
 
     isSystemKey(): boolean {
-        return !!this.userStoreKey && this.userStoreKey.isSystem();
+        return !!this.idProviderKey && this.idProviderKey.isSystem();
     }
 }

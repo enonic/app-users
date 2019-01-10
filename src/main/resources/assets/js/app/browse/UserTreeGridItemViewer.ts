@@ -14,7 +14,7 @@ export class UserTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTreeGr
 
     resolveUnnamedDisplayName(object: UserTreeGridItem): string {
         return object.getPrincipal() ? object.getPrincipal().getTypeName()
-            : object.getUserStore() ? i18n('field.userStore') : '';
+                                     : object.getIdProvider() ? i18n('field.idProvider') : '';
     }
 
     resolveSubName(object: UserTreeGridItem, relativePath: boolean = false): string {
@@ -22,7 +22,7 @@ export class UserTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTreeGr
         if (object.getType() != null) {
             switch (object.getType()) {
                 case UserTreeGridItemType.USER_STORE:
-                    return ('/' + object.getUserStore().getKey().toString());
+                    return ('/' + object.getIdProvider().getKey().toString());
                 case UserTreeGridItemType.PRINCIPAL:
                     return relativePath ? object.getPrincipal().getKey().getId() :
                            object.getPrincipal().getKey().toPath();
@@ -38,7 +38,7 @@ export class UserTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTreeGr
 
         switch (object.getType()) {
             case UserTreeGridItemType.USER_STORE:
-                if (object.getUserStore().getKey().isSystem()) {
+                if (object.getIdProvider().getKey().isSystem()) {
                     iconClass += 'icon-system ';
                 }
                 return iconClass + 'icon-address-book';
