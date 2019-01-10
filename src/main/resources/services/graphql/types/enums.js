@@ -56,7 +56,7 @@ exports.PermissionEnum = graphQl.createEnumType({
 
 exports.IdProviderAccessEnum = graphQl.createEnumType({
     name: 'IdProviderAccess',
-    description: 'Enumeration of user store access permissions',
+    description: 'Enumeration of id provider access permissions',
     values: {
         READ: 'READ',
         CREATE_USERS: 'CREATE_USERS',

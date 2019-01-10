@@ -198,7 +198,7 @@ export class UserItemsTreeGrid
                     .catch(api.DefaultErrorHandler.handle)
                     .done();
             } else {
-                // at root level, fetch user stores, and add 'Roles' folder
+                // at root level, fetch id providers, and add 'Roles' folder
                 new ListIdProvidersRequest().sendAndParse()
                     .then((idProviders: IdProvider[]) => {
                         idProviders.forEach((idProvider: IdProvider) => {
@@ -224,7 +224,7 @@ export class UserItemsTreeGrid
             deferred.resolve(this.addUsersGroupsToIdProvider(idProviderNode));
 
         } else if (level === 2) {
-            // fetch principals from the user store, if parent node 'Groups' or 'Users' was selected
+            // fetch principals from the id provider, if parent node 'Groups' or 'Users' was selected
             let folder: UserTreeGridItem = <UserTreeGridItem>parentNode.getData();
             let principalType = this.getPrincipalTypeForFolderItem(folder.getType());
 
@@ -304,7 +304,7 @@ export class UserItemsTreeGrid
 
         let idProviderNode: UserTreeGridItem = null;
         let idProviderKey: IdProviderKey = null;
-        // fetch principals from the user store, if parent node 'Groups' or 'Users' was selected
+        // fetch principals from the id provider, if parent node 'Groups' or 'Users' was selected
         if (!parentNode.getData().isRole()) {
             idProviderNode = parentNode.getParent().getData();
             idProviderKey = idProviderNode.getIdProvider().getKey();

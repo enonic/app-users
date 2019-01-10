@@ -7,7 +7,7 @@ exports.typeResolverMap = {
 
 exports.UserItemType = graphQl.createInterfaceType({
     name: 'UserItem',
-    description: 'User item is a base entity for every principal or user store',
+    description: 'User item is a base entity for every principal or id provider',
     typeResolver: function(source) {
         return source.principalType
                ? exports.typeResolverMap.principalType

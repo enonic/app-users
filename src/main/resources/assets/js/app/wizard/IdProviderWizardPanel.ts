@@ -88,7 +88,7 @@ export class IdProviderWizardPanel
         return this.produceCreateIdProviderRequest().sendAndParse().then((idProvider: IdProvider) => {
 
             this.unlock();
-            api.notify.showFeedback('User store was created');
+            api.notify.showFeedback('Id provider was created');
             new UserItemCreatedEvent(null, idProvider).fire();
 
             return idProvider;
@@ -105,7 +105,7 @@ export class IdProviderWizardPanel
         this.lock();
         return this.produceUpdateIdProviderRequest(this.assembleViewedIdProvider()).sendAndParse().then((idProvider: IdProvider) => {
             this.unlock();
-            api.notify.showFeedback('User store was updated');
+            api.notify.showFeedback('Id provider was updated');
             new UserItemUpdatedEvent(null, idProvider).fire();
 
             return idProvider;
@@ -190,7 +190,7 @@ export class IdProviderWizardPanel
     private listenToUserItemEvents() {
 
         let principalCreatedHandler = (event: UserItemCreatedEvent) => {
-            if (!this.getPersistedItem()) { // skip if user store is not persisted yet
+            if (!this.getPersistedItem()) { // skip if id provider is not persisted yet
                 return;
             }
 
@@ -204,7 +204,7 @@ export class IdProviderWizardPanel
         };
 
         let principalDeletedHandler = (event: UserItemDeletedEvent) => {
-            // skip if user store is not persisted yet or if anything except users or roles was deleted
+            // skip if id provider is not persisted yet or if anything except users or roles was deleted
             if (!this.getPersistedItem() || !event.getPrincipals()) {
                 return;
             }

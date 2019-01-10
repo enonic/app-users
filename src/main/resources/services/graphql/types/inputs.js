@@ -18,7 +18,7 @@ var PrincipalInput = graphQl.createInputObjectType({
 
 exports.idProviderAccessControlInput = graphQl.createInputObjectType({
     name: 'idProviderAccessControlInput',
-    description: 'Input definition for user store access control entry',
+    description: 'Input definition for id provider access control entry',
     fields: {
         principal: {
             type: graphQl.nonNull(graphQl.GraphQLString)
@@ -31,7 +31,7 @@ exports.idProviderAccessControlInput = graphQl.createInputObjectType({
 
 exports.IdProviderConfigInput = graphQl.createInputObjectType({
     name: 'IdProviderConfigInput',
-    description: 'Input definition for user store auth config',
+    description: 'Input definition for id provider auth config',
     fields: {
         applicationKey: {
             type: graphQl.nonNull(graphQl.GraphQLString)

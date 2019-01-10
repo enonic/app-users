@@ -25,11 +25,11 @@ function nullOrValue(value) {
 }
 
 /**
- * Returns the user store for the specified key.
+ * Returns the id provider for the specified key.
  *
  * @param {object} params JSON parameters.
  * @param {string} params.key IdProvider key.
- * @returns {object} the user store specified, or null if it doesn't exist.
+ * @returns {object} the id provider specified, or null if it doesn't exist.
  */
 exports.getIdProvider = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProviderHandler');
@@ -38,9 +38,9 @@ exports.getIdProvider = function (params) {
 };
 
 /**
- * Returns the list of all the user stores.
+ * Returns the list of all the id providers.
  *
- * @returns {object[]} Array of user stores.
+ * @returns {object[]} Array of id providers.
  */
 exports.getIdProviders = function () {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProvidersHandler');
@@ -61,10 +61,10 @@ exports.getIdProviderMode = function (params) {
 };
 
 /**
- * Returns the user store permissions.
+ * Returns the id provider permissions.
  *
  * @param {object} params JSON parameters.
- * @param {string} params.key Key of the user store to fetch permissions for.
+ * @param {string} params.key Key of the id provider to fetch permissions for.
  * @returns {object[]} Returns the list of principals with access level.
  */
 exports.getPermissions = function (params) {
@@ -74,7 +74,7 @@ exports.getPermissions = function (params) {
 };
 
 /**
- * Returns default user store permissions.
+ * Returns default id provider permissions.
  *
  * @returns {object[]} Returns the list of principals with access level.
  */
@@ -84,13 +84,13 @@ exports.defaultPermissions = function () {
 };
 
 /**
- * Creates a user store.
+ * Creates a id provider.
  *
- * @param {string} name User store name.
- * @param {string} [params.displayName] User store display name.
- * @param {string} [params.description] User store  description.
+ * @param {string} name Id provider name.
+ * @param {string} [params.displayName] Id provider display name.
+ * @param {string} [params.description] Id provider  description.
  * @param {object} [params.idProviderConfig] ID Provider configuration.
- * @param {object} [params.permissions] User store permissions.
+ * @param {object} [params.permissions] Id provider permissions.
  */
 exports.createIdProvider = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.CreateIdProviderHandler');
@@ -105,13 +105,13 @@ exports.createIdProvider = function (params) {
 };
 
 /**
- * Update a user store.
+ * Update a id provider.
  *
  * @param {object} params JSON parameters.
- * @param {string} params.key Key of the user store to modify.
- * @param {function} params.editor User store editor function to apply.
- * @param {object} [params.permissions] User store permissions.
- * @returns {object} The updated user store.
+ * @param {string} params.key Key of the id provider to modify.
+ * @param {function} params.editor Id provider editor function to apply.
+ * @param {object} [params.permissions] Id provider permissions.
+ * @returns {object} The updated id provider.
  */
 exports.modifyIdProvider = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.ModifyIdProviderHandler');
@@ -124,11 +124,11 @@ exports.modifyIdProvider = function (params) {
 };
 
 /**
- * Delete the user store by the key.
+ * Delete the id provider by the key.
  *
  * @param {object} params JSON parameters.
- * @param {string} params.keys Array of user store keys to delete.
- * @returns {object} the user stores specified, or null if it doesn't exist.
+ * @param {string} params.keys Array of id provider keys to delete.
+ * @returns {object} the id providers specified, or null if it doesn't exist.
  */
 exports.deleteIdProviders = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DeleteIdProvidersHandler');

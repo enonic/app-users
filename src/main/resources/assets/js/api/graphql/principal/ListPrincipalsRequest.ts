@@ -44,7 +44,7 @@ export class ListPrincipalsRequest
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }
         if (this.idProviderKey) {
-            vars['userstore'] = this.idProviderKey.toString();
+            vars['idprovider'] = this.idProviderKey.toString();
         }
         if (this.searchQuery) {
             vars['query'] = this.searchQuery;
@@ -53,8 +53,8 @@ export class ListPrincipalsRequest
     }
 
     getQuery(): string {
-        return `query($userstore: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
-                    principalsConnection (userstore: $userstore, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
+        return `query($idprovider: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
+                    principalsConnection (idprovider: $idprovider, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
                         totalCount
                         edges {
                             node {
