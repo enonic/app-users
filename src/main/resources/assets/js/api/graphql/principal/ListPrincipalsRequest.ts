@@ -54,7 +54,7 @@ export class ListPrincipalsRequest
 
     getQuery(): string {
         return `query($idprovider: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
-                    principalsConnection (idprovider: $idprovider, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
+                  principalsConnection (idprovider: $idprovider, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
                         totalCount
                         edges {
                             node {
