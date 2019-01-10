@@ -67,7 +67,7 @@ export class DeletePrincipalAction
                         .sendAndParse()
                         .done((results: DeleteIdProviderResult[]) => {
                             if (results && results.length > 0) {
-                                api.notify.showFeedback(i18n('notify.delete.userstore.single', results[0].getIdProviderKey()));
+                                api.notify.showFeedback(i18n('notify.delete.idprovider.single', results[0].getIdProviderKey()));
                                 UserItemDeletedEvent.create().setIdProviders(idProviderItems).build().fire();
                             }
                         });
