@@ -118,7 +118,7 @@ export class UserItemsTreeGrid
         let builder = new UserTreeGridItemBuilder();
 
         if (!principal) { // IdProvider type
-            userTreeGridItem = builder.setIdProvider(idProvider).setType(UserTreeGridItemType.USER_STORE).build();
+            userTreeGridItem = builder.setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
         } else {         // Principal type
             userTreeGridItem = builder.setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
         }
@@ -148,7 +148,7 @@ export class UserItemsTreeGrid
         if (!principal) { // IdProvider type
 
             const userTreeGridItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(
-                UserTreeGridItemType.USER_STORE).build();
+                UserTreeGridItemType.ID_PROVIDER).build();
 
             this.appendNode(userTreeGridItem, true, false, this.getRoot().isFiltered() ? this.getRoot().getDefaultRoot() : null);
 
@@ -203,7 +203,7 @@ export class UserItemsTreeGrid
                     .then((idProviders: IdProvider[]) => {
                         idProviders.forEach((idProvider: IdProvider) => {
                             gridItems.push(
-                                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USER_STORE).build());
+                                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build());
                         });
 
                         gridItems.push(new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build());

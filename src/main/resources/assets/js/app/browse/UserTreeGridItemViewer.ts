@@ -21,7 +21,7 @@ export class UserTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTreeGr
 
         if (object.getType() != null) {
             switch (object.getType()) {
-                case UserTreeGridItemType.USER_STORE:
+            case UserTreeGridItemType.ID_PROVIDER:
                     return ('/' + object.getIdProvider().getKey().toString());
                 case UserTreeGridItemType.PRINCIPAL:
                     return relativePath ? object.getPrincipal().getKey().getId() :
@@ -37,7 +37,7 @@ export class UserTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTreeGr
         let iconClass = 'icon-large ';
 
         switch (object.getType()) {
-            case UserTreeGridItemType.USER_STORE:
+        case UserTreeGridItemType.ID_PROVIDER:
                 if (object.getIdProvider().getKey().isSystem()) {
                     iconClass += 'icon-system ';
                 }

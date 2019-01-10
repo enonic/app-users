@@ -23,7 +23,7 @@ exports.UserItemTypeEnum = graphQl.createEnumType({
     name: 'UserItemType',
     description: 'Enumeration of user item types',
     values: {
-        USER_STORE: 'USER_STORE',
+        ID_PROVIDER: 'ID_PROVIDER',
         USER: 'USER',
         GROUP: 'GROUP',
         ROLE: 'ROLE'
@@ -61,7 +61,7 @@ exports.IdProviderAccessEnum = graphQl.createEnumType({
         READ: 'READ',
         CREATE_USERS: 'CREATE_USERS',
         WRITE_USERS: 'WRITE_USERS',
-        USER_STORE_MANAGER: 'USER_STORE_MANAGER',
+        ID_PROVIDER_MANAGER: 'ID_PROVIDER_MANAGER',
         ADMINISTRATOR: 'ADMINISTRATOR'
     }
 });

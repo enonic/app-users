@@ -144,7 +144,7 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
                 const isRootNode = node.calcLevel() === 1;
                 if (userItem instanceof IdProvider) {
                     if (isRootNode) {
-                        new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.USER_STORE).build()]).fire();
+                        new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ID_PROVIDER).build()]).fire();
                     } else if (node.getParent().getData().getUserItem() instanceof User) {
                         const item = new UserTreeGridItemBuilder().setIdProvider(userItem).setType(UserTreeGridItemType.USERS).build();
                         new NewPrincipalEvent([item]).fire();

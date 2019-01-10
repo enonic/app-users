@@ -29,7 +29,7 @@ export class UserBrowsePanel
 
             let label;
 
-            if (singleSelection && selection[0].getData().getType() !== UserTreeGridItemType.USER_STORE) {
+            if (singleSelection && selection[0].getData().getType() !== UserTreeGridItemType.ID_PROVIDER) {
                 const userItem = selection[0].getData();
 
                 switch (userItem.getType()) {
@@ -149,7 +149,7 @@ export class UserBrowsePanel
         let type: UserTreeGridItemType = item.getType();
 
         switch (type) {
-        case UserTreeGridItemType.USER_STORE:
+        case UserTreeGridItemType.ID_PROVIDER:
             return 'icon-address-book icon-large';
 
         case UserTreeGridItemType.PRINCIPAL:

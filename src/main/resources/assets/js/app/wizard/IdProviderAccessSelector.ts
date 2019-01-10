@@ -13,7 +13,7 @@ export class IdProviderAccessSelector
         {value: IdProviderAccess.READ, name: 'Read'},
         {value: IdProviderAccess.CREATE_USERS, name: 'Create Users'},
         {value: IdProviderAccess.WRITE_USERS, name: 'Write Users'},
-        {value: IdProviderAccess.USER_STORE_MANAGER, name: 'User Store Manager'},
+        {value: IdProviderAccess.ID_PROVIDER_MANAGER, name: 'User Store Manager'},
         {value: IdProviderAccess.ADMINISTRATOR, name: 'Administrator'}
     ];
 

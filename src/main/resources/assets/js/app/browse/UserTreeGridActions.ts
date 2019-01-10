@@ -61,7 +61,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
                 case UserTreeGridItemType.USERS:
                     directoriesSelected++;
                     break;
-                case UserTreeGridItemType.USER_STORE:
+                case UserTreeGridItemType.ID_PROVIDER:
                     idProvidersSelected++;
                     break;
                 }

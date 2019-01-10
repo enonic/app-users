@@ -37,7 +37,7 @@ function processIdProviderAggregation(result) {
     var idProvidersCount = result.total - principalsCount;
 
     if (idProvidersCount > 0) {
-        aggregationBuckets.push({key: 'user_store', docCount: '' + idProvidersCount});
+        aggregationBuckets.push({key: 'id_provider', docCount: '' + idProvidersCount});
     }
 }
 
@@ -63,7 +63,7 @@ function createTypesQuery(types) {
                 case common.UserItemType.GROUP:
                 case common.UserItemType.USER:
                     return 'principalType = "' + type + '"';
-                case common.UserItemType.USER_STORE:
+            case common.UserItemType.ID_PROVIDER:
                     return '(_parentPath = "/identity" AND _path != "/identity/roles")';
                 default:
                     return null;

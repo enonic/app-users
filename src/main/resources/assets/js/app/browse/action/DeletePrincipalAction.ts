@@ -27,7 +27,7 @@ export class DeletePrincipalAction
                 });
 
                 let idProviderItems = grid.getSelectedDataList().filter(
-                    userItem => UserTreeGridItemType.USER_STORE === userItem.getType()).map((userItem: UserTreeGridItem) => {
+                    userItem => UserTreeGridItemType.ID_PROVIDER === userItem.getType()).map((userItem: UserTreeGridItem) => {
                     return userItem.getIdProvider();
                 });
 

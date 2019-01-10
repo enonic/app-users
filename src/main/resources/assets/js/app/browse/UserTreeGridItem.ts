@@ -5,7 +5,7 @@ import i18n = api.util.i18n;
 import {IdProvider} from '../principal/IdProvider';
 
 export enum UserTreeGridItemType {
-    USER_STORE,
+    ID_PROVIDER,
     PRINCIPAL,
     GROUPS,
     USERS,
@@ -33,7 +33,7 @@ export class UserTreeGridItem implements api.Equitable {
     }
 
     static fromIdProvider(idProvider: IdProvider): UserTreeGridItem {
-        return new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USER_STORE).build();
+        return new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
     }
 
     setIdProvider(idProvider: IdProvider) {
@@ -58,7 +58,7 @@ export class UserTreeGridItem implements api.Equitable {
 
     getItemDisplayName(): string {
         switch (this.type) {
-        case UserTreeGridItemType.USER_STORE:
+        case UserTreeGridItemType.ID_PROVIDER:
             return this.idProvider.getDisplayName();
 
         case UserTreeGridItemType.PRINCIPAL:
@@ -79,7 +79,7 @@ export class UserTreeGridItem implements api.Equitable {
 
     getDataId(): string {
         switch (this.type) {
-        case UserTreeGridItemType.USER_STORE:
+        case UserTreeGridItemType.ID_PROVIDER:
             return this.idProvider.getKey().toString();
 
         case UserTreeGridItemType.PRINCIPAL:
@@ -108,7 +108,7 @@ export class UserTreeGridItem implements api.Equitable {
     }
 
     isIdProvider(): boolean {
-        return this.type === UserTreeGridItemType.USER_STORE;
+        return this.type === UserTreeGridItemType.ID_PROVIDER;
     }
 
     isRole(): boolean {
@@ -182,7 +182,7 @@ export class UserTreeGridItemBuilder {
         if (userItem instanceof Principal) {
             return this.setPrincipal(userItem).setType(UserTreeGridItemType.PRINCIPAL);
         } else if (userItem instanceof IdProvider) {
-            return this.setIdProvider(userItem).setType(UserTreeGridItemType.USER_STORE);
+            return this.setIdProvider(userItem).setType(UserTreeGridItemType.ID_PROVIDER);
         }
         return this;
     }

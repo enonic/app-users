@@ -43,7 +43,7 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
     }
 
     setSelection(selection: UserTreeGridItem[]): NewPrincipalDialog {
-        const isidProvider = selection.length === 1 && selection[0].getType() === UserTreeGridItemType.USER_STORE;
+        const isidProvider = selection.length === 1 && selection[0].getType() === UserTreeGridItemType.ID_PROVIDER;
         if (isidProvider) {
             this.grid.setIdProvider(selection[0].getIdProvider());
             this.setPath(selection[0].getItemDisplayName());

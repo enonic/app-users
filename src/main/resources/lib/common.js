@@ -10,14 +10,14 @@ var UserItemType = exports.UserItemType = {
     ROLE: 'ROLE',
     USER: 'USER',
     GROUP: 'GROUP',
-    USER_STORE: 'USER_STORE'
+    ID_PROVIDER: 'ID_PROVIDER'
 };
 exports.UserItemType.all = function () {
     return [
         UserItemType.ROLE,
         UserItemType.USER,
         UserItemType.GROUP,
-        UserItemType.USER_STORE
+        UserItemType.ID_PROVIDER
     ];
 };
 

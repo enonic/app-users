@@ -66,7 +66,7 @@ export class UserAppPanel
                 new GetIdProviderByKeyRequest(IdProviderKey.fromString(id)).sendAndParse().done((idProvider: IdProvider) => {
                     new EditPrincipalEvent([
                         new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(
-                            UserTreeGridItemType.USER_STORE).build()
+                            UserTreeGridItemType.ID_PROVIDER).build()
                     ]).fire();
                 });
             } else {
@@ -200,7 +200,7 @@ export class UserAppPanel
         if (tabMenuItem != null) {
             this.selectPanel(tabMenuItem);
         } else {
-            if (!userItem || userItem.getType() === UserTreeGridItemType.USER_STORE) {
+            if (!userItem || userItem.getType() === UserTreeGridItemType.ID_PROVIDER) {
                 this.handleIdProviderNew(tabId, data.tabName);
             } else {
                 this.loadIdProviderIfNeeded(userItem).then((idProvider: IdProvider) => {
@@ -239,7 +239,7 @@ export class UserAppPanel
                 principalPath = userItem.getPrincipal().getKey().toPath(true);
                 tabName = i18n(`field.${PrincipalType[principalType].toLowerCase()}`);
                 break;
-            case UserTreeGridItemType.USER_STORE:
+            case UserTreeGridItemType.ID_PROVIDER:
                 tabName = i18n('field.idProvider');
                 break;
             }
@@ -273,7 +273,7 @@ export class UserAppPanel
             }
             break;
         default:
-        case UserTreeGridItemType.USER_STORE:
+        case UserTreeGridItemType.ID_PROVIDER:
         case UserTreeGridItemType.ROLES:
             promise = wemQ(userItem.getIdProvider());
             break;
@@ -334,7 +334,7 @@ export class UserAppPanel
                 this.selectPanel(tabMenuItem);
             } else {
                 let tabId = this.getTabIdForUserItem(userItem);
-                if (userItem.getType() === UserTreeGridItemType.USER_STORE) {
+                if (userItem.getType() === UserTreeGridItemType.ID_PROVIDER) {
                     this.handleIdProviderEdit(userItem.getIdProvider(), tabId, tabMenuItem);
                 } else if (userItem.getType() === UserTreeGridItemType.PRINCIPAL) {
                     this.loadIdProviderIfNeeded(userItem).then((idProvider) => {
@@ -436,7 +436,7 @@ export class UserAppPanel
         let appBarTabId: AppBarTabId;
         if (UserTreeGridItemType.PRINCIPAL === userItem.getType()) {
             appBarTabId = AppBarTabId.forEdit(userItem.getPrincipal().getKey().toString());
-        } else if (UserTreeGridItemType.USER_STORE === userItem.getType()) {
+        } else if (UserTreeGridItemType.ID_PROVIDER === userItem.getType()) {
             appBarTabId = AppBarTabId.forEdit(userItem.getIdProvider().getKey().toString());
         }
         return appBarTabId;
