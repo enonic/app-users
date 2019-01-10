@@ -30,9 +30,9 @@ public class CreateIdProviderHandlerTest
     }
 
     @Test
-    public void testCreateUserStore()
+    public void testCreateIdProvider()
     {
-        Mockito.when( securityService.createIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.createIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestIdProvider() );
         Mockito.when( securityService.getPrincipal( Mockito.any() ) ).thenReturn( Optional.empty() ).thenReturn(
             (Optional) Optional.of( TestDataFixtures.getTestGroup() ) );
 
@@ -44,28 +44,28 @@ public class CreateIdProviderHandlerTest
         final CreateIdProviderParams params = issueParamsArgumentCaptor.getValue();
 
         assertNotNull( params );
-        assertEquals( "User store test", params.getDisplayName() );
-        assertEquals( "User store used for testing", params.getDescription() );
+        assertEquals( "Id provider test", params.getDisplayName() );
+        assertEquals( "Id provider used for testing", params.getDescription() );
         assertEquals( "com.enonic.app.test", params.getIdProviderConfig().getApplicationKey().toString() );
         assertEquals( "App Title", params.getIdProviderConfig().getConfig().getString( "title" ) );
         assertEquals( "noreply@example.com", params.getIdProviderConfig().getConfig().getSet( "forgotPassword" ).getString( "email" ) );
         final IdProviderAccessControlEntry entry =
-            params.getIdProviderPermissions().getEntry( PrincipalKey.from( "group:myUserStore:group" ) );
+            params.getIdProviderPermissions().getEntry( PrincipalKey.from( "group:myIdProvider:group" ) );
         assertNotNull( entry );
         assertEquals( entry.getAccess(), IdProviderAccess.CREATE_USERS );
         assertEquals( params.getIdProviderPermissions().getAllPrincipals().getSize(), 1 );
     }
 
     @Test
-    public void testCreateUserStoreByName()
+    public void testCreateIdProviderByName()
     {
-        Mockito.when( securityService.createIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.createIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestIdProvider() );
 
         runFunction( "/com/enonic/xp/app/users/lib/auth/createIdProvider-test.js", "createIdProviderByName" );
 
         ArgumentCaptor<CreateIdProviderParams> issueParamsArgumentCaptor = ArgumentCaptor.forClass( CreateIdProviderParams.class );
         Mockito.verify( securityService ).createIdProvider( issueParamsArgumentCaptor.capture() );
 
-        assertEquals( "myUserStore", issueParamsArgumentCaptor.getValue().getDisplayName() );
+        assertEquals( "myIdProvider", issueParamsArgumentCaptor.getValue().getDisplayName() );
     }
 }

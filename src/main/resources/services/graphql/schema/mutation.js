@@ -215,7 +215,7 @@ module.exports = graphQl.createObjectType({
             }
         },
         deleteidProviders: {
-            type: graphQl.list(graphQlObjectTypes.UserStoreDeleteType),
+            type: graphQl.list(graphQlObjectTypes.IdProviderDeleteType),
             args: {
                 keys: graphQl.list(graphQl.GraphQLString)
             },

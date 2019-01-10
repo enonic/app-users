@@ -55,21 +55,21 @@ public class TestDataFixtures
             build();
     }
 
-    public static IdProvider getTestBlankUserStore()
+    public static IdProvider getTestBlankIdProvider()
     {
         return IdProvider.create().
-            key( IdProviderKey.from( "myUserStore" ) ).
+            key( IdProviderKey.from( "myIdProvider" ) ).
             displayName( "" ).
             description( "" ).
             build();
     }
 
-    public static IdProvider getTestUserStore()
+    public static IdProvider getTestIdProvider()
     {
         return IdProvider.create().
-            key( IdProviderKey.from( "myUserStore" ) ).
-            displayName( "User store test" ).
-            description( "User store used for testing" ).
+            key( IdProviderKey.from( "myIdProvider" ) ).
+            displayName( "Id provider test" ).
+            description( "Id provider used for testing" ).
             idProviderConfig( getTestIdProviderConfig() ).
             build();
     }

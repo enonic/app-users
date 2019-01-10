@@ -255,7 +255,7 @@ module.exports = {
         return browsePanel.clickOnNewButton().then(() => {
             return newPrincipalDialog.waitForOpened();
         }).then(() => {
-            return newPrincipalDialog.clickOnItem(`User Store`);
+            return newPrincipalDialog.clickOnItem(`Id Provider`);
     }).
         then(() = > idProviderWizard.waitForOpened()
     )

@@ -1,14 +1,14 @@
 var t = require('/lib/xp/testing');
 var auth = require('/lib/auth');
 
-exports.getUserStore = function () {
+exports.getIdProvider = function () {
 
-    var result = auth.getUserStore({key: 'myUserStore'});
+    var result = auth.getIdProvider({key: 'myIdProvider'});
 
     var expectedJson = {
-        key: 'myUserStore',
-        displayName: 'User store test',
-        description: 'User store used for testing',
+        key: 'myIdProvider',
+        displayName: 'Id provider test',
+        description: 'Id provider used for testing',
         idProviderConfig: {
             applicationKey: 'com.enonic.app.test',
             config: [
@@ -83,9 +83,9 @@ exports.getUserStore = function () {
 
 };
 
-exports.getNonExistingUserStore = function () {
+exports.getNonExistingIdProvider = function () {
 
-    var result = auth.getUserStore({key: 'myUserStore'});
+    var result = auth.getIdProvider({key: 'myIdProvider'});
 
     t.assertEquals(null, result);
 

@@ -19,11 +19,11 @@ public class DefaultPermissionsHandlerTest
 {
     private SecurityService securityService;
 
-    private IdProviderKey userStoreKey;
+    private IdProviderKey idProviderKey;
 
     private Principals principals;
 
-    private IdProviderAccessControlList userStoreAccessControlEntries;
+    private IdProviderAccessControlList idProviderAccessControlEntries;
 
     @Override
     public void initialize()
@@ -33,12 +33,12 @@ public class DefaultPermissionsHandlerTest
         securityService = Mockito.mock( SecurityService.class );
         addService( SecurityService.class, securityService );
 
-        userStoreKey = IdProviderKey.from( "myUserStore" );
+        idProviderKey = IdProviderKey.from( "myIdProvider" );
 
-        final User user = User.create( TestDataFixtures.getTestUser() ).key( PrincipalKey.ofUser( userStoreKey, "user" ) ).build();
+        final User user = User.create( TestDataFixtures.getTestUser() ).key( PrincipalKey.ofUser( idProviderKey, "user" ) ).build();
         principals = Principals.from( user );
 
-        userStoreAccessControlEntries = IdProviderAccessControlList.create().
+        idProviderAccessControlEntries = IdProviderAccessControlList.create().
             add( IdProviderAccessControlEntry.create().principal( user.getKey() ).access( IdProviderAccess.ADMINISTRATOR ).build() ).
             build();
     }
@@ -46,9 +46,9 @@ public class DefaultPermissionsHandlerTest
     @Test
     public void testPermissions()
     {
-        Mockito.when( securityService.getIdProvider( userStoreKey ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.getIdProvider( idProviderKey ) ).thenReturn( TestDataFixtures.getTestIdProvider() );
         Mockito.when( securityService.getPrincipals( Mockito.any( PrincipalKeys.class ) ) ).thenReturn( principals );
-        Mockito.when( securityService.getDefaultIdProviderPermissions() ).thenReturn( userStoreAccessControlEntries );
+        Mockito.when( securityService.getDefaultIdProviderPermissions() ).thenReturn( idProviderAccessControlEntries );
 
         runFunction( "/com/enonic/xp/app/users/lib/auth/defaultPermissions-test.js", "defaultPermissions" );
     }

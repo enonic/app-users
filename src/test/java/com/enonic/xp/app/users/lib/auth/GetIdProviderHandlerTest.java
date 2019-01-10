@@ -22,19 +22,19 @@ public class GetIdProviderHandlerTest
     }
 
     @Test
-    public void testGetUserStore()
+    public void testGetIdProvider()
     {
-        Mockito.when( securityService.getIdProvider( IdProviderKey.from( "myUserStore" ) ) ).thenReturn(
-            TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.getIdProvider( IdProviderKey.from( "myIdProvider" ) ) ).thenReturn(
+            TestDataFixtures.getTestIdProvider() );
 
-        runFunction( "/com/enonic/xp/app/users/lib/auth/getUserStore-test.js", "getIdProvider" );
+        runFunction( "/com/enonic/xp/app/users/lib/auth/getIdProvider-test.js", "getIdProvider" );
     }
 
     @Test
-    public void testNonExistingUserStore()
+    public void testNonExistingIdProvider()
     {
-        Mockito.when( securityService.getIdProvider( IdProviderKey.from( "myUserStore" ) ) ).thenReturn( null );
+        Mockito.when( securityService.getIdProvider( IdProviderKey.from( "myIdProvider" ) ) ).thenReturn( null );
 
-        runFunction( "/com/enonic/xp/app/users/lib/auth/getUserStore-test.js", "getNonExistingUserStore" );
+        runFunction( "/com/enonic/xp/app/users/lib/auth/getIdProvider-test.js", "getNonExistingIdProvider" );
     }
 }

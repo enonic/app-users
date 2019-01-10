@@ -9,85 +9,94 @@ const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
-const userStoreWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/userstore.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const userWizard = require('../page_objects/wizardpanel/user.wizard');
 
-describe('User Store spec - save and edit', function () {
+describe('Id Provider spec - save and edit', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
-    let userStore;
+    let idProvider;
     let testUser;
 
-    it(`GIVEN 'User Store' wizard is opened WHEN name has been typed AND 'Save' button pressed THEN correct notification message should be displayed`,
-        () => {
-            userStore = userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store');
-            return testUtils.clickOnNewOpenUserStoreWizard().then(() => {
-                return userStoreWizard.typeDisplayName(userStore.displayName);
+    it(`GIVEN 'Id Provider' wizard is opened WHEN name has been typed AND 'Save' button pressed THEN correct notification message should be displayed`,
+        () = > {
+        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider');
+    return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
+        return idProviderWizard.typeDisplayName(idProvider.displayName);
             }).then(() => {
-                return userStoreWizard.waitAndClickOnSave();
+        return idProviderWizard.waitAndClickOnSave();
             }).then(() => {
-                return userStoreWizard.waitForNotificationMessage();
+        return idProviderWizard.waitForNotificationMessage();
             }).then(result => {
-                assert.strictEqual(result, 'User store was created', 'correct notification message should be displayed');
+        assert.strictEqual(result, 'Id provider was created', 'correct notification message should be displayed');
             })
         });
 
-    it(`GIVEN 'user store' wizard is opened WHEN the name that already in use has been typed THEN correct notification message should be present`,
-        () => {
-            return testUtils.clickOnNewOpenUserStoreWizard().then(() => userStoreWizard.waitForOpened())
-                .then(() => userStoreWizard.typeDisplayName(userStore.displayName)).pause(400).then(() => {
-                    return userStoreWizard.waitAndClickOnSave();
+    it(`GIVEN 'Id provider' wizard is opened WHEN the name that already in use has been typed THEN correct notification message should be present`,
+        () = > {
+        return testUtils.clickOnNewOpenIdProviderWizard().then(() = > idProviderWizard.waitForOpened()
+)
+.
+    then(() = > idProviderWizard.typeDisplayName(idProvider.displayName)
+).
+    pause(400).then(() = > {
+        return idProviderWizard.waitAndClickOnSave();
                 }).then(() => {
-                    return userStoreWizard.waitForErrorNotificationMessage();
+        return idProviderWizard.waitForErrorNotificationMessage();
                 }).then(result => {
-                    var msg = `User Store [` + userStore.displayName + `] could not be created. A User Store with that name already exists`;
+        var msg = `Id Provider [` + idProvider.displayName + `] could not be created. A Id Provider with that name already exists`;
                     assert.strictEqual(result, msg, 'expected notification message should be displayed');
                 })
         });
 
-    it(`GIVEN User Store wizard is opened WHEN data has been typed and 'Save' button pressed AND the wizard has been closed THEN new User Store should be listed`,
-        () => {
-            userStore = userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store');
-            return testUtils.openWizardAndSaveUserStore(userStore).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userStore.displayName);
+    it(`GIVEN Id Provider wizard is opened WHEN data has been typed and 'Save' button pressed AND the wizard has been closed THEN new Id Provider should be listed`,
+        () = > {
+        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider');
+    return testUtils.openWizardAndSaveIdProvider(idProvider).then(() = > {
+        return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
             }).pause(1000)
-                .then(() => userBrowsePanel.isItemDisplayed(userStore.displayName)).then(result => {
-                    assert.isTrue(result, 'new user store should be present in the grid');
+                   .then(() = > userBrowsePanel.isItemDisplayed(idProvider.displayName)
+).
+    then(result = > {
+        assert.isTrue(result, 'new Id provider should be present in the grid');
                 })
         });
 
-    it(`GIVEN User Store wizard is opened WHEN data and permissions have been typed and 'Save' button pressed AND the wizard has been closed THEN 'Save Before' dialog should not be displayed`,
-        () => {
+    it(`GIVEN Id Provider wizard is opened WHEN data and permissions have been typed and 'Save' button pressed AND the wizard has been closed THEN 'Save Before' dialog should not be displayed`,
+        () = > {
             let permissions = ['Everyone', 'Users App'];
             let testStore =
-                userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store', null, permissions);
-            return testUtils.clickOnNewOpenUserStoreWizard(testStore).then(() => {
-                return userStoreWizard.typeData(testStore);
+                userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider', null, permissions);
+    return testUtils.clickOnNewOpenIdProviderWizard(testStore).then(() = > {
+        return idProviderWizard.typeData(testStore);
             }).then(() => {
-                return userStoreWizard.waitAndClickOnSave();
+        return idProviderWizard.waitAndClickOnSave();
             }).then(()=>{
-                return userStoreWizard.waitForSpinnerNotVisible();
+        return idProviderWizard.waitForSpinnerNotVisible();
             }).pause(1500).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testStore.displayName);
             }).then(() => userBrowsePanel.isItemDisplayed(testStore.displayName)).then(result => {
-                assert.isTrue(result, 'new user store should be present in the grid');
+        assert.isTrue(result, 'new Id provider should be present in the grid');
             })
         });
 
-    it(`GIVEN existing 'User Store' WHEN it has been selected and opened THEN correct description should be present`, () => {
-        return userBrowsePanel.clickOnRowByName(userStore.displayName).then(() => {
+    it(`GIVEN existing 'Id Provider' WHEN it has been selected and opened THEN correct description should be present`, () = > {
+        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() = > {
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
-            return userStoreWizard.waitForOpened();
-        }).then(() => userStoreWizard.getDescription()).then(result => {
-            assert.strictEqual(result, userStore.description, 'actual description and expected should be equals');
+        return idProviderWizard.waitForOpened();
+}).
+    then(() = > idProviderWizard.getDescription()
+).
+    then(result = > {
+        assert.strictEqual(result, idProvider.description, 'actual description and expected should be equals');
         })
     });
 
-    it(`GIVEN existing 'User Store'(no any users) WHEN it has been selected THEN 'Delete' button should be enabled`, () => {
-        return userBrowsePanel.clickOnRowByName(userStore.displayName).then(() => {
+    it(`GIVEN existing 'Id Provider'(no any users) WHEN it has been selected THEN 'Delete' button should be enabled`, () = > {
+        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() = > {
             return assert.eventually.equal(userBrowsePanel.waitForDeleteButtonEnabled(), true,
                 "'Delete' button should be enabled, because of no any users were added in the store");
         }).then(() => {
@@ -97,10 +106,10 @@ describe('User Store spec - save and edit', function () {
         });
     });
 
-    it(`GIVEN existing 'User Store' has an user WHEN store has been selected THEN 'Delete' button should be disabled`, () => {
+    it(`GIVEN existing 'Id Provider' has an user WHEN store has been selected THEN 'Delete' button should be disabled`, () = > {
         let userName = userItemsBuilder.generateRandomName('user');
         testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName));
-        return testUtils.clickOnUserStoreAndOpenUserWizard(userStore.displayName).then(() => {
+    return testUtils.clickOnIdProviderAndOpenUserWizard(idProvider.displayName).then(() = > {
             return userWizard.typeData(testUser);
         }).then(() => {
             return testUtils.saveAndCloseWizard(testUser.displayName);
@@ -112,15 +121,15 @@ describe('User Store spec - save and edit', function () {
         });
     });
 
-    it(`GIVEN existing 'User Store' with an user WHEN the user has been deleted THEN the store can be deleted`, () => {
+    it(`GIVEN existing 'Id Provider' with an user WHEN the user has been deleted THEN the store can be deleted`, () = > {
         return testUtils.selectAndDeleteItem(testUser.displayName).then(() => {
             return userBrowsePanel.waitForItemNotDisplayed(testUser.displayName);
         }).then(result => {
             assert.isTrue(result, 'the user should not be present in the grid');
         }).then(() => {
-            return testUtils.selectAndDeleteItem(userStore.displayName)
+        return testUtils.selectAndDeleteItem(idProvider.displayName)
         }).then(() => {
-            return userBrowsePanel.waitForItemNotDisplayed(userStore.displayName)
+        return userBrowsePanel.waitForItemNotDisplayed(idProvider.displayName)
         });
     });
 

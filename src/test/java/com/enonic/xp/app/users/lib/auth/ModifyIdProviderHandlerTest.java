@@ -34,15 +34,15 @@ public class ModifyIdProviderHandlerTest
     }
 
     @Test
-    public void testModifyUserStore()
+    public void testModifyIdProvider()
     {
-        Mockito.when( securityService.getIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestBlankUserStore() );
+        Mockito.when( securityService.getIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestBlankIdProvider() );
         Mockito.when( securityService.getPrincipal( Mockito.any() ) ).thenReturn( Optional.empty() ).thenReturn(
             (Optional) Optional.of( TestDataFixtures.getTestGroup() ) );
         Mockito.when( securityService.updateIdProvider( Mockito.isA( UpdateIdProviderParams.class ) ) ).thenAnswer(
             invocationOnMock -> invokeUpdate( (UpdateIdProviderParams) invocationOnMock.getArguments()[0] ) );
 
-        runFunction( "/com/enonic/xp/app/users/lib/auth/modifyUserStore-test.js", "modifyUserStore" );
+        runFunction( "/com/enonic/xp/app/users/lib/auth/modifyIdProvider-test.js", "modifyIdProvider" );
     }
 
     private IdProvider invokeUpdate( final UpdateIdProviderParams params )
@@ -52,25 +52,25 @@ public class ModifyIdProviderHandlerTest
 
         final IdProviderAccessControlList permissions = params.getIdProviderPermissions();
         Assert.assertNotNull( "Permissions should not be empty", permissions );
-        final IdProviderAccessControlEntry entry = permissions.getEntry( PrincipalKey.from( "group:myUserStore:group" ) );
+        final IdProviderAccessControlEntry entry = permissions.getEntry( PrincipalKey.from( "group:myIdProvider:group" ) );
         assertNotNull( entry );
         assertEquals( entry.getAccess(), IdProviderAccess.CREATE_USERS );
         assertEquals( params.getIdProviderPermissions().getAllPrincipals().getSize(), 1 );
 
-        final EditableIdProvider editable = new EditableIdProvider( TestDataFixtures.getTestBlankUserStore() );
+        final EditableIdProvider editable = new EditableIdProvider( TestDataFixtures.getTestBlankIdProvider() );
 
         editor.edit( editable );
         return editable.build();
     }
 
     @Test
-    public void testModifyUserStoreWithNullValues()
+    public void testModifyIdProviderWithNullValues()
     {
-        Mockito.when( securityService.getIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.getIdProvider( Mockito.any() ) ).thenReturn( TestDataFixtures.getTestIdProvider() );
         Mockito.when( securityService.updateIdProvider( Mockito.isA( UpdateIdProviderParams.class ) ) ).thenAnswer(
             invocationOnMock -> invokeUpdateWithNullValues( (UpdateIdProviderParams) invocationOnMock.getArguments()[0] ) );
 
-        runFunction( "/com/enonic/xp/app/users/lib/auth/modifyUserStore-test.js", "modifyUserStoreWithNullValues" );
+        runFunction( "/com/enonic/xp/app/users/lib/auth/modifyIdProvider-test.js", "modifyIdProviderWithNullValues" );
     }
 
     private IdProvider invokeUpdateWithNullValues( final UpdateIdProviderParams params )
@@ -78,7 +78,7 @@ public class ModifyIdProviderHandlerTest
         final IdProviderEditor editor = params.getEditor();
         Assert.assertNotNull( editor );
 
-        final EditableIdProvider editable = new EditableIdProvider( TestDataFixtures.getTestUserStore() );
+        final EditableIdProvider editable = new EditableIdProvider( TestDataFixtures.getTestIdProvider() );
 
         editor.edit( editable );
         return editable.build();

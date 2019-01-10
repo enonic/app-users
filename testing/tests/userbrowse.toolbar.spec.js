@@ -45,11 +45,12 @@ describe('User Browse panel, toolbar spec', function () {
         });
     });
 
-    it(`GIVEN 'user browse panel' is opened WHEN 'System User Store' has been selected THEN all buttons should have correct states`, () => {
+    it(`GIVEN 'user browse panel' is opened WHEN 'System Id Provider' has been selected THEN all buttons should have correct states`, () = >
+    {
         return userBrowsePanel.clickOnRowByName('/system').waitForEnabled(userBrowsePanel.newButton).then(result=> {
             assert.isTrue(result, `'New' button should be enabled`);
         }).pause(1000).isEnabled(userBrowsePanel.deleteButton).then(result => {
-            assert.isFalse(result, `'Delete' button should be disabled, because this is the 'System' user store!`);
+        assert.isFalse(result, `'Delete' button should be disabled, because this is the 'System' Id provider!`);
         }).isEnabled(userBrowsePanel.editButton).then(function (result) {
             assert.isTrue(result, `'Edit' button should be enabled`);
         });
@@ -65,7 +66,7 @@ describe('User Browse panel, toolbar spec', function () {
         });
     });
 
-    it(`GIVEN 'System User Store' is expanded WHEN 'Users' has been selected THEN all buttons should have correct states`, () => {
+    it(`GIVEN 'System Id Provider' is expanded WHEN 'Users' has been selected THEN all buttons should have correct states`, () = > {
         return userBrowsePanel.clickOnExpanderIcon('/system').then(()=> {
             return userBrowsePanel.waitForFolderUsersVisible();
         }).then(()=> {
@@ -79,7 +80,7 @@ describe('User Browse panel, toolbar spec', function () {
         });
     });
 
-    it(`GIVEN 'System User Store' is expanded WHEN 'Groups' has been selected THEN all buttons should have correct states`, () => {
+    it(`GIVEN 'System Id Provider' is expanded WHEN 'Groups' has been selected THEN all buttons should have correct states`, () = > {
         return userBrowsePanel.clickOnExpanderIcon('/system').then(()=> {
             return userBrowsePanel.waitForFolderUsersVisible();
         }).then(()=> {

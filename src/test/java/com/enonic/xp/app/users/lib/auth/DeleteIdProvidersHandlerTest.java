@@ -23,12 +23,12 @@ public class DeleteIdProvidersHandlerTest
     }
 
     @Test
-    public void testDeleteUserStores()
+    public void testDeleteIdProviders()
     {
-        final IdProviderKey nonExistingUserStoreKey = IdProviderKey.from( "invalid" );
-        Mockito.doThrow( new IdProviderNotFoundException( nonExistingUserStoreKey ) ).when( securityService ).deleteIdProvider(
-            nonExistingUserStoreKey );
+        final IdProviderKey nonExistingIdProviderKey = IdProviderKey.from( "invalid" );
+        Mockito.doThrow( new IdProviderNotFoundException( nonExistingIdProviderKey ) ).when( securityService ).deleteIdProvider(
+            nonExistingIdProviderKey );
 
-        runFunction( "/com/enonic/xp/app/users/lib/auth/deleteUserStores-test.js", "deleteUserStores" );
+        runFunction( "/com/enonic/xp/app/users/lib/auth/deleteIdProviders-test.js", "deleteIdProviders" );
     }
 }

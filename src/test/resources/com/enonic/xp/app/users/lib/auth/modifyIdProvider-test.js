@@ -1,11 +1,11 @@
 var t = require('/lib/xp/testing');
 var auth = require('/lib/auth');
 
-exports.modifyUserStore = function () {
+exports.modifyIdProvider = function () {
     var expectedJson = {
-        key: 'myUserStore',
-        displayName: 'User store test',
-        description: 'User store used for testing',
+        key: 'myIdProvider',
+        displayName: 'Id provider test',
+        description: 'Id provider used for testing',
         idProviderConfig: {
             applicationKey: 'com.enonic.app.test',
             config: [
@@ -74,13 +74,13 @@ exports.modifyUserStore = function () {
         }
     };
 
-    var result = auth.modifyUserStore({
-        key: 'myUserStore',
-        editor: function (userStore) {
-            var newUserStore = userStore;
-            newUserStore.displayName = 'User store test';
-            newUserStore.description = 'User store used for testing';
-            newUserStore.idProviderConfig = {
+    var result = auth.modifyIdProvider({
+        key: 'myIdProvider',
+        editor: function (idProvider) {
+            var newIdProvider = idProvider;
+            newIdProvider.displayName = 'Id provider test';
+            newIdProvider.description = 'Id provider used for testing';
+            newIdProvider.idProviderConfig = {
                 applicationKey: 'com.enonic.app.test',
                 config: [
                     {
@@ -150,15 +150,15 @@ exports.modifyUserStore = function () {
                     }
                 ]
             };
-            return newUserStore
+            return newIdProvider
         },
         permissions: [
             {
-                principal: 'user:myUserStore:user',
+                principal: 'user:myIdProvider:user',
                 access: 'ADMINISTRATOR'
             },
             {
-                principal: 'group:myUserStore:group',
+                principal: 'group:myIdProvider:group',
                 access: 'CREATE_USERS'
             }
         ]
@@ -167,18 +167,18 @@ exports.modifyUserStore = function () {
     t.assertJsonEquals(expectedJson, result);
 };
 
-exports.modifyUserStoreWithNullValues = function () {
+exports.modifyIdProviderWithNullValues = function () {
     var expectedJson = {
-        key: 'myUserStore',
-        displayName: 'User store test'
+        key: 'myIdProvider',
+        displayName: 'Id provider test'
     };
 
-    var result = auth.modifyUserStore({
-        key: 'myUserStore',
-        editor: function (userStore) {
-            userStore.description = null;
-            userStore.idProviderConfig = null;
-            return userStore;
+    var result = auth.modifyIdProvider({
+        key: 'myIdProvider',
+        editor: function (idProvider) {
+            idProvider.description = null;
+            idProvider.idProviderConfig = null;
+            return idProvider;
         }
     });
 

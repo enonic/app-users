@@ -20,11 +20,11 @@ public class GetPermissionsHandlerTest
 {
     private SecurityService securityService;
 
-    private IdProviderKey userStoreKey;
+    private IdProviderKey idProviderKey;
 
     private Principals principals;
 
-    private IdProviderAccessControlList userStoreAccessControlEntries;
+    private IdProviderAccessControlList idProviderAccessControlEntries;
 
     @Override
     public void initialize()
@@ -34,14 +34,14 @@ public class GetPermissionsHandlerTest
         securityService = Mockito.mock( SecurityService.class );
         addService( SecurityService.class, securityService );
 
-        userStoreKey = IdProviderKey.from( "myUserStore" );
+        idProviderKey = IdProviderKey.from( "myIdProvider" );
 
-        final User user = User.create( TestDataFixtures.getTestUser() ).key( PrincipalKey.ofUser( userStoreKey, "user" ) ).build();
-        final Group group = Group.create( TestDataFixtures.getTestGroup() ).key( PrincipalKey.ofGroup( userStoreKey, "group" ) ).build();
+        final User user = User.create( TestDataFixtures.getTestUser() ).key( PrincipalKey.ofUser( idProviderKey, "user" ) ).build();
+        final Group group = Group.create( TestDataFixtures.getTestGroup() ).key( PrincipalKey.ofGroup( idProviderKey, "group" ) ).build();
         principals = Principals.from( user, group );
 
-        userStoreAccessControlEntries = IdProviderAccessControlList.create().
-            add( IdProviderAccessControlEntry.create().build().create().principal( user.getKey() ).access(
+        idProviderAccessControlEntries = IdProviderAccessControlList.create().
+            add( IdProviderAccessControlEntry.create().principal( user.getKey() ).access(
                 IdProviderAccess.ADMINISTRATOR ).build() ).
             add( IdProviderAccessControlEntry.create().principal( group.getKey() ).access( IdProviderAccess.CREATE_USERS ).build() ).
             build();
@@ -50,9 +50,9 @@ public class GetPermissionsHandlerTest
     @Test
     public void testPermissions()
     {
-        Mockito.when( securityService.getIdProvider( userStoreKey ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.getIdProvider( idProviderKey ) ).thenReturn( TestDataFixtures.getTestIdProvider() );
         Mockito.when( securityService.getPrincipals( Mockito.any( PrincipalKeys.class ) ) ).thenReturn( principals );
-        Mockito.when( securityService.getIdProviderPermissions( userStoreKey ) ).thenReturn( userStoreAccessControlEntries );
+        Mockito.when( securityService.getIdProviderPermissions( idProviderKey ) ).thenReturn( idProviderAccessControlEntries );
 
         runFunction( "/com/enonic/xp/app/users/lib/auth/getPermissions-test.js", "getPermissions" );
     }
@@ -60,9 +60,9 @@ public class GetPermissionsHandlerTest
     @Test
     public void testNonExistingPermissions()
     {
-        Mockito.when( securityService.getIdProvider( userStoreKey ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.getIdProvider( idProviderKey ) ).thenReturn( TestDataFixtures.getTestIdProvider() );
         Mockito.when( securityService.getPrincipals( Mockito.any( PrincipalKeys.class ) ) ).thenReturn( Principals.empty() );
-        Mockito.when( securityService.getIdProviderPermissions( userStoreKey ) ).thenReturn( IdProviderAccessControlList.empty() );
+        Mockito.when( securityService.getIdProviderPermissions( idProviderKey ) ).thenReturn( IdProviderAccessControlList.empty() );
 
         runFunction( "/com/enonic/xp/app/users/lib/auth/getPermissions-test.js", "getNonExistingPermissions" );
     }

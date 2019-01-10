@@ -6,63 +6,63 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const userStoreWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/userstore.wizard');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const confirmationDialog = require("../page_objects/confirmation.dialog");
 
-describe('Confirm and delete `User Store` in wizard and in browse panel', function () {
+describe('Confirm and delete `Id Provider` in wizard and in browse panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
-    let userStore;
+    let idProvider;
 
-    it('GIVEN `UserStore` is saved WHEN Delete button on toolbar has been pressed THEN Confirmation dialog should appear',
+    it('GIVEN `IdProvider` is saved WHEN Delete button on toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
-            userStore = userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store1');
-            return testUtils.clickOnNewOpenUserStoreWizard().then(() => {
-                return userStoreWizard.typeData(userStore)
+        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider1');
+    return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
+        return idProviderWizard.typeData(idProvider)
             }).then(() => {
-                return userStoreWizard.waitAndClickOnSave();
+        return idProviderWizard.waitAndClickOnSave();
             }).then(() => {
-                return userStoreWizard.waitForSpinnerNotVisible();
+        return idProviderWizard.waitForSpinnerNotVisible();
             }).pause(1200).then(() => {
-                return userStoreWizard.clickOnDelete();
+        return idProviderWizard.clickOnDelete();
             }).then(() => {
                 testUtils.saveScreenshot("userstore_wizard_confirm_delete1");
                 return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
-    it('GIVEN UserStore is opened WHEN the UserStore has been deleted THEN correct notification message should appear',
-        () => {
-            userStore = userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store2');
-            return testUtils.clickOnNewOpenUserStoreWizard().then(() => {
-                return userStoreWizard.typeData(userStore)
+    it('GIVEN IdProvider is opened WHEN the IdProvider has been deleted THEN correct notification message should appear',
+        () = > {
+        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider2');
+    return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
+        return idProviderWizard.typeData(idProvider)
             }).then(() => {
-                return userStoreWizard.waitAndClickOnSave();
+        return idProviderWizard.waitAndClickOnSave();
             }).then(() => {
-                return userStoreWizard.waitForSpinnerNotVisible();
+        return idProviderWizard.waitForSpinnerNotVisible();
             }).pause(900).then(() => {
-                return userStoreWizard.clickOnDelete();
+        return idProviderWizard.clickOnDelete();
             }).then(() => {
                 return testUtils.confirmDelete();
             }).then(result => {
                 testUtils.saveScreenshot("userstore_deleted_confirmation_mess1");
-                var expectedMessage = appConst.storeDeletedMessage(userStore.displayName);
+    var expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
                     "Correct notification message should appear");
             });
         });
 
-    it('GIVEN `UserStore` is selected WHEN Delete button on the browse-toolbar has been pressed THEN Confirmation dialog should appear',
-        () => {
-            userStore = userItemsBuilder.buildUserStore(userItemsBuilder.generateRandomName('store'), 'test user store3');
-            return testUtils.openWizardAndSaveUserStore(userStore).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userStore.displayName);
+    it('GIVEN `IdProvider` is selected WHEN Delete button on the browse-toolbar has been pressed THEN Confirmation dialog should appear',
+        () = > {
+        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider3');
+    return testUtils.openWizardAndSaveIdProvider(idProvider).then(() = > {
+        return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
             }).then(() => {
-                return testUtils.findAndSelectItem(userStore.displayName);
+        return testUtils.findAndSelectItem(idProvider.displayName);
             }).then(() => {
                 return userBrowsePanel.waitForDeleteButtonEnabled();
             }).then(() => {
@@ -73,13 +73,13 @@ describe('Confirm and delete `User Store` in wizard and in browse panel', functi
             });
         });
 
-    it('GIVEN existing UserStore WHEN the store has been deleted in the browse panel THEN correct notification should appear',
-        () => {
-            return testUtils.selectAndDeleteItem(userStore.displayName).then(() => {
+    it('GIVEN existing IdProvider WHEN the store has been deleted in the browse panel THEN correct notification should appear',
+        () = > {
+        return testUtils.selectAndDeleteItem(idProvider.displayName).then(() = > {
                 return userBrowsePanel.waitForNotificationMessage();
             }).then(result => {
                 testUtils.saveScreenshot("store_deleted_notification_mes2");
-                let msg = appConst.storeDeletedMessage(userStore.displayName);
+    let msg = appConst.storeDeletedMessage(idProvider.displayName);
                 assert.strictEqual(result, msg, 'expected notification message should be displayed');
             });
         });

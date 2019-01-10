@@ -2,22 +2,22 @@ const wizard = require('./wizard.panel');
 const elements = require('../../libs/elements');
 const loaderComboBox = require('../inputs/loaderComboBox');
 const panel = {
-    container: `//div[contains(@id,'UserStoreWizardPanel')]`,
+    container: `//div[contains(@id,'IdProviderWizardPanel')]`,
     providerFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='Application']]" +
                          `${loaderComboBox.optionsFilterInput}`,
-    permissionsFilterInput: `//div[contains(@id,'UserStoreAccessControlComboBox')]` + `${loaderComboBox.optionsFilterInput}`,
+    permissionsFilterInput: `//div[contains(@id,'IdProviderAccessControlComboBox')]` + `${loaderComboBox.optionsFilterInput}`,
     permissionsLink: `//li[child::a[text()='Permissions']]`,
     aclList: `//ul[contains(@class,'access-control-list')]`,
-    aceAccessSelector: `//div[contains(@id,'UserStoreAccessSelector')]`,
+    aceAccessSelector: `//div[contains(@id,'IdProviderAccessSelector')]`,
     selectedAcEntryByDisplayName: function (displayName) {
-        return `//div[contains(@id,'UserStoreACESelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
+        return `//div[contains(@id,'IdProviderACESelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
     providerComboBox: `//div[contains(@id,'AuthApplicationComboBox')]`,
     selectedProviderView: "//div[contains(@id,'AuthApplicationSelectedOptionView')]",
     removeProviderIcon: `//a[contains(@class,'remove')]`,
 
 };
-const userStoreWizard = Object.create(wizard, {
+const idProviderWizard = Object.create(wizard, {
 
     descriptionInput: {
         get: function () {
@@ -36,7 +36,7 @@ const userStoreWizard = Object.create(wizard, {
     },
     permissionsDropDownHandle: {
         get: function () {
-            return `${panel.container}` + `//div[contains(@id,'UserStoreAccessControlComboBox')]` + `${elements.DROP_DOWN_HANDLE}`;
+            return `${panel.container}` + `//div[contains(@id,'IdProviderAccessControlComboBox')]` + `${elements.DROP_DOWN_HANDLE}`;
         }
     },
     providerDropDownHandle: {
@@ -226,4 +226,4 @@ const userStoreWizard = Object.create(wizard, {
         }
     },
 });
-module.exports = userStoreWizard;
+module.exports = idProviderWizard;

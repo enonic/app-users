@@ -1,20 +1,20 @@
 var t = require('/lib/xp/testing');
 var auth = require('/lib/auth');
 
-exports.deleteUserStores = function () {
+exports.deleteIdProviders = function () {
 
-    var result = auth.deleteUserStores({
-        keys: ['invalid', 'myUserStore']
+    var result = auth.deleteIdProviders({
+        keys: ['invalid', 'myIdProvider']
     });
 
     var expected = [
         {
-            userStoreKey: 'invalid',
+            idProviderKey: 'invalid',
             deleted: false,
             reason: 'IdProvider [invalid] not found'
         },
         {
-            userStoreKey: 'myUserStore',
+            idProviderKey: 'myIdProvider',
             deleted: true,
             reason: undefined
         }

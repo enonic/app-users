@@ -3,12 +3,12 @@ var auth = require('/lib/auth');
 
 function createAndAssert(params) {
 
-    var result = auth.createUserStore(params);
+    var result = auth.createIdProvider(params);
 
     var expectedJson = {
-        key: 'myUserStore',
-        displayName: 'User store test',
-        description: 'User store used for testing',
+        key: 'myIdProvider',
+        displayName: 'Id provider test',
+        description: 'Id provider used for testing',
         idProviderConfig: {
             applicationKey: 'com.enonic.app.test',
             config: [
@@ -80,11 +80,11 @@ function createAndAssert(params) {
     t.assertJsonEquals(expectedJson, result);
 }
 
-exports.createUserStore = function () {
+exports.createIdProvider = function () {
     createAndAssert({
-        name: 'myUserStore',
-        displayName: 'User store test',
-        description: 'User store used for testing',
+        name: 'myIdProvider',
+        displayName: 'Id provider test',
+        description: 'Id provider used for testing',
         idProviderConfig: {
             applicationKey: 'com.enonic.app.test',
             config: [
@@ -157,17 +157,17 @@ exports.createUserStore = function () {
         },
         permissions: [
             {
-                principal: 'user:myUserStore:user',
+                principal: 'user:myIdProvider:user',
                 access: 'ADMINISTRATOR'
             },
             {
-                principal: 'group:myUserStore:group',
+                principal: 'group:myIdProvider:group',
                 access: 'CREATE_USERS'
             }
         ]
     });
 };
 
-exports.createUserStoreByName = function () {
-    createAndAssert({name: 'myUserStore'});
+exports.createIdProviderByName = function () {
+    createAndAssert({name: 'myIdProvider'});
 };
