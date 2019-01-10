@@ -8,7 +8,7 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const idProviderWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 

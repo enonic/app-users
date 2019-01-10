@@ -12,7 +12,7 @@ const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
-const idProviderWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const saveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
@@ -53,7 +53,7 @@ describe('Id Provider, provider-dialog specification', function () {
             }).then(() => {
         return idProviderWizard.isItemInvalid(testStore.displayName);
             }).then(result => {
-                testUtils.saveScreenshot('user_store_is_getting_valid');
+        testUtils.saveScreenshot('id_provider_is_getting_valid');
                 assert.isFalse(result, 'Red icon should not be present at the wizard');
             })
         });
@@ -73,7 +73,7 @@ describe('Id Provider, provider-dialog specification', function () {
             }).pause(1000).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
             }).pause(500).then(() => {
-                testUtils.saveScreenshot("userstore_wizard_modal_dialog_should_be_closed");
+        testUtils.saveScreenshot("idprovider_wizard_modal_dialog_should_be_closed");
                 return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog should not appear");
             })

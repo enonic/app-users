@@ -16,7 +16,7 @@ export class IdProviderAccessControlEntryView
     public static debug: boolean = false;
 
     constructor(ace: IdProviderAccessControlEntry, readonly: boolean = false) {
-        super('selected-option userstore-access-control-entry');
+        super('selected-option idprovider-access-control-entry');
 
         this.ace = ace;
         this.setEditable(!readonly);

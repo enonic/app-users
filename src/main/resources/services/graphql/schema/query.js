@@ -1,7 +1,7 @@
 var graphQl = require('/lib/graphql');
 var authLib = require('/lib/auth');
 
-var userstores = require('/lib/userstores');
+var idproviders = require('/lib/idproviders');
 var principals = require('/lib/principals');
 var useritems = require('/lib/useritems');
 var repositories = require('/lib/repositories');
@@ -15,7 +15,7 @@ module.exports = graphQl.createObjectType({
         idProviders: {
             type: graphQl.list(graphQlObjectTypes.idProviderType),
             resolve: function () {
-                return userstores.list();
+                return idproviders.list();
             }
         },
         idProvider: {
@@ -25,19 +25,19 @@ module.exports = graphQl.createObjectType({
             },
             resolve: function (env) {
                 var key = env.args.key;
-                return userstores.getByKey(key);
+                return idproviders.getByKey(key);
             }
         },
         defaultidProvider: {
             type: graphQlObjectTypes.idProviderType,
             resolve: function () {
-                return userstores.getDefault();
+                return idproviders.getDefault();
             }
         },
         principalsConnection: {
             type: graphQlObjectTypes.PrincipalConnectionType,
             args: {
-                userstore: graphQl.GraphQLString,
+                idprovider: graphQl.GraphQLString,
                 types: graphQl.list(graphQlEnums.PrincipalTypeEnum),
                 query: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
@@ -45,14 +45,14 @@ module.exports = graphQl.createObjectType({
                 sort: graphQlEnums.SortModeEnum
             },
             resolve: function (env) {
-                var userstore = env.args.userstore || 'system';
+                var idprovider = env.args.idprovider || 'system';
                 var types = env.args.types || principals.Type.all();
                 var query = env.args.query;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
                 return principals.list(
-                    userstore,
+                    idprovider,
                     types,
                     query,
                     start,

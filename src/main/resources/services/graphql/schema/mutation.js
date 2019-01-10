@@ -1,6 +1,6 @@
 var graphQl = require('/lib/graphql');
 
-var userstores = require('/lib/userstores');
+var idproviders = require('/lib/idproviders');
 var principals = require('/lib/principals');
 var users = require('/lib/users');
 var groups = require('/lib/groups');
@@ -178,7 +178,7 @@ module.exports = graphQl.createObjectType({
                     idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
-                return userstores.create({
+                return idproviders.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -205,7 +205,7 @@ module.exports = graphQl.createObjectType({
                     idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
-                return userstores.update({
+                return idproviders.update({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -220,7 +220,7 @@ module.exports = graphQl.createObjectType({
                 keys: graphQl.list(graphQl.GraphQLString)
             },
             resolve: function(env) {
-                return userstores.delete(env.args.keys);
+                return idproviders.delete(env.args.keys);
             }
         }
     }

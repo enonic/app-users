@@ -11,7 +11,7 @@ const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
-const idProviderWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 

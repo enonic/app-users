@@ -92,18 +92,22 @@ const idProviderWizard = Object.create(wizard, {
         }
     },
     typeData: {
-        value: function (userstore) {
-            return this.typeDisplayName(userstore.displayName).then(() => {
-                return this.typeDescription(userstore.description);
-            }).pause(500).then(() => {
-                if (userstore.permissions != null) {
+        value: function (idprovider) {
+            return this.typeDisplayName(idprovider.displayName).then(() = > {
+                return this.typeDescription(idprovider.description);
+            }).pause(500).then(() = > {
+                if(idprovider.permissions != null
+        )
+            {
                     return this.clickOnPermissionsTabItem().then(() => {
-                        return this.addPrincipals(userstore.permissions);
+                        return this.addPrincipals(idprovider.permissions);
                     })
                 }
-            }).then(() => {
-                if (userstore.providerName != null) {
-                    return this.filterOptionsAndSelectIdProvider(userstore.providerName);
+            }).then(() = > {
+                if(idprovider.providerName != null
+        )
+            {
+                return this.filterOptionsAndSelectIdProvider(idprovider.providerName);
                 }
             }).pause(400);
         }
@@ -221,7 +225,7 @@ const idProviderWizard = Object.create(wizard, {
                 return this.doClick(deleteSelector);
             }).catch(err => {
                 console.log(err);
-                this.doCatch('err_delete_in_userstore_wizard', 'Error when Delete button has been clicked ');
+            this.doCatch('err_delete_in_idprovider_wizard', 'Error when Delete button has been clicked ');
             });
         }
     },

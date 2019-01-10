@@ -10,7 +10,7 @@ const appConst = require('../libs/app_const');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const newPrincipalDialog = require('../page_objects/browsepanel/new.principal.dialog');
-const idProviderWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const confirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe('User Browse panel, toolbar shortcut spec', function () {

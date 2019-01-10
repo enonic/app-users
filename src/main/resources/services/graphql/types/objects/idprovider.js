@@ -4,11 +4,11 @@ var graphQlEnums = require('../enums');
 
 var graphQlUserItem = require('./userItem');
 
-var userstoresLib = require('/lib/userstores');
+var idproviderLib = require('/lib/idproviders');
 
 var IdProviderAccessControlEntryType = graphQl.createObjectType({
     name: 'IdProviderAccessControlEntry',
-    description: 'Domain representation of user store access control entry',
+    description: 'Domain representation of id provider access control entry',
     fields: {
         principal: {
             type: graphQl.reference('Principal')
@@ -21,7 +21,7 @@ var IdProviderAccessControlEntryType = graphQl.createObjectType({
 
 exports.IdProviderConfig = graphQl.createObjectType({
     name: 'IdProviderConfig',
-    description: 'Domain representation of auth config for user store',
+    description: 'Domain representation of auth config for id provider',
     fields: {
         applicationKey: {
             type: graphQl.GraphQLString
@@ -38,7 +38,7 @@ exports.IdProviderConfig = graphQl.createObjectType({
 
 exports.idProviderType = graphQl.createObjectType({
     name: 'IdProvider',
-    description: 'Domain representation of a user store',
+    description: 'Domain representation of a id provider',
     interfaces: [graphQlUserItem.UserItemType],
     fields: {
         key: {
@@ -75,14 +75,14 @@ exports.idProviderType = graphQl.createObjectType({
                     env.source.idProviderConfig &&
                     env.source.idProviderConfig.applicationKey;
                 return idProviderKey
-                    ? userstoresLib.getIdProviderMode(idProviderKey)
-                    : null;
+                       ? idprovidersLib.getIdProviderMode(idProviderKey)
+                       : null;
             }
         },
         permissions: {
             type: graphQl.list(IdProviderAccessControlEntryType),
             resolve: function(env) {
-                return userstoresLib.getPermissions(env.source.key);
+                return idprovidersLib.getPermissions(env.source.key);
             }
         },
         modifiedTime: {

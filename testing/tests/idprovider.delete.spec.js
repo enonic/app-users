@@ -6,7 +6,7 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const idProviderWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
@@ -30,7 +30,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             }).pause(1200).then(() => {
         return idProviderWizard.clickOnDelete();
             }).then(() => {
-                testUtils.saveScreenshot("userstore_wizard_confirm_delete1");
+        testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
                 return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
@@ -49,7 +49,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             }).then(() => {
                 return testUtils.confirmDelete();
             }).then(result => {
-                testUtils.saveScreenshot("userstore_deleted_confirmation_mess1");
+        testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
     var expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
                     "Correct notification message should appear");
