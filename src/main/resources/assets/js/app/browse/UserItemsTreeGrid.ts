@@ -2,12 +2,12 @@ import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from '.
 import {UserTreeGridActions} from './UserTreeGridActions';
 import {EditPrincipalEvent} from './EditPrincipalEvent';
 import {UserItemsRowFormatter} from './UserItemsRowFormatter';
-import {ListUserStoresRequest} from '../../api/graphql/userStore/ListUserStoresRequest';
+import {ListIdProvidersRequest} from '../../api/graphql/userStore/ListIdProvidersRequest';
 import {ListPrincipalsRequest} from '../../api/graphql/principal/ListPrincipalsRequest';
 import {PrincipalBrowseSearchData} from './filter/PrincipalBrowseSearchData';
 import {UserItemType} from './UserItemType';
 import {ListUserItemsRequest} from '../../api/graphql/principal/ListUserItemsRequest';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import TreeGrid = api.ui.treegrid.TreeGrid;
 import TreeNode = api.ui.treegrid.TreeNode;
 import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
@@ -19,7 +19,7 @@ import BrowseFilterSearchEvent = api.app.browse.filter.BrowseFilterSearchEvent;
 import ResponsiveRanges = api.ui.responsive.ResponsiveRanges;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
-import UserStoreKey = api.security.UserStoreKey;
+import IdProviderKey = api.security.IdProviderKey;
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -109,7 +109,7 @@ export class UserItemsTreeGrid
         return this.treeGridActions;
     }
 
-    updateUserNode(principal: Principal, userStore: UserStore) {
+    updateUserNode(principal: Principal, userStore: IdProvider) {
         if (!principal && !userStore) {
             return;
         }
@@ -117,7 +117,7 @@ export class UserItemsTreeGrid
         let userTreeGridItem;
         let builder = new UserTreeGridItemBuilder();
 
-        if (!principal) { // UserStore type
+        if (!principal) { // IdProvider type
             userTreeGridItem = builder.setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build();
         } else {         // Principal type
             userTreeGridItem = builder.setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
@@ -144,33 +144,8 @@ export class UserItemsTreeGrid
         super.deleteNodes(userTreeGridItemsToDelete);
     }
 
-    private loadParentNode(principal: Principal, userStore: UserStore): wemQ.Promise<TreeNode<UserTreeGridItem>> {
-        const rootNode = this.getRoot().getCurrentRoot();
-
-        if (principal.isRole()) {
-
-            const rolesNode = rootNode.getChildren()
-                .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
-
-            if (rolesNode) {
-                return this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode);
-            }
-        } else {
-            const userStoreId = userStore.getKey().getId();
-            const userStoreNode = rootNode.getChildren().filter(node => node.getDataId() === userStoreId)[0] || rootNode;
-
-            return this.fetchDataAndSetNodes(userStoreNode).then(() => {
-                const parentItemType = UserTreeGridItem.getParentType(principal);
-
-                const parentNode = userStoreNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0];
-
-                return this.fetchDataAndSetNodes(parentNode).then(() => parentNode);
-            });
-        }
-    }
-
-    appendUserNode(principal: Principal, userStore: UserStore, parentOfSameType?: boolean) {
-        if (!principal) { // UserStore type
+    appendUserNode(principal: Principal, userStore: IdProvider, parentOfSameType?: boolean) {
+        if (!principal) { // IdProvider type
 
             const userTreeGridItem = new UserTreeGridItemBuilder().setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build();
 
@@ -192,6 +167,69 @@ export class UserItemsTreeGrid
 
             this.loadParentNode(principal, userStore).then((parentNode) => this.appendNodeToParent(parentNode, userTreeGridItem));
         }
+    }
+
+    fetchChildren(parentNode?: TreeNode<UserTreeGridItem>): wemQ.Promise<UserTreeGridItem[]> {
+        let gridItems: UserTreeGridItem[] = [];
+
+        parentNode = parentNode || this.getRoot().getCurrentRoot();
+
+        let deferred = wemQ.defer<UserTreeGridItem[]>();
+        let level = parentNode ? parentNode.calcLevel() : 0;
+
+        // Creating a role with parent node pointing to another role may cause fetching to fail
+        // We need to select a parent node first
+        if (level !== 0 && parentNode.getData().getPrincipal() &&
+            parentNode.getData().isPrincipal() &&
+            parentNode.getData().getPrincipal().isRole() && !!parentNode.getParent()) {
+
+            parentNode = parentNode.getParent();
+            level--;
+        }
+
+        if (level === 0) {
+
+            if (this.isFiltered()) {
+                new ListUserItemsRequest().setTypes(this.searchTypes).setQuery(this.searchString).sendAndParse()
+                    .then((result) => {
+                        deferred.resolve(result.userItems.map(item => new UserTreeGridItemBuilder().setAny(item).build()));
+                    })
+                    .catch(api.DefaultErrorHandler.handle)
+                    .done();
+            } else {
+                // at root level, fetch user stores, and add 'Roles' folder
+                new ListIdProvidersRequest().sendAndParse()
+                    .then((userStores: IdProvider[]) => {
+                        userStores.forEach((userStore: IdProvider) => {
+                            gridItems.push(
+                                new UserTreeGridItemBuilder().setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build());
+                        });
+
+                        gridItems.push(new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build());
+
+                        deferred.resolve(gridItems);
+                    })
+                    .catch(api.DefaultErrorHandler.handle)
+                    .done();
+            }
+
+        } else if (parentNode.getData().isRole()) {
+            // fetch roles, if parent node 'Roles' was selected
+            return this.loadChildren(parentNode, [PrincipalType.ROLE]);
+
+        } else if (level === 1) {
+            // add parent folders 'Users' and 'Groups' to the selected IdProvider
+            let userStoreNode: UserTreeGridItem = parentNode.getData();
+            deferred.resolve(this.addUsersGroupsToUserStore(userStoreNode));
+
+        } else if (level === 2) {
+            // fetch principals from the user store, if parent node 'Groups' or 'Users' was selected
+            let folder: UserTreeGridItem = <UserTreeGridItem>parentNode.getData();
+            let principalType = this.getPrincipalTypeForFolderItem(folder.getType());
+
+            return this.loadChildren(parentNode, [principalType]);
+        }
+        return deferred.promise;
     }
 
     private getNodeToUpdate(node: TreeNode<UserTreeGridItem>): TreeNode<UserTreeGridItem> {
@@ -224,67 +262,29 @@ export class UserItemsTreeGrid
         return item.hasChildren();
     }
 
-    fetchChildren(parentNode?: TreeNode<UserTreeGridItem>): wemQ.Promise<UserTreeGridItem[]> {
-        let gridItems: UserTreeGridItem[] = [];
+    private loadParentNode(principal: Principal, userStore: IdProvider): wemQ.Promise<TreeNode<UserTreeGridItem>> {
+        const rootNode = this.getRoot().getCurrentRoot();
 
-        parentNode = parentNode || this.getRoot().getCurrentRoot();
+        if (principal.isRole()) {
 
-        let deferred = wemQ.defer<UserTreeGridItem[]>();
-        let level = parentNode ? parentNode.calcLevel() : 0;
+            const rolesNode = rootNode.getChildren()
+                .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
 
-        // Creating a role with parent node pointing to another role may cause fetching to fail
-        // We need to select a parent node first
-        if (level !== 0 && parentNode.getData().getPrincipal() &&
-            parentNode.getData().isPrincipal() &&
-            parentNode.getData().getPrincipal().isRole() && !!parentNode.getParent()) {
-
-            parentNode = parentNode.getParent();
-            level--;
-        }
-
-        if (level === 0) {
-
-            if (this.isFiltered()) {
-                new ListUserItemsRequest().setTypes(this.searchTypes).setQuery(this.searchString).sendAndParse()
-                    .then((result) => {
-                        deferred.resolve(result.userItems.map(item => new UserTreeGridItemBuilder().setAny(item).build()));
-                    })
-                    .catch(api.DefaultErrorHandler.handle)
-                    .done();
-            } else {
-                // at root level, fetch user stores, and add 'Roles' folder
-                new ListUserStoresRequest().sendAndParse()
-                    .then((userStores: UserStore[]) => {
-                        userStores.forEach((userStore: UserStore) => {
-                            gridItems.push(
-                                new UserTreeGridItemBuilder().setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build());
-                        });
-
-                        gridItems.push(new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build());
-
-                        deferred.resolve(gridItems);
-                    })
-                    .catch(api.DefaultErrorHandler.handle)
-                    .done();
+            if (rolesNode) {
+                return this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode);
             }
+        } else {
+            const userStoreId = userStore.getKey().getId();
+            const userStoreNode = rootNode.getChildren().filter(node => node.getDataId() === userStoreId)[0] || rootNode;
 
-        } else if (parentNode.getData().isRole()) {
-            // fetch roles, if parent node 'Roles' was selected
-            return this.loadChildren(parentNode, [PrincipalType.ROLE]);
+            return this.fetchDataAndSetNodes(userStoreNode).then(() => {
+                const parentItemType = UserTreeGridItem.getParentType(principal);
 
-        } else if (level === 1) {
-            // add parent folders 'Users' and 'Groups' to the selected UserStore
-            let userStoreNode: UserTreeGridItem = parentNode.getData();
-            deferred.resolve(this.addUsersGroupsToUserStore(userStoreNode));
+                const parentNode = userStoreNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0];
 
-        } else if (level === 2) {
-            // fetch principals from the user store, if parent node 'Groups' or 'Users' was selected
-            let folder: UserTreeGridItem = <UserTreeGridItem>parentNode.getData();
-            let principalType = this.getPrincipalTypeForFolderItem(folder.getType());
-
-            return this.loadChildren(parentNode, [principalType]);
+                return this.fetchDataAndSetNodes(parentNode).then(() => parentNode);
+            });
         }
-        return deferred.promise;
     }
 
     private loadChildren(parentNode: TreeNode<UserTreeGridItem>, allowedTypes: PrincipalType[]): wemQ.Promise<UserTreeGridItem[]> {
@@ -302,7 +302,7 @@ export class UserItemsTreeGrid
         }).slice(0, from);
 
         let userStoreNode: UserTreeGridItem = null;
-        let userStoreKey: UserStoreKey = null;
+        let userStoreKey: IdProviderKey = null;
         // fetch principals from the user store, if parent node 'Groups' or 'Users' was selected
         if (!parentNode.getData().isRole()) {
             userStoreNode = parentNode.getParent().getData();

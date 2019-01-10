@@ -5,7 +5,7 @@ import {EditPrincipalAction} from './action/EditPrincipalAction';
 import {NewPrincipalAction} from './action/NewPrincipalAction';
 import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {User} from '../principal/User';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import Action = api.ui.Action;
 import TreeGridActions = api.ui.treegrid.actions.TreeGridActions;
 import BrowseItem = api.app.browse.BrowseItem;
@@ -101,7 +101,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
     private establishDeleteActionState(userBrowseItem: UserTreeGridItem) {
         if (this.itemTypeAllowsDeletion(userBrowseItem.getType()) && userBrowseItem.getUserStore() &&
             userBrowseItem.getUserStore().getKey()) {
-            UserStore.checkOnDeletable(userBrowseItem.getUserStore().getKey()).then((result: boolean) => {
+            IdProvider.checkOnDeletable(userBrowseItem.getUserStore().getKey()).then((result: boolean) => {
                 this.DELETE.setEnabled(result);
             }).catch(api.DefaultErrorHandler.handle).done();
         } else {

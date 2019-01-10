@@ -1,13 +1,13 @@
 import Principal = api.security.Principal;
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 
 export class UserItemUpdatedEvent
     extends api.event.Event {
 
     private principal: Principal;
-    private userStore: UserStore;
+    private userStore: IdProvider;
 
-    constructor(principal: Principal, userStore: UserStore) {
+    constructor(principal: Principal, userStore: IdProvider) {
         super();
         this.principal = principal;
         this.userStore = userStore;
@@ -17,7 +17,7 @@ export class UserItemUpdatedEvent
         return this.principal;
     }
 
-    public getUserStore(): UserStore {
+    public getUserStore(): IdProvider {
         return this.userStore;
     }
 

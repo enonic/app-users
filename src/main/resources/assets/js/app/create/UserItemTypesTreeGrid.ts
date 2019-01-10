@@ -2,8 +2,8 @@ import {UserTypeTreeGridItem, UserTypeTreeGridItemBuilder} from './UserTypeTreeG
 import {UserItemTypesRowFormatter} from './UserItemTypesRowFormatter';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItemBuilder, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-import {ListUserStoresRequest} from '../../api/graphql/userStore/ListUserStoresRequest';
-import {UserStore, UserStoreBuilder} from '../principal/UserStore';
+import {ListIdProvidersRequest} from '../../api/graphql/userStore/ListIdProvidersRequest';
+import {IdProvider, IdProviderBuilder} from '../principal/IdProvider';
 import {User, UserBuilder} from '../principal/User';
 import {Group, GroupBuilder} from '../principal/Group';
 import {Role, RoleBuilder} from '../principal/Role';
@@ -15,11 +15,11 @@ import PrincipalType = api.security.PrincipalType;
 import ResponsiveManager = api.ui.responsive.ResponsiveManager;
 import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
 import i18n = api.util.i18n;
-import UserStoreKey = api.security.UserStoreKey;
+import IdProviderKey = api.security.IdProviderKey;
 
 export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
 
-    private userStores: UserStore[];
+    private userStores: IdProvider[];
 
     private manualUserStore: boolean;
 
@@ -44,53 +44,16 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         this.initEventHandlers();
     }
 
-    private initEventHandlers() {
-        this.getGrid().subscribeOnClick((event, data) => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const node = this.getGrid().getDataView().getItem(data.row);
-            const userItem = node.getData().getUserItem();
-            if (node.getData().hasChildren()) {
-                this.toggleNode(node);
-                ResponsiveManager.fireResizeEvent();
-            } else {
-                const isRootNode = node.calcLevel() === 1;
-                if (userItem instanceof UserStore) {
-                    if (isRootNode) {
-                        new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.USER_STORE).build()]).fire();
-                    } else if (node.getParent().getData().getUserItem() instanceof User) {
-                        const item = new UserTreeGridItemBuilder().setUserStore(userItem).setType(UserTreeGridItemType.USERS).build();
-                        new NewPrincipalEvent([item]).fire();
-                    } else if (node.getParent().getData().getUserItem() instanceof Group) {
-                        const item = new UserTreeGridItemBuilder().setUserStore(userItem).setType(UserTreeGridItemType.GROUPS).build();
-                        new NewPrincipalEvent([item]).fire();
-                    }
-                } else if (userItem instanceof Role) {
-                    new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build()]).fire();
-                }
-            }
-        });
-    }
-
-    fetchUserStores(): wemQ.Promise<UserStore[]> {
+    fetchUserStores(): wemQ.Promise<IdProvider[]> {
         if (this.userStores) {
             return wemQ.resolve(this.userStores);
         }
 
-        return new ListUserStoresRequest().sendAndParse().then((userStores: UserStore[]) => {
+        return new ListIdProvidersRequest().sendAndParse().then((userStores: IdProvider[]) => {
             this.userStores = userStores;
             this.toggleClass('flat', this.userStores.length === 1);
             return userStores;
         });
-    }
-
-    getDataId(data: UserTypeTreeGridItem): string {
-        return data.getId();
-    }
-
-    hasChildren(item: UserTypeTreeGridItem): boolean {
-        return item.hasChildren();
     }
 
     fetchRoot(): wemQ.Promise<UserTypeTreeGridItem[]> {
@@ -101,35 +64,43 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         ).then(userIsAdmin => [
             new UserTypeTreeGridItemBuilder()
                 .setUserItem(new UserBuilder()
-                    .setKey(new PrincipalKey(UserStoreKey.SYSTEM, PrincipalType.USER, 'user'))
+                    .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.USER, 'user'))
                     .setDisplayName(i18n('field.user'))
                     .build()).build(),
             new UserTypeTreeGridItemBuilder()
                 .setUserItem(new GroupBuilder()
-                    .setKey(new PrincipalKey(UserStoreKey.SYSTEM, PrincipalType.GROUP, 'user-group'))
+                    .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.GROUP, 'user-group'))
                     .setDisplayName(i18n('field.userGroup'))
                     .build()).build(),
             ...((this.manualUserStore || !userIsAdmin) ? [] : [
                     new UserTypeTreeGridItemBuilder()
-                        .setUserItem(new UserStoreBuilder()
-                            .setKey(UserStoreKey.SYSTEM.toString())
+                        .setUserItem(new IdProviderBuilder()
+                            .setKey(IdProviderKey.SYSTEM.toString())
                             .setDisplayName(i18n('field.userStore'))
                             .build()).build(),
                     new UserTypeTreeGridItemBuilder()
                         .setUserItem(new RoleBuilder()
-                            .setKey(new PrincipalKey(UserStoreKey.SYSTEM, PrincipalType.ROLE, 'role'))
+                            .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.ROLE, 'role'))
                             .setDisplayName(i18n('field.role'))
                             .build()).build(),
                 ])
         ]);
     }
 
+    getDataId(data: UserTypeTreeGridItem): string {
+        return data.getId();
+    }
+
+    hasChildren(item: UserTypeTreeGridItem): boolean {
+        return item.hasChildren();
+    }
+
     fetchChildren(parentNode: TreeNode<UserTypeTreeGridItem>): wemQ.Promise<UserTypeTreeGridItem[]> {
 
-        return this.fetchUserStores().then((userStores: UserStore[]) => {
+        return this.fetchUserStores().then((userStores: IdProvider[]) => {
             if (userStores.length > 1) {
-                return userStores.map((userStore: UserStore) => new UserTypeTreeGridItemBuilder()
-                    .setUserItem(new UserStoreBuilder()
+                return userStores.map((userStore: IdProvider) => new UserTypeTreeGridItemBuilder()
+                    .setUserItem(new IdProviderBuilder()
                         .setKey(userStore.getKey().toString())
                         .setDisplayName(userStore.getDisplayName())
                         .build()).build());
@@ -147,10 +118,39 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         });
     }
 
-    setUserStore(userStore: UserStore) {
+    setUserStore(userStore: IdProvider) {
         this.userStores = [userStore];
         this.manualUserStore = true;
         this.addClass('flat');
+    }
+
+    private initEventHandlers() {
+        this.getGrid().subscribeOnClick((event, data) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const node = this.getGrid().getDataView().getItem(data.row);
+            const userItem = node.getData().getUserItem();
+            if (node.getData().hasChildren()) {
+                this.toggleNode(node);
+                ResponsiveManager.fireResizeEvent();
+            } else {
+                const isRootNode = node.calcLevel() === 1;
+                if (userItem instanceof IdProvider) {
+                    if (isRootNode) {
+                        new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.USER_STORE).build()]).fire();
+                    } else if (node.getParent().getData().getUserItem() instanceof User) {
+                        const item = new UserTreeGridItemBuilder().setUserStore(userItem).setType(UserTreeGridItemType.USERS).build();
+                        new NewPrincipalEvent([item]).fire();
+                    } else if (node.getParent().getData().getUserItem() instanceof Group) {
+                        const item = new UserTreeGridItemBuilder().setUserStore(userItem).setType(UserTreeGridItemType.GROUPS).build();
+                        new NewPrincipalEvent([item]).fire();
+                    }
+                } else if (userItem instanceof Role) {
+                    new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build()]).fire();
+                }
+            }
+        });
     }
 
     clearUserStores() {

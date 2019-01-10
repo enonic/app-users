@@ -4,15 +4,15 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.enonic.xp.security.Group;
+import com.enonic.xp.security.IdProviderKey;
 import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.PrincipalKeys;
 import com.enonic.xp.security.Principals;
 import com.enonic.xp.security.SecurityService;
 import com.enonic.xp.security.User;
-import com.enonic.xp.security.UserStoreKey;
-import com.enonic.xp.security.acl.UserStoreAccess;
-import com.enonic.xp.security.acl.UserStoreAccessControlEntry;
-import com.enonic.xp.security.acl.UserStoreAccessControlList;
+import com.enonic.xp.security.acl.IdProviderAccess;
+import com.enonic.xp.security.acl.IdProviderAccessControlEntry;
+import com.enonic.xp.security.acl.IdProviderAccessControlList;
 import com.enonic.xp.testing.ScriptTestSupport;
 
 public class GetPermissionsHandlerTest
@@ -20,11 +20,11 @@ public class GetPermissionsHandlerTest
 {
     private SecurityService securityService;
 
-    private UserStoreKey userStoreKey;
+    private IdProviderKey userStoreKey;
 
     private Principals principals;
 
-    private UserStoreAccessControlList userStoreAccessControlEntries;
+    private IdProviderAccessControlList userStoreAccessControlEntries;
 
     @Override
     public void initialize()
@@ -34,24 +34,25 @@ public class GetPermissionsHandlerTest
         securityService = Mockito.mock( SecurityService.class );
         addService( SecurityService.class, securityService );
 
-        userStoreKey = UserStoreKey.from( "myUserStore" );
+        userStoreKey = IdProviderKey.from( "myUserStore" );
 
         final User user = User.create( TestDataFixtures.getTestUser() ).key( PrincipalKey.ofUser( userStoreKey, "user" ) ).build();
         final Group group = Group.create( TestDataFixtures.getTestGroup() ).key( PrincipalKey.ofGroup( userStoreKey, "group" ) ).build();
         principals = Principals.from( user, group );
 
-        userStoreAccessControlEntries = UserStoreAccessControlList.create().
-            add( UserStoreAccessControlEntry.create().principal( user.getKey() ).access( UserStoreAccess.ADMINISTRATOR ).build() ).
-            add( UserStoreAccessControlEntry.create().principal( group.getKey() ).access( UserStoreAccess.CREATE_USERS ).build() ).
+        userStoreAccessControlEntries = IdProviderAccessControlList.create().
+            add( IdProviderAccessControlEntry.create().build().create().principal( user.getKey() ).access(
+                IdProviderAccess.ADMINISTRATOR ).build() ).
+            add( IdProviderAccessControlEntry.create().principal( group.getKey() ).access( IdProviderAccess.CREATE_USERS ).build() ).
             build();
     }
 
     @Test
     public void testPermissions()
     {
-        Mockito.when( securityService.getUserStore( userStoreKey ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.getIdProvider( userStoreKey ) ).thenReturn( TestDataFixtures.getTestUserStore() );
         Mockito.when( securityService.getPrincipals( Mockito.any( PrincipalKeys.class ) ) ).thenReturn( principals );
-        Mockito.when( securityService.getUserStorePermissions( userStoreKey ) ).thenReturn( userStoreAccessControlEntries );
+        Mockito.when( securityService.getIdProviderPermissions( userStoreKey ) ).thenReturn( userStoreAccessControlEntries );
 
         runFunction( "/com/enonic/xp/app/users/lib/auth/getPermissions-test.js", "getPermissions" );
     }
@@ -59,9 +60,9 @@ public class GetPermissionsHandlerTest
     @Test
     public void testNonExistingPermissions()
     {
-        Mockito.when( securityService.getUserStore( userStoreKey ) ).thenReturn( TestDataFixtures.getTestUserStore() );
+        Mockito.when( securityService.getIdProvider( userStoreKey ) ).thenReturn( TestDataFixtures.getTestUserStore() );
         Mockito.when( securityService.getPrincipals( Mockito.any( PrincipalKeys.class ) ) ).thenReturn( Principals.empty() );
-        Mockito.when( securityService.getUserStorePermissions( userStoreKey ) ).thenReturn( UserStoreAccessControlList.empty() );
+        Mockito.when( securityService.getIdProviderPermissions( userStoreKey ) ).thenReturn( IdProviderAccessControlList.empty() );
 
         runFunction( "/com/enonic/xp/app/users/lib/auth/getPermissions-test.js", "getNonExistingPermissions" );
     }

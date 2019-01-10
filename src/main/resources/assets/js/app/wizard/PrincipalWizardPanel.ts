@@ -5,7 +5,7 @@ import {PrincipalWizardDataLoader} from './PrincipalWizardDataLoader';
 import {GraphQlRequest} from '../../api/graphql/GraphQlRequest';
 import {PrincipalNamedEvent} from '../event/PrincipalNamedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
@@ -97,7 +97,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         return this.getParams().parentOfSameType;
     }
 
-    getUserStore(): UserStore {
+    getUserStore(): IdProvider {
         return this.getParams().userStore;
     }
 

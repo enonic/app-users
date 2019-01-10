@@ -6,7 +6,7 @@ import {UserTreeGridActions} from './UserTreeGridActions';
 import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import TreeNode = api.ui.treegrid.TreeNode;
 import BrowseItem = api.app.browse.BrowseItem;
 import PrincipalType = api.security.PrincipalType;
@@ -66,7 +66,7 @@ export class UserBrowsePanel
     private bindServerEventListeners() {
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
-        serverHandler.onUserItemCreated((principal: Principal, userStore: UserStore, sameTypeParent?: boolean) => {
+        serverHandler.onUserItemCreated((principal: Principal, userStore: IdProvider, sameTypeParent?: boolean) => {
             this.treeGrid.appendUserNode(principal, userStore, sameTypeParent);
             this.setRefreshOfFilterRequired();
 
@@ -79,7 +79,7 @@ export class UserBrowsePanel
             }
         });
 
-        serverHandler.onUserItemUpdated((principal: Principal, userStore: UserStore) => {
+        serverHandler.onUserItemUpdated((principal: Principal, userStore: IdProvider) => {
             this.treeGrid.updateUserNode(principal, userStore);
         });
 

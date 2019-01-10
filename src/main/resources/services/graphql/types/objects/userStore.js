@@ -6,15 +6,15 @@ var graphQlUserItem = require('./userItem');
 
 var userstoresLib = require('/lib/userstores');
 
-var UserStoreAccessControlEntryType = graphQl.createObjectType({
-    name: 'UserStoreAccessControlEntry',
+var IdProviderAccessControlEntryType = graphQl.createObjectType({
+    name: 'IdProviderAccessControlEntry',
     description: 'Domain representation of user store access control entry',
     fields: {
         principal: {
             type: graphQl.reference('Principal')
         },
         access: {
-            type: graphQlEnums.UserStoreAccessEnum
+            type: graphQlEnums.IdProviderAccessEnum
         }
     }
 });
@@ -37,7 +37,7 @@ exports.IdProviderConfig = graphQl.createObjectType({
 });
 
 exports.UserStoreType = graphQl.createObjectType({
-    name: 'UserStore',
+    name: 'IdProvider',
     description: 'Domain representation of a user store',
     interfaces: [graphQlUserItem.UserItemType],
     fields: {
@@ -80,7 +80,7 @@ exports.UserStoreType = graphQl.createObjectType({
             }
         },
         permissions: {
-            type: graphQl.list(UserStoreAccessControlEntryType),
+            type: graphQl.list(IdProviderAccessControlEntryType),
             resolve: function(env) {
                 return userstoresLib.getPermissions(env.source.key);
             }

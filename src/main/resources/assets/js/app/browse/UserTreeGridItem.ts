@@ -2,7 +2,7 @@ import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 
 export enum UserTreeGridItemType {
     USER_STORE,
@@ -14,7 +14,7 @@ export enum UserTreeGridItemType {
 
 export class UserTreeGridItem implements api.Equitable {
 
-    private userStore: UserStore;
+    private userStore: IdProvider;
 
     private principal: Principal;
 
@@ -32,12 +32,12 @@ export class UserTreeGridItem implements api.Equitable {
         }
     }
 
-    setUserStore(userStore: UserStore) {
-        this.userStore = userStore;
+    static fromUserStore(userStore: IdProvider): UserTreeGridItem {
+        return new UserTreeGridItemBuilder().setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build();
     }
 
-    getUserStore(): UserStore {
-        return this.userStore;
+    setUserStore(userStore: IdProvider) {
+        this.userStore = userStore;
     }
 
     setPrincipal(principal: Principal) {
@@ -136,8 +136,8 @@ export class UserTreeGridItem implements api.Equitable {
         return new UserTreeGridItemBuilder();
     }
 
-    static fromUserStore(userStore: UserStore): UserTreeGridItem {
-        return new UserTreeGridItemBuilder().setUserStore(userStore).setType(UserTreeGridItemType.USER_STORE).build();
+    getUserStore(): IdProvider {
+        return this.userStore;
     }
 
     static fromPrincipal(principal: Principal): UserTreeGridItem {
@@ -159,11 +159,11 @@ export class UserTreeGridItem implements api.Equitable {
 }
 
 export class UserTreeGridItemBuilder {
-    userStore: UserStore;
+    userStore: IdProvider;
     principal: Principal;
     type: UserTreeGridItemType;
 
-    setUserStore(userStore: UserStore): UserTreeGridItemBuilder {
+    setUserStore(userStore: IdProvider): UserTreeGridItemBuilder {
         this.userStore = userStore;
         return this;
     }
@@ -181,7 +181,7 @@ export class UserTreeGridItemBuilder {
     setAny(userItem: UserItem): UserTreeGridItemBuilder {
         if (userItem instanceof Principal) {
             return this.setPrincipal(userItem).setType(UserTreeGridItemType.PRINCIPAL);
-        } else if (userItem instanceof UserStore) {
+        } else if (userItem instanceof IdProvider) {
             return this.setUserStore(userItem).setType(UserTreeGridItemType.USER_STORE);
         }
         return this;

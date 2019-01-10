@@ -28,7 +28,7 @@ function nullOrValue(value) {
  * Returns the user store for the specified key.
  *
  * @param {object} params JSON parameters.
- * @param {string} params.key UserStore key.
+ * @param {string} params.key IdProvider key.
  * @returns {object} the user store specified, or null if it doesn't exist.
  */
 exports.getUserStore = function (params) {
@@ -92,7 +92,7 @@ exports.defaultPermissions = function () {
  * @param {object} [params.idProviderConfig] ID Provider configuration.
  * @param {object} [params.permissions] User store permissions.
  */
-exports.createUserStore = function (params) {
+exports.createIdProvider = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.CreateUserStoreHandler');
 
     bean.name = required(params, 'name');
@@ -101,7 +101,7 @@ exports.createUserStore = function (params) {
     bean.idProviderConfig = __.toScriptValue(params.idProviderConfig);
     bean.permissions = __.toScriptValue(params.permissions);
 
-    return __.toNativeObject(bean.createUserStore());
+    return __.toNativeObject(bean.createIdProvider());
 };
 
 /**

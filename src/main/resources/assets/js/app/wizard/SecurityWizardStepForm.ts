@@ -1,6 +1,6 @@
-import {UserStoreAccessControlComboBox} from './UserStoreAccessControlComboBox';
-import {UserStore} from '../principal/UserStore';
-import {UserStoreAccessControlList} from '../access/UserStoreAccessControlList';
+import {IdProviderAccessControlComboBox} from './IdProviderAccessControlComboBox';
+import {IdProvider} from '../principal/IdProvider';
+import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import FormItemBuilder = api.ui.form.FormItemBuilder;
 import Validators = api.ui.form.Validators;
 import DivEl = api.dom.DivEl;
@@ -9,15 +9,15 @@ import i18n = api.util.i18n;
 export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
 
     private inheritance: DivEl;
-    private comboBox: UserStoreAccessControlComboBox;
-    private userStore: UserStore;
+    private comboBox: IdProviderAccessControlComboBox;
+    private userStore: IdProvider;
 
     constructor() {
         super('security-wizard-step-form');
 
         this.inheritance = new DivEl(/*'inheritance'*/);
 
-        this.comboBox = new UserStoreAccessControlComboBox();
+        this.comboBox = new IdProviderAccessControlComboBox();
         this.comboBox.addClass('principal-combobox');
 
         let accessComboBoxFormItem = new FormItemBuilder(this.comboBox)
@@ -41,7 +41,7 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
 
     }
 
-    layout(userStore: UserStore, defaultUserStore: UserStore) {
+    layout(userStore: IdProvider, defaultUserStore: IdProvider) {
         this.userStore = userStore;
 
         this.comboBox.clearSelection();
@@ -60,7 +60,7 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
 
     }
 
-    layoutReadOnly(userStore: UserStore) {
+    layoutReadOnly(userStore: IdProvider) {
         this.userStore = userStore;
 
         this.comboBox.clearSelection();
@@ -76,8 +76,8 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
         return this.comboBox.giveFocus();
     }
 
-    getPermissions(): UserStoreAccessControlList {
-        return new UserStoreAccessControlList(this.comboBox.getSelectedDisplayValues());
+    getPermissions(): IdProviderAccessControlList {
+        return new IdProviderAccessControlList(this.comboBox.getSelectedDisplayValues());
     }
 
 }

@@ -13,8 +13,8 @@ import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggregationJson';
 import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
 import {UserItemType} from '../../../app/browse/UserItemType';
-import {UserStore} from '../../../app/principal/UserStore';
-import {UserStoreJson} from '../../../app/principal/UserStoreJson';
+import {IdProvider} from '../../../app/principal/IdProvider';
+import {IdProviderJson} from '../../../app/principal/IdProviderJson';
 
 export type ListUserItemsRequestResult = {
     total: number,
@@ -97,7 +97,7 @@ export class ListUserItemsRequest
         return aggregations;
     }
 
-    private fromJsonToUserItem(json: PrincipalJson | UserStoreJson): Principal | UserStore {
+    private fromJsonToUserItem(json: PrincipalJson | IdProviderJson): Principal | IdProvider {
         try {
             const pKey: PrincipalKey = PrincipalKey.fromString(json.key);
             if (pKey.isRole()) {
@@ -108,7 +108,7 @@ export class ListUserItemsRequest
                 return User.fromJson(<UserJson>json);
             }
         } catch (e) {
-            return UserStore.fromJson(<UserStoreJson>json);
+            return IdProvider.fromJson(<IdProviderJson>json);
         }
     }
 }

@@ -9,7 +9,7 @@ import Principal = api.security.Principal;
 import PrincipalJson = api.security.PrincipalJson;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
-import UserStoreKey = api.security.UserStoreKey;
+import IdProviderKey = api.security.IdProviderKey;
 
 export type ListPrincipalsResult = {
     total: number;
@@ -20,7 +20,7 @@ export class ListPrincipalsRequest
     extends ListGraphQlRequest<any, any> {
 
     private types: PrincipalType[];
-    private userStoreKey: UserStoreKey;
+    private userStoreKey: IdProviderKey;
     private searchQuery: string;
 
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
@@ -28,7 +28,7 @@ export class ListPrincipalsRequest
         return this;
     }
 
-    setUserStoreKey(key: UserStoreKey): ListPrincipalsRequest {
+    setUserStoreKey(key: IdProviderKey): ListPrincipalsRequest {
         this.userStoreKey = key;
         return this;
     }

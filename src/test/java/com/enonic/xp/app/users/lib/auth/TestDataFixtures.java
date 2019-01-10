@@ -8,11 +8,11 @@ import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.data.PropertySet;
 import com.enonic.xp.data.PropertyTree;
 import com.enonic.xp.security.Group;
+import com.enonic.xp.security.IdProvider;
 import com.enonic.xp.security.IdProviderConfig;
+import com.enonic.xp.security.IdProviderKey;
 import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.User;
-import com.enonic.xp.security.UserStore;
-import com.enonic.xp.security.UserStoreKey;
 
 public class TestDataFixtures
 {
@@ -23,7 +23,7 @@ public class TestDataFixtures
     public static User getTestUser()
     {
         return User.create().
-            key( PrincipalKey.ofUser( UserStoreKey.from( "enonic" ), "user1" ) ).
+            key( PrincipalKey.ofUser( IdProviderKey.from( "enonic" ), "user1" ) ).
             displayName( "User 1" ).
             modifiedTime( Instant.now( clock ) ).
             email( "user1@enonic.com" ).
@@ -48,26 +48,26 @@ public class TestDataFixtures
     public static Group getTestGroup()
     {
         return Group.create().
-            key( PrincipalKey.ofGroup( UserStoreKey.system(), "group-a" ) ).
+            key( PrincipalKey.ofGroup( IdProviderKey.system(), "group-a" ) ).
             displayName( "Group A" ).
             modifiedTime( Instant.now( clock ) ).
             description( "description" ).
             build();
     }
 
-    public static UserStore getTestBlankUserStore()
+    public static IdProvider getTestBlankUserStore()
     {
-        return UserStore.create().
-            key( UserStoreKey.from( "myUserStore" ) ).
+        return IdProvider.create().
+            key( IdProviderKey.from( "myUserStore" ) ).
             displayName( "" ).
             description( "" ).
             build();
     }
 
-    public static UserStore getTestUserStore()
+    public static IdProvider getTestUserStore()
     {
-        return UserStore.create().
-            key( UserStoreKey.from( "myUserStore" ) ).
+        return IdProvider.create().
+            key( IdProviderKey.from( "myUserStore" ) ).
             displayName( "User store test" ).
             description( "User store used for testing" ).
             idProviderConfig( getTestIdProviderConfig() ).

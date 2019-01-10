@@ -1,17 +1,17 @@
 import {SecurityInputTypeViewContext} from './SecurityInputTypeViewContext';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 
 export class SecurityFormContext
     extends api.form.FormContext {
 
-    private userStore: UserStore;
+    private userStore: IdProvider;
 
     constructor(builder: SecurityFormContextBuilder) {
         super(builder);
         this.userStore = builder.userStore;
     }
 
-    getUserStore(): UserStore {
+    getUserStore(): IdProvider {
         return this.userStore;
     }
 
@@ -40,9 +40,9 @@ export class SecurityFormContext
 export class SecurityFormContextBuilder
     extends api.form.FormContextBuilder {
 
-    userStore: UserStore;
+    userStore: IdProvider;
 
-    setUserStore(value: UserStore): SecurityFormContextBuilder {
+    setUserStore(value: IdProvider): SecurityFormContextBuilder {
         this.userStore = value;
         return this;
     }

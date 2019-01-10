@@ -3,7 +3,7 @@ import EmailInput = api.ui.text.EmailInput;
 import FormItemBuilder = api.ui.form.FormItemBuilder;
 import Validators = api.ui.form.Validators;
 import i18n = api.util.i18n;
-import UserStoreKey = api.security.UserStoreKey;
+import IdProviderKey = api.security.IdProviderKey;
 import {User} from '../principal/User';
 
 export class UserEmailWizardStepForm
@@ -11,16 +11,16 @@ export class UserEmailWizardStepForm
 
     private email: EmailInput;
 
-    private userStoreKey: UserStoreKey;
+    private userStoreKey: IdProviderKey;
 
     private isSystemUser: boolean;
 
-    constructor(userStoreKey: UserStoreKey, isSystemUser: boolean) {
+    constructor(userStoreKey: IdProviderKey, isSystemUser: boolean) {
         super();
 
         this.userStoreKey = userStoreKey;
         this.email = new EmailInput();
-        this.email.setUserStoreKey(this.userStoreKey);
+        this.email.setIdProviderKey(this.userStoreKey);
         this.isSystemUser = isSystemUser;
 
         let emailFormItem = new FormItemBuilder(this.email).setLabel(i18n('field.email')).setValidator(Validators.required).build();

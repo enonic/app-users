@@ -11,7 +11,7 @@ exports.deleteUserStores = function () {
         {
             userStoreKey: 'invalid',
             deleted: false,
-            reason: 'UserStore [invalid] not found'
+            reason: 'IdProvider [invalid] not found'
         },
         {
             userStoreKey: 'myUserStore',

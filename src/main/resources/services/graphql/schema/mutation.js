@@ -159,8 +159,8 @@ module.exports = graphQl.createObjectType({
             }
         },
 
-        // UserStore
-        createUserStore: {
+        // IdProvider
+        createIdProvider: {
             type: graphQlObjectTypes.UserStoreType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
@@ -168,7 +168,7 @@ module.exports = graphQl.createObjectType({
                 description: graphQl.GraphQLString,
                 idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
                 permissions: graphQl.list(
-                    graphQlInputTypes.UserStoreAccessControlInput
+                    graphQlInputTypes.IdProviderAccessControlInput
                 )
             },
             resolve: function(env) {
@@ -195,7 +195,7 @@ module.exports = graphQl.createObjectType({
                 description: graphQl.GraphQLString,
                 idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
                 permissions: graphQl.list(
-                    graphQlInputTypes.UserStoreAccessControlInput
+                    graphQlInputTypes.IdProviderAccessControlInput
                 )
             },
             resolve: function(env) {
