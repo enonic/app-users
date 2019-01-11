@@ -6,6 +6,7 @@ import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
 import {Repository} from '../report/Repository';
+import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
 import ViewItem = api.app.view.ViewItem;
 import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
 import ItemDataGroup = api.app.view.ItemDataGroup;
@@ -34,7 +35,16 @@ export class UserItemStatisticsPanel
         this.isAdminPromise = new IsAuthenticatedRequest().sendAndParse().then(result => this.isAdmin(result.getPrincipals()));
 
         this.userDataContainer = new api.dom.DivEl('user-data-container');
-        this.appendChild(this.userDataContainer);
+
+        this.bindServerEventListeners();
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered) => {
+            this.appendChild(this.userDataContainer);
+
+            return rendered;
+        });
     }
 
     setItem(item: ViewItem<UserTreeGridItem>) {
@@ -45,11 +55,33 @@ export class UserItemStatisticsPanel
         }
 
         if (!currentItem || !currentItem.equals(item)) {
-            this.userDataContainer.removeChildren();
-
-            this.appendMetadata(item);
+            this.refreshPanel(item);
 
             super.setItem(item);
+        }
+    }
+
+    private refreshPanel(item: ViewItem<UserTreeGridItem>) {
+        this.userDataContainer.removeChildren();
+        this.appendMetadata(item);
+    }
+
+    private bindServerEventListeners() {
+        const handler: () => void = api.util.AppHelper.debounce(this.handleUserItemEvent.bind(this), 250);
+
+        const serverHandler = PrincipalServerEventsHandler.getInstance();
+
+        serverHandler.onUserItemCreated(handler);
+        serverHandler.onUserItemDeleted(handler);
+        serverHandler.onUserItemUpdated(handler);
+    }
+
+    private handleUserItemEvent() {
+        const currentItem: ViewItem<UserTreeGridItem> = this.getItem();
+        const isPrincipalSelected: boolean = !!currentItem || currentItem.getModel().getType() === UserTreeGridItemType.PRINCIPAL;
+
+        if (isPrincipalSelected) {
+            this.refreshPanel(currentItem);
         }
     }
 
