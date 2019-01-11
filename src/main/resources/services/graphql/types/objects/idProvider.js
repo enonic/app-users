@@ -4,7 +4,7 @@ var graphQlEnums = require('../enums');
 
 var graphQlUserItem = require('./userItem');
 
-var idproviderLib = require('/lib/idproviders');
+var idprovidersLib = require('/lib/idproviders');
 
 var IdProviderAccessControlEntryType = graphQl.createObjectType({
     name: 'IdProviderAccessControlEntry',
@@ -36,9 +36,9 @@ exports.IdProviderConfig = graphQl.createObjectType({
     }
 });
 
-exports.idProviderType = graphQl.createObjectType({
+exports.IdProviderType = graphQl.createObjectType({
     name: 'IdProvider',
-    description: 'Domain representation of a id provider',
+    description: 'Domain representation of an id provider',
     interfaces: [graphQlUserItem.UserItemType],
     fields: {
         key: {
@@ -93,11 +93,11 @@ exports.idProviderType = graphQl.createObjectType({
         }
     }
 });
-graphQlUserItem.typeResolverMap.idProviderType = exports.idProviderType;
+graphQlUserItem.typeResolverMap.idProviderType = exports.IdProviderType;
 
-exports.idProviderDeleteType = graphQl.createObjectType({
-    name: 'idProviderDelete',
-    description: 'Result of a idProvider delete operation',
+exports.IdProviderDeleteType = graphQl.createObjectType({
+    name: 'IdProviderDelete',
+    description: 'Result of an idProvider delete operation',
     fields: {
         idProviderKey: {
             type: graphQl.GraphQLString

@@ -9,17 +9,18 @@ var repositories = require('/lib/repositories');
 var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
 
+
 module.exports = graphQl.createObjectType({
     name: 'Query',
     fields: {
         idProviders: {
-            type: graphQl.list(graphQlObjectTypes.idProviderType),
+            type: graphQl.list(graphQlObjectTypes.IdProviderType),
             resolve: function () {
                 return idproviders.list();
             }
         },
         idProvider: {
-            type: graphQlObjectTypes.idProviderType,
+            type: graphQlObjectTypes.IdProviderType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString)
             },
@@ -28,8 +29,8 @@ module.exports = graphQl.createObjectType({
                 return idproviders.getByKey(key);
             }
         },
-        defaultidProvider: {
-            type: graphQlObjectTypes.idProviderType,
+        defaultIdProvider: {
+            type: graphQlObjectTypes.IdProviderType,
             resolve: function () {
                 return idproviders.getDefault();
             }

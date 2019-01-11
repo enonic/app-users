@@ -16,15 +16,15 @@ var PrincipalInput = graphQl.createInputObjectType({
     }
 });
 
-exports.idProviderAccessControlInput = graphQl.createInputObjectType({
-    name: 'idProviderAccessControlInput',
+exports.IdProviderAccessControlInput = graphQl.createInputObjectType({
+    name: 'IdProviderAccessControlInput',
     description: 'Input definition for id provider access control entry',
     fields: {
         principal: {
             type: graphQl.nonNull(graphQl.GraphQLString)
         },
         access: {
-            type: graphQl.nonNull(graphQlEnums.idProviderAccessEnum)
+            type: graphQl.nonNull(graphQlEnums.IdProviderAccessEnum)
         }
     }
 });

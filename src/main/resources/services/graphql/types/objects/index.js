@@ -1,14 +1,14 @@
 var graphQlConnection = require('./connection');
 
-var graphQlidProvider = require('./idProvider');
+var graphQlIdProvider = require('./idProvider');
 var graphQlPrincipal = require('./principal');
 var graphQlUserItem = require('./userItem');
 var graphQlTypes = require('./types');
 var graphQlRepository = require('./repository');
 
 module.exports = {
-    idProviderType: graphQlidProvider.idProviderType,
-    idProviderDeleteType: graphQlidProvider.idProviderDeleteType,
+    IdProviderType: graphQlIdProvider.IdProviderType,
+    IdProviderDeleteType: graphQlIdProvider.IdProviderDeleteType,
     PrincipalType: graphQlPrincipal.PrincipalType,
     PrincipalDeleteType: graphQlPrincipal.PrincipalDeleteType,
     TypesType: graphQlTypes.TypesType,

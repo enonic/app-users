@@ -84,7 +84,7 @@ exports.defaultPermissions = function () {
 };
 
 /**
- * Creates a id provider.
+ * Creates an id provider.
  *
  * @param {string} name Id provider name.
  * @param {string} [params.displayName] Id provider display name.
@@ -105,7 +105,7 @@ exports.createIdProvider = function (params) {
 };
 
 /**
- * Update a id provider.
+ * Update an id provider.
  *
  * @param {object} params JSON parameters.
  * @param {string} params.key Key of the id provider to modify.

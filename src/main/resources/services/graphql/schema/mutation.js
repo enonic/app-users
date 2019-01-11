@@ -161,7 +161,7 @@ module.exports = graphQl.createObjectType({
 
         // IdProvider
         createIdProvider: {
-            type: graphQlObjectTypes.idProviderType,
+            type: graphQlObjectTypes.IdProviderType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -187,8 +187,8 @@ module.exports = graphQl.createObjectType({
                 });
             }
         },
-        updateidProvider: {
-            type: graphQlObjectTypes.idProviderType,
+        updateIdProvider: {
+            type: graphQlObjectTypes.IdProviderType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
@@ -214,7 +214,7 @@ module.exports = graphQl.createObjectType({
                 });
             }
         },
-        deleteidProviders: {
+        deleteIdProviders: {
             type: graphQl.list(graphQlObjectTypes.IdProviderDeleteType),
             args: {
                 keys: graphQl.list(graphQl.GraphQLString)
