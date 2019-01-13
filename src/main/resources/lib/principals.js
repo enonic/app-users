@@ -146,7 +146,7 @@ function rolesQuery() {
 
 function idProviderQuery(key, type) {
     return (
-        '(idProviderKey="' +
+        '(userStoreKey="' +
         key +
         '"' +
         (type ? 'AND principalType="' + type + '")' : ')')
