@@ -27,6 +27,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
         this.DELETE = new DeletePrincipalAction(grid);
         this.SYNC = new SyncPrincipalAction(grid);
 
+        this.NEW.setEnabled(true);
         this.actions.push(this.NEW, this.EDIT, this.DELETE/*, this.SYNC*/);
     }
 
@@ -73,7 +74,6 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
             const onlyUsersSelected = totalSelection >= 1 && totalSelection === usersSelected;
             const onePrincipalSelected = totalSelection === 1 && totalSelection === principalsSelected;
 
-            this.NEW.setEnabled(true);
             this.EDIT.setEnabled(directoriesSelected < 1 && (anyUserStore || anyPrincipal));
 
             if (this.isSystemUserSelected(browseItems)) {
