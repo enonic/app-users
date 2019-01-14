@@ -117,7 +117,7 @@ export class UserBuilder
 
     protected getKeyFromJson(json: UserJson): PrincipalKey {
         const key = super.getKeyFromJson(json);
-        return json.name ? PrincipalKey.ofUser(key.getUserStore(), json.name) : key;
+        return json.name ? PrincipalKey.ofUser(key.getIdProvider(), json.name) : key;
     }
 
     setEmail(value: string): UserBuilder {

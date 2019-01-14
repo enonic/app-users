@@ -5,7 +5,7 @@ const launcherPanel = require('../page_objects/launcher.panel');
 const homePage = require('../page_objects/home.page');
 const loginPage = require('../page_objects/login.page');
 const browsePanel = require('../page_objects/browsepanel/userbrowse.panel');
-const userStoreWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const userWizard = require('../page_objects/wizardpanel/user.wizard');
 const groupWizard = require('../page_objects/wizardpanel/group.wizard');
 const roleWizard = require('../page_objects/wizardpanel/role.wizard');
@@ -181,13 +181,13 @@ module.exports = {
             return userWizard.waitForOpened();
         }).pause(500);
     },
-    selectSystemUserStoreAndOpenWizard: function () {
+    selectSystemIdProviderAndOpenWizard: function () {
         return this.findAndSelectItem('system').then(() => {
             return browsePanel.waitForEditButtonEnabled();
         }).then(() => {
             return browsePanel.clickOnEditButton();
         }).then(() => {
-            return userStoreWizard.waitForOpened();
+            return idProviderWizard.waitForOpened();
         }).pause(500);
     },
     clickOnRolesFolderAndOpenWizard: function () {
@@ -226,15 +226,15 @@ module.exports = {
             return browsePanel.doClickOnCloseTabAndWaitGrid(displayName);
         })
     },
-    openWizardAndSaveUserStore: function (userStoreData) {
-        return this.clickOnNewOpenUserStoreWizard().then(() => {
-            return userStoreWizard.typeData(userStoreData)
+    openWizardAndSaveIdProvider: function (idProviderData) {
+        return this.clickOnNewOpenIdProviderWizard().then(() = > {
+            return idProviderWizard.typeData(idProviderData)
         }).pause(500).then(() => {
-            return userStoreWizard.waitAndClickOnSave();
+            return idProviderWizard.waitAndClickOnSave();
         }).then(()=>{
-            return userStoreWizard.waitForSpinnerVisible()
+            return idProviderWizard.waitForSpinnerVisible()
         }).then(() => {
-            return userStoreWizard.waitForSpinnerNotVisible()
+            return idProviderWizard.waitForSpinnerNotVisible()
         }).pause(1200);
     },
     openWizardAndSaveRole: function (role) {
@@ -251,12 +251,15 @@ module.exports = {
             return this.saveAndCloseWizard(group.displayName)
         }).pause(1000);
     },
-    clickOnNewOpenUserStoreWizard: function () {
+    clickOnNewOpenIdProviderWizard: function () {
         return browsePanel.clickOnNewButton().then(() => {
             return newPrincipalDialog.waitForOpened();
         }).then(() => {
-            return newPrincipalDialog.clickOnItem(`User Store`);
-        }).then(() => userStoreWizard.waitForOpened());
+            return newPrincipalDialog.clickOnItem(`Id Provider`);
+    }).
+        then(() = > idProviderWizard.waitForOpened()
+    )
+        ;
     },
     clickOnSystemOpenUserWizard: function () {
         return browsePanel.clickOnRowByName('system').then(() => {
@@ -287,7 +290,7 @@ module.exports = {
             return groupWizard.waitForOpened();
         });
     },
-    clickOnUserStoreAndOpenUserWizard: function (storeName) {
+    clickOnIdProviderAndOpenUserWizard: function (storeName) {
         return browsePanel.clickOnRowByName(storeName).then(() => {
             return browsePanel.waitForNewButtonEnabled();
         }).then(() => {

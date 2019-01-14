@@ -4,5 +4,5 @@ export enum UserItemType {
     USER,
     GROUP,
     ROLE,
-    USER_STORE
+    ID_PROVIDER
 }

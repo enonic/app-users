@@ -23,7 +23,7 @@ exports.UserItemTypeEnum = graphQl.createEnumType({
     name: 'UserItemType',
     description: 'Enumeration of user item types',
     values: {
-        USER_STORE: 'USER_STORE',
+        ID_PROVIDER: 'ID_PROVIDER',
         USER: 'USER',
         GROUP: 'GROUP',
         ROLE: 'ROLE'
@@ -54,14 +54,14 @@ exports.PermissionEnum = graphQl.createEnumType({
     }
 });
 
-exports.UserStoreAccessEnum = graphQl.createEnumType({
-    name: 'UserStoreAccess',
-    description: 'Enumeration of user store access permissions',
+exports.IdProviderAccessEnum = graphQl.createEnumType({
+    name: 'IdProviderAccess',
+    description: 'Enumeration of id provider access permissions',
     values: {
         READ: 'READ',
         CREATE_USERS: 'CREATE_USERS',
         WRITE_USERS: 'WRITE_USERS',
-        USER_STORE_MANAGER: 'USER_STORE_MANAGER',
+        ID_PROVIDER_MANAGER: 'ID_PROVIDER_MANAGER',
         ADMINISTRATOR: 'ADMINISTRATOR'
     }
 });

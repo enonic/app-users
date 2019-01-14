@@ -42,7 +42,7 @@ export class RoleWizardPanel
         return this.produceCreateRoleRequest().sendAndParse().then((principal: Principal) => {
 
             api.notify.showFeedback(i18n('notify.create.role'));
-            new UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
+            new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 
             return principal;

@@ -1,5 +1,5 @@
 import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
@@ -8,7 +8,7 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
 
     persistedType: PrincipalType;
 
-    userStore: UserStore;
+    idProvider: IdProvider;
 
     parentOfSameType: boolean;
 
@@ -24,8 +24,8 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
         return this;
     }
 
-    setUserStore(value: UserStore): PrincipalWizardPanelParams {
-        this.userStore = value;
+    setIdProvider(value: IdProvider): PrincipalWizardPanelParams {
+        this.idProvider = value;
         return this;
     }
 

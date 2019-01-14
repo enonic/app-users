@@ -5,7 +5,7 @@ import {EditPrincipalAction} from './action/EditPrincipalAction';
 import {NewPrincipalAction} from './action/NewPrincipalAction';
 import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {User} from '../principal/User';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import Action = api.ui.Action;
 import TreeGridActions = api.ui.treegrid.actions.TreeGridActions;
 import BrowseItem = api.app.browse.BrowseItem;
@@ -38,7 +38,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
     updateActionsEnabledState(browseItems: BrowseItem<UserTreeGridItem>[],
                               changes?: BrowseItemsChanges<UserTreeGridItem>): wemQ.Promise<void> {
         return wemQ(true).then(() => {
-            let userStoresSelected: number = 0;
+            let idProvidersSelected: number = 0;
             let principalsSelected: number = 0;
             let directoriesSelected: number = 0;
             let usersSelected: number = 0;
@@ -62,19 +62,19 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
                 case UserTreeGridItemType.USERS:
                     directoriesSelected++;
                     break;
-                case UserTreeGridItemType.USER_STORE:
-                    userStoresSelected++;
+                case UserTreeGridItemType.ID_PROVIDER:
+                    idProvidersSelected++;
                     break;
                 }
             });
 
-            const totalSelection = userStoresSelected + principalsSelected + directoriesSelected;
+            const totalSelection = idProvidersSelected + principalsSelected + directoriesSelected;
             const anyPrincipal = principalsSelected > 0;
-            const anyUserStore = userStoresSelected > 0;
+            const anyIdProvider = idProvidersSelected > 0;
             const onlyUsersSelected = totalSelection >= 1 && totalSelection === usersSelected;
             const onePrincipalSelected = totalSelection === 1 && totalSelection === principalsSelected;
 
-            this.EDIT.setEnabled(directoriesSelected < 1 && (anyUserStore || anyPrincipal));
+            this.EDIT.setEnabled(directoriesSelected < 1 && (anyIdProvider || anyPrincipal));
 
             if (this.isSystemUserSelected(browseItems)) {
                 this.DELETE.setEnabled(false);
@@ -86,7 +86,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
                 this.DELETE.setEnabled(false);
             }
 
-            this.SYNC.setEnabled(anyUserStore);
+            this.SYNC.setEnabled(anyIdProvider);
         });
     }
 
@@ -99,9 +99,9 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
     }
 
     private establishDeleteActionState(userBrowseItem: UserTreeGridItem) {
-        if (this.itemTypeAllowsDeletion(userBrowseItem.getType()) && userBrowseItem.getUserStore() &&
-            userBrowseItem.getUserStore().getKey()) {
-            UserStore.checkOnDeletable(userBrowseItem.getUserStore().getKey()).then((result: boolean) => {
+        if (this.itemTypeAllowsDeletion(userBrowseItem.getType()) && userBrowseItem.getIdProvider() &&
+            userBrowseItem.getIdProvider().getKey()) {
+            IdProvider.checkOnDeletable(userBrowseItem.getIdProvider().getKey()).then((result: boolean) => {
                 this.DELETE.setEnabled(result);
             }).catch(api.DefaultErrorHandler.handle).done();
         } else {

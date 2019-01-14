@@ -6,7 +6,7 @@ import {UserTreeGridActions} from './UserTreeGridActions';
 import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import TreeNode = api.ui.treegrid.TreeNode;
 import BrowseItem = api.app.browse.BrowseItem;
 import PrincipalType = api.security.PrincipalType;
@@ -29,7 +29,7 @@ export class UserBrowsePanel
 
             let label;
 
-            if (singleSelection && selection[0].getData().getType() !== UserTreeGridItemType.USER_STORE) {
+            if (singleSelection && selection[0].getData().getType() !== UserTreeGridItemType.ID_PROVIDER) {
                 const userItem = selection[0].getData();
 
                 switch (userItem.getType()) {
@@ -66,8 +66,8 @@ export class UserBrowsePanel
     private bindServerEventListeners() {
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
-        serverHandler.onUserItemCreated((principal: Principal, userStore: UserStore, sameTypeParent?: boolean) => {
-            this.treeGrid.appendUserNode(principal, userStore, sameTypeParent);
+        serverHandler.onUserItemCreated((principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => {
+            this.treeGrid.appendUserNode(principal, idProvider, sameTypeParent);
             this.setRefreshOfFilterRequired();
 
             /*
@@ -79,8 +79,8 @@ export class UserBrowsePanel
             }
         });
 
-        serverHandler.onUserItemUpdated((principal: Principal, userStore: UserStore) => {
-            this.treeGrid.updateUserNode(principal, userStore);
+        serverHandler.onUserItemUpdated((principal: Principal, idProvider: IdProvider) => {
+            this.treeGrid.updateUserNode(principal, idProvider);
         });
 
         serverHandler.onUserItemDeleted((ids: string[]) => {
@@ -149,7 +149,7 @@ export class UserBrowsePanel
         let type: UserTreeGridItemType = item.getType();
 
         switch (type) {
-        case UserTreeGridItemType.USER_STORE:
+        case UserTreeGridItemType.ID_PROVIDER:
             return 'icon-address-book icon-large';
 
         case UserTreeGridItemType.PRINCIPAL:

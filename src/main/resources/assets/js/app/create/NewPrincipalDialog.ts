@@ -43,9 +43,9 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
     }
 
     setSelection(selection: UserTreeGridItem[]): NewPrincipalDialog {
-        const isUserStore = selection.length === 1 && selection[0].getType() === UserTreeGridItemType.USER_STORE;
-        if (isUserStore) {
-            this.grid.setUserStore(selection[0].getUserStore());
+        const isidProvider = selection.length === 1 && selection[0].getType() === UserTreeGridItemType.ID_PROVIDER;
+        if (isidProvider) {
+            this.grid.setIdProvider(selection[0].getIdProvider());
             this.setPath(selection[0].getItemDisplayName());
         } else if (this.pathEl) {
             this.pathEl.hide();
@@ -61,7 +61,7 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
     }
 
     close() {
-        this.grid.clearUserStores();
+        this.grid.clearidProviders();
         super.close();
     }
 

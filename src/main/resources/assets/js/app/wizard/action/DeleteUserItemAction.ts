@@ -1,9 +1,9 @@
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
-import {DeleteUserStoreRequest} from '../../../api/graphql/userStore/DeleteUserStoreRequest';
+import {DeleteIdProviderRequest} from '../../../api/graphql/idProvider/DeleteIdProviderRequest';
 import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
-import {DeleteUserStoreResult} from '../../../api/graphql/userStore/DeleteUserStoreResult';
+import {DeleteIdProviderResult} from '../../../api/graphql/idProvider/DeleteIdProviderResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
-import {UserStore} from '../../principal/UserStore';
+import {IdProvider} from '../../principal/IdProvider';
 import Principal = api.security.Principal;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
@@ -38,20 +38,20 @@ export class DeleteUserItemAction extends api.ui.Action {
                             }
                         });
                 } else {
-                    userItemKey = (<UserStore>persistedItem).getKey();
-                    new DeleteUserStoreRequest()
+                    userItemKey = (<IdProvider>persistedItem).getKey();
+                    new DeleteIdProviderRequest()
                         .setKeys([userItemKey])
                         .sendAndParse()
-                        .done((results: DeleteUserStoreResult[]) => {
+                        .done((results: DeleteIdProviderResult[]) => {
 
                             if (results && results.length > 0) {
-                                const keys = results.filter(result => result.isDeleted()).map(result => result.getUserStoreKey());
+                                const keys = results.filter(result => result.isDeleted()).map(result => result.getIdProviderKey());
                                 const msg = keys.length === 1 ?
-                                            i18n('notify.delete.userstore.single', keys[0]) :
-                                            i18n('notify.delete.userstore.multiple', keys.length);
+                                            i18n('notify.delete.idprovider.single', keys[0]) :
+                                            i18n('notify.delete.idprovider.multiple', keys.length);
 
                                 api.notify.showFeedback(msg);
-                                UserItemDeletedEvent.create().setUserStores([<UserStore>persistedItem]).build().fire();
+                                UserItemDeletedEvent.create().setIdProviders([<IdProvider>persistedItem]).build().fire();
                             }
                         });
                 }

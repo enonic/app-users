@@ -65,7 +65,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
                 assert.isTrue(result[0].includes('Group'), 'User aggregation-item should be present');
                 assert.isTrue(result[1].includes('Role'), 'Role aggregation-item should be present');
                 assert.isTrue(result[2].includes('User'), 'User aggregation-item should be present');
-                assert.isTrue(result[3].includes('User Store'), 'User Store aggregation-item should be present');
+                assert.isTrue(result[3].includes('Id Provider'), 'Id Provider aggregation-item should be present');
             })
         });
 

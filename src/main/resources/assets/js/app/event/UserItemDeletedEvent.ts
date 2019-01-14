@@ -1,25 +1,25 @@
 import Principal = api.security.Principal;
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 
 export class UserItemDeletedEvent
     extends api.event.Event {
 
     private principals: Principal[];
 
-    private userStores: UserStore[];
+    private idProviders: IdProvider[];
 
     constructor(builder: UserItemDeletedEventBuilder) {
         super();
         this.principals = builder.principals;
-        this.userStores = builder.userStores;
+        this.idProviders = builder.idProviders;
     }
 
     public getPrincipals(): Principal[] {
         return this.principals;
     }
 
-    public getUserStores(): UserStore[] {
-        return this.userStores;
+    public getIdProviders(): IdProvider[] {
+        return this.idProviders;
     }
 
     public static create(): UserItemDeletedEventBuilder {
@@ -39,15 +39,15 @@ export class UserItemDeletedEventBuilder {
 
     principals: Principal[];
 
-    userStores: UserStore[];
+    idProviders: IdProvider[];
 
     setPrincipals(principals: Principal[]): UserItemDeletedEventBuilder {
         this.principals = principals;
         return this;
     }
 
-    setUserStores(userStores: UserStore[]): UserItemDeletedEventBuilder {
-        this.userStores = userStores;
+    setIdProviders(idProviders: IdProvider[]): UserItemDeletedEventBuilder {
+        this.idProviders = idProviders;
         return this;
     }
 

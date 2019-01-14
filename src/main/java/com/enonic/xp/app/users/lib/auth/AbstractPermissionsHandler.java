@@ -9,26 +9,26 @@ import com.enonic.xp.script.bean.ScriptBean;
 import com.enonic.xp.security.Principal;
 import com.enonic.xp.security.Principals;
 import com.enonic.xp.security.SecurityService;
-import com.enonic.xp.security.acl.UserStoreAccess;
-import com.enonic.xp.security.acl.UserStoreAccessControlEntry;
-import com.enonic.xp.security.acl.UserStoreAccessControlList;
+import com.enonic.xp.security.acl.IdProviderAccess;
+import com.enonic.xp.security.acl.IdProviderAccessControlEntry;
+import com.enonic.xp.security.acl.IdProviderAccessControlList;
 
 public abstract class AbstractPermissionsHandler
     implements ScriptBean
 {
     protected Supplier<SecurityService> securityService;
 
-    public List<UserStoreAccessControlEntryMapper> mapUserStorePermissions( final UserStoreAccessControlList userStorePermissions )
+    public List<IdProviderAccessControlEntryMapper> mapIdProviderPermissions( final IdProviderAccessControlList idProviderPermissions )
     {
-        final Principals principals = securityService.get().getPrincipals( userStorePermissions.getAllPrincipals() );
+        final Principals principals = securityService.get().getPrincipals( idProviderPermissions.getAllPrincipals() );
         return principals.stream().
-            map( ( principal ) -> new UserStoreAccessControlEntryMapper( principal, getAccess( principal, userStorePermissions ) ) ).
+            map( ( principal ) -> new IdProviderAccessControlEntryMapper( principal, getAccess( principal, idProviderPermissions ) ) ).
             collect( Collectors.toList() );
     }
 
-    private UserStoreAccess getAccess( final Principal principal, final UserStoreAccessControlList userStoreAccessControlList )
+    private IdProviderAccess getAccess( final Principal principal, final IdProviderAccessControlList idProviderAccessControlList )
     {
-        for ( UserStoreAccessControlEntry entry : userStoreAccessControlList )
+        for ( IdProviderAccessControlEntry entry : idProviderAccessControlList )
         {
             if ( entry.getPrincipal().equals( principal.getKey() ) )
             {

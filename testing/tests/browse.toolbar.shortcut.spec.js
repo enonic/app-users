@@ -10,7 +10,7 @@ const appConst = require('../libs/app_const');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const newPrincipalDialog = require('../page_objects/browsepanel/new.principal.dialog');
-const userStoreWizard = require('../page_objects/wizardpanel/userstore.wizard');
+const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const confirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe('User Browse panel, toolbar shortcut spec', function () {
@@ -25,14 +25,14 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             assert.isTrue(result, 'New Principal Dialog should appear');
         });
     });
-    it(`GIVEN system user store is selected WHEN 'f4'  has been pressed THEN System User Store wizard should be loaded`, () => {
+    it(`GIVEN system Id provider is selected WHEN 'f4'  has been pressed THEN System Id Provider wizard should be loaded`, () = > {
         return testUtils.findAndSelectItem('/system').then(() => {
             return userBrowsePanel.hotKeyEdit();
         }).then(() => {
-            return userStoreWizard.waitForOpened();
+        return idProviderWizard.waitForOpened();
         }).then(result => {
             testUtils.saveScreenshot('hot_key_edit_system');
-            assert.isTrue(result, 'User Store wizard should be loaded');
+    assert.isTrue(result, 'Id Provider wizard should be loaded');
         });
     });
     it(`GIVEN system role is selected WHEN 'Ctrl+del' has been pressed THEN Confirmation Dialog should appear`, () => {

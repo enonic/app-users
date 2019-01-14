@@ -4,13 +4,13 @@ var authLib = require('/lib/xp/auth');
 
 exports.create = function createUser(params) {
     var key = common.required(params, 'key');
-    var userStoreKey = common.userStoreFromKey(key);
+    var idProviderKey = common.idProviderFromKey(key);
     var name = common.required(params, 'login');
     var displayName = common.required(params, 'displayName');
     var email = common.required(params, 'email');
 
     var createdUser = authLib.createUser({
-        userStore: userStoreKey,
+        idProvider: idProviderKey,
         name: name,
         displayName: displayName,
         email: email

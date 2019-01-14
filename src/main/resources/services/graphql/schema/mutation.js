@@ -1,6 +1,6 @@
 var graphQl = require('/lib/graphql');
 
-var userstores = require('/lib/userstores');
+var idproviders = require('/lib/idproviders');
 var principals = require('/lib/principals');
 var users = require('/lib/users');
 var groups = require('/lib/groups');
@@ -159,68 +159,68 @@ module.exports = graphQl.createObjectType({
             }
         },
 
-        // UserStore
-        createUserStore: {
-            type: graphQlObjectTypes.UserStoreType,
+        // IdProvider
+        createIdProvider: {
+            type: graphQlObjectTypes.IdProviderType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: graphQlInputTypes.AuthConfigInput,
+                idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
                 permissions: graphQl.list(
-                    graphQlInputTypes.UserStoreAccessControlInput
+                    graphQlInputTypes.IdProviderAccessControlInput
                 )
             },
             resolve: function(env) {
-                var authConfig = env.args.authConfig;
-                if (authConfig) {
+                var idProviderConfig = env.args.idProviderConfig;
+                if (idProviderConfig) {
                     // parse config as there's no graphql type for it
-                    authConfig.config = JSON.parse(authConfig.config);
+                    idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
-                return userstores.create({
+                return idproviders.create({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
-                    authConfig: authConfig,
+                    idProviderConfig: idProviderConfig,
                     permissions: env.args.permissions
                 });
             }
         },
-        updateUserStore: {
-            type: graphQlObjectTypes.UserStoreType,
+        updateIdProvider: {
+            type: graphQlObjectTypes.IdProviderType,
             args: {
                 key: graphQl.nonNull(graphQl.GraphQLString),
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 description: graphQl.GraphQLString,
-                authConfig: graphQlInputTypes.AuthConfigInput,
+                idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
                 permissions: graphQl.list(
-                    graphQlInputTypes.UserStoreAccessControlInput
+                    graphQlInputTypes.IdProviderAccessControlInput
                 )
             },
             resolve: function(env) {
-                var authConfig = env.args.authConfig;
-                if (authConfig) {
+                var idProviderConfig = env.args.idProviderConfig;
+                if (idProviderConfig) {
                     // parse config as there's no graphql type for it
-                    authConfig.config = JSON.parse(authConfig.config);
+                    idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
-                return userstores.update({
+                return idproviders.update({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
-                    authConfig: authConfig,
+                    idProviderConfig: idProviderConfig,
                     permissions: env.args.permissions
                 });
             }
         },
-        deleteUserStores: {
-            type: graphQl.list(graphQlObjectTypes.UserStoreDeleteType),
+        deleteIdProviders: {
+            type: graphQl.list(graphQlObjectTypes.IdProviderDeleteType),
             args: {
                 keys: graphQl.list(graphQl.GraphQLString)
             },
             resolve: function(env) {
-                return userstores.delete(env.args.keys);
+                return idproviders.delete(env.args.keys);
             }
         }
     }

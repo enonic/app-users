@@ -1,19 +1,19 @@
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './browse/UserTreeGridItem';
 import {UserItemWizardPanel} from './wizard/UserItemWizardPanel';
-import {UserStoreWizardPanel} from './wizard/UserStoreWizardPanel';
+import {IdProviderWizardPanel} from './wizard/IdProviderWizardPanel';
 import {PrincipalWizardPanel} from './wizard/PrincipalWizardPanel';
 import {NewPrincipalEvent} from './browse/NewPrincipalEvent';
 import {EditPrincipalEvent} from './browse/EditPrincipalEvent';
 import {UserBrowsePanel} from './browse/UserBrowsePanel';
-import {UserStoreWizardPanelParams} from './wizard/UserStoreWizardPanelParams';
+import {IdProviderWizardPanelParams} from './wizard/IdProviderWizardPanelParams';
 import {PrincipalWizardPanelParams} from './wizard/PrincipalWizardPanelParams';
 import {RoleWizardPanel} from './wizard/RoleWizardPanel';
 import {UserWizardPanel} from './wizard/UserWizardPanel';
 import {GroupWizardPanel} from './wizard/GroupWizardPanel';
-import {GetUserStoreByKeyRequest} from '../api/graphql/userStore/GetUserStoreByKeyRequest';
+import {GetIdProviderByKeyRequest} from '../api/graphql/idprovider/GetIdProviderByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../api/graphql/principal/GetPrincipalByKeyRequest';
 import {PrincipalNamedEvent} from './event/PrincipalNamedEvent';
-import {UserStore} from './principal/UserStore';
+import {IdProvider} from './principal/IdProvider';
 import NavigatedAppPanel = api.app.NavigatedAppPanel;
 import AppBarTabMenuItem = api.app.bar.AppBarTabMenuItem;
 import AppBarTabMenuItemBuilder = api.app.bar.AppBarTabMenuItemBuilder;
@@ -23,7 +23,7 @@ import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
 import UserItem = api.security.UserItem;
 import i18n = api.util.i18n;
-import UserStoreKey = api.security.UserStoreKey;
+import IdProviderKey = api.security.IdProviderKey;
 
 interface PrincipalData {
 
@@ -62,11 +62,11 @@ export class UserAppPanel
                             new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build()
                         ]).fire();
                     });
-            } else if (id && this.isValidUserStoreKey(id)) {
-                new GetUserStoreByKeyRequest(UserStoreKey.fromString(id)).sendAndParse().done((userStore: UserStore) => {
+            } else if (id && this.isValidIdProviderKey(id)) {
+                new GetIdProviderByKeyRequest(IdProviderKey.fromString(id)).sendAndParse().done((idProvider: IdProvider) => {
                     new EditPrincipalEvent([
-                        new UserTreeGridItemBuilder().setUserStore(userStore).setType(
-                            UserTreeGridItemType.USER_STORE).build()
+                        new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(
+                            UserTreeGridItemType.ID_PROVIDER).build()
                     ]).fire();
                 });
             } else {
@@ -91,9 +91,9 @@ export class UserAppPanel
         }
     }
 
-    private isValidUserStoreKey(value: string): boolean {
+    private isValidIdProviderKey(value: string): boolean {
         try {
-            UserStoreKey.fromString(value);
+            IdProviderKey.fromString(value);
             return true;
         } catch (e) {
             return false;
@@ -200,11 +200,11 @@ export class UserAppPanel
         if (tabMenuItem != null) {
             this.selectPanel(tabMenuItem);
         } else {
-            if (!userItem || userItem.getType() === UserTreeGridItemType.USER_STORE) {
-                this.handleUserStoreNew(tabId, data.tabName);
+            if (!userItem || userItem.getType() === UserTreeGridItemType.ID_PROVIDER) {
+                this.handleIdProviderNew(tabId, data.tabName);
             } else {
-                this.loadUserStoreIfNeeded(userItem).then((userStore: UserStore) => {
-                    this.handlePrincipalNew(tabId, data, userStore, userItem);
+                this.loadIdProviderIfNeeded(userItem).then((idProvider: IdProvider) => {
+                    this.handlePrincipalNew(tabId, data, idProvider, userItem);
                 });
             }
         }
@@ -221,12 +221,12 @@ export class UserAppPanel
 
             case UserTreeGridItemType.USERS:
                 principalType = PrincipalType.USER;
-                principalPath = PrincipalKey.ofUser(userItem.getUserStore().getKey(), 'none').toPath(true);
+                principalPath = PrincipalKey.ofUser(userItem.getIdProvider().getKey(), 'none').toPath(true);
                 tabName = i18n('field.user');
                 break;
             case UserTreeGridItemType.GROUPS:
                 principalType = PrincipalType.GROUP;
-                principalPath = PrincipalKey.ofGroup(userItem.getUserStore().getKey(), 'none').toPath(true);
+                principalPath = PrincipalKey.ofGroup(userItem.getIdProvider().getKey(), 'none').toPath(true);
                 tabName = i18n('field.group');
                 break;
             case UserTreeGridItemType.ROLES:
@@ -239,13 +239,13 @@ export class UserAppPanel
                 principalPath = userItem.getPrincipal().getKey().toPath(true);
                 tabName = i18n(`field.${PrincipalType[principalType].toLowerCase()}`);
                 break;
-            case UserTreeGridItemType.USER_STORE:
-                tabName = i18n('field.userStore');
+            case UserTreeGridItemType.ID_PROVIDER:
+                tabName = i18n('field.idProvider');
                 break;
             }
 
         } else {
-            tabName = i18n('field.userStore');
+            tabName = i18n('field.idProvider');
         }
 
         return {
@@ -255,27 +255,27 @@ export class UserAppPanel
         };
     }
 
-    private loadUserStoreIfNeeded(userItem: UserTreeGridItem) {
+    private loadIdProviderIfNeeded(userItem: UserTreeGridItem) {
         let promise;
         this.mask.show();
 
         switch (userItem.getType()) {
         case UserTreeGridItemType.USERS:
         case UserTreeGridItemType.GROUPS:
-            promise = new GetUserStoreByKeyRequest(userItem.getUserStore().getKey()).sendAndParse();
+            promise = new GetIdProviderByKeyRequest(userItem.getIdProvider().getKey()).sendAndParse();
             break;
         case UserTreeGridItemType.PRINCIPAL:
-            // Roles does not have a UserStore link
+            // Roles does not have a IdProvider link
             if (userItem.getPrincipal().getType() !== PrincipalType.ROLE) {
-                promise = new GetUserStoreByKeyRequest(userItem.getPrincipal().getKey().getUserStore()).sendAndParse();
+                promise = new GetIdProviderByKeyRequest(userItem.getPrincipal().getKey().getIdProvider()).sendAndParse();
             } else {
-                promise = wemQ(userItem.getUserStore());
+                promise = wemQ(userItem.getIdProvider());
             }
             break;
         default:
-        case UserTreeGridItemType.USER_STORE:
+        case UserTreeGridItemType.ID_PROVIDER:
         case UserTreeGridItemType.ROLES:
-            promise = wemQ(userItem.getUserStore());
+            promise = wemQ(userItem.getIdProvider());
             break;
         }
 
@@ -287,20 +287,20 @@ export class UserAppPanel
             });
     }
 
-    private handlePrincipalNew(tabId: AppBarTabId, data: PrincipalData, userStore: UserStore, userItem: UserTreeGridItem) {
-        if (data.principalType === PrincipalType.USER && !this.areUsersEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.create').toLowerCase(),
+    private handlePrincipalNew(tabId: AppBarTabId, data: PrincipalData, idProvider: IdProvider, userItem: UserTreeGridItem) {
+        if (data.principalType === PrincipalType.USER && !this.areUsersEditable(idProvider)) {
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.create').toLowerCase(),
                 i18n('field.users').toLowerCase()));
             return;
         }
-        if (data.principalType === PrincipalType.GROUP && !this.areGroupsEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.create').toLowerCase(),
+        if (data.principalType === PrincipalType.GROUP && !this.areGroupsEditable(idProvider)) {
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.create').toLowerCase(),
                 i18n('field.groups').toLowerCase()));
             return;
         }
 
         let wizardParams = <PrincipalWizardPanelParams> new PrincipalWizardPanelParams()
-            .setUserStore(userStore)
+            .setIdProvider(idProvider)
             .setParentOfSameType(userItem.getType() === UserTreeGridItemType.PRINCIPAL)
             .setPersistedType(data.principalType)
             .setPersistedPath(data.principalPath)
@@ -315,9 +315,9 @@ export class UserAppPanel
         this.handleWizardCreated(wizard, data.tabName);
     }
 
-    private handleUserStoreNew(tabId: AppBarTabId, tabName: string) {
-        let wizardParams = <UserStoreWizardPanelParams> new UserStoreWizardPanelParams().setTabId(tabId);
-        this.handleWizardCreated(new UserStoreWizardPanel(wizardParams), tabName);
+    private handleIdProviderNew(tabId: AppBarTabId, tabName: string) {
+        let wizardParams = <IdProviderWizardPanelParams> new IdProviderWizardPanelParams().setTabId(tabId);
+        this.handleWizardCreated(new IdProviderWizardPanel(wizardParams), tabName);
     }
 
     private handleEdit(event: EditPrincipalEvent) {
@@ -334,52 +334,52 @@ export class UserAppPanel
                 this.selectPanel(tabMenuItem);
             } else {
                 let tabId = this.getTabIdForUserItem(userItem);
-                if (userItem.getType() === UserTreeGridItemType.USER_STORE) {
-                    this.handleUserStoreEdit(userItem.getUserStore(), tabId, tabMenuItem);
+                if (userItem.getType() === UserTreeGridItemType.ID_PROVIDER) {
+                    this.handleIdProviderEdit(userItem.getIdProvider(), tabId, tabMenuItem);
                 } else if (userItem.getType() === UserTreeGridItemType.PRINCIPAL) {
-                    this.loadUserStoreIfNeeded(userItem).then((userStore) => {
-                        this.handlePrincipalEdit(userItem.getPrincipal(), userStore, tabId, tabMenuItem);
+                    this.loadIdProviderIfNeeded(userItem).then((idProvider) => {
+                        this.handlePrincipalEdit(userItem.getPrincipal(), idProvider, tabId, tabMenuItem);
                     });
                 }
             }
         });
     }
 
-    private handleUserStoreEdit(userStore: UserStore, tabId: AppBarTabId, tabMenuItem: AppBarTabMenuItem) {
+    private handleIdProviderEdit(idProvider: IdProvider, tabId: AppBarTabId, tabMenuItem: AppBarTabMenuItem) {
 
-        let wizardParams = new UserStoreWizardPanelParams()
-            .setUserStoreKey(userStore.getKey()) // use key to load persisted item
+        let wizardParams = new IdProviderWizardPanelParams()
+            .setIdProviderKey(idProvider.getKey()) // use key to load persisted item
             .setTabId(tabId)
-            .setPersistedDisplayName(userStore.getDisplayName());
+            .setPersistedDisplayName(idProvider.getDisplayName());
 
-        let wizard = new UserStoreWizardPanel(wizardParams);
+        let wizard = new IdProviderWizardPanel(wizardParams);
 
         this.handleWizardUpdated(wizard, tabMenuItem);
     }
 
-    private handlePrincipalEdit(principal: Principal, userStore: UserStore, tabId: AppBarTabId, tabMenuItem: AppBarTabMenuItem) {
+    private handlePrincipalEdit(principal: Principal, idProvider: IdProvider, tabId: AppBarTabId, tabMenuItem: AppBarTabMenuItem) {
 
         let principalType = principal.getType();
 
-        if (PrincipalType.USER === principalType && !this.areUsersEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.edit').toLowerCase(), i18n('field.users').toLowerCase()));
+        if (PrincipalType.USER === principalType && !this.areUsersEditable(idProvider)) {
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.edit').toLowerCase(), i18n('field.users').toLowerCase()));
             return;
 
-        } else if (PrincipalType.GROUP === principalType && !this.areGroupsEditable(userStore)) {
-            api.notify.showError(i18n('notify.invalid.idProvider', i18n('action.edit').toLowerCase(), i18n('field.groups').toLowerCase()));
+        } else if (PrincipalType.GROUP === principalType && !this.areGroupsEditable(idProvider)) {
+            api.notify.showError(i18n('notify.invalid.application', i18n('action.edit').toLowerCase(), i18n('field.groups').toLowerCase()));
             return;
 
         } else {
-            this.createPrincipalWizardPanelForEdit(principal, userStore, tabId, tabMenuItem);
+            this.createPrincipalWizardPanelForEdit(principal, idProvider, tabId, tabMenuItem);
 
         }
     }
 
-    private createPrincipalWizardPanelForEdit(principal: Principal, userStore: UserStore, tabId: AppBarTabId,
+    private createPrincipalWizardPanelForEdit(principal: Principal, idProvider: IdProvider, tabId: AppBarTabId,
                                               tabMenuItem: AppBarTabMenuItem) {
 
         let wizardParams = <PrincipalWizardPanelParams> new PrincipalWizardPanelParams()
-            .setUserStore(userStore)
+            .setIdProvider(idProvider)
             .setPrincipalKey(principal.getKey()) // user principal key to load persisted item
             .setPersistedType(principal.getType())
             .setPersistedPath(principal.getKey().toPath(true))
@@ -436,19 +436,19 @@ export class UserAppPanel
         let appBarTabId: AppBarTabId;
         if (UserTreeGridItemType.PRINCIPAL === userItem.getType()) {
             appBarTabId = AppBarTabId.forEdit(userItem.getPrincipal().getKey().toString());
-        } else if (UserTreeGridItemType.USER_STORE === userItem.getType()) {
-            appBarTabId = AppBarTabId.forEdit(userItem.getUserStore().getKey().toString());
+        } else if (UserTreeGridItemType.ID_PROVIDER === userItem.getType()) {
+            appBarTabId = AppBarTabId.forEdit(userItem.getIdProvider().getKey().toString());
         }
         return appBarTabId;
     }
 
-    private areUsersEditable(userStore: UserStore): boolean {
-        let idProviderMode = userStore.getIdProviderMode();
+    private areUsersEditable(idProvider: IdProvider): boolean {
+        let idProviderMode = idProvider.getIdProviderMode();
         return api.security.IdProviderMode.EXTERNAL !== idProviderMode && api.security.IdProviderMode.MIXED !== idProviderMode;
     }
 
-    private areGroupsEditable(userStore: UserStore): boolean {
-        let idProviderMode = userStore.getIdProviderMode();
+    private areGroupsEditable(idProvider: IdProvider): boolean {
+        let idProviderMode = idProvider.getIdProviderMode();
         return api.security.IdProviderMode.EXTERNAL !== idProviderMode;
     }
 

@@ -9,7 +9,7 @@ import Principal = api.security.Principal;
 import PrincipalJson = api.security.PrincipalJson;
 import PrincipalType = api.security.PrincipalType;
 import PrincipalKey = api.security.PrincipalKey;
-import UserStoreKey = api.security.UserStoreKey;
+import IdProviderKey = api.security.IdProviderKey;
 
 export type ListPrincipalsResult = {
     total: number;
@@ -20,7 +20,7 @@ export class ListPrincipalsRequest
     extends ListGraphQlRequest<any, any> {
 
     private types: PrincipalType[];
-    private userStoreKey: UserStoreKey;
+    private idProviderKey: IdProviderKey;
     private searchQuery: string;
 
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
@@ -28,8 +28,8 @@ export class ListPrincipalsRequest
         return this;
     }
 
-    setUserStoreKey(key: UserStoreKey): ListPrincipalsRequest {
-        this.userStoreKey = key;
+    setIdProviderKey(key: IdProviderKey): ListPrincipalsRequest {
+        this.idProviderKey = key;
         return this;
     }
 
@@ -43,8 +43,8 @@ export class ListPrincipalsRequest
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }
-        if (this.userStoreKey) {
-            vars['userstore'] = this.userStoreKey.toString();
+        if (this.idProviderKey) {
+            vars['idprovider'] = this.idProviderKey.toString();
         }
         if (this.searchQuery) {
             vars['query'] = this.searchQuery;
@@ -53,8 +53,8 @@ export class ListPrincipalsRequest
     }
 
     getQuery(): string {
-        return `query($userstore: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
-                    principalsConnection (userstore: $userstore, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
+        return `query($idprovider: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: SortMode) {
+                  principalsConnection (idprovider: $idprovider, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
                         totalCount
                         edges {
                             node {

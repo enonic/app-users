@@ -37,8 +37,8 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             })
         });
 
-    it('GIVEN `Principal Filter Panel` is opened WHEN `User Store` aggregation has been clicked THEN Roles-folder should not be displayed',
-        () => {
+    it('GIVEN `Principal Filter Panel` is opened WHEN `Id Provider` aggregation has been clicked THEN Roles-folder should not be displayed',
+        () = > {
             return testUtils.openFilterPanel().then(()=> {
                 return filterPanel.clickOnStoreAggregation();
             }).then(()=> {

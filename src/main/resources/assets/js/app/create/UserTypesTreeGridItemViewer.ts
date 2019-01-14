@@ -1,5 +1,5 @@
 import {UserTypeTreeGridItem} from './UserTypeTreeGridItem';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
@@ -24,7 +24,7 @@ export class UserTypesTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserT
 
     resolveIconClass(object: UserTypeTreeGridItem): string {
         const userItem = object.getUserItem();
-        if (userItem instanceof UserStore) {
+        if (userItem instanceof IdProvider) {
             return 'icon-address-book icon-large';
         } else if (userItem instanceof User) {
             return 'icon-user icon-large';

@@ -3,29 +3,29 @@ package com.enonic.xp.app.users.lib.auth;
 import java.util.List;
 
 import com.enonic.xp.script.bean.BeanContext;
+import com.enonic.xp.security.IdProvider;
+import com.enonic.xp.security.IdProviderKey;
 import com.enonic.xp.security.SecurityService;
-import com.enonic.xp.security.UserStore;
-import com.enonic.xp.security.UserStoreKey;
-import com.enonic.xp.security.acl.UserStoreAccessControlList;
+import com.enonic.xp.security.acl.IdProviderAccessControlList;
 
 public final class GetPermissionsHandler
     extends AbstractPermissionsHandler
 {
-    private UserStoreKey userStoreKey;
+    private IdProviderKey idProviderKey;
 
-    public void setUserStoreKey( final String userStoreKey )
+    public void setIdProviderKey( final String idProviderKey )
     {
-        this.userStoreKey = UserStoreKey.from( userStoreKey );
+        this.idProviderKey = IdProviderKey.from( idProviderKey );
     }
 
-    public List<UserStoreAccessControlEntryMapper> getPermissions()
+    public List<IdProviderAccessControlEntryMapper> getPermissions()
     {
-        final UserStore userStore = securityService.get().getUserStore( userStoreKey );
+        final IdProvider idProvider = securityService.get().getIdProvider( idProviderKey );
 
-        if ( userStore != null )
+        if ( idProvider != null )
         {
-            final UserStoreAccessControlList userStorePermissions = securityService.get().getUserStorePermissions( userStoreKey );
-            return mapUserStorePermissions( userStorePermissions );
+            final IdProviderAccessControlList idProviderPermissions = securityService.get().getIdProviderPermissions( idProviderKey );
+            return mapIdProviderPermissions( idProviderPermissions );
         }
 
         return null;

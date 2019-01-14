@@ -58,7 +58,7 @@ exports.PrincipalType = graphQl.createObjectType({
         principalType: {
             type: graphQlEnums.PrincipalTypeEnum
         },
-        userStoreKey: {
+        idProviderKey: {
             type: graphQl.GraphQLString
         },
         permissions: {

@@ -12,7 +12,7 @@ const panel = {
     aggregationGroupView: "//div[contains(@id,'AggregationContainer')]",
     userAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'User (')]]",
     roleAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Role (')]]",
-    storeAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'User Store (')]]",
+    storeAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Id Provider (')]]",
     userAggregationItems: "//div[contains(@id,'BucketView')]//div[contains(@id,'Checkbox') ]/label",
 };
 const browseFilterPanel = Object.create(page, {

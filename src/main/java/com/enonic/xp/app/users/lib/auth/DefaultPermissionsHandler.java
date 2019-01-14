@@ -4,15 +4,15 @@ import java.util.List;
 
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.security.SecurityService;
-import com.enonic.xp.security.acl.UserStoreAccessControlList;
+import com.enonic.xp.security.acl.IdProviderAccessControlList;
 
 public final class DefaultPermissionsHandler
     extends AbstractPermissionsHandler
 {
-    public List<UserStoreAccessControlEntryMapper> defaultPermissions()
+    public List<IdProviderAccessControlEntryMapper> defaultPermissions()
     {
-        final UserStoreAccessControlList userStorePermissions = securityService.get().getDefaultUserStorePermissions();
-        return mapUserStorePermissions( userStorePermissions );
+        final IdProviderAccessControlList idProviderPermissions = securityService.get().getDefaultIdProviderPermissions();
+        return mapIdProviderPermissions( idProviderPermissions );
     }
 
     @Override

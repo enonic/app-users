@@ -44,7 +44,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     createSteps(principal?: Principal): WizardStep[] {
         let steps: WizardStep[] = [];
 
-        this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams().userStore.getKey(), this.isSystemUserItem());
+        this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams().idProvider.getKey(), this.isSystemUserItem());
         this.userPasswordWizardStepForm = new UserPasswordWizardStepForm();
         this.membershipsWizardStepForm = new MembershipsWizardStepForm(MembershipsType.ALL);
 
@@ -103,7 +103,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
             this.decorateDeletedAction(principal.getKey());
 
-            new UserItemCreatedEvent(principal, this.getUserStore(), this.isParentOfSameType()).fire();
+            new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
 
             api.notify.showFeedback(i18n('notify.create.user'));
             this.notifyPrincipalNamed(principal);
@@ -124,7 +124,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         const wizardHeader = this.getWizardHeader();
         wizardHeader.normalizeNames();
         const login = wizardHeader.getName();
-        const key = PrincipalKey.ofUser(this.getUserStore().getKey(), login);
+        const key = PrincipalKey.ofUser(this.getIdProvider().getKey(), login);
         const name = wizardHeader.getDisplayName();
         const email = this.userEmailWizardStepForm.getEmail();
         const password = this.userPasswordWizardStepForm.getPassword();

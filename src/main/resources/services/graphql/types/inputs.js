@@ -16,22 +16,22 @@ var PrincipalInput = graphQl.createInputObjectType({
     }
 });
 
-exports.UserStoreAccessControlInput = graphQl.createInputObjectType({
-    name: 'UserStoreAccessControlInput',
-    description: 'Input definition for user store access control entry',
+exports.IdProviderAccessControlInput = graphQl.createInputObjectType({
+    name: 'IdProviderAccessControlInput',
+    description: 'Input definition for id provider access control entry',
     fields: {
         principal: {
             type: graphQl.nonNull(graphQl.GraphQLString)
         },
         access: {
-            type: graphQl.nonNull(graphQlEnums.UserStoreAccessEnum)
+            type: graphQl.nonNull(graphQlEnums.IdProviderAccessEnum)
         }
     }
 });
 
-exports.AuthConfigInput = graphQl.createInputObjectType({
-    name: 'AuthConfigInput',
-    description: 'Input definition for user store auth config',
+exports.IdProviderConfigInput = graphQl.createInputObjectType({
+    name: 'IdProviderConfigInput',
+    description: 'Input definition for id provider auth config',
     fields: {
         applicationKey: {
             type: graphQl.nonNull(graphQl.GraphQLString)

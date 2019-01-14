@@ -15,14 +15,14 @@ module.exports = {
             }
         });
 
-        processUserStoreAggregation(result);
+        processIdProviderAggregation(result);
 
         return result;
     },
     Type: common.UserItemType
 };
 
-function processUserStoreAggregation(result) {
+function processIdProviderAggregation(result) {
     if (!result || !result.aggregations || !result.aggregations.principalType || !result.aggregations.principalType.buckets) {
         return;
     }
@@ -34,10 +34,10 @@ function processUserStoreAggregation(result) {
         principalsCount += bucket.docCount;
     });
 
-    var userStoresCount = result.total - principalsCount;
+    var idProvidersCount = result.total - principalsCount;
 
-    if (userStoresCount > 0) {
-        aggregationBuckets.push({key: 'user_store', docCount: '' + userStoresCount});
+    if (idProvidersCount > 0) {
+        aggregationBuckets.push({key: 'id_provider', docCount: '' + idProvidersCount});
     }
 }
 
@@ -63,7 +63,7 @@ function createTypesQuery(types) {
                 case common.UserItemType.GROUP:
                 case common.UserItemType.USER:
                     return 'principalType = "' + type + '"';
-                case common.UserItemType.USER_STORE:
+            case common.UserItemType.ID_PROVIDER:
                     return '(_parentPath = "/identity" AND _path != "/identity/roles")';
                 default:
                     return null;

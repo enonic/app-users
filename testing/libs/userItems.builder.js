@@ -11,7 +11,7 @@ module.exports = {
     generateEmail: function (userName) {
         return userName + '@gmail.com'
     },
-    buildUserStore: function (displayName, description, providerName, permissions) {
+    buildIdProvider: function (displayName, description, providerName, permissions) {
         return {
             displayName: displayName,
             description: description,

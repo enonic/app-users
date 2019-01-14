@@ -8,7 +8,7 @@ module.exports = Object.freeze({
     TIMEOUT_2: 2000,
     TIMEOUT_1: 1000,
     TIMEOUT_SUITE: 180000,
-    USER_STORE: 'User Store',
+    ID_PROVIDER: 'Id Provider',
     ROLE: 'Role',
     ROLES: 'Roles',
     GROUP: 'Group',
@@ -53,7 +53,7 @@ module.exports = Object.freeze({
         return `Principal "user:system:${displayName}" is deleted`
     },
     storeDeletedMessage: function (displayName) {
-        return `User Store "${displayName}" is deleted`
+        return `Id Provider "${displayName}" is deleted`
     },
 
 });

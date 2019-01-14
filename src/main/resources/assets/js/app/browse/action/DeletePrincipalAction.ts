@@ -1,11 +1,11 @@
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
-import {DeleteUserStoreRequest} from '../../../api/graphql/userStore/DeleteUserStoreRequest';
+import {DeleteIdProviderRequest} from '../../../api/graphql/idProvider/DeleteIdProviderRequest';
 import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
-import {DeleteUserStoreResult} from '../../../api/graphql/userStore/DeleteUserStoreResult';
+import {DeleteIdProviderResult} from '../../../api/graphql/idProvider/DeleteIdProviderResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
-import {UserStore} from '../../principal/UserStore';
+import {IdProvider} from '../../principal/IdProvider';
 import Action = api.ui.Action;
 import Principal = api.security.Principal;
 import i18n = api.util.i18n;
@@ -26,9 +26,9 @@ export class DeletePrincipalAction
                     return userItem.getPrincipal();
                 });
 
-                let userStoreItems = grid.getSelectedDataList().filter(
-                    userItem => UserTreeGridItemType.USER_STORE === userItem.getType()).map((userItem: UserTreeGridItem) => {
-                    return userItem.getUserStore();
+                let idProviderItems = grid.getSelectedDataList().filter(
+                    userItem => UserTreeGridItemType.ID_PROVIDER === userItem.getType()).map((userItem: UserTreeGridItem) => {
+                    return userItem.getIdProvider();
                 });
 
                 let principalKeys = principalItems.filter((userItem) => {
@@ -37,10 +37,10 @@ export class DeletePrincipalAction
                     return principal.getKey();
                 });
 
-                let userStoreKeys = userStoreItems.filter((userItem) => {
-                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, UserStore);
-                }).map((userStore: UserStore) => {
-                    return userStore.getKey();
+                let idProviderKeys = idProviderItems.filter((userItem) => {
+                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, IdProvider);
+                }).map((idProvider: IdProvider) => {
+                    return idProvider.getKey();
                 });
 
                 if (principalKeys && principalKeys.length > 0) {
@@ -61,14 +61,14 @@ export class DeletePrincipalAction
                         });
                 }
 
-                if (userStoreKeys && userStoreKeys.length > 0) {
-                    new DeleteUserStoreRequest()
-                        .setKeys(userStoreKeys)
+                if (idProviderKeys && idProviderKeys.length > 0) {
+                    new DeleteIdProviderRequest()
+                        .setKeys(idProviderKeys)
                         .sendAndParse()
-                        .done((results: DeleteUserStoreResult[]) => {
+                        .done((results: DeleteIdProviderResult[]) => {
                             if (results && results.length > 0) {
-                                api.notify.showFeedback(i18n('notify.delete.userstore.single', results[0].getUserStoreKey()));
-                                UserItemDeletedEvent.create().setUserStores(userStoreItems).build().fire();
+                                api.notify.showFeedback(i18n('notify.delete.idprovider.single', results[0].getIdProviderKey()));
+                                UserItemDeletedEvent.create().setIdProviders(idProviderItems).build().fire();
                             }
                         });
 

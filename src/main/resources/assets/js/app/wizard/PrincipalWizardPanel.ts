@@ -5,7 +5,7 @@ import {PrincipalWizardDataLoader} from './PrincipalWizardDataLoader';
 import {GraphQlRequest} from '../../api/graphql/GraphQlRequest';
 import {PrincipalNamedEvent} from '../event/PrincipalNamedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
-import {UserStore} from '../principal/UserStore';
+import {IdProvider} from '../principal/IdProvider';
 import Principal = api.security.Principal;
 import PrincipalType = api.security.PrincipalType;
 import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
@@ -97,8 +97,8 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         return this.getParams().parentOfSameType;
     }
 
-    getUserStore(): UserStore {
-        return this.getParams().userStore;
+    getIdProvider(): IdProvider {
+        return this.getParams().idProvider;
     }
 
     createSteps(principal?: Principal): WizardStep[] {
@@ -156,7 +156,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
             const principalTypeName = i18n(`field.${PrincipalType[principal.getType()].toLowerCase()}`);
             api.notify.showFeedback(i18n('notify.update.any', principalTypeName, principal.getDisplayName()));
-            new UserItemUpdatedEvent(principal, this.getUserStore()).fire();
+            new UserItemUpdatedEvent(principal, this.getIdProvider()).fire();
 
             return principal;
         });

@@ -1,11 +1,11 @@
 import UserItem = api.security.UserItem;
-import UserStoreKey = api.security.UserStoreKey;
+import IdProviderKey = api.security.IdProviderKey;
 
 export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
 
     tabId: api.app.bar.AppBarTabId;
 
-    userStoreKey: UserStoreKey;
+    idProviderKey: IdProviderKey;
 
     persistedPath: string;
 
@@ -23,8 +23,8 @@ export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
         return this;
     }
 
-    setUserStoreKey(value: UserStoreKey): UserItemWizardPanelParams<USER_ITEM_TYPE> {
-        this.userStoreKey = value;
+    setIdProviderKey(value: IdProviderKey): UserItemWizardPanelParams<USER_ITEM_TYPE> {
+        this.idProviderKey = value;
         return this;
     }
 
@@ -39,6 +39,6 @@ export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
     }
 
     isSystemKey(): boolean {
-        return !!this.userStoreKey && this.userStoreKey.isSystem();
+        return !!this.idProviderKey && this.idProviderKey.isSystem();
     }
 }

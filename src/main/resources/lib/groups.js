@@ -4,12 +4,12 @@ var authLib = require('/lib/xp/auth');
 
 exports.create = function createGroup(params) {
     var key = common.required(params, 'key');
-    var userStoreKey = common.userStoreFromKey(key);
+    var idProviderKey = common.idProviderFromKey(key);
     var name = common.nameFromKey(key);
     var displayName = common.required(params, 'displayName');
 
     var createdGroup = authLib.createGroup({
-        userStore: userStoreKey,
+        idProvider: idProviderKey,
         name: name,
         displayName: displayName,
         description: params.description
