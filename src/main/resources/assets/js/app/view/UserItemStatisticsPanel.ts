@@ -78,7 +78,7 @@ export class UserItemStatisticsPanel
 
     private handleUserItemEvent() {
         const currentItem: ViewItem<UserTreeGridItem> = this.getItem();
-        const isPrincipalSelected: boolean = !!currentItem || currentItem.getModel().getType() === UserTreeGridItemType.PRINCIPAL;
+        const isPrincipalSelected: boolean = !!currentItem && currentItem.getModel().getType() === UserTreeGridItemType.PRINCIPAL;
 
         if (isPrincipalSelected) {
             this.refreshPanel(currentItem);
