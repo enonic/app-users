@@ -2,7 +2,7 @@ import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from '.
 import {UserTreeGridActions} from './UserTreeGridActions';
 import {EditPrincipalEvent} from './EditPrincipalEvent';
 import {UserItemsRowFormatter} from './UserItemsRowFormatter';
-import {ListIdProvidersRequest} from '../../api/graphql/idProvider/ListIdProvidersRequest';
+import {ListIdProvidersRequest} from '../../api/graphql/idprovider/ListIdProvidersRequest';
 import {ListPrincipalsRequest} from '../../api/graphql/principal/ListPrincipalsRequest';
 import {PrincipalBrowseSearchData} from './filter/PrincipalBrowseSearchData';
 import {UserItemType} from './UserItemType';

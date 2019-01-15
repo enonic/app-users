@@ -1,6 +1,6 @@
 import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
-import {GetIdProviderByKeyRequest} from '../../api/graphql/idProvider/GetIdProviderByKeyRequest';
-import {GetDefaultIdProviderRequest} from '../../api/graphql/idProvider/GetDefaultIdProviderRequest';
+import {GetIdProviderByKeyRequest} from '../../api/graphql/idprovider/GetIdProviderByKeyRequest';
+import {GetDefaultIdProviderRequest} from '../../api/graphql/idprovider/GetDefaultIdProviderRequest';
 import {IdProvider} from '../principal/IdProvider';
 
 export class IdProviderWizardDataLoader {

@@ -6,7 +6,7 @@ import PrincipalServerChange = api.security.event.PrincipalServerChange;
 import PrincipalServerChangeItem = api.security.event.PrincipalServerChangeItem;
 import PrincipalKey = api.security.PrincipalKey;
 import IdProviderKey = api.security.IdProviderKey;
-import {GetIdProviderByKeyRequest} from '../../api/graphql/idProvider/GetIdProviderByKeyRequest';
+import {GetIdProviderByKeyRequest} from '../../api/graphql/idprovider/GetIdProviderByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
 import {IdProvider} from '../principal/IdProvider';
 

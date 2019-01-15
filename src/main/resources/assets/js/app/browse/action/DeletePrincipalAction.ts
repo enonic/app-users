@@ -1,9 +1,9 @@
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
 import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
-import {DeleteIdProviderRequest} from '../../../api/graphql/idProvider/DeleteIdProviderRequest';
+import {DeleteIdProviderRequest} from '../../../api/graphql/idprovider/DeleteIdProviderRequest';
 import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
-import {DeleteIdProviderResult} from '../../../api/graphql/idProvider/DeleteIdProviderResult';
+import {DeleteIdProviderResult} from '../../../api/graphql/idprovider/DeleteIdProviderResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
 import {IdProvider} from '../../principal/IdProvider';
 import Action = api.ui.Action;

@@ -2,8 +2,8 @@ import {UserTypeTreeGridItem, UserTypeTreeGridItemBuilder} from './UserTypeTreeG
 import {UserItemTypesRowFormatter} from './UserItemTypesRowFormatter';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItemBuilder, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-import {ListIdProvidersRequest} from '../../api/graphql/idProvider/ListIdProvidersRequest';
-import {IdProvider, IdProviderBuilder} from '../principal/IdProvider';
+import {ListIdProvidersRequest} from '../../api/graphql/idprovider/ListIdProvidersRequest';
+import {IdProvider, IdProviderBuilder} from '../principal/idprovider';
 import {User, UserBuilder} from '../principal/User';
 import {Group, GroupBuilder} from '../principal/Group';
 import {Role, RoleBuilder} from '../principal/Role';
