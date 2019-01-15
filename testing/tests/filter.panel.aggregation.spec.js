@@ -13,13 +13,13 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `User` aggregation has been clicked THEN Roles and Store should not be displayed',
         () => {
-            return testUtils.openFilterPanel().then(()=> {
+            return testUtils.openFilterPanel().then(() => {
                 return filterPanel.clickOnUserAggregation();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.waitForItemNotDisplayed('roles');
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.waitForItemNotDisplayed('/system');
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot('aggregation_in_users');
                 return expect(userBrowsePanel.isItemDisplayed('/system/users/su')).to.eventually.be.true;
             })
@@ -27,23 +27,23 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `Role` aggregation has been clicked THEN Store should not be displayed',
         () => {
-            return testUtils.openFilterPanel().then(()=> {
+            return testUtils.openFilterPanel().then(() => {
                 return filterPanel.clickOnRoleAggregation();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.waitForItemNotDisplayed('/system');
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot('aggregation_in_role');
                 return expect(userBrowsePanel.isItemDisplayed('/roles/system.user.admin')).to.eventually.be.true;
             })
         });
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `Id Provider` aggregation has been clicked THEN Roles-folder should not be displayed',
-        () = > {
-            return testUtils.openFilterPanel().then(()=> {
+        () => {
+            return testUtils.openFilterPanel().then(() => {
                 return filterPanel.clickOnStoreAggregation();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.waitForItemNotDisplayed('roles');
-            }).then(()=> {
+            }).then(() => {
                 testUtils.saveScreenshot('aggregation_in_store');
                 return expect(userBrowsePanel.isItemDisplayed('/system')).to.eventually.be.true;
             })
@@ -52,7 +52,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

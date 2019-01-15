@@ -227,15 +227,15 @@ module.exports = {
         })
     },
     openWizardAndSaveIdProvider: function (idProviderData) {
-        return this.clickOnNewOpenIdProviderWizard().then(() = > {
-            return idProviderWizard.typeData(idProviderData)
+        return this.openIdProviderWizard().then(() => {
+            return idProviderWizard.typeData(idProviderData);
         }).pause(500).then(() => {
             return idProviderWizard.waitAndClickOnSave();
-        }).then(()=>{
-            return idProviderWizard.waitForSpinnerVisible()
         }).then(() => {
-            return idProviderWizard.waitForSpinnerNotVisible()
-        }).pause(1200);
+            //return idProviderWizard.waitForSpinnerVisible();
+        }).then(() => {
+            return idProviderWizard.waitForSpinnerNotVisible();
+        }).pause(1000);
     },
     openWizardAndSaveRole: function (role) {
         return this.clickOnRolesFolderAndOpenWizard().then(() => {
@@ -251,15 +251,15 @@ module.exports = {
             return this.saveAndCloseWizard(group.displayName)
         }).pause(1000);
     },
-    clickOnNewOpenIdProviderWizard: function () {
+    openIdProviderWizard: function () {
         return browsePanel.clickOnNewButton().then(() => {
             return newPrincipalDialog.waitForOpened();
         }).then(() => {
-            return newPrincipalDialog.clickOnItem(`Id Provider`);
-    }).
-        then(() = > idProviderWizard.waitForOpened()
-    )
-        ;
+            return newPrincipalDialog.clickOnItem(appConst.ID_PROVIDER);
+        }).then(() => {
+                return idProviderWizard.waitForOpened();
+            }
+        );
     },
     clickOnSystemOpenUserWizard: function () {
         return browsePanel.clickOnRowByName('system').then(() => {

@@ -9,6 +9,7 @@ module.exports = Object.freeze({
     TIMEOUT_1: 1000,
     TIMEOUT_SUITE: 180000,
     ID_PROVIDER: 'Id Provider',
+    SYSTEM_ID_PROVIDER: 'System Id Provider',
     ROLE: 'Role',
     ROLES: 'Roles',
     GROUP: 'Group',
@@ -24,6 +25,7 @@ module.exports = Object.freeze({
     USER_WIZARD_EMAIL_IS_INVALID: 'Email is invalid.',
     USER_WAS_CREATED_MESSAGE: 'User was created',
     GROUP_WAS_CREATED: 'Group was created',
+    PROVIDER_CREATED_NOTIFICATION: 'Id provider was created',
     STANDARD_ID_PROVIDER: 'Standard ID Provider',
 
     roles: {

@@ -3,7 +3,7 @@ const elements = require('../../libs/elements');
 const loaderComboBox = require('../inputs/loaderComboBox');
 const panel = {
     container: `//div[contains(@id,'IdProviderWizardPanel')]`,
-    providerFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='Application']]" +
+    authApplicationSelectorFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='Application']]" +
                          `${loaderComboBox.optionsFilterInput}`,
     permissionsFilterInput: `//div[contains(@id,'IdProviderAccessControlComboBox')]` + `${loaderComboBox.optionsFilterInput}`,
     permissionsLink: `//li[child::a[text()='Permissions']]`,
@@ -13,8 +13,8 @@ const panel = {
         return `//div[contains(@id,'IdProviderACESelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
     providerComboBox: `//div[contains(@id,'AuthApplicationComboBox')]`,
-    selectedProviderView: "//div[contains(@id,'AuthApplicationSelectedOptionView')]",
-    removeProviderIcon: `//a[contains(@class,'remove')]`,
+    selectedAuthApplicationView: "//div[contains(@id,'AuthApplicationSelectedOptionView')]",
+    removeAuthApplicationIcon: `//a[contains(@class,'remove')]`,
 
 };
 const idProviderWizard = Object.create(wizard, {
@@ -24,9 +24,9 @@ const idProviderWizard = Object.create(wizard, {
             return `${panel.container}//input[contains(@name,'description')]`;
         }
     },
-    providerOptionsFilterInput: {
+    authApplicationSelectorFilterInput: {
         get: function () {
-            return `${panel.container}` + `${panel.providerFilterInput}`;
+            return `${panel.container}` + `${panel.authApplicationSelectorFilterInput}`;
         }
     },
     permissionsOptionsFilterInput: {
@@ -49,9 +49,9 @@ const idProviderWizard = Object.create(wizard, {
             return `${panel.container}` + `${panel.permissionsLink}`;
         }
     },
-    removeProviderIcon: {
+    removeAuthApplicationIcon: {
         get: function () {
-            return `${panel.container}` + `${panel.selectedProviderView}` + `${panel.removeProviderIcon}`;
+            return `${panel.container}` + `${panel.selectedAuthApplicationView}` + `${panel.removeAuthApplicationIcon}`;
         }
     },
 
@@ -93,21 +93,18 @@ const idProviderWizard = Object.create(wizard, {
     },
     typeData: {
         value: function (idprovider) {
-            return this.typeDisplayName(idprovider.displayName).then(() = > {
+            return this.typeDisplayName(idprovider.displayName).then(() => {
                 return this.typeDescription(idprovider.description);
-            }).pause(500).then(() = > {
-                if(idprovider.permissions != null
-        )
-            {
+            }).pause(500).then(() => {
+                if (idprovider.permissions != null
+                ) {
                     return this.clickOnPermissionsTabItem().then(() => {
                         return this.addPrincipals(idprovider.permissions);
                     })
                 }
-            }).then(() = > {
-                if(idprovider.providerName != null
-        )
-            {
-                return this.filterOptionsAndSelectIdProvider(idprovider.providerName);
+            }).then(() => {
+                if (idprovider.authAppName != null) {
+                    return this.filterOptionsAndSelectApplication(idprovider.authAppName);
                 }
             }).pause(400);
         }
@@ -117,20 +114,20 @@ const idProviderWizard = Object.create(wizard, {
             return this.waitForVisible(this.displayNameInput, 3000);
         }
     },
-    removeProvider: {
+    removeAuthApplication: {
         value: function () {
-            return this.doClick(this.removeProviderIcon).pause(300);
+            return this.doClick(this.removeAuthApplicationIcon).pause(300);
         }
     },
     filterOptionsAndSelectApplication: {
-        value: function (providerName) {
-            return this.typeTextInInput(`${panel.providerFilterInput}`, providerName).pause(400).then(() => {
-                return loaderComboBox.waitForOptionVisible(`${panel.container}`, providerName);
+        value: function (authAppName) {
+            return this.typeTextInInput(`${panel.authApplicationSelectorFilterInput}`, authAppName).pause(400).then(() => {
+                return loaderComboBox.waitForOptionVisible(`${panel.container}`, authAppName);
             }).then(() => {
-                return loaderComboBox.clickOnOption(`${panel.container}`, providerName);
+                return loaderComboBox.clickOnOption(`${panel.container}`, authAppName);
             }).catch(err => {
                 this.saveScreenshot('err_application');
-            throw new Error('Error when selecting the application: ' + providerName + ' ' + err);
+                throw new Error('Error when selecting the auth-application: ' + authAppName + ' ' + err);
             })
         }
     },
@@ -202,9 +199,9 @@ const idProviderWizard = Object.create(wizard, {
             return this.isVisible(this.descriptionInput);
         }
     },
-    isProviderOptionsFilterInputDisplayed: {
+    isAuthApplicationsOptionsFilterInputDisplayed: {
         value: function () {
-            return this.isVisible(this.providerOptionsFilterInput);
+            return this.isVisible(this.authApplicationSelectorFilterInput);
         }
     },
     isPermissionsOptionsFilterInputDisplayed: {
@@ -225,7 +222,7 @@ const idProviderWizard = Object.create(wizard, {
                 return this.doClick(deleteSelector);
             }).catch(err => {
                 console.log(err);
-            this.doCatch('err_delete_in_idprovider_wizard', 'Error when Delete button has been clicked ');
+                this.doCatch('err_delete_in_idprovider_wizard', 'Error when Delete button has been clicked ');
             });
         }
     },

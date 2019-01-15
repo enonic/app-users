@@ -25,7 +25,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             assert.isTrue(result, 'New Principal Dialog should appear');
         });
     });
-    it(`GIVEN system Id provider is selected WHEN 'f4'  has been pressed THEN System Id Provider wizard should be loaded`, () = > {
+    it(`GIVEN system Id provider is selected WHEN 'f4'  has been pressed THEN System Id Provider wizard should be loaded`, () => {
         return testUtils.findAndSelectItem('/system').then(() => {
             return userBrowsePanel.hotKeyEdit();
         }).then(() => {

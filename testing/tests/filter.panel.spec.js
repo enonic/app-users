@@ -6,6 +6,7 @@ const webDriverHelper = require('../libs/WebDriverHelper');
 const itemBuilder = require('../libs/userItems.builder');
 const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
+const appConst = require('../libs/app_const');
 const filterPanel = require('../page_objects/browsepanel/principal.filter.panel');
 
 describe('filter.panel.spec Principal Filter Panel specification', function () {
@@ -63,9 +64,9 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             }).then(result=> {
                 assert.equal(result.length, 4, 'three aggregation-checkboxes should be present on the page');
                 assert.isTrue(result[0].includes('Group'), 'User aggregation-item should be present');
-                assert.isTrue(result[1].includes('Role'), 'Role aggregation-item should be present');
-                assert.isTrue(result[2].includes('User'), 'User aggregation-item should be present');
-                assert.isTrue(result[3].includes('Id Provider'), 'Id Provider aggregation-item should be present');
+                assert.isTrue(result[1].includes(appConst.ID_PROVIDER), 'Id Provider aggregation-item should be present');
+                assert.isTrue(result[2].includes('Role'), 'Role aggregation-item should be present');
+                assert.isTrue(result[3].includes('User'), 'User aggregation-item should be present');
             })
         });
 

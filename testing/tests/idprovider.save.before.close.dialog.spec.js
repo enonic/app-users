@@ -20,39 +20,39 @@ describe('Id Provider and Save Before Close dialog', function () {
 
     // verifies the xp-apps#689
     //Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
-    it('GIVEN `IdProvider` wizard is opened WHEN no data has been typed AND `close` icon pressed THEN SaveBeforeClose dialog must not appear',
+    it('GIVEN wizard for new Id Provider is opened WHEN no data has been typed AND `close` icon pressed THEN SaveBeforeClose dialog must not appear',
         () => {
-        return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
-            return userBrowsePanel.doClickOnCloseTabButton('<Unnamed Id Provider>');
-            }).pause(1000).then(()=> {
+            return testUtils.openIdProviderWizard().then(() => {
+                return userBrowsePanel.doClickOnCloseTabButton('<Unnamed Id Provider>');
+            }).pause(1000).then(() => {
                 return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog must not be present");
             })
         });
 
     it('GIVEN `IdProvider` wizard is opened WHEN description has been typed AND `close` icon pressed THEN SaveBeforeClose dialog should appear',
-        () = > {
-        return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
-            return idProviderWizard.typeDescription('description');
-            }).then(()=> {
-        return userBrowsePanel.doClickOnCloseTabButton('<Unnamed Id Provider>');
-            }).pause(1000).then(()=> {
+        () => {
+            return testUtils.openIdProviderWizard().then(() => {
+                return idProviderWizard.typeDescription('description');
+            }).then(() => {
+                return userBrowsePanel.doClickOnCloseTabButton('<Unnamed Id Provider>');
+            }).pause(1000).then(() => {
                 return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog should appear");
             })
         });
 
     it(`GIVEN Id Provider wizard is opened AND name and idProvider have been typed WHEN 'close' icon has been pressed THEN 'Save Before' dialog should be displayed`,
-        () = > {
+        () => {
             let testStore =
-                userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider', 'First Selenium App',
+                userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider', 'First Selenium App',
                     null);
-    return testUtils.clickOnNewOpenIdProviderWizard(testStore).then(() = > {
-        return idProviderWizard.typeData(testStore);
-            }).then(()=> {
-        testUtils.saveScreenshot("application_should_be_selected");
+            return testUtils.openIdProviderWizard(testStore).then(() => {
+                return idProviderWizard.typeData(testStore);
+            }).then(() => {
+                testUtils.saveScreenshot("application_should_be_selected");
                 return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
-            }).pause(700).then(()=> {
+            }).pause(700).then(() => {
                 return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogPresent(),
                     "`Save before close` dialog should appear");
             })
@@ -64,7 +64,7 @@ describe('Id Provider and Save Before Close dialog', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

@@ -14,67 +14,66 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 
 describe('Group Wizard and `Save Before Close dialog`', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testGroup;
 
     it('GIVEN group-wizard is opened AND display name has been typed WHEN close button pressed THEN Save Before Close dialog should appear',
         () => {
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeDisplayName('test-group');
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton('test-group');
-            }).then(()=> {
+            }).then(() => {
                 return saveBeforeClose.waitForDialogVisible(appConst.TIMEOUT_3);
             });
         });
 
     it('WHEN new group has been added THEN the group should be present in the grid',
         () => {
-            //this.bail(true);
             let groupName = userItemsBuilder.generateRandomName('group');
             testGroup = userItemsBuilder.buildGroup(groupName, 'description', null);
-            return testUtils.openWizardAndSaveGroup(testGroup).then(()=> {
+            return testUtils.openWizardAndSaveGroup(testGroup).then(() => {
                 return testUtils.typeNameInFilterPanel(groupName);
-            }).then(()=> {
+            }).then(() => {
                 return expect(userBrowsePanel.isItemDisplayed(groupName)).to.eventually.be.true;
             })
         });
 
     it('GIVEN existing group is opened WHEN display name has been changed AND `Close` button pressed THEN Save Before Close dialog should appear',
         () => {
-            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(()=> {
+            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(() => {
                 return groupWizard.typeDisplayName('new-name');
-            }).pause(500).then(()=> {
+            }).pause(500).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton('new-name');
-            }).then(()=> {
+            }).then(() => {
                 return saveBeforeClose.waitForDialogVisible(appConst.TIMEOUT_3);
             });
         });
 
     it('GIVEN existing group is opened WHEN description has been changed AND `Close` button pressed THEN Save Before Close dialog should appear',
         () => {
-            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(()=> {
+            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(() => {
                 return groupWizard.typeDescription('new-description');
-            }).pause(500).then(()=> {
+            }).pause(500).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
-            }).then(()=> {
+            }).then(() => {
                 return saveBeforeClose.waitForDialogVisible(appConst.TIMEOUT_3);
             });
         });
 
     it('GIVEN existing group is opened WHEN member has been added AND `Close` button pressed THEN Save Before Close dialog should appear',
         () => {
-            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(()=> {
+            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(() => {
                 return groupWizard.filterOptionsAndAddMember('Super User');
-            }).pause(500).then(()=> {
+            }).pause(500).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
-            }).then(()=> {
+            }).then(() => {
                 return saveBeforeClose.waitForDialogVisible(appConst.TIMEOUT_3);
             });
         });
 
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
     beforeEach(() => testUtils.navigateToUsersApp());

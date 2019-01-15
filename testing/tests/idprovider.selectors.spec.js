@@ -22,26 +22,26 @@ describe('Id Provider Permissions spec', function () {
 
     //verifies the lib-admin-ui#147
     it(`GIVEN 'Id Provider' wizard is opened AND Acl-entry has been added WHEN filter input has been cleared AND drop-down handle clicked THEN number of options should be more than 1`,
-        () = > {
-        return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
-            return idProviderWizard.filterOptionsAndSelectPermission('Everyone');
+        () => {
+            return testUtils.openIdProviderWizard().then(() => {
+                return idProviderWizard.filterOptionsAndSelectPermission('Everyone');
             }).then(() => {
-        return idProviderWizard.clearPrincipalOptionsFilterInput();
+                return idProviderWizard.clearPrincipalOptionsFilterInput();
             }).then(() => {
-        return idProviderWizard.clickOnPrincipalComboBoxDropDownHandle();
+                return idProviderWizard.clickOnPrincipalComboBoxDropDownHandle();
             }).then(() => {
-        return idProviderWizard.getPrincipalOptionDisplayNames()
+                return idProviderWizard.getPrincipalOptionDisplayNames()
             }).then(displayNames => {
                 assert.isTrue(displayNames.length > 1, 'number of options should be more than 1');
             })
         });
 
-    it(`GIVEN 'Id Provider' wizard is opened WHEN provider's drop-down handle has been clicked THEN 'Standard ID provider' item should be present in the list`,
-        () = > {
-        return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
-            return idProviderWizard.clickOnProviderComboBoxDropDownHandle();
+    it(`GIVEN wizard for new 'Id Provider' is opened WHEN provider's drop-down handle has been clicked THEN 'Standard ID provider' item should be present in the list`,
+        () => {
+            return testUtils.openIdProviderWizard().then(() => {
+                return idProviderWizard.clickOnProviderComboBoxDropDownHandle();
             }).then(() => {
-        return idProviderWizard.getProviderOptionDisplayNames();
+                return idProviderWizard.getProviderOptionDisplayNames();
             }).then(displayNames => {
                 assert.equal(displayNames[0], appConst.STANDARD_ID_PROVIDER, '`Standard ID provider` item should be present in the list');
             })

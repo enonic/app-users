@@ -14,89 +14,91 @@ const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const userWizard = require('../page_objects/wizardpanel/user.wizard');
 
-describe('Id Provider spec - save and edit', function () {
+describe('Id Provider specification - save and edit a provider', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let idProvider;
     let testUser;
 
-    it(`GIVEN 'Id Provider' wizard is opened WHEN name has been typed AND 'Save' button pressed THEN correct notification message should be displayed`,
-        () = > {
-        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider');
-    return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
-        return idProviderWizard.typeDisplayName(idProvider.displayName);
+    it(`GIVEN wizard for new 'Id Provider' is opened WHEN name has been typed AND 'Save' button pressed THEN correct notification message should be displayed`,
+        () => {
+            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
+            return testUtils.openIdProviderWizard().then(() => {
+                return idProviderWizard.typeDisplayName(idProvider.displayName);
             }).then(() => {
-        return idProviderWizard.waitAndClickOnSave();
+                return idProviderWizard.waitAndClickOnSave();
             }).then(() => {
-        return idProviderWizard.waitForNotificationMessage();
+                return idProviderWizard.waitForNotificationMessage();
             }).then(result => {
-        assert.strictEqual(result, 'Id provider was created', 'correct notification message should be displayed');
+                assert.strictEqual(result, appConst.PROVIDER_CREATED_NOTIFICATION, 'correct notification message should be displayed');
             })
         });
 
     it(`GIVEN 'Id provider' wizard is opened WHEN the name that already in use has been typed THEN correct notification message should be present`,
-        () = > {
-        return testUtils.clickOnNewOpenIdProviderWizard().then(() = > idProviderWizard.waitForOpened()
-)
-.
-    then(() = > idProviderWizard.typeDisplayName(idProvider.displayName)
-).
-    pause(400).then(() = > {
-        return idProviderWizard.waitAndClickOnSave();
-                }).then(() => {
-        return idProviderWizard.waitForErrorNotificationMessage();
-                }).then(result => {
-        var msg = `Id Provider [` + idProvider.displayName + `] could not be created. A Id Provider with that name already exists`;
-                    assert.strictEqual(result, msg, 'expected notification message should be displayed');
-                })
+        () => {
+            return testUtils.openIdProviderWizard().then(() => {
+                return idProviderWizard.waitForOpened();
+            }).then(() => idProviderWizard.typeDisplayName(idProvider.displayName)
+            ).pause(400).then(() => {
+                return idProviderWizard.waitAndClickOnSave();
+            }).then(() => {
+                return idProviderWizard.waitForErrorNotificationMessage();
+            }).then(result => {
+                let msg = `Id Provider [` + idProvider.displayName + `] could not be created. A Id Provider with that name already exists`;
+                assert.strictEqual(result, msg, 'expected notification message should be displayed');
+            }).pause(200).then(()=>{
+                //TODO finish it
+                //return idProviderWizard.isVisible(`//div[contains(@id,'LoadMask')]`);
+            }).then((result) => {
+                return idProviderWizard.waitForSpinnerNotVisible();
+                //return assert.eventually.isTrue(idProviderWizard.waitForSpinnerNotVisible(), "'Spinner' gets not visible in a few seconds");
+                //return assert.eventually.equal(idProviderWizard.waitForSpinnerNotVisible(), true, "'Spinner' gets not visible in a few seconds");
+            })
         });
 
     it(`GIVEN Id Provider wizard is opened WHEN data has been typed and 'Save' button pressed AND the wizard has been closed THEN new Id Provider should be listed`,
-        () = > {
-        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider');
-    return testUtils.openWizardAndSaveIdProvider(idProvider).then(() = > {
-        return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
+        () => {
+            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
+            return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
+                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
             }).pause(1000)
-                   .then(() = > userBrowsePanel.isItemDisplayed(idProvider.displayName)
-).
-    then(result = > {
-        assert.isTrue(result, 'new Id provider should be present in the grid');
+                .then(() => userBrowsePanel.isItemDisplayed(idProvider.displayName)
+                ).then(result => {
+                    assert.isTrue(result, 'new Id provider should be present in the grid');
                 })
         });
 
     it(`GIVEN Id Provider wizard is opened WHEN data and permissions have been typed and 'Save' button pressed AND the wizard has been closed THEN 'Save Before' dialog should not be displayed`,
-        () = > {
+        () => {
             let permissions = ['Everyone', 'Users App'];
             let testStore =
-                userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider', null, permissions);
-    return testUtils.clickOnNewOpenIdProviderWizard(testStore).then(() = > {
-        return idProviderWizard.typeData(testStore);
+                userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider', null, permissions);
+            return testUtils.openIdProviderWizard(testStore).then(() => {
+                return idProviderWizard.typeData(testStore);
             }).then(() => {
-        return idProviderWizard.waitAndClickOnSave();
-            }).then(()=>{
-        return idProviderWizard.waitForSpinnerNotVisible();
+                return idProviderWizard.waitAndClickOnSave();
+            }).then(() => {
+                return idProviderWizard.waitForSpinnerNotVisible();
             }).pause(1500).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testStore.displayName);
             }).then(() => userBrowsePanel.isItemDisplayed(testStore.displayName)).then(result => {
-        assert.isTrue(result, 'new Id provider should be present in the grid');
+                assert.isTrue(result, 'new Id provider should be present in the grid');
             })
         });
 
-    it(`GIVEN existing 'Id Provider' WHEN it has been selected and opened THEN correct description should be present`, () = > {
-        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() = > {
+    it(`GIVEN existing 'Id Provider' WHEN it has been selected and opened THEN correct description should be present`, () => {
+        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
-        return idProviderWizard.waitForOpened();
-}).
-    then(() = > idProviderWizard.getDescription()
-).
-    then(result = > {
-        assert.strictEqual(result, idProvider.description, 'actual description and expected should be equals');
+            return idProviderWizard.waitForOpened();
+        }).then(() => idProviderWizard.getDescription()
+        ).then(result => {
+            assert.strictEqual(result, idProvider.description, 'actual description and expected should be equals');
         })
     });
 
-    it(`GIVEN existing 'Id Provider'(no any users) WHEN it has been selected THEN 'Delete' button should be enabled`, () = > {
-        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() = > {
+    it(`GIVEN existing 'Id Provider'(no any users) WHEN it has been selected THEN 'Delete' button should be enabled`, () => {
+        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() => {
             return assert.eventually.equal(userBrowsePanel.waitForDeleteButtonEnabled(), true,
                 "'Delete' button should be enabled, because of no any users were added in the store");
         }).then(() => {
@@ -106,10 +108,10 @@ describe('Id Provider spec - save and edit', function () {
         });
     });
 
-    it(`GIVEN existing 'Id Provider' has an user WHEN store has been selected THEN 'Delete' button should be disabled`, () = > {
+    it(`GIVEN existing 'Id Provider' has an user WHEN store has been selected THEN 'Delete' button should be disabled`, () => {
         let userName = userItemsBuilder.generateRandomName('user');
         testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName));
-    return testUtils.clickOnIdProviderAndOpenUserWizard(idProvider.displayName).then(() = > {
+        return testUtils.clickOnIdProviderAndOpenUserWizard(idProvider.displayName).then(() => {
             return userWizard.typeData(testUser);
         }).then(() => {
             return testUtils.saveAndCloseWizard(testUser.displayName);
@@ -121,15 +123,15 @@ describe('Id Provider spec - save and edit', function () {
         });
     });
 
-    it(`GIVEN existing 'Id Provider' with an user WHEN the user has been deleted THEN the store can be deleted`, () = > {
+    it(`GIVEN existing 'Id Provider' with an user WHEN the user has been deleted THEN the store can be deleted`, () => {
         return testUtils.selectAndDeleteItem(testUser.displayName).then(() => {
             return userBrowsePanel.waitForItemNotDisplayed(testUser.displayName);
         }).then(result => {
             assert.isTrue(result, 'the user should not be present in the grid');
         }).then(() => {
-        return testUtils.selectAndDeleteItem(idProvider.displayName)
+            return testUtils.selectAndDeleteItem(idProvider.displayName)
         }).then(() => {
-        return userBrowsePanel.waitForItemNotDisplayed(idProvider.displayName)
+            return userBrowsePanel.waitForItemNotDisplayed(idProvider.displayName)
         });
     });
 
