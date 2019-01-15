@@ -18,7 +18,7 @@ describe('User Wizard negative spec ', function () {
     webDriverHelper.setupBrowser();
     let testUser;
 
-    it('GIVEN `User` wizard is opened WHEN name and e-mail has been typed  THEN red circle should be displayed on the wizard page',
+    it('GIVEN wizard for new User is opened WHEN name and e-mail has been typed  THEN red circle should be displayed on the wizard page',
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
@@ -33,7 +33,7 @@ describe('User Wizard negative spec ', function () {
             })
         });
 
-    it('GIVEN `User` wizard is opened WHEN all data has been typed THEN red circle should not be displayed on the wizard page',
+    it('GIVEN wizard for new User is opened WHEN all data has been typed THEN red circle should not be displayed on the wizard page',
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
@@ -46,7 +46,7 @@ describe('User Wizard negative spec ', function () {
             })
         });
 
-    it('GIVEN `User` wizard is opened AND all data has been typed WHEN password has been cleared THEN red circle should be displayed on the wizard page',
+    it('GIVEN wizard for new User is opened AND all data has been typed WHEN password has been cleared THEN red circle should be displayed on the wizard page',
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
@@ -61,7 +61,7 @@ describe('User Wizard negative spec ', function () {
             })
         });
 
-    it('GIVEN `User` wizard is opened AND all data has been typed WHEN e-mail has been cleared THEN red circle should be displayed on the wizard page',
+    it('GIVEN wizard for new User is opened AND all data has been typed WHEN e-mail has been cleared THEN red circle should be displayed on the wizard page',
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);

@@ -14,7 +14,7 @@ const xpath = {
     applyButton: `//button[contains(@id,'DialogButton')]/span[text()='Apply']`,
     cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
     selectedProviderView: `//div[contains(@id,'AuthApplicationSelectedOptionView')]`,
-    idProviderTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Id provider')]]",
+    idProviderTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Id Provider')]]",
     permissionsTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Permissions')]]"
 
 };

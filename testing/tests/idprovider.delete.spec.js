@@ -18,71 +18,72 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
     webDriverHelper.setupBrowser();
     let idProvider;
 
-    it('GIVEN `IdProvider` is saved WHEN Delete button on toolbar has been pressed THEN Confirmation dialog should appear',
+    it('GIVEN `IdProvider` has been saved in wizard WHEN Delete button on wizard-toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
-        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider1');
-    return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
-        return idProviderWizard.typeData(idProvider)
+            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider1');
+            return testUtils.openIdProviderWizard().then(() => {
+                return idProviderWizard.typeData(idProvider)
             }).then(() => {
-        return idProviderWizard.waitAndClickOnSave();
+                return idProviderWizard.waitAndClickOnSave();
             }).then(() => {
-        return idProviderWizard.waitForSpinnerNotVisible();
+                return idProviderWizard.waitForSpinnerNotVisible();
             }).pause(1200).then(() => {
-        return idProviderWizard.clickOnDelete();
+                return idProviderWizard.clickOnDelete();
             }).then(() => {
-        testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
+                testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
                 return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
-    it('GIVEN IdProvider is opened WHEN the IdProvider has been deleted THEN correct notification message should appear',
-        () = > {
-        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider2');
-    return testUtils.clickOnNewOpenIdProviderWizard().then(() = > {
-        return idProviderWizard.typeData(idProvider)
+    it('GIVEN existing IdProvider is opened WHEN the provider has been deleted THEN correct notification message should appear',
+        () => {
+            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider2');
+            return testUtils.openIdProviderWizard().then(() => {
+                return idProviderWizard.typeData(idProvider)
             }).then(() => {
-        return idProviderWizard.waitAndClickOnSave();
+                return idProviderWizard.waitAndClickOnSave();
             }).then(() => {
-        return idProviderWizard.waitForSpinnerNotVisible();
+                return idProviderWizard.waitForSpinnerNotVisible();
             }).pause(900).then(() => {
-        return idProviderWizard.clickOnDelete();
+                return idProviderWizard.clickOnDelete();
             }).then(() => {
                 return testUtils.confirmDelete();
             }).then(result => {
-        testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
-    var expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
+                testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
+                var expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
                     "Correct notification message should appear");
             });
         });
 
-    it('GIVEN `IdProvider` is selected WHEN Delete button on the browse-toolbar has been pressed THEN Confirmation dialog should appear',
-        () = > {
-        idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider3');
-    return testUtils.openWizardAndSaveIdProvider(idProvider).then(() = > {
-        return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
+    it('GIVEN existing `IdProvider` is selected WHEN Delete button on the browse-toolbar has been pressed THEN Confirmation dialog should appear',
+        () => {
+            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
+            return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
+                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
             }).then(() => {
-        return testUtils.findAndSelectItem(idProvider.displayName);
+                return testUtils.findAndSelectItem(idProvider.displayName);
             }).then(() => {
                 return userBrowsePanel.waitForDeleteButtonEnabled();
             }).then(() => {
                 return userBrowsePanel.clickOnDeleteButton();
             }).then(() => {
-                testUtils.saveScreenshot("store_confirm_delete2");
+                testUtils.saveScreenshot("idprovider_confirm_delete2");
                 return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
             });
         });
 
-    it('GIVEN existing IdProvider WHEN the store has been deleted in the browse panel THEN correct notification should appear',
-        () = > {
-        return testUtils.selectAndDeleteItem(idProvider.displayName).then(() = > {
+    it('GIVEN existing IdProvider WHEN the provider has been deleted in the browse panel THEN correct notification should appear',
+        () => {
+            return testUtils.selectAndDeleteItem(idProvider.displayName).then(() => {
                 return userBrowsePanel.waitForNotificationMessage();
             }).then(result => {
                 testUtils.saveScreenshot("store_deleted_notification_mes2");
-    let msg = appConst.storeDeletedMessage(idProvider.displayName);
+                let msg = appConst.storeDeletedMessage(idProvider.displayName);
                 assert.strictEqual(result, msg, 'expected notification message should be displayed');
             });
-        });
+        })
+    ;
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

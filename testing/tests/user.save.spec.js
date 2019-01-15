@@ -43,7 +43,7 @@ describe('Save User spec - save an user', function () {
         });
 
 
-    it('GIVEN `User` wizard is opened AND valid data is typed WHEN the user has been saved THEN correct notification message should appear AND the user should be searchable',
+    it('GIVEN wizard for new User is opened AND valid data is typed WHEN the user has been saved THEN correct notification message should appear AND the user should be searchable',
         () => {
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);

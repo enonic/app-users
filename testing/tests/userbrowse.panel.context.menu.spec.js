@@ -25,7 +25,7 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
         });
     it('GIVEN navigate to the browse panel WHEN right click on the `System` folder THEN `New...` menu item should be first ',
         () => {
-        return userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider').then(() = > {
+            return userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider').then(() => {
                 return gridContextMenu.waitForContextMenuVisible();
             }).then(() => {
                 return gridContextMenu.getGridContextMenuItems();
@@ -62,7 +62,7 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
         });
     it('GIVEN navigate to the browse panel WHEN right click on the `System` folder THEN `Delete` menu item should be disabled ',
         () => {
-        return userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider').then(() = > {
+            return userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider').then(() => {
                 return gridContextMenu.waitForContextMenuVisible();
             }).then(() => {
                 return gridContextMenu.waitForDeleteMenuItemDisabled();
@@ -101,20 +101,20 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
             })
         });
 
-    it('GIVEN existing Id Provider(empty) WHEN right click on the store THEN `Delete` menu item should be enabled ',
-        () = > {
-        let idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('store'), 'test Id provider3');
-    return testUtils.openWizardAndSaveIdProvider(idProvider).then(() = > {
-        return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
+    it('GIVEN existing Id Provider(empty) WHEN right click on the provider THEN `Delete` menu item should be enabled ',
+        () => {
+            let idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
+            return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
+                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
             }).pause(1000).then(() => {
-        return userBrowsePanel.rightClickOnRowByDisplayName(idProvider.displayName);
+                return userBrowsePanel.rightClickOnRowByDisplayName(idProvider.displayName);
             }).then(() => {
                 return gridContextMenu.waitForContextMenuVisible();
             }).then(() => {
                 return gridContextMenu.isDeleteMenuItemDisabled();
             }).then(result => {
                 testUtils.saveScreenshot("store_context_menu");
-                return assert.isFalse(result, "`Delete` menu item should be enabled, because the store is empty");
+                return assert.isFalse(result, "`Delete` menu item should be enabled, because the Id Provider is empty");
             });
         });
 

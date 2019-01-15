@@ -11,11 +11,11 @@ module.exports = {
     generateEmail: function (userName) {
         return userName + '@gmail.com'
     },
-    buildIdProvider: function (displayName, description, providerName, permissions) {
+    buildIdProvider: function (displayName, description, authAppName, permissions) {
         return {
             displayName: displayName,
             description: description,
-            providerName: providerName,
+            authAppName: authAppName,
             permissions: permissions,
         };
     },
