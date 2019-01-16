@@ -41,20 +41,22 @@ Page.prototype.waitForVisible = function (selector, ms) {
 Page.prototype.waitForNotVisible = function (selector, ms) {
     return this.getBrowser().waitForVisible(selector, ms, true);
 };
-Page.prototype.waitForSpinnerNotVisible = function () {
+Page.prototype.waitForSpinnerNotVisible1 = function () {
     return this.getBrowser().waitForVisible(`//div[@class='spinner']`, appConst.TIMEOUT_4, true).catch(err => {
         console.log('spinner is still visible after a the interval ');
         throw Error('spinner is still visible after a the interval ' + ` ` + appConst.TIMEOUT_3);
     })
+};
+Page.prototype.waitForSpinnerNotVisible = function () {
+    return this.getBrowser().waitUntil(() => {
+        return this.isElementNotDisplayed(`//div[@class='spinner']`);
+    }, appConst.TIMEOUT_4, "Spinner still displayed! timeout is ", appConst.TIMEOUT_4);
 };
 Page.prototype.waitForSpinnerVisible = function () {
     return this.getBrowser().waitForVisible(`//div[@class='spinner']`, appConst.TIMEOUT_3).catch(err => {
         console.log('spinner should be visible in 3 sec');
         throw Error('spinner should visible in 3 sec ' + ` ` + appConst.TIMEOUT_3);
     })
-};
-Page.prototype.isSpinnerVisible = function () {
-    return this.getBrowser().isVisible(`//div[@class='spinner']`);
 };
 
 Page.prototype.doClick = function (selector) {
@@ -195,6 +197,11 @@ Page.prototype.scroll = function (xoffset, yoffset) {
 Page.prototype.isElementDisplayed = function (selector) {
     return this.getDisplayedElements(selector).then(result => {
         return result.length > 0;
+    })
+};
+Page.prototype.isElementNotDisplayed = function (selector) {
+    return this.getDisplayedElements(selector).then(result => {
+        return result.length == 0;
     })
 };
 module.exports = new Page();
