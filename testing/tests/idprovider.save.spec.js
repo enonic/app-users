@@ -46,13 +46,9 @@ describe('Id Provider specification - save and edit a provider', function () {
             }).then(result => {
                 let msg = `Id Provider [` + idProvider.displayName + `] could not be created. A Id Provider with that name already exists`;
                 assert.strictEqual(result, msg, 'expected notification message should be displayed');
-            }).pause(200).then(()=>{
-                //TODO finish it
-                //return idProviderWizard.isVisible(`//div[contains(@id,'LoadMask')]`);
-            }).then((result) => {
+            }).pause(200).then(() => {
+                //verifes issue#189 - (Endless spinner when saving the Id Provider)
                 return idProviderWizard.waitForSpinnerNotVisible();
-                //return assert.eventually.isTrue(idProviderWizard.waitForSpinnerNotVisible(), "'Spinner' gets not visible in a few seconds");
-                //return assert.eventually.equal(idProviderWizard.waitForSpinnerNotVisible(), true, "'Spinner' gets not visible in a few seconds");
             })
         });
 
