@@ -48,7 +48,7 @@ describe('New Principal dialog specification', function () {
             }).then(items => {
                 assert.equal(items[0], appConst.USER, '`User` item should be present on the dialog');
                 assert.equal(items[1], appConst.USER_GROUP, '`User Group` item should be present on the dialog');
-    assert.equal(items[2], appConst.ID_PROVIDER, '`Id Provider` item should be present on the dialog');
+                assert.equal(items[2], appConst.ID_PROVIDER, '`Id Provider` item should be present on the dialog');
                 assert.equal(items[3], appConst.ROLE, '`Role` item should be present');
             })
         });
