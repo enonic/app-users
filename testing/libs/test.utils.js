@@ -125,6 +125,8 @@ module.exports = {
             return prevPromise;
         }).then(() => {
             return browsePanel.waitForSpinnerNotVisible();
+        }).catch(err => {
+            throw new Error("Spinner does not disappear on the Users grid " + err);
         }).then(() => {
             return browsePanel.waitForUsersGridLoaded(appConst.TIMEOUT_3);
         });

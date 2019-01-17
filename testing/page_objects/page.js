@@ -48,9 +48,10 @@ Page.prototype.waitForSpinnerNotVisible1 = function () {
     })
 };
 Page.prototype.waitForSpinnerNotVisible = function () {
+    let message = "Spinner still displayed! timeout is " + appConst.TIMEOUT_7;
     return this.getBrowser().waitUntil(() => {
         return this.isElementNotDisplayed(`//div[@class='spinner']`);
-    }, appConst.TIMEOUT_4, "Spinner still displayed! timeout is ", appConst.TIMEOUT_4);
+    }, appConst.TIMEOUT_7, message);
 };
 Page.prototype.waitForSpinnerVisible = function () {
     return this.getBrowser().waitForVisible(`//div[@class='spinner']`, appConst.TIMEOUT_3).catch(err => {
