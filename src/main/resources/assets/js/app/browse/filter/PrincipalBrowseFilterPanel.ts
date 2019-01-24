@@ -18,7 +18,6 @@ export class PrincipalBrowseFilterPanel
     extends api.app.browse.filter.BrowseFilterPanel<UserTreeGridItem> {
 
     static PRINCIPAL_TYPE_AGGREGATION_NAME: string = 'principalType';
-    static PRINCIPAL_TYPE_AGGREGATION_DISPLAY_NAME: string = i18n('field.types');
 
     private principalTypeAggregationGroupView: AggregationGroupView;
 
@@ -40,7 +39,7 @@ export class PrincipalBrowseFilterPanel
     protected getGroupViews(): api.aggregation.AggregationGroupView[] {
         this.principalTypeAggregationGroupView = new AggregationGroupView(
             PrincipalBrowseFilterPanel.PRINCIPAL_TYPE_AGGREGATION_NAME,
-            PrincipalBrowseFilterPanel.PRINCIPAL_TYPE_AGGREGATION_DISPLAY_NAME
+            i18n('field.types')
         );
 
         return [this.principalTypeAggregationGroupView];
