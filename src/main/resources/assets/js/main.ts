@@ -76,7 +76,7 @@ function startApplication() {
 }
 
 const renderListener = () => {
-    api.util.i18nInit(CONFIG.messages).then(() => startApplication());
+    api.util.i18nInit(CONFIG.i18nUrl).then(() => startApplication());
     body.unRendered(renderListener);
 };
 

@@ -18,12 +18,12 @@ function handleGet() {
         appName: 'Users',
         appId: app.name,
         xpVersion: app.version,
-        messages: admin.getPhrases(),
         launcherPath: admin.getLauncherPath(),
         launcherUrl: admin.getLauncherUrl(),
         reportServiceUrl: portal.serviceUrl({
             service: 'permissionReport'
-        })
+        }),
+        i18nUrl: portal.serviceUrl({service: 'i18n'})
     };
 
     return {
