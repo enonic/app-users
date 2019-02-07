@@ -76,7 +76,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
             })
         });
 
-    it('GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail-should be present on the statistics panel',
+    it('GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail should be present on the statistics panel',
         () => {
             let newEmail = userItemsBuilder.generateEmail(testUser.displayName);
             return testUtils.selectUserAndOpenWizard(testUser.displayName).then(()=> {
