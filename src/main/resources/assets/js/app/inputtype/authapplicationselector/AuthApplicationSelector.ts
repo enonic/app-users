@@ -149,9 +149,9 @@ export class AuthApplicationSelector
             }
         });
 
-        comboBox.onOptionMoved((selectedOption: SelectedOption<Application>) => {
-            this.ignorePropertyChange = true;
-            saveAndForceValidate(selectedOption);
+        comboBox.onOptionMoved((selectedOption: SelectedOption<Application>, fromIndex: number) => {
+            this.getPropertyArray().move(fromIndex, selectedOption.getIndex());
+            forcedValidate();
         });
 
         comboBox.onSiteConfigFormDisplayed((applicationKey: ApplicationKey, formView: FormView) => {
