@@ -223,11 +223,11 @@ class IdProviderACESelectedOptionsView
             });
     }
 
-    onOptionMoved(_listener: { (moved: SelectedOption<IdProviderAccessControlEntry>): void; }) {
+    onOptionMoved(_listener: { (moved: SelectedOption<IdProviderAccessControlEntry>, fromIndex: number): void; }) {
         // must be implemented by children
     }
 
-    unOptionMoved(_listener: { (moved: SelectedOption<IdProviderAccessControlEntry>): void; }) {
+    unOptionMoved(_listener: { (moved: SelectedOption<IdProviderAccessControlEntry>, fromIndex: number): void; }) {
         // must be implemented by children
     }
 
