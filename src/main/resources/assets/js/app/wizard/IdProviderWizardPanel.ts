@@ -86,13 +86,11 @@ export class IdProviderWizardPanel
     persistNewItem(): wemQ.Promise<IdProvider> {
         this.lock();
         return this.produceCreateIdProviderRequest().sendAndParse().then((idProvider: IdProvider) => {
-
-            this.unlock();
             api.notify.showFeedback('Id provider was created');
             new UserItemCreatedEvent(null, idProvider).fire();
 
             return idProvider;
-        });
+        }).finally(this.unlock.bind(this));
     }
 
     postPersistNewItem(idProvider: IdProvider): wemQ.Promise<IdProvider> {
