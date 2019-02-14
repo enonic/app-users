@@ -1,6 +1,6 @@
 var graphQl = require('/lib/graphql');
 
-var principals = require('principals');
+var principals = require('/lib/principals');
 
 var graphQlEnums = require('../enums');
 var graphQlUtils = require('../../utils');

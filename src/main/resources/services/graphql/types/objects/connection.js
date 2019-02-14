@@ -1,4 +1,4 @@
-var graphQl = require('graphql');
+var graphQl = require('/lib/graphql');
 var graphQlUtils = require('../../utils');
 var createAggregationsFiled = require('./aggregations').createAggregationsFiled;
 
