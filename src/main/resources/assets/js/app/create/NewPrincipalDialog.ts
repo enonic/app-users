@@ -12,30 +12,27 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
 
     constructor() {
         super(<api.ui.dialog.ModalDialogConfig>{
-            title: i18n('dialog.new')
+            title: i18n('dialog.new'),
+            class: 'new-principal-dialog'
         });
-
-        this.addClass('new-principal-dialog');
-
-        this.initElements();
-
-        this.initEventHandlers();
-
-        api.dom.Body.get().appendChild(this);
     }
 
-    private initElements() {
+    protected initElements() {
+        super.initElements();
+
         this.grid = new UserItemTypesTreeGrid();
     }
 
-    private initEventHandlers() {
+    protected initListeners() {
+        super.initListeners();
+
         this.grid.onDataChanged(() => ResponsiveManager.fireResizeEvent());
         NewPrincipalEvent.on(() => this.isVisible() && this.close());
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
-            this.addCancelButtonToBottom();
+            this.addCancelButtonToBottom(null, true);
             this.getContentPanel().appendChild(this.grid);
 
             return rendered;
@@ -56,13 +53,14 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
     open() {
         this.grid.reload(null, null, false);
         this.grid.getGrid().resizeCanvas();
+        api.dom.Body.get().appendChild(this);
         super.open();
-        this.getCancelButton().giveFocus();
     }
 
     close() {
         this.grid.clearidProviders();
         super.close();
+        this.remove();
     }
 
     private createPathEl(): api.dom.PEl {
