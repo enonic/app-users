@@ -1,1 +1,3 @@
 rootProject.name = 'app-users'
+
+enableFeaturePreview('STABLE_PUBLISHING')
