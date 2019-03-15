@@ -33,6 +33,16 @@ const browseFilterPanel = Object.create(page, {
             return this.getText(userSelector);
         }
     },
+    getNumberAggregatedRoles: {
+        value: function () {
+            let userSelector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.roleAggregationCheckbox}` + `/label`;
+            return this.getText(userSelector).then(result=>{
+                let startIndex = result.indexOf('(');
+                let endIndex = result.indexOf(')');
+                return result.substring(startIndex + 1, endIndex);
+            })
+        }
+    },
     getAggregationItems: {
         value: function () {
             let selector = `${panel.container}` + `${panel.aggregationGroupView}` + `${panel.userAggregationItems}`;
