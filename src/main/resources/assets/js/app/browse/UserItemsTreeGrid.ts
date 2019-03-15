@@ -264,16 +264,14 @@ export class UserItemsTreeGrid
     }
 
     private loadParentNode(principal: Principal, idProvider: IdProvider): wemQ.Promise<TreeNode<UserTreeGridItem>> {
-        const rootNode = this.getRoot().getCurrentRoot();
+        const rootNode = this.isFiltered() ? this.getRoot().getFilteredRoot() : this.getRoot().getCurrentRoot();
 
         if (principal.isRole()) {
 
             const rolesNode = rootNode.getChildren()
                 .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
 
-            if (rolesNode) {
-                return this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode);
-            }
+            return rolesNode ? this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode) : wemQ(null);
         } else {
             const idProviderId = idProvider.getKey().getId();
             const idProviderNode = rootNode.getChildren().filter(node => node.getDataId() === idProviderId)[0] || rootNode;
