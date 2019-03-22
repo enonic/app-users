@@ -92,8 +92,10 @@ export class AuthApplicationSelector
             propertySet = this.getPropertyArray().addSet();
         }
 
-        let config = applicationConfig.getConfig();
-        let appKey = applicationConfig.getApplicationKey();
+        const appKey = applicationConfig.getApplicationKey();
+        const config = applicationConfig.getConfig();
+
+        config.removeEmptySets();
 
         propertySet.setStringByPath('applicationKey', appKey.toString());
         propertySet.setPropertySetByPath('config', config);
