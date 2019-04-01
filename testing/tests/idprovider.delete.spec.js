@@ -35,7 +35,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             });
         });
 
-    it('GIVEN existing IdProvider is opened WHEN the provider has been deleted THEN correct notification message should appear',
+    it('GIVEN new IdProvider has been saved WHEN the provider has been deleted in the wizard THEN expected notification message should appear',
         () => {
             idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider2');
             return testUtils.openIdProviderWizard().then(() => {
@@ -52,7 +52,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
                 testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
                 var expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
                 return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
-                    "Correct notification message should appear");
+                    "Expected notification message should appear");
             });
         });
 
@@ -73,7 +73,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             });
         });
 
-    it('GIVEN existing IdProvider WHEN the provider has been deleted in the browse panel THEN correct notification should appear',
+    it('GIVEN existing IdProvider WHEN the provider has been deleted in the browse panel THEN expected notification should appear',
         () => {
             return testUtils.selectAndDeleteItem(idProvider.displayName).then(() => {
                 return userBrowsePanel.waitForNotificationMessage();
@@ -82,8 +82,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
                 let msg = appConst.storeDeletedMessage(idProvider.displayName);
                 assert.strictEqual(result, msg, 'expected notification message should be displayed');
             });
-        })
-    ;
+        });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

@@ -58,9 +58,6 @@ describe('Id Provider and Save Before Close dialog', function () {
             })
         });
 
-    //TODO implement the test, when  https://github.com/enonic/xp-apps/issues/696 will be fixed
-    //it(`GIVEN Id Provider wizard is opened AND name and idProvider have been typed AND Save button has been pressed WHEN 'close' icon has been pressed THEN 'Save Before' dialog should be displayed`,
-
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

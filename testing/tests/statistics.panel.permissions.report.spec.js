@@ -10,7 +10,7 @@ const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const userStatisticsPanel = require('../page_objects/browsepanel/user.statistics.panel');
 
-describe('`permissions.report.spec`: Generate Report data specification ', function () {
+describe('statistics.panel.permissions.report.spec: Generate Report data specification ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let REPO_TITLE_MASTER = 'com.enonic.cms.default (master)';
@@ -57,7 +57,7 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
                 return userStatisticsPanel.getReportTitles();
             }).then(result => {
                 assert.isTrue(result.length == 1, 'One report should be present on the page');
-    assert.isTrue(result[0] === 'com.enonic.cms.default (master)', 'expected title of the report should be displayed');
+                assert.isTrue(result[0] === 'com.enonic.cms.default (master)', 'expected title of the report should be displayed');
             }).then(() => {
                 return userStatisticsPanel.getReportDate(REPO_TITLE_MASTER);
             }).then(result => {
@@ -79,7 +79,8 @@ describe('`permissions.report.spec`: Generate Report data specification ', funct
             })
         });
 
-    it.skip('GIVEN `Super User` is selected WHEN `draft` option has been selected AND`Generate Report` button pressed THEN new report should be created',
+    it.skip(
+        'GIVEN `Super User` is selected WHEN `draft` option has been selected AND`Generate Report` button pressed THEN new report should be created',
         () => {
             return testUtils.findAndSelectItem('su').then(() => {
                 return userStatisticsPanel.selectRepository('com.enonic.cms.default');

@@ -13,6 +13,7 @@ const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard'
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const userWizard = require('../page_objects/wizardpanel/user.wizard');
+const newPrincipalDialog = require('../page_objects/browsepanel/new.principal.dialog');
 
 describe('Id Provider specification - save and edit a provider', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -20,7 +21,7 @@ describe('Id Provider specification - save and edit a provider', function () {
     let idProvider;
     let testUser;
 
-    it(`GIVEN wizard for new 'Id Provider' is opened WHEN name has been typed AND 'Save' button pressed THEN correct notification message should be displayed`,
+    it(`GIVEN wizard for new 'Id Provider' is opened WHEN name has been typed AND 'Save' button pressed THEN expected notification message should be displayed`,
         () => {
             idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
             return testUtils.openIdProviderWizard().then(() => {
@@ -31,6 +32,33 @@ describe('Id Provider specification - save and edit a provider', function () {
                 return idProviderWizard.waitForNotificationMessage();
             }).then(result => {
                 assert.strictEqual(result, appConst.PROVIDER_CREATED_NOTIFICATION, 'correct notification message should be displayed');
+            })
+        });
+
+    it(`GIVEN existing several providers WHEN New button has been pressed THEN 2 row-expander should be present in the dialog`,
+        () => {
+            return userBrowsePanel.clickOnNewButton().then(() => {
+                return newPrincipalDialog.waitForOpened();
+            }).then(() => {
+                return newPrincipalDialog.waitForExpanderIconDisplayed("User Group");
+            }).then(result => {
+                assert.isTrue(result, "Expander for User Group should be displayed");
+            }).then(() => {
+                return newPrincipalDialog.waitForExpanderIconDisplayed("User");
+            }).then(result => {
+                assert.isTrue(result, "Expander for User should be displayed");
+            })
+        });
+
+    it(`GIVEN existing several providers AND New button has been pressed WHEN expander has been clicked THEN expected provider's name should appear`,
+        () => {
+            return userBrowsePanel.clickOnNewButton().then(() => {
+                return newPrincipalDialog.waitForOpened();
+            }).then(() => {
+                return newPrincipalDialog.clickOnExpanderIcon("User Group");
+            }).then(() => {
+                testUtils.saveScreenshot('User_Group_row_expanded');
+                return newPrincipalDialog.waitForProviderNameDisplayed(idProvider.displayName);
             })
         });
 
@@ -52,37 +80,37 @@ describe('Id Provider specification - save and edit a provider', function () {
             })
         });
 
-    it(`GIVEN Id Provider wizard is opened WHEN data has been typed and 'Save' button pressed AND the wizard has been closed THEN new Id Provider should be listed`,
+    it(`GIVEN wizard for new Id Provider is opened WHEN data has been typed and 'Save' button pressed AND the wizard has been closed THEN new Id Provider should be listed`,
         () => {
             idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
             return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
-            }).pause(1000)
-                .then(() => userBrowsePanel.isItemDisplayed(idProvider.displayName)
-                ).then(result => {
-                    assert.isTrue(result, 'new Id provider should be present in the grid');
-                })
+            }).pause(1000).then(() => {
+                return userBrowsePanel.isItemDisplayed(idProvider.displayName);
+            }).then(result => {
+                assert.isTrue(result, 'new Id provider should be present in the grid');
+            })
         });
 
-    it(`GIVEN Id Provider wizard is opened WHEN data and permissions have been typed and 'Save' button pressed AND the wizard has been closed THEN 'Save Before' dialog should not be displayed`,
+    it(`GIVEN wizard for new Id Provider is opened WHEN data and permissions have been typed and 'Save' button pressed AND the wizard has been closed THEN 'Save Before' dialog should not be displayed`,
         () => {
             let permissions = ['Everyone', 'Users App'];
-            let testStore =
+            let testProvider =
                 userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider', null, permissions);
-            return testUtils.openIdProviderWizard(testStore).then(() => {
-                return idProviderWizard.typeData(testStore);
+            return testUtils.openIdProviderWizard(testProvider).then(() => {
+                return idProviderWizard.typeData(testProvider);
             }).then(() => {
                 return idProviderWizard.waitAndClickOnSave();
             }).then(() => {
                 return idProviderWizard.waitForSpinnerNotVisible();
             }).pause(1500).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testStore.displayName);
-            }).then(() => userBrowsePanel.isItemDisplayed(testStore.displayName)).then(result => {
+                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testProvider.displayName);
+            }).then(() => userBrowsePanel.isItemDisplayed(testProvider.displayName)).then(result => {
                 assert.isTrue(result, 'new Id provider should be present in the grid');
             })
         });
 
-    it(`GIVEN existing 'Id Provider' WHEN it has been selected and opened THEN correct description should be present`, () => {
+    it(`WHEN existing 'Id Provider' has been opened THEN expected description should be present`, () => {
         return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
@@ -104,7 +132,7 @@ describe('Id Provider specification - save and edit a provider', function () {
         });
     });
 
-    it(`GIVEN existing 'Id Provider' has an user WHEN store has been selected THEN 'Delete' button should be disabled`, () => {
+    it(`GIVEN existing 'Id Provider' has an user WHEN the provider has been selected THEN 'Delete' button should be disabled`, () => {
         let userName = userItemsBuilder.generateRandomName('user');
         testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName));
         return testUtils.clickOnIdProviderAndOpenUserWizard(idProvider.displayName).then(() => {
