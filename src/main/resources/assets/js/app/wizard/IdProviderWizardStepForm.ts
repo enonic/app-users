@@ -76,9 +76,12 @@ export class IdProviderWizardStepForm
             this.propertySet.addString('description', idProvider.getDescription());
             let idProviderConfig = idProvider.getIdProviderConfig();
             if (idProviderConfig) {
-                let idProviderConfigPropertySet = new api.data.PropertySet();
-                idProviderConfigPropertySet.addString('applicationKey', idProviderConfig.getApplicationKey().toString());
-                idProviderConfigPropertySet.addPropertySet('config', idProviderConfig.getConfig().getRoot());
+                const idProviderConfigPropertySet = new api.data.PropertySet();
+                const applicationKey = idProviderConfig.getApplicationKey().toString();
+                const config = idProviderConfig.getConfig().getRoot();
+                config.removeEmptySets();
+                idProviderConfigPropertySet.addString('applicationKey', applicationKey);
+                idProviderConfigPropertySet.addPropertySet('config', config);
                 this.propertySet.addPropertySet('idProviderConfig', idProviderConfigPropertySet);
             }
         }

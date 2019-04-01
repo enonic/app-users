@@ -147,16 +147,18 @@ export class AuthApplicationSelectedOptionView
                 this.applicationConfig.getConfig().removeProperty(property.getName(), property.getIndex());
             }
         });
+        this.applicationConfig.getConfig().removeEmptySets();
     }
 
     private makeTemporarySiteConfig(): ApplicationConfig {
-        let propSet = (new PropertyTree(this.applicationConfig.getConfig())).getRoot();
-        propSet.setContainerProperty(this.applicationConfig.getConfig().getProperty());
-        return ApplicationConfig.create().setConfig(propSet).setApplicationKey(this.applicationConfig.getApplicationKey()).build();
+        const propertyTree = new PropertyTree(this.applicationConfig.getConfig());
+        const propertySet = propertyTree.getRoot();
+        propertySet.setContainerProperty(this.applicationConfig.getConfig().getProperty());
+        return ApplicationConfig.create().setConfig(propertySet).setApplicationKey(this.applicationConfig.getApplicationKey()).build();
     }
 
     private createFormView(applicationConfig: ApplicationConfig): FormView {
-        let formView = new FormView(this.formContext, this.application.getIdProviderForm(), applicationConfig.getConfig());
+        const formView = new FormView(this.formContext, this.application.getIdProviderForm(), applicationConfig.getConfig());
         formView.addClass('site-form');
 
         formView.onLayoutFinished(() => {

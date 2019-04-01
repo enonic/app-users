@@ -179,10 +179,13 @@ export class IdProviderWizardPanel
     }
 
     private assembleViewedIdProvider(): IdProvider {
-        return <IdProvider>new IdProviderBuilder().setIdProviderConfig(
-            this.idProviderWizardStepForm.getIdProviderConfig()).setPermissions(this.permissionsWizardStepForm.getPermissions()).setKey(
-            this.getPersistedItem().getKey().toString()).setDisplayName(this.getWizardHeader().getDisplayName()).setDescription(
-            this.idProviderWizardStepForm.getDescription()).build();
+        return <IdProvider>new IdProviderBuilder()
+            .setIdProviderConfig(this.idProviderWizardStepForm.getIdProviderConfig())
+            .setPermissions(this.permissionsWizardStepForm.getPermissions())
+            .setKey(this.getPersistedItem().getKey().toString())
+            .setDisplayName(this.getWizardHeader().getDisplayName())
+            .setDescription(this.idProviderWizardStepForm.getDescription())
+            .build();
     }
 
     private listenToUserItemEvents() {
