@@ -6,11 +6,11 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const groupWizard = require('../page_objects/wizardpanel/group.wizard');
+const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const groupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
+const GroupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
 
 describe('`group.transitive.memberships.spec`: checks transitive memberships', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -25,7 +25,7 @@ describe('`group.transitive.memberships.spec`: checks transitive memberships', f
             let name = userItemsBuilder.generateRandomName('group');
             let roles = ['Users App'];
             let description = 'test group1';
-
+            let groupWizard= new  GroupWizard();
             group1 = userItemsBuilder.buildGroup(name, description, null, roles);
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(group1);
@@ -43,7 +43,8 @@ describe('`group.transitive.memberships.spec`: checks transitive memberships', f
             let name = userItemsBuilder.generateRandomName('group');
             let members = [group1.displayName];
             let roles = [TRANSITIVE_ROLE];
-            let description = 'test group2'
+            let description = 'test group2';
+            let groupWizard= new  GroupWizard();
             group2 = userItemsBuilder.buildGroup(name, description, members, roles);
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(group2);
@@ -59,6 +60,7 @@ describe('`group.transitive.memberships.spec`: checks transitive memberships', f
 
     it('WHEN `group 1` is selected and `transitive checkbox` is not checked THEN `transitive`-role should not be displayed',
         () => {
+            let groupStatisticsPanel = new GroupStatisticsPanel();
             return testUtils.findAndSelectItem(group1.displayName).then(() => {
                 testUtils.saveScreenshot("transitive_memberships_not_checked");
                 return groupStatisticsPanel.getDisplayNameOfRoles();
@@ -70,6 +72,7 @@ describe('`group.transitive.memberships.spec`: checks transitive memberships', f
 
     it('GIVEN group1 is selected WHEN `transitive checkbox` has been checked THEN one transitive role should be added in roles-list',
         () => {
+        let groupStatisticsPanel = new GroupStatisticsPanel();
             return testUtils.findAndSelectItem(group1.displayName).then(() => {
                 return groupStatisticsPanel.clickOnTransitiveCheckBox();
             }).then(() => {

@@ -1,62 +1,59 @@
 /**
  * Created on 19.09.2017.
  */
-const page = require('../page');
-const elements = require('../../libs/elements');
+const Page = require('../page');
+const lib = require('../../libs/elements');
 const xpath = {
     container: `//div[contains(@id,'LoaderComboBox')]`,
-    optionDisplayName: "//div[@class='slick-viewport']" + `${elements.H6_DISPLAY_NAME}`,
+    optionDisplayName: "//div[@class='slick-viewport']" + `${lib.H6_DISPLAY_NAME}`,
 };
-const loaderComboBox = Object.create(page, {
+class LoaderComboBox extends Page {
 
-    optionsFilterInput: {
-        get: function () {
-            return `${xpath.container}` + elements.COMBO_BOX_OPTION_FILTER_INPUT;
+    get optionsFilterInput() {
+        return `${xpath.container}` + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+    }
+
+    typeTextInOptionFilterInput(selector, text) {
+        return this.typeTextInInput(selector, text)
+    }
+
+    clickOnOption(panelDiv, displayName) {
+        return this.clickOnElement(panelDiv + `${lib.slickRowByDisplayName(displayName)}`).then(() => {
+            return this.pause(500);
+        });
+    }
+
+    waitForListExpanded(panelDiv) {
+        return this.waitForElementDisplayed(panelDiv + `${lib.SLICK_ROW}`, 1000)
+    }
+
+    waitForOptionVisible(panelDiv, displayName) {
+        return this.waitForElementDisplayed(panelDiv + `${lib.slickRowByDisplayName(displayName)}`, 3000);
+    }
+
+    getOptionDisplayNames(panelDiv) {
+        return this.waitForListExpanded(panelDiv).then(() => {
+            return this.getTextInElements(panelDiv + `${xpath.optionDisplayName}`)
+        });
+    };
+
+    typeTextAndSelectOption(optionDisplayName, xpath) {
+        let optionSelector = lib.slickRowByDisplayName(optionDisplayName);
+        if (xpath === undefined) {
+            xpath = '';
         }
-    },
-    typeTextInOptionFilterInput: {
-        value: function (selector, text) {
-            return this.typeTextInInput(selector, text)
-        }
-    },
-    clickOnOption: {
-        value: function (panelDiv, displayName) {
-            return this.doClick(panelDiv + `${elements.slickRowByDisplayName(displayName)}`).pause(500);
-        }
-    },
-    waitForOptionVisible: {
-        value: function (panelDiv, displayName) {
-            return this.waitForVisible(panelDiv + `${elements.slickRowByDisplayName(displayName)}`, 3000)
-        }
-    },
-    waitForListExpanded: {
-        value: function (panelDiv) {
-            return this.waitForVisible(panelDiv + `${elements.SLICK_ROW}`, 1000)
-        }
-    },
-    getOptionDisplayNames: {
-        value: function (panelDiv) {
-            return this.waitForListExpanded(panelDiv).then(()=> {
-                return this.getTextFromElements(panelDiv + `${xpath.optionDisplayName}`)
-            });
-        }
-    },
-    typeTextAndSelectOption: {
-        value: function (optionDisplayName, xpath) {
-            let optionSelector = elements.slickRowByDisplayName(optionDisplayName);
-            if (xpath === undefined) {
-                xpath = '';
-            }
-            return this.getDisplayedElements(xpath + this.optionsFilterInput).then(result => {
-                return this.getBrowser().elementIdValue(result[0].ELEMENT, optionDisplayName);
-            }).pause(1000).then(() => {
-                return this.doClick(optionSelector).catch(err => {
-                    this.saveScreenshot('err_clicking_on_option');
-                    throw new Error('Error when clicking on the option in loadercombobox!' + optionDisplayName + " " + err);
-                }).pause(500);
-            })
-        }
-    },
-});
-module.exports = loaderComboBox;
+        return this.typeTextInInput(xpath + this.optionsFilterInput, optionDisplayName).then(() => {
+            return this.clickOnElement(optionSelector)
+        }).catch(err => {
+            this.saveScreenshot('err_clicking_on_option');
+            throw new Error('Error when clicking on the option in loadercombobox!' + optionDisplayName + " " + err);
+        }).then(() => {
+            return this.pause(500);
+        });
+        //return this.getDisplayedElements(xpath + this.optionsFilterInput).then(result => {
+        //   return this.getBrowser().elementSendKeys(result[0].ELEMENT,[optionDisplayName]);
+    }
+};
+module.exports = LoaderComboBox;
+
 

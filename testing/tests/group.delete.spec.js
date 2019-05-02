@@ -1,18 +1,17 @@
 /**
  * Created on 17.11.2017.
  */
-
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const groupWizard = require('../page_objects/wizardpanel/group.wizard');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const confirmationDialog = require("../page_objects/confirmation.dialog");
+const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe('`group.delete.spec`: confirm and delete it in the wizard and in the browse panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -21,9 +20,9 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
 
     it('GIVEN `Group` is saved WHEN Delete button on toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
-            //this.bail(1);
-            testGroup =
-                userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
+            let groupWizard = new GroupWizard();
+            let confirmationDialog = new ConfirmationDialog();
+            testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup)
             }).then(() => {
@@ -38,8 +37,8 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
 
     it('GIVEN saved group is opened in the wizard WHEN the group has been deleted THEN correct notification message should appear',
         () => {
-            testGroup =
-                userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 3');
+            let groupWizard = new GroupWizard();let userBrowsePanel = new UserBrowsePanel();
+            testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 3');
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup)
             }).then(() => {
@@ -58,8 +57,9 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
 
     it('GIVEN `Group` is selected WHEN Delete button on toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
-            testGroup =
-                userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
+            let userBrowsePanel = new UserBrowsePanel();
+            let confirmationDialog = new ConfirmationDialog();
+            testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
             return testUtils.openWizardAndSaveGroup(testGroup).then(() => {
                 return testUtils.findAndSelectItem(testGroup.displayName);
             }).then(() => {
@@ -74,6 +74,7 @@ describe('`group.delete.spec`: confirm and delete it in the wizard and in the br
 
     it('GIVEN existing group WHEN the group has been deleted in browse panel THEN correct notification should appear',
         () => {
+            let userBrowsePanel = new UserBrowsePanel();
             return testUtils.selectAndDeleteItem(testGroup.displayName).then(() => {
                 return userBrowsePanel.waitForNotificationMessage();
             }).then(result => {

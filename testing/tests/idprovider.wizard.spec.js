@@ -8,7 +8,7 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const idProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
+const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 
@@ -18,14 +18,16 @@ describe('Id Provider wizard - validation and inputs', function () {
 
     it('WHEN `IdProvider` wizard is opened THEN red circle should be present, because required inputs are empty',
         () => {
+            let idProviderWizard = new IdProviderWizard();
             return testUtils.openIdProviderWizard().then(() => {
                 return idProviderWizard.waitUntilInvalidIconAppears('<Unnamed Id Provider>');
-            }).then((isRedIconPresent) => {
+            }).then(isRedIconPresent => {
                 assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because required inputs are empty');
             })
         });
-    it('WHEN `New` button has been pressed AND `Id Provider` item selected THEN `Id Provider Wizard` should be opened with all required inputs',
+    it('WHEN `New` button has been pressed AND `Id Provider` item selected THEN required inputs should be present on the wizard',
         () => {
+            let idProviderWizard = new IdProviderWizard();
             return testUtils.openIdProviderWizard().then(() => {
                 return assert.eventually.isTrue(idProviderWizard.isDisplayNameInputVisible(), '`display name` input should be present');
             }).then(result => {
@@ -40,9 +42,10 @@ describe('Id Provider wizard - validation and inputs', function () {
                     "`Permissions Options Filter` input should be present");
             })
         });
-    //verifies the xp-apps#201
+
     it('GIVEN `Id Provider` wizard is opened WHEN `Standard ID Provider` has been selected THEN `Provider Options Filter` input should not be displayed',
         () => {
+            let idProviderWizard = new IdProviderWizard();
             return testUtils.openIdProviderWizard().then(() => {
                 return idProviderWizard.filterOptionsAndSelectApplication(appConst.STANDARD_ID_PROVIDER);
             }).then(() => {
@@ -53,6 +56,7 @@ describe('Id Provider wizard - validation and inputs', function () {
 
     it('GIVEN wizard is opened and `Standard ID Provider` is selected WHEN the provider has been removed THEN `Provider Options Filter` input should be displayed',
         () => {
+            let idProviderWizard = new IdProviderWizard();
             return testUtils.openIdProviderWizard().then(() => {
                 return idProviderWizard.filterOptionsAndSelectApplication(appConst.STANDARD_ID_PROVIDER);
             }).then(() => {
@@ -65,9 +69,11 @@ describe('Id Provider wizard - validation and inputs', function () {
 
     it('WHEN new `Id Provider Wizard` is opened  THEN three default roles should be present',
         () => {
+            let idProviderWizard = new IdProviderWizard();
             return testUtils.openIdProviderWizard().then(() => {
                 return idProviderWizard.clickOnPermissionsTabItem();
             }).then(() => {
+                //3 default ACL entry should be displayed
                 return idProviderWizard.getPermissions();
             }).then(result => {
                 expect(result.length).to.equal(3);
@@ -78,6 +84,7 @@ describe('Id Provider wizard - validation and inputs', function () {
         });
     it('GIVEN `Id Provider Wizard` is opened WHEN `Everyone` role has been selected THEN `Permissions Options Filter` input should be displayed',
         () => {
+            let idProviderWizard = new IdProviderWizard();
             return testUtils.openIdProviderWizard().then(() => {
                 return idProviderWizard.filterOptionsAndSelectPermission('Everyone');
             }).then(() => {
@@ -95,6 +102,7 @@ describe('Id Provider wizard - validation and inputs', function () {
 
     it('GIVEN `Id Provider Wizard` is opened WHEN name has been typed THEN red icon should not be present on the page',
         () => {
+            let idProviderWizard = new IdProviderWizard();
             return testUtils.openIdProviderWizard().then(() => {
                 return idProviderWizard.typeDisplayName('test');
             }).then(() => {

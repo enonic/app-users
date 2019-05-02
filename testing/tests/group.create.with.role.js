@@ -8,25 +8,25 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
-const groupWizard = require('../page_objects/wizardpanel/group.wizard');
-const saveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
+const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
+const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
 
 describe('group.greate.with.role Create a Group with a just created new Role', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
     let testRole;
 
-
     it('WHEN `Role` with a description has been saved THEN the role should be searchable',
         () => {
             testRole =
                 userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'description');
-            return testUtils.openWizardAndSaveRole(testRole).then(()=> {
+            let userBrowsePanel = new UserBrowsePanel();
+            return testUtils.openWizardAndSaveRole(testRole).then(() => {
                 return testUtils.typeNameInFilterPanel(testRole.displayName)
-            }).then(()=> {
+            }).then(() => {
                 return expect(userBrowsePanel.isItemDisplayed(testRole.displayName)).to.eventually.be.true;
             })
         });
@@ -35,21 +35,24 @@ describe('group.greate.with.role Create a Group with a just created new Role', f
         () => {
             let testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'description', null, [testRole.displayName]);
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            let groupWizard = new GroupWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup);
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitAndClickOnSave();
-            }).pause(1000).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
-            }).pause(400).then(()=> {
-                return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogPresent(),
+            }).then(() => {
+                let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+                return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogLoaded(),
                     "`Save before close` dialog should not be present");
             })
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

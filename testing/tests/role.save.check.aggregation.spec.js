@@ -7,12 +7,12 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const roleWizard = require('../page_objects/wizardpanel/role.wizard');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const RoleWizard = require('../page_objects/wizardpanel/role.wizard');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const filterPanel = require('../page_objects/browsepanel/principal.filter.panel');
+const FilterPanel = require('../page_objects/browsepanel/principal.filter.panel');
 
 describe('Role - save a role and check the number in aggregations', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -25,11 +25,13 @@ describe('Role - save a role and check the number in aggregations', function () 
         () => {
             let roleName = userItemsBuilder.generateRandomName('role');
             let initialNumber;
-
+            let filterPanel = new FilterPanel();
+            let roleWizard = new RoleWizard();
+            let userBrowsePanel = new UserBrowsePanel();
             return testUtils.openFilterPanel().then(() => {
                 //Click on Role-checkbox
                 return filterPanel.clickOnRoleAggregation();
-            }).pause(1000).then(() => {
+            }).then(() => {
                 return filterPanel.getNumberAggregatedRoles();
             }).then(result => {
                 initialNumber = result;
@@ -41,7 +43,9 @@ describe('Role - save a role and check the number in aggregations', function () 
             }).then(() => {
                 //save the role
                 return roleWizard.waitAndClickOnSave();
-            }).pause(1000).then(() => {
+            }).then(() => {
+                return roleWizard.pause(1000);
+            }).then(() => {
                 // go to the grid
                 return userBrowsePanel.clickOnAppHomeButton();
             }).then(() => {

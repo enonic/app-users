@@ -1,36 +1,52 @@
 /**
  * Created on 10.10.2017.
  */
-
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const groupWizard = require('../page_objects/wizardpanel/group.wizard');
+const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
+const appConst = require('../libs/app_const');
 
 describe('`group.wizard.spec` - validation and check inputs', function () {
-    this.timeout(70000);
+    this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testGroup;
     it('WHEN `Group` wizard is opened  THEN red circle should be present, because required inputs are empty',
         () => {
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            let groupWizard = new GroupWizard();
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.waitUntilInvalidIconAppears('<Unnamed Group>');
-            }).then((isRedIconPresent)=> {
+            }).then(isRedIconPresent => {
+                assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because required inputs are empty');
+            })
+        });
+    it('GIVEN `Group` wizard is opened WHEN name has been typed THEN red circle gets not visible',
+        () => {
+            let groupWizard = new GroupWizard();
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
+                return groupWizard.typeDisplayName("test-group999")
+            }).then(() => {
+                return groupWizard.pause(400);
+            }).then(() => {
+                //red circle gets not visible:
+                return groupWizard.waitUntilInvalidIconDisappears("test-group");
+            }).then(isRedIconPresent => {
                 assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because required inputs are empty');
             })
         });
 
     it('WHEN `Group` wizard is opened THEN all required inputs should be present on the page',
         () => {
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            let groupWizard = new GroupWizard();
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return expect(groupWizard.isRoleOptionFilterInputDisplayed()).to.eventually.be.true;
-            }).then(()=> {
+            }).then(() => {
                 return expect(groupWizard.isMemberOptionFilterInputDisplayed()).to.eventually.be.true;
-            }).then(()=> {
+            }).then(() => {
                 return expect(groupWizard.isDescriptionInputDisplayed()).to.eventually.be.true;
             })
         });
@@ -39,13 +55,14 @@ describe('`group.wizard.spec` - validation and check inputs', function () {
         () => {
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', null, null);
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            let groupWizard = new GroupWizard();
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup);
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitUntilInvalidIconDisappears(testGroup.displayName);
-            }).then((isRedIconNotPresent)=> {
+            }).then(isRedIconNotPresent => {
                 assert.isTrue(isRedIconNotPresent, 'red circle should not be present on the tab, because all required inputs are filled');
-            }).then(()=> {
+            }).then(() => {
                 return expect(groupWizard.waitForSaveButtonEnabled()).to.eventually.be.true;
             });
         });
@@ -54,22 +71,23 @@ describe('`group.wizard.spec` - validation and check inputs', function () {
         () => {
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', null, null);
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(()=> {
+            let groupWizard = new GroupWizard();
+            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup);
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.clearDisplayNameInput();
-            }).then(()=> {
+            }).then(() => {
                 return groupWizard.waitUntilInvalidIconAppears('<Unnamed Group>');
-            }).then((isRedIconPresent)=> {
+            }).then((isRedIconPresent) => {
                 assert.isTrue(isRedIconPresent, 'red circle should appears on the tab, because name input has been cleared');
-            }).then(()=> {
+            }).then(() => {
                 return expect(groupWizard.waitForSaveButtonDisabled()).to.eventually.be.true;
             });
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

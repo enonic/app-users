@@ -3,7 +3,7 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 
 describe('User Browse Panel specification', function () {
@@ -12,6 +12,7 @@ describe('User Browse Panel specification', function () {
 
     it('WHEN navigate to the browse panel THEN folders with names `roles` and `/system` should  be present',
         () => {
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.isItemDisplayed('roles').then((result)=> {
                 assert.isTrue(result, 'roles folder should be present in the root directory');
             }).then(()=> {
@@ -26,6 +27,7 @@ describe('User Browse Panel specification', function () {
         });
     it('GIVEN navigate to the browse panel WHEN `roles` folder has been expanded THEN all system roles should be listed',
         () => {
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.clickOnExpanderIcon('roles').then(()=> {
                 return assert.eventually.isTrue(userBrowsePanel.isItemDisplayed('system.user.admin'),
                     "`User Administrator` role should be displayed");
@@ -52,6 +54,7 @@ describe('User Browse Panel specification', function () {
 
     it('GIVEN navigate to the browse panel WHEN `/system` folder has been expanded THEN `Groups` and `Users` folders should be listed in the grid',
         () => {
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.clickOnExpanderIcon('/system').then(()=> {
                 return userBrowsePanel.isItemDisplayed('groups');
             }).then(result=> {
@@ -65,6 +68,7 @@ describe('User Browse Panel specification', function () {
 
     it('WHEN checkbox for `Roles` is checked THEN SelectionPanelToggler is getting visible',
         () => {
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('Roles').then(()=> {
                 return userBrowsePanel.waitForSelectionTogglerVisible();
             }).then(()=> {
@@ -77,6 +81,7 @@ describe('User Browse Panel specification', function () {
 
     it('GIVEN checkbox for `Roles` is checked WHEN SelectionPanelToggler has been clicked THEN only one folder should be listed in the grid',
         () => {
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('Roles').then(()=> {
                 return userBrowsePanel.waitForSelectionTogglerVisible();
             }).then(()=> {

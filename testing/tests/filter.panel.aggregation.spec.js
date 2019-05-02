@@ -3,9 +3,9 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
-const filterPanel = require('../page_objects/browsepanel/principal.filter.panel');
+const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.panel');
 
 describe('filter.panel.aggregation.spec Principal Aggregation specification', function () {
     this.timeout(0);
@@ -13,8 +13,10 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `User` aggregation has been clicked THEN Roles and Store should not be displayed',
         () => {
+        let browseFilterPanel = new  BrowseFilterPanel();
+        let userBrowsePanel= new UserBrowsePanel();
             return testUtils.openFilterPanel().then(() => {
-                return filterPanel.clickOnUserAggregation();
+                return browseFilterPanel.clickOnUserAggregation();
             }).then(() => {
                 return userBrowsePanel.waitForItemNotDisplayed('roles');
             }).then(() => {
@@ -27,6 +29,8 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `Role` aggregation has been clicked THEN Store should not be displayed',
         () => {
+            let filterPanel = new  BrowseFilterPanel();
+            let userBrowsePanel= new UserBrowsePanel();
             return testUtils.openFilterPanel().then(() => {
                 return filterPanel.clickOnRoleAggregation();
             }).then(() => {
@@ -39,8 +43,10 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `Id Provider` aggregation has been clicked THEN Roles-folder should not be displayed',
         () => {
+            let filterPanel = new  BrowseFilterPanel();
+            let userBrowsePanel= new UserBrowsePanel();
             return testUtils.openFilterPanel().then(() => {
-                return filterPanel.clickOnStoreAggregation();
+                return filterPanel.clickOnIdProviderAggregation();
             }).then(() => {
                 return userBrowsePanel.waitForItemNotDisplayed('roles');
             }).then(() => {
@@ -48,7 +54,6 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
                 return expect(userBrowsePanel.isItemDisplayed('/system')).to.eventually.be.true;
             })
         });
-
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

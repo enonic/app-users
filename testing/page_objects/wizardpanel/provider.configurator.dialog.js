@@ -2,134 +2,120 @@
  * Created on 20.03.2018.
  */
 
-const page = require('../page');
-const elements = require('../../libs/elements');
+const Page = require('../page');
+const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const xpath = {
+const XPATH = {
     container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
     domainInput: "//input[contains(@id,'TextInput') and contains(@name,'appDomain')]",
     clientIdInput: "//input[contains(@id,'TextInput') and contains(@name,'appClientId')]",
     clientSecretInput: "//input[contains(@id,'TextInput') and contains(@name,'appSecret')]",
-
     applyButton: `//button[contains(@id,'DialogButton')]/span[text()='Apply']`,
     cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
     selectedProviderView: `//div[contains(@id,'AuthApplicationSelectedOptionView')]`,
     idProviderTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Id Provider')]]",
     permissionsTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Permissions')]]"
-
 };
-const idProviderConfiguratorDialog = Object.create(page, {
+class IdProviderConfiguratorDialog extends Page {
 
-    applyButton: {
-        get: function () {
-            return `${xpath.container}` + `${xpath.applyButton}`;
-        }
-    },
-    domainInput: {
-        get: function () {
-            return `${xpath.container}` + `${xpath.domainInput}`;
-        }
-    },
-    clientIdInput: {
-        get: function () {
-            return `${xpath.container}` + `${xpath.clientIdInput}`;
-        }
-    },
-    clientSecretInput: {
-        get: function () {
-            return `${xpath.container}` + `${xpath.clientSecretInput}`;
-        }
-    },
-    cancelButton: {
-        get: function () {
-            return `${xpath.container}` + `${xpath.cancelButton}`;
-        }
-    },
-    cancelButtonTop: {
-        get: function () {
-            return `${xpath.container}` + `${elements.CANCEL_BUTTON_TOP}`;
-        }
-    },
+    get applyButton() {
+        return `${XPATH.container}` + `${XPATH.applyButton}`;
+    }
 
-    isDomainInputDisplayed: {
-        value: function () {
-            return this.isVisible(this.domainInput);
-        }
-    },
-    typeInDomainInput: {
-        value: function (domain) {
-            return this.typeTextInInput(this.domainInput, domain).pause(200).catch(err => {
-                this.saveScreenshot('err_type_domainInput');
-                throw new Error(err);
-            })
-        }
-    },
-    typeInClientIdInput: {
-        value: function (clientId) {
-            return this.typeTextInInput(this.clientIdInput, clientId).pause(200).catch(err => {
-                this.saveScreenshot('err_type_clientIdInput');
-                throw new Error(err);
-            });
-        }
-    },
-    typeInClientSecretInput: {
-        value: function (text) {
-            return this.typeTextInInput(this.clientSecretInput, text).pause(200).catch(err => {
-                this.saveScreenshot('err_type_secretInput');
-                throw new Error(err);
-            })
-        }
-    },
-    doFillRequiredInputs: {
-        value: function (domain, clientId, clientSecret) {
-            let editButton = xpath.selectedProviderView + elements.EDIT_ICON;
-            return this.doClick(xpath.permissionsTabItem).then(() => {
-                return this.doClick(xpath.idProviderTabItem);
-            }).pause(1000).then(() => {
-                return this.waitForVisible(editButton, 3000);
-            }).then(result => {
-                return this.doClick(editButton);
-            }).then(() => {
-                return this.waitForDialogOpened();
-            }).then(() => {
-                return this.typeInDomainInput(domain);
-            }).then(() => {
-                return this.typeInClientIdInput(clientId);
-            }).then(() => {
-                return this.typeInClientSecretInput(clientSecret);
-            }).then(() => {
-                return this.clickOnApplyButton();
-            }).then(() => {
-                return this.waitForClosed();
-            }).pause(500);
-        }
-    },
-    waitForDialogOpened: {
-        value: function (ms) {
-            return this.waitForVisible(`${xpath.container}`, ms);
-        }
-    },
-    clickOnCancelTopButton: {
-        value: function () {
-            return this.doClick(this.cancelButtonTop);
-        }
-    },
-    clickOnApplyButton: {
-        value: function () {
-            return this.doClick(this.applyButton);
-        }
-    },
-    clickOnCancelButton: {
-        value: function () {
-            return this.doClick(this.cancelButton);
-        }
-    },
-    waitForClosed: {
-        value: function () {
-            return this.waitForNotVisible(`${xpath.container}`, appConst.TIMEOUT_3).catch(error => {
-                throw new Error('ID Provider config Dialog was not closed');
-            });
-        }
-    },
-});
-module.exports = idProviderConfiguratorDialog;
+    get domainInput() {
+        return `${XPATH.container}` + `${XPATH.domainInput}`;
+    }
+
+    get clientSecretInput() {
+        return `${XPATH.container}` + `${XPATH.clientSecretInput}`;
+    }
+
+    get cancelButton() {
+        return `${XPATH.container}` + `${XPATH.cancelButton}`;
+    }
+
+    get clientIdInput() {
+        return XPATH.container + XPATH.clientIdInput;
+    }
+
+    waitForDialogOpened() {
+        return this.waitForElementDisplayed(`${XPATH.container}`, appConst.TIMEOUT_3);
+    }
+
+    clickOnCancelTopButton() {
+        return this.clickOnElement(this.cancelButtonTop);
+    }
+
+    clickOnApplyButton() {
+
+        return this.clickOnElement(this.applyButton);
+    }
+
+    clickOnCancelButton() {
+        return this.clickOnElement(this.cancelButton);
+    }
+
+    cancelButtonTop() {
+        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+    }
+
+    isDomainInputDisplayed() {
+        return this.isElementEnabled(this.domainInput);
+    }
+
+    waitForClosed() {
+        return this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_3).catch(error => {
+            throw new Error('ID Provider config Dialog was not closed');
+        });
+    }
+
+    typeInDomainInput(domain) {
+        return this.typeTextInInput(this.domainInput, domain).catch(err => {
+            this.saveScreenshot('err_type_domainInput');
+            throw new Error(err);
+        })
+    }
+
+    typeInClientSecretInput(text) {
+        return this.typeTextInInput(this.clientSecretInput, text).catch(err => {
+            this.saveScreenshot('err_type_secretInput');
+            throw new Error(err);
+        })
+    }
+
+    typeInClientIdInput(clientId) {
+        return this.typeTextInInput(this.clientIdInput, clientId).catch(err => {
+            this.saveScreenshot('err_type_clientIdInput');
+            throw new Error(err);
+        });
+    }
+
+    openDialogFillRequiredInputs(domain, clientId, clientSecret) {
+        let editButton = XPATH.selectedProviderView + lib.EDIT_ICON;
+        return this.clickOnElement(XPATH.permissionsTabItem).then(() => {
+            return this.clickOnElement(XPATH.idProviderTabItem);
+        }).then(() => {
+            return this.pause(700);
+        }).then(() => {
+            return this.waitForElementDisplayed(editButton, appConst.TIMEOUT_3);
+        }).then(result => {
+            return this.clickOnElement(editButton);
+        }).then(() => {
+            return this.waitForDialogOpened();
+        }).then(() => {
+            return this.typeInDomainInput(domain);
+        }).then(() => {
+            return this.typeInClientIdInput(clientId);
+        }).then(() => {
+            return this.typeInClientSecretInput(clientSecret);
+        }).then(() => {
+            return this.clickOnApplyButton();
+        }).then(() => {
+            return this.waitForClosed();
+        }).then(() => {
+            return this.pause(500)
+        });
+    }
+};
+module.exports = IdProviderConfiguratorDialog;
+

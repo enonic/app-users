@@ -1,101 +1,87 @@
 /**
  * Created on 12.09.2017.
  */
-const wizard = require('./wizard.panel');
-const elements = require('../../libs/elements');
+const WizardPanel = require('./wizard.panel').WizardPanel;
+const baseXpath = require('./wizard.panel').XPATH;
+const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const loaderComboBox = require('../inputs/loaderComboBox');
+const LoaderComboBox = require('../inputs/loaderComboBox');
 
-const panel = {
+const xpath = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
-    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + `${loaderComboBox.optionsFilterInput}`,
+    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
 };
-const roleWizard = Object.create(wizard, {
+class RoleWizard extends WizardPanel {
 
-    descriptionInput: {
-        get: function () {
-            return `${panel.container}//div[contains(@id,'PrincipalDescriptionWizardStepForm')]` + `${elements.TEXT_INPUT}`;
-        }
-    },
-    deleteButton: {
-        get: function () {
-            return `${panel.container}` + `${wizard.deleteButton}`;
-        }
-    },
-    typeData: {
-        value: function (data) {
-            return this.typeTextInInput(this.displayNameInput, data.displayName).then(() => {
-                return this.typeTextInInput(this.descriptionInput, data.description)
-            });
-        }
-    },
-    filterOptionsAndAddMember: {
-        value: function (displayName) {
-            return this.typeTextInInput(`${panel.memberOptionsFilterInput}`, displayName).then(() => {
-                return loaderComboBox.waitForOptionVisible(`${panel.container}`, displayName);
-            }).then(() => {
-                return loaderComboBox.clickOnOption(`${panel.container}`, displayName);
-            }).catch((err) => {
-                throw new Error('Error selecting option ' + displayName + ' ' + err);
-            })
-        }
-    },
-    waitForOpened: {
-        value: function () {
-            return this.waitForVisible(`${panel.container}` + this.displayNameInput, appConst.TIMEOUT_3).catch((e) => {
-                throw new Error("Role wizard was not loaded! " + e);
-            });
-        }
-    },
+    get descriptionInput() {
+        return xpath.container + `//div[contains(@id,'PrincipalDescriptionWizardStepForm')]` + lib.TEXT_INPUT;
+    }
 
-    typeDescription: {
-        value: function (description) {
-            return this.typeTextInInput(this.descriptionInput, description);
-        }
-    },
-    getDescription: {
-        value: function () {
-            return this.getTextFromInput(this.descriptionInput);
-        }
-    },
-    getMembers: {
-        value: function () {
-            let selectedOptions = `${panel.container}` + `${elements.PRINCIPAL_SELECTED_OPTION}` + `${elements.H6_DISPLAY_NAME}`;
-            return this.getTextFromElements(selectedOptions).catch((err) => {
-                throw new Error('Error when getting text from elements ')
-            });
-        }
-    },
-    clickOnMembersLink: {
-        value: function () {
-            return this.doClick(this.membersLink);
-        }
-    },
-    removeMember: {
-        value: function (displayName) {
-            let selector = `${panel.container}` + `${elements.selectedPrincipalByDisplayName(displayName)}` + `${elements.REMOVE_ICON}`;
-            return this.doClick(selector).catch(err => {
-                this.saveScreenshot('err_remove_member');
-                throw new Error('Remove-icon for the role ' + displayName + ' ' + 'was not found on the  wizard page');
-            }).pause(500);
-        }
-    },
-    clickOnDelete: {
-        value: function () {
-            return this.waitForDeleteButtonEnabled().then(() => {
-                return this.doClick(this.deleteButton);
-            }).catch(err => {
-                return this.doCatch('err_delete_in_role_wizard', err);
-            });
-        }
-    },
-    waitForDeleteButtonEnabled: {
-        value: function () {
-            return this.waitForEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
-                return this.doCatch('err_delete_role_button_disabled', err);
-            });
-        }
-    },
-});
-module.exports = roleWizard;
+    get deleteButton() {
+        return xpath.container + baseXpath.deleteButton;
+    }
+
+    waitForLoaded() {
+        return this.waitForElementDisplayed(xpath.container + this.displayNameInput, appConst.TIMEOUT_3).catch(e => {
+            throw new Error("Role wizard was not loaded! " + e);
+        });
+    }
+
+    getDescription() {
+        return this.getTextInInput(this.descriptionInput);
+    }
+
+    typeDescription(description) {
+        return this.typeTextInInput(this.descriptionInput, description);
+    }
+
+    typeData(data) {
+        return this.typeTextInInput(this.displayNameInput, data.displayName).then(() => {
+            return this.typeTextInInput(this.descriptionInput, data.description)
+        });
+    }
+
+    clickOnDelete() {
+        return this.clickOnElement(this.deleteButton).catch(err => {
+            this.saveScreenshot('err_delete_button_in_role_wizard', err);
+            throw new Error("Role wizard - " + err);
+        });
+    }
+
+    waitForDeleteButtonEnabled() {
+        return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
+            return this.saveScreenshot('err_delete_role_button_disabled');
+            throw new Error("Role wizard, Delete button " + err);
+        });
+    }
+
+    getMembers() {
+        let selectedOptions = xpath.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
+        return this.getTextInElements(selectedOptions).catch(err => {
+            throw new Error('Error when getting text from elements ')
+        });
+    }
+
+    removeMember(displayName) {
+        let selector = xpath.container + lib.selectedPrincipalByDisplayName(displayName) + lib.REMOVE_ICON;
+        return this.clickOnElement(selector).catch(err => {
+            this.saveScreenshot('err_remove_member');
+            throw new Error('Remove-icon for the role ' + displayName + ' ' + 'was not found on the  wizard page');
+        }).then(() => {
+            return this.pause(500);
+        });
+    }
+
+    filterOptionsAndAddMember(displayName) {
+        let loaderComboBox = new LoaderComboBox();
+        return this.typeTextInInput(xpath.container + xpath.memberOptionsFilterInput, displayName).then(() => {
+            return loaderComboBox.waitForOptionVisible(xpath.container, displayName);
+        }).then(() => {
+            return loaderComboBox.clickOnOption(xpath.container, displayName);
+        }).catch(err => {
+            throw new Error('Error selecting option ' + displayName + ' ' + err);
+        })
+    }
+};
+module.exports = RoleWizard;
 
