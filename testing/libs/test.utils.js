@@ -88,7 +88,7 @@ module.exports = {
     },
     navigateToUsersApp: function (userName, password) {
         let launcherPanel = new LauncherPanel();
-        return launcherPanel.waitForPanelDisplayed(1000).then(result => {
+        return launcherPanel.waitForPanelDisplayed(3000).then(result => {
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Users` link...");
                 return launcherPanel.clickOnUsersLink();
