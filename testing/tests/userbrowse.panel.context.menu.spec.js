@@ -3,9 +3,9 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
-const gridContextMenu = require('../page_objects/browsepanel/grid.context.menu');
+const GridContextMenu = require('../page_objects/browsepanel/grid.context.menu');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 
@@ -15,6 +15,8 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
 
     it('GIVEN navigate to the browse panel WHEN right click on the `Roles` folder THEN `New role` menu item should be first ',
         () => {
+        let gridContextMenu = new GridContextMenu();
+        let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.rightClickOnRowByDisplayName(appConst.ROLES).then(() => {
                 return gridContextMenu.waitForContextMenuVisible();
             }).then(() => {
@@ -24,7 +26,9 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
             })
         });
     it('GIVEN navigate to the browse panel WHEN right click on the `System` folder THEN `New...` menu item should be first ',
-        () => {
+        () => { let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
+
             return userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider').then(() => {
                 return gridContextMenu.waitForContextMenuVisible();
             }).then(() => {
@@ -35,6 +39,8 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
         });
     it('WHEN right click on the `Anonymous` user THEN `Delete` menu item should be disabled ',
         () => {
+            let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
             return testUtils.findAndSelectItem('anonymous').then(() => {
                 return userBrowsePanel.rightClickOnRowByDisplayName('Anonymous User');
             }).then(() => {
@@ -49,6 +55,8 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
 
     it('WHEN right click on the `su` user THEN `Delete` menu item should be disabled',
         () => {
+            let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
             return testUtils.findAndSelectItem(appConst.SUPER_USER_NAME).then(() => {
                 return userBrowsePanel.rightClickOnRowByDisplayName(appConst.SUPER_USER_DISPLAY_NAME);
             }).then(() => {
@@ -62,6 +70,8 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
         });
     it('GIVEN navigate to the browse panel WHEN right click on the `System` folder THEN `Delete` menu item should be disabled ',
         () => {
+            let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider').then(() => {
                 return gridContextMenu.waitForContextMenuVisible();
             }).then(() => {
@@ -76,6 +86,8 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
 
     it('GIVEN navigate to the browse panel WHEN right click on the `Users` folder THEN `New User` menu item should be first ',
         () => {
+            let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.clickOnExpanderIcon('/system').then(() => {
                 return userBrowsePanel.rightClickOnRowByDisplayName('Users');
             }).then(() => {
@@ -89,6 +101,8 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
 
     it('GIVEN `/system` folder is expanded WHEN right click on the `Groups` folder THEN `New User Group` menu item should be first ',
         () => {
+            let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
             return userBrowsePanel.clickOnExpanderIcon('/system').then(() => {
                 return userBrowsePanel.rightClickOnRowByDisplayName('Groups');
             }).then(() => {
@@ -103,10 +117,12 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
 
     it('GIVEN existing Id Provider(empty) WHEN right click on the provider THEN `Delete` menu item should be enabled ',
         () => {
+            let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
             let idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
             return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
-            }).pause(1000).then(() => {
+            }).then(() => {
                 return userBrowsePanel.rightClickOnRowByDisplayName(idProvider.displayName);
             }).then(() => {
                 return gridContextMenu.waitForContextMenuVisible();
@@ -123,5 +139,4 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
     before(() => {
         return console.log('specification starting: ' + this.title);
     });
-})
-;
+});

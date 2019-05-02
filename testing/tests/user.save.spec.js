@@ -7,12 +7,12 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const userWizard = require('../page_objects/wizardpanel/user.wizard');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const UserWizard = require('../page_objects/wizardpanel/user.wizard');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const saveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
+const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
 
 describe('Save User spec - save an user', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -23,6 +23,9 @@ describe('Save User spec - save an user', function () {
     //User Wizard - confirmation about unsaved changes after changes were saved
     it('GIVEN new user has been saved in wizard AND display name has been changed AND Save button pressed WHEN `close` icon clicked THEN `Save before close dialog` should not appear',
         () => {
+            let userWizard = new UserWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
             return testUtils.clickOnSystemOpenUserWizard().then(() => {
@@ -31,20 +34,23 @@ describe('Save User spec - save an user', function () {
                 return userWizard.waitAndClickOnSave();
             }).then(() => {
                 return userWizard.typeDisplayName(userName + "123");
-            }).then(()=>{
+            }).then(() => {
                 return userWizard.waitAndClickOnSave();
             }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabButton(userName + "123");
-            }).pause(1000).then(() => {
-                return saveBeforeCloseDialog.isDialogPresent();
+            }).then(() => {
+                return userWizard.pause(400);
+            }).then(() => {
+                return saveBeforeCloseDialog.isDialogLoaded();
             }).then(result => {
                 assert.isFalse(result, "Save before dialog should not be present, because all changes were saved");
             })
         });
 
-
-    it('GIVEN wizard for new User is opened AND valid data is typed WHEN the user has been saved THEN correct notification message should appear AND the user should be searchable',
+    it('GIVEN wizard for new User is opened AND valid data is typed WHEN the user has been saved THEN expected notification message should appear AND the user should be searchable',
         () => {
+            let userWizard = new UserWizard();
+            let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
             return testUtils.clickOnSystemOpenUserWizard().then(() => {
@@ -66,6 +72,8 @@ describe('Save User spec - save an user', function () {
 
     it('WHEN user has been saved in the wizard AND the wizard closed AND Users folder has been expanded THEN grid should be updated AND the user should be listed',
         () => {
+            let userWizard = new UserWizard();
+            let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
             return testUtils.clickOnSystemOpenUserWizard().then(() => {
@@ -76,7 +84,9 @@ describe('Save User spec - save an user', function () {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
             }).then(() => {
                 return userBrowsePanel.clickOnExpanderIcon("system");
-            }).pause(500).then(() => {
+            }).then(() => {
+                return userBrowsePanel.pause(500);
+            }).then(() => {
                 return userBrowsePanel.clickOnExpanderIcon("users");
             }).then(() => {
                 return expect(userBrowsePanel.isItemDisplayed(userName)).to.eventually.be.true;
@@ -85,6 +95,7 @@ describe('Save User spec - save an user', function () {
 
     it('WHEN try to save user with name that already in use THEN correct notification message should appear',
         () => {
+            let userWizard = new UserWizard();
             testUser.email = userItemsBuilder.generateEmail('test');
             return testUtils.clickOnSystemOpenUserWizard().then(() => {
                 return userWizard.typeData(testUser);

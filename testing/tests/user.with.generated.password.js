@@ -1,18 +1,17 @@
 /**
  * Created on 13.04.2018.*
  */
-
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const userWizard = require('../page_objects/wizardpanel/user.wizard');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const UserWizard = require('../page_objects/wizardpanel/user.wizard');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const loginPage = require('../page_objects/login.page');
-const launcherPanel = require('../page_objects/launcher.panel');
+const LoginPage = require('../page_objects/login.page');
+const LauncherPanel = require('../page_objects/launcher.panel');
 
 describe('Create an user with generated password and log in the user', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -23,39 +22,43 @@ describe('Create an user with generated password and log in the user', function 
     it('WHEN `User`with roles has been added THEN the user should be searchable',
         () => {
             let permissions = ['Administration Console Login', 'Content Manager App'];
+            let userWizard = new UserWizard();
+            let userBrowsePanel = new UserBrowsePanel();
             userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, null, userItemsBuilder.generateEmail(userName), permissions);
-            return testUtils.navigateToUsersApp().then(()=> {
+            return testUtils.navigateToUsersApp().then(() => {
                 return testUtils.clickOnSystemOpenUserWizard();
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.typeDataAndGeneratePassword(testUser);
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.getTextInPasswordInput();
-            }).then((result)=> {
+            }).then((result) => {
                 password = result;
-            }).then(()=> {
+            }).then(() => {
                 return userWizard.waitAndClickOnSave();
-            }).then(()=> {
+            }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
-            }).then(()=> {
+            }).then(() => {
                 return testUtils.typeNameInFilterPanel(userName);
-            }).then(()=> {
+            }).then(() => {
                 return assert.eventually.isTrue(userBrowsePanel.isItemDisplayed(userName), 'user should be present in the grid');
             })
         });
 
     it('WHEN user name and `generated` password have been typed AND `login-button` pressed THEN user should be `logged in`',
         () => {
-            return testUtils.doCloseUsersApp().then(()=> {
+            let launcherPanel = new LauncherPanel();
+            let loginPage = new LoginPage();
+            return testUtils.doCloseUsersApp().then(() => {
                 return launcherPanel.clickOnLogoutLink();
-            }).then(()=> {
+            }).then(() => {
                 return loginPage.doLogin(userName, password);
-            }).then(()=> {
-                return launcherPanel.waitForPanelVisible();
+            }).then(() => {
+                return launcherPanel.waitForPanelDisplayed();
             })
         });
 
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

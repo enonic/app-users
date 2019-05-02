@@ -1,11 +1,11 @@
 /**
  * Created on 24.10.2017.
  */
-
-const page = require('../page');
-const elements = require('../../libs/elements');
+const Page = require('../page');
+const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const dialog = {
+
+const XPATH = {
     container: `//div[contains(@id,'ChangeUserPasswordDialog')]`,
     passwordInput: "//input[contains(@id,'PasswordInput')]",
     changePasswordButton: `//button[contains(@id,'DialogButton') and child::span[text()='Change Password']]`,
@@ -14,121 +14,97 @@ const dialog = {
     generatePasswordLink: `//a[text()='Generate']`,
     userPath: `//h6[@class='user-path']`,
 };
-const changeUserPasswordDialog = Object.create(page, {
+class ChangeUserPasswordDialog extends Page {
 
-    passwordInput: {
-        get: function () {
-            return `${dialog.container}` + `${dialog.passwordInput}`;
-        }
-    },
-    generatePasswordLink: {
-        get: function () {
-            return `${dialog.container}` + `${dialog.generatePasswordLink}`;
-        }
-    },
-    showPasswordLink: {
-        get: function () {
-            return `${dialog.container}` + `${dialog.showPasswordLink}`;
-        }
-    },
+    get passwordInput() {
+        return XPATH.container + XPATH.passwordInput;
+    }
 
-    cancelButton: {
-        get: function () {
-            return `${dialog.container}` + `${dialog.cancelButton}`;
-        }
-    },
+    get generatePasswordLink() {
+        return XPATH.container + XPATH.generatePasswordLink;
+    }
 
-    cancelButtonTop: {
-        get: function () {
-            return `${dialog.container}` + `${elements.CANCEL_BUTTON_TOP}`;
-        }
-    },
-    userPath: {
-        get: function () {
-            return `${dialog.container}` + `${dialog.userPath}`;
-        }
-    },
-    isPasswordInputDisplayed: {
-        value: function () {
-            return this.isVisible(this.passwordInput);
-        }
-    },
-    isShowLinkDisplayed: {
-        value: function () {
-            return this.isVisible(this.showPasswordLink);
-        }
-    },
-    isHideLinkDisplayed: {
-        value: function () {
-            return this.getAttribute(this.showPasswordLink, 'data-i18n').then(result => {
-                return result.includes('Hide')
-            });
-        }
-    },
-    isGenerateLinkDisplayed: {
-        value: function () {
-            return this.isVisible(this.generatePasswordLink);
-        }
-    },
+    get showPasswordLink() {
+        return XPATH.container + XPATH.showPasswordLink;
+    }
 
-    clickOnChangePasswordButton: {
-        value: function () {
-            return this.doClick(this.changePasswordButton).then(() => {
-                return this.waitForNotVisible(`${dialog.container}`, appConst.TIMEOUT_3);
-            });
-        }
-    },
-    clickOnShowPasswordLink: {
-        value: function () {
-            return this.doClick(this.showPasswordLink).pause(300);
-        }
-    },
-    clickOnGeneratePasswordLink: {
-        value: function () {
-            return this.doClick(this.generatePasswordLink).pause(300);
-        }
-    },
-    getUserPath: {
-        value: function () {
-            return this.getTextFromElements(this.userPath);
-        }
-    },
+    get cancelButton() {
+        return XPATH.container + XPATH.cancelButton;
+    }
 
-    waitForDialogVisible: {
-        value: function (ms) {
-            return this.waitForVisible(`${dialog.container}`, ms);
-        }
-    },
-    waitForDialogClosed: {
-        value: function (ms) {
-            return this.waitForVisible(`${dialog.container}`, ms);
-        }
-    },
+    get cancelButtonTop() {
+        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+    }
 
-    clickOnCancelButton: {
-        value: function () {
-            return this.doClick(this.cancelButton);
-        }
-    },
-    clickOnCancelButtonTop: {
-        value: function () {
-            return this.doClick(this.cancelButtonTop);
-        }
-    },
-    getPasswordString: {
-        value: function () {
-            return this.getTextFromInput(this.passwordInput)
-        }
-    },
-    waitForClosed: {
-        value: function () {
-            return this.waitForNotVisible(`${dialog.container}`, appConst.TIMEOUT_3).catch(error => {
-                throw new Error('Change Password Dialog was not closed ' + error);
-            });
-        }
-    },
-});
-module.exports = changeUserPasswordDialog;
+    get userPath() {
+        return XPATH.container + XPATH.userPath;
+    }
+
+    isPasswordInputDisplayed() {
+        return this.isElementDisplayed(this.passwordInput);
+    }
+
+    isShowLinkDisplayed() {
+        return this.isElementDisplayed(this.showPasswordLink);
+    }
+
+    waitForLoaded() {
+        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
+    }
+
+    waitForClosed() {
+        return this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_3).catch(error => {
+            throw new Error('Change Password Dialog is not closed ' + error);
+        });
+    }
+
+    async isHideLinkDisplayed() {
+        let attr = await this.getAttribute(this.showPasswordLink, 'data-i18n');
+        return attr.includes('Hide');
+    }
+
+    isGenerateLinkDisplayed() {
+        return this.isElementDisplayed(this.generatePasswordLink);
+    }
+
+    clickOnChangePasswordButton() {
+        return this.clickOnElement(this.changePasswordButton).then(() => {
+            return this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_3);
+        });
+    }
+
+    async clickOnShowPasswordLink() {
+        await this.clickOnElement(this.showPasswordLink);
+        return await this.pause(300);
+    }
+
+    clickOnCancelButton() {
+        return this.clickOnElement(this.cancelButton);
+    }
+
+    clickOnCancelButtonTop() {
+        return this.clickOnElement(this.cancelButtonTop);
+    }
+
+    getPasswordString() {
+        return this.getTextInInput(this.passwordInput)
+    }
+
+    async clickOnGeneratePasswordLink() {
+        await this.clickOnElement(this.generatePasswordLink);
+        return await this.pause(400);
+    }
+
+    getUserPath() {
+        return this.getTextInElements(this.userPath);
+    }
+
+    waitForDialogLoaded() {
+        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
+    }
+};
+module.exports = ChangeUserPasswordDialog;
+
 
 
 

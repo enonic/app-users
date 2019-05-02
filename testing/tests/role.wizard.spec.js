@@ -8,13 +8,12 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const roleWizard = require('../page_objects/wizardpanel/role.wizard');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const RoleWizard = require('../page_objects/wizardpanel/role.wizard');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const roleStatisticsPanel = require('../page_objects/browsepanel/role.statistics.panel');
-const confirmationDialog = require('../page_objects/confirmation.dialog');
+const RoleStatisticsPanel = require('../page_objects/browsepanel/role.statistics.panel');
 
 describe('Role Wizard and Statistics Panel spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -23,11 +22,13 @@ describe('Role Wizard and Statistics Panel spec', function () {
 
     it('GIVEN `Roles` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN `Role was created` message should appear',
         () => {
+            let roleWizard = new RoleWizard();
+            let userBrowsePanel = new  UserBrowsePanel();
             testRole = userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'test role', null);
             return userBrowsePanel.clickOnRowByName('roles').then(() => {
                 return userBrowsePanel.clickOnNewButton();
             }).then(() => {
-                return roleWizard.waitForOpened();
+                return roleWizard.waitForLoaded();
             }).then(() => roleWizard.typeData(testRole)).then(() => {
                 return roleWizard.waitAndClickOnSave();
             }).then(() => {
@@ -39,9 +40,10 @@ describe('Role Wizard and Statistics Panel spec', function () {
     //verifies: xp-apps#93 Incorrect message appears when try to create a role with name that already in use #93
     it(`GIVEN 'role' wizard is opened WHEN the name that already in use has been typed THEN correct notification message should be present`,
         () => {
+            let roleWizard = new RoleWizard();
             return testUtils.clickOnRolesFolderAndOpenWizard().then(() => {
                 return roleWizard.typeDisplayName(testRole.displayName);
-            }).pause(400).then(() => {
+            }).then(() => {
                 return roleWizard.waitAndClickOnSave();
             }).then(() => {
                 return roleWizard.waitForErrorNotificationMessage();
@@ -52,10 +54,12 @@ describe('Role Wizard and Statistics Panel spec', function () {
         });
 
     it(`GIVEN existing 'Role' WHEN 'Super User' has been added in members THEN the member should appear on the wizard page`, () => {
+        let roleWizard = new RoleWizard();
+        let userBrowsePanel = new  UserBrowsePanel();
         return testUtils.findAndSelectItem(testRole.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
-            return roleWizard.waitForOpened();
+            return roleWizard.waitForLoaded();
         }).then(() => roleWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME)).then(() => roleWizard.waitAndClickOnSave()).then(
             () => {
                 return roleWizard.getMembers();
@@ -65,10 +69,12 @@ describe('Role Wizard and Statistics Panel spec', function () {
     });
 
     it(`GIVEN existing 'Role' WHEN it has been selected and opened THEN correct description should be present`, () => {
+        let roleWizard = new RoleWizard();
+        let userBrowsePanel = new  UserBrowsePanel();
         return testUtils.findAndSelectItem(testRole.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
-            return roleWizard.waitForOpened();
+            return roleWizard.waitForLoaded();
         }).then(() => {
             return expect(roleWizard.getDescription()).to.eventually.be.equal(testRole.description);
         })
@@ -76,8 +82,10 @@ describe('Role Wizard and Statistics Panel spec', function () {
 
     it(`GIVEN existing 'Role' with a member WHEN it has been selected THEN correct info should be present in the 'statistics panel'`,
         () => {
+            let roleWizard = new RoleWizard();
+            let roleStatisticsPanel = new  RoleStatisticsPanel();
             return testUtils.findAndSelectItem(testRole.displayName).then(() => {
-                return roleStatisticsPanel.waitForPanelVisible();
+                return roleStatisticsPanel.waitForPanelLoaded();
             }).then(() => {
                 return expect(roleStatisticsPanel.getItemName()).to.eventually.be.equal(testRole.displayName);
             }).then(() => {
@@ -87,6 +95,8 @@ describe('Role Wizard and Statistics Panel spec', function () {
 
     it(`GIVEN existing 'Role' with a member is opened WHEN member has been removed AND navigated to the grid THEN no one member should be present on the 'statistics panel'`,
         () => {
+            let roleWizard = new RoleWizard();
+            let roleStatisticsPanel = new  RoleStatisticsPanel();
             return testUtils.selectRoleAndOpenWizard(testRole.displayName).then(() => {
                 return roleWizard.removeMember(appConst.SUPER_USER_DISPLAY_NAME)
             }).then(() => {

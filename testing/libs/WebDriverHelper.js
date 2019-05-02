@@ -1,5 +1,5 @@
 /**
- * Created by on 10.09.2017.
+ * Created on 02.12.2017.
  * Helper class that encapsulates webdriverio
  * and sets up mocha hooks for easier test writing.
  */
@@ -14,10 +14,10 @@ WebDriverHelper.prototype.getBrowser = function () {
 const makeChromeOptions = headless => ({
     "args": [
         ...(headless ? ["--headless", "--disable-gpu", "--no-sandbox"] : []),
-        "--lang=en",
-        '--disable-extensions',
-        'window-size=1920,1100'
-    ]
+    "--lang=en",
+    '--disable-extensions',
+    'window-size=1920,1100'
+]
 });
 
 /**
@@ -26,7 +26,7 @@ const makeChromeOptions = headless => ({
  */
 WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
     let _this = this;
-    before(function () {
+    before(async function () {
         let PropertiesReader = require('properties-reader');
         let path = require('path');
         let webdriverio = require('webdriverio');
@@ -40,22 +40,20 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
         console.log('is Headless ##################### ' + isHeadless);
         console.log('browser name ##################### ' + browser_name);
         let options = {
-            desiredCapabilities: {
+            capabilities: {
                 browserName: browser_name,
                 platform: platform_name,
                 binary: chromeBinPath,
                 chromeOptions: makeChromeOptions(isHeadless)
             }
         };
-        _this.browser = webdriverio
-            .remote(options)
-            .init().url(baseUrl);
+        _this.browser = await webdriverio.remote(options);
+        await _this.browser.url(baseUrl);
         console.log('webdriverio #####################  ' + 'is  initialized!');
         return _this.browser;
     });
-    after(function () {
-        console.log('webdriverio #####################  ' + 'browser is closed!');
-        return _this.browser.end();
+    after(async function () {
+        await _this.browser.deleteSession();
     });
     afterEach(function () {
         let state = this.currentTest.state ? this.currentTest.state.toString().toUpperCase() : 'FAILED';
@@ -63,5 +61,4 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
 
     });
 };
-
 module.exports = new WebDriverHelper();

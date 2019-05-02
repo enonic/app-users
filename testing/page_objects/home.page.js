@@ -2,39 +2,24 @@
  * Created on 6/19/2017.
  */
 
-const page = require('./page');
+const Page = require('./page');
+const appConst = require('../libs/app_const');
+
 const xpTourDialog = {
     container: `//div[contains(@id,'ModalDialog') and descendant::h2[contains(.,'Welcome Tour')]]`
 };
 const home = {
     container: `div[class*='home-main-container']`
 };
-const homePage = Object.create(page, {
 
-    closeXpTourButton: {
-        get: function () {
-            return `${xpTourDialog.container}//div[@class='cancel-button-top']`
-        }
-    },
-    waitForXpTourVisible: {
-        value: function (ms) {
-            return this.waitForVisible(`${xpTourDialog.container}`, ms).catch(err => {
-                return false;
-            })
-        }
-    },
-    waitForLoaded: {
-        value: function (ms) {
-            return this.waitForVisible(`${home.container}`, ms);
-        }
-    },
-    doCloseXpTourDialog: {
-        value: function () {
-            return this.doClick(this.closeXpTourButton).catch(err => {
-                this.saveScreenshot("err_close_xp_tour");
-                throw new Error("err when close the XpTour dialog " + err);
-            })
-        }
-    },
-});
-module.exports = homePage;
+class HomePage extends Page {
+
+    get closeXpTourButton() {
+        return `${xpTourDialog.container}//div[@class='cancel-button-top']`;
+    }
+
+    waitForLoaded() {
+        return this.waitForElementDisplayed(`${home.container}`, appConst.TIMEOUT_3);
+    }
+};
+module.exports = HomePage;

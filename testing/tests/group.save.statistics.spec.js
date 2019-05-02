@@ -6,12 +6,12 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const groupWizard = require('../page_objects/wizardpanel/group.wizard');
-const userBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
+const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
+const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const groupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
+const GroupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
 
 describe('`group.save.statistics.panel`: Save a Group and check the info in the Statistics Panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -20,8 +20,9 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
     let testGroup;
     it('GIVEN `Group` wizard is opened WHEN name, member and roles has been typed AND `Save` button pressed THEN message `Group was created` should appear',
         () => {
-            groupWithRoleAndMember =
-                userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', ['Super User'], ['Users App']);
+            let groupName = userItemsBuilder.generateRandomName('group');
+            groupWithRoleAndMember = userItemsBuilder.buildGroup(groupName, 'test group', ['Super User'], ['Users App']);
+            let groupWizard = new GroupWizard();
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(groupWithRoleAndMember);
             }).then(() => {
@@ -36,6 +37,8 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
 
     it('WHEN existing group is opened THEN description, role and members should be present',
         () => {
+            let groupWizard = new GroupWizard();
+            let userBrowsePanel = new  UserBrowsePanel();
             return testUtils.findAndSelectItem(groupWithRoleAndMember.displayName).then(() => {
                 return userBrowsePanel.clickOnEditButton();
             }).then(() => {
@@ -51,10 +54,15 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
 
     it('GIVEN `Group` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN Group should be searchable',
         () => {
-            testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', null, null);
+            let groupWizard = new GroupWizard();
+            let userBrowsePanel = new  UserBrowsePanel();
+            let groupName = userItemsBuilder.generateRandomName('group');
+            testGroup = userItemsBuilder.buildGroup(groupName, 'test group', null, null);
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
                 return groupWizard.typeData(testGroup);
-            }).pause(400).then(() => {
+            }).then(() => {
+                return groupWizard.pause(300);
+            }).then(() => {
                 return groupWizard.waitAndClickOnSave();
             }).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
@@ -67,6 +75,8 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
 
     it(`GIVEN existing 'group'(has no roles) is opened WHEN 'Users App' role has been added THEN the role should be visible on the wizard page`,
         () => {
+            let groupWizard = new GroupWizard();
+            let userBrowsePanel = new  UserBrowsePanel();
             return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
                 return userBrowsePanel.clickOnEditButton();
             }).then(() => {
@@ -84,6 +94,8 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
         });
 
     it(`GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be present on the wizard page`, () => {
+        let groupWizard = new GroupWizard();
+        let userBrowsePanel = new  UserBrowsePanel();
         return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
@@ -92,7 +104,9 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             return groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
         }).then(() => {
             return groupWizard.waitAndClickOnSave();
-        }).pause(1000).then(() => {
+        }).then(()=>{
+            return groupWizard.pause(1000);
+        }).then(() => {
             return groupWizard.getMembers();
         }).then(members => {
             testUtils.saveScreenshot("group_member_added");
@@ -102,6 +116,8 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
 
     it(`WHEN existing group has been selected  in the grid THEN expected info should be present in the 'statistics panel'`,
         () => {
+            let groupWizard = new GroupWizard();
+            let groupStatisticsPanel = new GroupStatisticsPanel();
             return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
                 return groupStatisticsPanel.getDisplayNameOfMembers();
             }).then(members => {
@@ -115,15 +131,17 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
 
     it(`GIVEN existing 'group' with the selected role is opened WHEN role has been removed THEN the role should not be present on the wizard page`,
         () => {
+            let groupWizard = new GroupWizard();
+            let userBrowsePanel = new UserBrowsePanel();
             return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
                 return userBrowsePanel.clickOnEditButton();
             }).then(() => {
                 return groupWizard.waitForOpened();
-            }).pause(400).then(() => {
+            }).then(() => {
                 return groupWizard.removeRole(appConst.roles.USERS_APP);
             }).then(() => {
                 return groupWizard.waitAndClickOnSave();
-            }).pause(500).then(() => {
+            }).then(() => {
                 return groupWizard.getRoles();
             }).then(roles => {
                 testUtils.saveScreenshot("groupwizard_role_removed");

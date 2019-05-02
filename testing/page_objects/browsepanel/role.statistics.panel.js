@@ -1,10 +1,10 @@
 /**
  * Created  on 06.10.2017.
  */
-const itemStatistic = require('./userItem.statistics.panel');
-const elements = require('../../libs/elements');
+const ItemStatistic = require('./userItem.statistics.panel');
+const lib = require('../../libs/elements');
 
-const panel = {
+const XPATH = {
     div: `//div[contains(@id,'UserItemStatisticsPanel')]`,
     header: `//div[contains(@id,'ItemStatisticsHeader')]`,
     itemName: `//h1[@class='title']`,
@@ -12,25 +12,16 @@ const panel = {
     membersDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]`,
     memberList: `//ul[@class='data-list' and child::li[text()='Members']]`
 };
-const roleStatisticsPanel = Object.create(itemStatistic, {
+class RoleStatisticsPanel extends ItemStatistic {
 
-    getDisplayNameOfMembers: {
-        value: function () {
-            let items = `${panel.div}` + `${panel.memberList}` + `${elements.H6_DISPLAY_NAME}`;
-            return this.waitForVisible(`${panel.membersDataGroup}`, 1000).catch((err)=> {
-                this.saveScreenshot('err_statistic_role');
-                throw new Error('Members data-group is not present on the page!');
-            }).then(()=> {
-                return this.isVisible(items);
-            }).then((result)=> {
-                if (!result) {
-                    return [];
-                }
-                return this.getTextFromElements(items)
-            }).catch((err)=> {
-                return [];
-            })
-        }
-    },
-});
-module.exports = roleStatisticsPanel;
+    getDisplayNameOfMembers() {
+        let items = XPATH.div + XPATH.memberList + lib.H6_DISPLAY_NAME;
+        return this.waitForElementDisplayed(XPATH.membersDataGroup, 1000).catch(err => {
+            this.saveScreenshot('err_role_statistic_members');
+            throw new Error('Members data-group is not present on the page!');
+        }).then(() => {
+            return this.getTextInElements(items);
+        })
+    }
+};
+module.exports = RoleStatisticsPanel;
