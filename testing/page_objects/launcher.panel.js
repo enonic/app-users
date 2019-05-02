@@ -28,8 +28,9 @@ class LauncherPanel extends Page {
         return XPATH.container + `//div[@class='user-logout']`;
     }
 
-    clickOnUsersLink() {
-        return this.clickOnElement(this.usersLink);
+    async clickOnUsersLink() {
+        await this.waitForElementDisplayed(this.usersLink,appConst.TIMEOUT_3);
+        return await this.clickOnElement(this.usersLink);
     }
 
     clickOnLogoutLink() {

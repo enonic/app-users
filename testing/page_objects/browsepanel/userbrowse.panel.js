@@ -3,7 +3,7 @@
  */
 const Page = require('../page');
 const SaveBeforeCloseDialog = require('../save.before.close.dialog');
-const elements = require('../../libs/elements');
+const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const itemBuilder = require('../../libs/userItems.builder');
 
@@ -22,12 +22,12 @@ const xpath = {
     rowByDisplayName:
         displayName => `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
     checkboxByName: function (name) {
-        return `${elements.itemByName(name)}` +
+        return `${lib.itemByName(name)}` +
                `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
 
     checkboxByDisplayName: function (displayName) {
-        return `${elements.itemByDisplayName(displayName)}` +
+        return `${lib.itemByDisplayName(displayName)}` +
                `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
 
@@ -287,9 +287,8 @@ class UserBrowsePanel extends Page {
     }
 
     waitForSelectionTogglerVisible() {
-
         let selector = xpath.container + xpath.selectionToggler;
-        return this.getBrowser().waitUntil(function () {
+        return this.getBrowser().waitUntil(()=>  {
             return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('any-selected');
             })
