@@ -39,6 +39,40 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             });
         });
 
+    it('GIVEN existing IdProvider is opened WHEN new acl-entry has been updated AND Save button pressed THEN new acl-operation should be saved',
+        () => {
+            let idProviderWizard = new IdProviderWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            return testUtils.findAndSelectItem(idProvider.displayName).then(() => {
+                return userBrowsePanel.waitForEditButtonEnabled();
+            }).then(() => {
+                return userBrowsePanel.clickOnEditButton();
+            }).then(() => {
+                return idProviderWizard.waitForOpened();
+            }).then(() => {
+                return idProviderWizard.addPrincipals(['Everyone']);
+            }).then(() => {
+                return idProviderWizard.pause(1000);
+            }).then(() => {
+                //open the ACE-menu
+                return idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
+            }).then(() => {
+                //click on "Administrator" menu item
+                return idProviderWizard.clickOnAceMenuOperation('Administrator');
+            }).then(() => {
+                //save the Id Provider
+                return idProviderWizard.waitAndClickOnSave();
+            }).then(() => {
+                return idProviderWizard.pause(1000);
+            }).then(() => {
+                // gets selected operation
+                return idProviderWizard.getSelectedAceOperation('Everyone');
+            }).then(result => {
+                testUtils.saveScreenshot("idprovider_administrator_for_everyone");
+                assert.equal(result, "Administrator", "Administrator should be present for Everyone");
+            })
+        });
+
     it('GIVEN new IdProvider has been saved WHEN the provider has been deleted in the wizard THEN expected notification message should appear',
         () => {
             let idProviderWizard = new IdProviderWizard();
@@ -64,10 +98,12 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             });
         });
 
+
     it('GIVEN existing `IdProvider` is selected WHEN Delete button on the browse-toolbar has been pressed THEN Confirmation dialog should appear',
         () => {
             let userBrowsePanel = new UserBrowsePanel();
-            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
+            idProvider =
+                userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
             return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
                 return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
             }).then(() => {
@@ -79,7 +115,8 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             }).then(() => {
                 let confirmationDialog = new ConfirmationDialog();
                 testUtils.saveScreenshot("idprovider_confirm_delete2");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
+                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
+                    "`Confirmation Dialog` should be displayed");
             });
         });
 

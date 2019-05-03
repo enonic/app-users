@@ -40,6 +40,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
         console.log('is Headless ##################### ' + isHeadless);
         console.log('browser name ##################### ' + browser_name);
         let options = {
+            logLevel: "error",
             capabilities: {
                 browserName: browser_name,
                 platform: platform_name,
