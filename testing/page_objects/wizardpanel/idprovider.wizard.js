@@ -18,6 +18,9 @@ const XPATH = {
     selectedAcEntryByDisplayName: function (displayName) {
         return `//div[contains(@id,'IdProviderACESelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
+    aceOperationByName: function (displayName) {
+        return `//ul[@class='menu']//li[child::a[text()='${displayName}']]`
+    },
     providerComboBox: `//div[contains(@id,'AuthApplicationComboBox')]`,
     selectedAuthApplicationView: "//div[contains(@id,'AuthApplicationSelectedOptionView')]",
     removeAuthApplicationIcon: `//a[contains(@class,'remove')]`,
@@ -151,12 +154,21 @@ class IdProviderWizard extends WizardPanel {
             return result.includes('expanded');
         })
     }
+    async clickOnAceMenuOperation(operation) {
+        let selector =XPATH.aceOperationByName(operation);
+        let elems =await this.getDisplayedElements(selector);
+        return await elems[0].click();
 
+    }
+    getSelectedAceOperation(principal){
+        let selector = XPATH.selectedAcEntryByDisplayName(principal)+XPATH.aceAccessSelector+ "//a";
+        return this.getText(selector);
+    }
     //gets ACE -operations in expanded menu
     async getAceMenuOperations() {
-        let result=[];
+        let result = [];
         let selector = XPATH.aceAccessSelector + "//ul[@class='menu']//li";
-        let elems= await this.getDisplayedElements(selector);
+        let elems = await this.getDisplayedElements(selector);
         elems.forEach(el => {
             result.push(el.getText());
         });

@@ -25,12 +25,20 @@ describe('Id Provider wizard, Access Control Entry - expand and collapse menu-op
             return testUtils.openIdProviderWizard(testProvider).then(() => {
                 return idProviderWizard.typeData(testProvider);
             }).then(() => {
+                //click on acl-entry and expand the menu
                 return idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
             }).then(() => {
                 testUtils.saveScreenshot('store_ace_menu_expanded');
                 return idProviderWizard.isAceMenuOptionsExpanded('Everyone');
             }).then(result => {
                 assert.isTrue(result, 'menu with operations should be expanded');
+            }).then(() => {
+                //gets operations in the expanded menu:
+                return idProviderWizard.getAceMenuOperations();
+            }).then(result => {
+                assert.equal(result[0], "Read");
+                assert.equal(result[1], "Create Users");
+                assert.equal(result.length, 5, "Five operations should be in the expanded menu");
             })
         });
 
