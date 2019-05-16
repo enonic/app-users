@@ -1,14 +1,21 @@
 import i18n = api.util.i18n;
 import IdProviderConfig = api.security.IdProviderConfig;
+import FormItem = api.form.FormItem;
+import PropertySet = api.data.PropertySet;
+import FormView = api.form.FormView;
+import FormBuilder = api.form.FormBuilder;
+import PropertyTree = api.data.PropertyTree;
+import ApplicationKey = api.application.ApplicationKey;
+import Form = api.form.Form;
 import {SecurityFormContext} from './SecurityFormContext';
 import {IdProvider} from '../principal/IdProvider';
 
 export class IdProviderWizardStepForm
     extends api.app.wizard.WizardStepForm {
 
-    private formView: api.form.FormView;
+    private formView: FormView;
 
-    private propertySet: api.data.PropertySet;
+    private propertySet: PropertySet;
 
     constructor() {
         super();
@@ -16,6 +23,7 @@ export class IdProviderWizardStepForm
 
     layout(idProvider: IdProvider): wemQ.Promise<void> {
 
+        this.propertySet = this.createPropertySet(idProvider);
         this.formView = this.createFormView(idProvider);
 
         return this.formView.layout().then(() => {
@@ -34,16 +42,19 @@ export class IdProviderWizardStepForm
                 this.notifyValidityChanged(new api.app.wizard.WizardStepValidityChangedEvent(event.isValid()));
             });
 
-            let formViewValid = this.formView.isValid();
-            this.notifyValidityChanged(new api.app.wizard.WizardStepValidityChangedEvent(formViewValid));
+            this.notifyValidityChanged(new api.app.wizard.WizardStepValidityChangedEvent(this.formView.isValid()));
         });
     }
 
     getIdProviderConfig(): IdProviderConfig {
-        let idProviderConfigPropertySet = this.propertySet.getPropertySet('idProviderConfig');
+        const idProviderConfigPropertySet: PropertySet = this.propertySet.getPropertySet('idProviderConfig');
+
         if (idProviderConfigPropertySet) {
-            let applicationKey = api.application.ApplicationKey.fromString(idProviderConfigPropertySet.getString('applicationKey'));
-            let config = new api.data.PropertyTree(idProviderConfigPropertySet.getPropertySet('config'));
+            idProviderConfigPropertySet.removeEmptySets();
+            const applicationKey: ApplicationKey = ApplicationKey.fromString(idProviderConfigPropertySet.getString('applicationKey'));
+            const config: PropertyTree = new PropertyTree(idProviderConfigPropertySet.getPropertySet('config'));
+
+
             return IdProviderConfig.create().setApplicationKey(applicationKey).setConfig(config).build();
         }
 
@@ -54,40 +65,60 @@ export class IdProviderWizardStepForm
         return this.formView.validate(silent);
     }
 
-    private createFormView(idProvider?: IdProvider): api.form.FormView {
-        let isSystemIdProvider = (!!idProvider && idProvider.getKey().isSystem()).toString();
-        let formBuilder = new api.form.FormBuilder().
-            addFormItem(new api.form.InputBuilder().
-                setName('description').
-                setInputType(api.form.inputtype.text.TextLine.getName()).
-                setLabel(i18n('field.description')).
-                setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build()).
-                setInputTypeConfig({}).
-                setMaximizeUIInputWidth(true).
-                build()).addFormItem(new api.form.InputBuilder().setName('idProviderConfig').setInputType(
-            new api.form.InputTypeName('AuthApplicationSelector', false)).setLabel(i18n('field.application')).setOccurrences(
-            new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build()).setInputTypeConfig(
-            {readOnly: [{value: isSystemIdProvider}]}).
-                setMaximizeUIInputWidth(true).
-                build());
+    private createPropertySet(idProvider?: IdProvider): PropertySet {
+        const propertySet: PropertySet = new PropertyTree().getRoot();
 
-        this.propertySet = new api.data.PropertyTree().getRoot();
         if (idProvider) {
-            this.propertySet.addString('description', idProvider.getDescription());
-            let idProviderConfig = idProvider.getIdProviderConfig();
+            propertySet.addString('description', idProvider.getDescription());
+
+            const idProviderConfig: IdProviderConfig = idProvider.getIdProviderConfig();
             if (idProviderConfig) {
-                const idProviderConfigPropertySet = new api.data.PropertySet();
-                const applicationKey = idProviderConfig.getApplicationKey().toString();
-                const config = idProviderConfig.getConfig().getRoot();
+                const idProviderConfigPropertySet: PropertySet = new PropertySet();
+                const applicationKeyAsString: string = idProviderConfig.getApplicationKey().toString();
+                const config: PropertySet = idProviderConfig.getConfig().getRoot();
                 config.removeEmptySets();
-                idProviderConfigPropertySet.addString('applicationKey', applicationKey);
+                idProviderConfigPropertySet.addString('applicationKey', applicationKeyAsString);
                 idProviderConfigPropertySet.addPropertySet('config', config);
-                this.propertySet.addPropertySet('idProviderConfig', idProviderConfigPropertySet);
+                propertySet.addPropertySet('idProviderConfig', idProviderConfigPropertySet);
             }
         }
 
-        const context = SecurityFormContext.create().setIdProvider(idProvider).build();
-        return new api.form.FormView(context, formBuilder.build(), this.propertySet);
+        return propertySet;
+    }
+
+    private createFormView(idProvider?: IdProvider): FormView {
+        const form: Form = new FormBuilder()
+            .addFormItem(this.createDescriptionFormItem())
+            .addFormItem(this.createAuthAppSelectorFormItem(idProvider))
+            .build();
+
+        const context: SecurityFormContext = SecurityFormContext.create().setIdProvider(idProvider).build();
+
+        return new FormView(context, form, this.propertySet);
+    }
+
+    private createDescriptionFormItem(): FormItem {
+        return new api.form.InputBuilder()
+            .setName('description')
+            .setInputType(api.form.inputtype.text.TextLine.getName())
+            .setLabel(i18n('field.description'))
+            .setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build())
+            .setInputTypeConfig({})
+            .setMaximizeUIInputWidth(true)
+            .build();
+    }
+
+    private createAuthAppSelectorFormItem(idProvider?: IdProvider): FormItem {
+        const isSystemIdProvider: string = (!!idProvider && idProvider.getKey().isSystem()).toString();
+
+        return new api.form.InputBuilder()
+            .setName('idProviderConfig')
+            .setInputType(new api.form.InputTypeName('AuthApplicationSelector', false))
+            .setLabel(i18n('field.application'))
+            .setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build())
+            .setInputTypeConfig({readOnly: [{value: isSystemIdProvider}]})
+            .setMaximizeUIInputWidth(true)
+            .build();
     }
 
     getDescription(): string {
