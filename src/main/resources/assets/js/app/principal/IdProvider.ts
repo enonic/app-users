@@ -60,7 +60,7 @@ export class IdProvider
         return <IdProviderKey>super.getKey();
     }
 
-    equals(o: api.Equitable): boolean {
+    equals(o: api.Equitable, ignoreEmptyValues: boolean = false): boolean {
         if (!api.ObjectHelper.iFrameSafeInstanceOf(o, IdProvider)) {
             return false;
         }
@@ -69,7 +69,7 @@ export class IdProvider
 
         return super.equals(other) &&
                ((!this.idProviderConfig && !other.idProviderConfig) ||
-                (this.idProviderConfig && this.idProviderConfig.equals(other.idProviderConfig))) &&
+                (this.idProviderConfig && this.idProviderConfig.equals(other.idProviderConfig, ignoreEmptyValues))) &&
                this.permissions.equals(other.permissions);
     }
 
