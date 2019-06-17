@@ -16,6 +16,7 @@
     "autoprefixer": "^8.6.5",
     "browserslist": "^3.2.8",
     "browserslist-config-enonic": "^1.0.4",
+    "circular-dependency-plugin": "^4.2.1",
     "css-loader": "^2.1.1",
     "css-mqpacker": "^6.0.2",
     "cssnano": "^4.1.10",
