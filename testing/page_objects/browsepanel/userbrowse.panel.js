@@ -11,7 +11,7 @@ const xpath = {
     container: `//div[contains(@id,'UserBrowsePanel')]`,
     selectionToggler: `//button[contains(@id,'SelectionPanelToggler')]`,
     toolbar: `//div[contains(@id,'UserBrowseToolbar')]`,
-    grid: `//div[@class='grid-canvas']`,
+    grid: `//div[contains(@class,'grid-canvas')]`,
     searchButton: "//button[contains(@class, 'icon-search')]",
     hideFilterPanelButton: "//span[contains(@class, 'hide-filter-panel-button')]",
     appHomeButton: "//div[contains(@id,'TabbedAppBar')]/div[contains(@class,'home-button')]",
@@ -61,15 +61,12 @@ class UserBrowsePanel extends Page {
         return `//div[contains(@id,'PrincipalBrowseFilterPanel')]` + `${xpath.hideFilterPanelButton}`;
     }
 
-
     get editButton() {
-
         return `${xpath.toolbar}/*[contains(@id, 'ActionButton') and child::span[text()='Edit']]`;
     }
 
 
     get deleteButton() {
-
         return `${xpath.toolbar}/*[contains(@id, 'ActionButton') and child::span[text()='Delete']]`;
     }
 
@@ -323,5 +320,3 @@ class UserBrowsePanel extends Page {
     }
 }
 module.exports = UserBrowsePanel;
-
-
