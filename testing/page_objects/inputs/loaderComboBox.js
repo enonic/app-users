@@ -5,8 +5,9 @@ const Page = require('../page');
 const lib = require('../../libs/elements');
 const xpath = {
     container: `//div[contains(@id,'LoaderComboBox')]`,
-    optionDisplayName: "//div[@class='slick-viewport']" + `${lib.H6_DISPLAY_NAME}`,
+    optionDisplayName: "//div[contains(@class,'slick-viewport')]" + `${lib.H6_DISPLAY_NAME}`,
 };
+
 class LoaderComboBox extends Page {
 
     get optionsFilterInput() {
@@ -55,5 +56,3 @@ class LoaderComboBox extends Page {
     }
 };
 module.exports = LoaderComboBox;
-
-

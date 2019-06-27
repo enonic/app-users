@@ -5,13 +5,13 @@
 module.exports = Object.freeze({
     NAMES_VIEW_BY_NAME: "//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'%s')]]",
     NAMES_VIEW_BY_DISPLAY_NAME: "//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'%s')]]",
-    SLICK_ROW: "//div[@class='slick-viewport']//div[contains(@class,'slick-row')]",
-    SLICK_ROW_BY_NAME: "//div[@class='slick-viewport']//div[contains(@class,'slick-row') and descendant::p[contains(@class,'sub-name') and contains(.,'%s')]]",
+    SLICK_ROW: "//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row')]",
+    SLICK_ROW_BY_NAME: "//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::p[contains(@class,'sub-name') and contains(.,'%s')]]",
     H6_DISPLAY_NAME: "//div[contains(@id,'NamesView')]//h6[contains(@class,'main-name')]",
     TEXT_INPUT: "//input[contains(@id,'TextInput')]",
     DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
     slickRowByDisplayName: function (displayName) {
-        return `//div[@class='slick-viewport']//div[contains(@class,'slick-row') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
+        return `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
     itemByDisplayName: function (displayName) {
         return `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
@@ -33,5 +33,5 @@ module.exports = Object.freeze({
     },
     REMOVE_ICON: `//a[@class='remove']`,
     EDIT_ICON: `//a[@class='edit']`,
-    CHECKBOX:`//div[contains(@id,'api.ui.Checkbox')]`
+    CHECKBOX: `//div[contains(@id,'api.ui.Checkbox')]`
 });

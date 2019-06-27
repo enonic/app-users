@@ -2,7 +2,7 @@
  * Created on 20.09.2017.
  */
 const Page = require('../page');
-const elements = require('../../libs/elements');
+const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const LoaderComboBox = require('../inputs/loaderComboBox');
 
@@ -20,7 +20,7 @@ const XPATH = {
         return `//li[contains(@id,'ReportProgressItem') and descendant::span[contains(.,'${title}')]]`
     },
     repositoryBranchOption: function (name) {
-        return `//div[@class='slick-viewport']//div[contains(@class,'slick-cell') and child::div[contains(@id,'DefaultOptionDisplayValueViewer') and contains(.,'${name}')]]`
+        return `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell') and child::div[contains(@id,'DefaultOptionDisplayValueViewer') and contains(.,'${name}')]]`
     },
     selectedOptionByRepoName: function (name) {
         return `//div[contains(@id,'ReportSelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${name}')]]`
@@ -95,7 +95,7 @@ class UserItemStatisticsPanel extends Page {
 
     //clicks on dropDown handle and selects draft/master
     clickOnDropDownHandleAndSelectBranch(optionName) {
-        let dropDownHandle = XPATH.reportSelectedOptionsView + elements.DROP_DOWN_HANDLE;
+        let dropDownHandle = XPATH.reportSelectedOptionsView + lib.DROP_DOWN_HANDLE;
         return this.waitForElementDisplayed(dropDownHandle).catch(err => {
             this.saveScreenshot('err_report_dropdown_handle');
             throw new Error('Report Selected Option, dropDown handle was not found!');
@@ -125,4 +125,3 @@ class UserItemStatisticsPanel extends Page {
     }
 };
 module.exports = UserItemStatisticsPanel;
-
