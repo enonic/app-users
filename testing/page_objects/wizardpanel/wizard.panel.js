@@ -26,7 +26,6 @@ class WizardPanel extends Page {
 
     waitForSaveButtonEnabled() {
         return this.waitForElementEnabled(this.saveButton, appConst.TIMEOUT_3).catch(err => {
-            console.log(err);
             this.saveScreenshot("err_save_button");
             throw new Error(err);
         })
@@ -68,7 +67,6 @@ class WizardPanel extends Page {
 
     clickOnDeleteButton() {
         return this.clickOnElement(this.deleteButton).catch(err => {
-            console.log(err);
             this.saveScreenshot('err_delete_wizard');
             throw new Error('Error when Delete button has been clicked ' + err);
         });
@@ -117,6 +115,7 @@ class WizardPanel extends Page {
             }
             if (status.os.name.toLowerCase().includes('mac')) {
                 return this.getBrowser().keys(['Command', 's']);
+
             }
         })
     }

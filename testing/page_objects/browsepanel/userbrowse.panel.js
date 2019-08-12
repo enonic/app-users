@@ -97,7 +97,7 @@ class UserBrowsePanel extends Page {
 
     isItemDisplayed(itemName) {
         return this.waitForElementDisplayed(`${xpath.rowByName(itemName)}`, appConst.TIMEOUT_2).catch(err => {
-            console.log("item is not displayed:" + itemName);
+            console.log("item is not displayed:" + itemName+ +" "+err);
             return false;
         });
     }

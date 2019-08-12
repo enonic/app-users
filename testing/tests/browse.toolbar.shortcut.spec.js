@@ -58,12 +58,6 @@ describe('User Browse panel, toolbar shortcut spec', function () {
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
-        return console.log('specification starting: ' + this.title);
+        return console.log('specification is starting: ' + this.title);
     });
 });
-
-
-
-
-
-
