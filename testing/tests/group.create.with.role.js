@@ -14,7 +14,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
 
-describe('group.greate.with.role Create a Group with a just created new Role', function () {
+describe('group.create.with.role Create a Group with a just created new Role', function () {
     this.timeout(70000);
     webDriverHelper.setupBrowser();
     let testRole;
@@ -53,6 +53,6 @@ describe('group.greate.with.role Create a Group with a just created new Role', f
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
-        return console.log('specification starting: ' + this.title);
+        return console.log('specification is starting: ' + this.title);
     });
 });

@@ -18,44 +18,42 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
     webDriverHelper.setupBrowser();
     let groupWithRoleAndMember;
     let testGroup;
-    it('GIVEN `Group` wizard is opened WHEN name, member and roles has been typed AND `Save` button pressed THEN message `Group was created` should appear',
-        () => {
+
+    it('GIVEN `Group` wizard is opened WHEN name, member and roles have been typed AND `Save` button pressed THEN message `Group was created` should appear',
+        async () => {
             let groupName = userItemsBuilder.generateRandomName('group');
             groupWithRoleAndMember = userItemsBuilder.buildGroup(groupName, 'test group', ['Super User'], ['Users App']);
             let groupWizard = new GroupWizard();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.typeData(groupWithRoleAndMember);
-            }).then(() => {
-                return groupWizard.waitAndClickOnSave();
-            }).then(() => {
-                return groupWizard.waitForNotificationMessage();
-            }).then(result => {
-                testUtils.saveScreenshot("group_is_saved");
-                expect(result).to.equal(appConst.GROUP_WAS_CREATED);
-            })
-        });
+            //1. Open new Group-wizard, type the data:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            await groupWizard.typeData(groupWithRoleAndMember);
+            //2. click on Save button
+            await groupWizard.waitAndClickOnSave();
+            // 3. wait for the notification message:
+            let message = await groupWizard.waitForNotificationMessage();
+            testUtils.saveScreenshot("group_is_saved");
+            assert.equal(message, appConst.GROUP_WAS_CREATED, "Expected notification message should appear");
+        })
 
-    it('WHEN existing group is opened THEN description, role and members should be present',
-        () => {
+    it('WHEN existing group is opened THEN expected description, role and members should be present',
+        async () => {
             let groupWizard = new GroupWizard();
-            let userBrowsePanel = new  UserBrowsePanel();
-            return testUtils.findAndSelectItem(groupWithRoleAndMember.displayName).then(() => {
-                return userBrowsePanel.clickOnEditButton();
-            }).then(() => {
-                return groupWizard.waitForOpened();
-            }).then(() => {
-                return expect(groupWizard.getDescription()).to.eventually.be.equal(groupWithRoleAndMember.description);
-            }).then(() => {
-                return groupWizard.getRoles();
-            }).then(roles => {
-                expect(roles[0]).to.equal(appConst.roles.USERS_APP);
-            })
+            let userBrowsePanel = new UserBrowsePanel();
+            //1. Open existing group:
+            await testUtils.findAndSelectItem(groupWithRoleAndMember.displayName);
+            await userBrowsePanel.clickOnEditButton();
+            await groupWizard.waitForOpened();
+            //2. Expected description and roles should be present in the wizard:
+            let description = await groupWizard.getDescription();
+            assert.equal(description, groupWithRoleAndMember.description, "Expected description should be present in the wizard");
+            let roles = await groupWizard.getRoles();
+            assert.equal(roles[0], appConst.roles.USERS_APP, "Expected roles should be present");
         });
 
     it('GIVEN `Group` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN Group should be searchable',
         () => {
             let groupWizard = new GroupWizard();
-            let userBrowsePanel = new  UserBrowsePanel();
+            let userBrowsePanel = new UserBrowsePanel();
             let groupName = userItemsBuilder.generateRandomName('group');
             testGroup = userItemsBuilder.buildGroup(groupName, 'test group', null, null);
             return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
@@ -76,7 +74,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
     it(`GIVEN existing 'group'(has no roles) is opened WHEN 'Users App' role has been added THEN the role should be visible on the wizard page`,
         () => {
             let groupWizard = new GroupWizard();
-            let userBrowsePanel = new  UserBrowsePanel();
+            let userBrowsePanel = new UserBrowsePanel();
             return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
                 return userBrowsePanel.clickOnEditButton();
             }).then(() => {
@@ -95,7 +93,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
 
     it(`GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be present on the wizard page`, () => {
         let groupWizard = new GroupWizard();
-        let userBrowsePanel = new  UserBrowsePanel();
+        let userBrowsePanel = new UserBrowsePanel();
         return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
             return userBrowsePanel.clickOnEditButton();
         }).then(() => {
@@ -104,7 +102,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             return groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
         }).then(() => {
             return groupWizard.waitAndClickOnSave();
-        }).then(()=>{
+        }).then(() => {
             return groupWizard.pause(1000);
         }).then(() => {
             return groupWizard.getMembers();
@@ -152,6 +150,6 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
-        return console.log('specification starting: ' + this.title);
+        return console.log('specification is starting: ' + this.title);
     });
 });

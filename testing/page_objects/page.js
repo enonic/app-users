@@ -53,7 +53,6 @@ class Page {
 
     async typeTextInInput(selector, text) {
         let inputElement = await this.findElement(selector);
-
         await inputElement.setValue(text);
         let value = await inputElement.getValue();
         //workaround for issue in WebdriverIO
@@ -68,13 +67,11 @@ class Page {
         return await inputElement.getValue(selector);
     }
 
-
     async clearInputText(selector) {
         let inputElement = await this.findElement(selector);
         await inputElement.waitForDisplayed(1000);
         await inputElement.clearValue();
         return await inputElement.pause(300);
-
     }
 
     saveScreenshot(name) {
@@ -141,12 +138,13 @@ class Page {
         return element.getAttribute(attributeName);
     }
 
-    waitForNotificationMessage() {
-        return this.waitForElementDisplayed(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3).catch(err => {
-            throw new Error('Error when wait for notification message: ' + err);
-        }).then(() => {
-            return this.getText(`//div[@class='notification-content']/span`);
-        })
+    async waitForNotificationMessage() {
+        try {
+            await this.waitForElementDisplayed(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3);
+            return await this.getText(`//div[@class='notification-content']/span`);
+        } catch (err) {
+            throw new Error('Error when wait for the notification message: ' + err);
+        }
     }
 
     waitForExpectedNotificationMessage(expectedMessage) {
@@ -168,7 +166,6 @@ class Page {
         let el = await this.findElement(selector);
         await el.moveTo();
         return await this.browser.positionClick(2);
-
     };
 }
 module.exports = Page;

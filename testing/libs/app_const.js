@@ -25,6 +25,7 @@ module.exports = Object.freeze({
     USER_WIZARD_EMAIL_MESSAGE: 'Email can not be empty.',
     USER_WIZARD_EMAIL_IS_INVALID: 'Email is invalid.',
     USER_WAS_CREATED_MESSAGE: 'User was created',
+    ROLE_WAS_CREATED_MESSAGE: 'Role was created',
     GROUP_WAS_CREATED: 'Group was created',
     PROVIDER_CREATED_NOTIFICATION: 'Id provider was created',
     STANDARD_ID_PROVIDER: 'Standard ID Provider',

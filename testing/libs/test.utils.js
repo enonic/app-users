@@ -34,12 +34,11 @@ module.exports = {
             return browsePanel.pause(800);
         });
     },
-    openFilterPanel() {
+    async openFilterPanel() {
         let filterPanel = new FilterPanel();
         let browsePanel = new UserBrowsePanel();
-        return browsePanel.clickOnSearchButton().then(() => {
-            return filterPanel.waitForOpened();
-        })
+        await browsePanel.clickOnSearchButton();
+        return await filterPanel.waitForOpened();
     },
     typeNameInFilterPanel(name) {
         let browsePanel = new UserBrowsePanel();
@@ -59,20 +58,15 @@ module.exports = {
             return browsePanel.waitForSpinnerNotVisible();
         });
     },
-    selectAndDeleteItem: function (name) {
+    async selectAndDeleteItem(name) {
         let browsePanel = new UserBrowsePanel();
         let confirmationDialog = new ConfirmationDialog();
-        return this.findAndSelectItem(name).then(() => {
-            return browsePanel.waitForDeleteButtonEnabled();
-        }).then(result => {
-            return browsePanel.clickOnDeleteButton();
-        }).then(() => {
-            return confirmationDialog.waitForDialogLoaded();
-        }).then(result => {
-            return confirmationDialog.clickOnYesButton();
-        }).then(() => {
-            return browsePanel.waitForSpinnerNotVisible();
-        })
+        await this.findAndSelectItem(name);
+        await browsePanel.waitForDeleteButtonEnabled();
+        await browsePanel.clickOnDeleteButton();
+        await confirmationDialog.waitForDialogLoaded();
+        await confirmationDialog.clickOnYesButton();
+        return await browsePanel.waitForSpinnerNotVisible();
     },
     confirmDelete: function () {
         let confirmationDialog = new ConfirmationDialog();
@@ -127,7 +121,6 @@ module.exports = {
     },
 
     doSwitchToHome: function () {
-        console.log('testUtils:switching to Home page...');
         return webDriverHelper.browser.switchWindow("Enonic XP Home").then(() => {
             console.log("switched to Home...");
         }).then(() => {
@@ -139,7 +132,6 @@ module.exports = {
         return webDriverHelper.browser.switchWindow(handle).then(() => {
             return webDriverHelper.browser.getTitle().then(title => {
                 return title == reqTitle;
-
             })
         });
     },
@@ -152,18 +144,15 @@ module.exports = {
             return this.doSwitchToHome();
         });
     },
-    selectUserAndOpenWizard(displayName) {
+    async selectUserAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
         let userWizard = new UserWizard();
-        return this.findAndSelectItem(displayName).then(() => {
-            return browsePanel.waitForEditButtonEnabled();
-        }).then(() => {
-            return browsePanel.clickOnEditButton();
-        }).then(() => {
-            return userWizard.waitForOpened();
-        }).then(() => {
-            return userWizard.pause(500);
-        })
+        await this.findAndSelectItem(displayName);
+        await browsePanel.waitForEditButtonEnabled();
+        await browsePanel.clickOnEditButton();
+        await userWizard.waitForOpened();
+        return await userWizard.pause(500);
+
     },
     openWizardAndSaveGroup: function (group) {
         let groupWizard = new GroupWizard();
@@ -221,19 +210,15 @@ module.exports = {
             return roleWizard.waitForLoaded();
         });
     },
-    clickOnSystemOpenUserWizard: function () {
+    async clickOnSystemOpenUserWizard() {
         let browsePanel = new UserBrowsePanel();
         let userWizard = new UserWizard();
         let newPrincipalDialog = new NewPrincipalDialog();
-        return browsePanel.clickOnRowByName('system').then(() => {
-            return browsePanel.waitForNewButtonEnabled();
-        }).then(() => {
-            return browsePanel.clickOnNewButton();
-        }).then(() => {
-            return newPrincipalDialog.clickOnItem('User');
-        }).then(() => {
-            return userWizard.waitForOpened();
-        });
+        await browsePanel.clickOnRowByName('system');
+        await browsePanel.waitForNewButtonEnabled();
+        await browsePanel.clickOnNewButton();
+        await newPrincipalDialog.clickOnItem('User');
+        return await userWizard.waitForOpened();
     },
     selectSystemIdProviderAndOpenWizard: function () {
         let browsePanel = new UserBrowsePanel();
@@ -246,33 +231,29 @@ module.exports = {
             return idProviderWizard.waitForOpened();
         });
     },
-    selectRoleAndOpenWizard: function (displayName) {
+    async selectRoleAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
         let roleWizard = new RoleWizard();
-        return this.findAndSelectItem(displayName).then(() => {
-            return browsePanel.waitForEditButtonEnabled();
-        }).then(result => {
-            if (!result) {
-                throw new Error('`Edit` button is disabled!');
-            }
-            return browsePanel.clickOnEditButton();
-        }).then(() => {
-            return roleWizard.waitForLoaded();
-        })
+        try {
+            await this.findAndSelectItem(displayName);
+            await browsePanel.waitForEditButtonEnabled();
+            await browsePanel.clickOnEditButton();
+            return await roleWizard.waitForLoaded();
+        } catch (err) {
+            throw new Error("Error when open the role: " + err);
+        }
     },
-    selectGroupAndOpenWizard: function (displayName) {
+    async selectGroupAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
         let groupWizard = new GroupWizard();
-        return this.findAndSelectItem(displayName).then(() => {
-            return browsePanel.waitForEditButtonEnabled();
-        }).then(result => {
-            if (!result) {
-                throw new Error('`Edit` button is disabled!');
-            }
-            return browsePanel.clickOnEditButton();
-        }).then(() => {
-            return groupWizard.waitForOpened();
-        })
+        try {
+            await this.findAndSelectItem(displayName);
+            await browsePanel.waitForEditButtonEnabled();
+            await browsePanel.clickOnEditButton();
+            return await groupWizard.waitForOpened();
+        } catch (err) {
+            throw new Error("Error when open the group: " + err);
+        }
     },
     openWizardAndSaveIdProvider: function (idProviderData) {
         let idProviderWizard = new IdProviderWizard();
@@ -283,23 +264,17 @@ module.exports = {
         }).then(() => {
             return idProviderWizard.waitAndClickOnSave();
         }).then(() => {
-            //return idProviderWizard.waitForSpinnerVisible();
-        }).then(() => {
             return idProviderWizard.waitForSpinnerNotVisible();
         });
     },
-    openIdProviderWizard: function () {
+    async openIdProviderWizard() {
         let browsePanel = new UserBrowsePanel();
         let newPrincipalDialog = new NewPrincipalDialog();
         let idProviderWizard = new IdProviderWizard();
-        return browsePanel.clickOnNewButton().then(() => {
-            return newPrincipalDialog.waitForDialogLoaded();
-        }).then(() => {
-            return newPrincipalDialog.clickOnItem(appConst.ID_PROVIDER);
-        }).then(() => {
-                return idProviderWizard.waitForOpened();
-            }
-        );
+        await browsePanel.clickOnNewButton();
+        await newPrincipalDialog.waitForDialogLoaded();
+        await newPrincipalDialog.clickOnItem(appConst.ID_PROVIDER);
+        return await idProviderWizard.waitForOpened();
     },
 
     addSystemUser: function (userData) {
@@ -310,19 +285,15 @@ module.exports = {
             })
         })
     },
-    clickOnIdProviderAndOpenUserWizard: function (storeName) {
+    async clickOnIdProviderAndOpenUserWizard(storeName) {
         let browsePanel = new UserBrowsePanel();
         let newPrincipalDialog = new NewPrincipalDialog();
         let userWizard = new UserWizard();
-        return browsePanel.clickOnRowByName(storeName).then(() => {
-            return browsePanel.waitForNewButtonEnabled();
-        }).then(() => {
-            return browsePanel.clickOnNewButton();
-        }).then(() => {
-            return newPrincipalDialog.clickOnItem('User');
-        }).then(() => {
-            return userWizard.waitForOpened();
-        });
+        await browsePanel.clickOnRowByName(storeName);
+        await browsePanel.waitForNewButtonEnabled();
+        await browsePanel.clickOnNewButton();
+        await newPrincipalDialog.clickOnItem('User');
+        return await userWizard.waitForOpened();
     },
     saveScreenshot: function (name) {
         let path = require('path')
