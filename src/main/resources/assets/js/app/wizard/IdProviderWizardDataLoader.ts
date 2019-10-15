@@ -1,6 +1,7 @@
+import * as Q from 'q';
 import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
-import {GetIdProviderByKeyRequest} from '../../api/graphql/idprovider/GetIdProviderByKeyRequest';
-import {GetDefaultIdProviderRequest} from '../../api/graphql/idprovider/GetDefaultIdProviderRequest';
+import {GetIdProviderByKeyRequest} from '../../graphql/idprovider/GetIdProviderByKeyRequest';
+import {GetDefaultIdProviderRequest} from '../../graphql/idprovider/GetDefaultIdProviderRequest';
 import {IdProvider} from '../principal/IdProvider';
 
 export class IdProviderWizardDataLoader {
@@ -9,7 +10,7 @@ export class IdProviderWizardDataLoader {
 
     defaultIdProvider: IdProvider;
 
-    loadData(params: IdProviderWizardPanelParams): wemQ.Promise<IdProviderWizardDataLoader> {
+    loadData(params: IdProviderWizardPanelParams): Q.Promise<IdProviderWizardDataLoader> {
         if (!params.persistedItem && !params.idProviderKey) {
             return this.loadDataForNew();
         } else {
@@ -17,7 +18,7 @@ export class IdProviderWizardDataLoader {
         }
     }
 
-    loadDataForEdit(params: IdProviderWizardPanelParams): wemQ.Promise<IdProviderWizardDataLoader> {
+    loadDataForEdit(params: IdProviderWizardPanelParams): Q.Promise<IdProviderWizardDataLoader> {
 
         return this.loadDataForNew().then((loader) => {
 
@@ -30,7 +31,7 @@ export class IdProviderWizardDataLoader {
         });
     }
 
-    private loadDataForNew(): wemQ.Promise<IdProviderWizardDataLoader> {
+    private loadDataForNew(): Q.Promise<IdProviderWizardDataLoader> {
 
         return this.loadDefaultIdProvider().then((defaultIdProvider: IdProvider) => {
 
@@ -40,15 +41,15 @@ export class IdProviderWizardDataLoader {
         });
     }
 
-    private loadIdProviderToEdit(params: IdProviderWizardPanelParams): wemQ.Promise<IdProvider> {
+    private loadIdProviderToEdit(params: IdProviderWizardPanelParams): Q.Promise<IdProvider> {
         if (!params.persistedItem && !!params.idProviderKey) {
             return new GetIdProviderByKeyRequest(params.idProviderKey).sendAndParse();
         } else {
-            return wemQ(params.persistedItem);
+            return Q(params.persistedItem);
         }
     }
 
-    private loadDefaultIdProvider(): wemQ.Promise<IdProvider> {
+    private loadDefaultIdProvider(): Q.Promise<IdProvider> {
         return new GetDefaultIdProviderRequest().sendAndParse();
     }
 

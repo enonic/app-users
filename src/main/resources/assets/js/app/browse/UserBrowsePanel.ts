@@ -7,14 +7,16 @@ import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
 import {IdProvider} from '../principal/IdProvider';
-import TreeNode = api.ui.treegrid.TreeNode;
-import BrowseItem = api.app.browse.BrowseItem;
-import PrincipalType = api.security.PrincipalType;
-import Principal = api.security.Principal;
-import i18n = api.util.i18n;
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 export class UserBrowsePanel
-    extends api.app.browse.BrowsePanel<UserTreeGridItem> {
+    extends BrowsePanel<UserTreeGridItem> {
 
     protected treeGrid: UserItemsTreeGrid;
 
@@ -23,7 +25,7 @@ export class UserBrowsePanel
 
         this.bindServerEventListeners();
 
-        const changeSelectionStatus = api.util.AppHelper.debounce((selection: TreeNode<UserTreeGridItem>[]) => {
+        const changeSelectionStatus = AppHelper.debounce((selection: TreeNode<UserTreeGridItem>[]) => {
             const singleSelection = selection.length === 1;
             const newAction = this.treeGrid.getTreeGridActions().NEW;
 

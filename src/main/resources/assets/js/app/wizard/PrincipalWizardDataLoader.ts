@@ -1,13 +1,13 @@
-import '../../api.ts';
+import * as Q from 'q';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
-import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
-import Principal = api.security.Principal;
+import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
+import {Principal} from 'lib-admin-ui/security/Principal';
 
 export class PrincipalWizardDataLoader {
 
     principal: Principal;
 
-    loadData(params: PrincipalWizardPanelParams): wemQ.Promise<PrincipalWizardDataLoader> {
+    loadData(params: PrincipalWizardPanelParams): Q.Promise<PrincipalWizardDataLoader> {
 
         if (!params.persistedItem && !params.principalKey) {
             return this.loadDataForNew(params);
@@ -18,12 +18,12 @@ export class PrincipalWizardDataLoader {
         }
     }
 
-    private loadDataForNew(params: PrincipalWizardPanelParams): wemQ.Promise<PrincipalWizardDataLoader> {
+    private loadDataForNew(params: PrincipalWizardPanelParams): Q.Promise<PrincipalWizardDataLoader> {
 
-        return wemQ(this);
+        return Q(this);
     }
 
-    private loadDataForEdit(params: PrincipalWizardPanelParams): wemQ.Promise<PrincipalWizardDataLoader> {
+    private loadDataForEdit(params: PrincipalWizardPanelParams): Q.Promise<PrincipalWizardDataLoader> {
 
         return this.loadDataForNew(params).then(() => {
 
@@ -36,11 +36,11 @@ export class PrincipalWizardDataLoader {
         });
     }
 
-    private loadPrincipalToEdit(params: PrincipalWizardPanelParams): wemQ.Promise<Principal> {
+    private loadPrincipalToEdit(params: PrincipalWizardPanelParams): Q.Promise<Principal> {
         if (!params.persistedItem && !!params.principalKey) {
             return new GetPrincipalByKeyRequest(params.principalKey).setIncludeMemberships(true).sendAndParse();
         } else {
-            return wemQ(params.persistedItem);
+            return Q(params.persistedItem);
         }
 
     }

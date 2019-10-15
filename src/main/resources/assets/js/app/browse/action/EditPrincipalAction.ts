@@ -1,10 +1,8 @@
-import '../../../api.ts';
 import {EditPrincipalEvent} from '../EditPrincipalEvent';
 import {UserTreeGridItem} from '../UserTreeGridItem';
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
-
-import Action = api.ui.Action;
-import i18n = api.util.i18n;
+import {Action} from 'lib-admin-ui/ui/Action';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 export class EditPrincipalAction extends Action {
 

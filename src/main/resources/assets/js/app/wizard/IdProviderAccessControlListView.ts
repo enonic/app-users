@@ -1,8 +1,9 @@
 import {IdProviderAccessControlEntryView} from './IdProviderAccessControlEntryView';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
+import {ListBox} from 'lib-admin-ui/ui/selector/list/ListBox';
 
 export class IdProviderAccessControlListView
-    extends api.ui.selector.list.ListBox<IdProviderAccessControlEntry> {
+    extends ListBox<IdProviderAccessControlEntry> {
 
     private itemValueChangedListeners: { (item: IdProviderAccessControlEntry): void }[] = [];
     private itemsEditable: boolean = true;

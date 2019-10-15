@@ -3,8 +3,10 @@ import {IdProvider} from '../principal/IdProvider';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
+import {NamesAndIconViewer} from 'lib-admin-ui/ui/NamesAndIconViewer';
 
-export class UserTypesTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTypeTreeGridItem> {
+export class UserTypesTreeGridItemViewer
+    extends NamesAndIconViewer<UserTypeTreeGridItem> {
 
     private rootViewer: boolean;
 

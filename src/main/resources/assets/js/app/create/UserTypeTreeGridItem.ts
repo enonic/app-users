@@ -1,8 +1,11 @@
-import UserItem = api.security.UserItem;
+import {UserItem} from 'lib-admin-ui/security/UserItem';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
-export class UserTypeTreeGridItem implements api.Equitable {
+export class UserTypeTreeGridItem
+    implements Equitable {
 
     private userItem: UserItem;
 
@@ -22,8 +25,8 @@ export class UserTypeTreeGridItem implements api.Equitable {
         return this.userItem instanceof User || this.userItem instanceof Group;
     }
 
-    equals(o: api.Equitable): boolean {
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, UserTypeTreeGridItem)) {
+    equals(o: Equitable): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, UserTypeTreeGridItem)) {
             return false;
         }
 

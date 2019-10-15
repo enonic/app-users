@@ -1,8 +1,10 @@
-import EventJson = api.event.EventJson;
+import {EventJson} from 'lib-admin-ui/event/EventJson';
 import {ReportServerEvent} from './ReportServerEvent';
+import {ServerEventsListener} from 'lib-admin-ui/event/ServerEventsListener';
+import {NodeEventJson} from 'lib-admin-ui/event/NodeServerEvent';
 
 export class UsersServerEventsListener
-    extends api.event.ServerEventsListener {
+    extends ServerEventsListener {
 
     protected onUnknownServerEvent(eventJson: EventJson) {
         const eventType: string = eventJson.type;
@@ -11,8 +13,8 @@ export class UsersServerEventsListener
             return;
         }
 
-        if (ReportServerEvent.is(<api.event.NodeEventJson>eventJson)) {
-            const event: ReportServerEvent = ReportServerEvent.fromJson(<api.event.NodeEventJson>eventJson);
+        if (ReportServerEvent.is(<NodeEventJson>eventJson)) {
+            const event: ReportServerEvent = ReportServerEvent.fromJson(<NodeEventJson>eventJson);
             this.fireEvent(event);
         }
     }

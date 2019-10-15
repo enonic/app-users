@@ -1,11 +1,11 @@
-import Application = api.application.Application;
-import ApplicationKey = api.application.ApplicationKey;
-import FormView = api.form.FormView;
-import Option = api.ui.selector.Option;
-import SelectedOption = api.ui.selector.combobox.SelectedOption;
-import BaseSelectedOptionsView = api.ui.selector.combobox.BaseSelectedOptionsView;
-import ApplicationConfigProvider = api.form.inputtype.appconfig.ApplicationConfigProvider;
-import FormContext = api.form.FormContext;
+import {Application} from 'lib-admin-ui/application/Application';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {FormView} from 'lib-admin-ui/form/FormView';
+import {Option} from 'lib-admin-ui/ui/selector/Option';
+import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
+import {BaseSelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
+import {ApplicationConfigProvider} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
+import {FormContext} from 'lib-admin-ui/form/FormContext';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 
 export class AuthApplicationSelectedOptionsView
@@ -60,7 +60,7 @@ export class AuthApplicationSelectedOptionsView
         return new SelectedOption<Application>(optionView, this.count());
     }
 
-    removeOption(optionToRemove: api.ui.selector.Option<Application>, silent: boolean = false) {
+    removeOption(optionToRemove: Option<Application>, silent: boolean = false) {
         this.items =
             this.items.filter(item => !item.getSiteConfig().getApplicationKey().equals(optionToRemove.displayValue.getApplicationKey()));
         super.removeOption(optionToRemove, silent);

@@ -1,29 +1,31 @@
-import Application = api.application.Application;
-import ApplicationKey = api.application.ApplicationKey;
-import ApplicationViewer = api.application.ApplicationViewer;
-import FormView = api.form.FormView;
-import SelectedOption = api.ui.selector.combobox.SelectedOption;
-import ApplicationConfigProvider = api.form.inputtype.appconfig.ApplicationConfigProvider;
-import FormContext = api.form.FormContext;
+import {Application} from 'lib-admin-ui/application/Application';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {ApplicationViewer} from 'lib-admin-ui/application/ApplicationViewer';
+import {FormView} from 'lib-admin-ui/form/FormView';
+import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
+import {ApplicationConfigProvider} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
+import {FormContext} from 'lib-admin-ui/form/FormContext';
 import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
+import {RichComboBox, RichComboBoxBuilder} from 'lib-admin-ui/ui/selector/combobox/RichComboBox';
+import {AuthApplicationLoader} from 'lib-admin-ui/security/auth/AuthApplicationLoader';
 
 export class AuthApplicationComboBox
-    extends api.ui.selector.combobox.RichComboBox<Application> {
+    extends RichComboBox<Application> {
 
     private authApplicationSelectedOptionsView: AuthApplicationSelectedOptionsView;
 
     constructor(maxOccurrences: number, applicationConfigProvider: ApplicationConfigProvider,
                 formContext: FormContext, value: string, readOnly: boolean) {
 
-        let builder = new api.ui.selector.combobox.RichComboBoxBuilder<Application>();
+        let builder = new RichComboBoxBuilder<Application>();
         // tslint:disable-next-line:max-line-length
         const view: AuthApplicationSelectedOptionsView = new AuthApplicationSelectedOptionsView(applicationConfigProvider, formContext,
             readOnly);
         builder.setMaximumOccurrences(maxOccurrences)
             .setIdentifierMethod('getApplicationKey')
             .setComboBoxName('applicationSelector')
-            .setLoader(new api.security.auth.AuthApplicationLoader())
+            .setLoader(new AuthApplicationLoader())
             .setSelectedOptionsView(view)
             .setOptionDisplayValueViewer(new ApplicationViewer())
             .setValue(value)

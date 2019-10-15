@@ -1,7 +1,9 @@
-import '../../api.ts';
-import Principal = api.security.Principal;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {Event} from 'lib-admin-ui/event/Event';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
 
-export class PrincipalSynchronizedEvent extends api.event.Event {
+export class PrincipalSynchronizedEvent
+    extends Event {
 
     private principal: Principal;
 
@@ -16,10 +18,10 @@ export class PrincipalSynchronizedEvent extends api.event.Event {
     }
 
     static on(handler: (event: PrincipalSynchronizedEvent) => void) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: PrincipalSynchronizedEvent) => void) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

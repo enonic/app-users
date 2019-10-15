@@ -1,7 +1,8 @@
-import '../../api.ts';
 import {UserTreeGridActions} from './UserTreeGridActions';
+import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 
-export class UserBrowseToolbar extends api.ui.toolbar.Toolbar {
+export class UserBrowseToolbar
+    extends Toolbar {
 
     constructor(actions: UserTreeGridActions) {
         super();

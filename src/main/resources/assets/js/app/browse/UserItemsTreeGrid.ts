@@ -1,25 +1,28 @@
+import * as Q from 'q';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {UserTreeGridActions} from './UserTreeGridActions';
 import {EditPrincipalEvent} from './EditPrincipalEvent';
 import {UserItemsRowFormatter} from './UserItemsRowFormatter';
-import {ListIdProvidersRequest} from '../../api/graphql/idprovider/ListIdProvidersRequest';
-import {ListPrincipalsRequest} from '../../api/graphql/principal/ListPrincipalsRequest';
+import {ListIdProvidersRequest} from '../../graphql/idprovider/ListIdProvidersRequest';
+import {ListPrincipalsRequest} from '../../graphql/principal/ListPrincipalsRequest';
 import {PrincipalBrowseSearchData} from './filter/PrincipalBrowseSearchData';
 import {UserItemType} from './UserItemType';
-import {ListUserItemsRequest} from '../../api/graphql/principal/ListUserItemsRequest';
+import {ListUserItemsRequest} from '../../graphql/principal/ListUserItemsRequest';
 import {IdProvider} from '../principal/IdProvider';
-import TreeGrid = api.ui.treegrid.TreeGrid;
-import TreeNode = api.ui.treegrid.TreeNode;
-import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
-import TreeGridContextMenu = api.ui.treegrid.TreeGridContextMenu;
-import Principal = api.security.Principal;
-import PrincipalType = api.security.PrincipalType;
-import BrowseFilterResetEvent = api.app.browse.filter.BrowseFilterResetEvent;
-import BrowseFilterSearchEvent = api.app.browse.filter.BrowseFilterSearchEvent;
-import ResponsiveRanges = api.ui.responsive.ResponsiveRanges;
-import UserItem = api.security.UserItem;
-import i18n = api.util.i18n;
-import IdProviderKey = api.security.IdProviderKey;
+import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
+import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {BrowseFilterResetEvent} from 'lib-admin-ui/app/browse/filter/BrowseFilterResetEvent';
+import {BrowseFilterSearchEvent} from 'lib-admin-ui/app/browse/filter/BrowseFilterSearchEvent';
+import {ResponsiveRanges} from 'lib-admin-ui/ui/responsive/ResponsiveRanges';
+import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {Body} from 'lib-admin-ui/dom/Body';
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -42,7 +45,7 @@ export class UserItemsTreeGrid
         const [nameColumn] = columns;
 
         const updateColumns = () => {
-            let checkSelIsMoved = ResponsiveRanges._540_720.isFitOrSmaller(api.dom.Body.get().getEl().getWidth());
+            let checkSelIsMoved = ResponsiveRanges._540_720.isFitOrSmaller(Body.get().getEl().getWidth());
 
             const curClass = nameColumn.getCssClass();
 
@@ -170,12 +173,12 @@ export class UserItemsTreeGrid
         }
     }
 
-    fetchChildren(parentNode?: TreeNode<UserTreeGridItem>): wemQ.Promise<UserTreeGridItem[]> {
+    fetchChildren(parentNode?: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
         let gridItems: UserTreeGridItem[] = [];
 
         parentNode = parentNode || this.getRoot().getCurrentRoot();
 
-        let deferred = wemQ.defer<UserTreeGridItem[]>();
+        let deferred = Q.defer<UserTreeGridItem[]>();
         let level = parentNode ? parentNode.calcLevel() : 0;
 
         // Creating a role with parent node pointing to another role may cause fetching to fail
@@ -195,7 +198,7 @@ export class UserItemsTreeGrid
                     .then((result) => {
                         deferred.resolve(result.userItems.map(item => new UserTreeGridItemBuilder().setAny(item).build()));
                     })
-                    .catch(api.DefaultErrorHandler.handle)
+                    .catch(DefaultErrorHandler.handle)
                     .done();
             } else {
                 // at root level, fetch id providers, and add 'Roles' folder
@@ -210,7 +213,7 @@ export class UserItemsTreeGrid
 
                         deferred.resolve(gridItems);
                     })
-                    .catch(api.DefaultErrorHandler.handle)
+                    .catch(DefaultErrorHandler.handle)
                     .done();
             }
 
@@ -263,7 +266,7 @@ export class UserItemsTreeGrid
         return item.hasChildren();
     }
 
-    private loadParentNode(principal: Principal, idProvider: IdProvider): wemQ.Promise<TreeNode<UserTreeGridItem>> {
+    private loadParentNode(principal: Principal, idProvider: IdProvider): Q.Promise<TreeNode<UserTreeGridItem>> {
         const rootNode = this.isFiltered() ? this.getRoot().getFilteredRoot() : this.getRoot().getCurrentRoot();
 
         if (principal.isRole()) {
@@ -271,7 +274,7 @@ export class UserItemsTreeGrid
             const rolesNode = rootNode.getChildren()
                 .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
 
-            return rolesNode ? this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode) : wemQ(null);
+            return rolesNode ? this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode) : Q(null);
         } else {
             const idProviderId = idProvider.getKey().getId();
             const idProviderNode = rootNode.getChildren().filter(node => node.getDataId() === idProviderId)[0] || rootNode;
@@ -286,9 +289,9 @@ export class UserItemsTreeGrid
         }
     }
 
-    private loadChildren(parentNode: TreeNode<UserTreeGridItem>, allowedTypes: PrincipalType[]): wemQ.Promise<UserTreeGridItem[]> {
+    private loadChildren(parentNode: TreeNode<UserTreeGridItem>, allowedTypes: PrincipalType[]): Q.Promise<UserTreeGridItem[]> {
 
-        let deferred = wemQ.defer<UserTreeGridItem[]>();
+        let deferred = Q.defer<UserTreeGridItem[]>();
 
         let from = parentNode.getChildren().length;
         if (from > 0 && !parentNode.getChildren()[from - 1].getData().getDataId()) {
@@ -329,13 +332,13 @@ export class UserItemsTreeGrid
 
                     deferred.resolve(gridItems);
                 }).catch((reason: any) => {
-            api.DefaultErrorHandler.handle(reason);
+            DefaultErrorHandler.handle(reason);
         }).done();
 
         return deferred.promise;
     }
 
-    refreshNodeData(parentNode: TreeNode<UserTreeGridItem>): wemQ.Promise<TreeNode<UserTreeGridItem>> {
+    refreshNodeData(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<TreeNode<UserTreeGridItem>> {
         let deferred = Q.defer<TreeNode<UserTreeGridItem>>();
         deferred.resolve(parentNode);
 

@@ -1,15 +1,21 @@
-import PropertyTree = api.data.PropertyTree;
-import Option = api.ui.selector.Option;
-import FormView = api.form.FormView;
-import Application = api.application.Application;
-import ApplicationKey = api.application.ApplicationKey;
-import ApplicationConfig = api.application.ApplicationConfig;
-import ApplicationConfiguratorDialog = api.form.inputtype.appconfig.ApplicationConfiguratorDialog;
-import FormContext = api.form.FormContext;
+import * as Q from 'q';
+import {PropertyTree} from 'lib-admin-ui/data/PropertyTree';
+import {Option} from 'lib-admin-ui/ui/selector/Option';
+import {FormView} from 'lib-admin-ui/form/FormView';
+import {Application} from 'lib-admin-ui/application/Application';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {ApplicationConfig} from 'lib-admin-ui/application/ApplicationConfig';
+import {ApplicationConfiguratorDialog} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfiguratorDialog';
+import {FormContext} from 'lib-admin-ui/form/FormContext';
 import {AuthApplicationComboBox} from './AuthApplicationComboBox';
+import {BaseSelectedOptionView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
+import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
+import {NamesAndIconView, NamesAndIconViewBuilder} from 'lib-admin-ui/app/NamesAndIconView';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {NamesAndIconViewSize} from 'lib-admin-ui/app/NamesAndIconViewSize';
 
 export class AuthApplicationSelectedOptionView
-    extends api.ui.selector.combobox.BaseSelectedOptionView<Application> {
+    extends BaseSelectedOptionView<Application> {
 
     private application: Application;
 
@@ -21,7 +27,7 @@ export class AuthApplicationSelectedOptionView
 
     private formContext: FormContext;
 
-    private formValidityChangedHandler: { (event: api.form.FormValidityChangedEvent): void };
+    private formValidityChangedHandler: { (event: FormValidityChangedEvent): void };
 
     private readOnly: boolean;
 
@@ -44,12 +50,12 @@ export class AuthApplicationSelectedOptionView
         this.formContext = formContext;
     }
 
-    doRender(): wemQ.Promise<boolean> {
+    doRender(): Q.Promise<boolean> {
 
-        let header = new api.dom.DivEl('header');
+        let header = new DivEl('header');
 
-        let namesAndIconView = new api.app.NamesAndIconView(new api.app.NamesAndIconViewBuilder().setSize(
-            api.app.NamesAndIconViewSize.small)).setMainName(this.application.getDisplayName()).setSubName(
+        let namesAndIconView = new NamesAndIconView(new NamesAndIconViewBuilder().setSize(
+            NamesAndIconViewSize.small)).setMainName(this.application.getDisplayName()).setSubName(
             this.application.getName() + '-' + this.application.getVersion()).setIconClass('icon-xlarge icon-puzzle');
 
         if (this.application.getIconUrl()) {
@@ -71,14 +77,14 @@ export class AuthApplicationSelectedOptionView
             this.appendActionButtons(header);
         }
 
-        this.formValidityChangedHandler = (event: api.form.FormValidityChangedEvent) => {
+        this.formValidityChangedHandler = (event: FormValidityChangedEvent) => {
             this.toggleClass('invalid', !event.isValid());
         };
 
         this.formView = this.createFormView(this.applicationConfig);
         this.formView.layout();
 
-        return wemQ(true);
+        return Q(true);
     }
 
     setSiteConfig(applicationConfig: ApplicationConfig) {

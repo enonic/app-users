@@ -1,7 +1,9 @@
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
-import PrincipalBuilder = api.security.PrincipalBuilder;
+import {Principal, PrincipalBuilder} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {GroupJson} from './GroupJson';
+import {assert} from 'lib-admin-ui/util/Assert';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class Group
     extends Principal {
@@ -12,7 +14,7 @@ export class Group
 
     constructor(builder: GroupBuilder) {
         super(builder);
-        api.util.assert(this.getKey().isGroup(), 'Expected PrincipalKey of type Group');
+        assert(this.getKey().isGroup(), 'Expected PrincipalKey of type Group');
         this.members = builder.members || [];
         this.memberships = builder.memberships || [];
     }
@@ -37,15 +39,15 @@ export class Group
         this.memberships = memberships;
     }
 
-    equals(o: api.Equitable): boolean {
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, Group)) {
+    equals(o: Equitable): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, Group)) {
             return false;
         }
 
         let other = <Group> o;
         return super.equals(o) &&
-               api.ObjectHelper.arrayEquals(this.members, other.getMembers()) &&
-               api.ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
+               ObjectHelper.arrayEquals(this.members, other.getMembers()) &&
+               ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
     }
 
     clone(): Group {

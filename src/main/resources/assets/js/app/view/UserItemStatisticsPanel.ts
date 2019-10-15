@@ -1,31 +1,38 @@
+import * as Q from 'q';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
-import {GetPrincipalsByKeysRequest} from '../../api/graphql/principal/GetPrincipalsByKeysRequest';
+import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
+import {GetPrincipalsByKeysRequest} from '../../graphql/principal/GetPrincipalsByKeysRequest';
 import {RepositoryComboBox} from '../report/RepositoryComboBox';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
 import {Repository} from '../report/Repository';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
-import ViewItem = api.app.view.ViewItem;
-import ItemStatisticsPanel = api.app.view.ItemStatisticsPanel;
-import ItemDataGroup = api.app.view.ItemDataGroup;
-import Principal = api.security.Principal;
-import PrincipalType = api.security.PrincipalType;
-import PrincipalKey = api.security.PrincipalKey;
-import PrincipalViewer = api.ui.security.PrincipalViewer;
-import i18n = api.util.i18n;
-import RoleKeys = api.security.RoleKeys;
-import DivEl = api.dom.DivEl;
-import Path = api.rest.Path;
-import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
+import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
+import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
+import {ItemDataGroup} from 'lib-admin-ui/app/view/ItemDataGroup';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalViewer} from 'lib-admin-ui/ui/security/PrincipalViewer';
+import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {IsAuthenticatedRequest} from 'lib-admin-ui/security/auth/IsAuthenticatedRequest';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {UriHelper} from 'lib-admin-ui/util/UriHelper';
+import {CheckboxBuilder} from 'lib-admin-ui/ui/Checkbox';
+import {Element} from 'lib-admin-ui/dom/Element';
+import {Button} from 'lib-admin-ui/ui/button/Button';
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel<UserTreeGridItem> {
 
-    private userDataContainer: api.dom.DivEl;
+    private userDataContainer: DivEl;
 
-    private isAdminPromise: wemQ.Promise<boolean>;
+    private isAdminPromise: Q.Promise<boolean>;
 
     private reportServicePath: string;
 
@@ -34,7 +41,7 @@ export class UserItemStatisticsPanel
 
         this.isAdminPromise = new IsAuthenticatedRequest().sendAndParse().then(result => this.isAdmin(result.getPrincipals()));
 
-        this.userDataContainer = new api.dom.DivEl('user-data-container');
+        this.userDataContainer = new DivEl('user-data-container');
 
         this.bindServerEventListeners();
     }
@@ -67,7 +74,7 @@ export class UserItemStatisticsPanel
     }
 
     private bindServerEventListeners() {
-        const handler: () => void = api.util.AppHelper.debounce(this.handleUserItemEvent.bind(this), 250);
+        const handler: () => void = AppHelper.debounce(this.handleUserItemEvent.bind(this), 250);
 
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
@@ -97,7 +104,7 @@ export class UserItemStatisticsPanel
 
         if (type) {
             const mainGroup = new ItemDataGroup(i18n(`field.${type}`), type);
-            let metaGroups: wemQ.Promise<ItemDataGroup[]>;
+            let metaGroups: Q.Promise<ItemDataGroup[]>;
 
             switch (principal.getType()) {
             case PrincipalType.USER:
@@ -115,7 +122,7 @@ export class UserItemStatisticsPanel
                 this.userDataContainer.removeChildren();
                 this.userDataContainer.appendChildren(...groups);
             }).catch((reason: any) => {
-                api.DefaultErrorHandler.handle(reason);
+                DefaultErrorHandler.handle(reason);
             }).done();
         }
     }
@@ -126,7 +133,7 @@ export class UserItemStatisticsPanel
         return viewer;
     }
 
-    private createUserMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): wemQ.Promise<ItemDataGroup[]> {
+    private createUserMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<ItemDataGroup[]> {
         this.userDataContainer.appendChild(mainGroup);
 
         const rolesAndGroupsGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'memberships');
@@ -155,8 +162,8 @@ export class UserItemStatisticsPanel
         return principals.some(pKey => pKey.equals(RoleKeys.ADMIN));
     }
 
-    private createGroupOrRoleMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): wemQ.Promise<ItemDataGroup[]> {
-        mainGroup.appendChild(new api.dom.DivEl('description').setHtml(principal.getDescription()));
+    private createGroupOrRoleMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<ItemDataGroup[]> {
+        mainGroup.appendChild(new DivEl('description').setHtml(principal.getDescription()));
         this.userDataContainer.appendChild(mainGroup);
 
         let membersGroup;
@@ -185,9 +192,9 @@ export class UserItemStatisticsPanel
         });
     }
 
-    private getMembersByKeys(keys: PrincipalKey[]): wemQ.Promise<Principal[]> {
+    private getMembersByKeys(keys: PrincipalKey[]): Q.Promise<Principal[]> {
         if (!keys || keys.length === 0) {
-            return wemQ([]);
+            return Q([]);
         } else {
             return new GetPrincipalsByKeysRequest(keys).sendAndParse();
         }
@@ -208,7 +215,7 @@ export class UserItemStatisticsPanel
             }
         });
 
-        const genButton = new api.ui.button.Button(i18n('action.report.generate'));
+        const genButton = new Button(i18n('action.report.generate'));
         genButton
             .setEnabled(false)
             .addClass('generate large')
@@ -222,7 +229,7 @@ export class UserItemStatisticsPanel
             });
 
         const comboAndButton = new DivEl();
-        comboAndButton.appendChildren<api.dom.Element>(reportsCombo, genButton);
+        comboAndButton.appendChildren<Element>(reportsCombo, genButton);
 
         reportsGroup.addDataElements(i18n('field.repository.select'), [comboAndButton]);
 
@@ -235,7 +242,7 @@ export class UserItemStatisticsPanel
             repositoryId: repo.getId(),
             branch: branch
         };
-        const uri: string = api.util.UriHelper.appendUrlParams(this.getReportServicePath(), params);
+        const uri: string = UriHelper.appendUrlParams(this.getReportServicePath(), params);
         const reportName: string = `perm-report-${repo.getName()}(${branch}).csv`;
 
         this.clickFakeElementForReportDownload(uri, reportName);
@@ -259,22 +266,22 @@ export class UserItemStatisticsPanel
         document.body.removeChild(element);
     }
 
-    private isRole(principal: api.security.Principal): boolean {
+    private isRole(principal: Principal): boolean {
         return principal.isRole();
     }
 
-    private isGroup(principal: api.security.Principal): boolean {
+    private isGroup(principal: Principal): boolean {
         return principal.isGroup();
     }
 
-    private getMembershipViews(memberships: api.security.Principal[], membershipCheck: (p: api.security.Principal) => boolean) {
+    private getMembershipViews(memberships: Principal[], membershipCheck: (p: Principal) => boolean) {
         return memberships
             .sort((item1, item2) => Number(item1.getDisplayName() > item2.getDisplayName()))
             .filter(el => membershipCheck(el))
             .map(el => this.createPrincipalViewer(el));
     }
 
-    private appendRolesAndGroups(memberships: api.security.Principal[], group: ItemDataGroup) {
+    private appendRolesAndGroups(memberships: Principal[], group: ItemDataGroup) {
         const roleViews = this.getMembershipViews(memberships, this.isRole);
         const groupViews = this.getMembershipViews(memberships, this.isGroup);
 
@@ -289,8 +296,8 @@ export class UserItemStatisticsPanel
             .sendAndParse();
     }
 
-    private appendTransitiveSwitch(pKey: PrincipalKey, dataGroup: api.app.view.ItemDataGroup, disabled?: boolean) {
-        const transitiveSwitch = new api.ui.CheckboxBuilder()
+    private appendTransitiveSwitch(pKey: PrincipalKey, dataGroup: ItemDataGroup, disabled?: boolean) {
+        const transitiveSwitch = new CheckboxBuilder()
             .setLabelText(i18n('field.transitiveMemberships'))
             .build().setDisabled(disabled);
         transitiveSwitch.addClass('transitive-switch');
@@ -299,7 +306,7 @@ export class UserItemStatisticsPanel
                 const updatedMemberships = (<Group | User>updatedP).getMemberships();
                 dataGroup.clearList();
                 this.appendRolesAndGroups(updatedMemberships, dataGroup);
-            }).catch(api.DefaultErrorHandler.handle);
+            }).catch(DefaultErrorHandler.handle);
         });
         dataGroup.getHeader().appendChild(transitiveSwitch);
     }

@@ -1,4 +1,3 @@
-const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -11,7 +10,7 @@ module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
     entry: {
         'js/bundle': './js/main.ts',
-        'styles/_all': './styles/main.less',
+        'styles/main': './styles/main.less',
     },
     output: {
         path: path.join(__dirname, '/build/resources/main/assets'),
@@ -56,7 +55,6 @@ module.exports = {
         ]
     },
     plugins: [
-        new ErrorLoggerPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].css',
             chunkFilename: './styles/[id].css'

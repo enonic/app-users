@@ -1,12 +1,16 @@
 import {IdProviderAccessControlComboBox} from './IdProviderAccessControlComboBox';
 import {IdProvider} from '../principal/IdProvider';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
-import FormItemBuilder = api.ui.form.FormItemBuilder;
-import Validators = api.ui.form.Validators;
-import DivEl = api.dom.DivEl;
-import i18n = api.util.i18n;
+import {Validators} from 'lib-admin-ui/ui/form/Validators';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
+import {Form} from 'lib-admin-ui/ui/form/Form';
 
-export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
+export class SecurityWizardStepForm
+    extends WizardStepForm {
 
     private inheritance: DivEl;
     private comboBox: IdProviderAccessControlComboBox;
@@ -24,10 +28,10 @@ export class SecurityWizardStepForm extends api.app.wizard.WizardStepForm {
             .setValidator(Validators.required)
             .setLabel(i18n('field.permissions')).build();
 
-        let fieldSet = new api.ui.form.Fieldset();
+        let fieldSet = new Fieldset();
         fieldSet.add(accessComboBoxFormItem);
 
-        let form = new api.ui.form.Form().add(fieldSet);
+        let form = new Form().add(fieldSet);
 
         form.onFocus((event) => {
             this.notifyFocused(event);

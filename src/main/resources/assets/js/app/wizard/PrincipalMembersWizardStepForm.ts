@@ -1,12 +1,16 @@
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
-import PrincipalType = api.security.PrincipalType;
-import PrincipalLoader = api.security.PrincipalLoader;
-import FormItemBuilder = api.ui.form.FormItemBuilder;
-import PrincipalComboBox = api.ui.security.PrincipalComboBox;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
+import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
+import {Form} from 'lib-admin-ui/ui/form/Form';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
-export class PrincipalMembersWizardStepForm extends api.app.wizard.WizardStepForm {
+export class PrincipalMembersWizardStepForm
+    extends WizardStepForm {
 
     private principals: PrincipalComboBox;
 
@@ -24,10 +28,10 @@ export class PrincipalMembersWizardStepForm extends api.app.wizard.WizardStepFor
 
         let principalsFormItem = new FormItemBuilder(this.principals).setLabel(i18n('field.members')).build();
 
-        let fieldSet = new api.ui.form.Fieldset();
+        let fieldSet = new Fieldset();
         fieldSet.add(principalsFormItem);
 
-        let form = new api.ui.form.Form().add(fieldSet);
+        let form = new Form().add(fieldSet);
 
         form.onFocus((event) => {
             this.notifyFocused(event);

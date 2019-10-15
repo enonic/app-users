@@ -1,7 +1,9 @@
-import PrincipalKey = api.security.PrincipalKey;
-import SecurityResourceRequest = api.security.SecurityResourceRequest;
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {SecurityResourceRequest} from 'lib-admin-ui/security/SecurityResourceRequest';
 import {UserJson} from '../principal/UserJson';
 import {User} from '../principal/User';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
 
 export class SetUserPasswordRequest
     extends SecurityResourceRequest<UserJson, User> {
@@ -31,13 +33,13 @@ export class SetUserPasswordRequest
         };
     }
 
-    getRequestPath(): api.rest.Path {
-        return api.rest.Path.fromParent(super.getResourcePath(), 'principals', 'setPassword');
+    getRequestPath(): Path {
+        return Path.fromParent(super.getResourcePath(), 'principals', 'setPassword');
     }
 
-    sendAndParse(): wemQ.Promise<User> {
+    sendAndParse(): Q.Promise<User> {
 
-        return this.send().then((response: api.rest.JsonResponse<UserJson>) => {
+        return this.send().then((response: JsonResponse<UserJson>) => {
             return User.fromJson(response.getResult());
         });
     }

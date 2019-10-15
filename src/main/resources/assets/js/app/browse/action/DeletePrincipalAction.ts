@@ -1,14 +1,17 @@
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
-import {DeletePrincipalRequest} from '../../../api/graphql/principal/DeletePrincipalRequest';
-import {DeleteIdProviderRequest} from '../../../api/graphql/idprovider/DeleteIdProviderRequest';
-import {DeletePrincipalResult} from '../../../api/graphql/principal/DeletePrincipalResult';
-import {DeleteIdProviderResult} from '../../../api/graphql/idprovider/DeleteIdProviderResult';
+import {DeletePrincipalRequest} from '../../../graphql/principal/DeletePrincipalRequest';
+import {DeleteIdProviderRequest} from '../../../graphql/idprovider/DeleteIdProviderRequest';
+import {DeletePrincipalResult} from '../../../graphql/principal/DeletePrincipalResult';
+import {DeleteIdProviderResult} from '../../../graphql/idprovider/DeleteIdProviderResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
 import {IdProvider} from '../../principal/IdProvider';
-import Action = api.ui.Action;
-import Principal = api.security.Principal;
-import i18n = api.util.i18n;
+import {Action} from 'lib-admin-ui/ui/Action';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 
 export class DeletePrincipalAction
     extends Action {
@@ -16,7 +19,7 @@ export class DeletePrincipalAction
     constructor(grid: UserItemsTreeGrid) {
         super(i18n('action.delete'), 'mod+del');
         this.setEnabled(false);
-        const confirmation = new api.ui.dialog.ConfirmationDialog()
+        const confirmation = new ConfirmationDialog()
             .setQuestion(i18n('dialog.delete.question'))
             .setNoCallback(null)
             .setYesCallback(() => {
@@ -32,13 +35,13 @@ export class DeletePrincipalAction
                 });
 
                 let principalKeys = principalItems.filter((userItem) => {
-                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, Principal);
+                    return ObjectHelper.iFrameSafeInstanceOf(userItem, Principal);
                 }).map((principal: Principal) => {
                     return principal.getKey();
                 });
 
                 let idProviderKeys = idProviderItems.filter((userItem) => {
-                    return api.ObjectHelper.iFrameSafeInstanceOf(userItem, IdProvider);
+                    return ObjectHelper.iFrameSafeInstanceOf(userItem, IdProvider);
                 }).map((idProvider: IdProvider) => {
                     return idProvider.getKey();
                 });
@@ -55,7 +58,7 @@ export class DeletePrincipalAction
                                             i18n('notify.delete.principal.single', keys[0]) :
                                             i18n('notify.delete.principal.multiple', keys.length);
 
-                                api.notify.showFeedback(msg);
+                                showFeedback(msg);
                                 UserItemDeletedEvent.create().setPrincipals(principalItems).build().fire();
                             }
                         });
@@ -67,7 +70,7 @@ export class DeletePrincipalAction
                         .sendAndParse()
                         .done((results: DeleteIdProviderResult[]) => {
                             if (results && results.length > 0) {
-                                api.notify.showFeedback(i18n('notify.delete.idprovider.single', results[0].getIdProviderKey()));
+                                showFeedback(i18n('notify.delete.idprovider.single', results[0].getIdProviderKey()));
                                 UserItemDeletedEvent.create().setIdProviders(idProviderItems).build().fire();
                             }
                         });

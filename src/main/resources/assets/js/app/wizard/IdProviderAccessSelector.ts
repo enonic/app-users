@@ -1,5 +1,8 @@
-import TabMenuItemBuilder = api.ui.tab.TabMenuItemBuilder;
 import {IdProviderAccess} from '../access/IdProviderAccess';
+import {TabMenu} from 'lib-admin-ui/ui/tab/TabMenu';
+import {ValueChangedEvent} from 'lib-admin-ui/ValueChangedEvent';
+import {TabMenuItem, TabMenuItemBuilder} from 'lib-admin-ui/ui/tab/TabMenuItem';
+import {NavigatorEvent} from 'lib-admin-ui/ui/NavigatorEvent';
 
 interface IdProviderAccessSelectorOption {
     value: IdProviderAccess;
@@ -7,7 +10,7 @@ interface IdProviderAccessSelectorOption {
 }
 
 export class IdProviderAccessSelector
-    extends api.ui.tab.TabMenu {
+    extends TabMenu {
 
     private static OPTIONS: IdProviderAccessSelectorOption[] = [
         {value: IdProviderAccess.READ, name: 'Read'},
@@ -18,7 +21,7 @@ export class IdProviderAccessSelector
     ];
 
     private value: IdProviderAccess;
-    private valueChangedListeners: { (event: api.ValueChangedEvent): void }[] = [];
+    private valueChangedListeners: { (event: ValueChangedEvent): void }[] = [];
 
     constructor() {
         super('access-selector');
@@ -28,8 +31,8 @@ export class IdProviderAccessSelector
             this.addNavigationItem(menuItem);
         });
 
-        this.onNavigationItemSelected((event: api.ui.NavigatorEvent) => {
-            let item: api.ui.tab.TabMenuItem = <api.ui.tab.TabMenuItem> event.getItem();
+        this.onNavigationItemSelected((event: NavigatorEvent) => {
+            let item: TabMenuItem = <TabMenuItem> event.getItem();
             this.setValue(IdProviderAccessSelector.OPTIONS[item.getIndex()].value);
         });
 
@@ -44,7 +47,7 @@ export class IdProviderAccessSelector
         if (option) {
             this.selectNavigationItem(IdProviderAccessSelector.OPTIONS.indexOf(option));
             if (!silent) {
-                this.notifyValueChanged(new api.ValueChangedEvent(IdProviderAccess[this.value], IdProviderAccess[value]));
+                this.notifyValueChanged(new ValueChangedEvent(IdProviderAccess[this.value], IdProviderAccess[value]));
             }
             this.value = value;
         }
@@ -61,17 +64,17 @@ export class IdProviderAccessSelector
         return undefined;
     }
 
-    onValueChanged(listener: (event: api.ValueChangedEvent) => void) {
+    onValueChanged(listener: (event: ValueChangedEvent) => void) {
         this.valueChangedListeners.push(listener);
     }
 
-    unValueChanged(listener: (event: api.ValueChangedEvent) => void) {
+    unValueChanged(listener: (event: ValueChangedEvent) => void) {
         this.valueChangedListeners = this.valueChangedListeners.filter((curr) => {
             return curr !== listener;
         });
     }
 
-    private notifyValueChanged(event: api.ValueChangedEvent) {
+    private notifyValueChanged(event: ValueChangedEvent) {
         this.valueChangedListeners.forEach((listener) => {
             listener(event);
         });

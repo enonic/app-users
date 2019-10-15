@@ -1,16 +1,18 @@
-import Option = api.ui.selector.Option;
-import SelectedOption = api.ui.selector.combobox.SelectedOption;
-import Dropdown = api.ui.selector.dropdown.Dropdown;
-import DropdownConfig = api.ui.selector.dropdown.DropdownConfig;
+import {Option} from 'lib-admin-ui/ui/selector/Option';
+import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
+import {Dropdown, DropdownConfig} from 'lib-admin-ui/ui/selector/dropdown/Dropdown';
 import {RepositoryViewer} from './RepositoryViewer';
 import {Repository} from './Repository';
 import {RepositoryLoader} from './RepositoryLoader';
+import {RichComboBox, RichComboBoxBuilder} from 'lib-admin-ui/ui/selector/combobox/RichComboBox';
+import {SelectedOptionView} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionView';
+import {BaseSelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
 
 export class RepositoryComboBox
-    extends api.ui.selector.combobox.RichComboBox<Repository> {
+    extends RichComboBox<Repository> {
 
     constructor(value?: string) {
-        let builder = new api.ui.selector.combobox.RichComboBoxBuilder<Repository>()
+        let builder = new RichComboBoxBuilder<Repository>()
             .setComboBoxName('ReportSelector')
             .setIdentifierMethod('getId')
             .setLoader(new RepositoryLoader())
@@ -34,7 +36,7 @@ export class RepositoryComboBox
 
 class ReportSelectedOptionView
     extends RepositoryViewer
-    implements api.ui.selector.combobox.SelectedOptionView<Repository> {
+    implements SelectedOptionView<Repository> {
 
     private option: Option<Repository>;
 
@@ -47,12 +49,12 @@ class ReportSelectedOptionView
         this.appendChild(this.branchDropDown = this.createBranchesDropdown(option.displayValue));
     }
 
-    setOption(option: api.ui.selector.Option<Repository>) {
+    setOption(option: Option<Repository>) {
         this.option = option;
         this.setObject(option.displayValue);
     }
 
-    getOption(): api.ui.selector.Option<Repository> {
+    getOption(): Option<Repository> {
         return this.option;
     }
 
@@ -81,7 +83,7 @@ class ReportSelectedOptionView
 }
 
 class ReportSelectedOptionsView
-    extends api.ui.selector.combobox.BaseSelectedOptionsView<Repository> {
+    extends BaseSelectedOptionsView<Repository> {
 
     constructor() {
         super('report-selected-options-view');
@@ -89,7 +91,7 @@ class ReportSelectedOptionsView
 
     createSelectedOption(option: Option<Repository>): SelectedOption<Repository> {
         let optionView = new ReportSelectedOptionView(option);
-        return new api.ui.selector.combobox.SelectedOption<Repository>(optionView, this.count());
+        return new SelectedOption<Repository>(optionView, this.count());
     }
 
 }

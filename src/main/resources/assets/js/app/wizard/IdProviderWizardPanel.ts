@@ -1,18 +1,23 @@
+import * as Q from 'q';
 import {Router} from '../Router';
 import {UserItemWizardPanel} from './UserItemWizardPanel';
 import {SecurityWizardStepForm} from './SecurityWizardStepForm';
 import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
 import {IdProviderWizardStepForm} from './IdProviderWizardStepForm';
 import {IdProviderWizardDataLoader} from './IdProviderWizardDataLoader';
-import {CreateIdProviderRequest} from '../../api/graphql/idprovider/CreateIdProviderRequest';
-import {UpdateIdProviderRequest} from '../../api/graphql/idprovider/UpdateIdProviderRequest';
+import {CreateIdProviderRequest} from '../../graphql/idprovider/CreateIdProviderRequest';
+import {UpdateIdProviderRequest} from '../../graphql/idprovider/UpdateIdProviderRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {UserItemDeletedEvent} from '../event/UserItemDeletedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
 import {IdProvider, IdProviderBuilder} from '../principal/IdProvider';
-import WizardStep = api.app.wizard.WizardStep;
-import i18n = api.util.i18n;
-import IdProviderKey = api.security.IdProviderKey;
+import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
+import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {FormIcon} from 'lib-admin-ui/app/wizard/FormIcon';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 
 export class IdProviderWizardPanel
     extends UserItemWizardPanel<IdProvider> {
@@ -45,7 +50,7 @@ export class IdProviderWizardPanel
         });
     }
 
-    protected createFormIcon(): api.app.wizard.FormIcon {
+    protected createFormIcon(): FormIcon {
         let formIcon = super.createFormIcon();
         formIcon.addClass('icon-address-book');
         return formIcon;
@@ -71,11 +76,11 @@ export class IdProviderWizardPanel
         return i18n('field.idProvider');
     }
 
-    doLayout(persistedIdProvider: IdProvider): wemQ.Promise<void> {
+    doLayout(persistedIdProvider: IdProvider): Q.Promise<void> {
         return super.doLayout(persistedIdProvider).then(() => {
 
             if (this.isRendered()) {
-                return wemQ<void>(null);
+                return Q<void>(null);
             } else {
                 return this.doLayoutPersistedItem(persistedIdProvider ? persistedIdProvider.clone() : null);
             }
@@ -83,37 +88,37 @@ export class IdProviderWizardPanel
         });
     }
 
-    persistNewItem(): wemQ.Promise<IdProvider> {
+    persistNewItem(): Q.Promise<IdProvider> {
         this.lock();
         return this.produceCreateIdProviderRequest().sendAndParse().then((idProvider: IdProvider) => {
-            api.notify.showFeedback('Id provider was created');
+            showFeedback('Id provider was created');
             new UserItemCreatedEvent(null, idProvider).fire();
 
             return idProvider;
         }).finally(this.unlock.bind(this));
     }
 
-    postPersistNewItem(idProvider: IdProvider): wemQ.Promise<IdProvider> {
+    postPersistNewItem(idProvider: IdProvider): Q.Promise<IdProvider> {
         Router.setHash('edit/' + idProvider.getKey());
 
-        return wemQ(idProvider);
+        return Q(idProvider);
     }
 
-    updatePersistedItem(): wemQ.Promise<IdProvider> {
+    updatePersistedItem(): Q.Promise<IdProvider> {
         this.lock();
         return this.produceUpdateIdProviderRequest(this.assembleViewedIdProvider()).sendAndParse().then((idProvider: IdProvider) => {
             this.unlock();
-            api.notify.showFeedback('Id provider was updated');
+            showFeedback('Id provider was updated');
             new UserItemUpdatedEvent(null, idProvider).fire();
 
             return idProvider;
         });
     }
 
-    saveChanges(): wemQ.Promise<IdProvider> {
+    saveChanges(): Q.Promise<IdProvider> {
         if (this.isRendered()) {
             if (!this.idProviderWizardStepForm.isValid()) {
-                return wemQ.fcall(() => {
+                return Q.fcall(() => {
                     throw i18n('notify.invalid.idProviderConfig');
                 });
             }
@@ -126,7 +131,7 @@ export class IdProviderWizardPanel
         const idProviderConfig = this.idProviderWizardStepForm.getIdProviderConfig();
         return wizardHeader.getName() !== '' ||
                wizardHeader.getDisplayName() !== '' ||
-               !api.ObjectHelper.stringEquals(this.idProviderWizardStepForm.getDescription(), this.defaultIdProvider.getDescription()) ||
+               !ObjectHelper.stringEquals(this.idProviderWizardStepForm.getDescription(), this.defaultIdProvider.getDescription()) ||
                !(!idProviderConfig || idProviderConfig.equals(this.defaultIdProvider.getIdProviderConfig())) ||
                !this.permissionsWizardStepForm.getPermissions().equals(this.defaultIdProvider.getPermissions());
     }
@@ -167,7 +172,7 @@ export class IdProviderWizardPanel
             this.permissionsWizardStepForm.layoutReadOnly(this.defaultIdProvider);
         }
 
-        return wemQ<void>(null);
+        return Q<void>(null);
     }
 
     protected updateHash() {
@@ -246,7 +251,7 @@ export class IdProviderWizardPanel
         if (key) {
             IdProvider.checkOnDeletable(key).then((result: boolean) => {
                 this.wizardActions.getDeleteAction().setEnabled(result);
-            }).catch(api.DefaultErrorHandler.handle).done();
+            }).catch(DefaultErrorHandler.handle).done();
         }
     }
 

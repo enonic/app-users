@@ -1,16 +1,19 @@
-import '../../api.ts';
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
 import {PasswordGenerator} from './PasswordGenerator';
-import Principal = api.security.Principal;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {Validators} from 'lib-admin-ui/ui/form/Validators';
+import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
+import {Button} from 'lib-admin-ui/ui/button/Button';
+import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {Form} from 'lib-admin-ui/ui/form/Form';
+import {FormView} from 'lib-admin-ui/form/FormView';
+import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
+import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 
-import FormItemBuilder = api.ui.form.FormItemBuilder;
-import Validators = api.ui.form.Validators;
-import FormItem = api.ui.form.FormItem;
-import Fieldset = api.ui.form.Fieldset;
-import Button = api.ui.button.Button;
-import i18n = api.util.i18n;
-
-export class UserPasswordWizardStepForm extends api.app.wizard.WizardStepForm {
+export class UserPasswordWizardStepForm
+    extends WizardStepForm {
 
     private password: PasswordGenerator;
 
@@ -42,12 +45,12 @@ export class UserPasswordWizardStepForm extends api.app.wizard.WizardStepForm {
         this.fieldSet.add(this.createPasswordFormItem);
         this.fieldSet.add(this.updatePasswordFormItem);
 
-        let passwordForm = new api.ui.form.Form(api.form.FormView.VALIDATION_CLASS).add(this.fieldSet);
+        let passwordForm = new Form(FormView.VALIDATION_CLASS).add(this.fieldSet);
 
-        passwordForm.onValidityChanged((event: api.ValidityChangedEvent) => {
-            this.notifyValidityChanged(new api.app.wizard.WizardStepValidityChangedEvent(event.isValid()));
-            this.createPasswordFormItem.toggleClass(api.ui.form.FormItem.INVALID_CLASS, !event.isValid());
-            this.updatePasswordFormItem.toggleClass(api.ui.form.FormItem.INVALID_CLASS, !event.isValid());
+        passwordForm.onValidityChanged((event: ValidityChangedEvent) => {
+            this.notifyValidityChanged(new WizardStepValidityChangedEvent(event.isValid()));
+            this.createPasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
+            this.updatePasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
         });
 
         this.changePasswordButton.onClicked(() => {

@@ -1,8 +1,10 @@
-import Principal = api.security.Principal;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {Event} from 'lib-admin-ui/event/Event';
 import {IdProvider} from '../principal/IdProvider';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
 
 export class UserItemDeletedEvent
-    extends api.event.Event {
+    extends Event {
 
     private principals: Principal[];
 
@@ -27,11 +29,11 @@ export class UserItemDeletedEvent
     }
 
     static on(handler: (event: UserItemDeletedEvent) => void) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: UserItemDeletedEvent) => void) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }
 

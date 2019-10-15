@@ -1,7 +1,9 @@
-import '../../api.ts';
-import Principal = api.security.Principal;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {Event} from 'lib-admin-ui/event/Event';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
 
-export class PrincipalDuplicatedEvent extends api.event.Event {
+export class PrincipalDuplicatedEvent
+    extends Event {
 
     private source: Principal;
     private principal: Principal;
@@ -27,10 +29,10 @@ export class PrincipalDuplicatedEvent extends api.event.Event {
     }
 
     static on(handler: (event: PrincipalDuplicatedEvent) => void) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: PrincipalDuplicatedEvent) => void) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

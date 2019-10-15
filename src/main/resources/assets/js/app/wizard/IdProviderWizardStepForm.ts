@@ -1,17 +1,24 @@
-import i18n = api.util.i18n;
-import IdProviderConfig = api.security.IdProviderConfig;
-import FormItem = api.form.FormItem;
-import PropertySet = api.data.PropertySet;
-import FormView = api.form.FormView;
-import FormBuilder = api.form.FormBuilder;
-import PropertyTree = api.data.PropertyTree;
-import ApplicationKey = api.application.ApplicationKey;
-import Form = api.form.Form;
+import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
+import {FormItem} from 'lib-admin-ui/form/FormItem';
+import {PropertySet} from 'lib-admin-ui/data/PropertySet';
+import {FormView} from 'lib-admin-ui/form/FormView';
+import {PropertyTree} from 'lib-admin-ui/data/PropertyTree';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {Form, FormBuilder} from 'lib-admin-ui/form/Form';
 import {SecurityFormContext} from './SecurityFormContext';
 import {IdProvider} from '../principal/IdProvider';
+import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
+import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {ValidationRecording} from 'lib-admin-ui/form/ValidationRecording';
+import {InputBuilder} from 'lib-admin-ui/form/Input';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {OccurrencesBuilder} from 'lib-admin-ui/form/Occurrences';
+import {InputTypeName} from 'lib-admin-ui/form/InputTypeName';
+import {TextLine} from 'lib-admin-ui/form/inputtype/text/TextLine';
 
 export class IdProviderWizardStepForm
-    extends api.app.wizard.WizardStepForm {
+    extends WizardStepForm {
 
     private formView: FormView;
 
@@ -21,7 +28,7 @@ export class IdProviderWizardStepForm
         super();
     }
 
-    layout(idProvider: IdProvider): wemQ.Promise<void> {
+    layout(idProvider: IdProvider): Q.Promise<void> {
 
         this.propertySet = this.createPropertySet(idProvider);
         this.formView = this.createFormView(idProvider);
@@ -37,12 +44,12 @@ export class IdProviderWizardStepForm
 
             this.appendChild(this.formView);
 
-            this.formView.onValidityChanged((event: api.form.FormValidityChangedEvent) => {
+            this.formView.onValidityChanged((event: FormValidityChangedEvent) => {
                 this.previousValidation = event.getRecording();
-                this.notifyValidityChanged(new api.app.wizard.WizardStepValidityChangedEvent(event.isValid()));
+                this.notifyValidityChanged(new WizardStepValidityChangedEvent(event.isValid()));
             });
 
-            this.notifyValidityChanged(new api.app.wizard.WizardStepValidityChangedEvent(this.formView.isValid()));
+            this.notifyValidityChanged(new WizardStepValidityChangedEvent(this.formView.isValid()));
         });
     }
 
@@ -61,7 +68,7 @@ export class IdProviderWizardStepForm
         return null;
     }
 
-    public validate(silent?: boolean): api.form.ValidationRecording {
+    public validate(silent?: boolean): ValidationRecording {
         return this.formView.validate(silent);
     }
 
@@ -98,11 +105,11 @@ export class IdProviderWizardStepForm
     }
 
     private createDescriptionFormItem(): FormItem {
-        return new api.form.InputBuilder()
+        return new InputBuilder()
             .setName('description')
-            .setInputType(api.form.inputtype.text.TextLine.getName())
+            .setInputType(TextLine.getName())
             .setLabel(i18n('field.description'))
-            .setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build())
+            .setOccurrences(new OccurrencesBuilder().setMinimum(0).setMaximum(1).build())
             .setInputTypeConfig({})
             .setMaximizeUIInputWidth(true)
             .build();
@@ -111,11 +118,11 @@ export class IdProviderWizardStepForm
     private createAuthAppSelectorFormItem(idProvider?: IdProvider): FormItem {
         const isSystemIdProvider: string = (!!idProvider && idProvider.getKey().isSystem()).toString();
 
-        return new api.form.InputBuilder()
+        return new InputBuilder()
             .setName('idProviderConfig')
-            .setInputType(new api.form.InputTypeName('AuthApplicationSelector', false))
+            .setInputType(new InputTypeName('AuthApplicationSelector', false))
             .setLabel(i18n('field.application'))
-            .setOccurrences(new api.form.OccurrencesBuilder().setMinimum(0).setMaximum(1).build())
+            .setOccurrences(new OccurrencesBuilder().setMinimum(0).setMaximum(1).build())
             .setInputTypeConfig({readOnly: [{value: isSystemIdProvider}]})
             .setMaximizeUIInputWidth(true)
             .build();

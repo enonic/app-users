@@ -1,13 +1,19 @@
-import Principal = api.security.Principal;
-import EmailInput = api.ui.text.EmailInput;
-import FormItemBuilder = api.ui.form.FormItemBuilder;
-import Validators = api.ui.form.Validators;
-import i18n = api.util.i18n;
-import IdProviderKey = api.security.IdProviderKey;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {EmailInput} from 'lib-admin-ui/ui/text/EmailInput';
+import {Validators} from 'lib-admin-ui/ui/form/Validators';
+import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {User} from '../principal/User';
+import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
+import {Form} from 'lib-admin-ui/ui/form/Form';
+import {FormView} from 'lib-admin-ui/form/FormView';
+import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
+import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 export class UserEmailWizardStepForm
-    extends api.app.wizard.WizardStepForm {
+    extends WizardStepForm {
 
     private email: EmailInput;
 
@@ -25,10 +31,10 @@ export class UserEmailWizardStepForm
 
         let emailFormItem = new FormItemBuilder(this.email).setLabel(i18n('field.email')).setValidator(Validators.required).build();
 
-        let fieldSet = new api.ui.form.Fieldset();
+        let fieldSet = new Fieldset();
         fieldSet.add(emailFormItem);
 
-        let form = new api.ui.form.Form(api.form.FormView.VALIDATION_CLASS).add(fieldSet);
+        let form = new Form(FormView.VALIDATION_CLASS).add(fieldSet);
 
         form.onFocus((event) => {
             this.notifyFocused(event);
@@ -37,9 +43,9 @@ export class UserEmailWizardStepForm
             this.notifyBlurred(event);
         });
 
-        form.onValidityChanged((event: api.ValidityChangedEvent) => {
-            this.notifyValidityChanged(new api.app.wizard.WizardStepValidityChangedEvent(event.isValid()));
-            emailFormItem.toggleClass(api.ui.form.FormItem.INVALID_CLASS, !event.isValid());
+        form.onValidityChanged((event: ValidityChangedEvent) => {
+            this.notifyValidityChanged(new WizardStepValidityChangedEvent(event.isValid()));
+            emailFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
         });
 
         this.appendChild(form);

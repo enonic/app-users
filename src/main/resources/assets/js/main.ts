@@ -1,16 +1,3 @@
-import i18n = api.util.i18n;
-
-declare const CONFIG;
-
-const body = api.dom.Body.get();
-
-// Dynamically import and execute all input types, since they are used
-// on-demand, when parsing XML schemas and has not real usage in app
-declare var require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
-const importAll = r => r.keys().forEach(r);
-importAll(require.context('./app/inputtype', true, /^(?!\.[\/\\]ui).*/));
-
-import './api.ts';
 import {UserAppPanel} from './app/UserAppPanel';
 import {ChangeUserPasswordDialog} from './app/wizard/ChangeUserPasswordDialog';
 import {Router} from './app/Router';
@@ -18,10 +5,31 @@ import {ShowNewPrincipalDialogEvent} from './app/browse/ShowNewPrincipalDialogEv
 import {NewPrincipalDialog} from './app/create/NewPrincipalDialog';
 import {PrincipalServerEventsHandler} from './app/event/PrincipalServerEventsHandler';
 import {UsersServerEventsListener} from './app/event/UsersServerEventsListener';
+import {Body} from 'lib-admin-ui/dom/Body';
+import {Application} from 'lib-admin-ui/app/Application';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {ConnectionDetector} from 'lib-admin-ui/system/ConnectionDetector';
+import {showError} from 'lib-admin-ui/notify/MessageBus';
+import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {UriHelper} from 'lib-admin-ui/util/UriHelper';
+import {TabbedAppBar} from 'lib-admin-ui/app/bar/TabbedAppBar';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
 
-function getApplication(): api.app.Application {
-    let application = new api.app.Application('user-manager', 'Users', 'UM', CONFIG.appIconUrl);
-    application.setPath(api.rest.Path.fromString(Router.getPath()));
+declare const CONFIG;
+
+const body = Body.get();
+
+// Dynamically import and execute all input types, since they are used
+// on-demand, when parsing XML schemas and has not real usage in app
+declare var require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
+const importAll = r => r.keys().forEach(r);
+importAll(require.context('./app/inputtype', true, /^(?!\.[\/\\]ui).*/));
+
+function getApplication(): Application {
+    let application = new Application('user-manager', 'Users', 'UM', CONFIG.appIconUrl);
+    application.setPath(Path.fromString(Router.getPath()));
     application.setWindow(window);
 
     return application;
@@ -29,18 +37,18 @@ function getApplication(): api.app.Application {
 
 function startLostConnectionDetector() {
     let messageId;
-    let lostConnectionDetector = new api.system.ConnectionDetector();
+    let lostConnectionDetector = new ConnectionDetector();
     lostConnectionDetector.setAuthenticated(true);
     lostConnectionDetector.onConnectionLost(() => {
-        api.notify.NotifyManager.get().hide(messageId);
-        messageId = api.notify.showError(i18n('notify.connection.loss'), false);
+        NotifyManager.get().hide(messageId);
+        messageId = showError(i18n('notify.connection.loss'), false);
     });
     lostConnectionDetector.onSessionExpired(() => {
-        api.notify.NotifyManager.get().hide(messageId);
-        window.location.href = api.util.UriHelper.getToolUri('');
+        NotifyManager.get().hide(messageId);
+        window.location.href = UriHelper.getToolUri('');
     });
     lostConnectionDetector.onConnectionRestored(() => {
-        api.notify.NotifyManager.get().hide(messageId);
+        NotifyManager.get().hide(messageId);
     });
 
     lostConnectionDetector.startPolling();
@@ -48,15 +56,15 @@ function startLostConnectionDetector() {
 
 function startApplication() {
 
-    const application: api.app.Application = getApplication();
-    const appBar = new api.app.bar.TabbedAppBar(application);
+    const application: Application = getApplication();
+    const appBar = new TabbedAppBar(application);
     appBar.setHomeIconAction();
     const appPanel = new UserAppPanel(appBar, application.getPath());
 
     body.appendChild(appBar);
     body.appendChild(appPanel);
 
-    api.util.AppHelper.preventDragRedirect();
+    AppHelper.preventDragRedirect();
 
     // tslint:disable-next-line:no-unused-expression
     new ChangeUserPasswordDialog();
@@ -76,7 +84,7 @@ function startApplication() {
 }
 
 const renderListener = () => {
-    api.util.i18nInit(CONFIG.i18nUrl).then(() => startApplication());
+    i18nInit(CONFIG.i18nUrl).then(() => startApplication());
     body.unRendered(renderListener);
 };
 

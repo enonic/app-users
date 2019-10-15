@@ -1,22 +1,26 @@
-import '../../../api.ts';
 import {UserItemWizardPanel} from '../UserItemWizardPanel';
 import {DeleteUserItemAction} from './DeleteUserItemAction';
-import UserItem = api.security.UserItem;
+import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {WizardActions} from 'lib-admin-ui/app/wizard/WizardActions';
+import {Action} from 'lib-admin-ui/ui/Action';
+import {SaveAction} from 'lib-admin-ui/app/wizard/SaveAction';
+import {CloseAction} from 'lib-admin-ui/app/wizard/CloseAction';
 
-export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem> extends api.app.wizard.WizardActions<USER_ITEM_TYPE> {
+export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem>
+    extends WizardActions<USER_ITEM_TYPE> {
 
-    private save: api.ui.Action;
+    private save: Action;
 
-    private close: api.ui.Action;
+    private close: Action;
 
-    private delete: api.ui.Action;
+    private delete: Action;
 
     constructor(wizardPanel: UserItemWizardPanel<USER_ITEM_TYPE>) {
         super();
 
-        this.save = new api.app.wizard.SaveAction(wizardPanel);
+        this.save = new SaveAction(wizardPanel);
         this.delete = new DeleteUserItemAction(wizardPanel);
-        this.close = new api.app.wizard.CloseAction(wizardPanel);
+        this.close = new CloseAction(wizardPanel);
 
         this.setActions(this.save, this.delete, this.close);
     }
@@ -31,15 +35,15 @@ export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem> extends api.
         this.delete.setEnabled(!userItem.getKey().isSystem());
     }
 
-    getDeleteAction(): api.ui.Action {
+    getDeleteAction(): Action {
         return this.delete;
     }
 
-    getSaveAction(): api.ui.Action {
+    getSaveAction(): Action {
         return this.save;
     }
 
-    getCloseAction(): api.ui.Action {
+    getCloseAction(): Action {
         return this.close;
     }
 

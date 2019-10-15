@@ -1,8 +1,13 @@
 import {SecurityInputTypeViewContext} from './SecurityInputTypeViewContext';
 import {IdProvider} from '../principal/IdProvider';
+import {FormContext, FormContextBuilder} from 'lib-admin-ui/form/FormContext';
+import {PropertyPath} from 'lib-admin-ui/data/PropertyPath';
+import {Input} from 'lib-admin-ui/form/Input';
+import {InputTypeViewContext} from 'lib-admin-ui/form/inputtype/InputTypeViewContext';
+import {ContentPath} from 'lib-admin-ui/content/ContentPath';
 
 export class SecurityFormContext
-    extends api.form.FormContext {
+    extends FormContext {
 
     private idProvider: IdProvider;
 
@@ -15,8 +20,8 @@ export class SecurityFormContext
         return this.idProvider;
     }
 
-    createInputTypeViewContext(inputTypeConfig: any, parentPropertyPath: api.data.PropertyPath,
-                               input: api.form.Input): api.form.inputtype.InputTypeViewContext {
+    createInputTypeViewContext(inputTypeConfig: any, parentPropertyPath: PropertyPath,
+                               input: Input): InputTypeViewContext {
 
         return <SecurityInputTypeViewContext> {
             formContext: this,
@@ -27,8 +32,8 @@ export class SecurityFormContext
         };
     }
 
-    private getContentPath(): api.content.ContentPath {
-        return new api.content.ContentPath([this.idProvider.getKey().toString()]);
+    private getContentPath(): ContentPath {
+        return new ContentPath([this.idProvider.getKey().toString()]);
     }
 
     static create(): SecurityFormContextBuilder {
@@ -38,7 +43,7 @@ export class SecurityFormContext
 }
 
 export class SecurityFormContextBuilder
-    extends api.form.FormContextBuilder {
+    extends FormContextBuilder {
 
     idProvider: IdProvider;
 

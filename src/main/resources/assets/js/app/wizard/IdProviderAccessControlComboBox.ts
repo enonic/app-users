@@ -1,24 +1,27 @@
-import Option = api.ui.selector.Option;
-import SelectedOption = api.ui.selector.combobox.SelectedOption;
-import SelectedOptionEvent = api.ui.selector.combobox.SelectedOptionEvent;
-import SelectedOptionView = api.ui.selector.combobox.SelectedOptionView;
-import SelectedOptionsView = api.ui.selector.combobox.SelectedOptionsView;
+import {Option} from 'lib-admin-ui/ui/selector/Option';
+import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
+import {SelectedOptionEvent} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionEvent';
+import {SelectedOptionView} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionView';
+import {SelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionsView';
 import {IdProviderAccessControlEntryViewer} from './IdProviderAccessControlEntryViewer';
 import {IdProviderAccessControlEntryView} from './IdProviderAccessControlEntryView';
 import {IdProviderAccessControlListView} from './IdProviderAccessControlListView';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
 import {IdProviderAccessControlEntryLoader} from '../access/IdProviderAccessControlEntryLoader';
+import {RichComboBox, RichComboBoxBuilder} from 'lib-admin-ui/ui/selector/combobox/RichComboBox';
+import {assertNotNull} from 'lib-admin-ui/util/Assert';
+import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
 
 export class IdProviderAccessControlComboBox
-    extends api.ui.selector.combobox.RichComboBox<IdProviderAccessControlEntry> {
+    extends RichComboBox<IdProviderAccessControlEntry> {
 
     private aceSelectedOptionsView: IdProviderACESelectedOptionsView;
 
     constructor() {
         let aceSelectedOptionsView = new IdProviderACESelectedOptionsView();
 
-        let builder = new api.ui.selector.combobox.RichComboBoxBuilder<IdProviderAccessControlEntry>().setMaximumOccurrences(
-            0).setComboBoxName('principalSelector').setLoader(new IdProviderAccessControlEntryLoader()).setSelectedOptionsView(
+        let builder = new RichComboBoxBuilder<IdProviderAccessControlEntry>().setMaximumOccurrences(0).setComboBoxName(
+            'principalSelector').setLoader(new IdProviderAccessControlEntryLoader()).setSelectedOptionsView(
             aceSelectedOptionsView).setOptionDisplayValueViewer(
             new IdProviderAccessControlEntryViewer()).setDelayedInputValueChangedHandling(500);
 
@@ -133,10 +136,10 @@ class IdProviderACESelectedOptionsView
     }
 
     removeOption(optionToRemove: Option<IdProviderAccessControlEntry>, silent: boolean = false) {
-        api.util.assertNotNull(optionToRemove, 'optionToRemove cannot be null');
+        assertNotNull(optionToRemove, 'optionToRemove cannot be null');
 
         let selectedOption = this.getByOption(optionToRemove);
-        api.util.assertNotNull(selectedOption, 'Did not find any selected option to remove from option: ' + optionToRemove.value);
+        assertNotNull(selectedOption, 'Did not find any selected option to remove from option: ' + optionToRemove.value);
 
         this.removeItem(optionToRemove.displayValue);
 
@@ -190,8 +193,8 @@ class IdProviderACESelectedOptionsView
     }
 
     moveOccurrence(formIndex: number, toIndex: number) {
-        api.util.ArrayHelper.moveElement(formIndex, toIndex, this.list);
-        api.util.ArrayHelper.moveElement(formIndex, toIndex, this.getChildren());
+        ArrayHelper.moveElement(formIndex, toIndex, this.list);
+        ArrayHelper.moveElement(formIndex, toIndex, this.getChildren());
 
         this.list.forEach((selectedOption: SelectedOption<IdProviderAccessControlEntry>,
                            index: number) => selectedOption.setIndex(index));

@@ -1,11 +1,12 @@
-import Principal = api.security.Principal;
-import ValueChangedEvent = api.ValueChangedEvent;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {ValueChangedEvent} from 'lib-admin-ui/ValueChangedEvent';
 import {IdProviderAccessSelector} from './IdProviderAccessSelector';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
 import {IdProviderAccess} from '../access/IdProviderAccess';
+import {PrincipalViewer} from 'lib-admin-ui/ui/security/PrincipalViewer';
 
 export class IdProviderAccessControlEntryView
-    extends api.ui.security.PrincipalViewer {
+    extends PrincipalViewer {
 
     private ace: IdProviderAccessControlEntry;
 

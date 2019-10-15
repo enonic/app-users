@@ -1,8 +1,5 @@
-import NodeEventJson = api.event.NodeEventJson;
-import NodeEventNodeJson = api.event.NodeEventNodeJson;
-import NodeServerChange = api.event.NodeServerChange;
-import NodeServerChangeType = api.event.NodeServerChangeType;
-import NodeServerChangeItem = api.event.NodeServerChangeItem;
+import {NodeEventJson, NodeEventNodeJson} from 'lib-admin-ui/event/NodeServerEvent';
+import {NodeServerChange, NodeServerChangeItem, NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
 
 export class ReportServerChangeItem
     extends NodeServerChangeItem<string> {

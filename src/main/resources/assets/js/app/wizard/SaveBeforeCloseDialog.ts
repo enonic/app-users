@@ -1,7 +1,10 @@
-import WizardPanel = api.app.wizard.WizardPanel;
-import ModalDialog = api.ui.dialog.ModalDialog;
-import Action = api.ui.Action;
-import i18n = api.util.i18n;
+import {WizardPanel} from 'lib-admin-ui/app/wizard/WizardPanel';
+import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
+import {Action} from 'lib-admin-ui/ui/Action';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {H6El} from 'lib-admin-ui/dom/H6El';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {Body} from 'lib-admin-ui/dom/Body';
 
 export class SaveBeforeCloseDialog extends ModalDialog {
 
@@ -16,7 +19,7 @@ export class SaveBeforeCloseDialog extends ModalDialog {
 
         this.wizardPanel = wizardPanel;
 
-        let message = new api.dom.H6El();
+        let message = new H6El();
         message.getEl().setInnerHtml(i18n('dialog.saveBeforeClose.msg'));
         this.appendChildToContentPanel(message);
 
@@ -36,7 +39,7 @@ export class SaveBeforeCloseDialog extends ModalDialog {
     }
 
     show() {
-        api.dom.Body.get().appendChild(this);
+        Body.get().appendChild(this);
         super.show();
     }
 
@@ -49,7 +52,7 @@ export class SaveBeforeCloseDialog extends ModalDialog {
         this.close();
         this.wizardPanel.saveChanges()
             .then(() => this.wizardPanel.close(true))
-            .catch(reason => api.DefaultErrorHandler.handle(reason));
+            .catch(reason => DefaultErrorHandler.handle(reason));
     }
 
     private doCloseWithoutSaveCheck() {

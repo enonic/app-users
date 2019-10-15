@@ -1,20 +1,27 @@
-import '../../api.ts';
+import * as Q from 'q';
 import {UserItemWizardActions} from './action/UserItemWizardActions';
 import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
 import {SaveBeforeCloseDialog} from './SaveBeforeCloseDialog';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
-import ResponsiveManager = api.ui.responsive.ResponsiveManager;
-import ResponsiveItem = api.ui.responsive.ResponsiveItem;
-import FormIcon = api.app.wizard.FormIcon;
-import WizardHeaderWithDisplayNameAndName = api.app.wizard.WizardHeaderWithDisplayNameAndName;
-import WizardHeaderWithDisplayNameAndNameBuilder = api.app.wizard.WizardHeaderWithDisplayNameAndNameBuilder;
-import WizardStep = api.app.wizard.WizardStep;
-import Toolbar = api.ui.toolbar.Toolbar;
-import UserItem = api.security.UserItem;
-import i18n = api.util.i18n;
+import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
+import {ResponsiveItem} from 'lib-admin-ui/ui/responsive/ResponsiveItem';
+import {FormIcon} from 'lib-admin-ui/app/wizard/FormIcon';
+import {
+    WizardHeaderWithDisplayNameAndName,
+    WizardHeaderWithDisplayNameAndNameBuilder
+} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
+import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
+import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {WizardPanel} from 'lib-admin-ui/app/wizard/WizardPanel';
+import {ImgEl} from 'lib-admin-ui/dom/ImgEl';
+import {ElementShownEvent} from 'lib-admin-ui/dom/ElementShownEvent';
+import {Error} from 'tslint/lib/error';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {Action} from 'lib-admin-ui/ui/Action';
 
 export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
-    extends api.app.wizard.WizardPanel<USER_ITEM_TYPE> {
+    extends WizardPanel<USER_ITEM_TYPE> {
 
     protected wizardActions: UserItemWizardActions<USER_ITEM_TYPE>;
 
@@ -97,7 +104,7 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     }
 
     protected createFormIcon(): FormIcon {
-        let iconUrl = api.dom.ImgEl.PLACEHOLDER;
+        let iconUrl = ImgEl.PLACEHOLDER;
         let formIcon = new FormIcon(iconUrl, 'icon');
         formIcon.addClass('icon icon-xlarge');
 
@@ -125,7 +132,7 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
             this.updateHash();
             this.onRemoved((event) => ResponsiveManager.unAvailableSizeChanged(this));
 
-            this.onShown((event: api.dom.ElementShownEvent) => {
+            this.onShown((event: ElementShownEvent) => {
                 this.updateHash();
                 responsiveItem.update();
             });
@@ -181,16 +188,16 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         this.notifyLockChanged(this.locked);
     }
 
-    saveChanges(): wemQ.Promise<USER_ITEM_TYPE> {
+    saveChanges(): Q.Promise<USER_ITEM_TYPE> {
         if (this.isRendered()) {
             this.getWizardHeader().normalizeNames();
             if (!this.getWizardHeader().getName()) {
-                return wemQ.fcall(() => {
+                return Q.fcall(() => {
                     throw i18n('notify.empty.name');
                 });
             }
             if (!this.getWizardHeader().getDisplayName()) {
-                return wemQ.fcall(() => {
+                return Q.fcall(() => {
                     throw i18n('notify.empty.displayName');
                 });
             }
@@ -228,26 +235,26 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         throw new Error('Must be implemented by inheritors');
     }
 
-    doLayout(persistedItem: USER_ITEM_TYPE): wemQ.Promise<void> {
+    doLayout(persistedItem: USER_ITEM_TYPE): Q.Promise<void> {
 
         this.setSteps(this.createSteps(this.getPersistedItem()));
 
-        return wemQ<void>(null);
+        return Q<void>(null);
     }
 
     protected doLayoutPersistedItem(persistedItem: USER_ITEM_TYPE): Q.Promise<void> {
         throw new Error('Must be implemented by inheritors');
     }
 
-    persistNewItem(): wemQ.Promise<USER_ITEM_TYPE> {
+    persistNewItem(): Q.Promise<USER_ITEM_TYPE> {
         throw new Error('Must be implemented by inheritors');
     }
 
-    updatePersistedItem(): wemQ.Promise<USER_ITEM_TYPE> {
+    updatePersistedItem(): Q.Promise<USER_ITEM_TYPE> {
         throw new Error('Must be implemented by inheritors');
     }
 
-    getCloseAction(): api.ui.Action {
+    getCloseAction(): Action {
         return this.wizardActions.getCloseAction();
     }
 

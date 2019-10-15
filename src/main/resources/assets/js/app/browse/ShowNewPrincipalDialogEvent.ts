@@ -1,7 +1,9 @@
-import '../../api.ts';
 import {UserTreeGridItem} from './UserTreeGridItem';
+import {Event} from 'lib-admin-ui/event/Event';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
 
-export class ShowNewPrincipalDialogEvent extends api.event.Event {
+export class ShowNewPrincipalDialogEvent
+    extends Event {
 
     private selection: UserTreeGridItem[];
 
@@ -15,10 +17,10 @@ export class ShowNewPrincipalDialogEvent extends api.event.Event {
     }
 
     static on(handler: (event: ShowNewPrincipalDialogEvent) => void) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: ShowNewPrincipalDialogEvent) => void) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

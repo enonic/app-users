@@ -1,9 +1,11 @@
-import PrincipalKey = api.security.PrincipalKey;
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {IdProviderAccessControlEntry} from './IdProviderAccessControlEntry';
 import {IdProviderAccessControlEntryJson} from './IdProviderAccessControlEntryJson';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class IdProviderAccessControlList
-    implements api.Equitable {
+    implements Equitable {
 
     private entries: { [key: string]: IdProviderAccessControlEntry };
 
@@ -68,9 +70,9 @@ export class IdProviderAccessControlList
         return acl;
     }
 
-    equals(o: api.Equitable): boolean {
+    equals(o: Equitable): boolean {
 
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, IdProviderAccessControlList)) {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, IdProviderAccessControlList)) {
             return false;
         }
 

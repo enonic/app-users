@@ -1,8 +1,10 @@
-import Principal = api.security.Principal;
-import PrincipalType = api.security.PrincipalType;
-import UserItem = api.security.UserItem;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {UserItem} from 'lib-admin-ui/security/UserItem';
 import {IdProvider} from '../principal/IdProvider';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 export enum UserTreeGridItemType {
     ID_PROVIDER,
@@ -12,7 +14,8 @@ export enum UserTreeGridItemType {
     ROLES
 }
 
-export class UserTreeGridItem implements api.Equitable {
+export class UserTreeGridItem
+    implements Equitable {
 
     private idProvider: IdProvider;
 
@@ -123,8 +126,8 @@ export class UserTreeGridItem implements api.Equitable {
         return (this.isUser() || this.isUserGroup() || this.isIdProvider() || this.isRole());
     }
 
-    equals(o: api.Equitable): boolean {
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, UserTreeGridItem)) {
+    equals(o: Equitable): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, UserTreeGridItem)) {
             return false;
         }
 

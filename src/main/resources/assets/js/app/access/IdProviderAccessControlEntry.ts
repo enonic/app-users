@@ -1,18 +1,21 @@
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {IdProviderAccess} from './IdProviderAccess';
 import {IdProviderAccessControlEntryJson} from './IdProviderAccessControlEntryJson';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {assertNotNull} from 'lib-admin-ui/util/Assert';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class IdProviderAccessControlEntry
-    implements api.Equitable {
+    implements Equitable {
 
     private principal: Principal;
 
     private access: IdProviderAccess;
 
     constructor(principal: Principal, access?: IdProviderAccess) {
-        api.util.assertNotNull(principal, 'principal not set');
-        //    api.util.assertNotNull(access, 'access not set');
+        assertNotNull(principal, 'principal not set');
+        //    assertNotNull(access, 'access not set');
         this.principal = principal;
         this.access = access;
     }
@@ -50,8 +53,8 @@ export class IdProviderAccessControlEntry
         return this.principal.getKey().toString();
     }
 
-    equals(o: api.Equitable): boolean {
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, IdProviderAccessControlEntry)) {
+    equals(o: Equitable): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, IdProviderAccessControlEntry)) {
             return false;
         }
         let other = <IdProviderAccessControlEntry>o;

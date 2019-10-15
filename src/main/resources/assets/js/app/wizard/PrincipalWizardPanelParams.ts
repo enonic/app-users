@@ -1,8 +1,8 @@
 import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
 import {IdProvider} from '../principal/IdProvider';
-import Principal = api.security.Principal;
-import PrincipalType = api.security.PrincipalType;
-import PrincipalKey = api.security.PrincipalKey;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
 export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Principal> {
 
@@ -14,7 +14,7 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
 
     principalKey: PrincipalKey;
 
-    setPrincipalKey(value: api.security.PrincipalKey): PrincipalWizardPanelParams {
+    setPrincipalKey(value: PrincipalKey): PrincipalWizardPanelParams {
         this.principalKey = value;
         return this;
     }
