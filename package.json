@@ -9,12 +9,12 @@
     "fix": "tslint -p tsconfig.build.json -c tslint.json --fix"
   },
   "dependencies": {
-    "@types/hasher": "0.0.31",
     "hasher": "^1.2.0",
     "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "q": "^1.5.1"
   },
   "devDependencies": {
+    "@types/hasher": "0.0.31",
     "@types/q": "^1.5.2",
     "autoprefixer": "^9.6.4",
     "browserslist": "^4.7.0",
