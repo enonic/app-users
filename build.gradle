@@ -73,6 +73,8 @@ task cleanNode( type: org.gradle.api.tasks.Delete ) {
     delete 'node_modules'
 }
 
+npmInstall.mustRunAfter unpackDevResources
+
 task lint( type: NpmTask, dependsOn: npmInstall ) {
     args = [ 'run', 'lint' ]
     inputs.files fileTree( dir: 'modules', include: '**/src/main/**.*' )
@@ -80,7 +82,7 @@ task lint( type: NpmTask, dependsOn: npmInstall ) {
     outputs.upToDateWhen { false }
 }
 
-task webpack( type: NodeTask, dependsOn: lint ) {
+task webpack( type: NodeTask, dependsOn: [npmInstall, lint] ) {
     environment = [ 'NODE_ENV': nodeEnvironment() ]
     description = 'Build UI resources (ts, css, etc).'
     inputs.dir '.xp/dev'
@@ -88,7 +90,6 @@ task webpack( type: NodeTask, dependsOn: lint ) {
     outputs.dir "${buildDir}/resources/main"
     script = file( './node_modules/webpack/bin/webpack' )
 }
-
 
 jar {
     exclude 'assets/**/*.ts'
@@ -110,8 +111,7 @@ if ( hasProperty( 'env' ) )
 
 def applyExcludedTasks() {
     def libAdminUi = gradle.includedBuild( 'lib-admin-ui' )
-    Closure permittedTasks = { it == 'lint' || it == 'test' }
-    def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( permittedTasks )
+    def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( { it == 'lint' || it == 'test' } )
     libAdminUi.getLoadedSettings().getStartParameter().setExcludedTaskNames( excludedTasks )
 }
 
