@@ -51,7 +51,7 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
     }
 
     open() {
-        this.grid.reload(null, null, false);
+        this.grid.reload(null);
         this.grid.getGrid().resizeCanvas();
         api.dom.Body.get().appendChild(this);
         super.open();
