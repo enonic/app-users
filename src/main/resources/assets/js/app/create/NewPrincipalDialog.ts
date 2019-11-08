@@ -54,7 +54,7 @@ export class NewPrincipalDialog
     }
 
     open() {
-        this.grid.reload(null, null, false);
+        this.grid.reload(null);
         this.grid.getGrid().resizeCanvas();
         Body.get().appendChild(this);
         super.open();
