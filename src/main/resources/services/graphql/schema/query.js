@@ -43,7 +43,7 @@ module.exports = graphQl.createObjectType({
                 query: graphQl.GraphQLString,
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt,
-                sort: graphQlEnums.SortModeEnum
+                sort: graphQl.GraphQLString
             },
             resolve: function (env) {
                 var idprovider = env.args.idprovider || 'system';
