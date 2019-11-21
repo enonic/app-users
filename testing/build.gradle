@@ -150,22 +150,21 @@ task startSeleniumDaemon( type: com.github.psxpaul.task.ExecFork ) {
     errorOutput = "${buildDir}${File.separator}selenium-daemon-error.log"
 }
 
-task testUsersApp( type: NpmTask, dependsOn: [npmInstall, startServer, copyApps, startSeleniumDaemon, ensureScreenshotsDirectory] ) {
+task testUsersApp( type: NpmTask, dependsOn: [npmInstall, startServer, copyApps, ensureScreenshotsDirectory] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
     args = ['test']
     startServer.mustRunAfter npmInstall
     copyApps.mustRunAfter startServer
     startSeleniumDaemon.mustRunAfter copyApps
-    ensureScreenshotsDirectory.mustRunAfter startSeleniumDaemon
+    ensureScreenshotsDirectory.mustRunAfter copyApps
     finalizedBy stopServer
 }
 
-task testUsersAppLocally( type: NpmTask, dependsOn: [npmInstall, ensureScreenshotsDirectory, startSeleniumDaemon] ) {
+task testUsersAppLocally( type: NpmTask, dependsOn: [npmInstall, ensureScreenshotsDirectory] ) {
     inputs.files fileTree( dir: '.' )
     outputs.files fileTree( dir: '/test-results' )
     args = ['test']
-    startSeleniumDaemon.mustRunAfter npmInstall
 }
 
 repositories {

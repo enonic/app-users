@@ -2,9 +2,7 @@
  * Created on 04.10.2017.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
 const assert = chai.assert;
-const expect = chai.expect;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -18,8 +16,8 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
     webDriverHelper.setupBrowser();
     let testUser;
 
-    it('GIVEN `User` with a role has been saved WHEN the user has been clicked THEN correct role should be displayed on the statistic panel',
-        () => {
+    it('GIVEN `User` with a role has been saved WHEN the user has been clicked THEN correct role should be displayed in the statistic panel',
+        async () => {
             this.bail(1);
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -27,86 +25,80 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
             let userName = userItemsBuilder.generateRandomName('user');
             let roles = [appConst.roles.CM_ADMIN, appConst.roles.USERS_ADMINISTRATOR];
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), roles);
-            return testUtils.clickOnSystemOpenUserWizard().then(()=> {
-                testUtils.saveScreenshot('edit_user_wizard1');
-                return userWizard.typeData(testUser);
-            }).then(()=> {
-                testUtils.saveScreenshot('edit_user_wizard2');
-                return userWizard.waitAndClickOnSave();
-            }).then(()=> {
-                return userBrowsePanel.clickOnAppHomeButton();
-            }).then(()=> {
-                return testUtils.typeNameInFilterPanel(userName);
-            }).then(()=> {
-                testUtils.saveScreenshot('edit_user_wizard3');
-                return userBrowsePanel.clickOnRowByName(userName);
-            }).then(()=> {
-                testUtils.saveScreenshot('edit_user_wizard4');
-                return userStatisticsPanel.getDisplayNameOfRoles();
-            }).then(roles => {
-                assert.equal(roles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
-                assert.equal(roles[1], appConst.roles.USERS_ADMINISTRATOR,
-                    '`Content Manager Administrator` role should be present on the panel');
-            }).then(()=> {
-                return expect(userStatisticsPanel.getItemName()).to.eventually.be.equal(userName);
-            })
+            //1. Select System folder and open User Wizard:
+            await testUtils.clickOnSystemOpenUserWizard();
+            testUtils.saveScreenshot('edit_user_wizard1');
+            await userWizard.typeData(testUser);
+            //2. Save the user:
+            testUtils.saveScreenshot('edit_user_wizard2');
+            await userWizard.waitAndClickOnSave();
+            //3. Go to Browse Panel:
+            await userBrowsePanel.clickOnAppHomeButton();
+            //4. Select the user in the grid
+            await testUtils.typeNameInFilterPanel(userName);
+            await userBrowsePanel.clickOnRowByName(userName);
+            testUtils.saveScreenshot('edit_user_wizard4');
+            let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
+
+            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present in the panel');
+            assert.equal(actualRoles[1], appConst.roles.USERS_ADMINISTRATOR,
+                '`Content Manager Administrator` role should be present in the panel');
+
+            let actualName = await userStatisticsPanel.getItemName();
+            assert.equal(actualName, userName, "Expected and actual name should be equal");
+
         });
 
     it('GIVEN existing user is opened WHEN display name has been changed THEN user should be searchable with the new display name',
-        () => {
+        async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(()=> {
-                return userWizard.typeDisplayName('new-name');
-            }).then(()=> {
-                return testUtils.saveAndCloseWizard('new-name');
-            }).then(()=> {
-                return testUtils.typeNameInFilterPanel('new-name');
-            }).then(()=> {
-                return expect(userBrowsePanel.isItemDisplayed(testUser.displayName)).to.eventually.be.true;
-            })
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await userWizard.typeDisplayName('new-name');
+            await testUtils.saveAndCloseWizard('new-name');
+            //Save new display name:
+            await testUtils.typeNameInFilterPanel('new-name');
+            let isDisplayed = await userBrowsePanel.isItemDisplayed(testUser.displayName);
+            assert.isTrue(isDisplayed, "User with new display name should be searchable in the grid");
         });
 
-    it('GIVEN existing user is opened WHEN one role has been removed THEN the role should not be present on the statistics panel',
-        () => {
+    it('GIVEN existing user is opened WHEN one role has been removed THEN this role should not be present in the statistics panel',
+        async () => {
             let userWizard = new UserWizard();
             let userStatisticsPanel = new UserStatisticsPanel();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(()=> {
-                return userWizard.removeRole(appConst.roles.USERS_ADMINISTRATOR);
-            }).then(()=> {
-                return testUtils.saveAndCloseWizard('new-name');
-            }).then(()=> {
-                return userStatisticsPanel.getDisplayNameOfRoles();
-            }).then(roles => {
-                assert.equal(roles.length, 1, 'one role should be present on the statistics panel');
-                assert.equal(roles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
-            })
+            //1. Open existing user:
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //2. Remove the role:
+            await userWizard.removeRole(appConst.roles.USERS_ADMINISTRATOR);
+            await testUtils.saveAndCloseWizard('new-name');
+            //3. Number of roles should be reduced in the Statistics Panel:
+            let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
+            assert.equal(actualRoles.length, 1, 'one role should be present on the statistics panel');
+            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
         });
 
-    it('GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail should be present on the statistics panel',
-        () => {
+    it('GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail should be present in the statistics panel',
+        async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userStatisticsPanel = new UserStatisticsPanel();
             let newEmail = userItemsBuilder.generateEmail(testUser.displayName);
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(()=> {
-                return userWizard.clearEmailInput();
-            }).then(()=> {
-                return userWizard.typeEmail(newEmail);
-            }).then(()=> {
-                return userWizard.waitAndClickOnSave();
-            }).then(()=> {
-                return userBrowsePanel.clickOnAppHomeButton();
-            }).then(()=> {
-                return userStatisticsPanel.getEmail();
-            }).then(email => {
-                assert.equal(email[0], newEmail, 'email should be updated on the statistics panel as well');
-            })
+            //1. Open existing user:
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await userWizard.clearEmailInput();
+            //2. Type new email:
+            await userWizard.typeEmail(newEmail);
+            //3. click on Save
+            await userWizard.waitAndClickOnSave();
+            //4. Go to the browse-panel:
+            await userBrowsePanel.clickOnAppHomeButton();
+            let actualEmail = await userStatisticsPanel.getEmail();
+            assert.equal(actualEmail[0], newEmail, 'email should be updated on the statistics panel as well');
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(()=> {
+    before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });

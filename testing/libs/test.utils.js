@@ -98,14 +98,12 @@ module.exports = {
             throw new Error('error when navigate to Users app ' + err);
         });
     },
-    doLoginAndClickOnUsersLink: function (userName, password) {
+    async doLoginAndClickOnUsersLink(userName, password) {
         let loginPage = new LoginPage();
-        return loginPage.doLogin(userName, password).then(() => {
-            let launcherPanel = new LauncherPanel();
-            return launcherPanel.clickOnUsersLink();
-        }).then(() => {
-            return loginPage.pause(1000);
-        })
+        await loginPage.doLogin(userName, password);
+        let launcherPanel = new LauncherPanel();
+        await launcherPanel.clickOnUsersLink();
+        return await loginPage.pause(1000);
     },
     doSwitchToUsersApp: function () {
         console.log('testUtils:switching to users app...');
@@ -154,61 +152,56 @@ module.exports = {
         return await userWizard.pause(500);
 
     },
-    openWizardAndSaveGroup: function (group) {
+    async openWizardAndSaveGroup(group) {
         let groupWizard = new GroupWizard();
-        return this.clickOnSystemAndOpenGroupWizard().then(() => {
-            return groupWizard.typeData(group)
-        }).then(() => {
-            return groupWizard.pause(500);
-        }).then(() => {
-            return this.saveAndCloseWizard(group.displayName)
-        }).then(() => {
-            return groupWizard.pause(500);
-        });
+        //Select System ID Provider and open new Group Wizard:
+        await this.clickOnSystemAndOpenGroupWizard();
+        await groupWizard.typeData(group)
+        await groupWizard.pause(500);
+        //Close the wizard:
+        await this.saveAndCloseWizard(group.displayName)
+        return await groupWizard.pause(500);
     },
-    clickOnSystemAndOpenGroupWizard: function () {
+    async clickOnSystemAndOpenGroupWizard() {
         let browsePanel = new UserBrowsePanel();
         let newPrincipalDialog = new NewPrincipalDialog();
         let groupWizard = new GroupWizard();
-        return browsePanel.clickOnRowByName('system').then(() => {
-            return browsePanel.waitForNewButtonEnabled();
-        }).then(() => {
-            return browsePanel.clickOnNewButton();
-        }).then(() => {
-            return newPrincipalDialog.clickOnItem('Group');
-        }).then(() => {
-            return groupWizard.waitForOpened();
-        });
+        //1. Select System ID Provider folder:
+        await browsePanel.clickOnRowByName('system');
+        //2. Open New Principal dialog:
+        await browsePanel.waitForNewButtonEnabled();
+        await browsePanel.clickOnNewButton();
+        await newPrincipalDialog.waitForDialogLoaded();
+        //3. Click on Group item in the modal dialog:
+        await newPrincipalDialog.clickOnItem('Group');
+        return await groupWizard.waitForOpened();
+
     },
-    saveAndCloseWizard: function (displayName) {
+    //Click on Save button and close the wizard:
+    async saveAndCloseWizard(displayName) {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
-        return wizardPanel.waitAndClickOnSave().then(() => {
-            return wizardPanel.pause(700);
-        }).then(() => {
-            return browsePanel.doClickOnCloseTabAndWaitGrid(displayName);
-        })
+        await wizardPanel.waitAndClickOnSave();
+        await wizardPanel.pause(700);
+        //Click on Close icon and close the wizard:
+        return await browsePanel.doClickOnCloseTabAndWaitGrid(displayName);
     },
-    openWizardAndSaveRole: function (role) {
+    async openWizardAndSaveRole(role) {
         let roleWizard = new RoleWizard();
-        return this.clickOnRolesFolderAndOpenWizard().then(() => {
-            return roleWizard.typeData(role)
-        }).then(() => {
-            return roleWizard.pause(500);
-        }).then(() => {
-            return this.saveAndCloseWizard(role.displayName)
-        }).then(() => {
-            return roleWizard.pause(500);
-        });
+        //Open Role-wizard:
+        await this.clickOnRolesFolderAndOpenWizard();
+        await roleWizard.typeData(role);
+        await roleWizard.pause(500);
+        await this.saveAndCloseWizard(role.displayName)
+        return await roleWizard.pause(500);
     },
-    clickOnRolesFolderAndOpenWizard: function () {
+    async clickOnRolesFolderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
         let roleWizard = new RoleWizard();
-        return browsePanel.clickOnRowByName('roles').then(() => {
-            return browsePanel.clickOnNewButton();
-        }).then(() => {
-            return roleWizard.waitForLoaded();
-        });
+        //Select Roles folder:
+        await browsePanel.clickOnRowByName('roles');
+        await browsePanel.clickOnNewButton();
+        return await roleWizard.waitForLoaded();
     },
     async clickOnSystemOpenUserWizard() {
         let browsePanel = new UserBrowsePanel();
@@ -220,16 +213,14 @@ module.exports = {
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },
-    selectSystemIdProviderAndOpenWizard: function () {
+    //Opens System ID Provider folder:
+    async selectSystemIdProviderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
         let idProviderWizard = new IdProviderWizard();
-        return this.findAndSelectItem('system').then(() => {
-            return browsePanel.waitForEditButtonEnabled();
-        }).then(() => {
-            return browsePanel.clickOnEditButton();
-        }).then(() => {
-            return idProviderWizard.waitForOpened();
-        });
+        await this.findAndSelectItem('system');
+        await browsePanel.waitForEditButtonEnabled();
+        await browsePanel.clickOnEditButton();
+        await idProviderWizard.waitForOpened();
     },
     async selectRoleAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
@@ -255,17 +246,15 @@ module.exports = {
             throw new Error("Error when open the group: " + err);
         }
     },
-    openWizardAndSaveIdProvider: function (idProviderData) {
+    async openWizardAndSaveIdProvider(idProviderData) {
         let idProviderWizard = new IdProviderWizard();
-        return this.openIdProviderWizard().then(() => {
-            return idProviderWizard.typeData(idProviderData);
-        }).then(() => {
-            return idProviderWizard.pause(500);
-        }).then(() => {
-            return idProviderWizard.waitAndClickOnSave();
-        }).then(() => {
-            return idProviderWizard.waitForSpinnerNotVisible();
-        });
+        //1. Open new ID Provider Wizard:
+        await this.openIdProviderWizard();
+        await idProviderWizard.typeData(idProviderData);
+        await idProviderWizard.pause(500);
+        //2. Save the data:
+        await idProviderWizard.waitAndClickOnSave();
+        return await idProviderWizard.waitForSpinnerNotVisible();
     },
     async openIdProviderWizard() {
         let browsePanel = new UserBrowsePanel();
@@ -277,13 +266,14 @@ module.exports = {
         return await idProviderWizard.waitForOpened();
     },
 
-    addSystemUser: function (userData) {
+    async addSystemUser(userData) {
         let userWizard = new UserWizard();
-        return this.clickOnSystemOpenUserWizard().then(() => {
-            return userWizard.typeData(userData).then(() => {
-                return this.saveAndCloseWizard(userData.displayName);
-            })
-        })
+        //1. Select System ID Provider folder:
+        await this.clickOnSystemOpenUserWizard();
+        //2. Type the data:
+        await userWizard.typeData(userData);
+        //3. Save the data and close the wizard:
+        return await this.saveAndCloseWizard(userData.displayName);
     },
     async clickOnIdProviderAndOpenUserWizard(storeName) {
         let browsePanel = new UserBrowsePanel();
