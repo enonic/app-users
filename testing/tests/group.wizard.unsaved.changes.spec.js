@@ -19,17 +19,16 @@ describe('Group Wizard and `Save Before Close dialog`', function () {
     let testGroup;
 
     it('GIVEN group-wizard is opened AND display name has been typed WHEN close button pressed THEN Save Before Close dialog should appear',
-        () => {
+        async () => {
             let groupWizard = new GroupWizard();
             let saveBeforeClose = new SaveBeforeClose();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.typeDisplayName('test-group');
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton('test-group');
-            }).then(() => {
-                return saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
-            });
+            //Select System folder and open Group Wizard:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            await groupWizard.typeDisplayName('test-group');
+            //Click on close icon:
+            await userBrowsePanel.doClickOnCloseTabButton('test-group');
+            await saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
         });
 
     it('WHEN new group has been added THEN the group should be present in the grid',
@@ -92,4 +91,3 @@ describe('Group Wizard and `Save Before Close dialog`', function () {
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
 });
-

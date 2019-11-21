@@ -4,8 +4,6 @@
  */
 
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -13,6 +11,7 @@ const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
+const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.dialog');
 
 describe('group.create.with.role Create a Group with a just created new Role', function () {
     this.timeout(70000);
@@ -20,35 +19,52 @@ describe('group.create.with.role Create a Group with a just created new Role', f
     let testRole;
 
     it('WHEN `Role` with a description has been saved THEN the role should be searchable',
-        () => {
+        async () => {
             testRole =
                 userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'description');
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.openWizardAndSaveRole(testRole).then(() => {
-                return testUtils.typeNameInFilterPanel(testRole.displayName)
-            }).then(() => {
-                return expect(userBrowsePanel.isItemDisplayed(testRole.displayName)).to.eventually.be.true;
-            })
+            //1. Create new Role
+            await testUtils.openWizardAndSaveRole(testRole);
+            //2. Type the name in the filter panel:
+            await testUtils.typeNameInFilterPanel(testRole.displayName)
+            let result = await userBrowsePanel.isItemDisplayed(testRole.displayName);
+            assert.isTrue(result, "New role should be present in the grid");
         });
+
     //verifies: xp-apps#371 GroupWizard - SaveBeforeClose dialog appears in saved group
     it('GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and `Close tab` has been clicked THEN `Save before close` dialog should not appear',
-        () => {
+        async () => {
             let testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'description', null, [testRole.displayName]);
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.typeData(testGroup);
-            }).then(() => {
-                return groupWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
-            }).then(() => {
-                let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-                return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogLoaded(),
-                    "`Save before close` dialog should not be present");
-            })
+            //1. Open Group Wizard:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            await groupWizard.typeData(testGroup);
+            //2. Save new group:
+            await groupWizard.waitAndClickOnSave();
+            //3. Click on close-tab icon:
+            await userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
+            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+            //`Save before close` dialog should not be displayed:
+            let result = await saveBeforeCloseDialog.isDialogLoaded();
         });
+
+    it('GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and `Close tab` has been clicked THEN `Save before close` dialog should not appear',
+        async () => {
+            let testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'description');
+            let newPrincipalDialog = new NewPrincipalDialog();
+            let userBrowsePanel = new UserBrowsePanel();
+            //1. Select System ID Provider, open Group Wizard, type the data, save it and close the wizard:
+            await testUtils.openWizardAndSaveGroup(testGroup);
+
+            //2. Click on New button(System ID Provider is selected in browse-panel):
+            await userBrowsePanel.clickOnNewButton();
+            testUtils.saveScreenshot("new_principal_dialog_should_be_loaded");
+            //3. New Principal dialog should be loaded:
+            await newPrincipalDialog.waitForDialogLoaded()
+        });
+
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
