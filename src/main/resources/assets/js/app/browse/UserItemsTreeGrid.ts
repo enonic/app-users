@@ -147,9 +147,9 @@ export class UserItemsTreeGrid
     appendUserNode(principal: Principal, idProvider: IdProvider, parentOfSameType?: boolean) {
         if (!principal) {
             this.appendIdProviderUserNode(idProvider);
+        } else {
+            this.appendPrincipalNode(principal, idProvider, parentOfSameType);
         }
-
-        this.appendPrincipalNode(principal, idProvider, parentOfSameType);
     }
 
     private appendIdProviderUserNode(idProvider: IdProvider) {
