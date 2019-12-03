@@ -35,23 +35,13 @@ function getApplication(): Application {
     return application;
 }
 
-function startLostConnectionDetector() {
-    let messageId;
-    let lostConnectionDetector = new ConnectionDetector();
-    lostConnectionDetector.setAuthenticated(true);
-    lostConnectionDetector.onConnectionLost(() => {
-        NotifyManager.get().hide(messageId);
-        messageId = showError(i18n('notify.connection.loss'), false);
-    });
-    lostConnectionDetector.onSessionExpired(() => {
-        NotifyManager.get().hide(messageId);
-        window.location.href = UriHelper.getToolUri('');
-    });
-    lostConnectionDetector.onConnectionRestored(() => {
-        NotifyManager.get().hide(messageId);
-    });
 
-    lostConnectionDetector.startPolling();
+function startLostConnectionDetector() {
+    ConnectionDetector.get()
+        .setAuthenticated(true)
+        .setSessionExpireRedirectUrl(UriHelper.getToolUri(''))
+        .setNotificationMessage(i18n('notify.connection.loss'))
+        .startPolling(true);
 }
 
 function startApplication() {
