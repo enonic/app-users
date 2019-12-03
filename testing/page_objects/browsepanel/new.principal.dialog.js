@@ -14,14 +14,15 @@ const XPATH = {
                `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
     },
 };
+
 class NewPrincipalDialog extends Page {
 
     get header() {
-        return `${XPATH.container}${XPATH.header}`;
+        return XPATH.container + XPATH.header;
     }
 
     get cancelButton() {
-        return `${XPATH.container}${lib.CANCEL_BUTTON_TOP}`;
+        return XPATH.container + lib.CANCEL_BUTTON_TOP;
     }
 
     clickOnCancelButtonTop() {
@@ -38,10 +39,12 @@ class NewPrincipalDialog extends Page {
         return this.isElementDisplayed(this.cancelButton);
     }
 
-    waitForDialogLoaded() {
-        return this.browser.$(XPATH.container).then(element => {
-            return element.waitForDisplayed(appConst.TIMEOUT_3);
-        });
+    async waitForDialogLoaded() {
+        try {
+            return await this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
+        } catch (err) {
+            throw new Error("New Principal dialog is not loaded in: " + appConst.TIMEOUT_3 + " ms  " + err);
+        }
     }
 
     getHeaderText() {
@@ -52,11 +55,6 @@ class NewPrincipalDialog extends Page {
         let items = XPATH.itemViewer + lib.H6_DISPLAY_NAME;
         let elements = await this.getDisplayedElements(items);
         return elements.length;
-        // let elements = await this.findElements(items);
-        // let result = await elements.filter(el => {
-        //     el.isElementDisplayed();
-        // })
-        //return Object.keys(result).length;
     }
 
     getItemNames() {
@@ -72,20 +70,19 @@ class NewPrincipalDialog extends Page {
         })
     }
 
-    waitForDialogClosed() {
+    async waitForDialogClosed() {
         try {
-            return this.waitForElementNotDisplayed(`${XPATH.container}`, appConst.TIMEOUT_2);
+            return await this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_2);
         } catch (err) {
             this.saveScreenshot('err_principal_dialog_close');
-            throw new Error('New Principal Dialog was not closed');
+            throw new Error('New Principal Dialog was not closed  ' + err);
         }
     }
 
-    clickOnExpanderIcon(name) {
+    async clickOnExpanderIcon(name) {
         let selector = XPATH.container + XPATH.expanderIconByName(name);
-        return this.clickOnElement(selector).then(() => {
-            return this.pause(300);
-        })
+        await this.clickOnElement(selector);
+        return await this.pause(300);
     }
 
     waitForProviderNameDisplayed(name) {

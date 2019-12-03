@@ -140,8 +140,12 @@ class Page {
 
     async waitForNotificationMessage() {
         try {
-            await this.waitForElementDisplayed(`//div[@class='notification-content']/span`, appConst.TIMEOUT_3);
-            return await this.getText(`//div[@class='notification-content']/span`);
+            let notificationXpath = `//div[@class='notification-content']/span`;
+            await this.getBrowser().waitUntil(async () => {
+                return await this.isElementDisplayed(notificationXpath);
+            }, appConst.TIMEOUT_3);
+            await this.pause(400);
+            return await this.getText(notificationXpath);
         } catch (err) {
             throw new Error('Error when wait for the notification message: ' + err);
         }
@@ -165,7 +169,26 @@ class Page {
     async doRightClick(selector) {
         let el = await this.findElement(selector);
         await el.moveTo();
-        return await this.browser.positionClick(2);
-    };
+        let xValue = await el.getLocation('x');
+        let yValue = await el.getLocation('y');
+        let y = parseInt(yValue);
+        let x = parseInt(xValue);
+        return await this.browser.performActions([{
+            type: 'pointer',
+            id: 'pointer1',
+            parameters: {
+                pointerType: 'mouse'
+            },
+            actions: [
+                {type: "pointerMove", origin: "pointer", "x": x, "y": y},
+                {
+                    type: 'pointerDown',
+                    button: 2
+                }, {
+                    type: 'pointerUp',
+                    button: 2
+                }]
+        }]);
+    }
 }
 module.exports = Page;

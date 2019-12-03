@@ -9,13 +9,14 @@ const LoaderComboBox = require('../inputs/loaderComboBox');
 
 const XPATH = {
     container: `//div[contains(@id,'GroupWizardPanel')]`,
-    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" ,
+    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]",
     roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]",
     rolesLink: `//li[child::a[text()='Roles']]`,
     membersLink: `//li[child::a[text()='Members']]`,
     membersStepForm: `//div[contains(@id,'GroupMembersWizardStepForm')]`,
     rolesStepForm: `//div[contains(@id,'MembershipsWizardStepForm')]`
 };
+
 class GroupWizard extends WizardPanel {
 
     get deleteButton() {
@@ -134,13 +135,9 @@ class GroupWizard extends WizardPanel {
         });
     }
 
-    clickOnDelete() {
-        return this.waitForDeleteButtonEnabled().then(() => {
-            return this.clickOnElement(this.deleteButton);
-        }).catch(err => {
-            this.saveScreenshot('err_delete_in_group_wizard', err);
-            throw new Error("GroupWizard - Delete button is disabled" + err);
-        });
+    async clickOnDelete() {
+        await this.waitForDeleteButtonEnabled();
+        return await this.clickOnElement(this.deleteButton);
     }
 
     getMembers() {
@@ -173,7 +170,7 @@ class GroupWizard extends WizardPanel {
     waitForDeleteButtonEnabled() {
         return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
             this.saveScreenshot('err_delete_group_button_disabled', err);
-            throw new Error("Save button should be enabled " + err);
+            throw new Error("Delete button should be enabled " + err);
         });
     }
 };
