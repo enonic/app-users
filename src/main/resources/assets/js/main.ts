@@ -38,6 +38,8 @@ function startApplication() {
     const application: api.app.Application = getApplication();
     const appBar = new api.app.bar.TabbedAppBar(application);
     appBar.setHomeIconAction();
+
+    const newPrincipalDialog = new NewPrincipalDialog();
     const appPanel = new UserAppPanel(appBar, application.getPath());
 
     body.appendChild(appBar);
@@ -56,7 +58,6 @@ function startApplication() {
 
     PrincipalServerEventsHandler.getInstance().start();
 
-    const newPrincipalDialog = new NewPrincipalDialog();
     ShowNewPrincipalDialogEvent.on((event) => {
         newPrincipalDialog.setSelection(event.getSelection()).open();
     });
