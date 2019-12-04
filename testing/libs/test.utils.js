@@ -220,7 +220,7 @@ module.exports = {
         await this.findAndSelectItem('system');
         await browsePanel.waitForEditButtonEnabled();
         await browsePanel.clickOnEditButton();
-        await idProviderWizard.waitForOpened();
+        return await idProviderWizard.waitForOpened();
     },
     async selectRoleAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
@@ -254,6 +254,7 @@ module.exports = {
         await idProviderWizard.pause(500);
         //2. Save the data:
         await idProviderWizard.waitAndClickOnSave();
+        await idProviderWizard.pause(2000);
         return await idProviderWizard.waitForSpinnerNotVisible();
     },
     async openIdProviderWizard() {
