@@ -44,6 +44,10 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         this.initEventHandlers();
     }
 
+    private isFlat(): boolean {
+        return this.idProviders.length <= 1;
+    }
+
     fetchidProviders(): wemQ.Promise<IdProvider[]> {
         if (this.idProviders) {
             return wemQ.resolve(this.idProviders);
@@ -51,7 +55,7 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
 
         return new ListIdProvidersRequest().sendAndParse().then((idProviders: IdProvider[]) => {
             this.idProviders = idProviders;
-            this.toggleClass('flat', this.idProviders.length === 1);
+            this.toggleClass('flat', this.isFlat());
             return idProviders;
         });
     }
@@ -104,15 +108,6 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
                         .setKey(idProvider.getKey().toString())
                         .setDisplayName(idProvider.getDisplayName())
                         .build()).build());
-            } else if (idProviders.length === 1) {
-                const userItem = parentNode.getData().getUserItem();
-                if (userItem instanceof User) {
-                    const item = new UserTreeGridItemBuilder().setIdProvider(idProviders[0]).setType(UserTreeGridItemType.USERS).build();
-                    new NewPrincipalEvent([item]).fire();
-                } else if (userItem instanceof Group) {
-                    const item = new UserTreeGridItemBuilder().setIdProvider(idProviders[0]).setType(UserTreeGridItemType.GROUPS).build();
-                    new NewPrincipalEvent([item]).fire();
-                }
             }
             return [];
         });
@@ -137,12 +132,13 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
 
             const node = this.getGrid().getDataView().getItem(data.row);
             const userItem = node.getData().getUserItem();
-            if (node.getData().hasChildren()) {
+            const isNodeTogglable = !this.isFlat() && this.hasChildren(node.getData());
+            if (isNodeTogglable) {
                 this.toggleNode(node);
                 ResponsiveManager.fireResizeEvent();
             } else {
-                const isRootNode = node.calcLevel() === 1;
                 if (userItem instanceof IdProvider) {
+                    const isRootNode = node.calcLevel() === 1;
                     if (isRootNode) {
                         new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ID_PROVIDER).build()]).fire();
                     } else if (node.getParent().getData().getUserItem() instanceof User) {
@@ -154,6 +150,14 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
                     }
                 } else if (userItem instanceof Role) {
                     new NewPrincipalEvent([new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build()]).fire();
+                } else if (userItem instanceof User) {
+                    const idProvider = this.idProviders[0];
+                    const item = new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USERS).build();
+                    new NewPrincipalEvent([item]).fire();
+                } else if (userItem instanceof Group) {
+                    const idProvider = this.idProviders[0];
+                    const item = new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.GROUPS).build();
+                    new NewPrincipalEvent([item]).fire();
                 }
             }
         });
