@@ -9,8 +9,6 @@ import {Body} from 'lib-admin-ui/dom/Body';
 import {Application} from 'lib-admin-ui/app/Application';
 import {Path} from 'lib-admin-ui/rest/Path';
 import {ConnectionDetector} from 'lib-admin-ui/system/ConnectionDetector';
-import {showError} from 'lib-admin-ui/notify/MessageBus';
-import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {UriHelper} from 'lib-admin-ui/util/UriHelper';
 import {TabbedAppBar} from 'lib-admin-ui/app/bar/TabbedAppBar';
@@ -36,22 +34,11 @@ function getApplication(): Application {
 }
 
 function startLostConnectionDetector() {
-    let messageId;
-    let lostConnectionDetector = new ConnectionDetector();
-    lostConnectionDetector.setAuthenticated(true);
-    lostConnectionDetector.onConnectionLost(() => {
-        NotifyManager.get().hide(messageId);
-        messageId = showError(i18n('notify.connection.loss'), false);
-    });
-    lostConnectionDetector.onSessionExpired(() => {
-        NotifyManager.get().hide(messageId);
-        window.location.href = UriHelper.getToolUri('');
-    });
-    lostConnectionDetector.onConnectionRestored(() => {
-        NotifyManager.get().hide(messageId);
-    });
-
-    lostConnectionDetector.startPolling();
+    ConnectionDetector.get()
+        .setAuthenticated(true)
+        .setSessionExpireRedirectUrl(UriHelper.getToolUri(''))
+        .setNotificationMessage(i18n('notify.connection.loss'))
+        .startPolling(true);
 }
 
 function startApplication() {
@@ -59,6 +46,8 @@ function startApplication() {
     const application: Application = getApplication();
     const appBar = new TabbedAppBar(application);
     appBar.setHomeIconAction();
+
+    const newPrincipalDialog = new NewPrincipalDialog();
     const appPanel = new UserAppPanel(appBar, application.getPath());
 
     body.appendChild(appBar);
@@ -77,7 +66,6 @@ function startApplication() {
 
     PrincipalServerEventsHandler.getInstance().start();
 
-    const newPrincipalDialog = new NewPrincipalDialog();
     ShowNewPrincipalDialogEvent.on((event) => {
         newPrincipalDialog.setSelection(event.getSelection()).open();
     });
