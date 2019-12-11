@@ -1,6 +1,7 @@
 import '../../../api.ts';
 import {UserItemWizardPanel} from '../UserItemWizardPanel';
 import {DeleteUserItemAction} from './DeleteUserItemAction';
+import {IdProvider} from '../../principal/IdProvider';
 import UserItem = api.security.UserItem;
 
 export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem> extends api.app.wizard.WizardActions<USER_ITEM_TYPE> {
@@ -28,7 +29,7 @@ export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem> extends api.
 
     enableActionsForExisting(userItem: UserItem) {
         this.save.setEnabled(false);
-        this.delete.setEnabled(!userItem.getKey().isSystem());
+        this.delete.setEnabled(!userItem.getKey().isSystem() && !api.ObjectHelper.iFrameSafeInstanceOf(userItem, IdProvider));
     }
 
     getDeleteAction(): api.ui.Action {
