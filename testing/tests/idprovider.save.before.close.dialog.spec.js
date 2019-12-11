@@ -49,7 +49,7 @@ describe('Id Provider and Save Before Close dialog', function () {
             })
         });
 
-    it(`GIVEN Id Provider wizard is opened AND name and idProvider have been typed WHEN 'close' icon has been pressed THEN 'Save Before' dialog should be displayed`,
+    it(`GIVEN Id Provider wizard is opened AND name and idProvider have been typed WHEN 'close' icon has been pressed THEN 'Save Before Close' dialog should appear`,
         () => {
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');

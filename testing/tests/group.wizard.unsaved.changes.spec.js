@@ -2,9 +2,7 @@
  * Created on 10.11.2017.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
 const assert = chai.assert;
-const expect = chai.expect;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const SaveBeforeClose = require('../page_objects/save.before.close.dialog');
@@ -23,66 +21,62 @@ describe('Group Wizard and `Save Before Close dialog`', function () {
             let groupWizard = new GroupWizard();
             let saveBeforeClose = new SaveBeforeClose();
             let userBrowsePanel = new UserBrowsePanel();
-            //Select System folder and open Group Wizard:
+            //1. Select System folder and open new Group Wizard:
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeDisplayName('test-group');
-            //Click on close icon:
+            //2. Click on close icon:
             await userBrowsePanel.doClickOnCloseTabButton('test-group');
+            //3. Save before dialog should appear( unsaved changes)
             await saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
         });
 
     it('WHEN new group has been added THEN the group should be present in the grid',
-        () => {
+        async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let groupName = userItemsBuilder.generateRandomName('group');
             testGroup = userItemsBuilder.buildGroup(groupName, 'description', null);
-            return testUtils.openWizardAndSaveGroup(testGroup).then(() => {
-                return testUtils.typeNameInFilterPanel(groupName);
-            }).then(() => {
-                return expect(userBrowsePanel.isItemDisplayed(groupName)).to.eventually.be.true;
-            })
+            await testUtils.openWizardAndSaveGroup(testGroup);
+            await testUtils.typeNameInFilterPanel(groupName);
+            let result = await userBrowsePanel.isItemDisplayed(groupName);
+            assert.isTrue(result, "New group should be present in grid");
         });
 
     it('GIVEN existing group is opened WHEN display name has been changed AND `Close` button pressed THEN Save Before Close dialog should appear',
-        () => {
+        async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let saveBeforeClose = new SaveBeforeClose();
-            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(() => {
-                return groupWizard.typeDisplayName('new-name');
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton('new-name');
-            }).then(() => {
-                return saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
-            });
+            //1. Open existing group and change the display name:
+            await testUtils.selectGroupAndOpenWizard(testGroup.displayName);
+            await groupWizard.typeDisplayName('new-name');
+            //2. Click on Close-icon:
+            await userBrowsePanel.doClickOnCloseTabButton('new-name');
+            await saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
         });
 
     it('GIVEN existing group is opened WHEN description has been changed AND `Close` button pressed THEN Save Before Close dialog should appear',
-        () => {
+        async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let saveBeforeClose = new SaveBeforeClose();
-            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(() => {
-                return groupWizard.typeDescription('new-description');
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
-            }).then(() => {
-                return saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
-            });
+            await testUtils.selectGroupAndOpenWizard(testGroup.displayName);
+            await groupWizard.typeDescription('new-description');
+            await userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
+            await saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
         });
 
     it('GIVEN existing group is opened WHEN member has been added AND `Close` button pressed THEN Save Before Close dialog should appear',
-        () => {
+        async () => {
             let groupWizard = new GroupWizard();
             let saveBeforeClose = new SaveBeforeClose();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.selectGroupAndOpenWizard(testGroup.displayName).then(() => {
-                return groupWizard.filterOptionsAndAddMember('Super User');
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
-            }).then(() => {
-                return saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
-            });
+            //1. Open existing group:
+            await testUtils.selectGroupAndOpenWizard(testGroup.displayName);
+            //2. Add the member:
+            await groupWizard.filterOptionsAndAddMember('Super User');
+            //3. Click on Close icon:
+            await userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
+            await saveBeforeClose.waitForDialogOpened(appConst.TIMEOUT_3);
         });
 
     before(() => {

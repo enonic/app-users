@@ -3,9 +3,6 @@
  *
  */
 const chai = require('chai');
-const should = require('chai').should;
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
@@ -20,79 +17,72 @@ describe('Id Provider, provider-dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it(`GIVEN wizard for new Id Provider is opened AND application has been selected WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Save Before' dialog should appear when 'Close' has been clicked`,
-        () => {
+    it(`GIVEN wizard for new Id Provider is opened WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Save Before' dialog should appear after 'Close' has been clicked`,
+        async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
-            return testUtils.openIdProviderWizard(testIdProvider).then(() => {
-                return idProviderWizard.typeData(testIdProvider);
-            }).then(() => {
-                return idProviderWizard.waitForSaveButtonDisabled();
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
-            }).then(() => {
-                return idProviderWizard.pause(400);
-            }).then(() => {
-                testUtils.saveScreenshot('application_save_before_close_present1');
-                let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-                return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogLoaded(), "`Save before close` dialog should appear");
-            })
+            //1. Open new ID Provider wizard and type the data:
+            await testUtils.openIdProviderWizard(testIdProvider);
+            await idProviderWizard.typeData(testIdProvider);
+            //2. Save button should be disabled, because  Provider-configuration has required inputs:
+            await idProviderWizard.waitForSaveButtonDisabled();
+            //3. Click on close-icon:
+            await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
+            testUtils.saveScreenshot('application_save_before_close_present1');
+            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+            //"Save before close" dialog should appear:
+            await saveBeforeCloseDialog.waitForDialogOpened();
         });
 
     it(`GIVEN Provider-configuration dialog is opened WHEN required inputs in Provider-dialog are filled THEN the Id Provider is getting valid`,
-        () => {
+        async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfigDialog = new ProviderConfigDialog();
-            return testUtils.openIdProviderWizard(testIdProvider).then(() => {
-                return idProviderWizard.typeData(testIdProvider);
-            }).then(()=>{
-                return idProviderWizard.pause(700);
-            }).then(() => {
-                return providerConfigDialog.openDialogFillRequiredInputs('domain', 'id', 'secret');
-            }).then(() => {
-                return idProviderWizard.isItemInvalid(testIdProvider.displayName);
-            }).then(result => {
-                testUtils.saveScreenshot('id_provider_is_getting_valid');
-                assert.isFalse(result, 'Red icon should not be present at the wizard');
-            })
+            //1. Open new id provider wizard, type the data:
+            await testUtils.openIdProviderWizard(testIdProvider);
+            await idProviderWizard.typeData(testIdProvider);
+            await idProviderWizard.pause(700);
+            //2. Open app-configuration dialog and fill required inputs:
+            await providerConfigDialog.openDialogFillRequiredInputs('domain', 'id', 'secret');
+            //3. ID Provider gets valid in the wizard:
+            let result = await idProviderWizard.isItemInvalid(testIdProvider.displayName);
+            testUtils.saveScreenshot('id_provider_is_getting_valid');
+            assert.isFalse(result, 'Red icon should not be present at the wizard');
         });
 
-    it(`GIVEN wizard for new Id Provider is opened AND required inputs in provider-configuration dialog are filled WHEN Save and Close buttons have been pressed THEN 'Save Before' dialog should not appear`,
-        () => {
+    it(`GIVEN wizard for new Id Provider is opened AND required inputs in provider-configuration dialog are filled WHEN Save and close the wizard THEN 'Save Before' dialog should not appear`,
+        async () => {
+            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let providerConfigDialog = new ProviderConfigDialog();
-            return testUtils.openIdProviderWizard(testIdProvider).then(() => {
-                return idProviderWizard.typeData(testIdProvider);
-            }).then(() => {
-                return idProviderWizard.pause(700);
-            }).then(() => {
-                return providerConfigDialog.openDialogFillRequiredInputs('domain', 'id', 'secret');
-            }).then(() => {
-                return idProviderWizard.waitAndClickOnSave();
-            }).then(() => {
-                return idProviderWizard.waitForSpinnerNotVisible();
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
-            }).then(() => {
-                return idProviderWizard.pause(500);
-            }).then(() => {
-                testUtils.saveScreenshot("idprovider_wizard_modal_dialog_should_be_closed");
-                let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-                return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogLoaded(), "`Save before close` dialog should not appear");
-            })
+            //1. Open new id provider wizard, type the data:
+            await testUtils.openIdProviderWizard(testIdProvider);
+            await idProviderWizard.typeData(testIdProvider);
+            await idProviderWizard.pause(700);
+            //2. Open app-configuration dialog and fill required inputs:
+            await providerConfigDialog.openDialogFillRequiredInputs('domain', 'id', 'secret');
+            //3. Save button should be enabled:
+            await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForSpinnerNotVisible();
+            //4. Click on close-icon:
+            await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
+            await idProviderWizard.pause(500);
+            testUtils.saveScreenshot("idprovider_wizard_modal_dialog_should_be_closed");
+            let result = await saveBeforeCloseDialog.isDialogLoaded();
+            assert.isFalse(result, "`Save before close` dialog should not appear");
         });
+
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
         return console.log('specification starting: ' + this.title);
     });
 });
-
 

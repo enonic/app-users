@@ -25,6 +25,7 @@ const XPATH = {
     selectedAuthApplicationView: "//div[contains(@id,'AuthApplicationSelectedOptionView')]",
     removeAuthApplicationIcon: `//a[contains(@class,'remove')]`,
 };
+
 class IdProviderWizard extends WizardPanel {
 
     get descriptionInput() {
@@ -63,13 +64,22 @@ class IdProviderWizard extends WizardPanel {
         return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3);
     }
 
-    clickOnDelete() {
-        return this.waitForDeleteButtonEnabled().then(result => {
-            return this.clickOnElement(this.deleteButton);
-        }).catch(err => {
+    async waitForDeleteButtonDisabled() {
+        try {
+            return await this.waitForElementDisabled(this.deleteButton, appConst.TIMEOUT_3);
+        } catch (err) {
+            throw new Error("ID Providewr wizard - Delete button should be disabled! " + err);
+        }
+    }
+
+    async clickOnDelete() {
+        try {
+            await this.waitForDeleteButtonEnabled();
+            return await this.clickOnElement(this.deleteButton);
+        } catch (err) {
             this.saveScreenshot('err_delete_in_idprovider_wizard');
             throw new Error('Error when Delete button has been clicked ' + err);
-        });
+        }
     }
 
     typeDescription(description) {
@@ -91,7 +101,7 @@ class IdProviderWizard extends WizardPanel {
         }).then(() => {
             return loaderComboBox.clickOnOption(XPATH.container, permissionDisplayName);
         }).then(() => {
-            this.pause(300);
+            return this.pause(300);
         }).catch(err => {
             throw new Error('Error when selecting the ACL-entry: ' + permissionDisplayName + ' ' + err);
         })
@@ -103,12 +113,12 @@ class IdProviderWizard extends WizardPanel {
     }
 
     async clickOnPrincipalComboBoxDropDownHandle() {
-        return this.clickOnElement(this.permissionsDropDownHandle);
+        await this.clickOnElement(this.permissionsDropDownHandle);
         return await this.pause(800);
     }
 
     async clickOnProviderComboBoxDropDownHandle() {
-        return this.clickOnElement(this.providerDropDownHandle);
+        await this.clickOnElement(this.providerDropDownHandle);
         return await this.pause(800);
     }
 
@@ -154,16 +164,19 @@ class IdProviderWizard extends WizardPanel {
             return result.includes('expanded');
         })
     }
+
     async clickOnAceMenuOperation(operation) {
-        let selector =XPATH.aceOperationByName(operation);
-        let elems =await this.getDisplayedElements(selector);
+        let selector = XPATH.aceOperationByName(operation);
+        let elems = await this.getDisplayedElements(selector);
         return await elems[0].click();
 
     }
-    getSelectedAceOperation(principal){
-        let selector = XPATH.selectedAcEntryByDisplayName(principal)+XPATH.aceAccessSelector+ "//a";
+
+    getSelectedAceOperation(principal) {
+        let selector = XPATH.selectedAcEntryByDisplayName(principal) + XPATH.aceAccessSelector + "//a";
         return this.getText(selector);
     }
+
     //gets ACE -operations in expanded menu
     async getAceMenuOperations() {
         let result = [];
