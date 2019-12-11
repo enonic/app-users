@@ -2,8 +2,6 @@
  * Created on 21.11.2017.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
@@ -18,118 +16,99 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
     webDriverHelper.setupBrowser();
     let idProvider;
 
-    it('GIVEN `IdProvider` has been saved in wizard WHEN Delete button on wizard-toolbar has been pressed THEN Confirmation dialog should appear',
-        () => {
+    it('GIVEN `IdProvider` has been saved WHEN Delete button in wizard-toolbar has been pressed THEN Confirmation dialog should appear',
+        async () => {
             let idProviderWizard = new IdProviderWizard();
             idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider1');
-            return testUtils.openIdProviderWizard().then(() => {
-                return idProviderWizard.typeData(idProvider)
-            }).then(() => {
-                return idProviderWizard.waitAndClickOnSave();
-            }).then(() => {
-                return idProviderWizard.waitForSpinnerNotVisible();
-            }).then(() => {
-                return idProviderWizard.pause(1000);
-            }).then(() => {
-                return idProviderWizard.clickOnDelete();
-            }).then(() => {
-                testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
-                let confirmationDialog = new ConfirmationDialog();
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(), "`Confirmation Dialog` should be displayed");
-            });
+            //1. Open new wizard and type the data:
+            await testUtils.openIdProviderWizard();
+            await idProviderWizard.typeData(idProvider)
+            await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForSpinnerNotVisible();
+            await idProviderWizard.pause(1000);
+            //2. Click on delete button:
+            await idProviderWizard.clickOnDelete();
+            testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
+            let confirmationDialog = new ConfirmationDialog();
+            //"Confirmation Dialog" should appear:
+            await confirmationDialog.waitForDialogLoaded();
         });
 
-    it('GIVEN existing IdProvider is opened WHEN new acl-entry has been updated AND Save button pressed THEN new acl-operation should be saved',
-        () => {
+    it('GIVEN existing IdProvider is opened and Everyone acl entry is added WHEN the acl-entry has been updated THEN new acl-operation should be saved',
+        async () => {
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.findAndSelectItem(idProvider.displayName).then(() => {
-                return userBrowsePanel.waitForEditButtonEnabled();
-            }).then(() => {
-                return userBrowsePanel.clickOnEditButton();
-            }).then(() => {
-                return idProviderWizard.waitForOpened();
-            }).then(() => {
-                return idProviderWizard.addPrincipals(['Everyone']);
-            }).then(() => {
-                return idProviderWizard.pause(1000);
-            }).then(() => {
-                //open the ACE-menu
-                return idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
-            }).then(() => {
-                //click on "Administrator" menu item
-                return idProviderWizard.clickOnAceMenuOperation('Administrator');
-            }).then(() => {
-                //save the Id Provider
-                return idProviderWizard.waitAndClickOnSave();
-            }).then(() => {
-                return idProviderWizard.pause(1000);
-            }).then(() => {
-                // gets selected operation
-                return idProviderWizard.getSelectedAceOperation('Everyone');
-            }).then(result => {
-                testUtils.saveScreenshot("idprovider_administrator_for_everyone");
-                assert.equal(result, "Administrator", "Administrator should be present for Everyone");
-            })
+            //1. Open existing ID provider:
+            await testUtils.findAndSelectItem(idProvider.displayName);
+            await userBrowsePanel.waitForEditButtonEnabled();
+            await userBrowsePanel.clickOnEditButton();
+            await idProviderWizard.waitForOpened();
+            //2. Type the principal in 'Options-Filter input' and click on 'Everyone':
+            await idProviderWizard.addPrincipals(['Everyone']);
+            await idProviderWizard.pause(1000);
+            //3. Click on the selected option (Everyone) and show menu options:
+            await idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
+
+            //4. Click on "Administrator" menu item
+            await idProviderWizard.clickOnAceMenuOperation('Administrator');
+            //5. save the Id Provider
+            await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.pause(1000);
+            // gets selected operation
+            let result = await idProviderWizard.getSelectedAceOperation('Everyone');
+            testUtils.saveScreenshot("idprovider_administrator_for_everyone");
+            assert.equal(result, "Administrator", "Administrator should be present for Everyone");
         });
 
     it('GIVEN new IdProvider has been saved WHEN the provider has been deleted in the wizard THEN expected notification message should appear',
-        () => {
+        async () => {
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
             idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider2');
-            return testUtils.openIdProviderWizard().then(() => {
-                return idProviderWizard.typeData(idProvider)
-            }).then(() => {
-                return idProviderWizard.waitAndClickOnSave();
-            }).then(() => {
-                return idProviderWizard.waitForSpinnerNotVisible();
-            }).then(() => {
-                return idProviderWizard.pause(1000);
-            }).then(() => {
-                return idProviderWizard.clickOnDelete();
-            }).then(() => {
-                return testUtils.confirmDelete();
-            }).then(result => {
-                testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
-                let expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
-                return assert.eventually.isTrue(userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage),
-                    "Expected notification message should appear");
-            });
+            //1. Open new wizard and type the data and save it:
+            await testUtils.openIdProviderWizard();
+            await idProviderWizard.typeData(idProvider);
+            await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForSpinnerNotVisible();
+            await idProviderWizard.pause(1000);
+            //2. click on Delete in wizard-toolbar:
+            await idProviderWizard.clickOnDelete();
+            //3. Confirm the deleting:
+            await testUtils.confirmDelete();
+            testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
+            let expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
+            //Expected notification message should appear
+            await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
         });
 
-
-    it('GIVEN existing `IdProvider` is selected WHEN Delete button on the browse-toolbar has been pressed THEN Confirmation dialog should appear',
-        () => {
+    it('GIVEN existing `IdProvider` is selected WHEN Delete button in browse-toolbar has been pressed THEN Confirmation dialog should appear',
+        async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            idProvider =
-                userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
-            return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
-            }).then(() => {
-                return testUtils.findAndSelectItem(idProvider.displayName);
-            }).then(() => {
-                return userBrowsePanel.waitForDeleteButtonEnabled();
-            }).then(() => {
-                return userBrowsePanel.clickOnDeleteButton();
-            }).then(() => {
-                let confirmationDialog = new ConfirmationDialog();
-                testUtils.saveScreenshot("idprovider_confirm_delete2");
-                return assert.eventually.isTrue(confirmationDialog.waitForDialogLoaded(),
-                    "`Confirmation Dialog` should be displayed");
-            });
+            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
+            //1. Save new id provider:
+            await testUtils.openWizardAndSaveIdProvider(idProvider);
+            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
+            //2. Go to browse panel and select the provider:
+            await testUtils.findAndSelectItem(idProvider.displayName);
+            await userBrowsePanel.waitForDeleteButtonEnabled();
+            //3. Click on Delete button:
+            await userBrowsePanel.clickOnDeleteButton();
+            let confirmationDialog = new ConfirmationDialog();
+            testUtils.saveScreenshot("idprovider_confirm_delete2");
+            //`Confirmation Dialog` should appear:
+            await confirmationDialog.waitForDialogLoaded();
         });
 
-    it('GIVEN existing IdProvider WHEN the provider has been deleted in the browse panel THEN expected notification should appear',
-        () => {
+    it('GIVEN existing IdProvider is selected WHEN the provider has been deleted THEN expected notification should appear',
+        async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.selectAndDeleteItem(idProvider.displayName).then(() => {
-                return userBrowsePanel.waitForNotificationMessage();
-            }).then(result => {
-                testUtils.saveScreenshot("store_deleted_notification_mes2");
-                let msg = appConst.storeDeletedMessage(idProvider.displayName);
-                assert.strictEqual(result, msg, 'expected notification message should be displayed');
-            });
+            //Select the provider and click on Delete button:
+            await testUtils.selectAndDeleteItem(idProvider.displayName);
+            let actualMessage = await userBrowsePanel.waitForNotificationMessage();
+            testUtils.saveScreenshot("store_deleted_notification_mes2");
+            let expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
+            //Id Provider "${displayName}" is deleted
+            assert.strictEqual(actualMessage, expectedMessage, 'expected notification message should be displayed');
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
@@ -138,4 +117,3 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
         return console.log('specification starting: ' + this.title);
     });
 });
-

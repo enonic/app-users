@@ -222,6 +222,14 @@ module.exports = {
         await browsePanel.clickOnEditButton();
         return await idProviderWizard.waitForOpened();
     },
+    async selectAndOpenIdProvider(displayName) {
+        let browsePanel = new UserBrowsePanel();
+        let idProviderWizard = new IdProviderWizard();
+        await this.findAndSelectItem(displayName);
+        await browsePanel.waitForEditButtonEnabled();
+        await browsePanel.clickOnEditButton();
+        return await idProviderWizard.waitForOpened();
+    },
     async selectRoleAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
         let roleWizard = new RoleWizard();

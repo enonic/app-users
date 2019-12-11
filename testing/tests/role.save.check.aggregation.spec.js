@@ -3,8 +3,6 @@
  */
 
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const RoleWizard = require('../page_objects/wizardpanel/role.wizard');
@@ -22,39 +20,27 @@ describe('Role - save a role and check the number in aggregations', function () 
     //verifies https://github.com/enonic/app-users/issues/214
     //Filter panel is not updated when the grid is filtered by role  and a new role is added
     it('GIVEN Filter Panel Is opened AND Roles checkbox is checked WHEN new role has been created THEN number of roles on the Filter panel should be increased',
-        () => {
+        async () => {
             let roleName = userItemsBuilder.generateRandomName('role');
             let initialNumber;
             let filterPanel = new FilterPanel();
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.openFilterPanel().then(() => {
-                //Click on Role-checkbox
-                return filterPanel.clickOnRoleAggregation();
-            }).then(() => {
-                return filterPanel.getNumberAggregatedRoles();
-            }).then(result => {
-                initialNumber = result;
-            }).then(() => {
-                //Open wizard for new Role
-                return testUtils.clickOnRolesFolderAndOpenWizard();
-            }).then(() => {
-                return roleWizard.typeDisplayName(roleName);
-            }).then(() => {
-                //save the role
-                return roleWizard.waitAndClickOnSave();
-            }).then(() => {
-                return roleWizard.pause(1000);
-            }).then(() => {
-                // go to the grid
-                return userBrowsePanel.clickOnAppHomeButton();
-            }).then(() => {
-                return filterPanel.getNumberAggregatedRoles();
-            }).then(result => {
-                assert.isTrue(result - initialNumber == 1, "Number of roles in Filter panel should be increased ")
-            });
+            await testUtils.openFilterPanel();
+            //1. Click on Role-checkbox:
+            await filterPanel.clickOnRoleAggregation();
+            //2. Get the initial number of roles:
+            initialNumber = await filterPanel.getNumberAggregatedRoles();
+            //3. Open new wizard and save new role:
+            await testUtils.clickOnRolesFolderAndOpenWizard();
+            await roleWizard.typeDisplayName(roleName);
+            await roleWizard.waitAndClickOnSave();
+            await roleWizard.pause(1000);
+            //4. Go to browse panel:
+            await userBrowsePanel.clickOnAppHomeButton();
+            let result = await filterPanel.getNumberAggregatedRoles();
+            assert.isTrue(result - initialNumber === 1, "Number of roles in Filter panel should be increased ");
         });
-
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

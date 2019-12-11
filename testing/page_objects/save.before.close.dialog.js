@@ -23,7 +23,7 @@ class SaveBeforeCloseDialog extends Page {
     }
 
     waitForLoaded() {
-        return this.waitForElementDisplayed(`${xpath.container}`, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(xpath.container, appConst.TIMEOUT_3);
     }
 
     clickOnYesButton() {
@@ -35,7 +35,7 @@ class SaveBeforeCloseDialog extends Page {
     }
 
     waitForDialogOpened() {
-        return this.waitForElementDisplayed(`${xpath.container}`, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(xpath.container, appConst.TIMEOUT_3);
     }
 
     waitForDialogClosed() {
@@ -46,7 +46,7 @@ class SaveBeforeCloseDialog extends Page {
     }
 
     isDialogLoaded() {
-        return this.isElementDisplayed(`${xpath.container}`);
+        return this.isElementDisplayed(xpath.container);
     }
 
     isWarningMessageVisible() {

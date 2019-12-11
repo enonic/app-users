@@ -2,9 +2,6 @@
  * Created on 29/06/2017.
  */
 const chai = require('chai');
-const should = require('chai').should;
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
@@ -18,165 +15,163 @@ const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.di
 describe('Id Provider specification - save and edit a provider', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
-    let idProvider;
-    let testUser;
+    let ID_PROVIDER;
+    let ID_PROVIDER_2;
+    let TEST_USER;
 
-    it(`GIVEN wizard for new 'Id Provider' is opened WHEN name has been typed AND 'Save' button pressed THEN expected notification message should be displayed`,
-        () => {
+    it(`GIVEN wizard for new 'Id Provider' is opened WHEN name has been typed AND 'Save' button pressed THEN expected notification message should appear`,
+        async () => {
             let idProviderWizard = new IdProviderWizard();
-            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
-            return testUtils.openIdProviderWizard().then(() => {
-                return idProviderWizard.typeDisplayName(idProvider.displayName);
-            }).then(() => {
-                return idProviderWizard.waitAndClickOnSave();
-            }).then(() => {
-                return idProviderWizard.waitForNotificationMessage();
-            }).then(result => {
-                assert.strictEqual(result, appConst.PROVIDER_CREATED_NOTIFICATION, 'expected notification message should be displayed');
-            })
+            ID_PROVIDER = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
+            await testUtils.openIdProviderWizard();
+            await idProviderWizard.typeDisplayName(ID_PROVIDER.displayName);
+            await idProviderWizard.waitAndClickOnSave();
+            let actualMessage = await idProviderWizard.waitForNotificationMessage();
+            assert.strictEqual(actualMessage, appConst.PROVIDER_CREATED_NOTIFICATION, 'expected notification message should be displayed');
         });
 
-    it(`GIVEN existing several providers WHEN New button has been pressed THEN 2 row-expander should be present in the dialog`,
-        () => {
+    it(`GIVEN existing two providers WHEN New button has been pressed THEN 2 row-expander should be present in the dialog`,
+        async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let newPrincipalDialog = new NewPrincipalDialog();
-            return userBrowsePanel.clickOnNewButton().then(() => {
-                return newPrincipalDialog.waitForDialogLoaded();
-            }).then(() => {
-                return newPrincipalDialog.waitForExpanderIconDisplayed("User Group");
-            }).then(result => {
-                assert.isTrue(result, "Expander for User Group should be displayed");
-            }).then(() => {
-                return newPrincipalDialog.waitForExpanderIconDisplayed("User");
-            }).then(result => {
-                assert.isTrue(result, "Expander for User should be displayed");
-            })
+            //1. Open New Content dialog:
+            await userBrowsePanel.clickOnNewButton();
+            await newPrincipalDialog.waitForDialogLoaded();
+
+            let result = await newPrincipalDialog.waitForExpanderIconDisplayed("User Group");
+            assert.isTrue(result, "Expander in User Group menu-item should be displayed");
+            result = await newPrincipalDialog.waitForExpanderIconDisplayed("User");
+            assert.isTrue(result, "Expander in User menu-item should be displayed");
         });
 
-    it(`GIVEN existing several providers AND New button has been pressed WHEN expander has been clicked THEN expected provider's name should appear`,
-        () => {
+    it(`GIVEN existing 2 id-providers AND New button has been pressed WHEN expander has been clicked THEN expected provider's name should be present in expanded menu`,
+        async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let newPrincipalDialog = new NewPrincipalDialog();
-            return userBrowsePanel.clickOnNewButton().then(() => {
-                return newPrincipalDialog.waitForDialogLoaded();
-            }).then(() => {
-                return newPrincipalDialog.clickOnExpanderIcon("User Group");
-            }).then(() => {
-                testUtils.saveScreenshot('User_Group_row_expanded');
-                return newPrincipalDialog.waitForProviderNameDisplayed(idProvider.displayName);
-            })
+            //1. Open New content dialog:
+            await userBrowsePanel.clickOnNewButton();
+            await newPrincipalDialog.waitForDialogLoaded();
+            //2. Click on the expander-icon in Users Group menu item:
+            await newPrincipalDialog.clickOnExpanderIcon("User Group");
+            //3. 2 id-providers should be present in the expanded menu:
+            testUtils.saveScreenshot('User_Group_row_expanded');
+            await newPrincipalDialog.waitForProviderNameDisplayed(ID_PROVIDER.displayName);
         });
 
-    it(`GIVEN 'Id provider' wizard is opened WHEN the name that already in use has been typed THEN correct notification message should be present`,
-        () => {
+    it(`GIVEN 'Id provider' wizard is opened WHEN the name that already in use has been typed THEN Expected notification message should appear`,
+        async () => {
             let idProviderWizard = new IdProviderWizard();
-            return testUtils.openIdProviderWizard().then(() => {
-                return idProviderWizard.waitForOpened();
-            }).then(() => idProviderWizard.typeDisplayName(idProvider.displayName)
-            ).then(() => {
-                return idProviderWizard.waitAndClickOnSave();
-            }).then(() => {
-                return idProviderWizard.waitForErrorNotificationMessage();
-            }).then(result => {
-                let msg = `Id Provider [` + idProvider.displayName + `] could not be created. A Id Provider with that name already exists`;
-                assert.strictEqual(result, msg, 'expected notification message should be displayed');
-            }).then(() => {
-                //verifies issue#189 - (Endless spinner when saving the Id Provider)
-                return idProviderWizard.waitForSpinnerNotVisible();
-            })
+            //1. Open new wizard:
+            await testUtils.openIdProviderWizard();
+            //2. Type the name and save:
+            await idProviderWizard.typeDisplayName(ID_PROVIDER.displayName)
+            await idProviderWizard.waitAndClickOnSave();
+            //3. Expected notification message should appear:
+            let actualMessage = await idProviderWizard.waitForErrorNotificationMessage();
+            let msg = `Id Provider [` + ID_PROVIDER.displayName + `] could not be created. A Id Provider with that name already exists`;
+            assert.strictEqual(actualMessage, msg, 'expected notification message should be displayed');
+            //verifies issue#189 - (Endless spinner when saving the Id Provider)
+            await idProviderWizard.waitForSpinnerNotVisible();
         });
 
-    it(`GIVEN wizard for new Id Provider is opened WHEN data has been typed and 'Save' button pressed AND the wizard has been closed THEN new Id Provider should be listed`,
-        () => {
+    it(`WHEN new Id Provider with description has been saved THEN new Id Provider should be present in browse panel`,
+        async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
-            return testUtils.openWizardAndSaveIdProvider(idProvider).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
-            }).then(() => {
-                return userBrowsePanel.pause(1000);
-            }).then(() => {
-                return userBrowsePanel.isItemDisplayed(idProvider.displayName);
-            }).then(result => {
-                assert.isTrue(result, 'new Id provider should be present in the grid');
-            })
+            ID_PROVIDER_2 = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
+            //1. Save new ID Provider:
+            await testUtils.openWizardAndSaveIdProvider(ID_PROVIDER_2);
+            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(ID_PROVIDER_2.displayName);
+            await userBrowsePanel.pause(1000);
+
+            let isDisplayed = await userBrowsePanel.isItemDisplayed(ID_PROVIDER_2.displayName);
+            assert.isTrue(isDisplayed, 'new Id provider should be present in the grid');
         });
 
-    it(`GIVEN wizard for new Id Provider is opened WHEN data and permissions have been typed and 'Save' button pressed AND the wizard has been closed THEN 'Save Before' dialog should not be displayed`,
-        () => {
+    it(`WHEN new ID Provider with permissions has been saved AND the wizard has been closed THEN 'Save Before Close' dialog should not appear`,
+        async () => {
             let idProviderWizard = new IdProviderWizard();
             let permissions = ['Everyone', 'Users App'];
             let userBrowsePanel = new UserBrowsePanel();
             let name = userItemsBuilder.generateRandomName('provider');
             let testProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', null, permissions);
-            return testUtils.openIdProviderWizard(testProvider).then(() => {
-                return idProviderWizard.typeData(testProvider);
-            }).then(() => {
-                return idProviderWizard.waitAndClickOnSave();
-            }).then(() => {
-                return idProviderWizard.waitForSpinnerNotVisible();
-            }).then(() => {
-                return idProviderWizard.pause(1500);
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testProvider.displayName);
-            }).then(() => userBrowsePanel.isItemDisplayed(testProvider.displayName)).then(result => {
-                assert.isTrue(result, 'new Id provider should be present in the grid');
-            })
+            //1. Open new wizard and type the data with permissions:
+            await testUtils.openIdProviderWizard(testProvider);
+            await idProviderWizard.typeData(testProvider);
+            //2. click on Save button:
+            await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForSpinnerNotVisible();
+            await idProviderWizard.pause(1500);
+            //3. Close the wizard-tab:
+            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(testProvider.displayName);
+            let result = await userBrowsePanel.isItemDisplayed(testProvider.displayName);
+            assert.isTrue(result, 'new Id provider should be present in browse panel');
         });
 
-    it(`WHEN existing 'Id Provider' has been opened THEN expected description should be present`, () => {
-        let idProviderWizard = new IdProviderWizard();
-        let userBrowsePanel = new UserBrowsePanel();
-        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() => {
-            return userBrowsePanel.clickOnEditButton();
-        }).then(() => {
-            return idProviderWizard.waitForOpened();
-        }).then(() => idProviderWizard.getDescription()
-        ).then(result => {
-            assert.strictEqual(result, idProvider.description, 'actual description and expected should be equals');
-        })
-    });
-
-    it(`GIVEN existing 'Id Provider'(no any users) WHEN it has been selected THEN 'Delete' button should be enabled`, () => {
-        let userBrowsePanel = new UserBrowsePanel();
-        return userBrowsePanel.clickOnRowByName(idProvider.displayName).then(() => {
-            return assert.eventually.equal(userBrowsePanel.waitForDeleteButtonEnabled(), true,
-                "'Delete' button should be enabled, because of no any users were added in the store");
-        }).then(() => {
-            return assert.eventually.equal(userBrowsePanel.waitForNewButtonEnabled(), true, "'New' button should be enabled");
-        }).then(() => {
-            return assert.eventually.equal(userBrowsePanel.isEditButtonEnabled(), true, "'Edit' button should be enabled");
+    it(`WHEN existing 'Id Provider' has been opened THEN expected description should be present`,
+        async () => {
+            let idProviderWizard = new IdProviderWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            await userBrowsePanel.clickOnRowByName(ID_PROVIDER_2.displayName);
+            await userBrowsePanel.clickOnEditButton();
+            await idProviderWizard.waitForOpened();
+            let description = await idProviderWizard.getDescription();
+            assert.strictEqual(description, ID_PROVIDER_2.description, 'actual and expected descriptions should be equal');
         });
-    });
 
-    it(`GIVEN existing 'Id Provider' has an user WHEN the provider has been selected THEN 'Delete' button should be disabled`, () => {
-        let userName = userItemsBuilder.generateRandomName('user');
-        let userWizard = new UserWizard();
-        let userBrowsePanel = new UserBrowsePanel();
-        testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName));
-        return testUtils.clickOnIdProviderAndOpenUserWizard(idProvider.displayName).then(() => {
-            return userWizard.typeData(testUser);
-        }).then(() => {
-            return testUtils.saveAndCloseWizard(testUser.displayName);
-        }).then(() => {
-            //Delete should be disabled, because of the store has an user
-            return expect(userBrowsePanel.waitForDeleteButtonDisabled()).to.eventually.be.true;
-        }).then(() => {
-            return expect(userBrowsePanel.waitForEditButtonEnabled()).to.eventually.be.true;
+    it(`GIVEN existing 'Id Provider'(no any users) WHEN it has been selected THEN 'Delete' button should be enabled`,
+        async () => {
+            let userBrowsePanel = new UserBrowsePanel();
+            await userBrowsePanel.clickOnRowByName(ID_PROVIDER_2.displayName);
+            //'Delete' button should be enabled, because of the provider does not contain users:
+            await userBrowsePanel.waitForDeleteButtonEnabled();
+            //'New' button should be enabled
+            await userBrowsePanel.waitForNewButtonEnabled()
+            //'Edit' button should be enabled
+            await userBrowsePanel.isEditButtonEnabled();
         });
-    });
 
-    it(`GIVEN existing 'Id Provider' with an user WHEN the user has been deleted THEN the store can be deleted`, () => {
-        let userBrowsePanel = new UserBrowsePanel();
-        return testUtils.selectAndDeleteItem(testUser.displayName).then(() => {
-            return userBrowsePanel.waitForItemNotDisplayed(testUser.displayName);
-        }).then(result => {
+    it(`GIVEN existing 'Id Provider'(with an user) is selected WHEN new user has been added THEN 'Delete' button(in browse panel) gets disabled`,
+        async () => {
+            let userName = userItemsBuilder.generateRandomName('user');
+            let userWizard = new UserWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            TEST_USER = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName));
+            //1. Select existing ID Provider and add new user:
+            await testUtils.clickOnIdProviderAndOpenUserWizard(ID_PROVIDER_2.displayName);
+            await userWizard.typeData(TEST_USER);
+            //2. Close the user-wizard:
+            await testUtils.saveAndCloseWizard(TEST_USER.displayName);
+            //3. Delete gets disabled, because of the ID Provider contains an user
+            await userBrowsePanel.waitForDeleteButtonDisabled();
+            await userBrowsePanel.waitForEditButtonEnabled();
+        });
+
+    //Verifies issue#275 : Id Provider wizard - Delete button gets enabled after updating the provider
+    it(`GIVEN existing 'Id Provider' (with an user) is opened WHEN description has been updated and the provider saved THEN 'Delete' button should be disabled`,
+        async () => {
+            let userBrowsePanel = new UserBrowsePanel();
+            let idProviderWizard = new IdProviderWizard();
+            //1. Select and open existing ID Provider:
+            await testUtils.selectAndOpenIdProvider(ID_PROVIDER_2.displayName);
+            //2. Update the description and save:
+            await idProviderWizard.typeDescription("new description");
+            await idProviderWizard.waitAndClickOnSave();
+            //3. Delete button should be disabled(id provider has users):
+            await idProviderWizard.waitForDeleteButtonDisabled();
+        });
+
+    it(`GIVEN existing 'Id Provider' with an user WHEN the user has been deleted THEN the ID Provider can be deleted now`,
+        async () => {
+            let userBrowsePanel = new UserBrowsePanel();
+            //1. Select and delete the user:
+            await testUtils.selectAndDeleteItem(TEST_USER.displayName);
+            let result = await userBrowsePanel.waitForItemNotDisplayed(TEST_USER.displayName);
             assert.isTrue(result, 'the user should not be present in the grid');
-        }).then(() => {
-            return testUtils.selectAndDeleteItem(idProvider.displayName)
-        }).then(() => {
-            return userBrowsePanel.waitForItemNotDisplayed(idProvider.displayName)
+            //2. User is deleted, so ID Provider can be deleted now:
+            await testUtils.selectAndDeleteItem(ID_PROVIDER_2.displayName)
+            let isPresent = await userBrowsePanel.waitForItemNotDisplayed(ID_PROVIDER_2.displayName);
+            assert.isTrue(isPresent, 'the ID provider should not be present in browse panel');
         });
-    });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
