@@ -1,8 +1,9 @@
-import '../../api.ts';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
+import {Event} from 'lib-admin-ui/event/Event';
 
-import Principal = api.security.Principal;
-
-export class OpenChangePasswordDialogEvent extends api.event.Event {
+export class OpenChangePasswordDialogEvent
+    extends Event {
 
     private principal: Principal;
 
@@ -16,10 +17,10 @@ export class OpenChangePasswordDialogEvent extends api.event.Event {
     }
 
     static on(handler: (event: OpenChangePasswordDialogEvent) => void, contextWindow: Window = window) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler, contextWindow);
+        Event.bind(ClassHelper.getFullName(this), handler, contextWindow);
     }
 
     static un(handler?: (event: OpenChangePasswordDialogEvent) => void, contextWindow: Window = window) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler, contextWindow);
+        Event.unbind(ClassHelper.getFullName(this), handler, contextWindow);
     }
 }

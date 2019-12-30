@@ -1,8 +1,12 @@
-import StringHelper = api.util.StringHelper;
-import NumberHelper = api.util.NumberHelper;
-import ArrayHelper = api.util.ArrayHelper;
-import i18n = api.util.i18n;
-import PasswordInput = api.ui.text.PasswordInput;
+import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {NumberHelper} from 'lib-admin-ui/util/NumberHelper';
+import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
+import {PasswordInput} from 'lib-admin-ui/ui/text/PasswordInput';
+import {FormInputEl} from 'lib-admin-ui/dom/FormInputEl';
+import {Element} from 'lib-admin-ui/dom/Element';
+import {AEl} from 'lib-admin-ui/dom/AEl';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 enum CharType {
     SPECIAL,
@@ -12,11 +16,11 @@ enum CharType {
 }
 
 export class PasswordGenerator
-    extends api.dom.FormInputEl {
+    extends FormInputEl {
 
     private input: PasswordInput;
-    private showLink: api.dom.AEl;
-    private generateLink: api.dom.AEl;
+    private showLink: AEl;
+    private generateLink: AEl;
 
     private complexity: string;
 
@@ -32,10 +36,10 @@ export class PasswordGenerator
     constructor() {
         super('div', 'password-generator');
 
-        const inputWrapper = new api.dom.DivEl('input-wrapper');
+        const inputWrapper = new DivEl('input-wrapper');
         this.appendChild(inputWrapper);
 
-        const strengthMeter = new api.dom.DivEl('strength-meter');
+        const strengthMeter = new DivEl('strength-meter');
         inputWrapper.appendChild(strengthMeter);
 
         this.input = new PasswordInput();
@@ -46,7 +50,7 @@ export class PasswordGenerator
         });
         inputWrapper.appendChild(this.input);
 
-        this.showLink = new api.dom.AEl('show-link');
+        this.showLink = new AEl('show-link');
         this.toggleShowLink(true);
         this.initFocusEvents(this.showLink);
         this.showLink.onClicked((event: MouseEvent) => {
@@ -64,7 +68,7 @@ export class PasswordGenerator
         });
         this.appendChild(this.showLink);
 
-        this.generateLink = new api.dom.AEl();
+        this.generateLink = new AEl();
         this.generateLink.setHtml(i18n('field.pswGenerator.generate'));
         this.initFocusEvents(this.generateLink);
         this.generateLink.onClicked((event: MouseEvent) => {
@@ -250,7 +254,7 @@ export class PasswordGenerator
         return /[^a-z\s]/i.test(value);
     }
 
-    private initFocusEvents(el: api.dom.Element) {
+    private initFocusEvents(el: Element) {
         el.onFocus((event: FocusEvent) => {
             this.notifyFocused(event);
         });

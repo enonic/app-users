@@ -1,12 +1,14 @@
-import UserItem = api.security.UserItem;
-import IdProviderConfig = api.security.IdProviderConfig;
-import IdProviderMode = api.security.IdProviderMode;
-import PrincipalType = api.security.PrincipalType;
-import UserItemBuilder = api.security.UserItemBuilder;
-import IdProviderKey = api.security.IdProviderKey;
-import {ListPrincipalsRequest, ListPrincipalsResult} from '../../api/graphql/principal/ListPrincipalsRequest';
+import * as Q from 'q';
+import {UserItem, UserItemBuilder} from 'lib-admin-ui/security/UserItem';
+import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
+import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {ListPrincipalsRequest, ListPrincipalsResult} from '../../graphql/principal/ListPrincipalsRequest';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {IdProviderJson} from './IdProviderJson';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class IdProvider
     extends UserItem {
@@ -32,11 +34,11 @@ export class IdProvider
         return this.idProviderMode;
     }
 
-    static checkOnDeletable(key: IdProviderKey): wemQ.Promise<boolean> {
-        return key ? IdProvider.create().setKey(key.toString()).build().isDeletable() : wemQ(false);
+    static checkOnDeletable(key: IdProviderKey): Q.Promise<boolean> {
+        return key ? IdProvider.create().setKey(key.toString()).build().isDeletable() : Q(false);
     }
 
-    isDeletable(): wemQ.Promise<boolean> {
+    isDeletable(): Q.Promise<boolean> {
         return new ListPrincipalsRequest()
             .setIdProviderKey(this.getKey())
             .setTypes([PrincipalType.USER, PrincipalType.GROUP])
@@ -60,8 +62,8 @@ export class IdProvider
         return <IdProviderKey>super.getKey();
     }
 
-    equals(o: api.Equitable, ignoreEmptyValues: boolean = false): boolean {
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, IdProvider)) {
+    equals(o: Equitable, ignoreEmptyValues: boolean = false): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, IdProvider)) {
             return false;
         }
 

@@ -1,3 +1,4 @@
+import * as Q from 'q';
 import {UserTreeGridItem, UserTreeGridItemType} from './UserTreeGridItem';
 import {SyncPrincipalAction} from './action/SyncPrincipalAction';
 import {DeletePrincipalAction} from './action/DeletePrincipalAction';
@@ -6,11 +7,13 @@ import {NewPrincipalAction} from './action/NewPrincipalAction';
 import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {User} from '../principal/User';
 import {IdProvider} from '../principal/IdProvider';
-import Action = api.ui.Action;
-import TreeGridActions = api.ui.treegrid.actions.TreeGridActions;
-import BrowseItem = api.app.browse.BrowseItem;
-import BrowseItemsChanges = api.app.browse.BrowseItemsChanges;
-import Principal = api.security.Principal;
+import {Action} from 'lib-admin-ui/ui/Action';
+import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
+import {BrowseItemsChanges} from 'lib-admin-ui/app/browse/BrowseItemsChanges';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 
 export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
 
@@ -19,7 +22,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
     public DELETE: Action;
     public SYNC: Action;
 
-    private actions: api.ui.Action[] = [];
+    private actions: Action[] = [];
 
     constructor(grid: UserItemsTreeGrid) {
         this.NEW = new NewPrincipalAction(grid);
@@ -31,13 +34,13 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
         this.actions.push(this.NEW, this.EDIT, this.DELETE/*, this.SYNC*/);
     }
 
-    getAllActions(): api.ui.Action[] {
+    getAllActions(): Action[] {
         return this.actions;
     }
 
     updateActionsEnabledState(browseItems: BrowseItem<UserTreeGridItem>[],
-                              changes?: BrowseItemsChanges<UserTreeGridItem>): wemQ.Promise<void> {
-        return wemQ(true).then(() => {
+                              changes?: BrowseItemsChanges<UserTreeGridItem>): Q.Promise<void> {
+        return Q(true).then(() => {
             let idProvidersSelected: number = 0;
             let principalsSelected: number = 0;
             let directoriesSelected: number = 0;
@@ -49,7 +52,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
                 switch (itemType) {
                 case UserTreeGridItemType.PRINCIPAL:
                     principalsSelected++;
-                    if (api.ObjectHelper.iFrameSafeInstanceOf(item.getPrincipal(), User)) {
+                    if (ObjectHelper.iFrameSafeInstanceOf(item.getPrincipal(), User)) {
                         usersSelected++;
                     }
                     break;
@@ -103,7 +106,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
             userBrowseItem.getIdProvider().getKey()) {
             IdProvider.checkOnDeletable(userBrowseItem.getIdProvider().getKey()).then((result: boolean) => {
                 this.DELETE.setEnabled(result);
-            }).catch(api.DefaultErrorHandler.handle).done();
+            }).catch(DefaultErrorHandler.handle).done();
         } else {
             this.DELETE.setEnabled(false);
         }

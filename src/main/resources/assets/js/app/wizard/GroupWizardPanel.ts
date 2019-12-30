@@ -1,17 +1,18 @@
 import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {GroupMembersWizardStepForm} from './GroupMembersWizardStepForm';
-import {CreateGroupRequest} from '../../api/graphql/principal/group/CreateGroupRequest';
-import {UpdateGroupRequest} from '../../api/graphql/principal/group/UpdateGroupRequest';
+import {CreateGroupRequest} from '../../graphql/principal/group/CreateGroupRequest';
+import {UpdateGroupRequest} from '../../graphql/principal/group/UpdateGroupRequest';
 import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardStepForm';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {Group, GroupBuilder} from '../principal/Group';
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
-import PrincipalLoader = api.security.PrincipalLoader;
-import WizardStep = api.app.wizard.WizardStep;
-import ArrayHelper = api.util.ArrayHelper;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
+import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 
 export class GroupWizardPanel extends GroupRoleWizardPanel {
 
@@ -38,7 +39,7 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
         return steps;
     }
 
-    protected doLayoutPersistedItem(principal: Principal): wemQ.Promise<void> {
+    protected doLayoutPersistedItem(principal: Principal): Q.Promise<void> {
 
         return super.doLayoutPersistedItem(principal).then(() => {
             if (principal) {
@@ -47,11 +48,11 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
         });
     }
 
-    persistNewItem(): wemQ.Promise<Principal> {
+    persistNewItem(): Q.Promise<Principal> {
 
         return this.produceCreateGroupRequest().sendAndParse().then((principal: Principal) => {
 
-            api.notify.showFeedback(i18n('notify.create.group'));
+            showFeedback(i18n('notify.create.group'));
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 
@@ -77,7 +78,7 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
             .setMemberships(memberships);
     }
 
-    updatePersistedItem(): wemQ.Promise<Principal> {
+    updatePersistedItem(): Q.Promise<Principal> {
         return super.updatePersistedItem().then((principal: Principal) => {
             //remove after users event handling is configured and layout is updated on receiving upd from server
             this.membershipsWizardStepForm.layout(principal);

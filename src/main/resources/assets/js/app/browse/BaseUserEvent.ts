@@ -1,7 +1,8 @@
-import '../../api.ts';
 import {UserTreeGridItem} from './UserTreeGridItem';
+import {Event} from 'lib-admin-ui/event/Event';
 
-export class BaseUserEvent extends api.event.Event {
+export class BaseUserEvent
+    extends Event {
 
     private gridItems: UserTreeGridItem[];
 

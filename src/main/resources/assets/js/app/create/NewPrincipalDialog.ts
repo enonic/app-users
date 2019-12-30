@@ -1,17 +1,20 @@
-import '../../api.ts';
 import {UserItemTypesTreeGrid} from './UserItemTypesTreeGrid';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-import i18n = api.util.i18n;
-import ResponsiveManager = api.ui.responsive.ResponsiveManager;
+import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
+import {PEl} from 'lib-admin-ui/dom/PEl';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {Body} from 'lib-admin-ui/dom/Body';
+import {ModalDialog, ModalDialogConfig} from 'lib-admin-ui/ui/dialog/ModalDialog';
 
-export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
+export class NewPrincipalDialog
+    extends ModalDialog {
     private grid: UserItemTypesTreeGrid;
 
-    private pathEl: api.dom.PEl;
+    private pathEl: PEl;
 
     constructor() {
-        super(<api.ui.dialog.ModalDialogConfig>{
+        super(<ModalDialogConfig>{
             title: i18n('dialog.new'),
             class: 'new-principal-dialog'
         });
@@ -53,7 +56,7 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
     open() {
         this.grid.reload(null);
         this.grid.getGrid().resizeCanvas();
-        api.dom.Body.get().appendChild(this);
+        Body.get().appendChild(this);
         super.open();
     }
 
@@ -63,8 +66,8 @@ export class NewPrincipalDialog extends api.ui.dialog.ModalDialog {
         this.remove();
     }
 
-    private createPathEl(): api.dom.PEl {
-        const pathEl = new api.dom.PEl('path');
+    private createPathEl(): PEl {
+        const pathEl = new PEl('path');
         pathEl.getEl().setAttribute('data-desc', `${i18n('dialog.newContent.pathDescription')}:`);
         this.header.appendChild(pathEl);
 

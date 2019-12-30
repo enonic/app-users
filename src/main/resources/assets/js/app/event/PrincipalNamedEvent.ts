@@ -1,18 +1,21 @@
-import Principal = api.security.Principal;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {Event} from 'lib-admin-ui/event/Event';
+import {WizardPanel} from 'lib-admin-ui/app/wizard/WizardPanel';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
 
 export class PrincipalNamedEvent
-    extends api.event.Event {
+    extends Event {
 
-    private wizard: api.app.wizard.WizardPanel<Principal>;
+    private wizard: WizardPanel<Principal>;
     private principal: Principal;
 
-    constructor(wizard: api.app.wizard.WizardPanel<Principal>, principal: Principal) {
+    constructor(wizard: WizardPanel<Principal>, principal: Principal) {
         super();
         this.wizard = wizard;
         this.principal = principal;
     }
 
-    public getWizard(): api.app.wizard.WizardPanel<Principal> {
+    public getWizard(): WizardPanel<Principal> {
         return this.wizard;
     }
 
@@ -21,11 +24,11 @@ export class PrincipalNamedEvent
     }
 
     static on(handler: (event: PrincipalNamedEvent) => void) {
-        api.event.Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: PrincipalNamedEvent) => void) {
-        api.event.Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 
 }

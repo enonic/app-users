@@ -1,6 +1,5 @@
-import '../../../api.ts';
 import {UserItemType} from '../UserItemType';
-import UserItem = api.security.UserItem;
+import {UserItem} from 'lib-admin-ui/security/UserItem';
 
 export class PrincipalBrowseSearchData {
 
@@ -22,7 +21,7 @@ export class PrincipalBrowseSearchData {
         return this.types;
     }
 
-    getUserItems(): api.security.UserItem[] {
+    getUserItems(): UserItem[] {
         return this.userItems;
     }
 }

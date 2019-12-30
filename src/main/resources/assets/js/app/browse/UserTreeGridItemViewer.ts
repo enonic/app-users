@@ -1,8 +1,9 @@
-import '../../api.ts';
 import {UserTreeGridItem, UserTreeGridItemType} from './UserTreeGridItem';
-import i18n = api.util.i18n;
+import {NamesAndIconViewer} from 'lib-admin-ui/ui/NamesAndIconViewer';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
-export class UserTreeGridItemViewer extends api.ui.NamesAndIconViewer<UserTreeGridItem> {
+export class UserTreeGridItemViewer
+    extends NamesAndIconViewer<UserTreeGridItem> {
 
     constructor() {
         super();

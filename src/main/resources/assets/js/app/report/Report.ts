@@ -1,5 +1,5 @@
-import Equitable = api.Equitable;
-import PrincipalKey = api.security.PrincipalKey;
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
 export class Report
     implements Equitable {

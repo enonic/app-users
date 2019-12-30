@@ -1,5 +1,5 @@
-import IdProviderConfigJson = api.security.IdProviderConfigJson;
-import UserItemJson = api.security.UserItemJson;
+import {IdProviderConfigJson} from 'lib-admin-ui/security/IdProviderConfigJson';
+import {UserItemJson} from 'lib-admin-ui/security/UserItemJson';
 import {IdProviderAccessControlEntryJson} from '../access/IdProviderAccessControlEntryJson';
 
 export interface IdProviderJson

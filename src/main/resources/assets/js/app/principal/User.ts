@@ -1,7 +1,9 @@
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
-import PrincipalBuilder = api.security.PrincipalBuilder;
+import {Principal, PrincipalBuilder} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {UserJson} from './UserJson';
+import {assert} from 'lib-admin-ui/util/Assert';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class User
     extends Principal {
@@ -16,7 +18,7 @@ export class User
 
     constructor(builder: UserBuilder) {
         super(builder);
-        api.util.assert(this.getKey().isUser(), 'Expected PrincipalKey of type User');
+        assert(this.getKey().isUser(), 'Expected PrincipalKey of type User');
         this.email = builder.email || '';
         this.login = builder.login || '';
         this.loginDisabled = builder.loginDisabled || false;
@@ -43,8 +45,8 @@ export class User
         this.memberships = memberships;
     }
 
-    equals(o: api.Equitable): boolean {
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, User)) {
+    equals(o: Equitable): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, User)) {
             return false;
         }
 
@@ -55,7 +57,7 @@ export class User
                this.email === other.getEmail() &&
                this.login === other.getLogin() &&
                //                   this.password === other.getPassword() &&
-               api.ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
+               ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
     }
 
     clone(): User {

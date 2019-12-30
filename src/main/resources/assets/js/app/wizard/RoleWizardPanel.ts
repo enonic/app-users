@@ -1,16 +1,16 @@
-import '../../api.ts';
 import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {RoleMembersWizardStepForm} from './RoleMembersWizardStepForm';
-import {CreateRoleRequest} from '../../api/graphql/principal/role/CreateRoleRequest';
-import {UpdateRoleRequest} from '../../api/graphql/principal/role/UpdateRoleRequest';
+import {CreateRoleRequest} from '../../graphql/principal/role/CreateRoleRequest';
+import {UpdateRoleRequest} from '../../graphql/principal/role/UpdateRoleRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {Role, RoleBuilder} from '../principal/Role';
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
-import RoleKeys = api.security.RoleKeys;
-import WizardStep = api.app.wizard.WizardStep;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
+import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 
 export class RoleWizardPanel
     extends GroupRoleWizardPanel {
@@ -38,10 +38,10 @@ export class RoleWizardPanel
         return steps;
     }
 
-    persistNewItem(): wemQ.Promise<Principal> {
+    persistNewItem(): Q.Promise<Principal> {
         return this.produceCreateRoleRequest().sendAndParse().then((principal: Principal) => {
 
-            api.notify.showFeedback(i18n('notify.create.role'));
+            showFeedback(i18n('notify.create.role'));
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 

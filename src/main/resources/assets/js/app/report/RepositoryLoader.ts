@@ -1,8 +1,10 @@
+import * as Q from 'q';
 import {Repository} from './Repository';
-import {ListRepositoriesRequest} from '../../api/graphql/repository/ListRepositoriesRequest';
+import {ListRepositoriesRequest} from '../../graphql/repository/ListRepositoriesRequest';
+import {BaseLoader} from 'lib-admin-ui/util/loader/BaseLoader';
 
 export class RepositoryLoader
-    extends api.util.loader.BaseLoader<any, Repository> {
+    extends BaseLoader<any, Repository> {
 
     private preservedSearchString: string;
     protected request: ListRepositoriesRequest;
@@ -15,7 +17,7 @@ export class RepositoryLoader
         return this.request;
     }
 
-    search(searchString: string): wemQ.Promise<Repository[]> {
+    search(searchString: string): Q.Promise<Repository[]> {
 
         this.getRequest().setSearchQuery(searchString);
 
@@ -27,7 +29,7 @@ export class RepositoryLoader
         this.getRequest().setSearchQuery(value);
     }
 
-    load(): wemQ.Promise<Repository[]> {
+    load(): Q.Promise<Repository[]> {
 
         this.notifyLoadingData();
 

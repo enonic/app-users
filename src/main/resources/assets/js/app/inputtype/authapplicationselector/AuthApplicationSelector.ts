@@ -1,18 +1,24 @@
-import PropertyArray = api.data.PropertyArray;
-import FormView = api.form.FormView;
-import Value = api.data.Value;
-import ValueType = api.data.ValueType;
-import ValueTypes = api.data.ValueTypes;
-import SelectedOption = api.ui.selector.combobox.SelectedOption;
-import Application = api.application.Application;
-import ApplicationKey = api.application.ApplicationKey;
-import ApplicationConfig = api.application.ApplicationConfig;
-import SelectedOptionEvent = api.ui.selector.combobox.SelectedOptionEvent;
-import ApplicationConfigProvider = api.form.inputtype.appconfig.ApplicationConfigProvider;
-import InputTypeViewContext = api.form.inputtype.InputTypeViewContext;
-import FormContext = api.form.FormContext;
+import * as Q from 'q';
+import {PropertyArray} from 'lib-admin-ui/data/PropertyArray';
+import {FormView} from 'lib-admin-ui/form/FormView';
+import {Value} from 'lib-admin-ui/data/Value';
+import {ValueType} from 'lib-admin-ui/data/ValueType';
+import {ValueTypes} from 'lib-admin-ui/data/ValueTypes';
+import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
+import {Application} from 'lib-admin-ui/application/Application';
+import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
+import {ApplicationConfig} from 'lib-admin-ui/application/ApplicationConfig';
+import {SelectedOptionEvent} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionEvent';
+import {ApplicationConfigProvider} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
+import {InputTypeViewContext} from 'lib-admin-ui/form/inputtype/InputTypeViewContext';
+import {FormContext} from 'lib-admin-ui/form/FormContext';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 import {AuthApplicationComboBox} from './AuthApplicationComboBox';
+import {BaseInputTypeManagingAdd} from 'lib-admin-ui/form/inputtype/support/BaseInputTypeManagingAdd';
+import {InputValidationRecording} from 'lib-admin-ui/form/inputtype/InputValidationRecording';
+import {Class} from 'lib-admin-ui/Class';
+import {InputTypeManager} from 'lib-admin-ui/form/inputtype/InputTypeManager';
+import {Input} from 'lib-admin-ui/form/Input';
 
 export interface AuthApplicationSelectorConfig
     extends InputTypeViewContext {
@@ -22,7 +28,7 @@ export interface AuthApplicationSelectorConfig
 }
 
 export class AuthApplicationSelector
-    extends api.form.inputtype.support.BaseInputTypeManagingAdd {
+    extends BaseInputTypeManagingAdd {
 
     private comboBox: AuthApplicationComboBox;
 
@@ -52,7 +58,7 @@ export class AuthApplicationSelector
         this.readOnly = readOnlyValue === 'true';
     }
 
-    layout(input: api.form.Input, propertyArray: PropertyArray): wemQ.Promise<void> {
+    layout(input: Input, propertyArray: PropertyArray): Q.Promise<void> {
 
         super.layout(input, propertyArray);
 
@@ -63,10 +69,10 @@ export class AuthApplicationSelector
 
         this.setLayoutInProgress(false);
 
-        return wemQ<void>(null);
+        return Q<void>(null);
     }
 
-    update(propertyArray: api.data.PropertyArray, unchangedOnly?: boolean): Q.Promise<void> {
+    update(propertyArray: PropertyArray, unchangedOnly?: boolean): Q.Promise<void> {
         let superPromise = super.update(propertyArray, unchangedOnly);
         this.applicationConfigProvider.setPropertyArray(propertyArray);
 
@@ -101,7 +107,7 @@ export class AuthApplicationSelector
         propertySet.setPropertySetByPath('config', config);
     }
 
-    protected getValueFromPropertyArray(propertyArray: api.data.PropertyArray): string {
+    protected getValueFromPropertyArray(propertyArray: PropertyArray): string {
         return propertyArray.getProperties().map((property) => {
             if (property.hasNonNullValue()) {
                 const applicationConfig = ApplicationConfig.create().fromData(property.getPropertySet()).build();
@@ -110,7 +116,7 @@ export class AuthApplicationSelector
         }).join(';');
     }
 
-    private createComboBox(input: api.form.Input, applicationConfigProvider: ApplicationConfigProvider): AuthApplicationComboBox {
+    private createComboBox(input: Input, applicationConfigProvider: ApplicationConfigProvider): AuthApplicationComboBox {
 
         const value = this.getValueFromPropertyArray(this.getPropertyArray());
         const applicationConfigFormsToDisplay = value.split(';');
@@ -180,8 +186,8 @@ export class AuthApplicationSelector
         return this.comboBox.countSelected();
     }
 
-    validate(silent: boolean = true): api.form.inputtype.InputValidationRecording {
-        let recording = new api.form.inputtype.InputValidationRecording();
+    validate(silent: boolean = true): InputValidationRecording {
+        let recording = new InputValidationRecording();
 
         this.comboBox.getSelectedOptionViews().forEach((view: AuthApplicationSelectedOptionView) => {
 
@@ -205,4 +211,4 @@ export class AuthApplicationSelector
     }
 }
 
-api.form.inputtype.InputTypeManager.register(new api.Class('AuthApplicationSelector', AuthApplicationSelector));
+InputTypeManager.register(new Class('AuthApplicationSelector', AuthApplicationSelector));

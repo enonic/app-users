@@ -1,28 +1,34 @@
 import {Role} from '../principal/Role';
 import {Group} from '../principal/Group';
-import Principal = api.security.Principal;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {TextInput} from 'lib-admin-ui/ui/text/TextInput';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {LabelEl} from 'lib-admin-ui/dom/LabelEl';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
-export class PrincipalDescriptionWizardStepForm extends api.app.wizard.WizardStepForm {
+export class PrincipalDescriptionWizardStepForm
+    extends WizardStepForm {
 
-    private description: api.ui.text.TextInput;
+    private description: TextInput;
 
     constructor() {
         super();
 
-        this.description = new api.ui.text.TextInput('middle');
+        this.description = new TextInput('middle');
         this.description.onFocus((event) => {
             this.notifyFocused(event);
         });
         this.description.onBlur((event) => {
             this.notifyBlurred(event);
         });
-        let formView = new api.dom.DivEl('form-view');
-        let inputView = new api.dom.DivEl('input-view valid');
-        let label = new api.dom.LabelEl(i18n('field.description'), this.description, 'input-label');
-        let inputTypeView = new api.dom.DivEl('input-type-view');
-        let inputOccurrenceView = new api.dom.DivEl('input-occurrence-view single-occurrence');
-        let inputWrapper = new api.dom.DivEl('input-wrapper');
+        let formView = new DivEl('form-view');
+        let inputView = new DivEl('input-view valid');
+        let label = new LabelEl(i18n('field.description'), this.description, 'input-label');
+        let inputTypeView = new DivEl('input-type-view');
+        let inputOccurrenceView = new DivEl('input-occurrence-view single-occurrence');
+        let inputWrapper = new DivEl('input-wrapper');
 
         inputWrapper.appendChild(this.description);
         inputOccurrenceView.appendChild(inputWrapper);
@@ -35,8 +41,8 @@ export class PrincipalDescriptionWizardStepForm extends api.app.wizard.WizardSte
     }
 
     layout(principal: Principal) {
-        if (api.ObjectHelper.iFrameSafeInstanceOf(principal, Role)
-            || api.ObjectHelper.iFrameSafeInstanceOf(principal, Group)) {
+        if (ObjectHelper.iFrameSafeInstanceOf(principal, Role)
+            || ObjectHelper.iFrameSafeInstanceOf(principal, Group)) {
             let description = principal.getDescription();
             this.description.setValue(!!description ? description : '');
         } else {

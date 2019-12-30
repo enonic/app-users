@@ -1,6 +1,6 @@
-import '../../api.ts';
-import Principal = api.security.Principal;
-import Event = api.event.Event;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {Event} from 'lib-admin-ui/event/Event';
+import {ClassHelper} from 'lib-admin-ui/ClassHelper';
 
 export class UpdatePrincipalEvent extends Event {
     private principals: Principal[];
@@ -15,10 +15,10 @@ export class UpdatePrincipalEvent extends Event {
     }
 
     static on(handler: (event: UpdatePrincipalEvent) => void) {
-        Event.bind(api.ClassHelper.getFullName(this), handler);
+        Event.bind(ClassHelper.getFullName(this), handler);
     }
 
     static un(handler?: (event: UpdatePrincipalEvent) => void) {
-        Event.unbind(api.ClassHelper.getFullName(this), handler);
+        Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

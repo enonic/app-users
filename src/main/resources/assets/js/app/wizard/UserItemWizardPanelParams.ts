@@ -1,9 +1,10 @@
-import UserItem = api.security.UserItem;
-import IdProviderKey = api.security.IdProviderKey;
+import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {AppBarTabId} from 'lib-admin-ui/app/bar/AppBarTabId';
 
 export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
 
-    tabId: api.app.bar.AppBarTabId;
+    tabId: AppBarTabId;
 
     idProviderKey: IdProviderKey;
 
@@ -28,7 +29,7 @@ export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
         return this;
     }
 
-    setTabId(value: api.app.bar.AppBarTabId): UserItemWizardPanelParams<USER_ITEM_TYPE> {
+    setTabId(value: AppBarTabId): UserItemWizardPanelParams<USER_ITEM_TYPE> {
         this.tabId = value;
         return this;
     }

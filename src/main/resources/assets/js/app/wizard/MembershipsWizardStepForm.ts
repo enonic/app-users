@@ -1,13 +1,15 @@
-import Principal = api.security.Principal;
-import PrincipalType = api.security.PrincipalType;
-import PrincipalLoader = api.security.PrincipalLoader;
-import RoleKeys = api.security.RoleKeys;
-import FormItemBuilder = api.ui.form.FormItemBuilder;
-import PrincipalComboBox = api.ui.security.PrincipalComboBox;
-import Fieldset = api.ui.form.Fieldset;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
+import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
+import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
+import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {Form} from 'lib-admin-ui/ui/form/Form';
+import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 export enum MembershipsType {
     GROUPS,
@@ -15,7 +17,8 @@ export enum MembershipsType {
     ALL
 }
 
-export class MembershipsWizardStepForm extends api.app.wizard.WizardStepForm {
+export class MembershipsWizardStepForm
+    extends WizardStepForm {
 
     private groups: PrincipalComboBox;
 
@@ -32,7 +35,7 @@ export class MembershipsWizardStepForm extends api.app.wizard.WizardStepForm {
 
         this.type = type;
 
-        const fieldSet = new api.ui.form.Fieldset();
+        const fieldSet = new Fieldset();
 
         if (type !== MembershipsType.GROUPS) {
             this.initRoles(fieldSet);
@@ -41,7 +44,7 @@ export class MembershipsWizardStepForm extends api.app.wizard.WizardStepForm {
             this.initGroups(fieldSet);
         }
 
-        const form = new api.ui.form.Form().add(fieldSet);
+        const form = new Form().add(fieldSet);
 
         this.appendChild(form);
 

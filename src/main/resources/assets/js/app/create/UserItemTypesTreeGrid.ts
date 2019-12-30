@@ -1,21 +1,24 @@
+import * as Q from 'q';
 import {UserTypeTreeGridItem, UserTypeTreeGridItemBuilder} from './UserTypeTreeGridItem';
 import {UserItemTypesRowFormatter} from './UserItemTypesRowFormatter';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItemBuilder, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-import {ListIdProvidersRequest} from '../../api/graphql/idprovider/ListIdProvidersRequest';
+import {ListIdProvidersRequest} from '../../graphql/idprovider/ListIdProvidersRequest';
 import {IdProvider, IdProviderBuilder} from '../principal/IdProvider';
 import {User, UserBuilder} from '../principal/User';
 import {Group, GroupBuilder} from '../principal/Group';
 import {Role, RoleBuilder} from '../principal/Role';
-import TreeGrid = api.ui.treegrid.TreeGrid;
-import TreeNode = api.ui.treegrid.TreeNode;
-import TreeGridBuilder = api.ui.treegrid.TreeGridBuilder;
-import PrincipalKey = api.security.PrincipalKey;
-import PrincipalType = api.security.PrincipalType;
-import ResponsiveManager = api.ui.responsive.ResponsiveManager;
-import IsAuthenticatedRequest = api.security.auth.IsAuthenticatedRequest;
-import i18n = api.util.i18n;
-import IdProviderKey = api.security.IdProviderKey;
+import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
+import {IsAuthenticatedRequest} from 'lib-admin-ui/security/auth/IsAuthenticatedRequest';
+import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
 
 export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
 
@@ -48,9 +51,9 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         return this.idProviders.length <= 1;
     }
 
-    fetchidProviders(): wemQ.Promise<IdProvider[]> {
+    fetchidProviders(): Q.Promise<IdProvider[]> {
         if (this.idProviders) {
-            return wemQ.resolve(this.idProviders);
+            return Q.resolve(this.idProviders);
         }
 
         return new ListIdProvidersRequest().sendAndParse().then((idProviders: IdProvider[]) => {
@@ -60,11 +63,14 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         });
     }
 
-    fetchRoot(): wemQ.Promise<UserTypeTreeGridItem[]> {
-        return wemQ.spread(
+    fetchRoot(): Q.Promise<UserTypeTreeGridItem[]> {
+        return Q.spread<any, any>(
             [new IsAuthenticatedRequest().sendAndParse(), this.fetchidProviders()],
-            result => result.isUserAdmin(),
-            reason => !api.DefaultErrorHandler.handle(reason)
+            (result: LoginResult) => result.isUserAdmin(),
+            reason => {
+                DefaultErrorHandler.handle(reason);
+                return false;
+            }
         ).then(userIsAdmin => [
             new UserTypeTreeGridItemBuilder()
                 .setUserItem(new UserBuilder()
@@ -77,17 +83,17 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
                     .setDisplayName(i18n('field.userGroup'))
                     .build()).build(),
             ...((this.manualidProvider || !userIsAdmin) ? [] : [
-                    new UserTypeTreeGridItemBuilder()
-                        .setUserItem(new IdProviderBuilder()
-                            .setKey(IdProviderKey.SYSTEM.toString())
-                            .setDisplayName(i18n('field.idProvider'))
-                            .build()).build(),
-                    new UserTypeTreeGridItemBuilder()
-                        .setUserItem(new RoleBuilder()
-                            .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.ROLE, 'role'))
-                            .setDisplayName(i18n('field.role'))
-                            .build()).build(),
-                ])
+                new UserTypeTreeGridItemBuilder()
+                    .setUserItem(new IdProviderBuilder()
+                        .setKey(IdProviderKey.SYSTEM.toString())
+                        .setDisplayName(i18n('field.idProvider'))
+                        .build()).build(),
+                new UserTypeTreeGridItemBuilder()
+                    .setUserItem(new RoleBuilder()
+                        .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.ROLE, 'role'))
+                        .setDisplayName(i18n('field.role'))
+                        .build()).build(),
+            ])
         ]);
     }
 
@@ -99,7 +105,7 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         return item.hasChildren();
     }
 
-    fetchChildren(parentNode: TreeNode<UserTypeTreeGridItem>): wemQ.Promise<UserTypeTreeGridItem[]> {
+    fetchChildren(parentNode: TreeNode<UserTypeTreeGridItem>): Q.Promise<UserTypeTreeGridItem[]> {
 
         return this.fetchidProviders().then((idProviders: IdProvider[]) => {
             if (idProviders.length > 1) {

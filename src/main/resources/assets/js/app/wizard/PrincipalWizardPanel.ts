@@ -1,16 +1,19 @@
+import * as Q from 'q';
 import {UserItemWizardPanel} from './UserItemWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {Router} from '../Router';
 import {PrincipalWizardDataLoader} from './PrincipalWizardDataLoader';
-import {GraphQlRequest} from '../../api/graphql/GraphQlRequest';
+import {GraphQlRequest} from '../../graphql/GraphQlRequest';
 import {PrincipalNamedEvent} from '../event/PrincipalNamedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
 import {IdProvider} from '../principal/IdProvider';
-import Principal = api.security.Principal;
-import PrincipalType = api.security.PrincipalType;
-import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
-import WizardStep = api.app.wizard.WizardStep;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
+import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
+import {FormIcon} from 'lib-admin-ui/app/wizard/FormIcon';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 
 export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
@@ -56,7 +59,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
             if (PrincipalWizardPanel.debug) {
                 console.debug('PrincipalWizardPanel.doLoadData: data present, skipping load...', equitable);
             }
-            return wemQ(equitable);
+            return Q(equitable);
         }
     }
 
@@ -64,18 +67,18 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         return this.getPersistedItem().getKey().toPath();
     }
 
-    protected createFormIcon(): api.app.wizard.FormIcon {
+    protected createFormIcon(): FormIcon {
         let formIcon = super.createFormIcon();
         switch (this.getParams().persistedType) {
-            case PrincipalType.USER:
-                formIcon.addClass('icon-user');
-                break;
-            case PrincipalType.GROUP:
-                formIcon.addClass('icon-users');
-                break;
-            case PrincipalType.ROLE:
-                formIcon.addClass('icon-masks');
-                break;
+        case PrincipalType.USER:
+            formIcon.addClass('icon-user');
+            break;
+        case PrincipalType.GROUP:
+            formIcon.addClass('icon-users');
+            break;
+        case PrincipalType.ROLE:
+            formIcon.addClass('icon-masks');
+            break;
         }
         return formIcon;
     }
@@ -105,7 +108,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         throw new Error('Must be implemented by inheritors');
     }
 
-    doLayout(persistedPrincipal: Principal): wemQ.Promise<void> {
+    doLayout(persistedPrincipal: Principal): Q.Promise<void> {
 
         return super.doLayout(persistedPrincipal).then(() => {
 
@@ -126,7 +129,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
                         .show();
                 }
 
-                return wemQ<void>(null);
+                return Q<void>(null);
             } else {
                 return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
             }
@@ -139,23 +142,23 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
             this.getWizardHeader().setDisplayName(principal.getDisplayName());
         }
 
-        return wemQ<void>(null);
+        return Q<void>(null);
     }
 
-    postPersistNewItem(persistedPrincipal: Principal): wemQ.Promise<Principal> {
+    postPersistNewItem(persistedPrincipal: Principal): Q.Promise<Principal> {
         Router.setHash('edit/' + persistedPrincipal.getKey());
 
-        return wemQ(persistedPrincipal);
+        return Q(persistedPrincipal);
     }
 
-    updatePersistedItem(): wemQ.Promise<Principal> {
+    updatePersistedItem(): Q.Promise<Principal> {
         return this.produceUpdateRequest(this.assembleViewedItem()).sendAndParse().then((principal:Principal) => {
             if (!this.getPersistedItem().getDisplayName() && !!principal.getDisplayName()) {
                 this.notifyPrincipalNamed(principal);
             }
 
             const principalTypeName = i18n(`field.${PrincipalType[principal.getType()].toLowerCase()}`);
-            api.notify.showFeedback(i18n('notify.update.any', principalTypeName, principal.getDisplayName()));
+            showFeedback(i18n('notify.update.any', principalTypeName, principal.getDisplayName()));
             new UserItemUpdatedEvent(principal, this.getIdProvider()).fire();
 
             return principal;

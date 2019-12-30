@@ -1,7 +1,9 @@
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
-import PrincipalBuilder = api.security.PrincipalBuilder;
+import {Principal, PrincipalBuilder} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {RoleJson} from './RoleJson';
+import {assert} from 'lib-admin-ui/util/Assert';
+import {Equitable} from 'lib-admin-ui/Equitable';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class Role
     extends Principal {
@@ -10,7 +12,7 @@ export class Role
 
     constructor(builder: RoleBuilder) {
         super(builder);
-        api.util.assert(this.getKey().isRole(), 'Expected PrincipalKey of type Role');
+        assert(this.getKey().isRole(), 'Expected PrincipalKey of type Role');
         this.members = builder.members || [];
     }
 
@@ -18,13 +20,13 @@ export class Role
         return this.members;
     }
 
-    equals(o: api.Equitable): boolean {
-        if (!api.ObjectHelper.iFrameSafeInstanceOf(o, Role)) {
+    equals(o: Equitable): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, Role)) {
             return false;
         }
 
         let other = <Role> o;
-        return super.equals(o) && api.ObjectHelper.arrayEquals(this.members, other.getMembers());
+        return super.equals(o) && ObjectHelper.arrayEquals(this.members, other.getMembers());
     }
 
     clone(): Role {

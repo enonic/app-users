@@ -1,5 +1,5 @@
-import InputTypeViewContext = api.form.inputtype.InputTypeViewContext;
-import ContentPath = api.content.ContentPath;
+import {InputTypeViewContext} from 'lib-admin-ui/form/inputtype/InputTypeViewContext';
+import {ContentPath} from 'lib-admin-ui/content/ContentPath';
 import {SecurityFormContext} from './SecurityFormContext';
 
 export interface SecurityInputTypeViewContext

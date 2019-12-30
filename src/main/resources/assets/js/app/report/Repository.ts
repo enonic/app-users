@@ -1,4 +1,4 @@
-import Equitable = api.Equitable;
+import {Equitable} from 'lib-admin-ui/Equitable';
 
 export class Repository
     implements Equitable {

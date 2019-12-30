@@ -1,7 +1,6 @@
-import '../../api.ts';
 import {UserTreeGridItem} from './UserTreeGridItem';
 import {UserTreeGridItemViewer} from './UserTreeGridItemViewer';
-import TreeNode = api.ui.treegrid.TreeNode;
+import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 
 export class UserItemsRowFormatter {
 

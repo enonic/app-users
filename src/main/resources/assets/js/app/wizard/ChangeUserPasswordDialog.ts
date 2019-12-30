@@ -1,21 +1,27 @@
-import '../../api.ts';
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
 import {SetUserPasswordRequest} from './SetUserPasswordRequest';
 import {PasswordGenerator} from './PasswordGenerator';
-import Principal = api.security.Principal;
-import DialogButton = api.ui.dialog.DialogButton;
-import FormItemBuilder = api.ui.form.FormItemBuilder;
-import Validators = api.ui.form.Validators;
-import DefaultErrorHandler = api.DefaultErrorHandler;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {DialogButton} from 'lib-admin-ui/ui/dialog/DialogButton';
+import {Validators} from 'lib-admin-ui/ui/form/Validators';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
+import {H6El} from 'lib-admin-ui/dom/H6El';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
+import {Form} from 'lib-admin-ui/ui/form/Form';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {Action} from 'lib-admin-ui/ui/Action';
 
-export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
+export class ChangeUserPasswordDialog
+    extends ModalDialog {
 
     private password: PasswordGenerator;
 
     private principal: Principal;
 
-    private userPath: api.dom.H6El;
+    private userPath: H6El;
 
     private changePasswordButton: DialogButton;
 
@@ -26,8 +32,8 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
 
         this.getEl().addClass('change-password-dialog');
 
-        this.userPath = new api.dom.H6El().addClass('user-path');
-        let descMessage = new api.dom.H6El().addClass('desc-message').setHtml(i18n('dialog.changePassword.msg'));
+        this.userPath = new H6El().addClass('user-path');
+        let descMessage = new H6El().addClass('desc-message').setHtml(i18n('dialog.changePassword.msg'));
 
         this.appendChildToContentPanel(this.userPath);
         this.appendChildToContentPanel(descMessage);
@@ -42,10 +48,10 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
             .setLabel(i18n('field.password'))
             .setValidator(Validators.required).build();
 
-        let fieldSet = new api.ui.form.Fieldset();
+        let fieldSet = new Fieldset();
         fieldSet.add(passwordFormItem);
 
-        let form = new api.ui.form.Form().add(fieldSet);
+        let form = new Form().add(fieldSet);
 
         this.appendChildToContentPanel(form);
         this.initializeActions();
@@ -61,10 +67,10 @@ export class ChangeUserPasswordDialog extends api.ui.dialog.ModalDialog {
 
     private initializeActions() {
 
-        this.changePasswordButton = this.addAction(new api.ui.Action(i18n('action.changePassword'), '').onExecuted(() => {
+        this.changePasswordButton = this.addAction(new Action(i18n('action.changePassword'), '').onExecuted(() => {
             new SetUserPasswordRequest().setKey(this.principal.getKey()).setPassword(
-                this.password.getValue()).sendAndParse().then((result) => {
-                api.notify.showFeedback(i18n('notify.change.password'));
+                this.password.getValue()).sendAndParse().then(() => {
+                showFeedback(i18n('notify.change.password'));
                 this.close();
             }).catch(DefaultErrorHandler.handle);
         }));

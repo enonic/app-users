@@ -1,12 +1,11 @@
-import '../../api.ts';
+import * as Q from 'q';
 import {PrincipalDescriptionWizardStepForm} from './PrincipalDescriptionWizardStepForm';
 import {PrincipalWizardPanel} from './PrincipalWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {PrincipalMembersWizardStepForm} from './PrincipalMembersWizardStepForm';
-import Principal = api.security.Principal;
-
-import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 export class GroupRoleWizardPanel extends PrincipalWizardPanel {
 
@@ -30,7 +29,7 @@ export class GroupRoleWizardPanel extends PrincipalWizardPanel {
         return this.membersWizardStepForm;
     }
 
-    doLayout(persistedPrincipal: Principal): wemQ.Promise<void> {
+    doLayout(persistedPrincipal: Principal): Q.Promise<void> {
 
         return super.doLayout(persistedPrincipal).then(() => {
 
@@ -50,7 +49,7 @@ export class GroupRoleWizardPanel extends PrincipalWizardPanel {
                         .show();
                 }
 
-                return wemQ<void>(null);
+                return Q<void>(null);
             } else {
                 return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
             }
@@ -58,7 +57,7 @@ export class GroupRoleWizardPanel extends PrincipalWizardPanel {
         });
     }
 
-    protected doLayoutPersistedItem(principal: Principal): wemQ.Promise<void> {
+    protected doLayoutPersistedItem(principal: Principal): Q.Promise<void> {
 
         return super.doLayoutPersistedItem(principal).then(() => {
             if (!!principal) {

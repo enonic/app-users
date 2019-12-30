@@ -1,18 +1,22 @@
+import * as Q from 'q';
 import {PrincipalWizardPanel} from './PrincipalWizardPanel';
 import {UserEmailWizardStepForm} from './UserEmailWizardStepForm';
 import {UserPasswordWizardStepForm} from './UserPasswordWizardStepForm';
 import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardStepForm';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
-import {CreateUserRequest} from '../../api/graphql/principal/user/CreateUserRequest';
-import {UpdateUserRequest} from '../../api/graphql/principal/user/UpdateUserRequest';
+import {CreateUserRequest} from '../../graphql/principal/user/CreateUserRequest';
+import {UpdateUserRequest} from '../../graphql/principal/user/UpdateUserRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {User, UserBuilder} from '../principal/User';
-import Principal = api.security.Principal;
-import PrincipalKey = api.security.PrincipalKey;
-import ConfirmationDialog = api.ui.dialog.ConfirmationDialog;
-import WizardStep = api.app.wizard.WizardStep;
-import ArrayHelper = api.util.ArrayHelper;
-import i18n = api.util.i18n;
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
+import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class UserWizardPanel extends PrincipalWizardPanel {
 
@@ -27,13 +31,13 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         this.addClass('user-wizard-panel');
     }
 
-    saveChanges(): wemQ.Promise<Principal> {
+    saveChanges(): Q.Promise<Principal> {
         if (!this.isRendered() ||
             (this.userEmailWizardStepForm.isValid() && this.userPasswordWizardStepForm.isValid())) {
 
             return super.saveChanges();
         } else {
-            return wemQ.fcall(() => {
+            return Q.fcall(() => {
                 // throw errors, if present
                 this.showErrors();
                 return null;
@@ -57,7 +61,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         return steps;
     }
 
-    doLayout(persistedPrincipal: Principal): wemQ.Promise<void> {
+    doLayout(persistedPrincipal: Principal): Q.Promise<void> {
 
         return super.doLayout(persistedPrincipal).then(() => {
 
@@ -77,7 +81,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
                         .show();
                 }
 
-                return wemQ<void>(null);
+                return Q<void>(null);
             } else {
                 return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
             }
@@ -85,7 +89,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         });
     }
 
-    protected doLayoutPersistedItem(principal: Principal): wemQ.Promise<void> {
+    protected doLayoutPersistedItem(principal: Principal): Q.Promise<void> {
 
         return super.doLayoutPersistedItem(principal).then(() => {
             if (principal) {
@@ -98,14 +102,14 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         });
     }
 
-    persistNewItem(): wemQ.Promise<Principal> {
+    persistNewItem(): Q.Promise<Principal> {
         return this.produceCreateUserRequest().sendAndParse().then((principal: Principal) => {
 
             this.decorateDeletedAction(principal.getKey());
 
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
 
-            api.notify.showFeedback(i18n('notify.create.user'));
+            showFeedback(i18n('notify.create.user'));
             this.notifyPrincipalNamed(principal);
 
             this.membershipsWizardStepForm.layout(principal);
@@ -138,7 +142,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
             .setMemberships(memberships);
     }
 
-    updatePersistedItem(): wemQ.Promise<Principal> {
+    updatePersistedItem(): Q.Promise<Principal> {
         return super.updatePersistedItem().then((principal: Principal) => {
             //remove after users event handling is configured and layout is updated on receiving upd from server
             this.membershipsWizardStepForm.layout(principal);
@@ -192,7 +196,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
     private showEmailErrors() {
         let formEmail = this.userEmailWizardStepForm.getEmail();
-        if (api.util.StringHelper.isEmpty(formEmail)) {
+        if (StringHelper.isEmpty(formEmail)) {
             throw i18n('notify.empty.email');
         } else if (!this.userEmailWizardStepForm.isValid()) {
             throw `${i18n('field.email.invalid')}.`;
@@ -202,7 +206,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
     private showPasswordErrors() {
         let password = this.userPasswordWizardStepForm.getPassword();
-        if (api.util.StringHelper.isEmpty(password)) {
+        if (StringHelper.isEmpty(password)) {
             throw i18n('notify.empty.password');
         } else if (!this.userPasswordWizardStepForm.isValid()) {
             throw `${i18n('field.password.invalid')}.`;
@@ -228,7 +232,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
             return el.getKey();
         });
 
-        if (api.ObjectHelper.arrayEquals(viewedMembershipsKeys, persistedMembershipsKeys)) {
+        if (ObjectHelper.arrayEquals(viewedMembershipsKeys, persistedMembershipsKeys)) {
             viewedPrincipal.setMemberships(persistedPrincipal.getMemberships());
         }
 

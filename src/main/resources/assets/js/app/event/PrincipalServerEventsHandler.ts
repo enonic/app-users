@@ -1,14 +1,14 @@
-import NodeServerChangeType = api.event.NodeServerChangeType;
-import Path = api.rest.Path;
-import Principal = api.security.Principal;
-import PrincipalServerEvent = api.security.event.PrincipalServerEvent;
-import PrincipalServerChange = api.security.event.PrincipalServerChange;
-import PrincipalServerChangeItem = api.security.event.PrincipalServerChangeItem;
-import PrincipalKey = api.security.PrincipalKey;
-import IdProviderKey = api.security.IdProviderKey;
-import {GetIdProviderByKeyRequest} from '../../api/graphql/idprovider/GetIdProviderByKeyRequest';
-import {GetPrincipalByKeyRequest} from '../../api/graphql/principal/GetPrincipalByKeyRequest';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalServerEvent} from 'lib-admin-ui/security/event/PrincipalServerEvent';
+import {PrincipalServerChange, PrincipalServerChangeItem} from 'lib-admin-ui/security/event/PrincipalServerChange';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {GetIdProviderByKeyRequest} from '../../graphql/idprovider/GetIdProviderByKeyRequest';
+import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
 import {IdProvider} from '../principal/IdProvider';
+import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 
 /**
  * Class that listens to server events and fires UI events
@@ -111,7 +111,7 @@ export class PrincipalServerEventsHandler {
 
     /**
      * Get <name> for idProviders, role:<name> for roles and ids otherwise
-     * @param {api.security.event.PrincipalServerChangeItem} changeItem
+     * @param {PrincipalServerChangeItem} changeItem
      * @returns {string}
      */
     private getId(changeItem: PrincipalServerChangeItem): string {
@@ -142,7 +142,7 @@ export class PrincipalServerEventsHandler {
                     if (idProvider) {
                         this.onUserItemLoaded(event, null, idProvider);
                     }
-                }).catch(api.DefaultErrorHandler.handle);
+                }).catch(DefaultErrorHandler.handle);
             } else {
                 // it's a principal, fetch him as well as idProvider
                 const key = PrincipalKey.fromString(id);
@@ -152,7 +152,7 @@ export class PrincipalServerEventsHandler {
                             console.debug('PrincipalServerEventsHandler.loaded principal:', principal);
                         }
                         this.onUserItemLoaded(event, principal, null);
-                    }).catch(api.DefaultErrorHandler.handle);
+                    }).catch(DefaultErrorHandler.handle);
                 } else {
                     new GetPrincipalByKeyRequest(key).sendAndParse().then(principal => {
                         if (PrincipalServerEventsHandler.debug) {
@@ -164,7 +164,7 @@ export class PrincipalServerEventsHandler {
                             });
                         }
                         console.warn('PrincipalServerEventsHandler: could not load principal[' + key.toString() + ']');
-                    }).catch(api.DefaultErrorHandler.handle);
+                    }).catch(DefaultErrorHandler.handle);
                 }
             }
         });

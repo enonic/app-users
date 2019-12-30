@@ -1,8 +1,12 @@
-import Principal = api.security.Principal;
-import PrincipalListJson = api.security.PrincipalListJson;
-import PrincipalJson = api.security.PrincipalJson;
-import SecurityResourceRequest = api.security.SecurityResourceRequest;
+import * as Q from 'q';
+import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalListJson} from 'lib-admin-ui/security/PrincipalListJson';
+import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
+import {SecurityResourceRequest} from 'lib-admin-ui/security/SecurityResourceRequest';
 import {IdProviderAccessControlEntry} from './IdProviderAccessControlEntry';
+import {Path} from 'lib-admin-ui/rest/Path';
+import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import {BaseLoader} from 'lib-admin-ui/util/loader/BaseLoader';
 
 // TODO: Implement GraphQL request and replace this one
 export class FindIdProviderAccessControlEntriesRequest
@@ -16,12 +20,12 @@ export class FindIdProviderAccessControlEntriesRequest
         };
     }
 
-    getRequestPath(): api.rest.Path {
-        return api.rest.Path.fromParent(super.getResourcePath(), 'principals');
+    getRequestPath(): Path {
+        return Path.fromParent(super.getResourcePath(), 'principals');
     }
 
-    sendAndParse(): wemQ.Promise<IdProviderAccessControlEntry[]> {
-        return this.send().then((response: api.rest.JsonResponse<PrincipalListJson>) => {
+    sendAndParse(): Q.Promise<IdProviderAccessControlEntry[]> {
+        return this.send().then((response: JsonResponse<PrincipalListJson>) => {
             return response.getResult().principals.map((principalJson: PrincipalJson) => {
                 return new IdProviderAccessControlEntry(Principal.fromJson(principalJson));
             });
@@ -35,11 +39,11 @@ export class FindIdProviderAccessControlEntriesRequest
 }
 
 export class IdProviderAccessControlEntryLoader
-    extends api.util.loader.BaseLoader<PrincipalListJson, IdProviderAccessControlEntry> {
+    extends BaseLoader<PrincipalListJson, IdProviderAccessControlEntry> {
 
     protected request: FindIdProviderAccessControlEntriesRequest;
 
-    search(searchString: string): wemQ.Promise<IdProviderAccessControlEntry[]> {
+    search(searchString: string): Q.Promise<IdProviderAccessControlEntry[]> {
         this.getRequest().setSearchQuery(searchString);
         return this.load();
     }

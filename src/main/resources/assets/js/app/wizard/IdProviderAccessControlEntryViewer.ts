@@ -1,8 +1,9 @@
-import PrincipalType = api.security.PrincipalType;
+import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
+import {NamesAndIconViewer} from 'lib-admin-ui/ui/NamesAndIconViewer';
 
 export class IdProviderAccessControlEntryViewer
-    extends api.ui.NamesAndIconViewer<IdProviderAccessControlEntry> {
+    extends NamesAndIconViewer<IdProviderAccessControlEntry> {
 
     constructor() {
         super();
