@@ -30,7 +30,7 @@ describe("group.wizard.spec - validation and check inputs", function () {
             await groupWizard.typeDisplayName("test-group999")
             await groupWizard.pause(400);
             //3. red circle gets not visible:
-            let isRedIconPresent = groupWizard.waitUntilInvalidIconDisappears("test-group");
+            let isRedIconPresent = await groupWizard.waitUntilInvalidIconDisappears("test-group");
             assert.isTrue(isRedIconPresent, "red circle should not be visible in the tab, because required input is filled");
         });
 
