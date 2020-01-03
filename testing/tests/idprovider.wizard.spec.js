@@ -19,7 +19,7 @@ describe("Id Provider wizard - validation and inputs", function () {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
             let isRedIconPresent = await idProviderWizard.waitUntilInvalidIconAppears('<Unnamed Id Provider>');
-            assert.isTrue(isRedIconPresent, 'red circle should be present in the tab, because required input(name) is empty');
+            assert.isTrue(isRedIconPresent, "red circle should be present in the tab, because required input(name) is empty");
         });
 
     it("WHEN 'New' button has been pressed AND 'Id Provider' menu-item has been clicked THEN required inputs should be loaded in the wizard",
@@ -76,7 +76,7 @@ describe("Id Provider wizard - validation and inputs", function () {
         async () => {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
-            await idProviderWizard.filterOptionsAndSelectPermission('Everyone');
+            await idProviderWizard.filterOptionsAndSelectPermission("Everyone");
             let result = await idProviderWizard.isPermissionsOptionsFilterInputDisplayed();
             assert.isTrue(result, "'Permissions Options Filter' input should not be displayed");
             let perm = await idProviderWizard.getPermissions();
@@ -90,10 +90,10 @@ describe("Id Provider wizard - validation and inputs", function () {
         async () => {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
-            await idProviderWizard.typeDisplayName('test');
+            await idProviderWizard.typeDisplayName("test");
 
-            let isRedIconNotPresent = await idProviderWizard.waitUntilInvalidIconDisappears('test');
-            assert.isTrue(isRedIconNotPresent, 'red circle gets not visible in the tab, because  required input(name) is filled');
+            let isRedIconNotPresent = await idProviderWizard.waitUntilInvalidIconDisappears("test");
+            assert.isTrue(isRedIconNotPresent, "red circle gets not visible in the tab, because  required input(name) is filled");
             // Save button gets enabled:
             await idProviderWizard.waitForSaveButtonEnabled();
             //Delete button should be disabled:
@@ -103,7 +103,7 @@ describe("Id Provider wizard - validation and inputs", function () {
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
-        return console.log('specification starting: ' + this.title);
+        return console.log("specification starting: " + this.title);
     });
 });
 

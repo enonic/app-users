@@ -11,12 +11,12 @@ const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 
-describe('User Wizard and `Save Before Close dialog`', function () {
+describe("User Wizard and 'Save Before Close dialog'", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
 
-    it('GIVEN user-wizard is opened AND display name has been typed WHEN close button pressed THEN Save Before Close dialog should appear',
+    it("GIVEN user-wizard is opened AND display name has been typed WHEN close button pressed THEN Save Before Close dialog should appear",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -25,16 +25,16 @@ describe('User Wizard and `Save Before Close dialog`', function () {
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeDisplayName('test-user');
             //2. Click on close-icon:
-            await userBrowsePanel.doClickOnCloseTabButton('test-user');
+            await userBrowsePanel.doClickOnCloseTabButton("test-user");
             await saveBeforeClose.waitForDialogOpened();
         });
 
-    it('WHEN the user has been saved THEN the user should be present in the grid',
+    it("WHEN the user has been saved THEN the user should be present in the grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            let userName = userItemsBuilder.generateRandomName('user');
+            let userName = userItemsBuilder.generateRandomName("user");
             let roles = [appConst.roles.CM_ADMIN, appConst.roles.USERS_ADMINISTRATOR];
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), roles);
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), roles);
             await testUtils.addSystemUser(testUser);
             await testUtils.typeNameInFilterPanel(userName);
 
@@ -42,7 +42,7 @@ describe('User Wizard and `Save Before Close dialog`', function () {
             assert.isTrue(result, "New user should be present in browse panel");
         });
 
-    it('GIVEN existing user is opened WHEN display name has been changed AND `Close` button pressed THEN Save Before Close dialog should appear',
+    it("GIVEN existing user is opened WHEN display name has been changed AND 'Close' button pressed THEN Save Before Close dialog should appear",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -50,26 +50,26 @@ describe('User Wizard and `Save Before Close dialog`', function () {
             //1. Select and open existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
             //2. Change the name:
-            await userWizard.typeDisplayName('new-name');
+            await userWizard.typeDisplayName("new-name");
             //3. Click on close-icon
-            await userBrowsePanel.doClickOnCloseTabButton('new-name');
+            await userBrowsePanel.doClickOnCloseTabButton("new-name");
             await saveBeforeClose.waitForDialogOpened();
         });
 
-    it('GIVEN existing user is opened WHEN e-mail name has been changed AND `Close` button pressed THEN Save Before Close dialog should appear',
+    it("GIVEN existing user is opened WHEN e-mail name has been changed AND `Close` button pressed THEN Save Before Close dialog should appear",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let saveBeforeClose = new SaveBeforeClose();
             //1. Select and open existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            await userWizard.typeEmail('new@gmail.com');
+            await userWizard.typeEmail("new@gmail.com");
             //2. Click on close-icon
             await userBrowsePanel.doClickOnCloseTabButton(testUser.displayName);
             await saveBeforeClose.waitForDialogOpened();
         });
 
-    it('GIVEN existing user is opened WHEN one role has been removed AND `Close` button pressed THEN Save Before Close dialog should appear',
+    it("GIVEN existing user is opened WHEN one role has been removed AND `Close` button pressed THEN Save Before Close dialog should appear",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();

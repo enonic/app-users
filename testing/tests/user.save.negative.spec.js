@@ -31,19 +31,19 @@ describe('User Wizard negative spec ', function () {
     it("GIVEN wizard for new User is opened WHEN all data has been typed THEN red circle gets not visible in the wizard page",
         async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             let isRedIconNotPresent = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
-            assert.isTrue(isRedIconNotPresent, 'red circle gets not visible, because all required inputs are filled');
+            assert.isTrue(isRedIconNotPresent, "red circle gets not visible, because all required inputs are filled");
         });
 
     it("GIVEN wizard for new User is opened AND all data has been typed WHEN password has been cleared THEN red circle gets visible again",
         async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             //password has been cleared:
@@ -55,8 +55,8 @@ describe('User Wizard negative spec ', function () {
     it("GIVEN wizard for new User is opened AND all data has been typed WHEN e-mail has been cleared THEN red circle gets visible",
         async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             //e-mail has been cleared:
@@ -68,8 +68,8 @@ describe('User Wizard negative spec ', function () {
     it("GIVEN all data has been typed in new wizard WHEN e-mail is invalid THEN red circle should be visible",
         async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', 'notvalid@@@mail.com', null);
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", 'notvalid@@@mail.com', null);
             await testUtils.clickOnSystemOpenUserWizard();
             //Type all data and email is not valid:
             await userWizard.typeData(testUser);

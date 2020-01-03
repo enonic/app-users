@@ -8,7 +8,7 @@ const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 
-describe('User Wizard generate password spec', function () {
+describe("User Wizard generate password spec", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
@@ -44,12 +44,12 @@ describe('User Wizard generate password spec', function () {
             await userWizard.clickOnShowLink();
 
             var request = await webDriverHelper.browser.getRequest(0);
-            assert.equal(request.method, 'GET');
-            assert.equal(request.response.headers['content-length'], '42');
+            assert.equal(request.method, "GET");
+            assert.equal(request.response.headers["content-length"], "42");
 
             testUtils.saveScreenshot('show_password_link_clicked');
             let result = await userWizard.isHidePasswordLinkDisplayed();
-            assert.isTrue(result, "`Hide` link gets displayed");
+            assert.isTrue(result, "'Hide' link gets displayed");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

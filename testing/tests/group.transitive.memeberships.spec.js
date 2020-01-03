@@ -10,7 +10,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const GroupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
 
-describe('group.transitive.memberships.spec: checks transitive memberships', function () {
+describe("group.transitive.memberships.spec: checks transitive memberships", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
@@ -18,7 +18,7 @@ describe('group.transitive.memberships.spec: checks transitive memberships', fun
     let group2;
     let TRANSITIVE_ROLE = 'Administration Console Login';
 
-    it('Precondition: group1 should be created',
+    it("Precondition: group1 should be created",
         async () => {
             let name = userItemsBuilder.generateRandomName('group');
             let roles = ['Users App'];
@@ -33,7 +33,7 @@ describe('group.transitive.memberships.spec: checks transitive memberships', fun
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message is expected");
         });
 
-    it('Precondition: group2 should be added, this group should have the group1 in members',
+    it("Precondition: group2 should be added, this group should have the group1 in members",
         async () => {
             let name = userItemsBuilder.generateRandomName('group');
             let members = [group1.displayName];

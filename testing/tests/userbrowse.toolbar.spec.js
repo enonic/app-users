@@ -9,29 +9,29 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 
-describe('User Browse panel, toolbar spec', function () {
+describe("User Browse panel, toolbar spec", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it(`WHEN 'su' user has been selected THEN Delete button should be disabled`,
+    it("WHEN 'su' user has been selected THEN Delete button should be disabled",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            await testUtils.findAndSelectItem('su');
+            await testUtils.findAndSelectItem("su");
             //`Delete button gets disabled`
             await userBrowsePanel.waitForDeleteButtonDisabled();
             //'Edit button should be enabled'
             await userBrowsePanel.waitForEditButtonEnabled();
         });
 
-    it(`WHEN 'Anonymous' user has been selected THEN Delete button should be disabled`, async () => {
+    it("WHEN 'Anonymous' user has been selected THEN Delete button should be disabled", async () => {
         let userBrowsePanel = new UserBrowsePanel();
-        await testUtils.findAndSelectItem('anonymous');
+        await testUtils.findAndSelectItem("anonymous");
         await userBrowsePanel.waitForDeleteButtonDisabled();
         //'Edit button should be enabled'
         await userBrowsePanel.waitForEditButtonEnabled();
     });
 
-    it(`WHEN no any items are selected THEN all buttons should have correct states`, async () => {
+    it("WHEN no any items are selected THEN all buttons should have correct states", async () => {
         let userBrowsePanel = new UserBrowsePanel();
         await userBrowsePanel.waitForNewButtonEnabled();
         await userBrowsePanel.waitForDeleteButtonDisabled();
@@ -39,19 +39,19 @@ describe('User Browse panel, toolbar spec', function () {
         await userBrowsePanel.waitForEditButtonDisabled();
     });
 
-    it(`WHEN 'System Id Provider' has been selected THEN all buttons should have correct states`,
+    it("WHEN 'System Id Provider' has been selected THEN all buttons should have correct states",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            await userBrowsePanel.clickOnRowByName('/system');
+            await userBrowsePanel.clickOnRowByName("/system");
             await userBrowsePanel.waitForNewButtonEnabled();
             //'Delete' button should be disabled, because this is the 'System' Id provider!
             await userBrowsePanel.waitForDeleteButtonDisabled();
             await userBrowsePanel.waitForEditButtonEnabled();
         });
 
-    it(`WHEN 'Roles' has been selected THEN all buttons should have correct states`, async () => {
+    it("WHEN 'Roles' has been selected THEN all buttons should have correct states", async () => {
         let userBrowsePanel = new UserBrowsePanel();
-        await userBrowsePanel.clickOnRowByName('roles');
+        await userBrowsePanel.clickOnRowByName("roles");
         await userBrowsePanel.waitForNewButtonEnabled();
         //Delete button should be disabled
         await userBrowsePanel.waitForDeleteButtonDisabled();
@@ -59,11 +59,11 @@ describe('User Browse panel, toolbar spec', function () {
         await userBrowsePanel.waitForEditButtonDisabled();
     });
 
-    it(`GIVEN 'System Id Provider' is expanded WHEN 'Users' has been selected THEN all buttons should have correct states`, async () => {
+    it("GIVEN 'System Id Provider' is expanded WHEN 'Users' has been selected THEN all buttons should have correct states", async () => {
         let userBrowsePanel = new UserBrowsePanel();
-        await userBrowsePanel.clickOnExpanderIcon('/system');
+        await userBrowsePanel.clickOnExpanderIcon("/system");
         await userBrowsePanel.waitForFolderUsersVisible();
-        await userBrowsePanel.clickOnRowByName('users');
+        await userBrowsePanel.clickOnRowByName("users");
         await userBrowsePanel.waitForNewButtonEnabled();
         //Delete button should be disabled
         await userBrowsePanel.waitForDeleteButtonDisabled();
@@ -71,11 +71,11 @@ describe('User Browse panel, toolbar spec', function () {
         await userBrowsePanel.waitForEditButtonDisabled();
     });
 
-    it(`GIVEN 'System Id Provider' is expanded WHEN 'Groups' has been selected THEN all buttons should have correct states`, async () => {
+    it("GIVEN 'System Id Provider' is expanded WHEN 'Groups' has been selected THEN all buttons should have correct states", async () => {
         let userBrowsePanel = new UserBrowsePanel();
-        await userBrowsePanel.clickOnExpanderIcon('/system');
+        await userBrowsePanel.clickOnExpanderIcon("/system");
         await userBrowsePanel.waitForFolderUsersVisible();
-        await userBrowsePanel.clickOnRowByName('groups');
+        await userBrowsePanel.clickOnRowByName("groups");
         await userBrowsePanel.waitForNewButtonEnabled();
         //Delete button should be disabled
         await userBrowsePanel.waitForDeleteButtonDisabled();
