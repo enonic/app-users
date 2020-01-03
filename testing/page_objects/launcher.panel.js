@@ -9,23 +9,23 @@ const XPATH = {
 class LauncherPanel extends Page {
 
     get homeLink() {
-        return XPATH.container + `//a[contains(@data-id,'home')]`;
+        return XPATH.container + "//a[contains(@data-id,'home')]";
     }
 
     get usersLink() {
-        return XPATH.container + `//a[contains(@data-id,'app.users')]`;
+        return XPATH.container + "//a[contains(@data-id,'app.users')]";
     }
 
     get contentStudioLink() {
-        return XPATH.container + `//a[contains(@data-id,'app.contentstudio')]`;
+        return XPATH.container + "//a[contains(@data-id,'contentstudio')]";
     }
 
     get applicationsLink() {
-        return XPATH.container + `//a[contains(@data-id,'app.applications')]`;
+        return XPATH.container + "//a[contains(@data-id,'app.applications')]";
     }
 
     get logoutLink() {
-        return XPATH.container + `//div[@class='user-logout']`;
+        return XPATH.container + "//div[@class='user-logout']";
     }
 
     async clickOnUsersLink() {

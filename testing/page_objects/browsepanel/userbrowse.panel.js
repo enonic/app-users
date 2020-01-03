@@ -8,14 +8,13 @@ const appConst = require('../../libs/app_const');
 const itemBuilder = require('../../libs/userItems.builder');
 
 const xpath = {
-    container: `//div[contains(@id,'UserBrowsePanel')]`,
-    selectionToggler: `//button[contains(@id,'SelectionPanelToggler')]`,
-    toolbar: `//div[contains(@id,'UserBrowseToolbar')]`,
-    grid: `//div[contains(@class,'grid-canvas')]`,
+    container: "//div[contains(@id,'UserBrowsePanel')]",
+    selectionToggler: "//button[contains(@id,'SelectionPanelToggler')]",
+    toolbar: "//div[contains(@id,'UserBrowseToolbar')]",
+    grid: "//div[contains(@class,'grid-canvas')]",
     searchButton: "//button[contains(@class, 'icon-search')]",
     hideFilterPanelButton: "//span[contains(@class, 'hide-filter-panel-button')]",
     appHomeButton: "//div[contains(@id,'TabbedAppBar')]/div[contains(@class,'home-button')]",
-
     rowByName: function (name) {
         return `//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
     },
@@ -40,25 +39,26 @@ const xpath = {
         return `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${name}']]/button`;
     },
 };
+
 class UserBrowsePanel extends Page {
     get newButton() {
-        return `${xpath.toolbar}/*[contains(@id, 'ActionButton') and child::span[contains(.,'New')]]`;
+        return xpath.toolbar + "/*[contains(@id, 'ActionButton') and child::span[contains(.,'New')]]";
     }
 
     get selectionToggler() {
-        return `${xpath.container}` + `${xpath.selectionToggler}`;
+        return xpath.container + xpath.selectionToggler;
     }
 
     get appHomeButton() {
-        return `${xpath.appHomeButton}`;
+        return xpath.appHomeButton;
     }
 
     get searchButton() {
-        return `${xpath.toolbar}` + `${xpath.searchButton}`;
+        return xpath.toolbar + xpath.searchButton;
     }
 
     get hideFilterPanelButton() {
-        return `//div[contains(@id,'PrincipalBrowseFilterPanel')]` + `${xpath.hideFilterPanelButton}`;
+        return "//div[contains(@id,'PrincipalBrowseFilterPanel')]" + xpath.hideFilterPanelButton;
     }
 
     get editButton() {
@@ -71,7 +71,7 @@ class UserBrowsePanel extends Page {
     }
 
     waitForPanelVisible(ms) {
-        return this.waitForElementDisplayed(`${xpath.toolbar}`, ms).catch(err => {
+        return this.waitForElementDisplayed(xpath.toolbar, ms).catch(err => {
             throw new Error('User browse panel was not loaded in ' + ms);
         });
     }
@@ -85,25 +85,25 @@ class UserBrowsePanel extends Page {
     }
 
     waitForUsersGridLoaded(ms) {
-        return this.waitForElementDisplayed(`${xpath.grid}`, ms).then(() => {
+        return this.waitForElementDisplayed(xpath.grid, ms).then(() => {
             return this.waitForSpinnerNotVisible();
         }).then(() => {
             return console.log('user browse panel is loaded')
         }).catch(err => {
             this.saveScreenshot("err_load_grid");
-            throw new Error('users browse panel was not loaded in: ' + ms);
+            throw new Error('users browse panel was not loaded in: ' + ms + " " + err);
         });
     }
 
     isItemDisplayed(itemName) {
-        return this.waitForElementDisplayed(`${xpath.rowByName(itemName)}`, appConst.TIMEOUT_2).catch(err => {
-            console.log("item is not displayed:" + itemName+ +" "+err);
+        return this.waitForElementDisplayed(xpath.rowByName(itemName), appConst.TIMEOUT_2).catch(err => {
+            console.log("item is not displayed:" + itemName + +" " + err);
             return false;
         });
     }
 
     waitForItemNotDisplayed(itemName) {
-        return this.waitForElementNotDisplayed(`${xpath.rowByName(itemName)}`, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.TIMEOUT_2).catch(err => {
             console.log("item is still displayed:" + itemName);
             return false;
         });
@@ -285,7 +285,7 @@ class UserBrowsePanel extends Page {
 
     waitForSelectionTogglerVisible() {
         let selector = xpath.container + xpath.selectionToggler;
-        return this.getBrowser().waitUntil(()=>  {
+        return this.getBrowser().waitUntil(() => {
             return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('any-selected');
             })
@@ -319,4 +319,5 @@ class UserBrowsePanel extends Page {
         })
     }
 }
+
 module.exports = UserBrowsePanel;

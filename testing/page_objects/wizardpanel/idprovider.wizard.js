@@ -8,22 +8,22 @@ const appConst = require('../../libs/app_const');
 const LoaderComboBox = require('../inputs/loaderComboBox');
 
 const XPATH = {
-    container: `//div[contains(@id,'IdProviderWizardPanel')]`,
+    container: "//div[contains(@id,'IdProviderWizardPanel')]",
     authApplicationSelectorFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='Application']]" +
                                         lib.COMBO_BOX_OPTION_FILTER_INPUT,
     permissionsFilterInput: "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
-    permissionsLink: `//li[child::a[text()='Permissions']]`,
-    aclList: `//ul[contains(@class,'access-control-list')]`,
-    aceAccessSelector: `//div[contains(@id,'IdProviderAccessSelector')]`,
+    permissionsLink: "//li[child::a[text()='Permissions']]",
+    aclList: "//ul[contains(@class,'access-control-list')]",
+    aceAccessSelector: "//div[contains(@id,'IdProviderAccessSelector')]",
     selectedAcEntryByDisplayName: function (displayName) {
         return `//div[contains(@id,'IdProviderACESelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
     aceOperationByName: function (displayName) {
         return `//ul[@class='menu']//li[child::a[text()='${displayName}']]`
     },
-    providerComboBox: `//div[contains(@id,'AuthApplicationComboBox')]`,
+    providerComboBox: "//div[contains(@id,'AuthApplicationComboBox')]",
     selectedAuthApplicationView: "//div[contains(@id,'AuthApplicationSelectedOptionView')]",
-    removeAuthApplicationIcon: `//a[contains(@class,'remove')]`,
+    removeAuthApplicationIcon: "//a[contains(@class,'remove')]",
 };
 
 class IdProviderWizard extends WizardPanel {
@@ -33,15 +33,15 @@ class IdProviderWizard extends WizardPanel {
     }
 
     get authApplicationSelectorFilterInput() {
-        return `${XPATH.container}` + `${XPATH.authApplicationSelectorFilterInput}`;
+        return XPATH.container + XPATH.authApplicationSelectorFilterInput;
     }
 
     get permissionsOptionsFilterInput() {
-        return `${XPATH.container}` + `${XPATH.permissionsFilterInput}`;
+        return XPATH.container + XPATH.permissionsFilterInput;
     }
 
     get permissionsDropDownHandle() {
-        return XPATH.container + `//div[contains(@id,'IdProviderAccessControlComboBox')]` + lib.DROP_DOWN_HANDLE;
+        return XPATH.container + "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.DROP_DOWN_HANDLE;
     }
 
     get providerDropDownHandle() {
@@ -235,7 +235,6 @@ class IdProviderWizard extends WizardPanel {
     }
 
     isAuthApplicationsOptionsFilterInputDisplayed() {
-
         return this.isElementDisplayed(this.authApplicationSelectorFilterInput);
     }
 

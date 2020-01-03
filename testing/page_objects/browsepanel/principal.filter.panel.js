@@ -6,7 +6,7 @@ const appConst = require('../../libs/app_const');
 const xpath = {
     container: "//div[contains(@id,'PrincipalBrowseFilterPanel')]",
     clearFilterButton: "//a[contains(@id,'ClearFilterButton')]",
-    searchInput: "//input[contains(@id,'api.app.browse.filter.TextSearchField')]",
+    searchInput: "//input[contains(@id,'TextSearchField')]",
     aggregationGroupView: "//div[contains(@id,'AggregationContainer')]",
     userAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'User (')]]",
     roleAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Role (')]]",

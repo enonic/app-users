@@ -8,18 +8,19 @@ const XPATH = {
     yesButton: `//button[contains(@id,'DialogButton') and child::span[text()='Yes']]`,
     noButton: `//div[@class='dialog-buttons']//button/span[text()='No']`
 };
+
 class ConfirmationDialog extends Page {
 
     get warningMessage() {
-        return `${XPATH.container}//h6[text()='Are you sure you want to delete this item?']`;
+        return XPATH.container + "//h6[text()='Are you sure you want to delete this item?']";
     }
 
     get yesButton() {
-        return `${XPATH.container}` + `${XPATH.yesButton}`;
+        return XPATH.container + XPATH.yesButton;
     }
 
     get noButton() {
-        return `${XPATH.container}` + `${XPATH.yesButton}`;
+        return XPATH.container + XPATH.yesButton;
     }
 
     clickOnYesButton() {

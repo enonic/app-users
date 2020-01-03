@@ -8,57 +8,58 @@ const appConst = require('../../libs/app_const');
 const LoaderComboBox = require('../inputs/loaderComboBox');
 
 const XPATH = {
-    container: `//div[contains(@id,'UserWizardPanel')]`,
-    emailInput: `//input[@type = 'email']`,
+    container: "//div[contains(@id,'UserWizardPanel')]",
+    emailInput: "//input[@type = 'email']",
     groupOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
     roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
-    rolesGroupLink: `//li[child::a[text()='Roles & Groups']]`,
-    passwordGenerator: `//div[contains(@id,'PasswordGenerator')]`,
-    showPasswordLink: `//a[@data-i18n='Show']`,
-    hidePasswordLink: `//a[@data-i18n='Hide']`,
-    generatePasswordLink: `//a[text()='Generate']`,
-    changePasswordButton: `//button[contains(@class,'change-password-button')]`,
+    rolesGroupLink: "//li[child::a[text()='Roles & Groups']]",
+    passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
+    showPasswordLink: "//a[@data-i18n='Show']",
+    hidePasswordLink: "//a[@data-i18n='Hide']",
+    generatePasswordLink: "//a[text()='Generate']",
+    changePasswordButton: "//button[contains(@class,'change-password-button')]",
 };
+
 class UserWizard extends wizards.WizardPanel {
 
     get deleteButton() {
-        return `${XPATH.container}` + `${wpXpath.deleteButton}`;
+        return XPATH.container + wpXpath.deleteButton;
     }
 
     get emailInput() {
-        return `${XPATH.container}` + `${XPATH.emailInput}`;
+        return XPATH.container + XPATH.emailInput;
     }
 
     get passwordInput() {
-        return `${XPATH.container}//input[@type = 'password']`;
+        return XPATH.container + "//input[@type = 'password']";
     }
 
     get groupOptionsFilterInput() {
-        return `${XPATH.container}` + `${XPATH.groupOptionsFilterInput}`;
+        return XPATH.container + XPATH.groupOptionsFilterInput;
     }
 
     get roleOptionsFilterInput() {
-        return `${XPATH.container}` + `${XPATH.roleOptionsFilterInput}`;
+        return XPATH.container + XPATH.roleOptionsFilterInput;
     }
 
     get rolesGroupsLink() {
-        return `${XPATH.container}` + `${XPATH.rolesGroupLink}`;
+        return XPATH.container + XPATH.rolesGroupLink;
     }
 
     get showPasswordLink() {
-        return `${XPATH.container}` + `${XPATH.showPasswordLink}`;
+        return XPATH.container + XPATH.showPasswordLink;
     }
 
     get hidePasswordLink() {
-        return `${XPATH.container}` + `${XPATH.hidePasswordLink}`;
+        return XPATH.container + XPATH.hidePasswordLink;
     }
 
     get generateLink() {
-        return `${XPATH.container}` + `${XPATH.generatePasswordLink}`;
+        return XPATH.container + XPATH.generatePasswordLink;
     }
 
     get changePasswordButton() {
-        return `${XPATH.container}` + `${XPATH.changePasswordButton}`;
+        return XPATH.container + XPATH.changePasswordButton;
     }
 
     isShowLinkDisplayed() {
@@ -87,7 +88,7 @@ class UserWizard extends wizards.WizardPanel {
 
     clickOnShowLink() {
         return this.clickOnElement(this.showPasswordLink).catch(err => {
-            throw new Error(err);
+            throw new Error("Error after clicking on Show Pass link:  " + err);
         })
     }
 
@@ -152,13 +153,13 @@ class UserWizard extends wizards.WizardPanel {
         return this.clearInputText(this.emailInput).then(() => {
             return this.typeTextInInput(this.emailInput, 'a');
         }).then(() => {
-             return this.getBrowser().keys('\uE003');
+            return this.getBrowser().keys('\uE003');
         });
     }
 
     getTextInPasswordInput() {
         return this.getTextInInput(this.passwordInput).catch(err => {
-            this.saveScreenshot('err_get_text_password');
+            this.saveScreenshot("err_get_text_password");
             throw new Error('Error when getting text in password input ' + err);
         });
     }
@@ -235,5 +236,4 @@ class UserWizard extends wizards.WizardPanel {
     }
 };
 module.exports = UserWizard;
-
 

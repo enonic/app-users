@@ -2,8 +2,6 @@
  * Created on 10.10.2017.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
@@ -11,83 +9,76 @@ const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 
-describe('`group.wizard.spec` - validation and check inputs', function () {
+describe('group.wizard.spec - validation and check inputs', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testGroup;
-    it('WHEN `Group` wizard is opened  THEN red circle should be present, because required inputs are empty',
-        () => {
+    it("WHEN 'Group' wizard is opened  THEN red circle should be present, because required input is empty",
+        async () => {
             let groupWizard = new GroupWizard();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.waitUntilInvalidIconAppears('<Unnamed Group>');
-            }).then(isRedIconPresent => {
-                assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because required inputs are empty');
-            })
-        });
-    it('GIVEN `Group` wizard is opened WHEN name has been typed THEN red circle gets not visible',
-        () => {
-            let groupWizard = new GroupWizard();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.typeDisplayName("test-group999")
-            }).then(() => {
-                return groupWizard.pause(400);
-            }).then(() => {
-                //red circle gets not visible:
-                return groupWizard.waitUntilInvalidIconDisappears("test-group");
-            }).then(isRedIconPresent => {
-                assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because required inputs are empty');
-            })
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            let isRedIconPresent = await groupWizard.waitUntilInvalidIconAppears('<Unnamed Group>');
+            assert.isTrue(isRedIconPresent, 'red circle should be present in the tab, because required input(name) is empty');
         });
 
-    it('WHEN `Group` wizard is opened THEN all required inputs should be present on the page',
-        () => {
+    it("GIVEN 'Group' wizard is opened WHEN name has been typed THEN red circle gets not visible",
+        async () => {
             let groupWizard = new GroupWizard();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return expect(groupWizard.isRoleOptionFilterInputDisplayed()).to.eventually.be.true;
-            }).then(() => {
-                return expect(groupWizard.isMemberOptionFilterInputDisplayed()).to.eventually.be.true;
-            }).then(() => {
-                return expect(groupWizard.isDescriptionInputDisplayed()).to.eventually.be.true;
-            })
+            //1. Open group-wizard:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            //2. Type a name:
+            await groupWizard.typeDisplayName("test-group999")
+            await groupWizard.pause(400);
+            //3. red circle gets not visible:
+            let isRedIconPresent = groupWizard.waitUntilInvalidIconDisappears("test-group");
+            assert.isTrue(isRedIconPresent, 'red circle should not be visible in the tab, because required input is filled');
         });
 
-    it('GIVEN `Group` wizard is opened WHEN name and description has been typed THEN red circle should not be present on the tab',
-        () => {
+    it("WHEN 'Group' wizard is opened THEN all required inputs should be present in the page",
+        async () => {
+            let groupWizard = new GroupWizard();
+            //1. Group wizard is opened:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            let result = await groupWizard.isRoleOptionFilterInputDisplayed();
+            assert.isTrue(result, "Role Options Filter input should be present");
+            result = await groupWizard.isMemberOptionFilterInputDisplayed();
+            assert.isTrue(result, "Member Options Filter input should be present");
+        });
+
+    it("GIVEN 'Group' wizard is opened WHEN name and description have been typed THEN red circle should not be present in the tab",
+        async () => {
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', null, null);
             let groupWizard = new GroupWizard();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.typeData(testGroup);
-            }).then(() => {
-                return groupWizard.waitUntilInvalidIconDisappears(testGroup.displayName);
-            }).then(isRedIconNotPresent => {
-                assert.isTrue(isRedIconNotPresent, 'red circle should not be present on the tab, because all required inputs are filled');
-            }).then(() => {
-                return expect(groupWizard.waitForSaveButtonEnabled()).to.eventually.be.true;
-            });
+            //1. Group wizard is opened:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            //2. Type a name and description:
+            await groupWizard.typeData(testGroup);
+            let isRedIconNotPresent = await groupWizard.waitUntilInvalidIconDisappears(testGroup.displayName);
+            assert.isTrue(isRedIconNotPresent, 'red circle gets not visible, because required input(name) is filled');
+            //Save button gets enabled:
+            await groupWizard.waitForSaveButtonEnabled();
         });
 
-    it('GIVEN `Group` wizard is opened WHEN name input has been cleared THEN red circle should appears on the tab',
-        () => {
+    it("GIVEN 'Group' wizard is opened WHEN name input has been cleared THEN red circle gets visible",
+        async () => {
             testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group', null, null);
             let groupWizard = new GroupWizard();
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.typeData(testGroup);
-            }).then(() => {
-                return groupWizard.clearDisplayNameInput();
-            }).then(() => {
-                return groupWizard.waitUntilInvalidIconAppears('<Unnamed Group>');
-            }).then((isRedIconPresent) => {
-                assert.isTrue(isRedIconPresent, 'red circle should appears on the tab, because name input has been cleared');
-            }).then(() => {
-                return expect(groupWizard.waitForSaveButtonDisabled()).to.eventually.be.true;
-            });
+            //1. Open new wizard and type all data:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            await groupWizard.typeData(testGroup);
+            //2. Clear the displayName input:
+            await groupWizard.clearDisplayNameInput();
+            let isRedIconPresent = await groupWizard.waitUntilInvalidIconAppears('<Unnamed Group>');
+            assert.isTrue(isRedIconPresent, 'red circle gets visible, because the name input has been cleared');
+            //3. Save button gets disabled:
+            await groupWizard.waitForSaveButtonDisabled();
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
-        return console.log('specification starting: ' + this.title);
+        return console.log("specification starting: " + this.title);
     });
 });

@@ -5,13 +5,14 @@ const ItemStatistic = require('./userItem.statistics.panel');
 const lib = require('../../libs/elements');
 
 const XPATH = {
-    div: `//div[contains(@id,'UserItemStatisticsPanel')]`,
-    header: `//div[contains(@id,'ItemStatisticsHeader')]`,
-    itemName: `//h1[@class='title']`,
-    itemPath: `//h4[@class='path']`,
-    membersDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]`,
-    memberList: `//ul[@class='data-list' and child::li[text()='Members']]`
+    div: "//div[contains(@id,'UserItemStatisticsPanel')]",
+    header: "//div[contains(@id,'ItemStatisticsHeader')]",
+    itemName: "//h1[@class='title']",
+    itemPath: "//h4[@class='path']",
+    membersDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]",
+    memberList: "//ul[@class='data-list' and child::li[text()='Members']]"
 };
+
 class RoleStatisticsPanel extends ItemStatistic {
 
     getDisplayNameOfMembers() {
