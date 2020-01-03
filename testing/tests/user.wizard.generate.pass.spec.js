@@ -41,12 +41,8 @@ describe("User Wizard generate password spec", function () {
             let userWizard = new UserWizard();
             //1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
+            //2. Click on Show Password button:
             await userWizard.clickOnShowLink();
-
-            var request = await webDriverHelper.browser.getRequest(0);
-            assert.equal(request.method, "GET");
-            assert.equal(request.response.headers["content-length"], "42");
-
             testUtils.saveScreenshot('show_password_link_clicked');
             let result = await userWizard.isHidePasswordLinkDisplayed();
             assert.isTrue(result, "'Hide' link gets displayed");
