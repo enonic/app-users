@@ -16,9 +16,8 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
     webDriverHelper.setupBrowser();
     let testUser;
 
-    it('GIVEN `User` with a role has been saved WHEN the user has been clicked THEN correct role should be displayed in the statistic panel',
+    it("GIVEN 'User' with a role has been saved WHEN the user has been clicked THEN correct role should be displayed in the statistic panel",
         async () => {
-            this.bail(1);
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userStatisticsPanel = new UserStatisticsPanel();
@@ -40,16 +39,15 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
             testUtils.saveScreenshot('edit_user_wizard4');
             let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
 
-            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present in the panel');
+            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, "`Content Manager Administrator` role should be present in the panel");
             assert.equal(actualRoles[1], appConst.roles.USERS_ADMINISTRATOR,
-                '`Content Manager Administrator` role should be present in the panel');
+                "'Content Manager Administrator' role should be present in the panel");
 
             let actualName = await userStatisticsPanel.getItemName();
             assert.equal(actualName, userName, "Expected and actual name should be equal");
-
         });
 
-    it('GIVEN existing user is opened WHEN display name has been changed THEN user should be searchable with the new display name',
+    it("GIVEN existing user is opened WHEN display name has been changed THEN user should be searchable with the new display name",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -62,7 +60,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
             assert.isTrue(isDisplayed, "User with new display name should be searchable in the grid");
         });
 
-    it('GIVEN existing user is opened WHEN one role has been removed THEN this role should not be present in the statistics panel',
+    it("GIVEN existing user is opened WHEN one role has been removed THEN this role should not be present in the statistics panel",
         async () => {
             let userWizard = new UserWizard();
             let userStatisticsPanel = new UserStatisticsPanel();
@@ -77,7 +75,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
             assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
         });
 
-    it('GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail should be present in the statistics panel',
+    it("GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail should be present in the statistics panel",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -93,7 +91,7 @@ describe('`edit.user.spec`: Edit an user - change e-mail, name and roles', funct
             //4. Go to the browse-panel:
             await userBrowsePanel.clickOnAppHomeButton();
             let actualEmail = await userStatisticsPanel.getEmail();
-            assert.equal(actualEmail[0], newEmail, 'email should be updated on the statistics panel as well');
+            assert.equal(actualEmail[0], newEmail, "email should be updated on the statistics panel as well");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

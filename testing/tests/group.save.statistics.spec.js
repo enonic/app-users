@@ -19,7 +19,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
     let groupWithRoleAndMember;
     let testGroup;
 
-    it('GIVEN `Group` wizard is opened WHEN name, member and roles have been typed AND `Save` button pressed THEN message `Group was created` should appear',
+    it("GIVEN 'Group' wizard is opened WHEN name, member and roles have been typed AND `Save` button pressed THEN message 'Group was created' should appear",
         async () => {
             let groupName = userItemsBuilder.generateRandomName('group');
             groupWithRoleAndMember = userItemsBuilder.buildGroup(groupName, 'test group', ['Super User'], ['Users App']);
@@ -35,7 +35,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Expected notification message should appear");
         })
 
-    it('WHEN existing group is opened THEN expected description, role and members should be present',
+    it("WHEN existing group is opened THEN expected description, role and members should be present",
         async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -50,7 +50,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             assert.equal(roles[0], appConst.roles.USERS_APP, "Expected roles should be present");
         });
 
-    it('GIVEN `Group` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN Group should be searchable',
+    it("GIVEN `Group` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN Group should be searchable",
         () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -71,7 +71,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             })
         });
 
-    it(`GIVEN existing 'group'(has no roles) is opened WHEN 'Users App' role has been added THEN the role should be visible on the wizard page`,
+    it("GIVEN existing 'group'(has no roles) is opened WHEN 'Users App' role has been added THEN the role should be visible on the wizard page",
         () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -91,7 +91,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             })
         });
 
-    it(`GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be present on the wizard page`, () => {
+    it("GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be present on the wizard page", () => {
         let groupWizard = new GroupWizard();
         let userBrowsePanel = new UserBrowsePanel();
         return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
@@ -112,7 +112,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
         })
     });
 
-    it(`WHEN existing group has been selected  in the grid THEN expected info should be present in the 'statistics panel'`,
+    it("WHEN existing group has been selected  in the grid THEN expected info should be present in the 'statistics panel",
         () => {
             let groupWizard = new GroupWizard();
             let groupStatisticsPanel = new GroupStatisticsPanel();
@@ -127,7 +127,7 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             })
         });
 
-    it(`GIVEN existing 'group' with the selected role is opened WHEN role has been removed THEN the role should not be present on the wizard page`,
+    it("GIVEN existing 'group' with the selected role is opened WHEN role has been removed THEN the role should not be present on the wizard page",
         () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();

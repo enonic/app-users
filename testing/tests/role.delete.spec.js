@@ -76,6 +76,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             await testUtils.clickOnRolesFolderAndOpenWizard();
             await roleWizard.typeData(testRole)
             await roleWizard.waitAndClickOnSave();
+            await roleWizard.pause(500);
             //2. Click on Delete and confirm the deleting:
             await roleWizard.clickOnDelete();
             await testUtils.confirmDelete();

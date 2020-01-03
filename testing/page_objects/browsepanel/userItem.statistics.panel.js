@@ -7,15 +7,15 @@ const appConst = require('../../libs/app_const');
 const LoaderComboBox = require('../inputs/loaderComboBox');
 
 const XPATH = {
-    container: `//div[contains(@id,'UserItemStatisticsPanel')]`,
-    header: `//div[contains(@id,'ItemStatisticsHeader')]`,
-    itemName: `//h1[@class='title']`,
-    itemPath: `//h4[@class='path']`,
-    reportDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Report']]`,
-    reportSelectedOptionsView: `//div[contains(@id,'ReportSelectedOptionsView')]`,
-    reportSelectedOptionView: `//div[contains(@id,'ReportSelectedOptionView')]`,
-    generateButton: `//button[contains(@id,'Button') and child::span[text()='Generate report']]`,
-    reportItem: `//ul[contains(@class,'data-list') and descendant::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]`,
+    container: "//div[contains(@id,'UserItemStatisticsPanel')]",
+    header: "//div[contains(@id,'ItemStatisticsHeader')]",
+    itemName: "//h1[@class='title']",
+    itemPath: "//h4[@class='path']",
+    reportDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Report']]",
+    reportSelectedOptionsView: "//div[contains(@id,'ReportSelectedOptionsView')]",
+    reportSelectedOptionView: "//div[contains(@id,'ReportSelectedOptionView')]",
+    generateButton: "//button[contains(@id,'Button') and child::span[text()='Generate report']]",
+    reportItem: "//ul[contains(@class,'data-list') and descendant::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]",
     reportByTitle: function (title) {
         return `//li[contains(@id,'ReportProgressItem') and descendant::span[contains(.,'${title}')]]`
     },

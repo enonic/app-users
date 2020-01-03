@@ -6,9 +6,9 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
 const XPATH = {
-    container: `//div[contains(@id,'NewPrincipalDialog')]`,
-    itemViewer: `//div[contains(@id,'UserTypesTreeGridItemViewer')]`,
-    header: `//h2[@class='title']`,
+    container: "//div[contains(@id,'NewPrincipalDialog')]",
+    itemViewer: "//div[contains(@id,'UserTypesTreeGridItemViewer')]",
+    header: "//h2[@class='title']",
     expanderIconByName: function (name) {
         return lib.itemByDisplayName(name) +
                `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
@@ -75,7 +75,7 @@ class NewPrincipalDialog extends Page {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_2);
         } catch (err) {
             this.saveScreenshot('err_principal_dialog_close');
-            throw new Error('New Principal Dialog was not closed  ' + err);
+            throw new Error("New Principal Dialog was not closed  " + err);
         }
     }
 

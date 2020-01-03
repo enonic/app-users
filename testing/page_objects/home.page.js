@@ -15,7 +15,7 @@ const home = {
 class HomePage extends Page {
 
     get closeXpTourButton() {
-        return `${xpTourDialog.container}//div[@class='cancel-button-top']`;
+        return xpTourDialog.container + "//div[@class='cancel-button-top']";
     }
 
     waitForLoaded() {

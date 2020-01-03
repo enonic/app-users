@@ -2,7 +2,6 @@
  * Created on 22.01.2018.
  * verifies: xp-apps#371 GroupWizard - SaveBeforeClose dialog appears in saved group
  */
-
 const chai = require('chai');
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -18,7 +17,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
     webDriverHelper.setupBrowser();
     let testRole;
 
-    it('WHEN `Role` with a description has been saved THEN the role should be searchable',
+    it("WHEN 'Role' with a description has been saved THEN the role should be searchable",
         async () => {
             testRole =
                 userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'description');
@@ -32,7 +31,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
         });
 
     //verifies: xp-apps#371 GroupWizard - SaveBeforeClose dialog appears in saved group
-    it('GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and `Close tab` has been clicked THEN `Save before close` dialog should not appear',
+    it("GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and `Close tab` has been clicked THEN `Save before close` dialog should not appear",
         async () => {
             let testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'description', null, [testRole.displayName]);
@@ -50,14 +49,13 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             let result = await saveBeforeCloseDialog.isDialogLoaded();
         });
 
-    it('GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and `Close tab` has been clicked THEN `Save before close` dialog should not appear',
+    it("GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and 'Close tab' has been clicked THEN 'Save before close' dialog should not appear",
         async () => {
             let testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'description');
             let newPrincipalDialog = new NewPrincipalDialog();
             let userBrowsePanel = new UserBrowsePanel();
             //1. Select System ID Provider, open Group Wizard, type the data, save it and close the wizard:
             await testUtils.openWizardAndSaveGroup(testGroup);
-
             //2. Click on New button(System ID Provider is selected in browse-panel):
             await userBrowsePanel.clickOnNewButton();
             testUtils.saveScreenshot("new_principal_dialog_should_be_loaded");

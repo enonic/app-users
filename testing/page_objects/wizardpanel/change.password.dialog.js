@@ -6,13 +6,13 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
 const XPATH = {
-    container: `//div[contains(@id,'ChangeUserPasswordDialog')]`,
+    container: "//div[contains(@id,'ChangeUserPasswordDialog')]",
     passwordInput: "//input[contains(@id,'PasswordInput')]",
-    changePasswordButton: `//button[contains(@id,'DialogButton') and child::span[text()='Change Password']]`,
-    cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
-    showPasswordLink: `//a[contains(@class,'show-link')]`,
-    generatePasswordLink: `//a[text()='Generate']`,
-    userPath: `//h6[@class='user-path']`,
+    changePasswordButton: "//button[contains(@id,'DialogButton') and child::span[text()='Change Password']]",
+    cancelButton: "//button[contains(@id,'DialogButton')]/span[text()='Cancel']",
+    showPasswordLink: "//a[contains(@class,'show-link')]",
+    generatePasswordLink: "//a[text()='Generate']",
+    userPath: "//h6[@class='user-path']",
 };
 class ChangeUserPasswordDialog extends Page {
 

@@ -20,27 +20,27 @@ const XPATH = {
 class GroupWizard extends WizardPanel {
 
     get deleteButton() {
-        return `${XPATH.container}` + `${wpXpath.deleteButton}`;
+        return XPATH.container + wpXpath.deleteButton;
     }
 
     get descriptionInput() {
-        return `${XPATH.container}//div[contains(@id,'PrincipalDescriptionWizardStepForm')]` + lib.TEXT_INPUT;
+        return XPATH.container + "//div[contains(@id,'PrincipalDescriptionWizardStepForm')]" + lib.TEXT_INPUT;
     }
 
     get memberOptionsFilterInput() {
-        return `${XPATH.container}` + `${XPATH.memberOptionsFilterInput}` + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+        return XPATH.container + XPATH.memberOptionsFilterInput + lib.COMBO_BOX_OPTION_FILTER_INPUT;
     }
 
     get roleOptionsFilterInput() {
-        return `${XPATH.container}` + `${XPATH.roleOptionsFilterInput}` + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+        return XPATH.container + XPATH.roleOptionsFilterInput + lib.COMBO_BOX_OPTION_FILTER_INPUT;
     }
 
     get rolesStepLink() {
-        return `${XPATH.container}` + `${XPATH.rolesLink}`;
+        return XPATH.container + XPATH.rolesLink;
     }
 
     get membersStepLink() {
-        return `${XPATH.container}` + `${XPATH.membersLink}`;
+        return XPATH.container + XPATH.membersLink;
     }
 
     clickOnRolesStep() {
@@ -70,7 +70,6 @@ class GroupWizard extends WizardPanel {
     }
 
     isRoleOptionFilterInputDisplayed() {
-
         return this.isElementDisplayed(this.roleOptionsFilterInput);
     }
 
@@ -109,7 +108,7 @@ class GroupWizard extends WizardPanel {
         }).then(() => {
             return this.pause(300);
         }).catch(err => {
-            this.saveScreenshot("err_group_wizard_role_selector")
+            this.saveScreenshot("err_group_wizard_role_selector");
             throw new Error('Error selecting the role-option ' + displayName + ' ' + err);
         })
     }

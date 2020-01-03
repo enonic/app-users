@@ -16,7 +16,7 @@ describe('`group.delete.spec`: confirm and delete a group in the wizard and in t
     webDriverHelper.setupBrowser();
     let testGroup;
 
-    it('GIVEN new group is saved WHEN Delete button in toolbar(wizard) has been pressed THEN Confirmation dialog should appear',
+    it("GIVEN new group is saved WHEN Delete button in toolbar(wizard) has been pressed THEN Confirmation dialog should appear",
         async () => {
             let groupWizard = new GroupWizard();
             let confirmationDialog = new ConfirmationDialog();
@@ -33,7 +33,7 @@ describe('`group.delete.spec`: confirm and delete a group in the wizard and in t
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it('GIVEN new group is saved WHEN Delete button in wizard has been clicked and the deleting confirmed THEN expected notification message should appear',
+    it("GIVEN new group is saved WHEN Delete button in wizard has been clicked and the deleting confirmed THEN expected notification message should appear",
         async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -52,7 +52,7 @@ describe('`group.delete.spec`: confirm and delete a group in the wizard and in t
             await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
         });
 
-    it('GIVEN existing group is selected WHEN Delete button in toolbar(browse panel) has been pressed THEN Confirmation dialog should appear',
+    it("GIVEN existing group is selected WHEN Delete button in toolbar(browse panel) has been pressed THEN Confirmation dialog should appear",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
@@ -68,7 +68,7 @@ describe('`group.delete.spec`: confirm and delete a group in the wizard and in t
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it('WHEN existing group has been deleted in browse panel THEN expected notification should appear',
+    it("WHEN existing group has been deleted in browse panel THEN expected notification should appear",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             //Select and delete existing group:
@@ -82,6 +82,6 @@ describe('`group.delete.spec`: confirm and delete a group in the wizard and in t
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
-        return console.log('specification starting: ' + this.title);
+        return console.log("specification starting: " + this.title);
     });
 });

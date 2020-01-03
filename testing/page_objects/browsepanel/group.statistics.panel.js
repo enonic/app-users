@@ -5,13 +5,13 @@ const UserItemStatisticsPanel = require('./userItem.statistics.panel');
 const lib = require('../../libs/elements');
 
 const XPATH = {
-    container: `//div[contains(@id,'UserItemStatisticsPanel')]`,
-    membersDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]`,
-    rolesAndGroupDataGroup: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]`,
-    memberList: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]//ul[@class='data-list']`,
-    roleList: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list' and child::li[text()='Roles']]`,
-    groupList: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list' and child::li[text()='Groups']]`,
-    transitiveCheckBox: `//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//div[contains(@id,'api.ui.Checkbox' ) and contains(@class,'transitive-switch')]`
+    container: "//div[contains(@id,'UserItemStatisticsPanel')]",
+    membersDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]",
+    rolesAndGroupDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]",
+    memberList: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]//ul[@class='data-list']",
+    roleList: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list' and child::li[text()='Roles']]",
+    groupList: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list' and child::li[text()='Groups']]",
+    transitiveCheckBox: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//div[contains(@id,'Checkbox' ) and contains(@class,'transitive-switch')]"
 };
 class GroupStatisticsPanel extends UserItemStatisticsPanel {
 

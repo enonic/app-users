@@ -26,12 +26,12 @@ module.exports = Object.freeze({
 
     COMBO_BOX_OPTION_FILTER_INPUT: "//input[contains(@id,'ComboBoxOptionFilterInput')]",
 
-    PRINCIPAL_SELECTED_OPTION: `//div[contains(@id,'security.PrincipalSelectedOptionView')]`,
+    PRINCIPAL_SELECTED_OPTION: `//div[contains(@id,'PrincipalSelectedOptionView')]`,
 
     selectedPrincipalByDisplayName: function (displayName) {
         return `//div[contains(@id,'PrincipalSelectedOptionView') and descendant::h6[contains(@class,'main-name') and text()='${displayName}']]`
     },
     REMOVE_ICON: `//a[@class='remove']`,
     EDIT_ICON: `//a[@class='edit']`,
-    CHECKBOX: `//div[contains(@id,'api.ui.Checkbox')]`
+    CHECKBOX: `//div[contains(@id,'Checkbox')]`
 });

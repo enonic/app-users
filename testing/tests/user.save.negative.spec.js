@@ -2,8 +2,6 @@
  * Created on 25.09.2017.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
@@ -16,80 +14,67 @@ describe('User Wizard negative spec ', function () {
     webDriverHelper.setupBrowser();
     let testUser;
 
-    it('GIVEN wizard for new User is opened WHEN name and e-mail has been typed  THEN red circle should be displayed on the wizard page',
-        () => {
+    it("GIVEN wizard for new User is opened WHEN name and e-mail have been typed THEN red circle should be displayed in the wizard page",
+        async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeEmail(testUser.email);
-            }).then(() => {
-                return userWizard.typeDisplayName(testUser.displayName);
-            }).then(() => {
-                return userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            }).then(isRedIconPresent => {
-                assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because `password` is empty');
-            })
+            await testUtils.clickOnSystemOpenUserWizard();
+            //Type an email and displayName:
+            await userWizard.typeEmail(testUser.email);
+            await userWizard.typeDisplayName(testUser.displayName);
+
+            let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
+            assert.isTrue(isRedIconPresent, "red circle should be visible in the tab, because 'password' is empty");
         });
 
-    it('GIVEN wizard for new User is opened WHEN all data has been typed THEN red circle should not be displayed on the wizard page',
-        () => {
+    it("GIVEN wizard for new User is opened WHEN all data has been typed THEN red circle gets not visible in the wizard page",
+        async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
-            }).then((isRedIconNotPresent) => {
-                assert.isTrue(isRedIconNotPresent, 'red circle should not be present on the tab, because all required inputs are filled');
-            })
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            let isRedIconNotPresent = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
+            assert.isTrue(isRedIconNotPresent, "red circle gets not visible, because all required inputs are filled");
         });
 
-    it('GIVEN wizard for new User is opened AND all data has been typed WHEN password has been cleared THEN red circle should be displayed on the wizard page',
-        () => {
+    it("GIVEN wizard for new User is opened AND all data has been typed WHEN password has been cleared THEN red circle gets visible again",
+        async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.clearPasswordInput();
-            }).then(() => {
-                return userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            }).then(isRedIconPresent => {
-                assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because `password` input has been cleared');
-            })
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            //password has been cleared:
+            await userWizard.clearPasswordInput();
+            let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
+            assert.isTrue(isRedIconPresent, "red circle gets visible, because 'password' input has been cleared");
         });
 
-    it('GIVEN wizard for new User is opened AND all data has been typed WHEN e-mail has been cleared THEN red circle should be displayed on the wizard page',
-        () => {
+    it("GIVEN wizard for new User is opened AND all data has been typed WHEN e-mail has been cleared THEN red circle gets visible",
+        async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.clearEmailInput();
-            }).then(() => {
-                return userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            }).then(isRedIconPresent => {
-                assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because `email` input has been cleared');
-            })
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            //e-mail has been cleared:
+            await userWizard.clearEmailInput();
+            let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
+            assert.isTrue(isRedIconPresent, "red circle gets visible, because 'email' input has been cleared");
         });
 
-    it('GIVEN all data in the wizard has been typed WHEN e-mail is invalid THEN red circle should be displayed on the wizard page',
-        () => {
+    it("GIVEN all data has been typed in new wizard WHEN e-mail is invalid THEN red circle should be visible",
+        async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', 'notvalid@@@mail.com', null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            }).then((result) => {
-                assert.isTrue(result, 'red circle should be present on the tab, because `e-mail` is invalid');
-            });
+            let userName = userItemsBuilder.generateRandomName("user");
+            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", 'notvalid@@@mail.com', null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            //Type all data and email is not valid:
+            await userWizard.typeData(testUser);
+            let result = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
+            assert.isTrue(result, "red circle should be visible, because 'e-mail' is not valid");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

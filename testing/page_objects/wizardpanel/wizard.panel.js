@@ -7,27 +7,28 @@ const appConst = require('../../libs/app_const');
 const itemBuilders = require('../../libs/userItems.builder');
 const XPATH = {
     displayNameInput: `//input[contains(@name,'displayName')]`,
-    saveButton: `//button[contains(@id,'ActionButton') and child::span[text()='Save']]`,
-    deleteButton: `//button[contains(@id,'ActionButton') and child::span[text()='Delete']]`,
+    saveButton: "//button[contains(@id,'ActionButton') and child::span[text()='Save']]",
+    deleteButton: "//button[contains(@id,'ActionButton') and child::span[text()='Delete']]",
 };
+
 class WizardPanel extends Page {
 
     get displayNameInput() {
-        return `${XPATH.displayNameInput}`;
+        return XPATH.displayNameInput;
     }
 
     get saveButton() {
-        return `${XPATH.saveButton}`;
+        return XPATH.saveButton;
     }
 
     get deleteButton() {
-        return `${XPATH.deleteButton}`;
+        return XPATH.deleteButton;
     }
 
     waitForSaveButtonEnabled() {
         return this.waitForElementEnabled(this.saveButton, appConst.TIMEOUT_3).catch(err => {
             this.saveScreenshot("err_save_button");
-            throw new Error(err);
+            throw new Error("Save button is not enabled: " + err);
         })
     }
 
@@ -55,14 +56,14 @@ class WizardPanel extends Page {
         return this.isElementDisplayed(this.displayNameInput);
     }
 
-    waitAndClickOnSave() {
-        return this.waitForSaveButtonEnabled().then(() => {
-            return this.clickOnElement(this.saveButton);
-        }).then(() => {
-            return this.pause(500);
-        }).catch(err => {
-            throw new Error(`Error when Save button has been clicked!` + err);
-        });
+    async waitAndClickOnSave() {
+        try {
+            await this.waitForSaveButtonEnabled();
+            await this.clickOnElement(this.saveButton);
+            return await this.pause(500);
+        } catch (err) {
+            throw new Error("Error when Save button has been clicked!" + err);
+        }
     }
 
     clickOnDeleteButton() {
