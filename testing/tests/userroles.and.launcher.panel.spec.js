@@ -4,7 +4,6 @@
  * Applications and Users links should not be present on the LauncherPanel, when an user has no Administrator role
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
@@ -15,52 +14,48 @@ const appConst = require('../libs/app_const');
 const LoginPage = require('../page_objects/login.page');
 const LauncherPanel = require('../page_objects/launcher.panel');
 
-describe('Checks links on Launcher Panel when an user has various roles', function () {
+describe('Checks links in Launcher Panel when an user has no administrator role', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
     let userName;
     let password = '1q2w3e';
-    it('WHEN `User`with roles has been added THEN the user should be searchable',
-        () => {
+
+    it("WHEN new user with required roles has been added THEN the user should be searchable",
+        async () => {
             let permissions = ['Administration Console Login', 'Content Manager App'];
             userName = userItemsBuilder.generateRandomName('user');
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             testUser = userItemsBuilder.buildUser(userName, password, userItemsBuilder.generateEmail(userName), permissions);
-            return testUtils.navigateToUsersApp().then(() => {
-                return testUtils.clickOnSystemOpenUserWizard();
-            }).then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
-            }).then(() => {
-                return testUtils.typeNameInFilterPanel(userName);
-            }).then(() => {
-                return assert.eventually.isTrue(userBrowsePanel.isItemDisplayed(userName), 'user should be present in the grid');
-            })
+            await testUtils.navigateToUsersApp();
+            //1. Open user-wizard and save the data:
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            await userWizard.waitAndClickOnSave();
+            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
+            //2. Type the user-name in Filter Panel:
+            await testUtils.typeNameInFilterPanel(userName);
+            let result = await userBrowsePanel.isItemDisplayed(userName);
+            assert.isTrue(result, 'new user should be filtered in the grid');
         });
+
     //Verifies the  https://github.com/enonic/xp-apps/issues/690
-    it('WHEN the user is logged in AND the user has no Administrator-role THEN `Applications` and `Users` links must not be present on the launcher panel',
-        () => {
-        let launcherPanel = new LauncherPanel();
-        let loginPage = new LoginPage();
-            return testUtils.doCloseUsersApp().then(() => {
-                return launcherPanel.clickOnLogoutLink();
-            }).then(() => {
-                return loginPage.doLogin(userName, password);
-            }).then(() => {
-                return launcherPanel.waitForPanelDisplayed();
-            }).then(() => {
-                testUtils.saveScreenshot("user_has_no_admin");
-                return assert.eventually.isFalse(launcherPanel.isApplicationsLinkDisplayed(),
-                    'Applications link should not be displayed, because the user has no Admin-role');
-            }).then(result => {
-                return assert.eventually.isFalse(launcherPanel.isUsersLinkDisplayed(),
-                    'Users link should not be displayed, because the user has no Admin-role');
-            })
+    it("WHEN an user has no Administrator-role THEN 'Applications' and 'Users' links must not be present in the launcher panel",
+        async () => {
+            let launcherPanel = new LauncherPanel();
+            let loginPage = new LoginPage();
+            await testUtils.doCloseUsersApp();
+            await launcherPanel.clickOnLogoutLink();
+            //1. Do login with just created user:
+            await loginPage.doLogin(userName, password);
+            await launcherPanel.waitForPanelDisplayed();
+            testUtils.saveScreenshot("user_has_no_admin");
+
+            let isDisplayed = await launcherPanel.isApplicationsLinkDisplayed();
+            await assert.isFalse(isDisplayed, 'Applications link should not be displayed, because the user has no Admin-role');
+            isDisplayed = await launcherPanel.isUsersLinkDisplayed();
+            await assert.isFalse(isDisplayed, 'Users link should not be displayed, because the user has no Admin-role');
         });
 
     before(() => {

@@ -5,9 +5,10 @@ const Page = require('./page');
 const appConst = require('../libs/app_const');
 const xpath = {
     container: `//div[contains(@id,'SaveBeforeCloseDialog')]`,
-    yesButton: `//button[contains(@id,'DialogButton') and child::span[text()='Yes']]`,
+    yesButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'es')]]`,
     noButton: `//div[@class='dialog-buttons']//button/span[text()='No']`,
 };
+
 class SaveBeforeCloseDialog extends Page {
 
     get warningMessage() {
@@ -15,11 +16,11 @@ class SaveBeforeCloseDialog extends Page {
     }
 
     get yesButton() {
-        return `${xpath.container}//button[contains(@id,'DialogButton') and child::span[text()='Yes']]`
+        return xpath.container + xpath.yesButton;
     }
 
     get noButton() {
-        return `${xpath.container}//div[@class='dialog-buttons']//button/span[text()='No']`
+        return xpath.container + xpath.noButton;
     }
 
     waitForLoaded() {
