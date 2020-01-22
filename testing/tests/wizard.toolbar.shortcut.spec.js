@@ -3,7 +3,6 @@
  *
  */
 const chai = require('chai');
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
@@ -37,7 +36,6 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await userWizard.typeEmail(TEST_USER.email);
             await userWizard.typePassword(password);
             await userWizard.waitForSaveButtonEnabled();
-
             //keyboard shortcut to save button has been pressed:
             await userWizard.hotKeySave();
             testUtils.saveScreenshot("user_shortcut_save");
@@ -51,7 +49,6 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let confirmationDialog = new ConfirmationDialog();
             //User-wizard is opened:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
-
             //keyboard shortcut to save button has been pressed:
             await userWizard.hotKeyDelete();
             testUtils.saveScreenshot("user_shortcut_delete");
@@ -134,10 +131,8 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let idProviderWizard = new IdProviderWizard();
             //new ID provider-wizard is opened:
             await testUtils.openIdProviderWizard();
-
             // data has been typed:
             await idProviderWizard.typeDisplayName(TEST_PROVIDER.displayName);
-
             await idProviderWizard.waitForSaveButtonEnabled();
             //keyboard shortcut to save button has been pressed:
             await idProviderWizard.hotKeySave();

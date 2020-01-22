@@ -2,58 +2,47 @@
  * Created on 13.09.2018.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
 const assert = chai.assert;
-const expect = chai.expect;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const UserStatisticsPanel = require('../page_objects/browsepanel/user.statistics.panel');
 
-describe('statistics.panel.permissions.report.spec: Generate Report data specification ', function () {
+describe('statistics.panel.permissions.report.spec: Generate Report specification ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it('GIVEN `Super User` is selected WHEN repository is not selected on the statistic panel THEN `Generate Report` button should be disabled',
-        () => {
+    it("GIVEN 'su' is selected WHEN repository is not selected in the statistic panel THEN 'Generate Report' button should be disabled",
+        async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
-            return testUtils.findAndSelectItem('su').then(() => {
-            }).then(() => {
-                testUtils.saveScreenshot('generate_report_button_is_disabled');
-                return userStatisticsPanel.waitForGenerateButtonDisabled();
-            }).then(result => {
-                assert.isTrue(result, '`Generate Report` button should be disabled');
-            });
+            await testUtils.findAndSelectItem('su');
+            testUtils.saveScreenshot('generate_report_button_is_disabled');
+            let isDisabled = await userStatisticsPanel.waitForGenerateButtonDisabled();
+            assert.isTrue(isDisabled, '`Generate Report` button should be disabled');
         });
 
-    it('GIVEN `Super User` is selected WHEN repository has been selected on the statistic panel THEN `Generate Report` button is getting enabled',
-        () => {
+    it("GIVEN 'su' is selected WHEN a repository has been selected in the statistic panel THEN 'Generate Report' button gets enabled",
+        async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
-            return testUtils.findAndSelectItem('su').then(() => {
-                return userStatisticsPanel.selectRepository('com.enonic.cms.default');
-            }).then(() => {
-                testUtils.saveScreenshot('generate_report_button_getting_enabled');
-                return userStatisticsPanel.waitForGenerateButtonEnabled();
-            }).then(result => {
-                assert.isTrue(result, '`Generate Report` button should be enabled now');
-            });
+            await testUtils.findAndSelectItem('su');
+            await userStatisticsPanel.selectRepository('com.enonic.cms.default');
+            testUtils.saveScreenshot('generate_report_button_getting_enabled');
+            let result = await userStatisticsPanel.waitForGenerateButtonEnabled();
+            assert.isTrue(result, '`Generate Report` button gets enabled');
         });
 
-    it('GIVEN `Super User` is selected WHEN  `default` repository and `draft` branch have been selected THEN draft branch should be displayed AND`remove` icon should appear',
-        () => {
+    it("GIVEN 'su' is selected WHEN 'default' repository and 'draft' branch have been selected THEN draft branch should be displayed AND 'remove' icon should appear",
+        async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
-            return testUtils.findAndSelectItem('su').then(() => {
-                return userStatisticsPanel.selectRepository('com.enonic.cms.default');
-            }).then(() => {
-                return userStatisticsPanel.clickOnDropDownHandleAndSelectBranch('draft');
-            }).then(() => {
-                //default repository and draft-branch should be selected
-                return userStatisticsPanel.isOptionSelected('com.enonic.cms.default');
-            }).then(() => {
-                return userStatisticsPanel.getBranchName('com.enonic.cms.default');
-            }).then(result => {
-                assert.equal(result, "draft", "Expected branch should be displayed")
-            })
+            await testUtils.findAndSelectItem('su');
+            //1. Select a repository and a branch:
+            await userStatisticsPanel.selectRepository('com.enonic.cms.default');
+            await userStatisticsPanel.clickOnDropDownHandleAndSelectBranch('draft');
+
+            //default repository and draft-branch should be selected:
+            await userStatisticsPanel.isOptionSelected('com.enonic.cms.default');
+            let branchName = await userStatisticsPanel.getBranchName('com.enonic.cms.default');
+            assert.equal(branchName, "draft", "Expected branch should be displayed")
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

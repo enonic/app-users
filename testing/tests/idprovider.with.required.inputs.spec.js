@@ -1,6 +1,5 @@
 /**
  * Created on 20/03/2018.
- *
  */
 const chai = require('chai');
 const assert = chai.assert;
@@ -34,6 +33,27 @@ describe('Id Provider, provider-dialog specification', function () {
             let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
             //"Save before close" dialog should appear:
             await saveBeforeCloseDialog.waitForDialogOpened();
+        });
+
+    it("GIVEN new ID provider with invalid configuration WHEN click on close icon AND click on 'Yes' button in the modal dialog THEN error notification message should appear",
+        async () => {
+            let name = userItemsBuilder.generateRandomName('provider');
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let userBrowsePanel = new UserBrowsePanel();
+            let idProviderWizard = new IdProviderWizard();
+            //1. Open new ID Provider wizard and select the provider with invalid configuration:
+            await testUtils.openIdProviderWizard(testIdProvider);
+            await idProviderWizard.typeData(testIdProvider);
+            //2. Click on close-icon:
+            await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
+            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+            //3. "Save before close" dialog should appear:
+            await saveBeforeCloseDialog.waitForDialogOpened();
+            //4. Click on 'Yes' button:
+            await saveBeforeCloseDialog.clickOnYesButton();
+            testUtils.saveScreenshot('provider_save_before_close_yes');
+            let message = await idProviderWizard.waitForNotificationMessage();
+            assert.equal(message, "Invalid configuration of the ID Provider.", "Expected notofication message should appear");
         });
 
     it(`GIVEN Provider-configuration dialog is opened WHEN required inputs in Provider-dialog are filled THEN the Id Provider is getting valid`,

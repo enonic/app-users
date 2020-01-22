@@ -2,8 +2,6 @@
  * Created on 24.10.2017.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
@@ -16,171 +14,152 @@ describe('User Wizard and Change Password dialog spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
-    it('WHEN `User` wizard is opened  THEN red circle should be present, because required inputs are empty',
-        () => {
+    it("WHEN user-wizard is opened THEN red circle should be present in the wizard, because required inputs are empty",
+        async () => {
             let userWizard = new UserWizard();
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.waitUntilInvalidIconAppears('<Unnamed User>');
-            }).then(isRedIconPresent => {
-                assert.isTrue(isRedIconPresent, 'red circle should be present on the tab, because required inputs are empty');
-            })
+            await testUtils.clickOnSystemOpenUserWizard();
+            let result = await userWizard.waitUntilInvalidIconAppears('<Unnamed User>');
+            assert.isTrue(result, 'red circle should be present on the tab, because required inputs are empty');
         });
 
-    it('WHEN `User` wizard is opened THEN all required inputs should be present on the page',
-        () => {
+    it('WHEN user-wizard is opened THEN all required inputs should be present in the page',
+        async () => {
             let userWizard = new UserWizard();
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return assert.eventually.isTrue(userWizard.isDisplayNameInputVisible(), "Display name input should be displayed");
-            }).then(() => {
-                return assert.eventually.isTrue(userWizard.isEmailInputDisplayed(), "E-mail name input should be displayed");
-            }).then(() => {
-                testUtils.saveScreenshot('change_pass_button_should_not_be_displayed');
-                return assert.eventually.isTrue(userWizard.isPasswordInputDisplayed(), "`Password` name input should be displayed");
-            }).then(() => {
-                return assert.eventually.isTrue(userWizard.isGroupOptionsFilterInputDisplayed(),
-                    "`Groups` selector should be displayed");
-            }).then(() => {
-                return assert.eventually.isTrue(userWizard.isRoleOptionsFilterInputDisplayed(),
-                    "`Roles` selector should be displayed");
-            }).then(() => {
-                return assert.eventually.isFalse(userWizard.isChangePasswordButtonDisplayed(),
-                    "`Change Password` button should not be displayed");
-            })
+            await testUtils.clickOnSystemOpenUserWizard();
+            let isDisplayed = await userWizard.isDisplayNameInputVisible();
+            assert.isTrue(isDisplayed, "Display name input should be displayed");
+            isDisplayed = await userWizard.isEmailInputDisplayed();
+            assert.isTrue(isDisplayed, "E-mail name input should be displayed");
+            testUtils.saveScreenshot('change_pass_button_should_not_be_displayed');
+            isDisplayed = await userWizard.isPasswordInputDisplayed();
+            assert.isTrue(isDisplayed, "Password-input should be displayed");
+            isDisplayed = await userWizard.isGroupOptionsFilterInputDisplayed();
+            assert.isTrue(isDisplayed, "'Groups' selector should be displayed");
+            isDisplayed = await userWizard.isRoleOptionsFilterInputDisplayed();
+            assert.isTrue(isDisplayed, "'Roles' selector should be displayed");
+            isDisplayed = await userWizard.isChangePasswordButtonDisplayed();
+            assert.isFalse(isDisplayed, "'Change Password' button should not be displayed");
         });
 
     it('GIVEN `User` wizard is opened WHEN name, e-mail, password have been typed THEN red circle should not be present on the tab',
-        () => {
+        async () => {
             let userWizard = new UserWizard();
             let displayName = userItemsBuilder.generateRandomName('user');
-            testUser =
-                userItemsBuilder.buildUser(displayName, 'password', userItemsBuilder.generateEmail(displayName), null, null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => userWizard.typeData(testUser)).then(() => {
-                return userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
-            }).then(isRedIconNotPresent => {
-                assert.isTrue(isRedIconNotPresent, 'red circle should not be present on the tab, because all required inputs are filled');
-            }).then(() => {
-                return assert.eventually.isTrue(userWizard.waitForSaveButtonEnabled(), "`Save` button should be enabled");
-            });
+            let email = userItemsBuilder.generateEmail(displayName);
+            testUser = userItemsBuilder.buildUser(displayName, 'password', email, null, null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            let result = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
+            assert.isTrue(result, 'red circle should not be present in the tab, because all required inputs are filled');
+            //'Save' button gets enabled, otherwise exception will be thrown:
+            await userWizard.waitForSaveButtonEnabled();
         });
 
-    it('GIVEN name, e-mail, password have been typed WHEN `Save` button has been pressed THEN `Change Password` button should appear',
-        () => {
+    it("GIVEN name, e-mail, password have been typed WHEN 'Save' button has been pressed THEN 'Change Password' button gets visible",
+        async () => {
             let userWizard = new UserWizard();
             let displayName = userItemsBuilder.generateRandomName('user');
-            testUser =
-                userItemsBuilder.buildUser(displayName, 'password', userItemsBuilder.generateEmail(displayName), null, null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => userWizard.typeData(testUser)).then(() => {
-                return userWizard.waitAndClickOnSave();
-            }).then(() => {
-                return assert.eventually.isTrue(userWizard.isChangePasswordButtonDisplayed(), "`Change Password` button should appear");
-            });
+            let email = userItemsBuilder.generateEmail(displayName);
+            testUser = userItemsBuilder.buildUser(displayName, 'password', email, null, null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            await userWizard.waitAndClickOnSave();
+            let isDisplayed = await userWizard.isChangePasswordButtonDisplayed();
+            await assert.isTrue(isDisplayed, "'Change Password' button gets visible");
         });
 
-    it('GIVEN  existing user is opened WHEN name input has been cleared THEN red circle should appears on the tab',
-        () => {
+    it('GIVEN existing user is opened WHEN name input has been cleared THEN red circle should appears in the tab',
+        async () => {
             let userWizard = new UserWizard();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(() => {
-                return userWizard.clearDisplayNameInput();
-            }).then(() => {
-                return userWizard.waitUntilInvalidIconAppears('<Unnamed User>');
-            }).then(isRedIconPresent => {
-                assert.isTrue(isRedIconPresent, 'red circle should appears on the tab, because display-name input has been cleared');
-            }).then(() => {
-                return assert.eventually.isTrue(userWizard.waitForSaveButtonDisabled(), 'Save button should be disabled now');
-            });
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //Clear the name-input:
+            await userWizard.clearDisplayNameInput();
+            let result = await userWizard.waitUntilInvalidIconAppears('<Unnamed User>');
+            assert.isTrue(result, 'red circle should appears in the tab, because display-name input has been cleared');
+            //'Save' button gets disabled now:
+            await userWizard.waitForSaveButtonDisabled();
         });
 
     it('GIVEN existing user is opened WHEN `Change Password` button has been pressed THEN modal dialog should appear',
-        () => {
+        async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(() => {
-                return userWizard.clickOnChangePasswordButton();
-            }).then(() => {
-                return changePasswordDialog.waitForDialogLoaded();
-            }).then(() => {
-                return changePasswordDialog.getUserPath();
-            }).then(result => {
-                assert.isTrue(result[0].includes(testUser.displayName), 'Display name of the user should be present in the path');
-            });
+            //1. Open the existing user:
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //2. Open Change Password dialog:
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            let result = await changePasswordDialog.getUserPath();
+            assert.isTrue(result[0].includes(testUser.displayName), 'Display name of the user should be present in the path');
         });
 
-    it('WHEN `Change Password Dialog` is opened THEN required elements should be present',
-        () => {
+    it("WHEN 'Change Password Dialog' is opened THEN required elements should be present",
+        async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(() => {
-                return userWizard.clickOnChangePasswordButton();
-            }).then(() => {
-                return changePasswordDialog.waitForDialogLoaded();
-            }).then(result => {
-                return assert.eventually.isTrue(changePasswordDialog.isPasswordInputDisplayed(), 'Password Input should be displayed');
-            }).then(() => {
-                return assert.eventually.isTrue(changePasswordDialog.isGenerateLinkDisplayed(), 'Generate Link should be displayed');
-            }).then(() => {
-                return assert.eventually.isTrue(changePasswordDialog.isShowLinkDisplayed(), 'Show Password Link should be displayed');
-            })
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //Open 'Change Password Dialog'
+            await userWizard.clickOnChangePasswordButton();
+
+            await changePasswordDialog.waitForDialogLoaded();
+            let isDisplayed = await changePasswordDialog.isPasswordInputDisplayed();
+            assert.isTrue(isDisplayed, 'Password Input should be displayed');
+            isDisplayed = await changePasswordDialog.isGenerateLinkDisplayed();
+            assert.isTrue(isDisplayed, 'Generate Link should be displayed');
+            isDisplayed = await changePasswordDialog.isShowLinkDisplayed();
+            assert.isTrue(isDisplayed, 'Show Password Link should be displayed');
         });
 
-    it('WHEN `Change Password Dialog` is opened THEN `Show password` link has been clicked THEN `Hide` link should appear',
-        () => {
+    it("WHEN `Change Password Dialog` is opened THEN `Show password` link has been clicked THEN `Hide` button should appear",
+        async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(() => {
-                return userWizard.clickOnChangePasswordButton();
-            }).then(() => {
-                return changePasswordDialog.waitForDialogLoaded();
-            }).then(result => {
-                return changePasswordDialog.clickOnShowPasswordLink();
-            }).then(() => {
-                return assert.eventually.isTrue(changePasswordDialog.isHideLinkDisplayed(), '`Hide` text in the link should appear');
-            })
+            //Existing user is opened:
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            //Click on Show Password:
+            await changePasswordDialog.clickOnShowPasswordLink();
+            let result = await changePasswordDialog.isHideLinkDisplayed()
+            await assert.isTrue(result, "'Hide' button should appear");
         });
 
-    it('WHEN `Change Password Dialog` is opened THEN `Generate password`  link has been clicked THEN `password` string should appear',
-        () => {
+    it("WHEN 'Change Password Dialog' is opened THEN 'Generate password' link has been clicked THEN generated 'password' should appear",
+        async () => {
             let changePasswordDialog = new ChangePasswordDialog();
             let userWizard = new UserWizard();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(() => {
-                return userWizard.clickOnChangePasswordButton();
-            }).then(() => {
-                return changePasswordDialog.waitForDialogLoaded();
-            }).then(result => {
-                return changePasswordDialog.clickOnGeneratePasswordLink();
-            }).then(() => {
-                return changePasswordDialog.getPasswordString();
-            }).then((password) => {
-                assert.isTrue(password.length > 0, 'password string should be present ');
-            })
-        });
-    it('GIVEN `Change Password Dialog` is opened WHEN `Cancel` button has been clicked THEN the dialog should be closed',
-        () => {
-            let userWizard = new UserWizard();
-            let changePasswordDialog = new ChangePasswordDialog();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(() => {
-                return userWizard.clickOnChangePasswordButton();
-            }).then(() => {
-                return changePasswordDialog.waitForDialogLoaded();
-            }).then(result => {
-                return changePasswordDialog.clickOnCancelButton();
-            }).then(() => {
-                return expect(changePasswordDialog.waitForClosed()).to.eventually.be.true;
-            })
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            //Click on 'Generate' button:
+            await changePasswordDialog.clickOnGeneratePasswordLink();
+            let password = await changePasswordDialog.getPasswordString();
+            assert.isTrue(password.length > 0, 'password should be generated');
         });
 
-    it('GIVEN `Change Password Dialog` is opened WHEN `Cancel-top` button has been clicked THEN the dialog should be closed',
-        () => {
+    it("GIVEN 'Change Password Dialog' is opened WHEN 'Cancel' button has been clicked THEN the dialog should be closed",
+        async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            return testUtils.selectUserAndOpenWizard(testUser.displayName).then(() => {
-                return userWizard.clickOnChangePasswordButton();
-            }).then(() => {
-                return changePasswordDialog.waitForDialogLoaded();
-            }).then(result => {
-                return changePasswordDialog.clickOnCancelButtonTop();
-            }).then(() => {
-                return expect(changePasswordDialog.waitForClosed()).to.eventually.be.true;
-            })
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            //Click on Cancel button:
+            await changePasswordDialog.clickOnCancelButton();
+            await changePasswordDialog.waitForClosed();
+        });
+
+    it("GIVEN 'Change Password Dialog' is opened WHEN 'Cancel-top' button has been clicked THEN the dialog should be closed",
+        async () => {
+            let userWizard = new UserWizard();
+            let changePasswordDialog = new ChangePasswordDialog();
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //1. Open 'Change Password Dialog'
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            //2. Click on Cancel-top:
+            await changePasswordDialog.clickOnCancelButtonTop();
+            await changePasswordDialog.waitForClosed();
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

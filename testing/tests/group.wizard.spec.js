@@ -27,7 +27,7 @@ describe("group.wizard.spec - validation and check inputs", function () {
             //1. Open group-wizard:
             await testUtils.clickOnSystemAndOpenGroupWizard();
             //2. Type a name:
-            await groupWizard.typeDisplayName("test-group999")
+            await groupWizard.typeDisplayName("test-group999");
             await groupWizard.pause(400);
             //3. red circle gets not visible:
             let isRedIconPresent = await groupWizard.waitUntilInvalidIconDisappears("test-group");
