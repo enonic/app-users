@@ -2,8 +2,6 @@
  * Created on 16.03.2018.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
@@ -18,55 +16,46 @@ describe("Id Provider and Save Before Close dialog", function () {
     webDriverHelper.setupBrowser();
 
     //Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
-    it("GIVEN wizard for new Id Provider is opened WHEN no data has been typed AND 'close' icon pressed THEN SaveBeforeClose dialog must not appear",
-        () => {
+    it("GIVEN wizard for new Id Provider is opened WHEN no changes in the wizard AND 'close' icon pressed THEN SaveBeforeClose dialog must not be loaded",
+        async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-            return testUtils.openIdProviderWizard().then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
-            }).then(() => {
-                return userBrowsePanel.pause(400);
-            }).then(() => {
-                //there are no unsaved changes, so dialog should not be present.
-                return assert.eventually.isFalse(saveBeforeCloseDialog.isDialogLoaded(), "'Save before close' dialog must not be present");
-            })
+            await testUtils.openIdProviderWizard();
+            await userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
+            await userBrowsePanel.pause(500);
+            testUtils.saveScreenshot("provider_save_before1");
+            let result = await saveBeforeCloseDialog.isDialogLoaded();
+            //there are no unsaved changes, so dialog should not be present.
+            assert.isFalse(result, "'Save before close' dialog must not be loaded");
         });
 
     it("GIVEN `IdProvider` wizard is opened WHEN description has been typed AND `close` icon pressed THEN SaveBeforeClose dialog should appear",
-        () => {
+        async () => {
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.openIdProviderWizard().then(() => {
-                return idProviderWizard.typeDescription('description');
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
-            }).then(() => {
-                return userBrowsePanel.pause(400);
-            }).then(() => {
-                let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-                //description has been typed, so save before close dialog should appear!
-                return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogLoaded(), "'Save before close' dialog should appear");
-            })
+            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+            await testUtils.openIdProviderWizard();
+            await idProviderWizard.typeDescription('description');
+            await userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
+            testUtils.saveScreenshot("provider_save_before2");
+            //description has been typed, so save before close dialog should appear!
+            await saveBeforeCloseDialog.waitForDialogOpened();
         });
 
     it("GIVEN Id Provider wizard is opened AND name and idProvider have been typed WHEN 'close' icon has been pressed THEN 'Save Before Close' dialog should appear",
-        () => {
+        async () => {
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');
             let userBrowsePanel = new UserBrowsePanel();
             let testStore = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
-            return testUtils.openIdProviderWizard(testStore).then(() => {
-                return idProviderWizard.typeData(testStore);
-            }).then(() => {
-                testUtils.saveScreenshot("application_should_be_selected");
-                return userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
-            }).then(()=>{
-                return userBrowsePanel.pause(400);
-            }).then(() => {
-                let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-                //name has been typed, so save before close dialog should appear!
-                return assert.eventually.isTrue(saveBeforeCloseDialog.isDialogLoaded(), "'Save before close' dialog should appear");
-            })
+            await testUtils.openIdProviderWizard(testStore);
+            await idProviderWizard.typeData(testStore);
+
+            testUtils.saveScreenshot("application_should_be_selected");
+            await userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
+            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+            //'save before close' dialog should appear, otherwise exception will be thrown:
+            await saveBeforeCloseDialog.waitForDialogOpened();
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
