@@ -1,10 +1,7 @@
 /**
  * Created on 28.09.2017.
  */
-
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
@@ -14,7 +11,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
 
-describe('Save User spec - save an user', function () {
+describe('Save User specification - save an user', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
@@ -22,93 +19,86 @@ describe('Save User spec - save an user', function () {
     //verifies  https://github.com/enonic/lib-admin-ui/issues/614
     //User Wizard - confirmation about unsaved changes after changes were saved
     it('GIVEN new user has been saved in wizard AND display name has been changed AND Save button pressed WHEN `close` icon clicked THEN `Save before close dialog` should not appear',
-        () => {
+        async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userWizard.typeDisplayName(userName + "123");
-            }).then(() => {
-                return userWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabButton(userName + "123");
-            }).then(() => {
-                return userWizard.pause(400);
-            }).then(() => {
-                return saveBeforeCloseDialog.isDialogLoaded();
-            }).then(result => {
-                assert.isFalse(result, "Save before dialog should not be present, because all changes were saved");
-            })
+            //1. Open new user-wizard and type a name, email and password:
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            //2. Save he user:
+            await userWizard.waitAndClickOnSave();
+            //3. update the name:
+            await userWizard.typeDisplayName(userName + "123");
+            //4. Click on Save button:
+            await userWizard.waitAndClickOnSave();
+            //5. Click on 'close tab' icon
+            await userBrowsePanel.doClickOnCloseTabButton(userName + "123");
+            await userWizard.pause(400);
+            //Verify that modal dialog is not loaded:
+            let isLoaded = await saveBeforeCloseDialog.isDialogLoaded();
+            assert.isFalse(isLoaded, "Save before dialog should not be loaded, because all changes were saved");
         });
 
     it('GIVEN wizard for new User is opened AND valid data is typed WHEN the user has been saved THEN expected notification message should appear AND the user should be searchable',
-        () => {
+        async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userWizard.waitForNotificationMessage();
-            }).then(message => {
-                expect(message).to.equal(appConst.USER_WAS_CREATED_MESSAGE);
-            }).then(() => {
-                return userBrowsePanel.clickOnAppHomeButton();
-            }).then(() => {
-                return testUtils.typeNameInFilterPanel(userName);
-            }).then(() => {
-                return expect(userBrowsePanel.isItemDisplayed(userName)).to.eventually.be.true;
-            })
+            //1. Open new wizard and save the user:
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            await userWizard.waitAndClickOnSave();
+            let actualMessage = await userWizard.waitForNotificationMessage();
+            assert.equal(actualMessage, appConst.USER_WAS_CREATED_MESSAGE, "'User was created' - this message should appear");
+            //2. Click on App Home button and go to the browse panel:
+            await userBrowsePanel.clickOnAppHomeButton();
+            //3. Type the name in Filter Panel:
+            await testUtils.typeNameInFilterPanel(userName);
+            //4. Verify that user is filtered
+            let isPresent = await userBrowsePanel.isItemDisplayed(userName);
+            assert.isTrue(isPresent, "New user should be added in the grid")
         });
 
     it('WHEN user has been saved in the wizard AND the wizard closed AND Users folder has been expanded THEN grid should be updated AND the user should be listed',
-        () => {
+        async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
-            }).then(() => {
-                return userBrowsePanel.clickOnExpanderIcon("system");
-            }).then(() => {
-                return userBrowsePanel.pause(500);
-            }).then(() => {
-                return userBrowsePanel.clickOnExpanderIcon("users");
-            }).then(() => {
-                return expect(userBrowsePanel.isItemDisplayed(userName)).to.eventually.be.true;
-            })
+            //1. Open new wizard and type username, password and email:
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            await userWizard.waitAndClickOnSave();
+            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
+            await userBrowsePanel.pause(500);
+            //2. Expand System  then Users folders:
+            await userBrowsePanel.clickOnExpanderIcon("system");
+            await userBrowsePanel.pause(500);
+            await userBrowsePanel.clickOnExpanderIcon("users");
+            //3. Verify that user is added:
+            let isPresent = await userBrowsePanel.isItemDisplayed(userName);
+            assert.isTrue(isPresent, "New user should be added beneath the Users folder");
         });
 
     it('WHEN try to save user with name that already in use THEN correct notification message should appear',
-        () => {
+        async () => {
             let userWizard = new UserWizard();
             testUser.email = userItemsBuilder.generateEmail('test');
-            return testUtils.clickOnSystemOpenUserWizard().then(() => {
-                return userWizard.typeData(testUser);
-            }).then(() => {
-                return userWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userWizard.waitForErrorNotificationMessage();
-            }).then(actualMessage => {
-                testUtils.saveScreenshot('user-already-exists-message');
-                let expectedMessage = appConst.principalExistsMessage(testUser.displayName);
-                expect(actualMessage).to.be.equal(expectedMessage);
-            })
+            //1. Open new wizard and type a name that is already in use:
+            await testUtils.clickOnSystemOpenUserWizard();
+            await userWizard.typeData(testUser);
+            await userWizard.waitAndClickOnSave();
+            let actualMessage = await userWizard.waitForErrorNotificationMessage();
+            //2. Verify the error message:
+            testUtils.saveScreenshot('user-already-exists-message');
+            let expectedMessage = appConst.principalExistsMessage(testUser.displayName);
+            assert.equal(actualMessage, expectedMessage, "' A principal with that name already exists' - this message should appear");
         });
+
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {

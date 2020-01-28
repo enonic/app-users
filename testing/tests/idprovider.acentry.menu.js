@@ -2,9 +2,6 @@
  * Created on 13/02/2018
  */
 const chai = require('chai');
-const should = require('chai').should;
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
@@ -16,53 +13,49 @@ describe('Id Provider wizard, Access Control Entry - expand and collapse menu-op
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it(`GIVEN Access Control Entry is added WHEN 'Entry-operations' has been clicked THEN menu with operations should be expanded`,
-        () => {
+    it(`GIVEN Access Control Entry is added WHEN 'Entry-operations' has been clicked THEN menu with operations gets visible`,
+        async () => {
             let permissions = ['Everyone', 'Users App'];
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');
             let testProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', null, permissions);
-            return testUtils.openIdProviderWizard(testProvider).then(() => {
-                return idProviderWizard.typeData(testProvider);
-            }).then(() => {
-                //click on acl-entry and expand the menu
-                return idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
-            }).then(() => {
-                testUtils.saveScreenshot('store_ace_menu_expanded');
-                return idProviderWizard.isAceMenuOptionsExpanded('Everyone');
-            }).then(result => {
-                assert.isTrue(result, 'menu with operations should be expanded');
-            }).then(() => {
-                //gets operations in the expanded menu:
-                return idProviderWizard.getAceMenuOperations();
-            }).then(result => {
-                assert.equal(result[0], "Read");
-                assert.equal(result[1], "Create Users");
-                assert.equal(result.length, 5, "Five operations should be in the expanded menu");
-            })
+            //1. Open new wizard:
+            await testUtils.openIdProviderWizard(testProvider);
+            await idProviderWizard.typeData(testProvider);
+            //2. Click on 'Everyone' acl-entry and expand the menu:
+            await idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
+            testUtils.saveScreenshot('store_ace_menu_expanded');
+            //3. Verify that ECE-menu is expanded:
+            let isExpanded = await idProviderWizard.isAceMenuOptionsExpanded('Everyone');
+            assert.isTrue(isExpanded, 'menu with operations gets visible');
+            //4. Verify all operations in the expanded menu:
+            let actualOperations = await idProviderWizard.getAceMenuOperations();
+            assert.equal(actualOperations[0], "Read");
+            assert.equal(actualOperations[1], "Create Users");
+            assert.equal(actualOperations[2], "Write Users");
+            assert.equal(actualOperations[3], "Id Provider Manager");
+            assert.equal(actualOperations[4], "Administrator");
+            assert.equal(actualOperations.length, 5, "Five operations should be in the expanded menu");
         });
 
-    it(`GIVEN 'System Id Provider' is opened AND 'Entry-operations' is expanded WHEN click outside the menu THEN the menu should be collapsed`,
-        () => {
+    it(`GIVEN 'System Id Provider' is opened AND menu for Everyone-ACE is expanded WHEN click outside the menu THEN the menu gets collapsed`,
+        async () => {
             let idProviderWizard = new IdProviderWizard();
-            return testUtils.selectSystemIdProviderAndOpenWizard().then(() => {
-                return idProviderWizard.clickOnPermissionsTabItem();
-            }).then(() => {
-                return idProviderWizard.addPrincipals(['Everyone']);
-            }).then(() => {
-                return idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
-            }).then(() => {
-                return idProviderWizard.isAceMenuOptionsExpanded('Everyone');
-            }).then(result => {
-                assert.isTrue(result, 'the menu should be expanded');
-            }).then(() => {
-                return idProviderWizard.clickOnPermissionsTabItem();
-            }).then(() => {
-                return idProviderWizard.isAceMenuOptionsExpanded('Everyone');
-            }).then(result => {
-                assert.isFalse(result, 'the menu should be collapsed, because was clicked outside the expanded menu');
-            })
+            //1. Open system ID provider:
+            await testUtils.selectSystemIdProviderAndOpenWizard();
+            await idProviderWizard.clickOnPermissionsTabItem();
+            //2. Add new ACE:
+            await idProviderWizard.addPrincipals(['Everyone']);
+            //3. Click on 'Everyone' ACE and open the menu:
+            await idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
+            let isExpanded = await idProviderWizard.isAceMenuOptionsExpanded('Everyone');
+            assert.isTrue(isExpanded, 'the menu should be expanded');
+            //4. Click outside the expanded menu:
+            await idProviderWizard.clickOnPermissionsTabItem();
+            isExpanded = await idProviderWizard.isAceMenuOptionsExpanded('Everyone');
+            assert.isFalse(isExpanded, 'the menu should be collapsed, after clicking outside the expanded menu');
         });
+
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {

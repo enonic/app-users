@@ -169,7 +169,6 @@ class IdProviderWizard extends WizardPanel {
         let selector = XPATH.aceOperationByName(operation);
         let elems = await this.getDisplayedElements(selector);
         return await elems[0].click();
-
     }
 
     getSelectedAceOperation(principal) {
@@ -186,7 +185,6 @@ class IdProviderWizard extends WizardPanel {
             result.push(el.getText());
         });
         return Promise.all(result);
-        //return this.getTextInElements(selector);
     }
 
     async clickOnPermissionsTabItem() {

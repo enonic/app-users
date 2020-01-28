@@ -26,12 +26,16 @@ class GridContextMenu extends Page {
             return this.getAttribute(XPATH.deleteMenuItem, 'class').then(result => {
                 return result.includes('disabled');
             });
-        }, 2000).then(() => {
-            return true;
-        }).catch(err => {
-            this.saveScreenshot('err_delete_context_menu_item');
-            throw new Error(`Grid context menu - Delete menu item should be disabled ` + err);
-        });
+        }, 2000, 'Grid context menu - Delete menu item is not disabled after 3 seconds');
+    }
+
+    waitForEditMenuItemDisabled() {
+        let selector = XPATH.container + XPATH.editMenuItem;
+        return this.getBrowser().waitUntil(() => {
+            return this.getAttribute(selector, 'class').then(result => {
+                return result.includes('disabled');
+            })
+        }, appConst.TIMEOUT_3, 'Grid context menu - Edit menu item is not enabled after 3 seconds');
     }
 
     isEditMenuItemDisabled() {

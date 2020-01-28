@@ -13,6 +13,7 @@ const XPATH = {
     groupList: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list' and child::li[text()='Groups']]",
     transitiveCheckBox: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//div[contains(@id,'Checkbox' ) and contains(@class,'transitive-switch')]"
 };
+
 class GroupStatisticsPanel extends UserItemStatisticsPanel {
 
     get transitiveCheckBox() {
@@ -49,6 +50,16 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
         }).then(() => {
             return this.getTextInElements(items)
         })
+    }
+
+    async getDisplayNamesInGroupList() {
+        try {
+            let groupsList = XPATH.container + XPATH.groupList + lib.H6_DISPLAY_NAME;
+            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, 1000);
+            return await this.getTextInElements(groupsList);
+        } catch (err) {
+            throw new Error("Unable to get group names in Statistics Panel:")
+        }
     }
 };
 module.exports = GroupStatisticsPanel;

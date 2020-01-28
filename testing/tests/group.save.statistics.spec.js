@@ -2,8 +2,6 @@
  * Created on 09.10.2017.
  */
 const chai = require('chai');
-chai.use(require('chai-as-promised'));
-const expect = chai.expect;
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
@@ -13,7 +11,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const GroupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
 
-describe('`group.save.statistics.panel`: Save a Group and check the info in the Statistics Panel', function () {
+describe('group.save.statistics.panel: Save a group and check the info in Statistics Panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let groupWithRoleAndMember;
@@ -48,103 +46,91 @@ describe('`group.save.statistics.panel`: Save a Group and check the info in the 
             assert.equal(description, groupWithRoleAndMember.description, "Expected description should be present in the wizard");
             let roles = await groupWizard.getRoles();
             assert.equal(roles[0], appConst.roles.USERS_APP, "Expected roles should be present");
+            let members = await groupWizard.getMembers();
+            assert.equal(members[0], 'Super User', "Expected member should be displayed");
         });
 
-    it("GIVEN `Group` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN Group should be searchable",
-        () => {
+    it("GIVEN 'Group' wizard is opened WHEN name and description has been typed AND 'Save' button pressed THEN that new group should be searchable",
+        async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let groupName = userItemsBuilder.generateRandomName('group');
             testGroup = userItemsBuilder.buildGroup(groupName, 'test group', null, null);
-            return testUtils.clickOnSystemAndOpenGroupWizard().then(() => {
-                return groupWizard.typeData(testGroup);
-            }).then(() => {
-                return groupWizard.pause(300);
-            }).then(() => {
-                return groupWizard.waitAndClickOnSave();
-            }).then(() => {
-                return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
-            }).then(() => {
-                return testUtils.typeNameInFilterPanel(testGroup.displayName);
-            }).then(() => {
-                return expect(userBrowsePanel.isItemDisplayed(testGroup.displayName)).to.eventually.be.true;
-            })
+            //1. Open user-wizard, type a data and save all:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            await groupWizard.typeData(testGroup);
+            await groupWizard.pause(300);
+            return groupWizard.waitAndClickOnSave();
+            //2. Close the wizard:
+            return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
+            //3. Type the name in Filter Panel:
+            await testUtils.typeNameInFilterPanel(testGroup.displayName);
+            //4. Verify that new group is filtered:
+            let isPresent = userBrowsePanel.isItemDisplayed(testGroup.displayName);
+            assert.isTrue(isPresent, "new group should be filtered in the rid");
         });
 
-    it("GIVEN existing 'group'(has no roles) is opened WHEN 'Users App' role has been added THEN the role should be visible on the wizard page",
-        () => {
+    it("GIVEN existing 'group'(has no roles) is opened WHEN 'Users App' role has been added THEN this role gets visible in roles-step",
+        async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
-                return userBrowsePanel.clickOnEditButton();
-            }).then(() => {
-                return groupWizard.waitForOpened();
-            }).then(() => {
-                // add 'Users App' role
-                return groupWizard.filterOptionsAndAddRole(appConst.roles.USERS_APP);
-            }).then(() => {
-                return groupWizard.waitAndClickOnSave();
-            }).then(() => {
-                return groupWizard.getRoles();
-            }).then(roles => {
-                expect(roles[0]).to.equal(appConst.roles.USERS_APP);
-            })
+            //1. open existing group:
+            await testUtils.findAndSelectItem(testGroup.displayName);
+            await userBrowsePanel.clickOnEditButton();
+            await groupWizard.waitForOpened();
+            //2. Add 'Users App' role
+            await groupWizard.filterOptionsAndAddRole(appConst.roles.USERS_APP);
+            await groupWizard.waitAndClickOnSave();
+            //3. Verify that new role should be added in roles-step:
+            let actualRoles = await groupWizard.getRoles();
+            assert.equal(actualRoles[0], appConst.roles.USERS_APP, "Expected role gets visible in roles-step");
         });
 
-    it("GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be present on the wizard page", () => {
+    it("GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be displayed in members-step", async () => {
         let groupWizard = new GroupWizard();
         let userBrowsePanel = new UserBrowsePanel();
-        return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
-            return userBrowsePanel.clickOnEditButton();
-        }).then(() => {
-            return groupWizard.waitForOpened();
-        }).then(() => {
-            return groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
-        }).then(() => {
-            return groupWizard.waitAndClickOnSave();
-        }).then(() => {
-            return groupWizard.pause(1000);
-        }).then(() => {
-            return groupWizard.getMembers();
-        }).then(members => {
-            testUtils.saveScreenshot("group_member_added");
-            expect(members[0]).to.equal(appConst.SUPER_USER_DISPLAY_NAME);
-        })
+        //1. open existing group:
+        await testUtils.findAndSelectItem(testGroup.displayName);
+        await userBrowsePanel.clickOnEditButton();
+        await groupWizard.waitForOpened();
+        //2. Add 'Super User' in members:
+        await groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
+        await groupWizard.waitAndClickOnSave();
+        await groupWizard.pause(1000);
+        //3. Verify that actual members and expected are equal:
+        let actualMembers = await groupWizard.getMembers();
+        testUtils.saveScreenshot("group_member_added");
+        assert.equal(actualMembers[0], appConst.SUPER_USER_DISPLAY_NAME);
     });
 
-    it("WHEN existing group has been selected  in the grid THEN expected info should be present in the 'statistics panel",
-        () => {
-            let groupWizard = new GroupWizard();
+    it("WHEN existing group has been selected THEN expected roles and members should be loaded in Statistics Panel",
+        async () => {
             let groupStatisticsPanel = new GroupStatisticsPanel();
-            return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
-                return groupStatisticsPanel.getDisplayNameOfMembers();
-            }).then(members => {
-                expect(members[0]).to.equal(appConst.SUPER_USER_DISPLAY_NAME);
-            }).then(() => {
-                return groupStatisticsPanel.getDisplayNameOfRoles();
-            }).then(roles => {
-                expect(roles[0]).to.equal(appConst.roles.USERS_APP);
-            })
+            //Select existing group:
+            await testUtils.findAndSelectItem(testGroup.displayName);
+            let actualMembers = await groupStatisticsPanel.getDisplayNameOfMembers();
+
+            assert.equal(actualMembers[0], appConst.SUPER_USER_DISPLAY_NAME, "Expected members should be loaded");
+            assert.equal(actualMembers.length, 1, "One member should be loaded");
+            let actualRoles = await groupStatisticsPanel.getDisplayNameOfRoles();
+            assert.equal(actualRoles[0], appConst.roles.USERS_APP, "Expected roles should be loaded");
+            assert.equal(actualRoles.length, 1, "One roles should be loaded");
         });
 
-    it("GIVEN existing 'group' with the selected role is opened WHEN role has been removed THEN the role should not be present on the wizard page",
-        () => {
+    it("GIVEN existing 'group'(with role) is opened WHEN role has been removed THEN the role should not be present in the roles-step",
+        async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            return testUtils.findAndSelectItem(testGroup.displayName).then(() => {
-                return userBrowsePanel.clickOnEditButton();
-            }).then(() => {
-                return groupWizard.waitForOpened();
-            }).then(() => {
-                return groupWizard.removeRole(appConst.roles.USERS_APP);
-            }).then(() => {
-                return groupWizard.waitAndClickOnSave();
-            }).then(() => {
-                return groupWizard.getRoles();
-            }).then(roles => {
-                testUtils.saveScreenshot("groupwizard_role_removed");
-                expect(roles.length).to.equal(0);
-            })
+            //1. open existing group and remove the role:
+            await testUtils.findAndSelectItem(testGroup.displayName);
+            await userBrowsePanel.clickOnEditButton();
+            await groupWizard.waitForOpened();
+            await groupWizard.removeRole(appConst.roles.USERS_APP);
+            await groupWizard.waitAndClickOnSave();
+            //2. Verify roles:
+            let actualRoles = await groupWizard.getRoles();
+            testUtils.saveScreenshot("group_wizard_role_removed");
+            assert.equal(actualRoles.length, 0, "Empty list of roles should be in the wizard-step");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

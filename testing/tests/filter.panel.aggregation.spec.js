@@ -15,7 +15,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             let userBrowsePanel = new UserBrowsePanel();
             //1. Open Filter Panel:
             await testUtils.openFilterPanel();
-            //2. Click on User checkbox:
+            //2. Click on 'User' checkbox:
             await browseFilterPanel.clickOnUserAggregation();
             //3. user-items should be filtered:
             await userBrowsePanel.waitForItemNotDisplayed('roles');
@@ -30,7 +30,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             let filterPanel = new BrowseFilterPanel();
             let userBrowsePanel = new UserBrowsePanel();
             await testUtils.openFilterPanel();
-            //Click on Role checkbox:
+            //Click on 'Role' checkbox:
             await filterPanel.clickOnRoleAggregation();
             await userBrowsePanel.waitForItemNotDisplayed('/system');
             testUtils.saveScreenshot('aggregation_in_role');
@@ -43,7 +43,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             let filterPanel = new BrowseFilterPanel();
             let userBrowsePanel = new UserBrowsePanel();
             await testUtils.openFilterPanel();
-            //Click on Provider checkbox:
+            //Click on 'Provider' checkbox:
             await filterPanel.clickOnIdProviderAggregation();
             await userBrowsePanel.waitForItemNotDisplayed('roles');
             testUtils.saveScreenshot('aggregation_in_provider');

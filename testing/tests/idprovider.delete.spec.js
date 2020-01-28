@@ -16,6 +16,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
     webDriverHelper.setupBrowser();
     let idProvider;
 
+    //Verifies https://github.com/enonic/app-users/issues/281  Delete button does not get enabled after saving of new provider
     it('GIVEN `IdProvider` has been saved WHEN Delete button in wizard-toolbar has been pressed THEN Confirmation dialog should appear',
         async () => {
             let idProviderWizard = new IdProviderWizard();
@@ -60,6 +61,7 @@ describe('Confirm and delete `Id Provider` in wizard and in browse panel', funct
             assert.equal(result, "Administrator", "Administrator should be present for Everyone");
         });
 
+    //Verifies https://github.com/enonic/app-users/issues/281  Delete button does not get enabled after saving of new provider
     it('GIVEN new IdProvider has been saved WHEN the provider has been deleted in the wizard THEN expected notification message should appear',
         async () => {
             let idProviderWizard = new IdProviderWizard();
