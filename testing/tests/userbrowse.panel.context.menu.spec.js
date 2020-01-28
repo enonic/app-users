@@ -7,11 +7,11 @@ const GridContextMenu = require('../page_objects/browsepanel/grid.context.menu')
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 
-describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu specification', function () {
+describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it('GIVEN navigate to the browse panel WHEN do right click on the `Roles` folder THEN `New role` menu item should be first ',
+    it('GIVEN navigate to the browse panel WHEN do right click on the `Roles` folder THEN `New role` menu item should be first',
         async () => {
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
@@ -20,6 +20,10 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
             await gridContextMenu.waitForContextMenuVisible();
             let items = await gridContextMenu.getGridContextMenuItems();
             assert.equal(items[0], 'New Role', "New Role menu item should be first");
+            //2.'Delete menu item should be disabled,otherwise exception will be thrown in 3 seconds:
+            await gridContextMenu.waitForDeleteMenuItemDisabled();
+            //3. 'Edit' menu item should be disabled, otherwise exception will be thrown in 3 seconds:
+            await gridContextMenu.waitForEditMenuItemDisabled();
         });
 
     it('GIVEN navigate to the browse panel WHEN do right click on the `System` folder THEN `New...` menu item should be first',
@@ -60,19 +64,20 @@ describe('userbrowse.panel.context.menu.spec User Browse Panel Context Menu spec
         });
 
     it('GIVEN navigate to the browse panel WHEN right click on the `System` folder THEN `Delete` menu item should be disabled ',
-        () => {
+        async () => {
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
-            return userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider').then(() => {
-                return gridContextMenu.waitForContextMenuVisible();
-            }).then(() => {
-                return gridContextMenu.waitForDeleteMenuItemDisabled();
-            }).then(() => {
-                testUtils.saveScreenshot('system_context_menu');
-                return assert.eventually.isFalse(gridContextMenu.isEditMenuItemDisabled(), "`Edit` menu item should be enabled");
-            }).then(() => {
-                return assert.eventually.isFalse(gridContextMenu.isNewMenuItemDisabled(), "`New..` menu item should be enabled");
-            })
+            //1. Do right click on System Id Provider:
+            await userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider');
+            await gridContextMenu.waitForContextMenuVisible();
+            //2. Verify that 'Delete' menu item is disabled:
+            await gridContextMenu.waitForDeleteMenuItemDisabled();
+            //3. 'Edit' and 'New...' should be enabled:
+            testUtils.saveScreenshot('system_provider_context_menu');
+            let isDisabled = await gridContextMenu.isEditMenuItemDisabled();
+            assert.isFalse(isDisabled, "'Edit' menu item should be enabled");
+            isDisabled = await gridContextMenu.isNewMenuItemDisabled();
+            assert.isFalse(isDisabled, "'New...' menu item should be enabled");
         });
 
     it('GIVEN navigate to the browse panel WHEN right click on the `Users` folder THEN `New User` menu item should be first',

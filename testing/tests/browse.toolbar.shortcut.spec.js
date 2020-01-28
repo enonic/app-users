@@ -21,7 +21,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             let userBrowsePanel = new UserBrowsePanel();
             let newPrincipalDialog = new NewPrincipalDialog();
             await userBrowsePanel.hotKeyNew();
-            //'New Principal Dialog' should appear:
+            //'New Principal Dialog' should be loaded:
             await newPrincipalDialog.waitForDialogLoaded();
         });
 

@@ -37,7 +37,7 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
             assert.isTrue(result, "trimmed name should be displayed");
         });
 
-    it("GIVEN user wizard is opened WHEN password with white space has been typed THEN 'Invalid password' validation message should be displayed",
+    it("GIVEN user wizard is opened WHEN password with white space has been typed THEN 'Invalid password' validation message gets visible",
         async () => {
             let userWizard = new UserWizard();
             let passwordWithSpaces = '   1q2w3e  ';

@@ -1,6 +1,5 @@
 /**
  * Created on 12/08/2019.
- *
  */
 const chai = require('chai');
 const assert = chai.assert;
@@ -36,7 +35,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await userWizard.typeEmail(TEST_USER.email);
             await userWizard.typePassword(password);
             await userWizard.waitForSaveButtonEnabled();
-            //keyboard shortcut to save button has been pressed:
+            //keyboard shortcut to Save button has been pressed:
             await userWizard.hotKeySave();
             testUtils.saveScreenshot("user_shortcut_save");
 
@@ -49,7 +48,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let confirmationDialog = new ConfirmationDialog();
             //User-wizard is opened:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
-            //keyboard shortcut to save button has been pressed:
+            //keyboard shortcut to Delete button has been pressed:
             await userWizard.hotKeyDelete();
             testUtils.saveScreenshot("user_shortcut_delete");
             //Confirmation dialog should be loaded:
@@ -83,8 +82,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let confirmationDialog = new ConfirmationDialog();
             //User-wizard is opened:
             await testUtils.selectGroupAndOpenWizard(TEST_GROUP.displayName);
-
-            //keyboard shortcut to save button has been pressed:
+            //keyboard shortcut to Delete button has been pressed:
             await groupWizard.hotKeyDelete();
             testUtils.saveScreenshot("group_shortcut_delete");
             //Confirmation dialog should be loaded:
@@ -102,7 +100,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await roleWizard.typeDisplayName(TEST_ROLE.displayName);
             await roleWizard.waitForSaveButtonEnabled();
 
-            //keyboard shortcut to save button has been pressed:
+            //keyboard shortcut to Save button has been pressed:
             await roleWizard.hotKeySave();
             testUtils.saveScreenshot("role_shortcut_save");
 
@@ -116,8 +114,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let confirmationDialog = new ConfirmationDialog();
             //Role-wizard is opened:
             await testUtils.selectRoleAndOpenWizard(TEST_ROLE.displayName);
-
-            //keyboard shortcut to save button has been pressed:
+            //keyboard shortcut to Delete button has been pressed:
             await roleWizard.hotKeyDelete();
             testUtils.saveScreenshot("group_shortcut_delete");
             //Confirmation dialog should be loaded:
@@ -134,7 +131,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // data has been typed:
             await idProviderWizard.typeDisplayName(TEST_PROVIDER.displayName);
             await idProviderWizard.waitForSaveButtonEnabled();
-            //keyboard shortcut to save button has been pressed:
+            //keyboard shortcut to Save button has been pressed:
             await idProviderWizard.hotKeySave();
             testUtils.saveScreenshot("provider_shortcut_save");
 

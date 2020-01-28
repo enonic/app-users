@@ -91,7 +91,6 @@ describe("Id Provider wizard - validation and inputs", function () {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
             await idProviderWizard.typeDisplayName("test");
-
             let isRedIconNotPresent = await idProviderWizard.waitUntilInvalidIconDisappears("test");
             assert.isTrue(isRedIconNotPresent, "red circle gets not visible in the tab, because  required input(name) is filled");
             // Save button gets enabled:

@@ -38,6 +38,9 @@ const xpath = {
     closeItemTabButton: function (name) {
         return `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${name}']]/button`;
     },
+    itemTabByDisplayName:
+        displayName => `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${displayName}']]`,
+
 };
 
 class UserBrowsePanel extends Page {
@@ -245,32 +248,33 @@ class UserBrowsePanel extends Page {
         })
     }
 
-    doClickOnCloseTabAndWaitGrid(displayName) {
-        let closeIcon = xpath.closeItemTabButton(displayName);
-        return this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_2).then(() => {
-            return this.waitForElementEnabled(closeIcon, appConst.TIMEOUT_4);
-        }).then(() => {
-            return this.clickOnElement(closeIcon);
-        }).catch(err => {
+    //Click on existing Tab-Item and navigates to the opened wizard:
+    async clickOnTabBarItem(displayName) {
+        let tabItem = xpath.itemTabByDisplayName(displayName);
+        await this.waitForElementDisplayed(tabItem)
+        return await this.clickOnElement(tabItem);
+    }
+
+    async doClickOnCloseTabAndWaitGrid(displayName) {
+        try {
+            let closeIcon = xpath.closeItemTabButton(displayName);
+            await this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_2);
+            await this.waitForElementEnabled(closeIcon, appConst.TIMEOUT_2);
+            await this.clickOnElement(closeIcon);
+        } catch (err) {
             this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
-            throw new Error('itemTabButton was not found!' + displayName + "  " + err);
-        }).then(() => {
-            return this.pause(300);
-        }).then(() => {
-            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-            return saveBeforeCloseDialog.isDialogLoaded();
-        }).then(result => {
-            if (result) {
-                this.saveScreenshot('err_save_close_item').then(() => {
-                    console.log('save before close dialog must not be present');
-                    throw new Error('`Save Before Close` dialog should not appear when try to close the ' + displayName);
-                });
-            }
-        }).then(() => {
-            return this.waitForSpinnerNotVisible();
-        }).then(() => {
-            return this.waitForUsersGridLoaded(appConst.TIMEOUT_3);
-        })
+            throw new Error('Item Tab Button was not found!' + displayName + "  " + err);
+        }
+        await this.pause(300);
+        let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+        let isLoaded = await saveBeforeCloseDialog.isDialogLoaded();
+        if (isLoaded) {
+            this.saveScreenshot('err_save_close_item');
+            console.log('save before close dialog must not be loaded');
+            throw new Error('`Save Before Close` dialog should not appear when try to close the ' + displayName);
+        }
+        await this.waitForSpinnerNotVisible();
+        return await this.waitForUsersGridLoaded(appConst.TIMEOUT_3);
     }
 
     clickOnExpanderIcon(name) {

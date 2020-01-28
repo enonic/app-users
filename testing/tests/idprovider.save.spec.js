@@ -37,7 +37,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             //1. Open New Content dialog:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
-
+            //2. Verify expander-icons on the dialog:
             let result = await newPrincipalDialog.waitForExpanderIconDisplayed("User Group");
             assert.isTrue(result, "Expander in User Group menu-item should be displayed");
             result = await newPrincipalDialog.waitForExpanderIconDisplayed("User");
