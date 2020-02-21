@@ -2,36 +2,17 @@ import {Principal} from 'lib-admin-ui/security/Principal';
 import {ValueChangedEvent} from 'lib-admin-ui/ValueChangedEvent';
 import {IdProviderAccessSelector} from './IdProviderAccessSelector';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
-import {IdProviderAccess} from '../access/IdProviderAccess';
-import {PrincipalViewer} from 'lib-admin-ui/ui/security/PrincipalViewer';
+import {PrincipalContainerSelectedEntryView} from 'lib-admin-ui/ui/security/PrincipalContainerSelectedEntryView';
 
 export class IdProviderAccessControlEntryView
-    extends PrincipalViewer {
-
-    private ace: IdProviderAccessControlEntry;
+    extends PrincipalContainerSelectedEntryView<IdProviderAccessControlEntry> {
 
     private accessSelector: IdProviderAccessSelector;
-
-    private valueChangedListeners: { (item: IdProviderAccessControlEntry): void }[] = [];
 
     public static debug: boolean = false;
 
     constructor(ace: IdProviderAccessControlEntry, readonly: boolean = false) {
-        super('selected-option idprovider-access-control-entry');
-
-        this.ace = ace;
-        this.setEditable(!readonly);
-
-        if (isNaN(this.ace.getAccess())) {
-            this.ace.setAccess(IdProviderAccess[IdProviderAccess.CREATE_USERS]);
-        }
-
-        this.setIdProviderAccessControlEntry(this.ace);
-
-    }
-
-    getValueChangedListeners(): { (item: IdProviderAccessControlEntry): void }[] {
-        return this.valueChangedListeners;
+        super(ace, readonly);
     }
 
     setEditable(editable: boolean) {
@@ -43,24 +24,8 @@ export class IdProviderAccessControlEntryView
         }
     }
 
-    onValueChanged(listener: (item: IdProviderAccessControlEntry) => void) {
-        this.valueChangedListeners.push(listener);
-    }
-
-    unValueChanged(listener: (item: IdProviderAccessControlEntry) => void) {
-        this.valueChangedListeners = this.valueChangedListeners.filter((curr) => {
-            return curr !== listener;
-        });
-    }
-
-    notifyValueChanged(item: IdProviderAccessControlEntry) {
-        this.valueChangedListeners.forEach((listener) => {
-            listener(item);
-        });
-    }
-
-    public setIdProviderAccessControlEntry(ace: IdProviderAccessControlEntry) {
-        this.ace = ace;
+    public setItem(ace: IdProviderAccessControlEntry) {
+        super.setItem(ace);
 
         let principal: Principal = <Principal>Principal.create().setKey(ace.getPrincipal().getKey()).setModifiedTime(
             ace.getPrincipal().getModifiedTime()).setDisplayName(
@@ -70,12 +35,13 @@ export class IdProviderAccessControlEntryView
         this.doLayout(principal);
     }
 
-    public getIdProviderAccessControlEntry(): IdProviderAccessControlEntry {
-        return new IdProviderAccessControlEntry(this.ace.getPrincipal(), this.ace.getAccess());
+    public getItem(): IdProviderAccessControlEntry {
+        return new IdProviderAccessControlEntry(this.item.getPrincipal(), this.item.getAccess());
     }
 
     doLayout(object: Principal) {
         super.doLayout(object);
+        this.addClass('idprovider-access-control-entry');
 
         if (IdProviderAccessControlEntryView.debug) {
             console.debug('IdProviderAccessControlEntryView.doLayout');
@@ -87,11 +53,12 @@ export class IdProviderAccessControlEntryView
             this.accessSelector = new IdProviderAccessSelector();
             this.accessSelector.setEnabled(this.isEditable());
             this.accessSelector.onValueChanged((event: ValueChangedEvent) => {
-                this.ace.setAccess(event.getNewValue());
+                this.item.setAccess(event.getNewValue());
+                this.notifyValueChanged(this.getItem());
             });
             this.appendChild(this.accessSelector);
         }
-        this.accessSelector.setValue(this.ace.getAccess(), true);
+        this.accessSelector.setValue(this.item.getAccess(), true);
 
         this.appendRemoveButton();
     }

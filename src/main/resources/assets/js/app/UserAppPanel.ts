@@ -150,7 +150,7 @@ export class UserAppPanel
         });
     }
 
-    protected handleBrowse() {
+    handleBrowse() {
         super.handleBrowse();
 
         this.getAppBarTabMenu().deselectNavigationItem();

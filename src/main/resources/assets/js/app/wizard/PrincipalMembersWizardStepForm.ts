@@ -24,7 +24,7 @@ export class PrincipalMembersWizardStepForm
         this.loader =
             new PrincipalLoader().setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER]).skipPrincipals([PrincipalKey.ofAnonymous()]);
 
-        this.principals = PrincipalComboBox.create().setLoader(this.loader).build();
+        this.principals = <PrincipalComboBox>PrincipalComboBox.create().setLoader(this.loader).build();
 
         let principalsFormItem = new FormItemBuilder(this.principals).setLabel(i18n('field.members')).build();
 

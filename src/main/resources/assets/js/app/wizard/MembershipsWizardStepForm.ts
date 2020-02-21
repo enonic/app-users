@@ -62,7 +62,7 @@ export class MembershipsWizardStepForm
 
         const groupsLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.GROUP]);
 
-        this.groups = PrincipalComboBox.create().setLoader(groupsLoader).build();
+        this.groups = <PrincipalComboBox>PrincipalComboBox.create().setLoader(groupsLoader).build();
 
         const formItem = new FormItemBuilder(this.groups).setLabel(i18n('field.groups')).build();
 
@@ -75,7 +75,7 @@ export class MembershipsWizardStepForm
         const rolesLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.ROLE]).skipPrincipals([RoleKeys.EVERYONE,
             RoleKeys.AUTHENTICATED]);
 
-        this.roles = PrincipalComboBox.create().setLoader(rolesLoader).build();
+        this.roles = <PrincipalComboBox>PrincipalComboBox.create().setLoader(rolesLoader).build();
 
         const formItem = new FormItemBuilder(this.roles).setLabel(i18n('field.roles')).build();
 

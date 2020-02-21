@@ -4,6 +4,7 @@ import {UserJson} from '../principal/UserJson';
 import {User} from '../principal/User';
 import {Path} from 'lib-admin-ui/rest/Path';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
 
 export class SetUserPasswordRequest
     extends SecurityResourceRequest<UserJson, User> {
@@ -13,7 +14,7 @@ export class SetUserPasswordRequest
 
     constructor() {
         super();
-        super.setMethod('POST');
+        super.setMethod(HttpMethod.POST);
     }
 
     setKey(key: PrincipalKey): SetUserPasswordRequest {

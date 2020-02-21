@@ -1,7 +1,9 @@
 import {Path} from 'lib-admin-ui/rest/Path';
-import {JsonRequest} from 'lib-admin-ui/rest/JsonRequest';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 import {HttpRequest} from 'lib-admin-ui/rest/HttpRequest';
+import {PostRequest} from 'lib-admin-ui/rest/PostRequest';
+import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import * as Q from 'q';
 
 export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE>
     implements HttpRequest<PARSED_TYPE> {
@@ -55,13 +57,16 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE>
     private send(query: string, mutation: string): Q.Promise<RAW_JSON_TYPE> {
 
         if (this.validate()) {
+            const deferred: Q.Deferred<JsonResponse<RAW_JSON_TYPE>> = Q.defer<JsonResponse<RAW_JSON_TYPE>>();
 
-            let jsonRequest = new JsonRequest<RAW_JSON_TYPE>()
-                .setMethod('POST')
+            let jsonRequest = new PostRequest()
                 .setParams(this.getParams(query, mutation))
-                .setPath(this.path);
+                .setPath(this.path)
+                .handleReadyStateChanged(deferred);
 
-            return jsonRequest.send().then(response => {
+            jsonRequest.send();
+
+            return deferred.promise.then(response => {
                 const json = response.getJson() || {};
                 const result = json.data || {};
                 if (json.errors) {

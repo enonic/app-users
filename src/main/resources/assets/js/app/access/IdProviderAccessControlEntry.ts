@@ -1,21 +1,18 @@
 import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {IdProviderAccess} from './IdProviderAccess';
 import {IdProviderAccessControlEntryJson} from './IdProviderAccessControlEntryJson';
 import {Equitable} from 'lib-admin-ui/Equitable';
-import {assertNotNull} from 'lib-admin-ui/util/Assert';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {PrincipalContainer} from 'lib-admin-ui/ui/security/PrincipalContainer';
 
 export class IdProviderAccessControlEntry
+    extends PrincipalContainer
     implements Equitable {
-
-    private principal: Principal;
 
     private access: IdProviderAccess;
 
-    constructor(principal: Principal, access?: IdProviderAccess) {
-        assertNotNull(principal, 'principal not set');
-        //    assertNotNull(access, 'access not set');
+    constructor(principal: Principal, access: IdProviderAccess = IdProviderAccess.CREATE_USERS) {
+        super(principal);
         this.principal = principal;
         this.access = access;
     }
@@ -30,18 +27,6 @@ export class IdProviderAccessControlEntry
 
     getAccess(): IdProviderAccess {
         return this.access;
-    }
-
-    getPrincipalKey(): PrincipalKey {
-        return this.principal.getKey();
-    }
-
-    getPrincipalDisplayName(): string {
-        return this.principal.getDisplayName();
-    }
-
-    getPrincipalTypeName(): string {
-        return this.principal.getTypeName();
     }
 
     setAccess(value: string): IdProviderAccessControlEntry {
