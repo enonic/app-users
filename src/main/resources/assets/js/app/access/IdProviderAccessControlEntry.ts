@@ -13,7 +13,6 @@ export class IdProviderAccessControlEntry
 
     constructor(principal: Principal, access: IdProviderAccess = IdProviderAccess.CREATE_USERS) {
         super(principal);
-        this.principal = principal;
         this.access = access;
     }
 
