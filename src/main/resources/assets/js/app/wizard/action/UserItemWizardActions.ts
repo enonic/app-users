@@ -5,17 +5,15 @@ import {WizardActions} from 'lib-admin-ui/app/wizard/WizardActions';
 import {Action} from 'lib-admin-ui/ui/Action';
 import {SaveAction} from 'lib-admin-ui/app/wizard/SaveAction';
 import {CloseAction} from 'lib-admin-ui/app/wizard/CloseAction';
-import {IdProvider} from '../../principal/IdProvider';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem>
     extends WizardActions<USER_ITEM_TYPE> {
 
-    private save: Action;
+    protected save: Action;
 
-    private close: Action;
+    protected close: Action;
 
-    private delete: Action;
+    protected delete: Action;
 
     constructor(wizardPanel: UserItemWizardPanel<USER_ITEM_TYPE>) {
         super();
@@ -34,7 +32,7 @@ export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem>
 
     enableActionsForExisting(userItem: UserItem) {
         this.save.setEnabled(false);
-        this.delete.setEnabled(!userItem.getKey().isSystem() && !ObjectHelper.iFrameSafeInstanceOf(userItem, IdProvider));
+        this.delete.setEnabled(!userItem.getKey().isSystem());
     }
 
     getDeleteAction(): Action {

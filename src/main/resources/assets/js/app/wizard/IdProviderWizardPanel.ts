@@ -18,6 +18,11 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {IdProviderWizardActions} from './IdProviderWizardActions';
+import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
+import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
+import {Principal} from 'lib-admin-ui/security/Principal';
 
 export class IdProviderWizardPanel
     extends UserItemWizardPanel<IdProvider> {
@@ -37,6 +42,10 @@ export class IdProviderWizardPanel
         this.listenToUserItemEvents();
     }
 
+    protected createWizardActions(): IdProviderWizardActions {
+        return new IdProviderWizardActions(this);
+    }
+
     doRenderOnDataLoaded(rendered: boolean): Q.Promise<boolean> {
         return super.doRenderOnDataLoaded(rendered).then((nextRendered) => {
             if (IdProviderWizardPanel.debug) {
@@ -51,13 +60,13 @@ export class IdProviderWizardPanel
     }
 
     protected createFormIcon(): FormIcon {
-        let formIcon = super.createFormIcon();
+        const formIcon: FormIcon = super.createFormIcon();
         formIcon.addClass('icon-address-book');
         return formIcon;
     }
 
     createSteps(persistedItem: IdProvider): WizardStep[] {
-        let steps: WizardStep[] = [];
+        const steps: WizardStep[] = [];
 
         this.idProviderWizardStepForm = new IdProviderWizardStepForm();
         this.permissionsWizardStepForm = new SecurityWizardStepForm();
@@ -127,8 +136,8 @@ export class IdProviderWizardPanel
     }
 
     isNewChanged(): boolean {
-        const wizardHeader = this.getWizardHeader();
-        const idProviderConfig = this.idProviderWizardStepForm.getIdProviderConfig();
+        const wizardHeader: WizardHeaderWithDisplayNameAndName = this.getWizardHeader();
+        const idProviderConfig: IdProviderConfig = this.idProviderWizardStepForm.getIdProviderConfig();
         return wizardHeader.getName() !== '' ||
                wizardHeader.getDisplayName() !== '' ||
                !ObjectHelper.stringEquals(this.idProviderWizardStepForm.getDescription(), this.defaultIdProvider.getDescription()) ||
@@ -137,7 +146,7 @@ export class IdProviderWizardPanel
     }
 
     isPersistedEqualsViewed(): boolean {
-        const viewedPrincipal = this.assembleViewedIdProvider();
+        const viewedPrincipal: IdProvider = this.assembleViewedIdProvider();
         return viewedPrincipal.equals(this.getPersistedItem());
     }
 
@@ -162,7 +171,6 @@ export class IdProviderWizardPanel
     }
 
     protected doLayoutPersistedItem(persistedItem: IdProvider): Q.Promise<void> {
-
         if (!!persistedItem) {
             this.getWizardHeader().setDisplayName(persistedItem.getDisplayName());
             this.idProviderWizardStepForm.layout(persistedItem);
@@ -194,14 +202,13 @@ export class IdProviderWizardPanel
     }
 
     private listenToUserItemEvents() {
-
-        let principalCreatedHandler = (event: UserItemCreatedEvent) => {
+        const principalCreatedHandler = (event: UserItemCreatedEvent) => {
             if (!this.getPersistedItem()) { // skip if id provider is not persisted yet
                 return;
             }
 
-            let principal = event.getPrincipal();
-            let isCreatedInCurrentIdProvider = !!principal && (principal.isUser() || principal.isGroup())
+            const principal: Principal = event.getPrincipal();
+            const isCreatedInCurrentIdProvider: boolean = !!principal && (principal.isUser() || principal.isGroup())
                                                && event.getIdProvider().getKey().equals(this.getPersistedItem().getKey());
 
             if (isCreatedInCurrentIdProvider) {
@@ -209,7 +216,7 @@ export class IdProviderWizardPanel
             }
         };
 
-        let principalDeletedHandler = (event: UserItemDeletedEvent) => {
+        const principalDeletedHandler = (event: UserItemDeletedEvent) => {
             // skip if id provider is not persisted yet or if anything except users or roles was deleted
             if (!this.getPersistedItem() || !event.getPrincipals()) {
                 return;
@@ -231,13 +238,13 @@ export class IdProviderWizardPanel
     }
 
     private produceCreateIdProviderRequest(): CreateIdProviderRequest {
-        let wizardHeader = this.getWizardHeader();
+        const wizardHeader: WizardHeaderWithDisplayNameAndName = this.getWizardHeader();
         wizardHeader.normalizeNames();
-        let key = new IdProviderKey(wizardHeader.getName());
-        let name = wizardHeader.getDisplayName();
-        let description = this.idProviderWizardStepForm.getDescription();
-        let idProviderConfig = this.idProviderWizardStepForm.getIdProviderConfig();
-        let permissions = this.permissionsWizardStepForm.getPermissions();
+        const key: IdProviderKey = new IdProviderKey(wizardHeader.getName());
+        const name: string = wizardHeader.getDisplayName();
+        const description: string = this.idProviderWizardStepForm.getDescription();
+        const idProviderConfig: IdProviderConfig = this.idProviderWizardStepForm.getIdProviderConfig();
+        const permissions: IdProviderAccessControlList = this.permissionsWizardStepForm.getPermissions();
 
         return new CreateIdProviderRequest()
             .setDisplayName(name)
@@ -256,11 +263,11 @@ export class IdProviderWizardPanel
     }
 
     private produceUpdateIdProviderRequest(viewedIdProvider: IdProvider): UpdateIdProviderRequest {
-        let key = this.getPersistedItem().getKey();
-        let name = viewedIdProvider.getDisplayName();
-        let description = viewedIdProvider.getDescription();
-        let idProviderConfig = viewedIdProvider.getIdProviderConfig();
-        let permissions = viewedIdProvider.getPermissions();
+        const key: IdProviderKey = this.getPersistedItem().getKey();
+        const name: string = viewedIdProvider.getDisplayName();
+        const description: string = viewedIdProvider.getDescription();
+        const idProviderConfig: IdProviderConfig = viewedIdProvider.getIdProviderConfig();
+        const permissions: IdProviderAccessControlList = viewedIdProvider.getPermissions();
 
         return new UpdateIdProviderRequest()
             .setKey(key)
