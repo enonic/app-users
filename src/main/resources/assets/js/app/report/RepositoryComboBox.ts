@@ -7,19 +7,13 @@ import {RepositoryLoader} from './RepositoryLoader';
 import {RichComboBox, RichComboBoxBuilder} from 'lib-admin-ui/ui/selector/combobox/RichComboBox';
 import {SelectedOptionView} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionView';
 import {BaseSelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
+import {Viewer} from 'lib-admin-ui/ui/Viewer';
+import {SelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionsView';
 
 export class RepositoryComboBox
     extends RichComboBox<Repository> {
 
-    constructor(value?: string) {
-        let builder = new RichComboBoxBuilder<Repository>()
-            .setComboBoxName('ReportSelector')
-            .setIdentifierMethod('getId')
-            .setLoader(new RepositoryLoader())
-            .setValue(value)
-            .setSelectedOptionsView(new ReportSelectedOptionsView())
-            .setOptionDisplayValueViewer(new RepositoryViewer())
-            .setDelayedInputValueChangedHandling(500);
+    constructor(builder: RepositoryComboBoxBuilder = new RepositoryComboBoxBuilder()) {
         super(builder);
     }
 
@@ -94,4 +88,18 @@ class ReportSelectedOptionsView
         return new SelectedOption<Repository>(optionView, this.count());
     }
 
+}
+
+export class RepositoryComboBoxBuilder
+    extends RichComboBoxBuilder<Repository> {
+
+    comboBoxName: string = 'ReportSelector';
+
+    loader: RepositoryLoader = new RepositoryLoader();
+
+    optionDisplayValueViewer: Viewer<Repository> = new RepositoryViewer();
+
+    delayedInputValueChangedHandling: number = 500;
+
+    selectedOptionsView: SelectedOptionsView<Repository> = new ReportSelectedOptionsView();
 }
