@@ -20,36 +20,32 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
         return XPATH.container + XPATH.transitiveCheckBox;
     }
 
-    clickOnTransitiveCheckBox() {
-        return this.waitForElementDisplayed(this.transitiveCheckBox, 2000).catch(err => {
+    async clickOnTransitiveCheckBox() {
+        try {
+            await this.waitForElementDisplayed(this.transitiveCheckBox, 2000);
+            await this.clickOnElement(this.transitiveCheckBox);
+            return await this.pause(500);
+        } catch (err) {
             this.saveScreenshot("err_transitive_checkbox");
-            throw new Error("Transitive checkbox is not visible" + err);
-        }).then(() => {
-            return this.clickOnElement(this.transitiveCheckBox);
-        }).then(() => {
-            return this.pause(500);
-        })
+            throw new Error("Error when clicking on Transitive checkbox  " + err);
+        }
     }
 
-    getDisplayNameOfMembers() {
+    async getDisplayNameOfMembers() {
         let items = XPATH.container + XPATH.memberList + lib.H6_DISPLAY_NAME;
-        return this.waitForElementDisplayed(XPATH.membersDataGroup, 1000).catch((err) => {
+        try {
+            await this.waitForElementDisplayed(XPATH.membersDataGroup, 1000);
+            return await this.getTextInElements(items);
+        } catch (err) {
             this.saveScreenshot('err_member_list');
             throw new Error('Members data-group is not present on the page!');
-        }).then(() => {
-            return this.getTextInElements(items);
-        })
+        }
     }
 
-    getDisplayNameOfRoles() {
+    async getDisplayNameOfRoles() {
         let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
-        return this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, 1000).then((result) => {
-            if (!result) {
-                throw new Error('Roles data-group is not present on the page!');
-            }
-        }).then(() => {
-            return this.getTextInElements(items)
-        })
+        await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, 2000);
+        return await this.getTextInElements(items);
     }
 
     async getDisplayNamesInGroupList() {

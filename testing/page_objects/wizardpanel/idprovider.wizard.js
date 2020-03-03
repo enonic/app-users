@@ -13,10 +13,10 @@ const XPATH = {
                                         lib.COMBO_BOX_OPTION_FILTER_INPUT,
     permissionsFilterInput: "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
     permissionsLink: "//li[child::a[text()='Permissions']]",
-    aclList: "//ul[contains(@class,'access-control-list')]",
+    aclList: "//div[contains(@id,'IdProviderACESelectedOptionsView') and contains(@class,'selected-options')]",
     aceAccessSelector: "//div[contains(@id,'IdProviderAccessSelector')]",
     selectedAcEntryByDisplayName: function (displayName) {
-        return `//div[contains(@id,'IdProviderACESelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
+        return `//div[contains(@id,'IdProviderAccessControlEntryView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
     aceOperationByName: function (displayName) {
         return `//ul[@class='menu']//li[child::a[text()='${displayName}']]`
@@ -133,29 +133,27 @@ class IdProviderWizard extends WizardPanel {
     }
 
     async removeAuthApplication() {
-        return this.clickOnElement(this.removeAuthApplicationIcon);
+        await this.clickOnElement(this.removeAuthApplicationIcon);
         return await this.pause(400);
     }
 
-    filterOptionsAndSelectApplication(authAppName) {
-        let loaderComboBox = new LoaderComboBox();
-        return this.typeTextInInput(XPATH.authApplicationSelectorFilterInput, authAppName).then(() => {
-            return loaderComboBox.waitForOptionVisible(XPATH.container, authAppName);
-        }).then(() => {
-            return loaderComboBox.clickOnOption(XPATH.container, authAppName);
-        }).catch(err => {
+    async filterOptionsAndSelectApplication(authAppName) {
+        try {
+            let loaderComboBox = new LoaderComboBox();
+            await this.typeTextInInput(XPATH.authApplicationSelectorFilterInput, authAppName);
+            await loaderComboBox.waitForOptionVisible(XPATH.container, authAppName);
+            await loaderComboBox.clickOnOption(XPATH.container, authAppName);
+            return await this.pause(300);
+        } catch (err) {
             this.saveScreenshot('err_select_application');
             throw new Error('ID Provider - Error when selecting the auth-application: ' + authAppName + ' ' + err);
-        }).then(() => {
-            return this.pause(300);
-        })
+        }
     }
 
-    clickOnSelectedACEAndShowMenuOperations(entryDisplayName) {
+    async clickOnSelectedACEAndShowMenuOperations(entryDisplayName) {
         let selector = XPATH.selectedAcEntryByDisplayName(entryDisplayName) + XPATH.aceAccessSelector;
-        return this.clickOnElement(selector).then(() => {
-            return this.pause(400);
-        })
+        await this.clickOnElement(selector);
+        return await this.pause(400);
     }
 
     isAceMenuOptionsExpanded(entryDisplayName) {
@@ -245,5 +243,6 @@ class IdProviderWizard extends WizardPanel {
         return this.waitForElementDisplayed(this.displayNameInput, appConst.TIMEOUT_3);
     }
 };
+
 module.exports = IdProviderWizard;
 
