@@ -63,7 +63,6 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             await newPrincipalDialog.waitForDialogLoaded()
         });
 
-
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {

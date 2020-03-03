@@ -11,19 +11,19 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
-describe('Confirm and delete `Id Provider` in wizard and in browse panel', function () {
+describe("Confirm and delete 'Id Provider' in wizard and in browse panel", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let idProvider;
 
     //Verifies https://github.com/enonic/app-users/issues/281  Delete button does not get enabled after saving of new provider
-    it('GIVEN `IdProvider` has been saved WHEN Delete button in wizard-toolbar has been pressed THEN Confirmation dialog should appear',
+    it("GIVEN 'IdProvider' has been saved WHEN Delete button in wizard-toolbar has been pressed THEN Confirmation dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider1');
             //1. Open new wizard and type the data:
             await testUtils.openIdProviderWizard();
-            await idProviderWizard.typeData(idProvider)
+            await idProviderWizard.typeData(idProvider);
             await idProviderWizard.waitAndClickOnSave();
             await idProviderWizard.waitForSpinnerNotVisible();
             await idProviderWizard.pause(1000);
