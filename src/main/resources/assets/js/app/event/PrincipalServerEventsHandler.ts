@@ -1,11 +1,9 @@
 import {Path} from 'lib-admin-ui/rest/Path';
-import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalServerEvent} from 'lib-admin-ui/security/event/PrincipalServerEvent';
 import {PrincipalServerChange, PrincipalServerChangeItem} from 'lib-admin-ui/security/event/PrincipalServerChange';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {GetIdProviderByKeyRequest} from '../../graphql/idprovider/GetIdProviderByKeyRequest';
-import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
 import {IdProvider} from '../principal/IdProvider';
 import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
@@ -19,8 +17,10 @@ export class PrincipalServerEventsHandler {
 
     private handler: (event: PrincipalServerEvent) => void;
 
-    private userItemCreatedListeners: { (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean): void }[] = [];
-    private userItemUpdatedListeners: { (principal: Principal, idProvider: IdProvider): void }[] = [];
+    private principalCreatedListeners: { (key: PrincipalKey): void }[] = [];
+    private principalUpdatedListeners: { (key: PrincipalKey): void }[] = [];
+    private idProviderCreatedListeners: { (idProvider: IdProvider): void }[] = [];
+    private idProviderUpdatedListeners: { (idProvider: IdProvider): void }[] = [];
     private userItemDeletedListeners: { (ids: string[]): void }[] = [];
 
     private static debug: boolean = false;
@@ -49,56 +49,25 @@ export class PrincipalServerEventsHandler {
         }
 
         if (event.getType() === NodeServerChangeType.DELETE) {
-            this.handleUserItemDeleted(this.extractPrincipalIds([event.getNodeChange()]));
+            this.handlePrincipalDeleted(this.extractPrincipalIds([event.getNodeChange()]));
         } else {
             // allow some time for the backend to process items before requesting them
-            setTimeout(this.loadUserItems.bind(this, event), 1000);
+            setTimeout(this.handleUserItemServerEvent.bind(this, event), 1000);
         }
     }
 
-    private isIgnoredItem(item: PrincipalServerChangeItem): boolean {
-        const id = this.getId(item);
-        if (!id) {
-            return true;
-        }
-        const path = Path.fromString(item.getPath());
-        const name = path.getElement(path.getElements().length - 1);
-
-        if (name === 'groups' || name === 'users' || name === 'roles') {
-            return true;
-        }
-
-        return false;
-    }
-
-    onUserItemCreated(listener: (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => void) {
-        this.userItemCreatedListeners.push(listener);
-    }
-
-    unUserItemCreated(listener: (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => void) {
-        this.userItemCreatedListeners =
-            this.userItemCreatedListeners.filter(currentListener => {
-                return currentListener !== listener;
-            });
-    }
-
-    onUserItemUpdated(listener: (principal: Principal, idProvider: IdProvider) => void) {
-        this.userItemUpdatedListeners.push(listener);
-    }
-
-    unUserItemUpdated(listener: (principal: Principal, idProvider: IdProvider) => void) {
-        this.userItemUpdatedListeners =
-            this.userItemUpdatedListeners.filter((currentListener: (principal: Principal, idProvider: IdProvider) => void) => {
-                return currentListener !== listener;
-            });
-    }
-
-    private handleUserItemDeleted(ids: string[]) {
+    private handlePrincipalDeleted(ids: string[]) {
         if (PrincipalServerEventsHandler.debug) {
             console.debug('UserItemServerEventsHandler: deleted', ids);
         }
 
-        this.notifyUserItemDeleted(ids);
+        this.notifyPrincipalDeleted(ids);
+    }
+
+    private notifyPrincipalDeleted(ids: string[]) {
+        this.userItemDeletedListeners.forEach((listener: (ids: string[]) => void) => {
+            listener(ids);
+        });
     }
 
     private extractPrincipalIds(changes: PrincipalServerChange[]): string[] {
@@ -124,90 +93,170 @@ export class PrincipalServerEventsHandler {
         return name;
     }
 
-    private loadUserItems(event: PrincipalServerEvent) {
+    private handleUserItemServerEvent(event: PrincipalServerEvent) {
         event.getNodeChange().getChangeItems().forEach((item: PrincipalServerChangeItem) => {
 
             if (this.isIgnoredItem(item)) {
                 return;
             }
 
-            const path = Path.fromString(item.getPath());
-            const id = this.getId(item);
-            if (!path.hasParent()) {
+            const path: Path = Path.fromString(item.getPath());
+            const id: string = this.getId(item);
+            if (path.hasParent()) {
+                // it's a principal, fetch him as well as idProvider
+                const key: PrincipalKey = PrincipalKey.fromString(id);
+                this.onPrincipalCreateUpdate(event.getType(), key);
+            } else {
                 // it's a idProvider
-                new GetIdProviderByKeyRequest(IdProviderKey.fromString(id)).sendAndParse().then(idProvider => {
+                new GetIdProviderByKeyRequest(IdProviderKey.fromString(id)).sendAndParse().then((idProvider: IdProvider) => {
                     if (PrincipalServerEventsHandler.debug) {
                         console.debug('PrincipalServerEventsHandler.loaded idprovider:', idProvider);
                     }
                     if (idProvider) {
-                        this.onUserItemLoaded(event, null, idProvider);
+                        this.onIdProviderCreateUpdate(event.getType(), idProvider);
                     }
                 }).catch(DefaultErrorHandler.handle);
-            } else {
-                // it's a principal, fetch him as well as idProvider
-                const key = PrincipalKey.fromString(id);
-                if (key.isRole()) {
-                    new GetPrincipalByKeyRequest(key).sendAndParse().then(principal => {
-                        if (PrincipalServerEventsHandler.debug) {
-                            console.debug('PrincipalServerEventsHandler.loaded principal:', principal);
-                        }
-                        this.onUserItemLoaded(event, principal, null);
-                    }).catch(DefaultErrorHandler.handle);
-                } else {
-                    new GetPrincipalByKeyRequest(key).sendAndParse().then(principal => {
-                        if (PrincipalServerEventsHandler.debug) {
-                            console.debug('PrincipalServerEventsHandler.loaded principal:', principal);
-                        }
-                        if (principal) {
-                            return new GetIdProviderByKeyRequest(principal.getKey().getIdProvider()).sendAndParse().then(idProvider => {
-                                this.onUserItemLoaded(event, principal, idProvider);
-                            });
-                        }
-                        console.warn('PrincipalServerEventsHandler: could not load principal[' + key.toString() + ']');
-                    }).catch(DefaultErrorHandler.handle);
-                }
             }
         });
     }
 
-    private onUserItemLoaded(event: PrincipalServerEvent, principal: Principal, idProvider: IdProvider) {
-        switch (event.getType()) {
+    private isIgnoredItem(item: PrincipalServerChangeItem): boolean {
+        const id = this.getId(item);
+        if (!id) {
+            return true;
+        }
+        const path = Path.fromString(item.getPath());
+        const name = path.getElement(path.getElements().length - 1);
+
+        if (name === 'groups' || name === 'users' || name === 'roles') {
+            return true;
+        }
+
+        return false;
+    }
+
+    private onPrincipalCreateUpdate(eventType: NodeServerChangeType, key: PrincipalKey) {
+        switch (eventType) {
         case NodeServerChangeType.CREATE:
-            this.handleUserItemCreated(principal, idProvider);
+            this.handlePrincipalCreated(key);
             break;
         case NodeServerChangeType.UPDATE:
         case NodeServerChangeType.UPDATE_PERMISSIONS:
-            this.handleUserItemUpdated(principal, idProvider);
+            this.handlePrincipalUpdated(key);
             break;
         }
     }
 
-    private handleUserItemCreated(principal: Principal, idProvider: IdProvider) {
+    private handlePrincipalCreated(key: PrincipalKey) {
         if (PrincipalServerEventsHandler.debug) {
-            console.debug('UserItemServerEventsHandler: created', principal, idProvider);
+            console.debug('UserItemServerEventsHandler: created', key);
         }
 
-        this.notifyUserItemCreated(principal, idProvider, false);
+        this.notifyPrincipalCreated(key);
     }
 
-    private handleUserItemUpdated(principal: Principal, idProvider: IdProvider) {
-        if (PrincipalServerEventsHandler.debug) {
-            console.debug('UserItemServerEventsHandler: updated', principal, idProvider);
-        }
-
-        this.notifyUserItemUpdated(principal, idProvider);
-    }
-
-    private notifyUserItemCreated(principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) {
-        this.userItemCreatedListeners.forEach(listener => {
-            listener(principal, idProvider, sameTypeParent);
+    private notifyPrincipalCreated(key: PrincipalKey) {
+        this.principalCreatedListeners.forEach(listener => {
+            listener(key);
         });
     }
 
-    private notifyUserItemUpdated(principal: Principal, idProvider: IdProvider) {
-        this.userItemUpdatedListeners.forEach((listener: (principal: Principal, idProvider: IdProvider) => void) => {
-            listener(principal, idProvider);
+    private handlePrincipalUpdated(key: PrincipalKey) {
+        if (PrincipalServerEventsHandler.debug) {
+            console.debug('UserItemServerEventsHandler: updated', key);
+        }
+
+        this.notifyPrincipalUpdated(key);
+    }
+
+    private notifyPrincipalUpdated(key: PrincipalKey) {
+        this.principalUpdatedListeners.forEach((listener: (key: PrincipalKey) => void) => {
+            listener(key);
         });
+    }
+
+    private onIdProviderCreateUpdate(eventType: NodeServerChangeType, idProvider: IdProvider) {
+        switch (eventType) {
+        case NodeServerChangeType.CREATE:
+            this.handleIdProviderCreated(idProvider);
+            break;
+        case NodeServerChangeType.UPDATE:
+        case NodeServerChangeType.UPDATE_PERMISSIONS:
+            this.handleIdProviderUpdated(idProvider);
+            break;
+        }
+    }
+
+    private handleIdProviderCreated(idProvider: IdProvider) {
+        if (PrincipalServerEventsHandler.debug) {
+            console.debug('UserItemServerEventsHandler: created', idProvider.getKey());
+        }
+
+        this.notifyIdProviderCreated(idProvider);
+    }
+
+    private notifyIdProviderCreated(idProvider: IdProvider) {
+        this.idProviderCreatedListeners.forEach(listener => {
+            listener(idProvider);
+        });
+    }
+
+    private handleIdProviderUpdated(idProvider: IdProvider) {
+        if (PrincipalServerEventsHandler.debug) {
+            console.debug('UserItemServerEventsHandler: updated', idProvider);
+        }
+
+        this.notifyIdProviderUpdated(idProvider);
+    }
+
+    private notifyIdProviderUpdated(idProvider: IdProvider) {
+        this.idProviderUpdatedListeners.forEach((listener: (idProvider: IdProvider) => void) => {
+            listener(idProvider);
+        });
+    }
+
+    onPrincipalCreated(listener: (key: PrincipalKey) => void) {
+        this.principalCreatedListeners.push(listener);
+    }
+
+    unPrincipalCreated(listener: (key: PrincipalKey) => void) {
+        this.principalCreatedListeners =
+            this.principalCreatedListeners.filter(currentListener => {
+                return currentListener !== listener;
+            });
+    }
+
+    onPrincipalUpdated(listener: (key: PrincipalKey) => void) {
+        this.principalUpdatedListeners.push(listener);
+    }
+
+    unPrincipalUpdated(listener: (key: PrincipalKey) => void) {
+        this.principalUpdatedListeners =
+            this.principalUpdatedListeners.filter((currentListener: (key: PrincipalKey) => void) => {
+                return currentListener !== listener;
+            });
+    }
+
+    onIdProviderCreated(listener: (idProvider: IdProvider) => void) {
+        this.idProviderCreatedListeners.push(listener);
+    }
+
+    unIdProviderCreated(listener: (idProvider: IdProvider) => void) {
+        this.idProviderCreatedListeners =
+            this.idProviderCreatedListeners.filter(currentListener => {
+                return currentListener !== listener;
+            });
+    }
+
+    onIdProviderUpdated(listener: (idProvider: IdProvider) => void) {
+        this.idProviderUpdatedListeners.push(listener);
+    }
+
+    unIdProviderUpdated(listener: (idProvider: IdProvider) => void) {
+        this.idProviderUpdatedListeners =
+            this.idProviderUpdatedListeners.filter((currentListener: (idProvider: IdProvider) => void) => {
+                return currentListener !== listener;
+            });
     }
 
     onUserItemDeleted(listener: (ids: string[]) => void) {
@@ -219,11 +268,5 @@ export class PrincipalServerEventsHandler {
             this.userItemDeletedListeners.filter((currentListener: (ids: string[]) => void) => {
                 return currentListener !== listener;
             });
-    }
-
-    private notifyUserItemDeleted(ids: string[]) {
-        this.userItemDeletedListeners.forEach((listener: (ids: string[]) => void) => {
-            listener(ids);
-        });
     }
 }

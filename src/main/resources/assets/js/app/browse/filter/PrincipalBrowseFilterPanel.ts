@@ -6,7 +6,6 @@ import {ListTypesRequest} from '../../../graphql/principal/ListTypesRequest';
 import {BrowseFilterResetEvent} from 'lib-admin-ui/app/browse/filter/BrowseFilterResetEvent';
 import {BrowseFilterSearchEvent} from 'lib-admin-ui/app/browse/filter/BrowseFilterSearchEvent';
 import {AggregationGroupView} from 'lib-admin-ui/aggregation/AggregationGroupView';
-import {AggregationSelection} from 'lib-admin-ui/aggregation/AggregationSelection';
 import {Aggregation} from 'lib-admin-ui/aggregation/Aggregation';
 import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
 import {Bucket} from 'lib-admin-ui/aggregation/Bucket';
@@ -14,6 +13,7 @@ import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 import {BrowseFilterPanel} from 'lib-admin-ui/app/browse/filter/BrowseFilterPanel';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {ListTypesResult} from '../../../graphql/principal/ListTypesResult';
 
 export class PrincipalBrowseFilterPanel
     extends BrowseFilterPanel<UserTreeGridItem> {
@@ -30,8 +30,8 @@ export class PrincipalBrowseFilterPanel
     }
 
     private initHitsCounter() {
-        new ListUserItemsRequest().sendAndParse().then((result: ListUserItemsRequestResult) => {
-            this.updateHitsCounter(result.userItems ? result.userItems.length : 0, true);
+        new ListTypesRequest().sendAndParse().then((result: ListTypesResult) => {
+            this.updateHitsCounter(result.getTotal(), true);
         }).catch((reason: any) => {
             DefaultErrorHandler.handle(reason);
         });
@@ -77,11 +77,6 @@ export class PrincipalBrowseFilterPanel
         }).catch((reason: any) => {
             DefaultErrorHandler.handle(reason);
         });
-    }
-
-    private hasSelectedAggregations(): boolean {
-        const selections: AggregationSelection[] = this.getSearchInputValues().aggregationSelections || [];
-        return selections.some(selection => selection.getSelectedBuckets().length > 0);
     }
 
     private getCheckedTypes(): UserItemType[] {
@@ -163,9 +158,9 @@ export class PrincipalBrowseFilterPanel
         return new ListTypesRequest()
             .setQuery(searchString)
             .sendAndParse()
-            .then((typeAggregation) => {
-                this.updateAggregations([typeAggregation], true);
-                this.toggleAggregationsVisibility([typeAggregation]);
+            .then((result: ListTypesResult) => {
+                this.updateAggregations([result.getBucketAggregation()], true);
+                this.toggleAggregationsVisibility([result.getBucketAggregation()]);
             }).catch((reason: any) => {
                 DefaultErrorHandler.handle(reason);
             });

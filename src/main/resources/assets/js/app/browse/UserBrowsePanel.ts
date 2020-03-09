@@ -6,14 +6,14 @@ import {UserTreeGridActions} from './UserTreeGridActions';
 import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
-import {IdProvider} from '../principal/IdProvider';
 import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {Principal} from 'lib-admin-ui/security/Principal';
 import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {IdProvider} from '../principal/IdProvider';
 
 export class UserBrowsePanel
     extends BrowsePanel<UserTreeGridItem> {
@@ -68,8 +68,8 @@ export class UserBrowsePanel
     private bindServerEventListeners() {
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
-        serverHandler.onUserItemCreated((principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => {
-            this.treeGrid.appendUserNode(principal, idProvider, sameTypeParent);
+        serverHandler.onPrincipalCreated((key: PrincipalKey) => {
+            this.treeGrid.appendPrincipalNode(key);
             this.setRefreshOfFilterRequired();
 
             /*
@@ -81,8 +81,21 @@ export class UserBrowsePanel
             }
         });
 
-        serverHandler.onUserItemUpdated((principal: Principal, idProvider: IdProvider) => {
-            this.treeGrid.updateUserNode(principal, idProvider);
+        serverHandler.onIdProviderCreated((idProvider: IdProvider) => {
+            this.treeGrid.appendIdProviderUserNode(idProvider);
+            this.setRefreshOfFilterRequired();
+
+            if (this.isVisible()) {
+                this.refreshFilter();
+            }
+        });
+
+        serverHandler.onPrincipalUpdated((key: PrincipalKey) => {
+            this.treeGrid.updatePrincipalNode(key);
+        });
+
+        serverHandler.onIdProviderUpdated((idProvider: IdProvider) => {
+            this.treeGrid.updateIdProviderNode(idProvider);
         });
 
         serverHandler.onUserItemDeleted((ids: string[]) => {

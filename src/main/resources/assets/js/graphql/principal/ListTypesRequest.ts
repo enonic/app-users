@@ -2,9 +2,10 @@ import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
 import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggregationJson';
 import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
+import {ListTypesResult} from './ListTypesResult';
 
 export class ListTypesRequest
-    extends ListGraphQlRequest<any, any> {
+    extends ListGraphQlRequest<any, ListTypesResult> {
 
     private searchQuery: string;
 
@@ -38,10 +39,11 @@ export class ListTypesRequest
                 }`;
     }
 
-    sendAndParse(): Q.Promise<BucketAggregation> {
+    sendAndParse(): Q.Promise<ListTypesResult> {
         return this.query().then((response: any) => {
             const data = response.types;
-            return this.fromJsonToAggregation(data.aggregations);
+            const aggregation: BucketAggregation = this.fromJsonToAggregation(data.aggregations);
+            return new ListTypesResult(aggregation, data.totalCount);
         });
     }
 

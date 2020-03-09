@@ -22,6 +22,9 @@ import {UserItem} from 'lib-admin-ui/security/UserItem';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {Body} from 'lib-admin-ui/dom/Body';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -111,31 +114,119 @@ export class UserItemsTreeGrid
         return this.treeGridActions;
     }
 
-    updateUserNode(principal: Principal, idProvider: IdProvider) {
-        if (!principal && !idProvider) {
+    appendIdProviderUserNode(idProvider: IdProvider) {
+        const insertIndex: number = this.getIndexToInsertNewIdProvider(idProvider);
+        const newIdProviderNode: TreeNode<UserTreeGridItem> = this.createNodeFromIdProvider(idProvider);
+        const rootNode: TreeNode<UserTreeGridItem> = this.getRoot().getDefaultRoot();
+
+        if (insertIndex > 0) {
+            rootNode.insertChild(newIdProviderNode, insertIndex);
+        } else {
+            rootNode.addChild(newIdProviderNode);
+        }
+
+        this.initData(this.getRoot().getDefaultRoot().treeToList());
+    }
+
+    private getIndexToInsertNewIdProvider(newIdProvider: IdProvider): number {
+        const rootNodes: TreeNode<UserTreeGridItem>[] = this.getRoot().getDefaultRoot().getChildren();
+
+        const idProviderDisplayName: string = newIdProvider.getDisplayName();
+        let insertIndex: number = 0;
+
+        rootNodes.some((rootNode: TreeNode<UserTreeGridItem>, index: number) => {
+            if (rootNode.getData().getType() === UserTreeGridItemType.ID_PROVIDER) {
+                const existingIdProvider: IdProvider = rootNode.getData().getIdProvider();
+                if (existingIdProvider.getDisplayName().localeCompare(idProviderDisplayName) > 0) {
+                    insertIndex = index;
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        return insertIndex;
+    }
+
+    private createNodeFromIdProvider(idProvider: IdProvider): TreeNode<UserTreeGridItem> {
+        const userTreeGridItem: UserTreeGridItem =
+            new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
+
+        return this.dataToTreeNode(userTreeGridItem, this.getRoot().getDefaultRoot());
+    }
+
+    updateIdProviderNode(idProvider: IdProvider) {
+        const nodesToUpdate: TreeNode<UserTreeGridItem>[] = this.getNodesToUpdate(idProvider.getKey().toString());
+
+        if (nodesToUpdate.length === 0) {
             return;
         }
 
-        let userTreeGridItem: UserTreeGridItem;
-        const builder: UserTreeGridItemBuilder = new UserTreeGridItemBuilder();
+        const userTreeGridItem: UserTreeGridItem =
+            new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
 
-        if (!principal) { // IdProvider type
-            userTreeGridItem = builder.setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
-        } else {         // Principal type
-            userTreeGridItem = builder.setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
-        }
-
-        const nodeList: TreeNode<UserTreeGridItem>[] = this.getRoot().getCurrentRoot().treeToList();
-
-        nodeList.forEach((node) => {
-            if (node.getDataId() === userTreeGridItem.getDataId()) {
-                node.setData(userTreeGridItem);
-                node.clearViewers();
-            }
+        nodesToUpdate.forEach((nodeToUpdate: TreeNode<UserTreeGridItem>) => {
+            nodeToUpdate.setData(userTreeGridItem);
+            nodeToUpdate.clearViewers();
         });
 
-        this.initData(nodeList);
-        this.invalidate();
+        this.invalidateNodes(nodesToUpdate);
+    }
+
+    updatePrincipalNode(key: PrincipalKey) {
+        const nodesToUpdate: TreeNode<UserTreeGridItem>[] = this.getNodesToUpdate(key.toString());
+
+        if (nodesToUpdate.length === 0) {
+            return;
+        }
+
+        new GetPrincipalByKeyRequest(key).sendAndParse().then((principal: Principal) => {
+            const userTreeGridItem: UserTreeGridItem =
+                new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
+
+            nodesToUpdate.forEach((nodeToUpdate: TreeNode<UserTreeGridItem>) => {
+                nodeToUpdate.setData(userTreeGridItem);
+                nodeToUpdate.clearViewers();
+            });
+
+            this.invalidateNodes(nodesToUpdate);
+        }).catch(DefaultErrorHandler.handle);
+    }
+
+    private getNodesToUpdate(keyAsString: string): TreeNode<UserTreeGridItem>[] {
+        const nodesToUpdate: TreeNode<UserTreeGridItem>[] = [];
+
+        const defaultRootNodeToUpdate: TreeNode<UserTreeGridItem> = this.getNodeById(keyAsString);
+        if (defaultRootNodeToUpdate) {
+            nodesToUpdate.push(defaultRootNodeToUpdate);
+        }
+
+        if (this.isFiltered()) {
+            const filteredRootNodeToUpdate: TreeNode<UserTreeGridItem> = this.getNodeById(keyAsString, true);
+            if (!!filteredRootNodeToUpdate) {
+                nodesToUpdate.push(filteredRootNodeToUpdate);
+            }
+        }
+
+        return nodesToUpdate;
+    }
+
+    private getNodeById(id: string, fromFilteredRoot?: boolean): TreeNode<UserTreeGridItem> {
+        const nodeList: TreeNode<UserTreeGridItem>[] = fromFilteredRoot ? this.getRoot().getFilteredRoot().treeToList() :
+                                                       this.getRoot().getDefaultRoot().treeToList();
+
+        let result: TreeNode<UserTreeGridItem> = null;
+
+        nodeList.some((node: TreeNode<UserTreeGridItem>) => {
+            if (node.getDataId() === id) {
+                result = node;
+                return true;
+            }
+
+            return false;
+        });
+
+        return result;
     }
 
     deleteNodes(userTreeGridItemsToDelete: UserTreeGridItem[]) {
@@ -146,35 +237,152 @@ export class UserItemsTreeGrid
         super.deleteNodes(userTreeGridItemsToDelete);
     }
 
-    appendUserNode(principal: Principal, idProvider: IdProvider, parentOfSameType?: boolean) {
-        if (!principal) {
-            this.appendIdProviderUserNode(idProvider);
-        } else {
-            this.appendPrincipalNode(principal, idProvider, parentOfSameType);
-        }
-    }
-
-    private appendIdProviderUserNode(idProvider: IdProvider) {
-        const userTreeGridItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(
-            UserTreeGridItemType.ID_PROVIDER).build();
-
-        this.appendNode(userTreeGridItem, true, false, this.getRoot().isFiltered() ? this.getRoot().getDefaultRoot() : null);
-
-        if (!this.getRoot().isFiltered()) {
-            this.initData(this.getRoot().getDefaultRoot().treeToList());
-            this.invalidate();
-        }
-    }
-
-    private appendPrincipalNode(principal: Principal, idProvider: IdProvider, parentOfSameType?: boolean) {
-        const userTreeGridItem = new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
-
-        if (parentOfSameType) {
-            this.appendNode(userTreeGridItem, parentOfSameType, false);
+    appendPrincipalNode(key: PrincipalKey) {
+        if (key.isRole()) {
+            this.reloadRolesNode();
             return;
         }
 
-        this.loadParentNode(principal, idProvider).then((parentNode) => this.appendNodeToParent(parentNode, userTreeGridItem));
+        if (key.isGroup()) {
+            this.reloadGroupsNode(key.getIdProvider());
+            return;
+        }
+
+        if (key.isUser()) {
+            this.reloadUsersNode(key.getIdProvider());
+            return;
+        }
+    }
+
+    private reloadRolesNode() {
+        const rolesNode: TreeNode<UserTreeGridItem> = this.getRolesNode();
+
+        if (!rolesNode.isExpanded() && !rolesNode.hasChildren()) {
+            return;
+        }
+
+        this.loadChildren(null, 0, [PrincipalType.ROLE], rolesNode.getChildren().length).then((items: UserTreeGridItem[]) => {
+            rolesNode.setChildren(this.dataToTreeNodes(items, rolesNode));
+            this.initData(this.getRoot().getDefaultRoot().treeToList());
+        });
+    }
+
+    private getRolesNode(): TreeNode<UserTreeGridItem> {
+        const rootNode: TreeNode<UserTreeGridItem> = this.getRoot().getDefaultRoot();
+
+        const rolesNode: TreeNode<UserTreeGridItem> = rootNode.getChildren()
+            .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
+
+        return rolesNode;
+    }
+
+    private reloadGroupsNode(idProviderKey: IdProviderKey) {
+        const groupsNode: TreeNode<UserTreeGridItem> = this.getGroupsNodeByIdProvider(idProviderKey);
+
+        if (!groupsNode) {
+            return;
+        }
+
+        if (!groupsNode.isExpanded() && !groupsNode.hasChildren()) {
+            return;
+        }
+
+        this.loadChildren(idProviderKey, 0, [PrincipalType.GROUP], groupsNode.getChildren().length).then((items: UserTreeGridItem[]) => {
+            groupsNode.setChildren(this.dataToTreeNodes(items, groupsNode));
+            this.initData(this.getRoot().getDefaultRoot().treeToList());
+        });
+    }
+
+    private getGroupsNodeByIdProvider(idProviderKey: IdProviderKey): TreeNode<UserTreeGridItem> {
+        const idProviderNode: TreeNode<UserTreeGridItem> = this.getIdProviderNode(idProviderKey);
+
+        if (!idProviderNode) {
+            return;
+        }
+
+        return this.getGroupsNodeFromIdProviderNode(idProviderNode);
+    }
+
+    private getIdProviderNode(idProviderKey: IdProviderKey): TreeNode<UserTreeGridItem> {
+        const rootNode: TreeNode<UserTreeGridItem> = this.getRoot().getDefaultRoot();
+
+        let idProviderNode: TreeNode<UserTreeGridItem> = null;
+
+        rootNode.getChildren().some((node: TreeNode<UserTreeGridItem>) => {
+            if (node.getData() && node.getDataId() === idProviderKey.toString()) {
+                idProviderNode = node;
+                return true;
+            }
+
+            return false;
+        });
+
+        return idProviderNode;
+    }
+
+    private getGroupsNodeFromIdProviderNode(idProviderNode: TreeNode<UserTreeGridItem>): TreeNode<UserTreeGridItem> {
+        let groupsNode: TreeNode<UserTreeGridItem> = null;
+
+        idProviderNode.getChildren().some((node: TreeNode<UserTreeGridItem>) => {
+            if (!node.getData()) {
+                return false;
+            }
+
+            if (node.getData().getType() === UserTreeGridItemType.GROUPS) {
+                groupsNode = node;
+                return true;
+            }
+
+            return false;
+        });
+
+        return groupsNode;
+    }
+
+    private reloadUsersNode(idProviderKey: IdProviderKey) {
+        const usersNode: TreeNode<UserTreeGridItem> = this.getUsersNodeByIdProvider(idProviderKey);
+
+        if (!usersNode) {
+            return;
+        }
+
+        if (!usersNode.isExpanded() && !usersNode.hasChildren()) {
+            return;
+        }
+
+        this.loadChildren(idProviderKey, 0, [PrincipalType.USER], usersNode.getChildren().length).then((items: UserTreeGridItem[]) => {
+            usersNode.setChildren(this.dataToTreeNodes(items, usersNode));
+            this.initData(this.getRoot().getDefaultRoot().treeToList());
+        });
+    }
+
+    private getUsersNodeByIdProvider(idProviderKey: IdProviderKey): TreeNode<UserTreeGridItem> {
+        const idProviderNode: TreeNode<UserTreeGridItem> = this.getIdProviderNode(idProviderKey);
+
+        if (!idProviderNode) {
+            return;
+        }
+
+        return this.getUsersNodeFromIdProviderNode(idProviderNode);
+    }
+
+    private getUsersNodeFromIdProviderNode(idProviderNode: TreeNode<UserTreeGridItem>): TreeNode<UserTreeGridItem> {
+        let groupsNode: TreeNode<UserTreeGridItem> = null;
+
+        idProviderNode.getChildren().some((node: TreeNode<UserTreeGridItem>) => {
+            if (!node.getData()) {
+                return false;
+            }
+
+            if (node.getData().getType() === UserTreeGridItemType.USERS) {
+                groupsNode = node;
+                return true;
+            }
+
+            return false;
+        });
+
+        return groupsNode;
     }
 
     fetchChildren(parentNode?: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
@@ -217,23 +425,40 @@ export class UserItemsTreeGrid
     }
 
     private fetchIdProvidersAndRoles(): Q.Promise<UserTreeGridItem[]> {
-        return new ListIdProvidersRequest()
-            .setSort('displayName ASC')
-            .sendAndParse()
-            .then((idProviders: IdProvider[]) => {
-                const gridItems: UserTreeGridItem[] = [];
-                gridItems.push(new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build());
-                idProviders.forEach((idProvider: IdProvider) => {
-                    gridItems.push(
-                        new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build());
-                });
-
-                return gridItems;
-            });
+        return this.fetchIdProviders().then((idProviders: IdProvider[]) => {
+            return this.makeIdProvidersAndRolesTreeGridItems(idProviders);
+        });
     }
 
+    private makeIdProvidersAndRolesTreeGridItems(idProviders: IdProvider[]) {
+        const gridItems: UserTreeGridItem[] = [];
+
+        gridItems.push(new UserTreeGridItemBuilder().setType(UserTreeGridItemType.ROLES).build());
+
+        idProviders.forEach((idProvider: IdProvider) => {
+            gridItems.push(
+                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build());
+        });
+
+        return gridItems;
+    }
+
+    private fetchIdProviders(): Q.Promise<IdProvider[]> {
+        return new ListIdProvidersRequest()
+            .setSort('displayName ASC')
+            .sendAndParse();
+    }
+
+
     private fetchRoles(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
-        return this.loadChildren(parentNode, [PrincipalType.ROLE]);
+        this.removeEmptyNode(parentNode);
+        const idProviderKey: IdProviderKey = this.getIdProviderKey(parentNode);
+        const from: number = parentNode.getChildren().length;
+        return this.loadChildren(idProviderKey, from, [PrincipalType.ROLE]).then((newItems: UserTreeGridItem[]) => {
+            const gridItems: UserTreeGridItem[] = parentNode.getChildren().map((el) => el.getData()).slice(0, from);
+            gridItems.push(...newItems);
+            return gridItems;
+        });
     }
 
     private createUsersAndGroupsFolders(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
@@ -261,8 +486,15 @@ export class UserItemsTreeGrid
     private fetchPrincipals(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
         const folder: UserTreeGridItem = <UserTreeGridItem>parentNode.getData();
         const principalType: PrincipalType = this.getPrincipalTypeForFolderItem(folder.getType());
+        this.removeEmptyNode(parentNode);
+        const idProviderKey: IdProviderKey = this.getIdProviderKey(parentNode);
+        const from: number = parentNode.getChildren().length;
 
-        return this.loadChildren(parentNode, [principalType]);
+        return this.loadChildren(idProviderKey, from, [principalType]).then((newItems: UserTreeGridItem[]) => {
+            const gridItems: UserTreeGridItem[] = parentNode.getChildren().map((el) => el.getData()).slice(0, from);
+            gridItems.push(...newItems);
+            return gridItems;
+        });
     }
 
     private getNodeToUpdate(node: TreeNode<UserTreeGridItem>): TreeNode<UserTreeGridItem> {
@@ -295,52 +527,17 @@ export class UserItemsTreeGrid
         return item.hasChildren();
     }
 
-    private loadParentNode(principal: Principal, idProvider: IdProvider): Q.Promise<TreeNode<UserTreeGridItem>> {
-        if (principal.isRole()) {
-            return this.loadRolesNode();
-        }
-
-        return this.loadPrincipalNode(principal, idProvider);
-    }
-
-    private loadRolesNode(): Q.Promise<TreeNode<UserTreeGridItem>> {
-        const rootNode: TreeNode<UserTreeGridItem> = this.isFiltered() ? this.getRoot().getFilteredRoot() : this.getRoot().getCurrentRoot();
-
-        const rolesNode: TreeNode<UserTreeGridItem> = rootNode.getChildren()
-            .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
-
-        return rolesNode ? this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode) : Q(null);
-    }
-
-    private loadPrincipalNode(principal: Principal, idProvider: IdProvider): Q.Promise<TreeNode<UserTreeGridItem>> {
-        const rootNode: TreeNode<UserTreeGridItem> = this.isFiltered() ? this.getRoot().getFilteredRoot() : this.getRoot().getCurrentRoot();
-        const idProviderId: string = idProvider.getKey().getId();
-        const idProviderNode: TreeNode<UserTreeGridItem> =
-            rootNode.getChildren().filter(node => node.getDataId() === idProviderId)[0] || rootNode;
-
-        return this.fetchDataAndSetNodes(idProviderNode).then(() => {
-            const parentItemType = UserTreeGridItem.getParentType(principal);
-
-            const parentNode: TreeNode<UserTreeGridItem> =
-                idProviderNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0];
-
-            return this.fetchDataAndSetNodes(parentNode).then(() => parentNode);
-        });
-    }
-
-    private loadChildren(parentNode: TreeNode<UserTreeGridItem>, allowedTypes: PrincipalType[]): Q.Promise<UserTreeGridItem[]> {
-        this.removeEmptyNode(parentNode);
-        const from: number = parentNode.getChildren().length;
-        const gridItems: UserTreeGridItem[] = parentNode.getChildren().map((el) => el.getData()).slice(0, from);
-
+    private loadChildren(idProviderKey: IdProviderKey, from: number, allowedTypes: PrincipalType[],
+                         itemsToLoad: number = 10): Q.Promise<UserTreeGridItem[]> {
         return new ListPrincipalsRequest()
-            .setIdProviderKey(this.getIdProviderKey(parentNode))
+            .setIdProviderKey(idProviderKey)
             .setTypes(allowedTypes)
             .setSort('displayName ASC')
             .setStart(from)
-            .setCount(10)
+            .setCount(itemsToLoad)
             .sendAndParse()
             .then((result: ListPrincipalsResult) => {
+                const gridItems: UserTreeGridItem[] = [];
                 const principals: Principal[] = result.principals;
 
                 principals.forEach((principal: Principal) => {
