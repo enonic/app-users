@@ -1,7 +1,5 @@
 import {Path} from 'lib-admin-ui/rest/Path';
 import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalServerEvent} from 'lib-admin-ui/security/event/PrincipalServerEvent';
-import {PrincipalServerChange, PrincipalServerChangeItem} from 'lib-admin-ui/security/event/PrincipalServerChange';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {GetIdProviderByKeyRequest} from '../../graphql/idprovider/GetIdProviderByKeyRequest';
@@ -9,6 +7,9 @@ import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKe
 import {IdProvider} from '../principal/IdProvider';
 import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {PrincipalServerEvent} from './PrincipalServerEvent';
+import {PrincipalServerChange} from './PrincipalServerChange';
+import {PrincipalServerChangeItem} from './PrincipalServerChangeItem';
 
 /**
  * Class that listens to server events and fires UI events
