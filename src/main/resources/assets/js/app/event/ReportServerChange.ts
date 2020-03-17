@@ -1,55 +1,32 @@
 import {NodeEventJson, NodeEventNodeJson} from 'lib-admin-ui/event/NodeServerEvent';
-import {NodeServerChange, NodeServerChangeItem, NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
-
-export class ReportServerChangeItem
-    extends NodeServerChangeItem<string> {
-
-    private id: string;
-
-    constructor(id: string, path: string, branch: string) {
-        super(path, branch);
-
-        this.id = id;
-    }
-
-    getId(): string {
-        return this.id;
-    }
-
-    static fromJson(node: NodeEventNodeJson): ReportServerChangeItem {
-        return new ReportServerChangeItem(node.id, node.path.substr('/reports'.length), node.branch);
-    }
-}
+import {NodeServerChange, NodeServerChangeBuilder} from 'lib-admin-ui/event/NodeServerChange';
+import {ReportServerChangeItem} from './ReportServerChangeItem';
 
 export class ReportServerChange
-    extends NodeServerChange<string> {
+    extends NodeServerChange {
 
-    constructor(type: NodeServerChangeType, changeItems: ReportServerChangeItem[], newReportPaths?: string[]) {
-        super(type, changeItems, newReportPaths);
-    }
-
-    getChangeType(): NodeServerChangeType {
-        return this.type;
-    }
-
-    toString(): string {
-        return NodeServerChangeType[this.type] + ': <' +
-               this.changeItems.map((item) => item.getPath()).join(', ') + !!this.newNodePaths
-               ? this.newNodePaths.join(', ')
-               : '' +
-                 '>';
+    constructor(builder: ReportServerChangeBuilder) {
+        super(builder);
     }
 
     static fromJson(nodeEventJson: NodeEventJson): ReportServerChange {
-
-        let changedItems = nodeEventJson.data.nodes.filter((node) => node.path.indexOf('/reports') === 0).map(
-            (node: NodeEventNodeJson) => ReportServerChangeItem.fromJson(node));
-
-        if (changedItems.length === 0) {
-            return null;
-        }
-
-        let reportEventType = this.getNodeServerChangeType(nodeEventJson.type);
-        return new ReportServerChange(reportEventType, changedItems);
+        return new ReportServerChangeBuilder().fromJson(nodeEventJson).build();
     }
+}
+
+export class ReportServerChangeBuilder
+    extends NodeServerChangeBuilder {
+
+    build(): ReportServerChange {
+        return new ReportServerChange(this);
+    }
+
+    getPathPrefix(): string {
+        return ReportServerChangeItem.pathPrefix;
+    }
+
+    nodeJsonToChangeItem(node: NodeEventNodeJson): ReportServerChangeItem {
+        return ReportServerChangeItem.fromJson(node);
+    }
+
 }

@@ -1,6 +1,7 @@
 import {ReportServerChange} from './ReportServerChange';
 import {NodeEventJson, NodeServerEvent} from 'lib-admin-ui/event/NodeServerEvent';
 import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
+import {ReportServerChangeItem} from './ReportServerChangeItem';
 
 export class ReportServerEvent
     extends NodeServerEvent {
@@ -18,7 +19,7 @@ export class ReportServerEvent
     }
 
     static is(eventJson: NodeEventJson): boolean {
-        return eventJson.data.nodes.some(node => node.path.indexOf('/reports') === 0);
+        return eventJson.data.nodes.some(node => node.path.indexOf(ReportServerChangeItem.pathPrefix) === 0);
     }
 
     static fromJson(nodeEventJson: NodeEventJson): ReportServerEvent {
