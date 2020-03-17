@@ -4,12 +4,14 @@ import {NodeServerChangeItem, NodeServerChangeItemBuilder} from 'lib-admin-ui/ev
 export class ReportServerChangeItem
     extends NodeServerChangeItem {
 
+    public static pathPrefix: string = '/reports';
+
     constructor(builder: ReportServerChangeItemBuilder) {
         super(builder);
     }
 
     protected processPath(path: string): string {
-        return path.substr('/reports'.length);
+        return path.substr(ReportServerChangeItem.pathPrefix.length);
     }
 
     static fromJson(json: NodeEventNodeJson): ReportServerChangeItem {

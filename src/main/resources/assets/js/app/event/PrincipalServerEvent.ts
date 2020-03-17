@@ -1,6 +1,7 @@
 import {PrincipalServerChange} from './PrincipalServerChange';
 import {NodeEventJson, NodeServerEvent} from 'lib-admin-ui/event/NodeServerEvent';
 import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
+import {PrincipalServerChangeItem} from './PrincipalServerChangeItem';
 
 export class PrincipalServerEvent
     extends NodeServerEvent {
@@ -10,7 +11,7 @@ export class PrincipalServerEvent
     }
 
     static is(eventJson: NodeEventJson): boolean {
-        return eventJson.data.nodes.some(node => node.path.indexOf('/identity') === 0);
+        return eventJson.data.nodes.some(node => node.path.indexOf(PrincipalServerChangeItem.pathPrefix) === 0);
     }
 
     static fromJson(nodeEventJson: NodeEventJson): PrincipalServerEvent {

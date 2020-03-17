@@ -22,7 +22,7 @@ export class PrincipalServerChangeBuilder
     }
 
     getPathPrefix(): string {
-        return '/identity';
+        return PrincipalServerChangeItem.pathPrefix;
     }
 
     nodeJsonToChangeItem(node: NodeEventNodeJson): PrincipalServerChangeItem {

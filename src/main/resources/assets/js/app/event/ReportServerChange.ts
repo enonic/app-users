@@ -22,7 +22,7 @@ export class ReportServerChangeBuilder
     }
 
     getPathPrefix(): string {
-        return '/reports';
+        return ReportServerChangeItem.pathPrefix;
     }
 
     nodeJsonToChangeItem(node: NodeEventNodeJson): ReportServerChangeItem {
