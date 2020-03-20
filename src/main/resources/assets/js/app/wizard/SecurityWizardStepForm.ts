@@ -48,7 +48,7 @@ export class SecurityWizardStepForm
     layout(idProvider: IdProvider, defaultIdProvider: IdProvider) {
         this.idProvider = idProvider;
 
-        this.comboBox.clearSelection();
+        this.comboBox.clearSelection(true);
 
         if (defaultIdProvider) {
             defaultIdProvider.getPermissions().getEntries().forEach((item) => {

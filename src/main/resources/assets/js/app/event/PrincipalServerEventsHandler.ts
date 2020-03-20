@@ -155,7 +155,7 @@ export class PrincipalServerEventsHandler {
                         this.onUserItemLoaded(event, principal, null);
                     }).catch(DefaultErrorHandler.handle);
                 } else {
-                    new GetPrincipalByKeyRequest(key).sendAndParse().then(principal => {
+                    new GetPrincipalByKeyRequest(key).setIncludeMemberships(true).sendAndParse().then(principal => {
                         if (PrincipalServerEventsHandler.debug) {
                             console.debug('PrincipalServerEventsHandler.loaded principal:', principal);
                         }

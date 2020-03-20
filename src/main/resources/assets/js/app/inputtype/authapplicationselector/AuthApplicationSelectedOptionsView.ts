@@ -17,7 +17,7 @@ export class AuthApplicationSelectedOptionsView
 
     private beforeOptionCreatedListeners: { (): void }[] = [];
 
-    private afterOptionCreatedListeners: { (): void }[] = [];
+    private afterOptionCreatedListeners: { (optionView: AuthApplicationSelectedOptionView): void }[] = [];
 
     private formContext: FormContext;
 
@@ -56,7 +56,7 @@ export class AuthApplicationSelectedOptionsView
         });
         this.items.push(optionView);
 
-        this.notifyAfterOptionCreated();
+        this.notifyAfterOptionCreated(optionView);
         return new SelectedOption<Application>(optionView, this.count());
     }
 
@@ -93,18 +93,18 @@ export class AuthApplicationSelectedOptionsView
         this.beforeOptionCreatedListeners.forEach((listener) => listener());
     }
 
-    onAfterOptionCreated(listener: () => void) {
+    onAfterOptionCreated(listener: (optionView: AuthApplicationSelectedOptionView) => void) {
         this.afterOptionCreatedListeners.push(listener);
     }
 
-    unAfterOptionCreated(listener: () => void) {
+    unAfterOptionCreated(listener: (optionView: AuthApplicationSelectedOptionView) => void) {
         this.afterOptionCreatedListeners = this.afterOptionCreatedListeners.filter((curr) => {
             return listener !== curr;
         });
     }
 
-    private notifyAfterOptionCreated() {
-        this.afterOptionCreatedListeners.forEach((listener) => listener());
+    private notifyAfterOptionCreated(optionView: AuthApplicationSelectedOptionView) {
+        this.afterOptionCreatedListeners.forEach((listener) => listener(optionView));
     }
 
 }
