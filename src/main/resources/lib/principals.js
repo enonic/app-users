@@ -81,9 +81,9 @@ module.exports = {
             module.exports.removeMembers(key, removeMs);
         }
     },
-    list: function (idProviderKey, types, query, start, count, sort) {
+    list: function (idProviderKey, types, query, forbidden, start, count, sort) {
         return common.queryAll({
-            query: createPrincipalQuery(idProviderKey, types, query),
+            query: createPrincipalQuery(idProviderKey, types, query, forbidden),
             start: start,
             count: count,
             sort: sort
@@ -103,14 +103,14 @@ module.exports = {
                     key: key,
                     deleted: false,
                     reason: e.message
-                }; 
-            }            
+                };
+            }
         });
     },
-    Type: common.PrincipalType    
+    Type: common.PrincipalType
 };
 
-function createPrincipalQuery(idProviderKey, types, query) {
+function createPrincipalQuery(idProviderKey, types, query, forbidden) {
     var q = query ? textQuery(query) : '';
     if (!types) {
         q += (q ? ' AND ' : '') + idProviderQuery(idProviderKey);
@@ -132,6 +132,15 @@ function createPrincipalQuery(idProviderKey, types, query) {
         });
         q += q ? ' AND (' + tq + ')' : tq;
     }
+
+    if (forbidden) {
+        forbidden.forEach(function (pattern) {
+            q += ' AND _name NOT LIKE "' + pattern + '"';
+        });
+    }
+
+    log.info('query: ' + q);
+
     return q;
 }
 

@@ -22,6 +22,15 @@ export class ListPrincipalsRequest
     private types: PrincipalType[];
     private idProviderKey: IdProviderKey;
     private searchQuery: string;
+    private forbidden: string[] = [];
+
+    private static defaultForbiddenPrincipalPattern: string = 'com.enonic.cms.*';
+
+    constructor() {
+        super();
+
+        this.forbidden.push(ListPrincipalsRequest.defaultForbiddenPrincipalPattern);
+    }
 
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
         this.types = types;
@@ -38,6 +47,11 @@ export class ListPrincipalsRequest
         return this;
     }
 
+    addForbiddenKeyPattern(value: string): ListPrincipalsRequest {
+        this.forbidden.push(value);
+        return this;
+    }
+
     getVariables(): { [key: string]: any } {
         let vars = super.getVariables();
         if (this.types && this.types.length > 0) {
@@ -49,12 +63,15 @@ export class ListPrincipalsRequest
         if (this.searchQuery) {
             vars['query'] = this.searchQuery;
         }
+        if (this.forbidden && this.forbidden.length > 0) {
+            vars['forbidden'] = this.forbidden;
+        }
         return vars;
     }
 
     getQuery(): string {
-        return `query($idprovider: String, $types: [PrincipalType], $query: String, $start: Int, $count: Int, $sort: String) {
-                  principalsConnection (idprovider: $idprovider, types: $types, query: $query, start: $start, count: $count, sort: $sort) {
+        return `query($idprovider: String, $types: [PrincipalType], $query: String, $forbidden: [String], $start: Int, $count: Int, $sort: String) {
+                  principalsConnection (idprovider: $idprovider, types: $types, query: $query, forbidden: $forbidden, start: $start, count: $count, sort: $sort) {
                         totalCount
                         edges {
                             node {

@@ -1,6 +1,6 @@
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {FilterablePrincipalLoader} from 'lib-admin-ui/security/FilterablePrincipalLoader';
 import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
 import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
 import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
@@ -8,7 +8,7 @@ import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
 import {Form} from 'lib-admin-ui/ui/form/Form';
-import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
 
 export enum MembershipsType {
@@ -59,12 +59,12 @@ export class MembershipsWizardStepForm
     }
 
     private initGroups(fieldSet: Fieldset) {
-
-        const groupsLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.GROUP]);
+        const groupsLoader: FilterablePrincipalLoader =
+            <FilterablePrincipalLoader>new FilterablePrincipalLoader().setAllowedTypes([PrincipalType.GROUP]);
 
         this.groups = <PrincipalComboBox>PrincipalComboBox.create().setLoader(groupsLoader).build();
 
-        const formItem = new FormItemBuilder(this.groups).setLabel(i18n('field.groups')).build();
+        const formItem: FormItem = new FormItemBuilder(this.groups).setLabel(i18n('field.groups')).build();
 
         fieldSet.add(formItem);
     }
@@ -72,12 +72,13 @@ export class MembershipsWizardStepForm
     private initRoles(fieldSet: Fieldset) {
         this.rolesLoaded = false;
 
-        const rolesLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.ROLE]).skipPrincipals([RoleKeys.EVERYONE,
-            RoleKeys.AUTHENTICATED]);
+        const rolesLoader: FilterablePrincipalLoader = <FilterablePrincipalLoader>new FilterablePrincipalLoader()
+            .setAllowedTypes([PrincipalType.ROLE])
+            .skipPrincipals([RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED]);
 
         this.roles = <PrincipalComboBox>PrincipalComboBox.create().setLoader(rolesLoader).build();
 
-        const formItem = new FormItemBuilder(this.roles).setLabel(i18n('field.roles')).build();
+        const formItem: FormItem = new FormItemBuilder(this.roles).setLabel(i18n('field.roles')).build();
 
         fieldSet.add(formItem);
     }

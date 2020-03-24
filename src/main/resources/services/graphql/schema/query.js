@@ -41,6 +41,7 @@ module.exports = graphQl.createObjectType({
                 idprovider: graphQl.GraphQLString,
                 types: graphQl.list(graphQlEnums.PrincipalTypeEnum),
                 query: graphQl.GraphQLString,
+                forbidden: graphQl.list(graphQl.GraphQLString),
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt,
                 sort: graphQl.GraphQLString
@@ -49,6 +50,7 @@ module.exports = graphQl.createObjectType({
                 var idprovider = env.args.idprovider || 'system';
                 var types = env.args.types || principals.Type.all();
                 var query = env.args.query;
+                var forbidden = env.args.forbidden;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
@@ -56,6 +58,7 @@ module.exports = graphQl.createObjectType({
                     idprovider,
                     types,
                     query,
+                    forbidden,
                     start,
                     count,
                     sort
