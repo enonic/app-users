@@ -99,8 +99,11 @@ exports.IdProviderDeleteType = graphQl.createObjectType({
     name: 'IdProviderDelete',
     description: 'Result of an idProvider delete operation',
     fields: {
-        idProviderKey: {
-            type: graphQl.GraphQLString
+        key: {
+            type: graphQl.GraphQLString,
+            resolve: function (env) {
+                return env.source.idProviderKey;
+            }
         },
         deleted: {
             type: graphQl.GraphQLBoolean

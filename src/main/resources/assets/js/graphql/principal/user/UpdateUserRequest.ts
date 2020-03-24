@@ -1,6 +1,7 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
 import {User} from '../../../app/principal/User';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {UserJson} from '../../../app/principal/UserJson';
 
 export class UpdateUserRequest
     extends GraphQlRequest<any, User> {
@@ -72,7 +73,13 @@ export class UpdateUserRequest
     // tslint:enable max-line-length
 
     sendAndParse(): Q.Promise<User> {
-        return this.mutate().then(json => User.fromJson(json.updateUser));
+        return this.mutate().then(json => this.fromJson(json.updateUser, json.error));
     }
 
+    fromJson(user: UserJson, error: string): User {
+        if (!user || error) {
+            throw error;
+        }
+        return User.fromJson(user);
+    }
 }

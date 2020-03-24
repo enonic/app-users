@@ -23,6 +23,10 @@ import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/Wizard
 import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {Principal} from 'lib-admin-ui/security/Principal';
+import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemRequest';
+import {DeleteIdProviderRequest} from '../../graphql/idprovider/DeleteIdProviderRequest';
+import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
+import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
 
 export class IdProviderWizardPanel
     extends UserItemWizardPanel<IdProvider> {
@@ -116,12 +120,11 @@ export class IdProviderWizardPanel
     updatePersistedItem(): Q.Promise<IdProvider> {
         this.lock();
         return this.produceUpdateIdProviderRequest(this.assembleViewedIdProvider()).sendAndParse().then((idProvider: IdProvider) => {
-            this.unlock();
             showFeedback('Id provider was updated');
             new UserItemUpdatedEvent(null, idProvider).fire();
 
             return idProvider;
-        });
+        }).finally(this.unlock.bind(this));
     }
 
     saveChanges(): Q.Promise<IdProvider> {
@@ -275,6 +278,21 @@ export class IdProviderWizardPanel
             .setDescription(description)
             .setIdProviderConfig(idProviderConfig)
             .setPermissions(permissions);
+    }
+
+    protected handleSuccessfulDelete(results: DeleteUserItemResult[]) {
+        const keys: UserItemKey[] = results.filter(result => result.isDeleted()).map(result => result.getKey());
+        const msg = keys.length === 1 ?
+            i18n('notify.delete.idprovider.single', keys[0]) :
+            i18n('notify.delete.idprovider.multiple', keys.length);
+
+        this.close();
+        showFeedback(msg);
+        UserItemDeletedEvent.create().setIdProviders([this.getPersistedItem()]).build().fire();
+    }
+
+    protected produceDeleteRequest(): DeleteUserItemRequest {
+        return new DeleteIdProviderRequest().setKeys([this.getPersistedItem().getKey()]);
     }
 
 }

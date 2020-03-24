@@ -19,8 +19,12 @@ import {ElementShownEvent} from 'lib-admin-ui/dom/ElementShownEvent';
 import {Error} from 'tslint/lib/error';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {Action} from 'lib-admin-ui/ui/Action';
+import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemRequest';
+import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
 
-export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
+export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     extends WizardPanel<USER_ITEM_TYPE> {
 
     protected wizardActions: UserItemWizardActions<USER_ITEM_TYPE>;
@@ -35,6 +39,10 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
         super(params);
 
+        this.initListeners();
+    }
+
+    protected initListeners() {
         this.onWizardHeaderCreated(() => {
             this.getWizardHeader().setAutoTrim(true);
         });
@@ -51,6 +59,7 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
             }
         });
 
+        this.wizardActions.getDeleteAction().onExecuted(this.handleDelete.bind(this));
     }
 
     protected getParams(): UserItemWizardPanelParams<USER_ITEM_TYPE> {
@@ -269,6 +278,44 @@ export class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     isNewChanged(): boolean {
         throw new Error('Must be implemented by inheritors');
     }
+
+    protected handleDelete() {
+        new ConfirmationDialog()
+            .setQuestion(i18n('dialog.delete.question'))
+            .setNoCallback(null)
+            .setYesCallback(() => {
+                if (!this.isItemPersisted()) {
+                    return;
+                }
+
+                this.produceDeleteRequest()
+                    .sendAndParse()
+                    .done((results: DeleteUserItemResult[]) => {
+                        this.handleDeletedResult(results);
+                    });
+
+            }).open();
+    }
+
+    protected abstract produceDeleteRequest(): DeleteUserItemRequest;
+
+    protected handleDeletedResult(results: DeleteUserItemResult[]) {
+        if (!results || results.length === 0) {
+            return;
+        }
+
+        if (results[0].isDeleted()) {
+            this.handleSuccessfulDelete(results);
+
+            return;
+        }
+
+        if (results[0].getReason()) {
+            DefaultErrorHandler.handle(results[0].getReason());
+        }
+    }
+
+    protected abstract handleSuccessfulDelete(results: DeleteUserItemResult[]);
 
     onLockChanged(listener: (value: boolean) => void) {
         this.lockChangedListeners.push(listener);

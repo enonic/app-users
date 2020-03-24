@@ -1,42 +1,15 @@
-import {GraphQlRequest} from '../GraphQlRequest';
-import {DeleteIdProviderResult} from './DeleteIdProviderResult';
-import {DeleteIdProviderResultJson} from './DeleteIdProviderResultJson';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
-
-type DeleteIdProvidersResult = {
-    deleteIdProviders: DeleteIdProviderResultJson[]
-};
+import {DeleteUserItemRequest} from '../useritem/DeleteUserItemRequest';
 
 export class DeleteIdProviderRequest
-    extends GraphQlRequest<any, DeleteIdProviderResult[]> {
+    extends DeleteUserItemRequest {
 
-    private keys: IdProviderKey[];
-
-    setKeys(keys: IdProviderKey[]): DeleteIdProviderRequest {
-        this.keys = keys.slice(0);
-        return this;
+    protected getMutationName(): string {
+        return 'deleteIdProviders';
     }
 
-    getVariables() {
-        let vars = super.getVariables();
-        vars['keys'] = this.keys.map(memberKey => memberKey.toString());
-        return vars;
-    }
-
-    getMutation() {
-        return `mutation ($keys: [String]!) {
-            deleteIdProviders(keys: $keys) {
-                idProviderKey
-                deleted
-                reason
-            }
-        }`;
-    }
-
-    sendAndParse(): Q.Promise<DeleteIdProviderResult[]> {
-        return this.mutate().then((response: DeleteIdProvidersResult) => {
-            return response.deleteIdProviders.map(DeleteIdProviderResult.fromJson);
-        });
+    protected convertKey(value: string): IdProviderKey {
+        return IdProviderKey.fromString(value);
     }
 
 }

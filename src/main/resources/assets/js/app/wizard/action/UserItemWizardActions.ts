@@ -19,7 +19,7 @@ export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem>
         super();
 
         this.save = new SaveAction(wizardPanel);
-        this.delete = new DeleteUserItemAction(wizardPanel);
+        this.delete = new DeleteUserItemAction();
         this.close = new CloseAction(wizardPanel);
 
         this.setActions(this.save, this.delete, this.close);
