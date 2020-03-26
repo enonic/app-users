@@ -19,6 +19,7 @@ import {InputValidationRecording} from 'lib-admin-ui/form/inputtype/InputValidat
 import {Class} from 'lib-admin-ui/Class';
 import {InputTypeManager} from 'lib-admin-ui/form/inputtype/InputTypeManager';
 import {Input} from 'lib-admin-ui/form/Input';
+import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
 
 export interface AuthApplicationSelectorConfig
     extends InputTypeViewContext {
@@ -120,8 +121,13 @@ export class AuthApplicationSelector
 
         const value = this.getValueFromPropertyArray(this.getPropertyArray());
         const applicationConfigFormsToDisplay = value.split(';');
-        const comboBox = new AuthApplicationComboBox(input.getOccurrences().getMaximum() || 0, applicationConfigProvider,
-            this.formContext, value, this.readOnly);
+        const selectedOptionsView: AuthApplicationSelectedOptionsView =
+            new AuthApplicationSelectedOptionsView(applicationConfigProvider, this.formContext, this.readOnly);
+
+        const comboBox: AuthApplicationComboBox = <AuthApplicationComboBox>AuthApplicationComboBox.create()
+            .setMaximumOccurrences(input.getOccurrences().getMaximum() || 0)
+            .setSelectedOptionsView(selectedOptionsView)
+            .build();
 
         // creating selected option might involve property changes
         comboBox.onBeforeOptionCreated(() => this.ignorePropertyChange = true);

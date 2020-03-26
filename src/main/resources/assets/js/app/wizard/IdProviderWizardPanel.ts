@@ -51,7 +51,7 @@ export class IdProviderWizardPanel
             if (IdProviderWizardPanel.debug) {
                 console.debug('IdProviderWizardPanel.doRenderOnDataLoaded');
             }
-            this.addClass('principal-wizard-panel');
+            this.addClass('principal-wizard-panel id-provider-wizard-panel');
 
             this.getFormIcon().addClass('icon-address-book');
 
@@ -68,7 +68,7 @@ export class IdProviderWizardPanel
     createSteps(persistedItem: IdProvider): WizardStep[] {
         const steps: WizardStep[] = [];
 
-        this.idProviderWizardStepForm = new IdProviderWizardStepForm();
+        this.idProviderWizardStepForm = new IdProviderWizardStepForm(persistedItem);
         this.permissionsWizardStepForm = new SecurityWizardStepForm();
 
         steps.push(new WizardStep(i18n('field.idProvider'), this.idProviderWizardStepForm));
@@ -172,7 +172,7 @@ export class IdProviderWizardPanel
 
     protected doLayoutPersistedItem(persistedItem: IdProvider): Q.Promise<void> {
         if (!!persistedItem) {
-            this.getWizardHeader().setDisplayName(persistedItem.getDisplayName());
+            this.getWizardHeader().initNames(persistedItem.getDisplayName(), this.getWizardNameValue(), false);
             this.idProviderWizardStepForm.layout(persistedItem);
             this.permissionsWizardStepForm.layout(persistedItem, this.defaultIdProvider);
         } else {
@@ -275,6 +275,13 @@ export class IdProviderWizardPanel
             .setDescription(description)
             .setIdProviderConfig(idProviderConfig)
             .setPermissions(permissions);
+    }
+
+    protected handleServerUpdate(principal: Principal, idProvider: IdProvider) {
+        if (idProvider && this.getPersistedItem().getKey().equals(idProvider.getKey())) {
+            this.setPersistedItem(idProvider);
+            this.doLayoutPersistedItem(idProvider);
+        }
     }
 
 }
