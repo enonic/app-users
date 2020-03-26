@@ -23,6 +23,8 @@ import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemRequest';
 import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
+import {IdProvider} from '../principal/IdProvider';
+import {Principal} from 'lib-admin-ui/security/Principal';
 
 export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     extends WizardPanel<USER_ITEM_TYPE> {
@@ -146,22 +148,40 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
                 responsiveItem.update();
             });
 
-            const deleteHandler = ((ids: string[]) => {
-                const item = this.getPersistedItem();
-                if (!!item && ids.indexOf(item.getKey().toString()) >= 0) {
-                    this.close();
-                }
-            });
-
-            const handler = PrincipalServerEventsHandler.getInstance();
-            handler.onUserItemDeleted(deleteHandler);
-
-            this.onRemoved(() => {
-                handler.unUserItemDeleted(deleteHandler);
-            });
+            this.handleServerEvents();
 
             return nextRendered;
         });
+    }
+
+    private handleServerEvents() {
+        const deleteHandler = (ids: string[]) => {
+            const item = this.getPersistedItem();
+            if (!!item && ids.indexOf(item.getKey().toString()) >= 0) {
+                this.close();
+            }
+        };
+
+        const handler = PrincipalServerEventsHandler.getInstance();
+        handler.onUserItemDeleted(deleteHandler);
+
+        const updateHandler = (principal: Principal, idProvider: IdProvider) => {
+            if (!this.isItemPersisted()) {
+                return;
+            }
+
+            this.handleServerUpdate(principal, idProvider);
+        };
+
+        handler.onUserItemUpdated(updateHandler);
+
+        this.onRemoved(() => {
+            handler.unUserItemDeleted(deleteHandler);
+        });
+    }
+
+    protected handleServerUpdate(principal: Principal, idProvider: IdProvider) {
+        //
     }
 
     protected getPersistedItemPath(): string {

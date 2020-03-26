@@ -145,7 +145,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
     protected doLayoutPersistedItem(principal: Principal): Q.Promise<void> {
         if (principal) {
-            this.getWizardHeader().setDisplayName(principal.getDisplayName());
+            this.getWizardHeader().initNames(principal.getDisplayName(), this.getWizardNameValue(), false);
         }
 
         return Q<void>(null);
@@ -177,6 +177,13 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
     protected assembleViewedItem(): Principal {
         throw new Error('Must be implemented by inheritors');
+    }
+
+    protected handleServerUpdate(principal: Principal, idProvider: IdProvider) {
+        if (principal && this.getPersistedItem().getKey().equals(principal.getKey())) {
+            this.setPersistedItem(principal);
+            this.doLayoutPersistedItem(principal);
+        }
     }
 
     onPrincipalNamed(listener: (event: PrincipalNamedEvent) => void) {
