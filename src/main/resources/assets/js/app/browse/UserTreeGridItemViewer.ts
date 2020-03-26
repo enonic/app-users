@@ -18,14 +18,14 @@ export class UserTreeGridItemViewer
                                      : object.getIdProvider() ? i18n('field.idProvider') : '';
     }
 
-    resolveSubName(object: UserTreeGridItem, relativePath: boolean = false): string {
+    resolveSubName(object: UserTreeGridItem): string {
 
         if (object.getType() != null) {
             switch (object.getType()) {
             case UserTreeGridItemType.ID_PROVIDER:
                     return ('/' + object.getIdProvider().getKey().toString());
                 case UserTreeGridItemType.PRINCIPAL:
-                    return relativePath ? object.getPrincipal().getKey().getId() :
+                    return this.isRelativePath ? object.getPrincipal().getKey().getId() :
                            object.getPrincipal().getKey().toPath();
                 default:
                     return object.getItemDisplayName().toLocaleLowerCase();

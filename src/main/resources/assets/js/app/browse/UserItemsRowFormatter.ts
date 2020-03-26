@@ -8,7 +8,8 @@ export class UserItemsRowFormatter {
         let viewer = <UserTreeGridItemViewer>dataContext.getViewer('displayName');
         if (!viewer) {
             viewer = new UserTreeGridItemViewer();
-            viewer.setObject(dataContext.getData(), dataContext.calcLevel() > 1);
+            viewer.setIsRelativePath(dataContext.calcLevel() > 1);
+            viewer.setObject(dataContext.getData());
             dataContext.setViewer('displayName', viewer);
         }
         return viewer.toString();
