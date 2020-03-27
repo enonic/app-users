@@ -2,8 +2,6 @@ import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
 import {DeletePrincipalRequest} from '../../../graphql/principal/DeletePrincipalRequest';
 import {DeleteIdProviderRequest} from '../../../graphql/idprovider/DeleteIdProviderRequest';
-import {DeletePrincipalResult} from '../../../graphql/principal/DeletePrincipalResult';
-import {DeleteIdProviderResult} from '../../../graphql/idprovider/DeleteIdProviderResult';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
 import {IdProvider} from '../../principal/IdProvider';
 import {Action} from 'lib-admin-ui/ui/Action';
@@ -12,6 +10,7 @@ import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {DeleteUserItemResult} from '../../../graphql/useritem/DeleteUserItemResult';
 
 export class DeletePrincipalAction
     extends Action {
@@ -50,10 +49,10 @@ export class DeletePrincipalAction
                     new DeletePrincipalRequest()
                         .setKeys(principalKeys)
                         .sendAndParse()
-                        .done((results: DeletePrincipalResult[]) => {
+                        .done((results: DeleteUserItemResult[]) => {
 
                             if (results.length > 0) {
-                                const keys = results.filter(result => result.isDeleted()).map(result => result.getPrincipalKey());
+                                const keys = results.filter(result => result.isDeleted()).map(result => result.getKey());
                                 const msg = keys.length === 1 ?
                                             i18n('notify.delete.principal.single', keys[0]) :
                                             i18n('notify.delete.principal.multiple', keys.length);
@@ -68,9 +67,9 @@ export class DeletePrincipalAction
                     new DeleteIdProviderRequest()
                         .setKeys(idProviderKeys)
                         .sendAndParse()
-                        .done((results: DeleteIdProviderResult[]) => {
+                        .done((results: DeleteUserItemResult[]) => {
                             if (results && results.length > 0) {
-                                showFeedback(i18n('notify.delete.idprovider.single', results[0].getIdProviderKey()));
+                                showFeedback(i18n('notify.delete.idprovider.single', results[0].getKey()));
                                 UserItemDeletedEvent.create().setIdProviders(idProviderItems).build().fire();
                             }
                         });

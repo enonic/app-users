@@ -1,6 +1,7 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
 import {Group} from '../../../app/principal/Group';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {GroupJson} from '../../../app/principal/GroupJson';
 
 export class UpdateGroupRequest
     extends GraphQlRequest<any, Group> {
@@ -81,7 +82,15 @@ export class UpdateGroupRequest
     // tslint:enable max-line-length
 
     sendAndParse(): Q.Promise<Group> {
-        return this.mutate().then(json => Group.fromJson(json.updateGroup));
+        return this.mutate().then(json => this.fromJson(json.updateGroup, json.error));
+    }
+
+    fromJson(group: GroupJson, error: string): Group {
+        if (!group || error) {
+            throw error;
+        }
+
+        return Group.fromJson(group);
     }
 
 }

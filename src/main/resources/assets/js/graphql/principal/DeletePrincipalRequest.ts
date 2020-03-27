@@ -1,37 +1,14 @@
-import {GraphQlRequest} from '../GraphQlRequest';
-import {DeletePrincipalResult} from './DeletePrincipalResult';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {DeleteUserItemRequest} from '../useritem/DeleteUserItemRequest';
 
 export class DeletePrincipalRequest
-    extends GraphQlRequest<any, DeletePrincipalResult[]> {
+    extends DeleteUserItemRequest {
 
-    private keys: PrincipalKey[];
-
-    setKeys(keys: PrincipalKey[]): DeletePrincipalRequest {
-        this.keys = keys.slice(0);
-        return this;
+    protected getMutationName(): string {
+        return 'deletePrincipals';
     }
 
-    getVariables(): Object {
-        return {
-            keys: this.keys.map((memberKey) => memberKey.toString())
-        };
-    }
-
-    getMutation(): string {
-        return `mutation ($keys: [String]!) {
-            deletePrincipals(keys: $keys) {
-                principalKey
-                deleted
-                reason
-            }
-        }`;
-    }
-
-    sendAndParse(): Q.Promise<DeletePrincipalResult[]> {
-
-        return this.mutate().then(json => {
-            return json.deletePrincipals.map(resultJson => DeletePrincipalResult.fromJson(resultJson));
-        });
+    protected convertKey(value: string): PrincipalKey {
+        return PrincipalKey.fromString(value);
     }
 }

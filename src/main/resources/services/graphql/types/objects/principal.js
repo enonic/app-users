@@ -104,7 +104,7 @@ exports.PrincipalDeleteType = graphQl.createObjectType({
     name: 'PrincipalDelete',
     description: 'Result of a principal delete operation',
     fields: {
-        principalKey: {
+        key: {
             type: graphQl.GraphQLString,
             resolve: function (env) {
                 return env.source.key;

@@ -14,12 +14,17 @@ import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
 import {FormIcon} from 'lib-admin-ui/app/wizard/FormIcon';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {UserItemDeletedEvent} from '../event/UserItemDeletedEvent';
+import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
+import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
+import {DeletePrincipalRequest} from '../../graphql/principal/DeletePrincipalRequest';
+import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemRequest';
 
 export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
     protected params: PrincipalWizardPanelParams;
 
-    protected principalNamedListeners: {(event: PrincipalNamedEvent): void}[];
+    protected principalNamedListeners: { (event: PrincipalNamedEvent): void }[];
 
     public static debug: boolean = false;
 
@@ -70,29 +75,29 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
     protected createFormIcon(): FormIcon {
         let formIcon = super.createFormIcon();
         switch (this.getParams().persistedType) {
-        case PrincipalType.USER:
-            formIcon.addClass('icon-user');
-            break;
-        case PrincipalType.GROUP:
-            formIcon.addClass('icon-users');
-            break;
-        case PrincipalType.ROLE:
-            formIcon.addClass('icon-masks');
-            break;
+            case PrincipalType.USER:
+                formIcon.addClass('icon-user');
+                break;
+            case PrincipalType.GROUP:
+                formIcon.addClass('icon-users');
+                break;
+            case PrincipalType.ROLE:
+                formIcon.addClass('icon-masks');
+                break;
         }
         return formIcon;
     }
 
     getUserItemType(): string {
         switch (this.getParams().persistedType) {
-        case PrincipalType.USER:
-            return i18n('field.user');
-        case PrincipalType.GROUP:
-            return i18n('field.group');
-        case PrincipalType.ROLE:
-            return i18n('field.role');
-        default:
-            return '';
+            case PrincipalType.USER:
+                return i18n('field.user');
+            case PrincipalType.GROUP:
+                return i18n('field.group');
+            case PrincipalType.ROLE:
+                return i18n('field.role');
+            default:
+                return '';
         }
     }
 
@@ -125,7 +130,8 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
                     new ConfirmationDialog()
                         .setQuestion(i18n('dialog.principal.update'))
                         .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null))
-                        .setNoCallback(() => { /* empty */ })
+                        .setNoCallback(() => { /* empty */
+                        })
                         .show();
                 }
 
@@ -152,7 +158,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
     }
 
     updatePersistedItem(): Q.Promise<Principal> {
-        return this.produceUpdateRequest(this.assembleViewedItem()).sendAndParse().then((principal:Principal) => {
+        return this.produceUpdateRequest(this.assembleViewedItem()).sendAndParse().then((principal: Principal) => {
             if (!this.getPersistedItem().getDisplayName() && !!principal.getDisplayName()) {
                 this.notifyPrincipalNamed(principal);
             }
@@ -169,7 +175,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         throw new Error('Must be implemented by inheritors');
     }
 
-    protected assembleViewedItem():Principal {
+    protected assembleViewedItem(): Principal {
         throw new Error('Must be implemented by inheritors');
     }
 
@@ -180,12 +186,12 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         }
     }
 
-    onPrincipalNamed(listener: (event: PrincipalNamedEvent)=>void) {
+    onPrincipalNamed(listener: (event: PrincipalNamedEvent) => void) {
         this.principalNamedListeners.push(listener);
     }
 
     notifyPrincipalNamed(principal: Principal) {
-        this.principalNamedListeners.forEach((listener: (event: PrincipalNamedEvent)=>void)=> {
+        this.principalNamedListeners.forEach((listener: (event: PrincipalNamedEvent) => void) => {
             listener.call(this, new PrincipalNamedEvent(this, principal));
         });
     }
@@ -205,5 +211,19 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
     isNewChanged(): boolean {
         return true;
+    }
+
+    protected produceDeleteRequest(): DeleteUserItemRequest {
+        return new DeletePrincipalRequest().setKeys([this.getPersistedItem().getKey()]);
+    }
+
+    protected handleSuccessfulDelete(results: DeleteUserItemResult[]) {
+        const keys: UserItemKey[] = results.filter(result => result.isDeleted()).map(result => result.getKey());
+        const msg: string =
+            i18n(`notify.delete.principal.${keys.length === 1 ? 'single' : 'multiple'}`, keys.join(', '));
+
+        this.close();
+        showFeedback(msg);
+        UserItemDeletedEvent.create().setPrincipals([this.getPersistedItem()]).build().fire();
     }
 }
