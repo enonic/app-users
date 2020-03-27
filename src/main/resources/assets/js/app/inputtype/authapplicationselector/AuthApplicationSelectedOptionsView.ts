@@ -23,13 +23,11 @@ export class AuthApplicationSelectedOptionsView
 
     private items: AuthApplicationSelectedOptionView[] = [];
 
-    private readOnly: boolean;
-
     constructor(applicationConfigProvider: ApplicationConfigProvider, formContext: FormContext, readOnly: boolean) {
         super();
-        this.readOnly = readOnly;
         this.applicationConfigProvider = applicationConfigProvider;
         this.formContext = formContext;
+        this.setReadonly(readOnly);
 
         this.applicationConfigProvider.onPropertyChanged(() => {
 
@@ -49,7 +47,7 @@ export class AuthApplicationSelectedOptionsView
         this.notifyBeforeOptionCreated();
 
         let applicationConfig = this.applicationConfigProvider.getConfig(option.displayValue.getApplicationKey());
-        let optionView = new AuthApplicationSelectedOptionView(option, applicationConfig, this.formContext, this.readOnly);
+        let optionView = new AuthApplicationSelectedOptionView(option, applicationConfig, this.formContext, this.readonly);
 
         optionView.onApplicationConfigFormDisplayed((applicationKey: ApplicationKey) => {
             this.notifyApplicationConfigFormDisplayed(applicationKey, optionView.getFormView());
