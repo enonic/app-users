@@ -109,7 +109,7 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             let actualMessage = await userBrowsePanel.waitForNotificationMessage();
             testUtils.saveScreenshot("store_deleted_notification_mes2");
             let expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
-            //Id Provider "${displayName}" is deleted
+            //Expected message: Id Provider "${displayName}" is deleted
             assert.strictEqual(actualMessage, expectedMessage, 'expected notification message should be displayed');
         });
 

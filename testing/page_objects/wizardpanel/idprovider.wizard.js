@@ -9,8 +9,6 @@ const LoaderComboBox = require('../inputs/loaderComboBox');
 
 const XPATH = {
     container: "//div[contains(@id,'IdProviderWizardPanel')]",
-    authApplicationSelectorFilterInput: "//div[contains(@id,'InputView') and descendant::div[text()='Application']]" +
-                                        lib.COMBO_BOX_OPTION_FILTER_INPUT,
     permissionsFilterInput: "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
     permissionsLink: "//li[child::a[text()='Permissions']]",
     aclList: "//div[contains(@id,'IdProviderACESelectedOptionsView') and contains(@class,'selected-options')]",
@@ -29,11 +27,11 @@ const XPATH = {
 class IdProviderWizard extends WizardPanel {
 
     get descriptionInput() {
-        return XPATH.container + "//input[contains(@name,'description')]";
+        return XPATH.container + lib.formItemByLabel("Description") + lib.TEXT_INPUT;
     }
 
     get authApplicationSelectorFilterInput() {
-        return XPATH.container + XPATH.authApplicationSelectorFilterInput;
+        return XPATH.container + lib.formItemByLabel("Application") + lib.COMBO_BOX_OPTION_FILTER_INPUT;
     }
 
     get permissionsOptionsFilterInput() {
@@ -140,7 +138,7 @@ class IdProviderWizard extends WizardPanel {
     async filterOptionsAndSelectApplication(authAppName) {
         try {
             let loaderComboBox = new LoaderComboBox();
-            await this.typeTextInInput(XPATH.authApplicationSelectorFilterInput, authAppName);
+            await this.typeTextInInput(this.authApplicationSelectorFilterInput, authAppName);
             await loaderComboBox.waitForOptionVisible(XPATH.container, authAppName);
             await loaderComboBox.clickOnOption(XPATH.container, authAppName);
             return await this.pause(300);
@@ -190,21 +188,16 @@ class IdProviderWizard extends WizardPanel {
         return await this.pause(500);
     }
 
-    typeData(idprovider) {
-        return this.typeDisplayName(idprovider.displayName).then(() => {
-            return this.typeDescription(idprovider.description);
-        }).then(() => {
-            if (idprovider.permissions != null
-            ) {
-                return this.clickOnPermissionsTabItem().then(() => {
-                    return this.addPrincipals(idprovider.permissions);
-                })
-            }
-        }).then(() => {
-            if (idprovider.authAppName != null) {
-                return this.filterOptionsAndSelectApplication(idprovider.authAppName);
-            }
-        });
+    async typeData(idprovider) {
+        await this.typeDisplayName(idprovider.displayName);
+        await this.typeDescription(idprovider.description);
+        if (idprovider.permissions != null) {
+            await this.clickOnPermissionsTabItem();
+            await this.addPrincipals(idprovider.permissions);
+        }
+        if (idprovider.authAppName != null) {
+            return await this.filterOptionsAndSelectApplication(idprovider.authAppName);
+        }
     }
 
     typeDescription(description) {
