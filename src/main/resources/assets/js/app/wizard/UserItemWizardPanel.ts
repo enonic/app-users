@@ -1,7 +1,6 @@
 import * as Q from 'q';
 import {UserItemWizardActions} from './action/UserItemWizardActions';
 import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
-import {SaveBeforeCloseDialog} from './SaveBeforeCloseDialog';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
 import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
 import {ResponsiveItem} from 'lib-admin-ui/ui/responsive/ResponsiveItem';
@@ -242,11 +241,25 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     canClose(): boolean {
         if (this.hasUnsavedChanges()) {
-            new SaveBeforeCloseDialog(this).open();
+            this.openSaveBeforeCloseDialog();
             return false;
         } else {
             return true;
         }
+    }
+
+    private openSaveBeforeCloseDialog() {
+        new ConfirmationDialog()
+            .setQuestion(i18n('dialog.confirm.unsavedChanges'))
+            .setYesCallback(this.saveAndClose.bind(this))
+            .setNoCallback(this.close.bind(this))
+            .open();
+    }
+
+    private saveAndClose() {
+        this.saveChanges().then(() => {
+            this.close();
+        }).catch(DefaultErrorHandler.handle);
     }
 
     hasUnsavedChanges(): boolean {
