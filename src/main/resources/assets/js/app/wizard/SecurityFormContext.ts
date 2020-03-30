@@ -16,6 +16,10 @@ export class SecurityFormContext
         this.idProvider = builder.idProvider;
     }
 
+    setIdProvider(value: IdProvider) {
+        this.idProvider = value;
+    }
+
     getIdProvider(): IdProvider {
         return this.idProvider;
     }

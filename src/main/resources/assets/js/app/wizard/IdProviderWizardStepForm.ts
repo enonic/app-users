@@ -27,16 +27,18 @@ export class IdProviderWizardStepForm
 
     private applicationComboBox: AuthApplicationComboBox;
 
+    private idProviderFormContext: SecurityFormContext;
+
     constructor(idProvider: IdProvider) {
         super();
 
-        this.appendChild(this.createForm(idProvider));
+        this.appendChild(this.createForm());
     }
 
-    private createForm(idProvider: IdProvider): Form {
+    private createForm(): Form {
         const fieldSet: Fieldset = new Fieldset();
         fieldSet.add(this.createDescriptionFormItem());
-        fieldSet.add(this.createIdProviderFormItem(idProvider));
+        fieldSet.add(this.createIdProviderFormItem());
 
         const form: Form = new Form().add(fieldSet);
 
@@ -56,17 +58,18 @@ export class IdProviderWizardStepForm
         return new FormItemBuilder(this.descriptionInput).setLabel(i18n('field.description')).build();
     }
 
-    private createIdProviderFormItem(idProvider: IdProvider): FormItem {
+    private createIdProviderFormItem(): FormItem {
         const propertyArray: PropertyArray = PropertyArray.create()
             .setName('idProviderConfig')
             .setType(new ValueTypePropertySet())
             .setParent(new PropertyTree().getRoot())
             .build();
-        const isSystemIdProvider: boolean = !!idProvider && idProvider.getKey().isSystem();
-        const formContext: SecurityFormContext = SecurityFormContext.create().setIdProvider(idProvider).build();
+
+        this.idProviderFormContext = SecurityFormContext.create().build();
 
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
-            new AuthApplicationSelectedOptionsView(new ApplicationConfigProvider(propertyArray), formContext, isSystemIdProvider);
+            new AuthApplicationSelectedOptionsView(new ApplicationConfigProvider(propertyArray),
+                this.idProviderFormContext, false);
 
         this.applicationComboBox = <AuthApplicationComboBox>new AuthApplicationComboBoxBuilder()
             .setSelectedOptionsView(selectedOptionsView)
@@ -88,6 +91,8 @@ export class IdProviderWizardStepForm
     private layoutApplicationCombobox(idProvider: IdProvider) {
         const config: IdProviderConfig = idProvider.getIdProviderConfig();
         this.applicationComboBox.setValue(!!config ? config.getApplicationKey().toString() : '');
+        this.idProviderFormContext.setIdProvider(idProvider);
+        this.applicationComboBox.getSelectedOptionView().setReadonly(idProvider.getKey().isSystem());
 
         if (!config) {
             return;
