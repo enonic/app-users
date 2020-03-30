@@ -2,7 +2,7 @@
  * Created on 5/31/2017.
  */
 const Page = require('../page');
-const SaveBeforeCloseDialog = require('../save.before.close.dialog');
+const ConfirmationDialog = require('../confirmation.dialog');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const itemBuilder = require('../../libs/userItems.builder');
@@ -266,12 +266,12 @@ class UserBrowsePanel extends Page {
             throw new Error('Item Tab Button was not found!' + displayName + "  " + err);
         }
         await this.pause(300);
-        let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-        let isLoaded = await saveBeforeCloseDialog.isDialogLoaded();
+        let confirmationDialog = new ConfirmationDialog();
+        let isLoaded = await confirmationDialog.isDialogLoaded();
         if (isLoaded) {
             this.saveScreenshot('err_save_close_item');
-            console.log('save before close dialog must not be loaded');
-            throw new Error('`Save Before Close` dialog should not appear when try to close the ' + displayName);
+            console.log('confirmation dialog must not be loaded');
+            throw new Error('Confirmation dialog should not appear when try to close the ' + displayName);
         }
         await this.waitForSpinnerNotVisible();
         return await this.waitForUsersGridLoaded(appConst.TIMEOUT_3);

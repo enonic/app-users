@@ -9,14 +9,14 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
-const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
+const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 const ProviderConfigDialog = require('../page_objects/wizardpanel/provider.configurator.dialog');
 
 describe('Id Provider, provider-dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it(`GIVEN wizard for new Id Provider is opened WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Save Before' dialog should appear after 'Close' has been clicked`,
+    it(`GIVEN wizard for new Id Provider is opened WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Confirmation' dialog should appear after 'Close' has been clicked`,
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
@@ -30,9 +30,9 @@ describe('Id Provider, provider-dialog specification', function () {
             //3. Click on close-icon:
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
             testUtils.saveScreenshot('application_save_before_close_present1');
-            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-            //"Save before close" dialog should appear:
-            await saveBeforeCloseDialog.waitForDialogOpened();
+            let confirmationDialog = new ConfirmationDialog();
+            //Confirmation dialog should appear:
+            await confirmationDialog.waitForDialogLoaded();
         });
 
     it("GIVEN new ID provider with invalid configuration WHEN click on close icon AND click on 'Yes' button in the modal dialog THEN error notification message should appear",
@@ -46,14 +46,14 @@ describe('Id Provider, provider-dialog specification', function () {
             await idProviderWizard.typeData(testIdProvider);
             //2. Click on close-icon:
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
-            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-            //3. "Save before close" dialog should appear:
-            await saveBeforeCloseDialog.waitForDialogOpened();
+            let confirmationDialog = new ConfirmationDialog();
+            //3. "Confirmation" dialog should appear:
+            await confirmationDialog.waitForDialogLoaded();
             //4. Click on 'Yes' button:
-            await saveBeforeCloseDialog.clickOnYesButton();
+            await confirmationDialog.clickOnYesButton();
             testUtils.saveScreenshot('provider_save_before_close_yes');
             let message = await idProviderWizard.waitForNotificationMessage();
-            assert.equal(message, "Invalid configuration of the ID Provider.", "Expected notofication message should appear");
+            assert.equal(message, "Invalid configuration of the ID Provider.", "Expected notification message should appear");
         });
 
     it(`GIVEN Provider-configuration dialog is opened WHEN required inputs in Provider-dialog are filled THEN the Id Provider is getting valid`,
@@ -76,7 +76,7 @@ describe('Id Provider, provider-dialog specification', function () {
 
     it(`GIVEN wizard for new Id Provider is opened AND required inputs in provider-configuration dialog are filled WHEN Save and close the wizard THEN 'Save Before' dialog should not appear`,
         async () => {
-            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+            let confirmationDialog = new ConfirmationDialog();
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
             let idProviderWizard = new IdProviderWizard();
@@ -95,8 +95,8 @@ describe('Id Provider, provider-dialog specification', function () {
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
             await idProviderWizard.pause(500);
             testUtils.saveScreenshot("idprovider_wizard_modal_dialog_should_be_closed");
-            let result = await saveBeforeCloseDialog.isDialogLoaded();
-            assert.isFalse(result, "`Save before close` dialog should not appear");
+            let result = await confirmationDialog.isDialogLoaded();
+            assert.isFalse(result, "`Confirmation dialog should not appear");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
