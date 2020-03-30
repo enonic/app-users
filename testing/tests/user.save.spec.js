@@ -9,7 +9,7 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
+const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe('Save User specification - save an user', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -18,11 +18,11 @@ describe('Save User specification - save an user', function () {
 
     //verifies  https://github.com/enonic/lib-admin-ui/issues/614
     //User Wizard - confirmation about unsaved changes after changes were saved
-    it('GIVEN new user has been saved in wizard AND display name has been changed AND Save button pressed WHEN `close` icon clicked THEN `Save before close dialog` should not appear',
+    it('GIVEN new user has been saved in wizard AND display name has been changed AND Save button pressed WHEN `close` icon clicked THEN `Confirmation dialog` should not appear',
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
+            let confirmationDialog = new ConfirmationDialog();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
             //1. Open new user-wizard and type a name, email and password:
@@ -37,8 +37,8 @@ describe('Save User specification - save an user', function () {
             //5. Click on 'close tab' icon
             await userBrowsePanel.doClickOnCloseTabButton(userName + "123");
             await userWizard.pause(400);
-            //Verify that modal dialog is not loaded:
-            let isLoaded = await saveBeforeCloseDialog.isDialogLoaded();
+            //Verify that confirmation dialog is not loaded:
+            let isLoaded = await confirmationDialog.isDialogLoaded();
             assert.isFalse(isLoaded, "Save before dialog should not be loaded, because all changes were saved");
         });
 

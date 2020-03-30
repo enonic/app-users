@@ -9,7 +9,7 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
-const SaveBeforeCloseDialog = require('../page_objects/save.before.close.dialog');
+const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.dialog');
 
 describe('group.create.with.role Create a Group with a just created new Role', function () {
@@ -44,9 +44,10 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             await groupWizard.waitAndClickOnSave();
             //3. Click on close-tab icon:
             await userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
-            let saveBeforeCloseDialog = new SaveBeforeCloseDialog();
-            //`Save before close` dialog should not be displayed:
-            let result = await saveBeforeCloseDialog.isDialogLoaded();
+            let confirmationDialog = new ConfirmationDialog();
+            //Confirmation dialog should not be displayed:
+            let result = await confirmationDialog.isDialogLoaded();
+            assert.isFalse(result, "Confirmation dialog should not be loaded");
         });
 
     it("GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and 'Close tab' has been clicked THEN 'Save before close' dialog should not appear",
