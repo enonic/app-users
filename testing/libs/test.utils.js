@@ -68,17 +68,17 @@ module.exports = {
         await confirmationDialog.clickOnYesButton();
         return await browsePanel.waitForSpinnerNotVisible();
     },
-    confirmDelete: function () {
-        let confirmationDialog = new ConfirmationDialog();
-        let browsePanel = new UserBrowsePanel();
-        return confirmationDialog.waitForDialogLoaded().then(() => {
-            return confirmationDialog.clickOnYesButton();
-        }).then(() => {
-            return browsePanel.waitForSpinnerNotVisible();
-        }).catch(err => {
+    async confirmDelete() {
+        try {
+            let confirmationDialog = new ConfirmationDialog();
+            let browsePanel = new UserBrowsePanel();
+            await confirmationDialog.waitForDialogLoaded();
+            await confirmationDialog.clickOnYesButton();
+            return await browsePanel.waitForSpinnerNotVisible();
+        } catch (err) {
             this.saveScreenshot('err_confirm_dialog');
             throw new Error('Error in Confirm Delete: ' + err);
-        })
+        }
     },
     navigateToUsersApp: function (userName, password) {
         let launcherPanel = new LauncherPanel();
