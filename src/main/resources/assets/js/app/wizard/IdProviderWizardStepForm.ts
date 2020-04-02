@@ -19,6 +19,9 @@ import {ValueTypePropertySet} from 'lib-admin-ui/data/ValueTypePropertySet';
 import {AuthApplicationSelectedOptionView} from '../inputtype/authapplicationselector/AuthApplicationSelectedOptionView';
 import {AuthApplicationSelectedOptionsView} from '../inputtype/authapplicationselector/AuthApplicationSelectedOptionsView';
 import {ApplicationConfig} from 'lib-admin-ui/application/ApplicationConfig';
+import {ValidationRecording} from 'lib-admin-ui/form/ValidationRecording';
+import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
 
 export class IdProviderWizardStepForm
     extends WizardStepForm {
@@ -29,7 +32,7 @@ export class IdProviderWizardStepForm
 
     private idProviderFormContext: SecurityFormContext;
 
-    constructor(idProvider: IdProvider) {
+    constructor() {
         super();
 
         this.appendChild(this.createForm());
@@ -75,6 +78,21 @@ export class IdProviderWizardStepForm
             .setSelectedOptionsView(selectedOptionsView)
             .build();
         this.applicationComboBox.addClass('application-configurator');
+
+        this.applicationComboBox.onOptionSelected(() => {
+            const selectedIdProviderOptionView: AuthApplicationSelectedOptionView =
+                <AuthApplicationSelectedOptionView>selectedOptionsView.getSelectedOptions()[0].getOptionView();
+
+            selectedIdProviderOptionView.getFormView().onValidityChanged((event: FormValidityChangedEvent) => {
+                this.previousValidation = event.getRecording();
+                this.notifyValidityChanged(new WizardStepValidityChangedEvent(event.isValid()));
+            });
+        });
+
+        this.applicationComboBox.onOptionDeselected(() => {
+            this.previousValidation = new ValidationRecording();
+            this.notifyValidityChanged(new WizardStepValidityChangedEvent(true));
+        });
 
         return new FormItemBuilder(this.applicationComboBox).setLabel(i18n('field.application')).build();
     }
