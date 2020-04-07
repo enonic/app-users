@@ -10,7 +10,7 @@ import {Exception} from 'lib-admin-ui/Exception';
 export type SaveMutation = 'updateIdProvider' | 'createIdProvider';
 
 export class SaveIdProviderRequest
-    extends GraphQlRequest<any, IdProvider> {
+    extends GraphQlRequest<IdProvider> {
 
     private idProviderKey: IdProviderKey;
     private displayName: string;

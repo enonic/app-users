@@ -4,7 +4,7 @@ import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggreg
 import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
 
 export class ListTypesRequest
-    extends ListGraphQlRequest<any, any> {
+    extends ListGraphQlRequest<any> {
 
     private searchQuery: string;
 

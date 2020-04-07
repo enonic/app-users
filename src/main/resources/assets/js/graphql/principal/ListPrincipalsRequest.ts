@@ -17,7 +17,7 @@ export type ListPrincipalsResult = {
 };
 
 export class ListPrincipalsRequest
-    extends ListGraphQlRequest<any, any> {
+    extends ListGraphQlRequest<any> {
 
     private types: PrincipalType[];
     private idProviderKey: IdProviderKey;

@@ -2,12 +2,11 @@ import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {SecurityResourceRequest} from 'lib-admin-ui/security/SecurityResourceRequest';
 import {UserJson} from '../principal/UserJson';
 import {User} from '../principal/User';
-import {Path} from 'lib-admin-ui/rest/Path';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
 import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
 
 export class SetUserPasswordRequest
-    extends SecurityResourceRequest<UserJson, User> {
+    extends SecurityResourceRequest<User> {
 
     private key: PrincipalKey;
     private password: string;
@@ -15,6 +14,7 @@ export class SetUserPasswordRequest
     constructor() {
         super();
         super.setMethod(HttpMethod.POST);
+        this.addRequestPathElements('principals', 'setPassword');
     }
 
     setKey(key: PrincipalKey): SetUserPasswordRequest {
@@ -34,15 +34,8 @@ export class SetUserPasswordRequest
         };
     }
 
-    getRequestPath(): Path {
-        return Path.fromParent(super.getResourcePath(), 'principals', 'setPassword');
-    }
-
-    sendAndParse(): Q.Promise<User> {
-
-        return this.send().then((response: JsonResponse<UserJson>) => {
-            return User.fromJson(response.getResult());
-        });
+    protected parseResponse(response: JsonResponse<UserJson>): User {
+        return User.fromJson(response.getResult());
     }
 
 }

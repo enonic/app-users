@@ -10,7 +10,7 @@ import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
 
 export class GetPrincipalsByKeysRequest
-    extends GraphQlRequest<any, Principal[]> {
+    extends GraphQlRequest<Principal[]> {
 
     private keys: PrincipalKey[];
     private includeMemberships: boolean = false;

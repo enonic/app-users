@@ -3,7 +3,7 @@ import {Repository} from '../../app/report/Repository';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 
 export class ListRepositoriesRequest
-    extends ListGraphQlRequest<any, Repository[]> {
+    extends ListGraphQlRequest<Repository[]> {
     private searchQuery: string;
 
     getQuery(): string {

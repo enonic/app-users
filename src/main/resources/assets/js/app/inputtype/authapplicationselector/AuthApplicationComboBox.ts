@@ -66,7 +66,7 @@ export class AuthApplicationComboBoxBuilder extends RichComboBoxBuilder<Applicat
 
     delayedInputValueChangedHandling: number = 500;
 
-    loader: BaseLoader<any, Application> = new AuthApplicationLoader();
+    loader: BaseLoader<Application> = new AuthApplicationLoader();
 
     optionDisplayValueViewer: Viewer<Application> = new ApplicationViewer();
 

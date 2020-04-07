@@ -3,7 +3,7 @@ import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
 
 export class GetDefaultIdProviderRequest
-    extends GraphQlRequest<any, IdProvider> {
+    extends GraphQlRequest<IdProvider> {
 
     getQuery(): string {
         return `query {

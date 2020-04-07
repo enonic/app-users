@@ -4,7 +4,7 @@ import {ListRepositoriesRequest} from '../../graphql/repository/ListRepositories
 import {BaseLoader} from 'lib-admin-ui/util/loader/BaseLoader';
 
 export class RepositoryLoader
-    extends BaseLoader<any, Repository> {
+    extends BaseLoader<Repository> {
 
     private preservedSearchString: string;
     protected request: ListRepositoriesRequest;

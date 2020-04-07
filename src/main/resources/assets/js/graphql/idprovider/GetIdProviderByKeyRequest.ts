@@ -4,7 +4,7 @@ import {IdProviderJson} from '../../app/principal/IdProviderJson';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 
 export class GetIdProviderByKeyRequest
-    extends GraphQlRequest<any, IdProvider> {
+    extends GraphQlRequest<IdProvider> {
 
     private key: IdProviderKey;
 

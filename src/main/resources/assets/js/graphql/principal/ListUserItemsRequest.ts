@@ -23,7 +23,7 @@ export type ListUserItemsRequestResult = {
 };
 
 export class ListUserItemsRequest
-    extends ListGraphQlRequest<any, any> {
+    extends ListGraphQlRequest<any> {
 
     private types: UserItemType[];
     private searchQuery: string;
