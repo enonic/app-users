@@ -2,7 +2,7 @@ import {GraphQlRequest} from '../../GraphQlRequest';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
 export class UpdatePasswordRequest
-    extends GraphQlRequest<any, Boolean> {
+    extends GraphQlRequest<Boolean> {
 
     private key: PrincipalKey;
     private password: string;

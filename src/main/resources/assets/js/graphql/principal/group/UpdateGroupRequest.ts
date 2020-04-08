@@ -4,7 +4,7 @@ import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {GroupJson} from '../../../app/principal/GroupJson';
 
 export class UpdateGroupRequest
-    extends GraphQlRequest<any, Group> {
+    extends GraphQlRequest<Group> {
 
     private key: PrincipalKey;
     private displayName: string;

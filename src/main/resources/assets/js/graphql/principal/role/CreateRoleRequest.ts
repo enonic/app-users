@@ -4,7 +4,7 @@ import {RoleJson} from '../../../app/principal/RoleJson';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
 export class CreateRoleRequest
-    extends GraphQlRequest<any, Role> {
+    extends GraphQlRequest<Role> {
 
     private key: PrincipalKey;
     private displayName: string;

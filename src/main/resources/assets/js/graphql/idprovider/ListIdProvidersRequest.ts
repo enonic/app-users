@@ -4,7 +4,7 @@ import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
 
 export class ListIdProvidersRequest
-    extends ListGraphQlRequest<IdProviderListResult, IdProvider[]> {
+    extends ListGraphQlRequest<IdProvider[]> {
 
     getQuery(): string {
         return `query {

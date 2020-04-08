@@ -171,7 +171,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         });
     }
 
-    protected produceUpdateRequest(viewedPrincipal: Principal): GraphQlRequest<any, Principal> {
+    protected produceUpdateRequest(viewedPrincipal: Principal): GraphQlRequest<Principal> {
         throw new Error('Must be implemented by inheritors');
     }
 

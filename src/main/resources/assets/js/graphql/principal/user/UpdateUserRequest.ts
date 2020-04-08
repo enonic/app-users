@@ -4,7 +4,7 @@ import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {UserJson} from '../../../app/principal/UserJson';
 
 export class UpdateUserRequest
-    extends GraphQlRequest<any, User> {
+    extends GraphQlRequest<User> {
 
     private key: PrincipalKey;
     private displayName: string;

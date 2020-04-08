@@ -11,7 +11,7 @@ import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 
 export class GetPrincipalByKeyRequest
-    extends GraphQlRequest<any, Principal> {
+    extends GraphQlRequest<Principal> {
 
     private key: PrincipalKey;
     private includeMemberships: boolean = false;

@@ -5,7 +5,7 @@ import {PostRequest} from 'lib-admin-ui/rest/PostRequest';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
 import * as Q from 'q';
 
-export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE>
+export class GraphQlRequest<PARSED_TYPE>
     implements HttpRequest<PARSED_TYPE> {
 
     private path: Path;
@@ -46,28 +46,28 @@ export class GraphQlRequest<RAW_JSON_TYPE, PARSED_TYPE>
         return true;
     }
 
-    query(): Q.Promise<RAW_JSON_TYPE> {
+    query(): Q.Promise<any> {
         return this.send(this.getQuery(), null);
     }
 
-    mutate(): Q.Promise<RAW_JSON_TYPE> {
+    mutate(): Q.Promise<any> {
         return this.send(null, this.getMutation());
     }
 
-    private send(query: string, mutation: string): Q.Promise<RAW_JSON_TYPE> {
+    private send(query: string, mutation: string): Q.Promise<any> {
 
         if (this.validate()) {
-            const deferred: Q.Deferred<JsonResponse<RAW_JSON_TYPE>> = Q.defer<JsonResponse<RAW_JSON_TYPE>>();
+            const deferred: Q.Deferred<any> = Q.defer<any>();
 
-            let jsonRequest = new PostRequest()
+            const jsonRequest = new PostRequest()
                 .setParams(this.getParams(query, mutation))
                 .setPath(this.path)
                 .handleReadyStateChanged(deferred);
 
             jsonRequest.send();
 
-            return deferred.promise.then(response => {
-                const json = response.getJson() || {};
+            return deferred.promise.then((rawResponse: any) => {
+                const json = new JsonResponse(rawResponse).getJson() || {};
                 const result = json.data || {};
                 if (json.errors) {
                     const firstError = json.errors[0];

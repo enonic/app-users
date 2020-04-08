@@ -3,7 +3,7 @@ import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
 import {DeleteUserItemJson} from './DeleteUserItemJson';
 import {DeleteUserItemResult} from './DeleteUserItemResult';
 
-export abstract class DeleteUserItemRequest extends GraphQlRequest<any, DeleteUserItemResult[]> {
+export abstract class DeleteUserItemRequest extends GraphQlRequest<DeleteUserItemResult[]> {
 
     private keys: UserItemKey[];
 
