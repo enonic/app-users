@@ -22,17 +22,12 @@ module.exports = {
     generateRandomName: function (part) {
         return part + Math.round(Math.random() * 1000000);
     },
-    findAndSelectItem(name) {
+    async findAndSelectItem(name) {
         let browsePanel = new UserBrowsePanel();
-        return this.typeNameInFilterPanel(name).then(() => {
-            return browsePanel.pause(400);
-        }).then(() => {
-            return browsePanel.waitForRowByNameVisible(name);
-        }).then(() => {
-            return browsePanel.clickOnRowByName(name);
-        }).then(() => {
-            return browsePanel.pause(800);
-        });
+        await this.typeNameInFilterPanel(name);
+        await browsePanel.waitForRowByNameVisible(name);
+        await browsePanel.clickOnRowByName(name);
+        return await browsePanel.pause(500);
     },
     async openFilterPanel() {
         let filterPanel = new FilterPanel();

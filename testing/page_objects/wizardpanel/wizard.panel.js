@@ -62,6 +62,7 @@ class WizardPanel extends Page {
             await this.clickOnElement(this.saveButton);
             return await this.pause(500);
         } catch (err) {
+            this.saveScreenshot(lib.generateRandomName("err_save_button"));
             throw new Error("Error when Save button has been clicked!" + err);
         }
     }
