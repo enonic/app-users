@@ -214,7 +214,7 @@ class UserBrowsePanel extends Page {
 
     doClickOnCloseTabButton(displayName) {
         let closeIcon = `${xpath.closeItemTabButton(displayName)}`;
-        return this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_2).then(() => {
+        return this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_4).then(() => {
             return this.clickOnElement(closeIcon);
         }).catch(err => {
             this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());

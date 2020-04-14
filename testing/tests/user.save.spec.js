@@ -30,8 +30,10 @@ describe('Save User specification - save an user', function () {
             await userWizard.typeData(testUser);
             //2. Save he user:
             await userWizard.waitAndClickOnSave();
+            await userWizard.pause(3000);
             //3. update the name:
             await userWizard.typeDisplayName(userName + "123");
+            await userWizard.pause(300);
             //4. Click on Save button:
             await userWizard.waitAndClickOnSave();
             //5. Click on 'close tab' icon
@@ -39,7 +41,7 @@ describe('Save User specification - save an user', function () {
             await userWizard.pause(400);
             //Verify that confirmation dialog is not loaded:
             let isLoaded = await confirmationDialog.isDialogLoaded();
-            assert.isFalse(isLoaded, "Save before dialog should not be loaded, because all changes were saved");
+            assert.isFalse(isLoaded, "Confirmation dialog should not be loaded, because all changes were saved");
         });
 
     it('GIVEN wizard for new User is opened AND valid data is typed WHEN the user has been saved THEN expected notification message should appear AND the user should be searchable',
