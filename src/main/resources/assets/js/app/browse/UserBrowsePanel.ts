@@ -56,7 +56,7 @@ export class UserBrowsePanel
             newAction.setLabel(label);
         }, 10);
 
-        this.treeGrid.onSelectionChanged((currentSelection: TreeNode<UserTreeGridItem>[]) => changeSelectionStatus(currentSelection));
+        this.treeGrid.onSelectionChanged(() => changeSelectionStatus(this.treeGrid.getRoot().getCurrentSelection()));
 
         this.treeGrid.onHighlightingChanged((node: TreeNode<UserTreeGridItem>) => changeSelectionStatus(node ? [node] : []));
 
