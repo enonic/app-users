@@ -39,21 +39,22 @@ export class UserTreeGridItemViewer
 
         switch (object.getType()) {
         case UserTreeGridItemType.ID_PROVIDER:
-                if (object.getIdProvider().getKey().isSystem()) {
-                    iconClass += 'icon-system ';
-                }
-                return iconClass + 'icon-address-book';
-            case UserTreeGridItemType.PRINCIPAL:
-                if (object.getPrincipal().isRole()) {
-                    return iconClass + 'icon-masks';
-                }
-                if (object.getPrincipal().isGroup()) {
-                    return iconClass + 'icon-users';
-                }
-                if (object.getPrincipal().isSystemUser()) {
-                    iconClass += 'icon-system ';
-                }
-                return iconClass + 'icon-user';
+            if (object.getIdProvider().getKey().isSystem()) {
+                iconClass += 'icon-system ';
+            }
+            return iconClass + 'icon-address-book';
+        case UserTreeGridItemType.PRINCIPAL:
+            if (object.getPrincipal().isSystem()) {
+                iconClass += 'icon-system ';
+            }
+
+            if (object.getPrincipal().isRole()) {
+                return iconClass + 'icon-masks';
+            }
+            if (object.getPrincipal().isGroup()) {
+                return iconClass + 'icon-users';
+            }
+            return iconClass + 'icon-user';
 
             default:
                 return iconClass + 'icon-folder';

@@ -79,7 +79,7 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
 
             this.EDIT.setEnabled(directoriesSelected < 1 && (anyIdProvider || anyPrincipal));
 
-            if (this.isSystemUserSelected(browseItems)) {
+            if (this.isSystemUserItemSelected(browseItems)) {
                 this.DELETE.setEnabled(false);
             } else if (onlyUsersSelected || onePrincipalSelected) {
                 this.DELETE.setEnabled(true);
@@ -93,12 +93,12 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
         });
     }
 
-    private isSystemUserSelected(browseItems: BrowseItem<UserTreeGridItem>[]) {
-        const users: Principal[] = browseItems
+    private isSystemUserItemSelected(browseItems: BrowseItem<UserTreeGridItem>[]) {
+        const principals: Principal[] = browseItems
             .filter(item => (<BrowseItem<UserTreeGridItem>>item).getModel().isPrincipal())
             .map(item => (<BrowseItem<UserTreeGridItem>>item).getModel().getPrincipal());
 
-        return users.some(user => user.isSystemUser());
+        return principals.some(principal => principal.isSystem());
     }
 
     private establishDeleteActionState(userBrowseItem: UserTreeGridItem) {
