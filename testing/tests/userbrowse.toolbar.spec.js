@@ -81,6 +81,15 @@ describe("User Browse panel, toolbar spec", function () {
         await userBrowsePanel.waitForDeleteButtonDisabled();
     });
 
+    //Forbid deletion of system roles #324
+    it("WHEN a system role has been selected THEN 'Delete' button should be disabled", async () => {
+        let userBrowsePanel = new UserBrowsePanel();
+        let roleName = 'system.everyone'
+        await testUtils.findAndSelectItem(roleName);
+        //Delete button should be disabled
+        await userBrowsePanel.waitForDeleteButtonDisabled();
+    });
+
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(() => {

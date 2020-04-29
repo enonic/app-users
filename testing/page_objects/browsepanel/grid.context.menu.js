@@ -11,7 +11,9 @@ const XPATH = {
     deleteMenuItem: `//li[contains(@id,'MenuItem') and text()='Delete']`,
     editMenuItem: `//li[contains(@id,'MenuItem') and text()='Edit']`,
     newMenuItem: `//li[contains(@id,'MenuItem') and text()='New...']`,
+    newRoleMenuItem: `//li[contains(@id,'MenuItem') and text()='New Role']`,
 };
+
 class GridContextMenu extends Page {
 
     waitForContextMenuVisible() {
@@ -23,7 +25,7 @@ class GridContextMenu extends Page {
 
     waitForDeleteMenuItemDisabled() {
         return this.getBrowser().waitUntil(() => {
-            return this.getAttribute(XPATH.deleteMenuItem, 'class').then(result => {
+            return this.getAttribute(XPATH.container + XPATH.deleteMenuItem, 'class').then(result => {
                 return result.includes('disabled');
             });
         }, 2000, 'Grid context menu - Delete menu item is not disabled after 3 seconds');
@@ -39,7 +41,13 @@ class GridContextMenu extends Page {
     }
 
     isEditMenuItemDisabled() {
-        return this.getAttribute(XPATH.editMenuItem, 'class').then(result => {
+        return this.getAttribute(XPATH.container + XPATH.editMenuItem, 'class').then(result => {
+            return result.includes('disabled');
+        });
+    }
+
+    isNewRoleMenuItemDisabled() {
+        return this.getAttribute(XPATH.container + XPATH.newRoleMenuItem, 'class').then(result => {
             return result.includes('disabled');
         });
     }
@@ -51,7 +59,7 @@ class GridContextMenu extends Page {
     }
 
     isNewMenuItemDisabled() {
-        return this.getAttribute(XPATH.newMenuItem, 'class').then(result => {
+        return this.getAttribute(XPATH.container + XPATH.newMenuItem, 'class').then(result => {
             return result.includes('disabled');
         });
     }
@@ -74,7 +82,6 @@ class GridContextMenu extends Page {
             throw Error('Item  ' + menuItem + ' was not found')
         })
     }
-
 };
 module.exports = GridContextMenu;
 
