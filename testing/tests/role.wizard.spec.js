@@ -78,6 +78,19 @@ describe('Role Wizard and Statistics Panel spec', function () {
             assert.equal(actualDescription, TEST_ROLE.description, "Actual and expected descriptions should be equal");
         });
 
+    it(`WHEN a system 'role' is opened THEN 'Delete' button should be disabled`,
+        async () => {
+            let roleWizard = new RoleWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            //1. Type 'system.auditlog' in the filter panel:
+            await testUtils.findAndSelectItem("system.auditlog");
+            //2. Click on 'Edit' button:
+            await userBrowsePanel.clickOnEditButton();
+            await roleWizard.waitForLoaded();
+            //3. Verify that 'Delete' button is disabled:
+            await roleWizard.waitForDeleteButtonDisabled();
+        });
+
     it(`GIVEN existing 'Role' with a member WHEN it has been selected THEN expected info should be present in the 'statistics panel'`,
         async () => {
             let roleStatisticsPanel = new RoleStatisticsPanel();

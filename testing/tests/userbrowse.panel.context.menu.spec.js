@@ -11,7 +11,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it('GIVEN navigate to the browse panel WHEN do right click on the `Roles` folder THEN `New role` menu item should be first',
+    it("GIVEN navigate to the browse panel WHEN do right click on the 'Roles' folder THEN 'New role' menu item should be first",
         async () => {
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
@@ -61,6 +61,19 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             testUtils.saveScreenshot('su_context_menu');
             let result = await gridContextMenu.waitForDeleteMenuItemDisabled();
             assert.isTrue(result, 'Delete menu item should be disabled');
+        });
+
+    it("WHEN right click on 'system.auditlog' role THEN `Delete` menu item should be disabled",
+        async () => {
+            let gridContextMenu = new GridContextMenu();
+            let userBrowsePanel = new UserBrowsePanel();
+            await testUtils.findAndSelectItem("system.auditlog");
+            //1. Do right click on 'system.auditlog' role
+            await userBrowsePanel.rightClickOnRowByDisplayName("Audit Log");
+            await gridContextMenu.waitForContextMenuVisible();
+            testUtils.saveScreenshot('auditlog_context_menu');
+            //2. Verify that 'Delete' menu item is disabled:
+            await gridContextMenu.waitForDeleteMenuItemDisabled();
         });
 
     it('GIVEN navigate to the browse panel WHEN right click on the `System` folder THEN `Delete` menu item should be disabled ',
