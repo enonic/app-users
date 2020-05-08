@@ -25,14 +25,14 @@ export class UserBrowsePanel
 
         this.bindServerEventListeners();
 
-        const changeSelectionStatus = AppHelper.debounce((selection: TreeNode<UserTreeGridItem>[]) => {
+        const changeSelectionStatus = AppHelper.debounce((selection: UserTreeGridItem[]) => {
             const singleSelection = selection.length === 1;
             const newAction = this.treeGrid.getTreeGridActions().NEW;
 
             let label;
 
-            if (singleSelection && selection[0].getData().getType() !== UserTreeGridItemType.ID_PROVIDER) {
-                const userItem = selection[0].getData();
+            if (singleSelection && selection[0].getType() !== UserTreeGridItemType.ID_PROVIDER) {
+                const userItem: UserTreeGridItem = selection[0];
 
                 switch (userItem.getType()) {
                 case UserTreeGridItemType.USERS:
@@ -56,9 +56,9 @@ export class UserBrowsePanel
             newAction.setLabel(label);
         }, 10);
 
-        this.treeGrid.onSelectionChanged(() => changeSelectionStatus(this.treeGrid.getRoot().getCurrentSelection()));
+        this.treeGrid.onSelectionChanged(() => changeSelectionStatus(this.treeGrid.getCurrentSelection()));
 
-        this.treeGrid.onHighlightingChanged((node: TreeNode<UserTreeGridItem>) => changeSelectionStatus(node ? [node] : []));
+        this.treeGrid.onHighlightingChanged((node: TreeNode<UserTreeGridItem>) => changeSelectionStatus(node ? [node.getData()] : []));
 
         this.onShown(() => {
             Router.setHash('browse');
@@ -125,25 +125,11 @@ export class UserBrowsePanel
         this.treeGrid.filter(this.treeGrid.getSelectedDataList());
     }
 
-    treeNodeToBrowseItem(node: TreeNode<UserTreeGridItem>): BrowseItem<UserTreeGridItem> | null {
-        const data = node ? node.getData() : null;
-        return !data ? null : <BrowseItem<UserTreeGridItem>>new BrowseItem<UserTreeGridItem>(data)
+    dataToBrowseItem(data: UserTreeGridItem): BrowseItem<UserTreeGridItem> | null {
+        return <BrowseItem<UserTreeGridItem>>new BrowseItem<UserTreeGridItem>(data)
             .setId(data.getDataId())
             .setDisplayName(data.getItemDisplayName())
             .setIconClass(this.selectIconClass(data));
-    }
-
-    treeNodesToBrowseItems(nodes: TreeNode<UserTreeGridItem>[]): BrowseItem<UserTreeGridItem>[] {
-        let browseItems: BrowseItem<UserTreeGridItem>[] = [];
-
-        // do not proceed duplicated content. still, it can be selected
-        nodes.forEach((node: TreeNode<UserTreeGridItem>) => {
-            const item = this.treeNodeToBrowseItem(node);
-            if (item) {
-                browseItems.push(item);
-            }
-        });
-        return browseItems;
     }
 
     private selectIconClass(item: UserTreeGridItem): string {
