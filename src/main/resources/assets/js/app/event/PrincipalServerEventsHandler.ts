@@ -165,7 +165,7 @@ export class PrincipalServerEventsHandler {
 
         if (key.isRole()) {
             return this.fetchPrincipal(key).then(principal => {
-                return {principal}
+                return {principal};
             });
         }
 
