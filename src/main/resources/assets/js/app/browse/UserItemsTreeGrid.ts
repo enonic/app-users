@@ -275,14 +275,14 @@ export class UserItemsTreeGrid
 
     protected updateSelectedNode(node: TreeNode<UserTreeGridItem>) {
         // Highlighted nodes should remain as is, and must not be selected
-        const firstSelectedOrHighlighted = this.getFirstSelectedOrHighlightedNode();
-        const selected = this.getRoot().getFullSelection().length > 0;
-        const highlighted = !selected && !!firstSelectedOrHighlighted;
+        const hasHighlightedNode: boolean = this.hasHighlightedNode();
+        const hasSelected: boolean = this.hasSelectedItems();
+        const highlighted: boolean = !hasSelected && hasHighlightedNode;
 
         const nodeToUpdate = this.getNodeToUpdate(node);
         if (highlighted) {
             this.refreshNode(nodeToUpdate);
-        } else if (selected) {
+        } else if (hasSelected) {
             super.updateSelectedNode(nodeToUpdate);
         }
     }
@@ -399,7 +399,7 @@ export class UserItemsTreeGrid
 
     private isHighlightedItemIn(userTreeGridItems: UserTreeGridItem[]): boolean {
         return userTreeGridItems.some((userTreeGridItem: UserTreeGridItem) => {
-            return userTreeGridItem.getDataId() === this.getFirstSelectedOrHighlightedNode().getDataId();
+            return userTreeGridItem.getDataId() === this.getFirstSelectedOrHighlightedItem().getDataId();
         });
     }
 
