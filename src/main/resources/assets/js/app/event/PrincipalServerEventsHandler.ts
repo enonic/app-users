@@ -11,6 +11,13 @@ import {PrincipalServerEvent} from './PrincipalServerEvent';
 import {PrincipalServerChange} from './PrincipalServerChange';
 import {PrincipalServerChangeItem} from './PrincipalServerChangeItem';
 
+class PrincipalAndIdProvider {
+
+    principal?: Principal;
+
+    idProvider?: IdProvider;
+}
+
 /**
  * Class that listens to server events and fires UI events
  */
@@ -23,6 +30,8 @@ export class PrincipalServerEventsHandler {
     private userItemCreatedListeners: { (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean): void }[] = [];
     private userItemUpdatedListeners: { (principal: Principal, idProvider: IdProvider): void }[] = [];
     private userItemDeletedListeners: { (ids: string[]): void }[] = [];
+
+    private deletedItemsIds: string[] = [];
 
     private static debug: boolean = false;
 
@@ -53,17 +62,17 @@ export class PrincipalServerEventsHandler {
             this.handleUserItemDeleted(this.extractPrincipalIds([event.getNodeChange()]));
         } else {
             // allow some time for the backend to process items before requesting them
-            setTimeout(this.loadUserItems.bind(this, event), 1000);
+            setTimeout(this.handleUserItemEvent.bind(this, event), 1000);
         }
     }
 
     private isIgnoredItem(item: PrincipalServerChangeItem): boolean {
-        const id = this.getId(item);
+        const id: string = this.getId(item);
         if (!id) {
             return true;
         }
-        const path = Path.fromString(item.getPath());
-        const name = path.getElement(path.getElements().length - 1);
+        const path: Path = Path.fromString(item.getPath());
+        const name: string = path.getElement(path.getElements().length - 1);
 
         if (name === 'groups' || name === 'users' || name === 'roles') {
             return true;
@@ -99,6 +108,8 @@ export class PrincipalServerEventsHandler {
             console.debug('UserItemServerEventsHandler: deleted', ids);
         }
 
+        this.deletedItemsIds.push(...ids);
+
         this.notifyUserItemDeleted(ids);
     }
 
@@ -116,8 +127,9 @@ export class PrincipalServerEventsHandler {
      * @returns {string}
      */
     private getId(changeItem: PrincipalServerChangeItem): string {
-        const path = Path.fromString(changeItem.getPath());
-        const name = path.getElement(path.getElements().length - 1);
+        const path: Path = Path.fromString(changeItem.getPath());
+        const name: string = path.getElement(path.getElements().length - 1);
+
         if (path.hasParent()) {
             return path.getParentPath().toString() === '/roles' ? 'role:' + name : changeItem.getId();
         }
@@ -125,61 +137,66 @@ export class PrincipalServerEventsHandler {
         return name;
     }
 
-    private loadUserItems(event: PrincipalServerEvent) {
-        event.getNodeChange().getChangeItems().forEach((item: PrincipalServerChangeItem) => {
+    private handleUserItemEvent(event: PrincipalServerEvent) {
+        const eventType: NodeServerChangeType = event.getType();
 
-            if (this.isIgnoredItem(item)) {
-                return;
-            }
+        event.getNodeChange().getChangeItems()
+            .filter((item: PrincipalServerChangeItem) => !this.isIgnoredItem(item) && !this.isAlreadyDeleted(item))
+            .forEach((item: PrincipalServerChangeItem) => {
+                this.doLoadUserItem(item)
+                    .then((result: PrincipalAndIdProvider) => this.handleUserItem(result, eventType))
+                    .catch(DefaultErrorHandler.handle);
+            });
+    }
 
-            const path = Path.fromString(item.getPath());
-            const id = this.getId(item);
-            if (!path.hasParent()) {
-                // it's a idProvider
-                new GetIdProviderByKeyRequest(IdProviderKey.fromString(id)).sendAndParse().then(idProvider => {
-                    if (PrincipalServerEventsHandler.debug) {
-                        console.debug('PrincipalServerEventsHandler.loaded idprovider:', idProvider);
-                    }
-                    if (idProvider) {
-                        this.onUserItemLoaded(event, null, idProvider);
-                    }
-                }).catch(DefaultErrorHandler.handle);
-            } else {
-                // it's a principal, fetch him as well as idProvider
-                const key = PrincipalKey.fromString(id);
-                if (key.isRole()) {
-                    new GetPrincipalByKeyRequest(key).sendAndParse().then(principal => {
-                        if (PrincipalServerEventsHandler.debug) {
-                            console.debug('PrincipalServerEventsHandler.loaded principal:', principal);
-                        }
-                        this.onUserItemLoaded(event, principal, null);
-                    }).catch(DefaultErrorHandler.handle);
-                } else {
-                    new GetPrincipalByKeyRequest(key).setIncludeMemberships(true).sendAndParse().then(principal => {
-                        if (PrincipalServerEventsHandler.debug) {
-                            console.debug('PrincipalServerEventsHandler.loaded principal:', principal);
-                        }
-                        if (principal) {
-                            return new GetIdProviderByKeyRequest(principal.getKey().getIdProvider()).sendAndParse().then(idProvider => {
-                                this.onUserItemLoaded(event, principal, idProvider);
-                            });
-                        }
-                        console.warn('PrincipalServerEventsHandler: could not load principal[' + key.toString() + ']');
-                    }).catch(DefaultErrorHandler.handle);
-                }
-            }
+    private doLoadUserItem(item: PrincipalServerChangeItem): Q.Promise<PrincipalAndIdProvider> {
+        const path: Path = Path.fromString(item.getPath());
+        const id: string = this.getId(item);
+
+        if (!path.hasParent()) {
+            // it's a idProvider
+            return this.fetchIdProvider(IdProviderKey.fromString(id)).then(idProvider => {
+                return {idProvider};
+            });
+        }
+
+        // it's a principal, fetch him as well as idProvider
+        const key: PrincipalKey = PrincipalKey.fromString(id);
+
+        if (key.isRole()) {
+            return this.fetchPrincipal(key).then(principal => {
+                return {principal}
+            });
+        }
+
+        return this.fetchPrincipal(key, true).then((principal: Principal) => {
+            return this.fetchIdProvider(principal.getKey().getIdProvider()).then((idProvider: IdProvider) => {
+                return {principal, idProvider};
+            });
         });
     }
 
-    private onUserItemLoaded(event: PrincipalServerEvent, principal: Principal, idProvider: IdProvider) {
-        switch (event.getType()) {
-        case NodeServerChangeType.CREATE:
-            this.handleUserItemCreated(principal, idProvider);
-            break;
-        case NodeServerChangeType.UPDATE:
-        case NodeServerChangeType.UPDATE_PERMISSIONS:
-            this.handleUserItemUpdated(principal, idProvider);
-            break;
+    private isAlreadyDeleted(item: PrincipalServerChangeItem): boolean {
+        return this.deletedItemsIds.indexOf(this.getId(item)) >= 0;
+    }
+
+    private fetchIdProvider(key: IdProviderKey): Q.Promise<IdProvider> {
+        return new GetIdProviderByKeyRequest(key).sendAndParse();
+    }
+
+    private fetchPrincipal(key: PrincipalKey, indludeMemberships: boolean = false): Q.Promise<Principal> {
+        return new GetPrincipalByKeyRequest(key).setIncludeMemberships(indludeMemberships).sendAndParse();
+    }
+
+    private handleUserItem(principalAndIdProvider: PrincipalAndIdProvider, eventType: NodeServerChangeType) {
+        switch (eventType) {
+            case NodeServerChangeType.CREATE:
+                this.handleUserItemCreated(principalAndIdProvider.principal, principalAndIdProvider.idProvider);
+                break;
+            case NodeServerChangeType.UPDATE:
+            case NodeServerChangeType.UPDATE_PERMISSIONS:
+                this.handleUserItemUpdated(principalAndIdProvider.principal, principalAndIdProvider.idProvider);
+                break;
         }
     }
 
