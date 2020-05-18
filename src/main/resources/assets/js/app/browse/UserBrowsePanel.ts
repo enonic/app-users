@@ -92,6 +92,8 @@ export class UserBrowsePanel
              because we are left on the same panel. We need to refresh manually.
              */
 
+            this.treeGrid.deselectNodes(ids);
+
             ids.forEach(id => {
                 const node = this.treeGrid.getRoot().getCurrentRoot().findNode(id);
                 if (node) {
