@@ -124,7 +124,13 @@ export class UserBrowsePanel
     }
 
     protected enableSelectionMode() {
-        this.treeGrid.filter(this.treeGrid.getSelectedDataList());
+        this.filterPanel.setSelectedItems(this.treeGrid.getSelectedDataList());
+    }
+
+    protected disableSelectionMode() {
+        this.filterPanel.resetConstraints();
+        this.hideFilterPanel();
+        super.disableSelectionMode();
     }
 
     dataToBrowseItem(data: UserTreeGridItem): BrowseItem<UserTreeGridItem> | null {

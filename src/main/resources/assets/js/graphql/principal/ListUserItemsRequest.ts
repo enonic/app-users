@@ -27,6 +27,7 @@ export class ListUserItemsRequest
 
     private types: UserItemType[];
     private searchQuery: string;
+    private itemIds: string[];
 
     setTypes(types: UserItemType[]): ListUserItemsRequest {
         this.types = types;
@@ -38,20 +39,32 @@ export class ListUserItemsRequest
         return this;
     }
 
+    setItems(items: string[]): ListUserItemsRequest {
+        this.itemIds = items;
+        return this;
+    }
+
     getVariables(): {[key: string]: any} {
-        let vars = super.getVariables();
+        const vars = super.getVariables();
+
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => UserItemType[type]);
         }
+
         if (this.searchQuery) {
             vars['query'] = this.searchQuery;
         }
+
+        if (this.itemIds && this.itemIds.length > 0) {
+            vars['itemIds'] = this.itemIds;
+        }
+
         return vars;
     }
 
     getQuery(): string {
-        return `query($types: [UserItemType], $query: String, $start: Int, $count: Int) {
-                    userItemsConnection (types: $types, query: $query, start: $start, count: $count) {
+        return `query($types: [UserItemType], $query: String, $itemIds: [String], $start: Int, $count: Int) {
+                    userItemsConnection (types: $types, query: $query, itemIds: $itemIds, start: $start, count: $count) {
                         totalCount
                         edges {
                             node {
