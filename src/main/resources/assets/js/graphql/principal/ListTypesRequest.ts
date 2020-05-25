@@ -8,24 +8,35 @@ export class ListTypesRequest
 
     private searchQuery: string;
 
+    private itemIds: string[];
+
     setQuery(query: string): ListTypesRequest {
         this.searchQuery = query;
         return this;
     }
 
+    setItems(items: string[]): ListTypesRequest {
+        this.itemIds = items;
+        return this;
+    }
+
     getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
+        const vars = super.getVariables();
 
         if (this.searchQuery) {
             vars['query'] = this.searchQuery;
+        }
+
+        if (this.itemIds && this.itemIds.length > 0) {
+            vars['itemIds'] = this.itemIds;
         }
 
         return vars;
     }
 
     getQuery(): string {
-        return `query ($query: String, $start: Int, $count: Int) {
-                    types (query: $query, start: $start, count: $count) {
+        return `query ($query: String, $itemIds: [String], $start: Int, $count: Int) {
+                    types (query: $query, itemIds: $itemIds, start: $start, count: $count) {
                         totalCount
                         aggregations {
                             name,

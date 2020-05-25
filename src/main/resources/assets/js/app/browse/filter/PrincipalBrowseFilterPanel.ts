@@ -14,6 +14,8 @@ import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 import {BrowseFilterPanel} from 'lib-admin-ui/app/browse/filter/BrowseFilterPanel';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {SearchInputValues} from 'lib-admin-ui/query/SearchInputValues';
 
 export class PrincipalBrowseFilterPanel
     extends BrowseFilterPanel<UserTreeGridItem> {
@@ -65,7 +67,7 @@ export class PrincipalBrowseFilterPanel
     protected resetFacets(suppressEvent?: boolean, doResetAll?: boolean): Q.Promise<void> {
         return new ListUserItemsRequest().sendAndParse().then((result: ListUserItemsRequestResult) => {
             return this.fetchAndUpdateAggregations().then(() => {
-                const userItems = result.userItems;
+                const userItems: UserItem[] = result.userItems;
                 this.updateHitsCounter(userItems ? userItems.length : 0, true);
                 this.toggleAggregationsVisibility(result.aggregations);
 
@@ -85,8 +87,8 @@ export class PrincipalBrowseFilterPanel
     }
 
     private getCheckedTypes(): UserItemType[] {
-        const values = this.getSearchInputValues();
-        const aggregationType = PrincipalBrowseFilterPanel.PRINCIPAL_TYPE_AGGREGATION_NAME;
+        const values: SearchInputValues = this.getSearchInputValues();
+        const aggregationType: string = PrincipalBrowseFilterPanel.PRINCIPAL_TYPE_AGGREGATION_NAME;
         const selectedBuckets: Bucket[] = values.getSelectedValuesForAggregationName(aggregationType) || [];
         return selectedBuckets
             .map(bucket => UserItemType[bucket.getKey().replace(/\s/g, '_').toUpperCase()])
@@ -96,8 +98,9 @@ export class PrincipalBrowseFilterPanel
     private searchDataAndHandleResponse(): Q.Promise<void> {
         const types: UserItemType[] = this.getCheckedTypes();
         const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
+        const itemIds: string[] = this.getSelectedItemIds();
 
-        return new ListUserItemsRequest().setTypes(types).setQuery(searchString).sendAndParse()
+        return new ListUserItemsRequest().setTypes(types).setQuery(searchString).setItems(itemIds).sendAndParse()
             .then((result: ListUserItemsRequestResult) => {
                 this.handleDataSearchResult(result, types, searchString);
             }).catch((reason: any) => {
@@ -108,8 +111,9 @@ export class PrincipalBrowseFilterPanel
     private refreshDataAndHandleResponse(): Q.Promise<void> {
         const types: UserItemType[] = this.getCheckedTypes();
         const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
+        const itemIds: string[] = this.getSelectedItemIds();
 
-        return new ListUserItemsRequest().setTypes(types).setQuery(searchString).sendAndParse()
+        return new ListUserItemsRequest().setTypes(types).setQuery(searchString).setItems(itemIds).sendAndParse()
             .then((result: ListUserItemsRequestResult) => {
                 if (result.userItems.length > 0) {
                     this.handleDataSearchResult(result, types, searchString);
@@ -121,14 +125,17 @@ export class PrincipalBrowseFilterPanel
             });
     }
 
+    getSelectedItemIds(): string[] {
+        if (this.hasConstraint()) {
+            return this.getSelectionItems().map((item: UserTreeGridItem) => item.getDataId());
+        }
+
+        return [];
+    }
+
     private handleDataSearchResult(result: ListUserItemsRequestResult, types: UserItemType[], searchString: string) {
         this.fetchAndUpdateAggregations().then(() => {
-            let userItems = result.userItems;
-
-            if (this.hasConstraint()) {
-                const principalKeys = this.getSelectionItems().map(key => key.getDataId());
-                userItems = userItems.filter(principal => principalKeys.some(pr => pr === principal.getKey().toString()));
-            }
+            const userItems: UserItem[] = result.userItems;
 
             new BrowseFilterSearchEvent(new PrincipalBrowseSearchData(searchString, types, userItems)).fire();
 
@@ -159,9 +166,11 @@ export class PrincipalBrowseFilterPanel
 
     private fetchAndUpdateAggregations(): Q.Promise<void> {
         const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
+        const itemIds: string[] = this.getSelectedItemIds();
 
         return new ListTypesRequest()
             .setQuery(searchString)
+            .setItems(itemIds)
             .sendAndParse()
             .then((typeAggregation) => {
                 this.updateAggregations([typeAggregation], true);

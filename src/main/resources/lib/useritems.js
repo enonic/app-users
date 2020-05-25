@@ -1,9 +1,9 @@
 var common = require('./common');
 
 module.exports = {
-    list: function(types, query, start, count) {
+    list: function (types, query, itemIds, start, count) {
         var result = common.queryAll({
-            query: createUserItemsQuery(query, types),
+            query: createUserItemsQuery(query, types, itemIds),
             start: start,
             count: count,
             aggregations: {
@@ -41,11 +41,26 @@ function processIdProviderAggregation(result) {
     }
 }
 
-function createUserItemsQuery(query, types) {
+function createUserItemsQuery(query, types, itemIds) {
     var q = createTypesQuery(types);
     if (query) {
         q = createTextQuery(query) + ' AND ' + q;
     }
+
+    log.info(itemIds);
+
+    if (itemIds && itemIds.length > 0) {
+        var itemsIdsQuery = '';
+
+        itemIds.forEach(function (id, index) {
+            itemsIdsQuery += (index > 0 ? ' OR ' : '') + '_id="' + id + '"';
+        });
+
+        q += q ? ' AND (' + itemsIdsQuery + ')' : itemsIdsQuery;
+    }
+
+    log.info(q);
+
     return q;
 }
 
