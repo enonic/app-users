@@ -171,6 +171,6 @@ class GroupWizard extends WizardPanel {
             throw new Error("Delete button should be enabled " + err);
         });
     }
-};
+}
 module.exports = GroupWizard;
 

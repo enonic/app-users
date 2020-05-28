@@ -9,7 +9,7 @@ const xpTourDialog = {
     container: `//div[contains(@id,'ModalDialog') and descendant::h2[contains(.,'Welcome Tour')]]`
 };
 const home = {
-    container: `div[class*='home-main-container']`
+    container: "div[class*='home-main-container']"
 };
 
 class HomePage extends Page {
@@ -21,5 +21,5 @@ class HomePage extends Page {
     waitForLoaded() {
         return this.waitForElementDisplayed(`${home.container}`, appConst.TIMEOUT_3);
     }
-};
+}
 module.exports = HomePage;

@@ -31,7 +31,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
         });
 
     //verifies: xp-apps#371 GroupWizard - SaveBeforeClose dialog appears in saved group
-    it("GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and `Close tab` has been clicked THEN `Save before close` dialog should not appear",
+    it("GIVEN new group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button then `Close tab` have been clicked THEN `Save before close` dialog should not appear",
         async () => {
             let testGroup =
                 userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'description', null, [testRole.displayName]);
@@ -50,7 +50,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             assert.isFalse(result, "Confirmation dialog should not be loaded");
         });
 
-    it("GIVEN group-wizard is opened AND name has been typed and new created role selected WHEN `Save` button has been pressed and 'Close tab' has been clicked THEN 'Save before close' dialog should not appear",
+    it("GIVEN new group is saved AND System ID Provider is selected WHEN New button has been clicked THEN 'New principal' dialog should be loaded",
         async () => {
             let testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'description');
             let newPrincipalDialog = new NewPrincipalDialog();
@@ -60,7 +60,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             //2. Click on New button(System ID Provider is selected in browse-panel):
             await userBrowsePanel.clickOnNewButton();
             testUtils.saveScreenshot("new_principal_dialog_should_be_loaded");
-            //3. New Principal dialog should be loaded:
+            //3. 'New Principal' dialog should be loaded:
             await newPrincipalDialog.waitForDialogLoaded()
         });
 

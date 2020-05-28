@@ -234,6 +234,6 @@ class UserWizard extends wizards.WizardPanel {
             throw new Error('User Wizard is not loaded! ' + err);
         });
     }
-};
+}
 module.exports = UserWizard;
 

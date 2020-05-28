@@ -10,6 +10,7 @@ const xpath = {
     aggregationGroupView: "//div[contains(@id,'AggregationContainer')]",
     userAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'User (')]]",
     roleAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Role (')]]",
+    groupAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Group')]]",
     idProviderAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Id Provider (')]]",
     userAggregationItems: "//div[contains(@id,'BucketView')]//div[contains(@id,'Checkbox') ]/label",
 };
@@ -47,9 +48,9 @@ class BrowseFilterPanel extends Page {
         return this.clickOnElement(selector);
     }
 
-    clickOnUserAggregation() {
-        let userSelector = xpath.container + xpath.aggregationGroupView + xpath.userAggregationCheckbox + '/label';
-        return this.clickOnElement(userSelector);
+    clickOnGroupAggregation() {
+        let locator = xpath.container + xpath.aggregationGroupView + xpath.groupAggregationCheckbox + '/label';
+        return this.clickOnElement(locator);
     }
 
     async clickOnRoleAggregation() {
@@ -99,6 +100,6 @@ class BrowseFilterPanel extends Page {
     isPanelVisible() {
         return this.isElementDisplayed(xpath.container);
     }
-};
+}
 module.exports = BrowseFilterPanel;
 

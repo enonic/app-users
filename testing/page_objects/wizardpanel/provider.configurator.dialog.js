@@ -116,6 +116,6 @@ class IdProviderConfiguratorDialog extends Page {
             return this.pause(500)
         });
     }
-};
+}
 module.exports = IdProviderConfiguratorDialog;
 

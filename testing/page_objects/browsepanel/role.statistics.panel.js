@@ -24,5 +24,5 @@ class RoleStatisticsPanel extends ItemStatistic {
             return this.getTextInElements(items);
         })
     }
-};
+}
 module.exports = RoleStatisticsPanel;

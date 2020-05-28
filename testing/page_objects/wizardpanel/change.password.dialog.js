@@ -102,7 +102,7 @@ class ChangeUserPasswordDialog extends Page {
     waitForDialogLoaded() {
         return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
     }
-};
+}
 module.exports = ChangeUserPasswordDialog;
 
 

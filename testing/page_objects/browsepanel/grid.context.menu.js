@@ -2,7 +2,6 @@
  * Created on 12/01/2017.
  */
 const Page = require('../page');
-const elements = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
 const XPATH = {
@@ -82,6 +81,6 @@ class GridContextMenu extends Page {
             throw Error('Item  ' + menuItem + ' was not found')
         })
     }
-};
+}
 module.exports = GridContextMenu;
 

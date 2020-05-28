@@ -11,6 +11,7 @@ const xpath = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
     memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
 };
+
 class RoleWizard extends WizardPanel {
 
     get descriptionInput() {
@@ -35,10 +36,9 @@ class RoleWizard extends WizardPanel {
         return this.typeTextInInput(this.descriptionInput, description);
     }
 
-    typeData(data) {
-        return this.typeTextInInput(this.displayNameInput, data.displayName).then(() => {
-            return this.typeTextInInput(this.descriptionInput, data.description)
-        });
+    async typeData(data) {
+        await this.typeTextInInput(this.displayNameInput, data.displayName);
+        return await this.typeTextInInput(this.descriptionInput, data.description);
     }
 
     clickOnDelete() {
@@ -50,7 +50,7 @@ class RoleWizard extends WizardPanel {
 
     waitForDeleteButtonEnabled() {
         return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
-            return this.saveScreenshot('err_delete_role_button_disabled');
+            this.saveScreenshot('err_delete_role_button_disabled');
             throw new Error("Role wizard, Delete button " + err);
         });
     }
@@ -82,6 +82,7 @@ class RoleWizard extends WizardPanel {
             throw new Error('Error selecting option ' + displayName + ' ' + err);
         })
     }
-};
+}
+
 module.exports = RoleWizard;
 
