@@ -46,6 +46,7 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             assert.isTrue(result, "'Selection Controller' shows that selection is partial");
         });
 
+    //Verifies  issue#334 Incorrect behaviour of Show Selection button and Selection Controller gets irresponsive
     it("WHEN 'Show Selection', 'Hide Selection',Show Selection sequentially clicked in filtered grid THEN expected group should be present and Selection Controller should be selected",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
