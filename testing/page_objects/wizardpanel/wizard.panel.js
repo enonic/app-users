@@ -132,7 +132,7 @@ class WizardPanel extends Page {
             }
         })
     }
-};
+}
 module.exports = {WizardPanel, XPATH};
 
 

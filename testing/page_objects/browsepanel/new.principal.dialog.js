@@ -89,6 +89,6 @@ class NewPrincipalDialog extends Page {
         let selector = XPATH.container + XPATH.itemViewer + lib.itemByName(name);
         return this.waitForElementDisplayed(selector, appConst.TIMEOUT_2);
     }
-};
+}
 module.exports = NewPrincipalDialog;
 

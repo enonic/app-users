@@ -200,10 +200,6 @@ class IdProviderWizard extends WizardPanel {
         }
     }
 
-    typeDescription(description) {
-        return this.typeTextInInput(this.descriptionInput, description);
-    }
-
     //return text in the Description input
     getDescription() {
         return this.getTextInInput(this.descriptionInput);
@@ -235,7 +231,7 @@ class IdProviderWizard extends WizardPanel {
     waitForOpened() {
         return this.waitForElementDisplayed(this.displayNameInput, appConst.TIMEOUT_3);
     }
-};
+}
 
 module.exports = IdProviderWizard;
 

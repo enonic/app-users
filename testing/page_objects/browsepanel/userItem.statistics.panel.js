@@ -116,12 +116,12 @@ class UserItemStatisticsPanel extends Page {
 
     isOptionSelected(repoName) {
         let selector = XPATH.selectedOptionByRepoName(repoName);
-        return this.waitForElementDisplayed(selector);
+        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3);
     }
 
     getBranchName(repoName) {
         let selector = XPATH.selectedOptionByRepoName(repoName) + "//div[@name='branch']//div[@class='viewer']";
         return this.getText(selector);
     }
-};
+}
 module.exports = UserItemStatisticsPanel;

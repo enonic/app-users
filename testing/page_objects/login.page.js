@@ -27,13 +27,6 @@ class LoginPage extends Page {
         //this.passwordInput.click();
     }
 
-    waitForPageLoaded1() {
-        let elem = this.browser.findElement("By.xpath", "//input[contains(@id,'username-input')]").then(result => {
-            //const elem = $(`input[id^='username-input']`);
-            return result.waitForDisplayed(3000);
-        });
-    }
-
     waitForPageLoaded(ms) {
         return this.browser.$(`//input[contains(@id,'username-input')]`).then(element => {
             return element.waitForDisplayed(ms);
@@ -54,7 +47,7 @@ class LoginPage extends Page {
         await passwordInput.addValue(pass);
         return await this.clickOnLoginButton();
     }
-};
+}
 module.exports = LoginPage;
 
 

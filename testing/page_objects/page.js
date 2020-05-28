@@ -190,5 +190,11 @@ class Page {
                 }]
         }]);
     }
+
+    //is checkbox selected...
+    async isSelected(selector) {
+        let elem = await this.findElement(selector);
+        return await elem.isSelected();
+    }
 }
 module.exports = Page;

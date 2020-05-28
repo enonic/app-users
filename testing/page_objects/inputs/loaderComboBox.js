@@ -51,8 +51,6 @@ class LoaderComboBox extends Page {
         }).then(() => {
             return this.pause(500);
         });
-        //return this.getDisplayedElements(xpath + this.optionsFilterInput).then(result => {
-        //   return this.getBrowser().elementSendKeys(result[0].ELEMENT,[optionDisplayName]);
     }
-};
+}
 module.exports = LoaderComboBox;

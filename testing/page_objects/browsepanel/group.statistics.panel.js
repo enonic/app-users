@@ -57,5 +57,5 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
             throw new Error("Unable to get group names in Statistics Panel:")
         }
     }
-};
+}
 module.exports = GroupStatisticsPanel;
