@@ -124,7 +124,17 @@ export class UserBrowsePanel
     }
 
     protected enableSelectionMode() {
-        this.filterPanel.setSelectedItems(this.treeGrid.getSelectedDataList());
+        const selectedItems: UserTreeGridItem[] = this.treeGrid.getSelectedDataList();
+
+        if (selectedItems.some(this.isEditableItem)) {
+            this.filterPanel.setSelectedItems(selectedItems);
+        } else {
+            this.treeGrid.filter(selectedItems);
+        }
+    }
+
+    private isEditableItem(item: UserTreeGridItem): boolean {
+        return item.isPrincipal() || item.isIdProvider();
     }
 
     protected disableSelectionMode() {

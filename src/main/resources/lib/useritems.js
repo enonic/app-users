@@ -47,13 +47,11 @@ function createUserItemsQuery(query, types, itemIds) {
         q = createTextQuery(query) + ' AND ' + q;
     }
 
-    log.info(itemIds);
-
     if (itemIds && itemIds.length > 0) {
         var itemsIdsQuery = '';
 
         itemIds.forEach(function (id, index) {
-            itemsIdsQuery += (index > 0 ? ' OR ' : '') + '_id="' + id + '"';
+            itemsIdsQuery += (index > 0 ? ' OR ' : '') + '_id="' + id + '" OR _name="' + id + '"';
         });
 
         q += q ? ' AND (' + itemsIdsQuery + ')' : itemsIdsQuery;
