@@ -51,7 +51,7 @@ function createUserItemsQuery(query, types, itemIds) {
         var itemsIdsQuery = '';
 
         itemIds.forEach(function (id, index) {
-            itemsIdsQuery += (index > 0 ? ' OR ' : '') + '_id="' + id + '"';
+            itemsIdsQuery += (index > 0 ? ' OR ' : '') + '_id="' + id + '" OR _name="' + id + '"';
         });
 
         q += q ? ' AND (' + itemsIdsQuery + ')' : itemsIdsQuery;
