@@ -25,7 +25,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             //1. Create new Role
             await testUtils.openWizardAndSaveRole(testRole);
             //2. Type the name in the filter panel:
-            await testUtils.typeNameInFilterPanel(testRole.displayName)
+            await testUtils.typeNameInFilterPanel(testRole.displayName);
             let result = await userBrowsePanel.isItemDisplayed(testRole.displayName);
             assert.isTrue(result, "New role should be present in the grid");
         });

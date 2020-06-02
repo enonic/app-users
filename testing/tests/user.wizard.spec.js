@@ -120,7 +120,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             await changePasswordDialog.waitForDialogLoaded();
             //Click on Show Password:
             await changePasswordDialog.clickOnShowPasswordLink();
-            let result = await changePasswordDialog.isHideLinkDisplayed()
+            let result = await changePasswordDialog.isHideLinkDisplayed();
             await assert.isTrue(result, "'Hide' button should appear");
         });
 

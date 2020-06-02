@@ -98,7 +98,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             //4. Go to the grid
             await userBrowsePanel.clickOnAppHomeButton();
             testUtils.saveScreenshot("transitive_memberships_checked");
-            let groups = await groupStatisticsPanel.getDisplayNamesInGroupList()
+            let groups = await groupStatisticsPanel.getDisplayNamesInGroupList();
             //5. Verify that group stats should be correctly updated:
             assert.equal(groups.length, 0, "Group list gets empty in Statistics Panel");
         });

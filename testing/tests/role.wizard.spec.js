@@ -110,7 +110,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
             let roleStatisticsPanel = new RoleStatisticsPanel();
             //1. Open existing role and remove the member:
             await testUtils.selectRoleAndOpenWizard(TEST_ROLE.displayName);
-            await roleWizard.removeMember(appConst.SUPER_USER_DISPLAY_NAME)
+            await roleWizard.removeMember(appConst.SUPER_USER_DISPLAY_NAME);
             //2. role has been saved and the wizard closed
             await testUtils.saveAndCloseWizard(TEST_ROLE.displayName);
             //3. Members should be updated in the Statistics Panel

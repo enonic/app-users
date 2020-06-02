@@ -40,7 +40,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             let roleWizard = new RoleWizard();
             //1. Open new role-wizard:
             await testUtils.clickOnRolesFolderAndOpenWizard();
-            await roleWizard.typeData(testRole)
+            await roleWizard.typeData(testRole);
             //2. Save the role:
             await roleWizard.waitAndClickOnSave();
             //3. Click on Delete button:
@@ -74,7 +74,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             testRole = userItemsBuilder.buildRole(name, 'test role 3');
             //1. Save ne role:
             await testUtils.clickOnRolesFolderAndOpenWizard();
-            await roleWizard.typeData(testRole)
+            await roleWizard.typeData(testRole);
             await roleWizard.waitAndClickOnSave();
             await roleWizard.pause(500);
             //2. Click on Delete and confirm the deleting:

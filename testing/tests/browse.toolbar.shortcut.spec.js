@@ -25,7 +25,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             await newPrincipalDialog.waitForDialogLoaded();
         });
 
-    it(`GIVEN system Id provider is selected WHEN 'f4'  has been pressed THEN System Id Provider wizard should be loaded`,
+    it(`GIVEN system Id provider is selected WHEN 'f4' has been pressed THEN System Id Provider wizard should be loaded`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
@@ -39,7 +39,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
     it(`GIVEN cms role is selected WHEN 'Ctrl+del' has been pressed THEN Confirmation Dialog should appear`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            let roleName = 'cms.cm.app'
+            let roleName = 'cms.cm.app';
             await testUtils.findAndSelectItem(roleName);
             await userBrowsePanel.hotKeyDelete();
             testUtils.saveScreenshot('hot_key_delete_role');

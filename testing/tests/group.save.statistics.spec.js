@@ -31,7 +31,7 @@ describe('group.save.statistics.panel: Save a group and check the info in Statis
             let message = await groupWizard.waitForNotificationMessage();
             testUtils.saveScreenshot("group_is_saved");
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Expected notification message should appear");
-        })
+        });
 
     it("WHEN existing group is opened THEN expected description, role and members should be present",
         async () => {
@@ -62,7 +62,7 @@ describe('group.save.statistics.panel: Save a group and check the info in Statis
             await groupWizard.pause(300);
             return groupWizard.waitAndClickOnSave();
             //2. Close the wizard:
-            return userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
+            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
             //3. Type the name in Filter Panel:
             await testUtils.typeNameInFilterPanel(testGroup.displayName);
             //4. Verify that new group is filtered:
