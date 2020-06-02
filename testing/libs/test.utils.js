@@ -151,10 +151,10 @@ module.exports = {
         let groupWizard = new GroupWizard();
         //Select System ID Provider and open new Group Wizard:
         await this.clickOnSystemAndOpenGroupWizard();
-        await groupWizard.typeData(group)
+        await groupWizard.typeData(group);
         await groupWizard.pause(500);
         //Close the wizard:
-        await this.saveAndCloseWizard(group.displayName)
+        await this.saveAndCloseWizard(group.displayName);
         return await groupWizard.pause(500);
     },
     async clickOnSystemAndOpenGroupWizard() {
@@ -172,7 +172,7 @@ module.exports = {
         return await groupWizard.waitForOpened();
 
     },
-    //Click on Save button and close the wizard:
+//Click on Save button and close the wizard:
     async saveAndCloseWizard(displayName) {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
@@ -187,7 +187,7 @@ module.exports = {
         await this.clickOnRolesFolderAndOpenWizard();
         await roleWizard.typeData(role);
         await roleWizard.pause(500);
-        await this.saveAndCloseWizard(role.displayName)
+        await this.saveAndCloseWizard(role.displayName);
         return await roleWizard.pause(500);
     },
     async clickOnRolesFolderAndOpenWizard() {
@@ -208,7 +208,7 @@ module.exports = {
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },
-    //Opens System ID Provider folder:
+//Opens System ID Provider folder:
     async selectSystemIdProviderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
         let idProviderWizard = new IdProviderWizard();
@@ -290,7 +290,7 @@ module.exports = {
         return await userWizard.waitForOpened();
     },
     saveScreenshot: function (name) {
-        let path = require('path')
+        let path = require('path');
         let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
         return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
             return console.log('screenshot saved ' + name);

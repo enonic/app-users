@@ -64,7 +64,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             //1. Open new wizard:
             await testUtils.openIdProviderWizard();
             //2. Type the name and save:
-            await idProviderWizard.typeDisplayName(ID_PROVIDER.displayName)
+            await idProviderWizard.typeDisplayName(ID_PROVIDER.displayName);
             await idProviderWizard.waitAndClickOnSave();
             //3. Expected notification message should appear:
             let actualMessage = await idProviderWizard.waitForErrorNotificationMessage();
@@ -125,7 +125,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             //'Delete' button should be enabled, because of the provider does not contain users:
             await userBrowsePanel.waitForDeleteButtonEnabled();
             //'New' button should be enabled
-            await userBrowsePanel.waitForNewButtonEnabled()
+            await userBrowsePanel.waitForNewButtonEnabled();
             //'Edit' button should be enabled
             await userBrowsePanel.isEditButtonEnabled();
         });
@@ -168,7 +168,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             let result = await userBrowsePanel.waitForItemNotDisplayed(TEST_USER.displayName);
             assert.isTrue(result, 'the user should not be present in the grid');
             //2. User is deleted, so ID Provider can be deleted now:
-            await testUtils.selectAndDeleteItem(ID_PROVIDER_2.displayName)
+            await testUtils.selectAndDeleteItem(ID_PROVIDER_2.displayName);
             let isPresent = await userBrowsePanel.waitForItemNotDisplayed(ID_PROVIDER_2.displayName);
             assert.isTrue(isPresent, 'the ID provider should not be present in browse panel');
         });

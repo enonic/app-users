@@ -56,7 +56,7 @@ class Page {
         await inputElement.setValue(text);
         let value = await inputElement.getValue();
         //workaround for issue in WebdriverIO
-        if (value == "") {
+        if (value === "") {
             await inputElement.setValue(text);
         }
         return await inputElement.pause(300);
@@ -129,7 +129,7 @@ class Page {
 
     isElementNotDisplayed(selector) {
         return this.getDisplayedElements(selector).then(result => {
-            return result.length == 0;
+            return result.length === 0;
         })
     }
 
@@ -189,6 +189,12 @@ class Page {
                     button: 2
                 }]
         }]);
+    }
+
+    //is checkbox selected...
+    async isSelected(selector) {
+        let elem = await this.findElement(selector);
+        return await elem.isSelected();
     }
 }
 module.exports = Page;

@@ -38,7 +38,7 @@ describe('New Principal dialog specification', function () {
             let header = await newPrincipalDialog.getHeaderText();
             assert.equal(header, 'Create New', 'Expected header should be displayed');
 
-            let result = await newPrincipalDialog.isCancelButtonDisplayed()
+            let result = await newPrincipalDialog.isCancelButtonDisplayed();
             assert.isTrue(result, '`Cancel` button should be present');
             //2. Expected items should be present in the dialog:
             let items = await newPrincipalDialog.getItemNames();
@@ -56,7 +56,7 @@ describe('New Principal dialog specification', function () {
             //1. Select System ID Provider:
             await userBrowsePanel.clickOnRowByName('/system');
             //2. Click on New button:
-            await userBrowsePanel.clickOnNewButton()
+            await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
             testUtils.saveScreenshot("new_principal_dialog_2_items");
             //3. Two items should be present in the modal dialog:

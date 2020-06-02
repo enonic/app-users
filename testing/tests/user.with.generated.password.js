@@ -37,7 +37,7 @@ describe("Create an user with generated password and log in the user", function 
             await userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
 
             await testUtils.typeNameInFilterPanel(userName);
-            let result = await userBrowsePanel.isItemDisplayed(userName)
+            let result = await userBrowsePanel.isItemDisplayed(userName);
             assert.isTrue(result, 'new user should be present in the grid');
         });
 

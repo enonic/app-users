@@ -65,7 +65,7 @@ function runSeleniumTests() {
                     console.log("Selenium server is not started 2 !" + error);
                     return error;
                 }
-                console.log("Selenium server is started!")
+                console.log("Selenium server is started!");
                 selenium.child = child;
                 runTests();
             });
