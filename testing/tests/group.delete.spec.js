@@ -11,19 +11,19 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
-describe('group.delete.spec: confirm and delete a group in the wizard and in the browse panel', function () {
+describe('group.delete.spec: confirm and delete a group in wizard and in Browse Panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testGroup;
 
-    it("GIVEN new group is saved WHEN Delete button in toolbar(wizard) has been pressed THEN Confirmation dialog should appear",
+    it("GIVEN new group is saved WHEN 'Delete' button in toolbar(wizard) has been pressed THEN Confirmation dialog should appear",
         async () => {
             let groupWizard = new GroupWizard();
             let confirmationDialog = new ConfirmationDialog();
             testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
             //1. Group wizard has been opened:
             await testUtils.clickOnSystemAndOpenGroupWizard();
-            await groupWizard.typeData(testGroup)
+            await groupWizard.typeData(testGroup);
             //2. The Group has been saved:
             await groupWizard.waitAndClickOnSave();
             //3. Delete button in toolbar has been clicked:
@@ -33,13 +33,13 @@ describe('group.delete.spec: confirm and delete a group in the wizard and in the
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it("GIVEN new group is saved WHEN Delete button in wizard has been clicked and the deleting confirmed THEN expected notification message should appear",
+    it("GIVEN new group is saved WHEN 'Delete' button in wizard has been clicked and the deleting confirmed THEN the group should be deleted",
         async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
             testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 3');
             await testUtils.clickOnSystemAndOpenGroupWizard();
-            await groupWizard.typeData(testGroup)
+            await groupWizard.typeData(testGroup);
             //1. Save new group:
             await groupWizard.waitAndClickOnSave();
             //2. Click on delete:
@@ -62,9 +62,9 @@ describe('group.delete.spec: confirm and delete a group in the wizard and in the
             await testUtils.findAndSelectItem(testGroup.displayName);
             //2. Click on Delete button:
             await userBrowsePanel.waitForDeleteButtonEnabled();
-            return userBrowsePanel.clickOnDeleteButton();
-            testUtils.saveScreenshot("group_confirm_delete2");
-            //`Confirmation Dialog` should be displayed
+            await userBrowsePanel.clickOnDeleteButton();
+            testUtils.saveScreenshot("group_confirm_dialog_appears");
+            //Verify that Confirmation Dialog appears:
             await confirmationDialog.waitForDialogLoaded();
         });
 

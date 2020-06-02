@@ -9,15 +9,15 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
     this.timeout(0);
     webDriverHelper.setupBrowser();
 
-    it('GIVEN `Principal Filter Panel` is opened WHEN `User` aggregation has been clicked THEN Roles and Store should not be displayed',
+    it('GIVEN `Principal Filter Panel` is opened WHEN `User` aggregation has been clicked THEN Roles and Id Provider should not be displayed',
         async () => {
             let browseFilterPanel = new BrowseFilterPanel();
             let userBrowsePanel = new UserBrowsePanel();
             //1. Open Filter Panel:
             await testUtils.openFilterPanel();
-            //2. Click on 'User' checkbox:
+            //2. Click on 'User' aggregation checkbox:
             await browseFilterPanel.clickOnUserAggregation();
-            //3. user-items should be filtered:
+            //3. user-items should be filtered: Roles and System ID provider folders should not be displayed:
             await userBrowsePanel.waitForItemNotDisplayed('roles');
             await userBrowsePanel.waitForItemNotDisplayed('/system');
             testUtils.saveScreenshot('aggregation_in_users');
@@ -25,7 +25,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             assert.isTrue(isDisplayed, "SU should be displayed in the filtered panel");
         });
 
-    it('GIVEN `Principal Filter Panel` is opened WHEN `Role` aggregation has been clicked THEN Store should not be displayed',
+    it('GIVEN `Principal Filter Panel` is opened WHEN `Role` aggregation has been clicked THEN Id Provider should not be displayed',
         async () => {
             let filterPanel = new BrowseFilterPanel();
             let userBrowsePanel = new UserBrowsePanel();

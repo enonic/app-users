@@ -26,7 +26,7 @@ describe('Id Provider Permissions spec', function () {
             await idProviderWizard.clearPrincipalOptionsFilterInput();
             //4.Expand the combobox:
             await idProviderWizard.clickOnPrincipalComboBoxDropDownHandle();
-            let result = await idProviderWizard.getPrincipalOptionDisplayNames()
+            let result = await idProviderWizard.getPrincipalOptionDisplayNames();
             assert.isTrue(result.length > 1, 'number of options should be more than 1');
         });
 
@@ -36,7 +36,8 @@ describe('Id Provider Permissions spec', function () {
             await testUtils.openIdProviderWizard();
             await idProviderWizard.clickOnProviderComboBoxDropDownHandle();
             let displayNames = await idProviderWizard.getProviderOptionDisplayNames();
-            assert.equal(displayNames[0], appConst.STANDARD_ID_PROVIDER, 'Standard ID provider item should be present in the options list');
+            assert.isTrue(displayNames.includes(appConst.STANDARD_ID_PROVIDER),
+                'Standard ID provider item should be present in the options list');
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
