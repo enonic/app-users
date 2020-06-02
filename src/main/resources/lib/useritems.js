@@ -47,8 +47,6 @@ function createUserItemsQuery(query, types, itemIds) {
         q = createTextQuery(query) + ' AND ' + q;
     }
 
-    log.info(itemIds);
-
     if (itemIds && itemIds.length > 0) {
         var itemsIdsQuery = '';
 
@@ -58,8 +56,6 @@ function createUserItemsQuery(query, types, itemIds) {
 
         q += q ? ' AND (' + itemsIdsQuery + ')' : itemsIdsQuery;
     }
-
-    log.info(q);
 
     return q;
 }
