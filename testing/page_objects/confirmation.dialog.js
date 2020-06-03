@@ -52,9 +52,9 @@ class ConfirmationDialog extends Page {
     }
 
     isWarningMessageDisplayed() {
-        return this.waitForElementDisplayed(this.warningMessage);
+        return this.waitForElementDisplayed(this.warningMessage, appConst.TIMEOUT_3);
     }
-};
+}
 module.exports = ConfirmationDialog;
 
 

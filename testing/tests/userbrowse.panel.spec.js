@@ -50,11 +50,11 @@ describe('User Browse Panel specification', function () {
             assert.isTrue(isDisplayed, "'Users' folder should be present beneath the 'system'");
         });
 
-    it("WHEN checkbox 'Roles' has been checked THEN SelectionPanelToggler gets visible",
+    it("WHEN checkbox 'System Id Provider' has been checked THEN SelectionPanelToggler gets visible",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             //1. Click on the checkbox:
-            await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('Roles');
+            await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
             await userBrowsePanel.waitForSelectionTogglerVisible();
             let result = await userBrowsePanel.getNumberInSelectionToggler();
             testUtils.saveScreenshot('number_in_selection');
@@ -62,19 +62,34 @@ describe('User Browse Panel specification', function () {
         });
 
     //Verifies - https://github.com/enonic/app-users/issues/340  Empty TreeGrid when toggling Selection
-    it("GIVEN 'Roles' checkbox is checked WHEN SelectionPanelToggler has been clicked THEN grid gets filtered - one item should be in the grid",
+    it("GIVEN 'System Id Provider' checkbox is checked WHEN SelectionPanelToggler has been clicked THEN grid gets filtered - one item should be in the grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             //1. Click on the checkbox:
-            await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('Roles');
+            await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
             await userBrowsePanel.waitForSelectionTogglerVisible();
             //2. Click on Show Selection:
             await userBrowsePanel.clickOnSelectionToggler();
             //3. The grid should be filtered:
             let names = await userBrowsePanel.getGridItemDisplayNames();
-            testUtils.saveScreenshot('selection_toggler_clicked');
-            assert.equal(names.length, 1, 'only Roles folder should be present in the grid');
-            assert.equal(names[0], 'Roles', 'The name of the folder should be Roles');
+            testUtils.saveScreenshot('selection_toggler_clicked1');
+            assert.equal(names.length, 1, 'only System Id Provider folder should be present in the grid');
+            assert.equal(names[0], 'System Id Provider', 'The name of the folder should be System Id Provider');
+        });
+
+    it("GIVEN 'Selection Controller' checkbox has been clicked WHEN 'Selection Toggler' has been clicked THEN grid gets filtered -  only 'System Id Provider' item should be present",
+        async () => {
+            let userBrowsePanel = new UserBrowsePanel();
+            //1. Click on the Controller Checkbox(select all items):
+            await userBrowsePanel.clickOnSelectionControllerCheckbox();
+            await userBrowsePanel.waitForSelectionTogglerVisible();
+            //2. Click on 'Show Selection':
+            await userBrowsePanel.clickOnSelectionToggler();
+            //3. The grid should be filtered: one item remains in the grid
+            let names = await userBrowsePanel.getGridItemDisplayNames();
+            testUtils.saveScreenshot('selection_toggler_clicked2');
+            assert.equal(names.length, 1, 'only System Id Provider folder should be present in the grid');
+            assert.equal(names[0], 'System Id Provider', 'The name of the folder should be System Id Provider');
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

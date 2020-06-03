@@ -172,7 +172,7 @@ module.exports = {
         return await groupWizard.waitForOpened();
 
     },
-//Click on Save button and close the wizard:
+    //Click on Save button and close the wizard:
     async saveAndCloseWizard(displayName) {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
@@ -208,7 +208,7 @@ module.exports = {
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },
-//Opens System ID Provider folder:
+    //Opens System ID Provider folder:
     async selectSystemIdProviderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
         let idProviderWizard = new IdProviderWizard();

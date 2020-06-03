@@ -10,8 +10,10 @@ const itemBuilder = require('../../libs/userItems.builder');
 const xpath = {
     container: "//div[contains(@id,'UserBrowsePanel')]",
     selectionToggler: "//button[contains(@id,'SelectionPanelToggler')]",
+    selectionControllerCheckBox: "//div[contains(@id,'SelectionController')]",
     toolbar: "//div[contains(@id,'UserBrowseToolbar')]",
     grid: "//div[contains(@class,'grid-canvas')]",
+    treeGridToolbar: `//div[contains(@id,'TreeGridToolbar')]`,
     searchButton: "//button[contains(@class, 'icon-search')]",
     hideFilterPanelButton: "//span[contains(@class, 'hide-filter-panel-button')]",
     appHomeButton: "//div[contains(@id,'TabbedAppBar')]/div[contains(@class,'home-button')]",
@@ -71,6 +73,10 @@ class UserBrowsePanel extends Page {
 
     get deleteButton() {
         return `${xpath.toolbar}/*[contains(@id, 'ActionButton') and child::span[text()='Delete']]`;
+    }
+
+    get selectionControllerCheckBox() {
+        return xpath.treeGridToolbar + xpath.selectionControllerCheckBox;
     }
 
     waitForPanelVisible(ms) {
@@ -159,7 +165,7 @@ class UserBrowsePanel extends Page {
 
     clickOnDeleteButton() {
         return this.clickOnElement(this.deleteButton).catch(err => {
-            this.saveScreenshot('err_browsepanel_delete');
+            this.saveScreenshot('err_browsepanel_delete_button');
             throw new Error('Error when clicking on Delete button ! ' + err);
         })
     }
@@ -178,6 +184,7 @@ class UserBrowsePanel extends Page {
 
     waitForDeleteButtonEnabled() {
         return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
+            this.saveScreenshot("err_delete_button_not_enabled");
             throw new Error('Delete button is not enabled ! ' + err);
         });
     }
@@ -251,7 +258,7 @@ class UserBrowsePanel extends Page {
     //Click on existing Tab-Item and navigates to the opened wizard:
     async clickOnTabBarItem(displayName) {
         let tabItem = xpath.itemTabByDisplayName(displayName);
-        await this.waitForElementDisplayed(tabItem)
+        await this.waitForElementDisplayed(tabItem, appConst.TIMEOUT_3);
         return await this.clickOnElement(tabItem);
     }
 
@@ -296,9 +303,11 @@ class UserBrowsePanel extends Page {
         }, appConst.TIMEOUT_3, 'expected style not present after 3s');
     }
 
-    clickOnSelectionToggler() {
+    //Click on Show/Hide selections
+    async clickOnSelectionToggler() {
         let selector = xpath.container + xpath.selectionToggler;
-        return this.clickOnElement(selector);
+        await this.clickOnElement(selector);
+        return await this.pause(1000);
     }
 
     isSelectionTogglerVisible() {
@@ -321,6 +330,32 @@ class UserBrowsePanel extends Page {
             this.saveScreenshot(`err_find_${displayName}`);
             throw Error(`Row with the name ${displayName} was not found  ` + err);
         })
+    }
+
+    //Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
+    async waitForSelectionControllerPartial() {
+        let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
+        await this.getBrowser().waitUntil(async () => {
+            let text = await this.getAttribute(selector, "class");
+            return text.includes('partial');
+        }, appConst.TIMEOUT_2, "Selection Controller checkBox should displayed as partial");
+        return true;
+    }
+
+    // returns true if 'Selection Controller' checkbox is selected:
+    isSelectionControllerSelected() {
+        let locator = this.selectionControllerCheckBox + "//input[@type='checkbox']";
+        return this.isSelected(locator);
+    }
+
+    async clickOnSelectionControllerCheckbox() {
+        try {
+            await this.clickOnElement(this.selectionControllerCheckBox);
+            return await this.pause(300);
+        } catch (err) {
+            this.saveScreenshot('err_click_on_selection_controller');
+            throw new Error('error when click on selection_controller ' + err);
+        }
     }
 }
 

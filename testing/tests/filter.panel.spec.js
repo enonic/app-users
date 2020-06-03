@@ -49,7 +49,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await filterPanel.waitForClearLinkNotVisible();
         });
 
-    it('GIVEN `Principal Filter Panel` is opened AND group has been added THEN four aggregation items should be present on the panel',
+    it('GIVEN `Principal Filter Panel` is opened AND group has been added THEN four aggregation items should be present in Filter Panel',
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let filterPanel = new BrowseFilterPanel();
@@ -60,7 +60,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             //2. Open Filter Panel:
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
-            //3. Check aggregation items:
+            //3. Verify aggregation items:
             testUtils.saveScreenshot('aggregation_group_added');
             let result = await filterPanel.getAggregationItems();
             assert.equal(result.length, 4, 'three aggregation-checkboxes should be present on the page');

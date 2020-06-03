@@ -3,7 +3,7 @@
  */
 const UserItemStatisticsPanel = require('./userItem.statistics.panel');
 const lib = require('../../libs/elements');
-const appConst = require('../../libs/app_const')
+const appConst = require('../../libs/app_const');
 
 const XPATH = {
     container: "//div[contains(@id,'UserItemStatisticsPanel')]",
@@ -30,7 +30,7 @@ class UserStatisticsPanel extends UserItemStatisticsPanel {
             return this.getTextInElements(items);
         })
     }
-};
+}
 module.exports = UserStatisticsPanel;
 
 
