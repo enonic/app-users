@@ -347,6 +347,16 @@ class UserBrowsePanel extends Page {
         let locator = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         return this.isSelected(locator);
     }
+
+    async clickOnSelectionControllerCheckbox() {
+        try {
+            await this.clickOnElement(this.selectionControllerCheckBox);
+            return await this.pause(300);
+        } catch (err) {
+            this.saveScreenshot('err_click_on_selection_controller');
+            throw new Error('error when click on selection_controller ' + err);
+        }
+    }
 }
 
 module.exports = UserBrowsePanel;
