@@ -3,6 +3,7 @@ const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
+const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.panel');
 
 describe('User Browse Panel specification', function () {
     this.timeout(0);
@@ -24,7 +25,7 @@ describe('User Browse Panel specification', function () {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnExpanderIcon('roles');
             let isDisplayed = await userBrowsePanel.isItemDisplayed('system.user.admin');
-            assert.isTrue(isDisplayed, "`User Administrator` role should be displayed");
+            assert.isTrue(isDisplayed, "'User Administrator' role should be displayed");
             isDisplayed = await userBrowsePanel.isItemDisplayed('system.admin');
             assert.isTrue(isDisplayed, "'Administrator' role should be displayed");
             isDisplayed = await userBrowsePanel.isItemDisplayed('cms.admin');
@@ -77,19 +78,24 @@ describe('User Browse Panel specification', function () {
             assert.equal(names[0], 'System Id Provider', 'The name of the folder should be System Id Provider');
         });
 
-    it("GIVEN 'Selection Controller' checkbox has been clicked WHEN 'Selection Toggler' has been clicked THEN grid gets filtered -  only 'System Id Provider' item should be present",
+    it("GIVEN 'Selection Controller' checkbox has been clicked WHEN 'Selection Toggler' has been clicked THEN grid gets filtered - only provider-folders should be present in grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
+            let browseFilterPanel = new BrowseFilterPanel();
             //1. Click on the Controller Checkbox(select all items):
             await userBrowsePanel.clickOnSelectionControllerCheckbox();
             await userBrowsePanel.waitForSelectionTogglerVisible();
             //2. Click on 'Show Selection':
             await userBrowsePanel.clickOnSelectionToggler();
+            await testUtils.openFilterPanel();
+            let aggregationItems = await browseFilterPanel.getAggregationItems();
+            assert.equal(aggregationItems.length, 1, "one aggregation item should be present in Filter Panel - 'Id provider'");
+            assert.isTrue(aggregationItems[0].includes('Id Provider'),
+                "one aggregation item should be present in Filter Panel - 'Id provider'")
             //3. The grid should be filtered: one item remains in the grid
             let names = await userBrowsePanel.getGridItemDisplayNames();
             testUtils.saveScreenshot('selection_toggler_clicked2');
-            assert.equal(names.length, 1, 'only System Id Provider folder should be present in the grid');
-            assert.equal(names[0], 'System Id Provider', 'The name of the folder should be System Id Provider');
+            assert.isTrue(names.includes('System Id Provider'), "Row with 'System Id Provider' should be present in the grid");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
