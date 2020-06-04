@@ -66,7 +66,7 @@ class BrowseFilterPanel extends Page {
     }
 
     waitForOpened() {
-        return this.waitForElementDisplayed(xpath.userAggregationCheckbox, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.TIMEOUT_3);
     }
 
     waitForClosed() {
