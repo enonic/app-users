@@ -92,29 +92,33 @@ module.exports = graphQl.createObjectType({
             args: {
                 types: graphQl.list(graphQlEnums.UserItemTypeEnum),
                 query: graphQl.GraphQLString,
+                itemIds: graphQl.list(graphQl.GraphQLString),
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
             resolve: function (env) {
                 var types = env.args.types;
                 var query = env.args.query;
+                var itemIds = env.args.itemIds;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
-                return useritems.list(types, query, start, count);
+                return useritems.list(types, query, itemIds, start, count);
             }
         },
         types: {
             type: graphQlObjectTypes.TypesType,
             args: {
                 query: graphQl.GraphQLString,
+                itemIds: graphQl.list(graphQl.GraphQLString),
                 start: graphQl.GraphQLInt,
                 count: graphQl.GraphQLInt
             },
             resolve: function (env) {
                 var query = env.args.query;
+                var itemIds = env.args.itemIds;
                 var count = env.args.count || Number.MAX_SAFE_INTEGER;
                 var start = env.args.start || 0;
-                return useritems.list(null, query, start, count);
+                return useritems.list(null, query, itemIds, start, count);
             }
         },
         repository: {

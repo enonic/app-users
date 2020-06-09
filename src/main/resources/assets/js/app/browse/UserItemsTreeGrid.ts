@@ -68,6 +68,10 @@ export class UserItemsTreeGrid
         this.initEventHandlers();
     }
 
+    protected isSelectableNode(node: TreeNode<UserTreeGridItem>): boolean {
+        return this.isUserItemEditable(node.getData());
+    }
+
     private initEventHandlers() {
         BrowseFilterSearchEvent.on((event: BrowseFilterSearchEvent<PrincipalBrowseSearchData>) => {
             const data = event.getData();
