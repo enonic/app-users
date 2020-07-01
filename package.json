@@ -20,7 +20,7 @@
   "devDependencies": {
     "@types/core-js": "^2.5.3",
     "@types/hasher": "0.0.31",
-    "@types/q": "^1.5.2",
+    "@types/q": "^1.5.4",
     "autoprefixer": "^9.7.5",
     "browserslist": "^4.12.2",
     "browserslist-config-enonic": "^1.0.5",
