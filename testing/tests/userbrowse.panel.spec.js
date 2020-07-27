@@ -91,7 +91,7 @@ describe('User Browse Panel specification', function () {
             let aggregationItems = await browseFilterPanel.getAggregationItems();
             assert.equal(aggregationItems.length, 1, "one aggregation item should be present in Filter Panel - 'Id provider'");
             assert.isTrue(aggregationItems[0].includes('Id Provider'),
-                "one aggregation item should be present in Filter Panel - 'Id provider'")
+                "one aggregation item should be present in Filter Panel - 'Id provider'");
             //3. The grid should be filtered: one item remains in the grid
             let names = await userBrowsePanel.getGridItemDisplayNames();
             testUtils.saveScreenshot('selection_toggler_clicked2');

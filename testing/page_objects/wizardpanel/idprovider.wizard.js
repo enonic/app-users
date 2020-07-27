@@ -209,7 +209,7 @@ class IdProviderWizard extends WizardPanel {
     getPermissions() {
         let items = XPATH.container + XPATH.aclList + lib.H6_DISPLAY_NAME;
         return this.waitForElementDisplayed(XPATH.aclList, 1000).catch(err => {
-            throw new Error('ID Provider wizard, ACL entries are not displayed in Permissions wizard-step');
+            throw new Error('ID Provider wizard, ACL entries are not displayed in Permissions wizard-step. ' + err);
         }).then(() => {
             return this.getTextInElements(items)
         });

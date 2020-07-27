@@ -72,7 +72,7 @@ class BrowseFilterPanel extends Page {
     waitForClosed() {
         return this.waitUntilElementNotVisible(xpath.userAggregationCheckbox, appConst.TIMEOUT_2).catch(err => {
             this.saveScreenshot('err_filter_panel_not_closed');
-            throw new Error('Filter Panel was not closed');
+            throw new Error('Filter Panel was not closed. ' + err);
         })
     }
 

@@ -77,12 +77,8 @@ describe('New Principal dialog specification', function () {
             await roleWizard.waitForLoaded();
         });
 
-    beforeEach(() => {
-        return testUtils.navigateToUsersApp();
-    });
-    afterEach(() => {
-        return testUtils.doCloseUsersApp();
-    });
+    beforeEach(() => testUtils.navigateToUsersApp());
+    afterEach(() => testUtils.doCloseUsersApp());
     before(() => {
         return console.log('specification starting: ' + this.title);
     })

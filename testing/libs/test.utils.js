@@ -44,7 +44,7 @@ module.exports = {
                     return filterPanel.waitForOpened();
                 });
             }
-        }).then(result => {
+        }).then(() => {
             console.log('filter panel is opened, typing the text: ' + name);
             return filterPanel.typeSearchText(name);
         }).then(() => {

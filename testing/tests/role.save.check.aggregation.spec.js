@@ -15,7 +15,6 @@ const FilterPanel = require('../page_objects/browsepanel/principal.filter.panel'
 describe('Role - save a role and check the number in aggregations', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
-    let testRole;
 
     //verifies https://github.com/enonic/app-users/issues/214
     //Filter panel is not updated when the grid is filtered by role  and a new role is added

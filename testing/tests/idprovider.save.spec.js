@@ -149,7 +149,6 @@ describe('Id Provider specification - save and edit a provider', function () {
     //Verifies issue#275 : Id Provider wizard - Delete button gets enabled after updating the provider
     it(`GIVEN existing 'Id Provider' (with an user) is opened WHEN description has been updated and the provider saved THEN 'Delete' button should be disabled`,
         async () => {
-            let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
             //1. Select and open existing ID Provider:
             await testUtils.selectAndOpenIdProvider(ID_PROVIDER_2.displayName);

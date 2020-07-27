@@ -35,7 +35,6 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser() {
         let browser_name = properties.get('browser.name');
         let platform_name = properties.get('platform');
         let baseUrl = properties.get('base.url');
-        let chromeBinPath = properties.get('chrome.bin.path');
         let isHeadless = properties.get('is.headless');
         console.log('is Headless ##################### ' + isHeadless);
         console.log('browser name ##################### ' + browser_name);
