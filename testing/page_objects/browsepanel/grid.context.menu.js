@@ -78,9 +78,10 @@ class GridContextMenu extends Page {
             return this.pause(500);
         }).catch(err => {
             this.saveScreenshot('err_find_' + menuItem);
-            throw Error('Item  ' + menuItem + ' was not found')
+            throw Error('Item  ' + menuItem + ' was not found. ' + err);
         })
     }
 }
+
 module.exports = GridContextMenu;
 

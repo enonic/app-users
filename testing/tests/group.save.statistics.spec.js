@@ -60,13 +60,13 @@ describe('group.save.statistics.panel: Save a group and check the info in Statis
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeData(testGroup);
             await groupWizard.pause(300);
-            return groupWizard.waitAndClickOnSave();
+            await groupWizard.waitAndClickOnSave();
             //2. Close the wizard:
             await userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
             //3. Type the name in Filter Panel:
             await testUtils.typeNameInFilterPanel(testGroup.displayName);
             //4. Verify that new group is filtered:
-            let isPresent = userBrowsePanel.isItemDisplayed(testGroup.displayName);
+            let isPresent = await userBrowsePanel.isItemDisplayed(testGroup.displayName);
             assert.isTrue(isPresent, "new group should be filtered in the rid");
         });
 
@@ -86,22 +86,23 @@ describe('group.save.statistics.panel: Save a group and check the info in Statis
             assert.equal(actualRoles[0], appConst.roles.USERS_APP, "Expected role gets visible in roles-step");
         });
 
-    it("GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be displayed in members-step", async () => {
-        let groupWizard = new GroupWizard();
-        let userBrowsePanel = new UserBrowsePanel();
-        //1. open existing group:
-        await testUtils.findAndSelectItem(testGroup.displayName);
-        await userBrowsePanel.clickOnEditButton();
-        await groupWizard.waitForOpened();
-        //2. Add 'Super User' in members:
-        await groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
-        await groupWizard.waitAndClickOnSave();
-        await groupWizard.pause(1000);
-        //3. Verify that actual members and expected are equal:
-        let actualMembers = await groupWizard.getMembers();
-        testUtils.saveScreenshot("group_member_added");
-        assert.equal(actualMembers[0], appConst.SUPER_USER_DISPLAY_NAME);
-    });
+    it("GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be displayed in members-step",
+        async () => {
+            let groupWizard = new GroupWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            //1. open existing group:
+            await testUtils.findAndSelectItem(testGroup.displayName);
+            await userBrowsePanel.clickOnEditButton();
+            await groupWizard.waitForOpened();
+            //2. Add 'Super User' in members:
+            await groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
+            await groupWizard.waitAndClickOnSave();
+            await groupWizard.pause(1000);
+            //3. Verify that actual members and expected are equal:
+            let actualMembers = await groupWizard.getMembers();
+            testUtils.saveScreenshot("group_member_added");
+            assert.equal(actualMembers[0], appConst.SUPER_USER_DISPLAY_NAME);
+        });
 
     it("WHEN existing group has been selected THEN expected roles and members should be loaded in Statistics Panel",
         async () => {

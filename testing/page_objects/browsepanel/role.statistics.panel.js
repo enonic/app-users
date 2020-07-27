@@ -19,7 +19,7 @@ class RoleStatisticsPanel extends ItemStatistic {
         let items = XPATH.div + XPATH.memberList + lib.H6_DISPLAY_NAME;
         return this.waitForElementDisplayed(XPATH.membersDataGroup, 1000).catch(err => {
             this.saveScreenshot('err_role_statistic_members');
-            throw new Error('Members data-group was not in Role Statistic panel!');
+            throw new Error('Members data-group was not in Role Statistic panel!' + err);
         }).then(() => {
             return this.getTextInElements(items);
         })

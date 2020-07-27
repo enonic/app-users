@@ -16,6 +16,7 @@ const XPATH = {
     idProviderTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Id Provider')]]",
     permissionsTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Permissions')]]"
 };
+
 class IdProviderConfiguratorDialog extends Page {
 
     get applyButton() {
@@ -90,32 +91,21 @@ class IdProviderConfiguratorDialog extends Page {
         });
     }
 
-    openDialogFillRequiredInputs(domain, clientId, clientSecret) {
+    async openDialogFillRequiredInputs(domain, clientId, clientSecret) {
         let editButton = XPATH.selectedProviderView + lib.EDIT_ICON;
-        return this.clickOnElement(XPATH.permissionsTabItem).then(() => {
-            return this.clickOnElement(XPATH.idProviderTabItem);
-        }).then(() => {
-            return this.pause(700);
-        }).then(() => {
-            return this.waitForElementDisplayed(editButton, appConst.TIMEOUT_3);
-        }).then(result => {
-            return this.clickOnElement(editButton);
-        }).then(() => {
-            return this.waitForDialogOpened();
-        }).then(() => {
-            return this.typeInDomainInput(domain);
-        }).then(() => {
-            return this.typeInClientIdInput(clientId);
-        }).then(() => {
-            return this.typeInClientSecretInput(clientSecret);
-        }).then(() => {
-            return this.clickOnApplyButton();
-        }).then(() => {
-            return this.waitForClosed();
-        }).then(() => {
-            return this.pause(500)
-        });
+        await this.clickOnElement(XPATH.permissionsTabItem);
+        await this.clickOnElement(XPATH.idProviderTabItem);
+        await this.pause(700);
+        await this.waitForElementDisplayed(editButton, appConst.TIMEOUT_3);
+        await this.clickOnElement(editButton);
+        await this.waitForDialogOpened();
+        await this.typeInDomainInput(domain);
+        await this.typeInClientIdInput(clientId);
+        await this.typeInClientSecretInput(clientSecret);
+        await this.clickOnApplyButton();
+        await this.waitForClosed();
+        return await this.pause(500);
     }
 }
-module.exports = IdProviderConfiguratorDialog;
 
+module.exports = IdProviderConfiguratorDialog;
