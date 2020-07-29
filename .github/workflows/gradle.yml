@@ -67,4 +67,3 @@ jobs:
               with:
                   tag_name: v${{ steps.read_version.outputs.value }}
                   release_name: Enonic XP Users App ${{ steps.read_version.outputs.value }}
-                  draft: true
