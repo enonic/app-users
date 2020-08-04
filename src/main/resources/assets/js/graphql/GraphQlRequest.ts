@@ -61,12 +61,9 @@ export class GraphQlRequest<PARSED_TYPE>
 
             const jsonRequest = new PostRequest()
                 .setParams(this.getParams(query, mutation))
-                .setPath(this.path)
-                .handleReadyStateChanged(deferred);
+                .setPath(this.path);
 
-            jsonRequest.send();
-
-            return deferred.promise.then((rawResponse: any) => {
+            return jsonRequest.send().then((rawResponse: any) => {
                 const json = new JsonResponse(rawResponse).getJson() || {};
                 const result = json.data || {};
                 if (json.errors) {
