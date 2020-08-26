@@ -70,18 +70,15 @@ export class Group
 export class GroupBuilder
     extends PrincipalBuilder {
 
-    members: PrincipalKey[];
+    members: PrincipalKey[] = [];
 
-    memberships: Principal[];
+    memberships: Principal[] = [];
 
     constructor(source?: Group) {
+        super(source);
         if (source) {
-            super(source);
             this.members = source.getMembers().slice(0);
             this.memberships = source.getMemberships().slice(0);
-        } else {
-            this.members = [];
-            this.memberships = [];
         }
     }
 
