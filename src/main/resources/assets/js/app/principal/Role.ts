@@ -49,14 +49,12 @@ export class Role
 export class RoleBuilder
     extends PrincipalBuilder {
 
-    members: PrincipalKey[];
+    members: PrincipalKey[] = [];
 
     constructor(source?: Role) {
+        super(source);
         if (source) {
-            super(source);
             this.members = source.getMembers().slice(0);
-        } else {
-            this.members = [];
         }
     }
 

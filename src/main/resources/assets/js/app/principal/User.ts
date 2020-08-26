@@ -87,11 +87,11 @@ export class UserBuilder
 
     loginDisabled: boolean;
 
-    memberships: Principal[];
+    memberships: Principal[] = [];
 
     constructor(source?: User) {
+        super(source);
         if (source) {
-            super(source);
             this.key = source.getKey();
             this.displayName = source.getDisplayName();
             this.email = source.getEmail();
@@ -99,8 +99,6 @@ export class UserBuilder
             this.loginDisabled = source.isDisabled();
             this.modifiedTime = source.getModifiedTime();
             this.memberships = source.getMemberships().slice(0);
-        } else {
-            this.memberships = [];
         }
     }
 
