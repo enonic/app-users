@@ -4,6 +4,11 @@ const Mocha = require('mocha');
 const globby = require('globby');
 const selenium = require('selenium-standalone');
 const testFilesGlob = './tests/*.js';
+const PropertiesReader = require('properties-reader');
+const file = path.join(__dirname, '/../browser.properties');
+const properties = PropertiesReader(file);
+const driverVersion = properties.get('chromedriver.version');
+const seleniumVersion = properties.get('selenium.version');
 
 const mocha = new Mocha({
     reporter: 'mochawesome',
@@ -35,11 +40,11 @@ async function runTests() {
 function runSeleniumTests() {
     selenium.install(
         {
-            version: '3.9.0',
+            version: seleniumVersion,
             baseURL: 'https://selenium-release.storage.googleapis.com',
             drivers: {
                 chrome: {
-                    version: '76.0.3809.126',
+                    version: driverVersion,
                     arch: process.arch,
                     baseURL: 'https://chromedriver.storage.googleapis.com'
                 }
@@ -53,10 +58,10 @@ function runSeleniumTests() {
                 return error;
             }
             selenium.start({
-                version: '3.9.0',
+                version: seleniumVersion,
                 drivers: {
                     chrome: {
-                        version: '76.0.3809.126'
+                        version: driverVersion
                     }
                 }
             }, (error, child) => {
