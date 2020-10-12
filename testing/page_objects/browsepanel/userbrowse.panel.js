@@ -86,7 +86,7 @@ class UserBrowsePanel extends Page {
     }
 
     clickOnNewButton() {
-        return this.waitForElementEnabled(this.newButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementEnabled(this.newButton, appConst.mediumTimeout).catch(err => {
             throw new Error("New button is not enabled!" + err);
         }).then(() => {
             return this.clickOnElement(this.newButton);
@@ -120,7 +120,7 @@ class UserBrowsePanel extends Page {
 
     clickOnRowByName(name) {
         let nameXpath = xpath.rowByName(name);
-        return this.clickOnElement(nameXpath, appConst.TIMEOUT_3).catch(err => {
+        return this.clickOnElement(nameXpath, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_find_' + name);
             throw Error('Row with the name ' + name + ' was not found.  ' + err);
         }).then(() => {
@@ -175,22 +175,22 @@ class UserBrowsePanel extends Page {
     }
 
     waitForNewButtonEnabled() {
-        return this.waitForElementEnabled(this.newButton, appConst.TIMEOUT_3);
+        return this.waitForElementEnabled(this.newButton, appConst.mediumTimeout);
     }
 
     waitForEditButtonEnabled() {
-        return this.waitForElementEnabled(this.editButton, appConst.TIMEOUT_3);
+        return this.waitForElementEnabled(this.editButton, appConst.mediumTimeout);
     }
 
     waitForDeleteButtonEnabled() {
-        return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot("err_delete_button_not_enabled");
             throw new Error('Delete button is not enabled ! ' + err);
         });
     }
 
     waitForDeleteButtonDisabled() {
-        return this.waitForElementDisabled(this.deleteButton, appConst.TIMEOUT_3);
+        return this.waitForElementDisabled(this.deleteButton, appConst.mediumTimeout);
     }
 
     isEditButtonEnabled() {
@@ -203,7 +203,7 @@ class UserBrowsePanel extends Page {
 
     waitForRowByNameVisible(name) {
         let nameXpath = xpath.rowByName(name);
-        return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_find_' + name);
             throw Error('Row with the name ' + name + ' is not visible in ' + 3000 + 'ms')
         })
@@ -258,7 +258,7 @@ class UserBrowsePanel extends Page {
     //Click on existing Tab-Item and navigates to the opened wizard:
     async clickOnTabBarItem(displayName) {
         let tabItem = xpath.itemTabByDisplayName(displayName);
-        await this.waitForElementDisplayed(tabItem, appConst.TIMEOUT_3);
+        await this.waitForElementDisplayed(tabItem, appConst.mediumTimeout);
         return await this.clickOnElement(tabItem);
     }
 
@@ -281,7 +281,7 @@ class UserBrowsePanel extends Page {
             throw new Error('Confirmation dialog should not appear when try to close the ' + displayName);
         }
         await this.waitForSpinnerNotVisible();
-        return await this.waitForUsersGridLoaded(appConst.TIMEOUT_3);
+        return await this.waitForUsersGridLoaded(appConst.mediumTimeout);
     }
 
     clickOnExpanderIcon(name) {
@@ -300,7 +300,7 @@ class UserBrowsePanel extends Page {
             return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('any-selected');
             })
-        }, appConst.TIMEOUT_3, 'expected style not present after 3s');
+        }, appConst.mediumTimeout, 'expected style not present after 3s');
     }
 
     //Click on Show/Hide selections
@@ -324,7 +324,7 @@ class UserBrowsePanel extends Page {
 
     rightClickOnRowByDisplayName(displayName) {
         const selector = xpath.rowByDisplayName(displayName);
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
             return this.doRightClick(selector);
         }).catch(err => {
             this.saveScreenshot(`err_find_${displayName}`);

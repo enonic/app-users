@@ -66,7 +66,7 @@ class BrowseFilterPanel extends Page {
     }
 
     waitForOpened() {
-        return this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.mediumTimeout);
     }
 
     waitForClosed() {
@@ -83,7 +83,7 @@ class BrowseFilterPanel extends Page {
     }
 
     waitForClearLinkVisible() {
-        return this.waitForElementDisplayed(this.clearFilterLink, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(this.clearFilterLink, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_clear_link_filter_panel');
             throw new Error('Clear link should be visible: ' + err);
         })

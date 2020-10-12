@@ -19,7 +19,7 @@ class HomePage extends Page {
     }
 
     waitForLoaded() {
-        return this.waitForElementDisplayed(`${home.container}`, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(`${home.container}`, appConst.mediumTimeout);
     }
 }
 module.exports = HomePage;

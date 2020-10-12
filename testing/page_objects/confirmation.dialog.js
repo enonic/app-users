@@ -38,7 +38,7 @@ class ConfirmationDialog extends Page {
     }
 
     waitForDialogLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
             throw  new Error("Confirmation dialog was not loaded! " + err);
         })
     }
@@ -48,11 +48,11 @@ class ConfirmationDialog extends Page {
     }
 
     waitForDialogClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, ms);
+        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
     }
 
     isWarningMessageDisplayed() {
-        return this.waitForElementDisplayed(this.warningMessage, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(this.warningMessage, appConst.mediumTimeout);
     }
 }
 module.exports = ConfirmationDialog;

@@ -40,7 +40,7 @@ class IdProviderConfiguratorDialog extends Page {
     }
 
     waitForDialogOpened() {
-        return this.waitForElementDisplayed(`${XPATH.container}`, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(`${XPATH.container}`, appConst.mediumTimeout);
     }
 
     clickOnCancelTopButton() {
@@ -65,7 +65,7 @@ class IdProviderConfiguratorDialog extends Page {
     }
 
     waitForClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_3).catch(error => {
+        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(error => {
             throw new Error('ID Provider config Dialog was not closed');
         });
     }
@@ -96,7 +96,7 @@ class IdProviderConfiguratorDialog extends Page {
         await this.clickOnElement(XPATH.permissionsTabItem);
         await this.clickOnElement(XPATH.idProviderTabItem);
         await this.pause(700);
-        await this.waitForElementDisplayed(editButton, appConst.TIMEOUT_3);
+        await this.waitForElementDisplayed(editButton, appConst.mediumTimeout);
         await this.clickOnElement(editButton);
         await this.waitForDialogOpened();
         await this.typeInDomainInput(domain);

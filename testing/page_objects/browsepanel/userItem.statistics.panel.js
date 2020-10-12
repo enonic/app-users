@@ -65,7 +65,7 @@ class UserItemStatisticsPanel extends Page {
     }
 
     waitForGenerateButtonEnabled() {
-        return this.waitForElementEnabled(this.generateReportButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementEnabled(this.generateReportButton, appConst.mediumTimeout).catch(err => {
             console.log('Generate Report Button : ' + err);
             return false;
         })
@@ -80,7 +80,7 @@ class UserItemStatisticsPanel extends Page {
     }
 
     waitForGenerateButtonDisabled() {
-        return this.waitForElementDisabled(this.generateReportButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisabled(this.generateReportButton, appConst.mediumTimeout).catch(err => {
             console.log('Generate Report Button : ' + err);
             return false;
         })
@@ -94,29 +94,19 @@ class UserItemStatisticsPanel extends Page {
 
 
     //clicks on dropDown handle and selects draft/master
-    clickOnDropDownHandleAndSelectBranch(optionName) {
+    async clickOnDropDownHandleAndSelectBranch(optionName) {
         let dropDownHandle = XPATH.reportSelectedOptionsView + lib.DROP_DOWN_HANDLE;
-        return this.waitForElementDisplayed(dropDownHandle).catch(err => {
-            this.saveScreenshot('err_report_dropdown_handle');
-            throw new Error('Report Selected Option, dropDown handle was not found!');
-        }).then(() => {
-            return this.clickOnElement(dropDownHandle);
-        }).then(() => {
-            let optionSelector = XPATH.reportSelectedOptionsView + XPATH.repositoryBranchOption(optionName);
-            return this.waitForElementDisplayed(optionSelector).catch(err => {
-                this.saveScreenshot('err_report_dropdown_options');
-                throw new Error('Report Selected Option was not found !' + optionName + "  " + err);
-            }).then(() => {
-                return this.clickOnElement(optionSelector);
-            }).then(() => {
-                return this.pause(400);
-            });
-        })
+        await this.waitForElementDisplayed(dropDownHandle, appConst.mediumTimeout);
+        await this.clickOnElement(dropDownHandle);
+        let optionSelector = XPATH.reportSelectedOptionsView + XPATH.repositoryBranchOption(optionName);
+        await this.waitForElementDisplayed(optionSelector, appConst.mediumTimeout);
+        await this.clickOnElement(optionSelector);
+        return await this.pause(400);
     }
 
     isOptionSelected(repoName) {
         let selector = XPATH.selectedOptionByRepoName(repoName);
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
     }
 
     getBranchName(repoName) {
@@ -124,4 +114,5 @@ class UserItemStatisticsPanel extends Page {
         return this.getText(selector);
     }
 }
+
 module.exports = UserItemStatisticsPanel;
