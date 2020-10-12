@@ -16,7 +16,7 @@ const XPATH = {
 class GridContextMenu extends Page {
 
     waitForContextMenuVisible() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_grid_context_menu');
             throw new Error(`tree grid context menu is not loaded ` + err);
         });
@@ -36,7 +36,7 @@ class GridContextMenu extends Page {
             return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('disabled');
             })
-        }, appConst.TIMEOUT_3, 'Grid context menu - Edit menu item is not enabled after 3 seconds');
+        }, appConst.mediumTimeout, 'Grid context menu - Edit menu item is not enabled after 3 seconds');
     }
 
     isEditMenuItemDisabled() {
@@ -72,7 +72,7 @@ class GridContextMenu extends Page {
     clickOnMenuItem(menuItem) {
         //TODO finish it
         let nameXpath = XPATH.itemByName(menuItem);
-        return this.waitForElementDisplayed(nameXpath, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).then(() => {
             return this.clickOnElement(nameXpath);
         }).then(() => {
             return this.pause(500);

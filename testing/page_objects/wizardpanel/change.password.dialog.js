@@ -49,11 +49,11 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     waitForLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
     }
 
     waitForClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_3).catch(error => {
+        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(error => {
             throw new Error('Change Password Dialog is not closed ' + error);
         });
     }
@@ -69,7 +69,7 @@ class ChangeUserPasswordDialog extends Page {
 
     clickOnChangePasswordButton() {
         return this.clickOnElement(this.changePasswordButton).then(() => {
-            return this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_3);
+            return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
         });
     }
 
@@ -100,7 +100,7 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     waitForDialogLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
     }
 }
 module.exports = ChangeUserPasswordDialog;

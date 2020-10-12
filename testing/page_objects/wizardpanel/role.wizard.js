@@ -23,7 +23,7 @@ class RoleWizard extends WizardPanel {
     }
 
     waitForLoaded() {
-        return this.waitForElementDisplayed(xpath.container + this.displayNameInput, appConst.TIMEOUT_3).catch(e => {
+        return this.waitForElementDisplayed(xpath.container + this.displayNameInput, appConst.mediumTimeout).catch(e => {
             throw new Error("Role wizard was not loaded! " + e);
         });
     }
@@ -49,7 +49,7 @@ class RoleWizard extends WizardPanel {
     }
 
     waitForDeleteButtonEnabled() {
-        return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_delete_role_button_disabled');
             throw new Error("Role wizard, Delete button " + err);
         });

@@ -23,13 +23,9 @@ class LoginPage extends Page {
         return this.clickOnElement(this.loginButton);
     }
 
-    typePassword() {
-        //this.passwordInput.click();
-    }
-
     waitForPageLoaded(ms) {
         return this.browser.$(`//input[contains(@id,'username-input')]`).then(element => {
-            return element.waitForDisplayed(ms);
+            return element.waitForDisplayed({timeout: ms});
         });
     }
 
@@ -42,7 +38,7 @@ class LoginPage extends Page {
         let pass = password ? password : 'password';
         let usernameInput = await this.findElement(this.usernameInput);
         let passwordInput = await this.findElement(this.passwordInput);
-        await usernameInput.waitForDisplayed(1000);
+        await usernameInput.waitForDisplayed({timeout: 1000});
         await usernameInput.addValue(name);
         await passwordInput.addValue(pass);
         return await this.clickOnLoginButton();

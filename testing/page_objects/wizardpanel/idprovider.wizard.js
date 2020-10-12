@@ -59,12 +59,12 @@ class IdProviderWizard extends WizardPanel {
     }
 
     waitForDeleteButtonEnabled() {
-        return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3);
+        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout);
     }
 
     async waitForDeleteButtonDisabled() {
         try {
-            return await this.waitForElementDisabled(this.deleteButton, appConst.TIMEOUT_3);
+            return await this.waitForElementDisabled(this.deleteButton, appConst.mediumTimeout);
         } catch (err) {
             throw new Error("ID Providewr wizard - Delete button should be disabled! " + err);
         }
@@ -229,7 +229,7 @@ class IdProviderWizard extends WizardPanel {
     }
 
     waitForOpened() {
-        return this.waitForElementDisplayed(this.displayNameInput, appConst.TIMEOUT_3);
+        return this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout);
     }
 }
 

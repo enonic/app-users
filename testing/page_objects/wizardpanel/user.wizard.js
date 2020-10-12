@@ -135,7 +135,7 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     waitForDeleteButtonEnabled() {
-        return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_delete_user_button_disabled', err);
             throw new Error(err);
         });
@@ -230,7 +230,7 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     waitForOpened() {
-        return this.waitForElementDisplayed(this.displayNameInput, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout).catch(err => {
             throw new Error('User Wizard is not loaded! ' + err);
         });
     }

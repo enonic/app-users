@@ -107,7 +107,7 @@ module.exports = {
             console.log("switched to Users app...");
             return browsePanel.waitForSpinnerNotVisible();
         }).then(() => {
-            return browsePanel.waitForUsersGridLoaded(appConst.TIMEOUT_3);
+            return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
         }).catch(err => {
             throw new Error("Error when switching to Users App " + err);
         })
@@ -118,7 +118,7 @@ module.exports = {
             console.log("switched to Home...");
         }).then(() => {
             let homePage = new HomePage();
-            return homePage.waitForLoaded(appConst.TIMEOUT_3);
+            return homePage.waitForLoaded(appConst.mediumTimeout);
         });
     },
     switchAndCheckTitle: function (handle, reqTitle) {

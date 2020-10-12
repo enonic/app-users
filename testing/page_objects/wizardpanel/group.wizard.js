@@ -52,7 +52,7 @@ class GroupWizard extends WizardPanel {
     }
 
     waitForOpened() {
-        return this.waitForElementDisplayed(this.memberOptionsFilterInput, appConst.TIMEOUT_3).catch(e => {
+        return this.waitForElementDisplayed(this.memberOptionsFilterInput, appConst.mediumTimeout).catch(e => {
             throw new Error("Group wizard was not loaded! " + e);
         });
     }
@@ -166,7 +166,7 @@ class GroupWizard extends WizardPanel {
     }
 
     waitForDeleteButtonEnabled() {
-        return this.waitForElementEnabled(this.deleteButton, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_delete_group_button_disabled', err);
             throw new Error("Delete button should be enabled " + err);
         });

@@ -33,7 +33,7 @@ class Page {
 
     async clickOnElement(selector) {
         let element = await this.findElement(selector);
-        await element.waitForDisplayed(1500);
+        await element.waitForDisplayed({timeout: 1000});
         return await element.click();
     }
 
@@ -69,7 +69,7 @@ class Page {
 
     async clearInputText(selector) {
         let inputElement = await this.findElement(selector);
-        await inputElement.waitForDisplayed(1000);
+        await inputElement.waitForDisplayed({timeout: 1000});
         await inputElement.clearValue();
         return await inputElement.pause(300);
     }
@@ -100,17 +100,27 @@ class Page {
 
     async waitForElementDisabled(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForEnabled(ms, true);
+        return await element.waitForEnabled({timeout: ms, reverse: true});
     }
 
     async waitForElementNotDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForDisplayed(ms, true);
+        return element.waitForDisplayed({timeout: ms, reverse: true});
+    }
+
+    waitUntilElementNotDisplayed(selector, ms) {
+        return this.getBrowser().waitUntil(() => {
+            return this.getDisplayedElements(selector).then(result => {
+                return result.length === 0;
+            })
+        }, {timeout: ms}).catch(err => {
+            throw new Error("Timeout exception. Element " + selector + " still visible in: " + ms);
+        });
     }
 
     async waitForElementDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForDisplayed(ms);
+        return element.waitForDisplayed({timeout: ms});
     }
 
     waitForSpinnerNotVisible() {
@@ -143,7 +153,7 @@ class Page {
             let notificationXpath = "//div[@class='notification-content']";
             await this.getBrowser().waitUntil(async () => {
                 return await this.isElementDisplayed(notificationXpath);
-            }, appConst.TIMEOUT_3);
+            }, appConst.mediumTimeout);
             await this.pause(400);
             return await this.getText(notificationXpath);
         } catch (err) {
@@ -153,7 +163,7 @@ class Page {
 
     waitForExpectedNotificationMessage(expectedMessage) {
         let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-content') and contains(.,'${expectedMessage}')]`;
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).catch(err => {
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_notification_mess');
             throw new Error('expected notification message was not shown! ' + err);
         })
@@ -161,7 +171,7 @@ class Page {
 
     waitForErrorNotificationMessage() {
         let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']//div[contains(@class,'notification-content')]`;
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_3).then(() => {
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
             return this.getText(selector);
         })
     }
@@ -197,4 +207,5 @@ class Page {
         return await elem.isSelected();
     }
 }
+
 module.exports = Page;
