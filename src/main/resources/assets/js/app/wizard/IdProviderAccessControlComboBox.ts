@@ -21,7 +21,7 @@ class IdProviderACESelectedOptionsView
     extends PrincipalContainerSelectedOptionsView<IdProviderAccessControlEntry> {
 
     protected createSelectedEntryView(option: Option<IdProviderAccessControlEntry>): IdProviderAccessControlEntryView {
-        return new IdProviderAccessControlEntryView(option.displayValue, option.readOnly);
+        return new IdProviderAccessControlEntryView(option.getDisplayValue(), option.isReadOnly());
     }
 
 }

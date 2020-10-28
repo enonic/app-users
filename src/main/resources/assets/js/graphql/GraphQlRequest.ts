@@ -57,16 +57,11 @@ export class GraphQlRequest<PARSED_TYPE>
     private send(query: string, mutation: string): Q.Promise<any> {
 
         if (this.validate()) {
-            const deferred: Q.Deferred<any> = Q.defer<any>();
-
             const jsonRequest = new PostRequest()
                 .setParams(this.getParams(query, mutation))
-                .setPath(this.path)
-                .handleReadyStateChanged(deferred);
+                .setPath(this.path);
 
-            jsonRequest.send();
-
-            return deferred.promise.then((rawResponse: any) => {
+            return jsonRequest.send().then((rawResponse: any) => {
                 const json = new JsonResponse(rawResponse).getJson() || {};
                 const result = json.data || {};
                 if (json.errors) {

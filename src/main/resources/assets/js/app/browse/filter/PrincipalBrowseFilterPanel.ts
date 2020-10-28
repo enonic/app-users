@@ -127,7 +127,7 @@ export class PrincipalBrowseFilterPanel
 
     getSelectedItemIds(): string[] {
         if (this.hasConstraint()) {
-            return this.getSelectionItems().map((item: UserTreeGridItem) => item.getDataId());
+            return this.getSelectionItems().map((item: UserTreeGridItem) => item.getId());
         }
 
         return [];

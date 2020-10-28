@@ -5,6 +5,7 @@ import {IdProvider} from '../principal/IdProvider';
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {IDentifiable} from 'lib-admin-ui/IDentifiable';
 
 export enum UserTreeGridItemType {
     ID_PROVIDER,
@@ -15,7 +16,7 @@ export enum UserTreeGridItemType {
 }
 
 export class UserTreeGridItem
-    implements Equitable {
+    implements Equitable, IDentifiable {
 
     private idProvider: IdProvider;
 
@@ -80,7 +81,7 @@ export class UserTreeGridItem
         return '';
     }
 
-    getDataId(): string {
+    getId(): string {
         switch (this.type) {
         case UserTreeGridItemType.ID_PROVIDER:
             return this.idProvider.getKey().toString();
