@@ -40,12 +40,12 @@ class ReportSelectedOptionView
         super('selected-option report-selected-option-view');
         this.setOption(option);
         this.appendRemoveButton();
-        this.appendChild(this.branchDropDown = this.createBranchesDropdown(option.displayValue));
+        this.appendChild(this.branchDropDown = this.createBranchesDropdown(option.getDisplayValue()));
     }
 
     setOption(option: Option<Repository>) {
         this.option = option;
-        this.setObject(option.displayValue);
+        this.setObject(option.getDisplayValue());
     }
 
     getOption(): Option<Repository> {
@@ -61,7 +61,10 @@ class ReportSelectedOptionView
         const masterBranch: string = 'master';
 
         repo.getBranches().forEach((branch: string) => {
-            branchDropDown.addOption(<Option<string>>{value: branch, displayValue: branch});
+            branchDropDown.addOption(Option.create<string>()
+                .setValue(branch)
+                .setDisplayValue(branch)
+                .build());
 
             if (branch === masterBranch) {
                 branchDropDown.setValue(masterBranch);

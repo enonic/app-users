@@ -58,7 +58,10 @@ export class UserBrowsePanel
 
         this.treeGrid.onSelectionChanged(() => changeSelectionStatus(this.treeGrid.getCurrentSelection()));
 
-        this.treeGrid.onHighlightingChanged((node: TreeNode<UserTreeGridItem>) => changeSelectionStatus(node ? [node.getData()] : []));
+        this.treeGrid.onHighlightingChanged(() => {
+            const selectedItem: UserTreeGridItem = this.treeGrid.getFirstSelectedOrHighlightedItem();
+            changeSelectionStatus(!!selectedItem ? [selectedItem] : []);
+        });
 
         this.onShown(() => {
             Router.setHash('browse');
@@ -68,8 +71,8 @@ export class UserBrowsePanel
     private bindServerEventListeners() {
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
-        serverHandler.onUserItemCreated((principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => {
-            this.treeGrid.appendUserNode(principal, idProvider, sameTypeParent);
+        serverHandler.onUserItemCreated((principal: Principal, idProvider: IdProvider) => {
+            this.treeGrid.appendUserItemNode(principal, idProvider);
             this.setRefreshOfFilterRequired();
 
             /*
@@ -92,13 +95,8 @@ export class UserBrowsePanel
              because we are left on the same panel. We need to refresh manually.
              */
 
-            this.treeGrid.deselectNodes(ids);
-
-            ids.forEach(id => {
-                const node = this.treeGrid.getRoot().getCurrentRoot().findNode(id);
-                if (node) {
-                    this.treeGrid.deleteNode(node.getData());
-                }
+            ids.forEach((id: string) => {
+                this.treeGrid.deleteNodeByDataId(id);
             });
 
             this.refreshFilter();
@@ -135,7 +133,7 @@ export class UserBrowsePanel
 
     dataToBrowseItem(data: UserTreeGridItem): BrowseItem<UserTreeGridItem> | null {
         return <BrowseItem<UserTreeGridItem>>new BrowseItem<UserTreeGridItem>(data)
-            .setId(data.getDataId())
+            .setId(data.getId())
             .setDisplayName(data.getItemDisplayName())
             .setIconClass(this.selectIconClass(data));
     }

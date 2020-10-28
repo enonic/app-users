@@ -45,7 +45,7 @@ export class AuthApplicationSelectedOptionView
             this.setRemovable(false);
         }
 
-        this.application = option.displayValue;
+        this.application = option.getDisplayValue();
         this.applicationConfig = applicationConfig;
         this.formContext = formContext;
     }

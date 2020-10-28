@@ -132,7 +132,7 @@ export class UserItemsTreeGrid
         const nodeList: TreeNode<UserTreeGridItem>[] = this.getRoot().getCurrentRoot().treeToList();
 
         nodeList.forEach((node) => {
-            if (node.getDataId() === userTreeGridItem.getDataId()) {
+            if (node.getDataId() === userTreeGridItem.getId()) {
                 node.setData(userTreeGridItem);
                 node.clearViewers();
             }
@@ -142,27 +142,19 @@ export class UserItemsTreeGrid
         this.invalidate();
     }
 
-    deleteNodes(userTreeGridItemsToDelete: UserTreeGridItem[]) {
-        if (this.isSingleItemSelected() && this.isHighlightedItemIn(userTreeGridItemsToDelete)) {
-            this.removeHighlighting();
-        }
-
-        super.deleteNodes(userTreeGridItemsToDelete);
-    }
-
-    appendUserNode(principal: Principal, idProvider: IdProvider, parentOfSameType?: boolean) {
+    appendUserItemNode(principal: Principal, idProvider: IdProvider) {
         if (!principal) {
-            this.appendIdProviderUserNode(idProvider);
+            this.appendIdProviderNode(idProvider);
         } else {
-            this.appendPrincipalNode(principal, idProvider, parentOfSameType);
+            this.appendPrincipalNode(principal, idProvider);
         }
     }
 
-    private appendIdProviderUserNode(idProvider: IdProvider) {
+    private appendIdProviderNode(idProvider: IdProvider) {
         const userTreeGridItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(
             UserTreeGridItemType.ID_PROVIDER).build();
 
-        this.appendNode(userTreeGridItem, true, false, this.getRoot().isFiltered() ? this.getRoot().getDefaultRoot() : null);
+        this.appendDataToParentNode(userTreeGridItem, this.getRoot().getDefaultRoot());
 
         if (!this.getRoot().isFiltered()) {
             this.initData(this.getRoot().getDefaultRoot().treeToList());
@@ -170,15 +162,26 @@ export class UserItemsTreeGrid
         }
     }
 
-    private appendPrincipalNode(principal: Principal, idProvider: IdProvider, parentOfSameType?: boolean) {
-        const userTreeGridItem = new UserTreeGridItemBuilder().setPrincipal(principal).setType(UserTreeGridItemType.PRINCIPAL).build();
+    private appendPrincipalNode(principal: Principal, idProvider: IdProvider) {
+        const userTreeGridItem: UserTreeGridItem = new UserTreeGridItemBuilder().setPrincipal(principal).setType(
+            UserTreeGridItemType.PRINCIPAL).build();
+        const parentNode: TreeNode<UserTreeGridItem> = this.getRoot().getNodeByDataId(this.getPrincipalParentPath(principal, idProvider));
 
-        if (parentOfSameType) {
-            this.appendNode(userTreeGridItem, parentOfSameType, false);
-            return;
+        if (parentNode) {
+            this.appendDataToParentNode(userTreeGridItem, parentNode);
+        }
+    }
+
+    private getPrincipalParentPath(principal: Principal, idProvider: IdProvider): string {
+        if (principal.getType() === PrincipalType.USER) {
+            return idProvider.getKey().toString() + '/users';
         }
 
-        this.loadParentNode(principal, idProvider).then((parentNode) => this.appendNodeToParent(parentNode, userTreeGridItem));
+        if (principal.getType() === PrincipalType.GROUP) {
+            return idProvider.getKey().toString() + '/groups';
+        }
+
+        return '/roles';
     }
 
     fetchChildren(parentNode?: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
@@ -269,67 +272,12 @@ export class UserItemsTreeGrid
         return this.loadChildren(parentNode, [principalType]);
     }
 
-    private getNodeToUpdate(node: TreeNode<UserTreeGridItem>): TreeNode<UserTreeGridItem> {
-        const usersOrGroupsUpdating = node.getData().isUser() || node.getData().isUserGroup();
-        const selectedData = this.getSelectedDataList()[0];
-        const idProviderSelected = selectedData && selectedData.isIdProvider();
-
-        return (usersOrGroupsUpdating && idProviderSelected) ? node.getParent() : node;
-    }
-
-    protected updateSelectedNode(node: TreeNode<UserTreeGridItem>) {
-        // Highlighted nodes should remain as is, and must not be selected
-        const hasHighlightedNode: boolean = this.hasHighlightedNode();
-        const hasSelected: boolean = this.hasSelectedItems();
-        const highlighted: boolean = !hasSelected && hasHighlightedNode;
-
-        const nodeToUpdate = this.getNodeToUpdate(node);
-        if (highlighted) {
-            this.refreshNode(nodeToUpdate);
-        } else if (hasSelected) {
-            super.updateSelectedNode(nodeToUpdate);
-        }
-    }
-
     getDataId(item: UserTreeGridItem): string {
-        return item.getDataId();
+        return item.getId();
     }
 
     hasChildren(item: UserTreeGridItem): boolean {
         return item.hasChildren();
-    }
-
-    private loadParentNode(principal: Principal, idProvider: IdProvider): Q.Promise<TreeNode<UserTreeGridItem>> {
-        if (principal.isRole()) {
-            return this.loadRolesNode();
-        }
-
-        return this.loadPrincipalNode(principal, idProvider);
-    }
-
-    private loadRolesNode(): Q.Promise<TreeNode<UserTreeGridItem>> {
-        const rootNode: TreeNode<UserTreeGridItem> = this.isFiltered() ? this.getRoot().getFilteredRoot() : this.getRoot().getCurrentRoot();
-
-        const rolesNode: TreeNode<UserTreeGridItem> = rootNode.getChildren()
-            .filter(node => node.getData() && node.getData().getType() === UserTreeGridItemType.ROLES)[0];
-
-        return rolesNode ? this.fetchDataAndSetNodes(rolesNode).then(() => rolesNode) : Q(null);
-    }
-
-    private loadPrincipalNode(principal: Principal, idProvider: IdProvider): Q.Promise<TreeNode<UserTreeGridItem>> {
-        const rootNode: TreeNode<UserTreeGridItem> = this.isFiltered() ? this.getRoot().getFilteredRoot() : this.getRoot().getCurrentRoot();
-        const idProviderId: string = idProvider.getKey().getId();
-        const idProviderNode: TreeNode<UserTreeGridItem> =
-            rootNode.getChildren().filter(node => node.getDataId() === idProviderId)[0] || rootNode;
-
-        return this.fetchDataAndSetNodes(idProviderNode).then(() => {
-            const parentItemType = UserTreeGridItem.getParentType(principal);
-
-            const parentNode: TreeNode<UserTreeGridItem> =
-                idProviderNode.getChildren().filter(node => node.getData().getType() === parentItemType)[0];
-
-            return this.fetchDataAndSetNodes(parentNode).then(() => parentNode);
-        });
     }
 
     private loadChildren(parentNode: TreeNode<UserTreeGridItem>, allowedTypes: PrincipalType[]): Q.Promise<UserTreeGridItem[]> {
@@ -362,7 +310,7 @@ export class UserItemsTreeGrid
 
     private removeEmptyNode(parentNode: TreeNode<UserTreeGridItem>) {
         parentNode.getChildren().some((child: TreeNode<UserTreeGridItem>, index: number) => {
-            if (!child.getData().getDataId()) {
+            if (!child.getData().getId()) {
                 parentNode.getChildren().splice(index, 1);
                 return true;
             }
@@ -379,10 +327,6 @@ export class UserItemsTreeGrid
         }
 
         return null;
-    }
-
-    refreshNodeData(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<TreeNode<UserTreeGridItem>> {
-        return Q(parentNode);
     }
 
     private getPrincipalTypeForFolderItem(itemType: UserTreeGridItemType): PrincipalType {
@@ -403,7 +347,7 @@ export class UserItemsTreeGrid
 
     private isHighlightedItemIn(userTreeGridItems: UserTreeGridItem[]): boolean {
         return userTreeGridItems.some((userTreeGridItem: UserTreeGridItem) => {
-            return userTreeGridItem.getDataId() === this.getFirstSelectedOrHighlightedItem().getDataId();
+            return userTreeGridItem.getId() === this.getFirstSelectedOrHighlightedItem().getId();
         });
     }
 

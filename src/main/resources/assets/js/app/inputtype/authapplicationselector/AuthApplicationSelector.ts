@@ -157,7 +157,7 @@ export class AuthApplicationSelector
             this.ignorePropertyChange = true;
 
             const selectedOption = event.getSelectedOption();
-            const key = selectedOption.getOption().displayValue.getApplicationKey();
+            const key = selectedOption.getOption().getDisplayValue().getApplicationKey();
             if (key) {
                 saveAndForceValidate(selectedOption);
             }

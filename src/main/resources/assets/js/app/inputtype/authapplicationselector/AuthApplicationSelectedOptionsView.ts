@@ -46,7 +46,7 @@ export class AuthApplicationSelectedOptionsView
     createSelectedOption(option: Option<Application>): SelectedOption<Application> {
         this.notifyBeforeOptionCreated();
 
-        let applicationConfig = this.applicationConfigProvider.getConfig(option.displayValue.getApplicationKey());
+        let applicationConfig = this.applicationConfigProvider.getConfig(option.getDisplayValue().getApplicationKey());
         let optionView = new AuthApplicationSelectedOptionView(option, applicationConfig, this.formContext, this.readonly);
 
         optionView.onApplicationConfigFormDisplayed((applicationKey: ApplicationKey) => {
@@ -59,8 +59,8 @@ export class AuthApplicationSelectedOptionsView
     }
 
     removeOption(optionToRemove: Option<Application>, silent: boolean = false) {
-        this.items =
-            this.items.filter(item => !item.getSiteConfig().getApplicationKey().equals(optionToRemove.displayValue.getApplicationKey()));
+        this.items = this.items.filter(
+            item => !item.getSiteConfig().getApplicationKey().equals(optionToRemove.getDisplayValue().getApplicationKey()));
         super.removeOption(optionToRemove, silent);
     }
 
