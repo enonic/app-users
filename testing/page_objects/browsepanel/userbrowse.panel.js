@@ -120,7 +120,7 @@ class UserBrowsePanel extends Page {
 
     clickOnRowByName(name) {
         let nameXpath = xpath.rowByName(name);
-        return this.clickOnElement(nameXpath, appConst.mediumTimeout).catch(err => {
+        return this.clickOnElement(nameXpath).catch(err => {
             this.saveScreenshot('err_find_' + name);
             throw Error('Row with the name ' + name + ' was not found.  ' + err);
         }).then(() => {
@@ -300,7 +300,7 @@ class UserBrowsePanel extends Page {
             return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('any-selected');
             })
-        }, appConst.mediumTimeout, 'expected style not present after 3s');
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'expected style not present after 3s'});
     }
 
     //Click on Show/Hide selections
@@ -318,7 +318,7 @@ class UserBrowsePanel extends Page {
     }
 
     getNumberInSelectionToggler() {
-        let selector = xpath.selectionToggler + `/span`;
+        let selector = xpath.selectionToggler + "/span";
         return this.getText(selector);
     }
 
@@ -338,7 +338,7 @@ class UserBrowsePanel extends Page {
         await this.getBrowser().waitUntil(async () => {
             let text = await this.getAttribute(selector, "class");
             return text.includes('partial');
-        }, appConst.TIMEOUT_2, "Selection Controller checkBox should displayed as partial");
+        }, {timeout: appConst.TIMEOUT_2, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
         return true;
     }
 

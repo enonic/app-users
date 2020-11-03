@@ -15,11 +15,14 @@ const XPATH = {
 
 class GridContextMenu extends Page {
 
-    waitForContextMenuVisible() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
+    async waitForContextMenuVisible() {
+        try {
+            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            return await this.pause(400);
+        } catch (err) {
             this.saveScreenshot('err_grid_context_menu');
             throw new Error(`tree grid context menu is not loaded ` + err);
-        });
+        }
     }
 
     waitForDeleteMenuItemDisabled() {
@@ -27,7 +30,7 @@ class GridContextMenu extends Page {
             return this.getAttribute(XPATH.container + XPATH.deleteMenuItem, 'class').then(result => {
                 return result.includes('disabled');
             });
-        }, 2000, 'Grid context menu - Delete menu item is not disabled after 3 seconds');
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Grid context menu - Delete menu item is not disabled after 3 seconds'});
     }
 
     waitForEditMenuItemDisabled() {
@@ -36,8 +39,9 @@ class GridContextMenu extends Page {
             return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('disabled');
             })
-        }, appConst.mediumTimeout, 'Grid context menu - Edit menu item is not enabled after 3 seconds');
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Grid context menu - Edit menu item is not enabled after 3 seconds'});
     }
+
 
     isEditMenuItemDisabled() {
         return this.getAttribute(XPATH.container + XPATH.editMenuItem, 'class').then(result => {

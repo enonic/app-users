@@ -89,12 +89,8 @@ class WizardPanel extends Page {
             return this.getAttribute(selector, 'class').then(result => {
                 return result.includes('invalid');
             });
-        }, 3000).then(() => {
-            return true;
-        }).catch(err => {
-            this.saveScreenshot(itemBuilders.generateRandomName("err_icon"));
-            throw new Error('group-wizard:invalid-icon should be displayed');
-        });
+        }, {timeout: 10000, timeoutMsg: "Group-wizard:invalid-icon should be displayed"});
+
     }
 
     waitUntilInvalidIconDisappears(displayName) {
@@ -103,11 +99,7 @@ class WizardPanel extends Page {
             return this.getAttribute(selector, 'class').then(result => {
                 return !result.includes('invalid');
             })
-        }, 2000).then(() => {
-            return true;
-        }).catch(err => {
-            throw new Error(err);
-        });
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Invalid icon should not be displayed", interval: 500});
     }
 
     hotKeySave() {
@@ -133,6 +125,7 @@ class WizardPanel extends Page {
         })
     }
 }
+
 module.exports = {WizardPanel, XPATH};
 
 
