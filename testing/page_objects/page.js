@@ -113,10 +113,9 @@ class Page {
             return this.getDisplayedElements(selector).then(result => {
                 return result.length === 0;
             })
-        }, {timeout: ms}).catch(err => {
-            throw new Error("Timeout exception. Element " + selector + " still visible in: " + ms);
-        });
+        }, {timeout: ms, timeoutMsg: "Timeout exception. Element " + selector + " still visible in: " + ms});
     }
+
 
     async waitForElementDisplayed(selector, ms) {
         let element = await this.findElement(selector);
@@ -126,15 +125,15 @@ class Page {
     waitForSpinnerNotVisible() {
         let message = "Spinner still displayed! timeout is " + appConst.TIMEOUT_7;
         return this.browser.waitUntil(() => {
-            return this.isElementNotDisplayed(`//div[@class='spinner']`);
-        }, appConst.TIMEOUT_7, message);
+            return this.isElementNotDisplayed("//div[@class='spinner']");
+        }, {timeout: appConst.TIMEOUT_7, timeoutMsg: message});
     }
 
     waitUntilElementNotVisible(selector, timeout) {
         let message = "Element still displayed! timeout is " + appConst.TIMEOUT_7 + "  " + selector;
         return this.browser.waitUntil(() => {
             return this.isElementNotDisplayed(selector);
-        }, timeout, message);
+        }, {timeout: timeout, timeoutMsg: message});
     }
 
     isElementNotDisplayed(selector) {
@@ -153,7 +152,7 @@ class Page {
             let notificationXpath = "//div[@class='notification-content']";
             await this.getBrowser().waitUntil(async () => {
                 return await this.isElementDisplayed(notificationXpath);
-            }, appConst.mediumTimeout);
+            }, {timeout: appConst.mediumTimeout});
             await this.pause(400);
             return await this.getText(notificationXpath);
         } catch (err) {

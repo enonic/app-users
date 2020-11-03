@@ -9,7 +9,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
     this.timeout(0);
     webDriverHelper.setupBrowser();
 
-    it('GIVEN `Principal Filter Panel` is opened WHEN `User` aggregation has been clicked THEN Roles and Id Provider should not be displayed',
+    it("GIVEN 'Principal Filter Panel' is opened WHEN 'User' aggregation has been clicked THEN Roles and Id Provider should not be displayed",
         async () => {
             let browseFilterPanel = new BrowseFilterPanel();
             let userBrowsePanel = new UserBrowsePanel();
@@ -32,10 +32,13 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             await testUtils.openFilterPanel();
             //Click on 'Role' checkbox:
             await filterPanel.clickOnRoleAggregation();
-            await userBrowsePanel.waitForItemNotDisplayed('/system');
+            let result = await userBrowsePanel.waitForItemNotDisplayed('/system');
+            //Verify that 'System Id Provider' is not displayed in the filtered grid:
+            assert.isFalse(result, "System folder should not be displayed");
             testUtils.saveScreenshot('aggregation_in_role');
+            //Verify that 'Users Administrator' role is displayed:
             let isDisplayed = await userBrowsePanel.isItemDisplayed('/roles/system.user.admin');
-            assert.isTrue(isDisplayed, "System folder is not displayed, but expected role should be displayed in the filtered panel");
+            assert.isTrue(isDisplayed, "expected role should be displayed in the filtered panel");
         });
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `Id Provider` aggregation has been clicked THEN Roles-folder should not be displayed',
