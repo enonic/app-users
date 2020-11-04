@@ -22,6 +22,9 @@ import {UserItem} from 'lib-admin-ui/security/UserItem';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {Body} from 'lib-admin-ui/dom/Body';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {ListPrincipalsKeysResult, ListPrincipalsNamesRequest} from '../../graphql/principal/ListPrincipalsNamesRequest';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {GetPrincipalsTotalRequest} from '../../graphql/principal/GetPrincipalsTotalRequest';
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -154,25 +157,56 @@ export class UserItemsTreeGrid
         const userTreeGridItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(
             UserTreeGridItemType.ID_PROVIDER).build();
 
-        this.appendDataToParentNode(userTreeGridItem, this.getRoot().getDefaultRoot());
+        this.insertDataToParentNode(userTreeGridItem, this.getRoot().getDefaultRoot(), this.getIdProviderInsertIndex(idProvider));
+    }
 
-        if (!this.getRoot().isFiltered()) {
-            this.initData(this.getRoot().getDefaultRoot().treeToList());
-            this.invalidate();
-        }
+    private getIdProviderInsertIndex(idProvider: IdProvider): number {
+        const idProvidersNames: string[] =
+            this.getRoot().getDefaultRoot().getChildren().slice(1).map(
+                (node: TreeNode<UserTreeGridItem>) => node.getData().getItemDisplayName());
+
+        return this.doGetPrincipalIndex(idProvidersNames, idProvider.getDisplayName()) + 1;
     }
 
     private appendPrincipalNode(principal: Principal, idProvider: IdProvider) {
-        const userTreeGridItem: UserTreeGridItem = new UserTreeGridItemBuilder().setPrincipal(principal).setType(
-            UserTreeGridItemType.PRINCIPAL).build();
-        const parentNode: TreeNode<UserTreeGridItem> = this.getRoot().getNodeByDataId(this.getPrincipalParentPath(principal, idProvider));
+        const parentNode: TreeNode<UserTreeGridItem> = this.getRoot().getNodeByDataId(this.getPrincipalParentDataId(principal, idProvider));
 
         if (parentNode) {
-            this.appendDataToParentNode(userTreeGridItem, parentNode);
+            if (parentNode.isExpandable() && !parentNode.hasChildren()) {
+                return;
+            }
+
+            const userTreeGridItem: UserTreeGridItem = new UserTreeGridItemBuilder().setPrincipal(principal).setType(
+                UserTreeGridItemType.PRINCIPAL).build();
+            this.getPrincipalIndex(parentNode, userTreeGridItem).then((insertIndex: number) => {
+                this.insertDataToParentNode(userTreeGridItem, parentNode, insertIndex);
+            }).catch(DefaultErrorHandler.handle);
         }
     }
 
-    private getPrincipalParentPath(principal: Principal, idProvider: IdProvider): string {
+    private getPrincipalIndex(parentNode: TreeNode<UserTreeGridItem>, userTreeGridItem: UserTreeGridItem): Q.Promise<number> {
+        return new ListPrincipalsNamesRequest()
+            .setIdProviderKey(this.getIdProviderKey(parentNode))
+            .setTypes([this.getPrincipalTypeForFolderItem(parentNode.getData().getType())])
+            .setSort('displayName ASC')
+            .sendAndParse()
+            .then((result: ListPrincipalsKeysResult) => {
+                return this.doGetPrincipalIndex(result.displayNames, userTreeGridItem.getItemDisplayName());
+            });
+    }
+
+    private doGetPrincipalIndex(displayNames: string[], item: string): number {
+        let insertIndex: number = 0;
+
+        displayNames.some((dn: string, index: number) => {
+            insertIndex = index;
+            return dn.localeCompare(item) >= 0;
+        });
+
+        return insertIndex;
+    }
+
+    private getPrincipalParentDataId(principal: Principal, idProvider: IdProvider): string {
         if (principal.getType() === PrincipalType.USER) {
             return idProvider.getKey().toString() + '/users';
         }
@@ -252,17 +286,26 @@ export class UserItemsTreeGrid
         return Q([]);
     }
 
-    private addUsersGroupsToIdProvider(parentItem: UserTreeGridItem): UserTreeGridItem[] {
-        const items: UserTreeGridItem[] = [];
+    private addUsersGroupsToIdProvider(parentItem: UserTreeGridItem): Q.Promise<UserTreeGridItem[]> {
         const idProvider: IdProvider = parentItem.getIdProvider();
-        const userFolderItem: UserTreeGridItem =
-            new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USERS).build();
-        const groupFolderItem: UserTreeGridItem =
-            new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.GROUPS).build();
-        items.push(userFolderItem);
-        items.push(groupFolderItem);
+        const promises: Q.Promise<number>[] = [];
 
-        return items;
+        promises.push(this.getTotalPrincipals(idProvider.getKey(), PrincipalType.USER));
+        promises.push(this.getTotalPrincipals(idProvider.getKey(), PrincipalType.GROUP));
+
+        return Q.all(promises).spread((totalUsers: number, totalGroups: number) => {
+            const userFolderItem: UserTreeGridItem =
+                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USERS).setHasChildren(
+                    totalUsers > 0).build();
+            const groupFolderItem: UserTreeGridItem =
+                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.GROUPS).setHasChildren(
+                    totalGroups > 0).build();
+            return [userFolderItem, groupFolderItem];
+        });
+    }
+
+    private getTotalPrincipals(idProviderKey: IdProviderKey, type: PrincipalType): Q.Promise<number> {
+        return new GetPrincipalsTotalRequest().setIdProviderKey(idProviderKey).setTypes([type]).sendAndParse();
     }
 
     private fetchPrincipals(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
@@ -270,10 +313,6 @@ export class UserItemsTreeGrid
         const principalType: PrincipalType = this.getPrincipalTypeForFolderItem(folder.getType());
 
         return this.loadChildren(parentNode, [principalType]);
-    }
-
-    getDataId(item: UserTreeGridItem): string {
-        return item.getId();
     }
 
     hasChildren(item: UserTreeGridItem): boolean {
@@ -336,6 +375,10 @@ export class UserItemsTreeGrid
 
         if (itemType === UserTreeGridItemType.USERS) {
             return PrincipalType.USER;
+        }
+
+        if (itemType === UserTreeGridItemType.ROLES) {
+            return PrincipalType.ROLE;
         }
 
         throw new Error('Invalid item type for folder with principals: ' + UserTreeGridItemType[itemType]);
