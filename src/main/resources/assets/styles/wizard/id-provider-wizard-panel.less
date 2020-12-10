@@ -6,11 +6,21 @@
 
       label {
         width: 120px;
+        display: inline-table;
       }
 
       .form-input {
-        margin-left: 0px;
+        margin-left: 0;
         flex-grow: 1;
+
+        &.application-configurator {
+          display: inline-grid;
+
+          .selected-options {
+            overflow: hidden;
+            width: 100%;
+          }
+        }
       }
     }
 
