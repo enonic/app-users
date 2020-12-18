@@ -95,7 +95,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         if (existing) {
             displayName = existing.getDisplayName();
 
-            wizardHeader.disableNameInput();
+            wizardHeader.toggleNameInput(false);
             wizardHeader.setAutoGenerationEnabled(false);
         }
 
@@ -191,7 +191,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         super.setPersistedItem(newPersistedItem);
 
         if (this.wizardHeader) {
-            (<WizardHeaderWithDisplayNameAndName>this.wizardHeader).disableNameInput();
+            (<WizardHeaderWithDisplayNameAndName>this.wizardHeader).toggleNameInput(false);
         }
     }
 

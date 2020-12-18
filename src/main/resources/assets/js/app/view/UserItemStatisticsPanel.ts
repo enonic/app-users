@@ -145,7 +145,7 @@ export class UserItemStatisticsPanel
             const user = <User>p;
             const mems = user.getMemberships();
             mainGroup.addDataList(i18n('field.email'), user.getEmail());
-            this.appendTransitiveSwitch(principal.getKey(), rolesAndGroupsGroup, mems.length === 0);
+            this.appendTransitiveSwitch(principal.getKey(), rolesAndGroupsGroup, mems.length > 0);
             this.appendRolesAndGroups(mems, rolesAndGroupsGroup);
 
             return this.isAdminPromise.then(isAdmin => {
@@ -176,7 +176,7 @@ export class UserItemStatisticsPanel
             if (p.isGroup()) {
                 const mems = (<Group>p).getMemberships();
                 const rolesGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'memberships');
-                this.appendTransitiveSwitch(principal.getKey(), rolesGroup, mems.length === 0);
+                this.appendTransitiveSwitch(principal.getKey(), rolesGroup, mems.length > 0);
                 this.userDataContainer.appendChild(rolesGroup);
 
                 this.appendRolesAndGroups(mems, rolesGroup);
@@ -296,10 +296,11 @@ export class UserItemStatisticsPanel
             .sendAndParse();
     }
 
-    private appendTransitiveSwitch(pKey: PrincipalKey, dataGroup: ItemDataGroup, disabled?: boolean) {
+    private appendTransitiveSwitch(pKey: PrincipalKey, dataGroup: ItemDataGroup, enabled: boolean) {
         const transitiveSwitch = new CheckboxBuilder()
             .setLabelText(i18n('field.transitiveMemberships'))
-            .build().setDisabled(disabled);
+            .build();
+        transitiveSwitch.setEnabled(enabled);
         transitiveSwitch.addClass('transitive-switch');
         transitiveSwitch.onValueChanged(event => {
             this.fetchPrincipal(pKey, 'true' === event.getNewValue()).then(updatedP => {
