@@ -1,12 +1,11 @@
-import {UserTreeGridItem} from './UserTreeGridItem';
 import {UserItemStatisticsPanel} from '../view/UserItemStatisticsPanel';
 import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
 import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
 
 export class UserBrowseItemPanel
-    extends BrowseItemPanel<UserTreeGridItem> {
+    extends BrowseItemPanel {
 
-    createItemStatisticsPanel(): ItemStatisticsPanel<UserTreeGridItem> {
+    createItemStatisticsPanel(): ItemStatisticsPanel {
         return new UserItemStatisticsPanel();
     }
 
