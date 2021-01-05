@@ -5,7 +5,7 @@ import {IdProvider} from '../principal/IdProvider';
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {IDentifiable} from 'lib-admin-ui/IDentifiable';
+import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
 
 export enum UserTreeGridItemType {
     ID_PROVIDER,
@@ -16,7 +16,7 @@ export enum UserTreeGridItemType {
 }
 
 export class UserTreeGridItem
-    implements Equitable, IDentifiable {
+    implements ViewItem {
 
     private idProvider: IdProvider;
 
@@ -135,8 +135,8 @@ export class UserTreeGridItem
             return false;
         }
 
-        let other = <UserTreeGridItem> o;
-        return this.principal === other.getPrincipal() && this.idProvider === other.getIdProvider();
+        const other:UserTreeGridItem = <UserTreeGridItem> o;
+        return this.type === other.getType() && this.principal === other.getPrincipal() && this.idProvider === other.getIdProvider();
     }
 
     static create(): UserTreeGridItemBuilder {
@@ -162,6 +162,42 @@ export class UserTreeGridItem
         default:
             return null;
         }
+    }
+
+    getDisplayName(): string {
+        return this.getItemDisplayName();
+    }
+
+    getIconClass(): string {
+        switch (this.getType()) {
+        case UserTreeGridItemType.ID_PROVIDER:
+            return 'icon-address-book icon-large';
+
+        case UserTreeGridItemType.PRINCIPAL:
+            if (this.getPrincipal().isRole()) {
+                return 'icon-masks icon-large';
+
+            } else if (this.getPrincipal().isUser()) {
+                return 'icon-user icon-large';
+
+            } else if (this.getPrincipal().isGroup()) {
+                return 'icon-users icon-large';
+            }
+            break;
+
+        case UserTreeGridItemType.GROUPS:
+            return 'icon-folder icon-large';
+
+        case UserTreeGridItemType.ROLES:
+            return 'icon-folder icon-large';
+
+        case UserTreeGridItemType.USERS:
+            return 'icon-folder icon-large';
+        }
+    }
+
+    getIconUrl(): string {
+        return '';
     }
 }
 

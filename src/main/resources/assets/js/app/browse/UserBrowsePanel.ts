@@ -16,7 +16,7 @@ import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
 
 export class UserBrowsePanel
-    extends BrowsePanel<UserTreeGridItem> {
+    extends BrowsePanel {
 
     protected treeGrid: UserItemsTreeGrid;
 
@@ -129,13 +129,6 @@ export class UserBrowsePanel
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
         super.disableSelectionMode();
-    }
-
-    dataToBrowseItem(data: UserTreeGridItem): BrowseItem<UserTreeGridItem> | null {
-        return <BrowseItem<UserTreeGridItem>>new BrowseItem<UserTreeGridItem>(data)
-            .setId(data.getId())
-            .setDisplayName(data.getItemDisplayName())
-            .setIconClass(this.selectIconClass(data));
     }
 
     private selectIconClass(item: UserTreeGridItem): string {
