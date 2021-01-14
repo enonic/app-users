@@ -36,7 +36,7 @@ dependencies {
     include "${group}:lib-task:${xpVersion}"
     include "${group}:lib-websocket:${xpVersion}"
     include "${group}:lib-event:${xpVersion}"
-    include "com.graphql-java:graphql-java:2.3.0"
+    include "com.graphql-java:graphql-java:11.0"
     include "com.enonic.lib:lib-graphql:1.0.0"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-mustache:2.0.0"
