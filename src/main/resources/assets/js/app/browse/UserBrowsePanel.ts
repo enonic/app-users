@@ -7,8 +7,6 @@ import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
 import {IdProvider} from '../principal/IdProvider';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
