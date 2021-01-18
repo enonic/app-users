@@ -51,12 +51,13 @@ var queryRepositoryNodes = function (repositoryId, branch, filters) {
 
     return repoConn.query({
         count: 1024, //TODO Batch
-        query: '',
+        query: `_path LIKE '/content*'`,
         filters: filters
     }).hits.map(function (nodeHit) {
         var node = repoConn.get(nodeHit.id);
+        const path = node._path.substr(8); // remove starting '/content'
         return {
-            _path: node._path,
+            _path: path.length === 0 ? '/' : path,
             _permissions: node._permissions
         };
     });
