@@ -9,8 +9,6 @@ import {User} from '../principal/User';
 import {IdProvider} from '../principal/IdProvider';
 import {Action} from 'lib-admin-ui/ui/Action';
 import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
-import {BrowseItemsChanges} from 'lib-admin-ui/app/browse/BrowseItemsChanges';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
