@@ -8,7 +8,6 @@ import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
 import {Repository} from '../report/Repository';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
-import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
 import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
 import {ItemDataGroup} from 'lib-admin-ui/app/view/ItemDataGroup';
 import {Principal} from 'lib-admin-ui/security/Principal';
@@ -26,15 +25,18 @@ import {UriHelper} from 'lib-admin-ui/util/UriHelper';
 import {CheckboxBuilder} from 'lib-admin-ui/ui/Checkbox';
 import {Element} from 'lib-admin-ui/dom/Element';
 import {Button} from 'lib-admin-ui/ui/button/Button';
+import {UserItemStatisticsHeader} from './UserItemStatisticsHeader';
 
 export class UserItemStatisticsPanel
-    extends ItemStatisticsPanel<UserTreeGridItem> {
+    extends ItemStatisticsPanel {
 
-    private userDataContainer: DivEl;
+    private readonly userDataContainer: DivEl;
 
     private isAdminPromise: Q.Promise<boolean>;
 
     private reportServicePath: string;
+
+    private readonly header: UserItemStatisticsHeader;
 
     constructor() {
         super('principal-item-statistics-panel');
@@ -43,32 +45,32 @@ export class UserItemStatisticsPanel
 
         this.userDataContainer = new DivEl('user-data-container');
 
+        this.header = new UserItemStatisticsHeader();
+
         this.bindServerEventListeners();
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
+            this.appendChild(this.header);
             this.appendChild(this.userDataContainer);
 
             return rendered;
         });
     }
 
-    setItem(item: ViewItem<UserTreeGridItem>) {
+    setItem(item: UserTreeGridItem) {
         const currentItem = this.getItem();
-
-        if (item.getModel().getType() === UserTreeGridItemType.PRINCIPAL) {
-            this.populatePrincipalViewItem(item);
-        }
 
         if (!currentItem || !currentItem.equals(item)) {
             this.refreshPanel(item);
 
             super.setItem(item);
+            this.header.setItem(item);
         }
     }
 
-    private refreshPanel(item: ViewItem<UserTreeGridItem>) {
+    private refreshPanel(item: UserTreeGridItem) {
         this.userDataContainer.removeChildren();
         this.appendMetadata(item);
     }
@@ -84,22 +86,16 @@ export class UserItemStatisticsPanel
     }
 
     private handleUserItemEvent() {
-        const currentItem: ViewItem<UserTreeGridItem> = this.getItem();
-        const isPrincipalSelected: boolean = !!currentItem && currentItem.getModel().getType() === UserTreeGridItemType.PRINCIPAL;
+        const currentItem: UserTreeGridItem = <UserTreeGridItem>this.getItem();
+        const isPrincipalSelected: boolean = !!currentItem && currentItem.getType() === UserTreeGridItemType.PRINCIPAL;
 
         if (isPrincipalSelected) {
             this.refreshPanel(currentItem);
         }
     }
 
-    private populatePrincipalViewItem(item: ViewItem<UserTreeGridItem>) {
-        item.setPathName(item.getModel().getPrincipal().getKey().getId());
-        item.setPath(item.getModel().getPrincipal().getKey().toPath(true));
-        item.setIconSize(128);
-    }
-
-    private appendMetadata(item: ViewItem<UserTreeGridItem>) {
-        const principal = item.getModel().getPrincipal();
+    private appendMetadata(item: UserTreeGridItem) {
+        const principal = item.getPrincipal();
         const type = principal ? principal.getTypeName().toLowerCase() : '';
 
         if (type) {
@@ -310,5 +306,10 @@ export class UserItemStatisticsPanel
             }).catch(DefaultErrorHandler.handle);
         });
         dataGroup.getHeader().appendChild(transitiveSwitch);
+    }
+
+    clearItem(): void {
+        super.clearItem();
+        this.header.setItem(null);
     }
 }

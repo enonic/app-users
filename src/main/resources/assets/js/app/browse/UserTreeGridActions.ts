@@ -9,8 +9,6 @@ import {User} from '../principal/User';
 import {IdProvider} from '../principal/IdProvider';
 import {Action} from 'lib-admin-ui/ui/Action';
 import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
-import {BrowseItemsChanges} from 'lib-admin-ui/app/browse/BrowseItemsChanges';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
@@ -38,17 +36,15 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
         return this.actions;
     }
 
-    updateActionsEnabledState(browseItems: BrowseItem<UserTreeGridItem>[],
-                              changes?: BrowseItemsChanges<UserTreeGridItem>): Q.Promise<void> {
+    updateActionsEnabledState(items: UserTreeGridItem[]): Q.Promise<void> {
         return Q(true).then(() => {
             let idProvidersSelected: number = 0;
             let principalsSelected: number = 0;
             let directoriesSelected: number = 0;
             let usersSelected: number = 0;
 
-            browseItems.forEach((browseItem: BrowseItem<UserTreeGridItem>) => {
-                const item = <UserTreeGridItem>browseItem.getModel();
-                const itemType = item.getType();
+            items.forEach((item: UserTreeGridItem) => {
+                const itemType: UserTreeGridItemType = item.getType();
                 switch (itemType) {
                 case UserTreeGridItemType.PRINCIPAL:
                     principalsSelected++;
@@ -79,12 +75,12 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
 
             this.EDIT.setEnabled(directoriesSelected < 1 && (anyIdProvider || anyPrincipal));
 
-            if (this.isSystemUserItemSelected(browseItems)) {
+            if (this.isSystemUserItemSelected(items)) {
                 this.DELETE.setEnabled(false);
             } else if (onlyUsersSelected || onePrincipalSelected) {
                 this.DELETE.setEnabled(true);
             } else if (totalSelection === 1) {
-                this.establishDeleteActionState((<BrowseItem<UserTreeGridItem>>browseItems[0]).getModel());
+                this.establishDeleteActionState(items[0]);
             } else {
                 this.DELETE.setEnabled(false);
             }
@@ -93,10 +89,10 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
         });
     }
 
-    private isSystemUserItemSelected(browseItems: BrowseItem<UserTreeGridItem>[]) {
-        const principals: Principal[] = browseItems
-            .filter(item => (<BrowseItem<UserTreeGridItem>>item).getModel().isPrincipal())
-            .map(item => (<BrowseItem<UserTreeGridItem>>item).getModel().getPrincipal());
+    private isSystemUserItemSelected(items: UserTreeGridItem[]) {
+        const principals: Principal[] = items
+            .filter((item: UserTreeGridItem) => item.isPrincipal())
+            .map((item: UserTreeGridItem) => item.getPrincipal());
 
         return principals.some(principal => principal.isSystem());
     }

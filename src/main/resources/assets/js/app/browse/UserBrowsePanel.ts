@@ -7,8 +7,6 @@ import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
 import {IdProvider} from '../principal/IdProvider';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {BrowseItem} from 'lib-admin-ui/app/browse/BrowseItem';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
@@ -16,7 +14,7 @@ import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
 
 export class UserBrowsePanel
-    extends BrowsePanel<UserTreeGridItem> {
+    extends BrowsePanel {
 
     protected treeGrid: UserItemsTreeGrid;
 
@@ -129,13 +127,6 @@ export class UserBrowsePanel
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
         super.disableSelectionMode();
-    }
-
-    dataToBrowseItem(data: UserTreeGridItem): BrowseItem<UserTreeGridItem> | null {
-        return <BrowseItem<UserTreeGridItem>>new BrowseItem<UserTreeGridItem>(data)
-            .setId(data.getId())
-            .setDisplayName(data.getItemDisplayName())
-            .setIconClass(this.selectIconClass(data));
     }
 
     private selectIconClass(item: UserTreeGridItem): string {
