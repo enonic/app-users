@@ -48,7 +48,7 @@ interface PrincipalData {
 }
 
 export class UserAppPanel
-    extends NavigatedAppPanel<UserTreeGridItem> {
+    extends NavigatedAppPanel {
 
     private mask: LoadMask;
 
