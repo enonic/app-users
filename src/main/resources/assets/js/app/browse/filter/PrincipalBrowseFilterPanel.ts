@@ -81,11 +81,6 @@ export class PrincipalBrowseFilterPanel
         });
     }
 
-    private hasSelectedAggregations(): boolean {
-        const selections: AggregationSelection[] = this.getSearchInputValues().aggregationSelections || [];
-        return selections.some(selection => selection.getSelectedBuckets().length > 0);
-    }
-
     private getCheckedTypes(): UserItemType[] {
         const values: SearchInputValues = this.getSearchInputValues();
         const aggregationType: string = PrincipalBrowseFilterPanel.PRINCIPAL_TYPE_AGGREGATION_NAME;

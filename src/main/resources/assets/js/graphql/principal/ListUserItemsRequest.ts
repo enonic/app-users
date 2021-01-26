@@ -15,6 +15,7 @@ import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelpe
 import {UserItemType} from '../../app/browse/UserItemType';
 import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
+import {ListItemsRequest} from './ListItemsRequest';
 
 export type ListUserItemsRequestResult = {
     total: number,
@@ -23,24 +24,12 @@ export type ListUserItemsRequestResult = {
 };
 
 export class ListUserItemsRequest
-    extends ListGraphQlRequest<any> {
+    extends ListItemsRequest {
 
     private types: UserItemType[];
-    private searchQuery: string;
-    private itemIds: string[];
 
     setTypes(types: UserItemType[]): ListUserItemsRequest {
         this.types = types;
-        return this;
-    }
-
-    setQuery(query: string): ListUserItemsRequest {
-        this.searchQuery = query;
-        return this;
-    }
-
-    setItems(items: string[]): ListUserItemsRequest {
-        this.itemIds = items;
         return this;
     }
 
@@ -49,14 +38,6 @@ export class ListUserItemsRequest
 
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => UserItemType[type]);
-        }
-
-        if (this.searchQuery) {
-            vars['query'] = this.searchQuery;
-        }
-
-        if (this.itemIds && this.itemIds.length > 0) {
-            vars['itemIds'] = this.itemIds;
         }
 
         return vars;

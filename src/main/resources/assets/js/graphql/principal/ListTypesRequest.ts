@@ -2,37 +2,10 @@ import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
 import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggregationJson';
 import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
+import {ListItemsRequest} from './ListItemsRequest';
 
 export class ListTypesRequest
-    extends ListGraphQlRequest<any> {
-
-    private searchQuery: string;
-
-    private itemIds: string[];
-
-    setQuery(query: string): ListTypesRequest {
-        this.searchQuery = query;
-        return this;
-    }
-
-    setItems(items: string[]): ListTypesRequest {
-        this.itemIds = items;
-        return this;
-    }
-
-    getVariables(): { [key: string]: any } {
-        const vars = super.getVariables();
-
-        if (this.searchQuery) {
-            vars['query'] = this.searchQuery;
-        }
-
-        if (this.itemIds && this.itemIds.length > 0) {
-            vars['itemIds'] = this.itemIds;
-        }
-
-        return vars;
-    }
+    extends ListItemsRequest {
 
     getQuery(): string {
         return `query ($query: String, $itemIds: [String], $start: Int, $count: Int) {
