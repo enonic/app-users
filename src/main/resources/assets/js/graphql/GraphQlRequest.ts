@@ -8,7 +8,7 @@ import * as Q from 'q';
 export class GraphQlRequest<PARSED_TYPE>
     implements HttpRequest<PARSED_TYPE> {
 
-    private path: Path;
+    private readonly path: Path;
 
     constructor() {
         this.path = Path.fromString(window['CONFIG'] && window['CONFIG']['graphQlUrl']);

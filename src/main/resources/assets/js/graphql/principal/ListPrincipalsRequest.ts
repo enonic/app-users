@@ -21,7 +21,6 @@ export class ListPrincipalsRequest
 
     private types: PrincipalType[];
     private idProviderKey: IdProviderKey;
-    private searchQuery: string;
 
     setTypes(types: PrincipalType[]): ListPrincipalsRequest {
         this.types = types;
@@ -33,22 +32,17 @@ export class ListPrincipalsRequest
         return this;
     }
 
-    setQuery(query: string): ListPrincipalsRequest {
-        this.searchQuery = query;
-        return this;
-    }
-
     getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
+        const vars = super.getVariables();
+
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }
+
         if (this.idProviderKey) {
             vars['idprovider'] = this.idProviderKey.toString();
         }
-        if (this.searchQuery) {
-            vars['query'] = this.searchQuery;
-        }
+
         return vars;
     }
 
