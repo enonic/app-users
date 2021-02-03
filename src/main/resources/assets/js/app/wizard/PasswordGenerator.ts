@@ -156,7 +156,13 @@ export class PasswordGenerator
     }
 
     isValid(): boolean {
-        return !!this.getValue() && this.getValue().length > 0 && this.input.isValid() && this.passwordStrength === PasswordStrength.GOOD;
+        return !!this.getValue() && this.getValue().length > 0 && this.input.isValid() && this.isPasswordValid();
+    }
+
+    private isPasswordValid(): boolean {
+        return this.passwordStrength === PasswordStrength.GOOD ||
+               this.passwordStrength === PasswordStrength.ALMOST_GOOD ||
+               this.passwordStrength === PasswordStrength.NOT_GOOD;
     }
 
     private initFocusEvents(el: Element) {
