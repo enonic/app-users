@@ -7,7 +7,7 @@ export class UserItemStatisticsHeader
     setItem(item: UserTreeGridItem): void {
         super.setItem(item);
 
-        if (item.getType() === UserTreeGridItemType.PRINCIPAL) {
+        if (!!item && item.getType() === UserTreeGridItemType.PRINCIPAL) {
             this.appendToHeaderPath(item.getPrincipal().getKey().toPath(true), 'parent-path');
             this.appendToHeaderPath(item.getPrincipal().getKey().getId(), 'path-name');
         }
