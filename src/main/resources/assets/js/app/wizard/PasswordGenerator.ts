@@ -1,60 +1,61 @@
-import {StringHelper} from 'lib-admin-ui/util/StringHelper';
-import {NumberHelper} from 'lib-admin-ui/util/NumberHelper';
-import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
-import {PasswordInput} from 'lib-admin-ui/ui/text/PasswordInput';
 import {FormInputEl} from 'lib-admin-ui/dom/FormInputEl';
 import {Element} from 'lib-admin-ui/dom/Element';
 import {AEl} from 'lib-admin-ui/dom/AEl';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {nanoid} from 'nanoid';
+import {InputEl} from 'lib-admin-ui/dom/InputEl';
+import * as owasp from 'owasp-password-strength-test';
+import {PasswordStrengthBlock} from './PasswordStrengthBlock';
+import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 
-enum CharType {
-    SPECIAL,
-    DIGIT,
-    UPPERCASE,
-    LOWERCASE
+export enum PasswordStrength {
+    GOOD = 'good',
+    ALMOST_GOOD = 'almostgood',
+    NOT_GOOD = 'notgood',
+    BAD = 'bad',
+    VERY_BAD = 'verybad'
 }
 
 export class PasswordGenerator
     extends FormInputEl {
 
-    private input: PasswordInput;
+    private input: InputEl;
     private showLink: AEl;
     private generateLink: AEl;
-
-    private complexity: string;
+    private passwordStrengthBlock: PasswordStrengthBlock;
+    private passwordStrength: PasswordStrength;
 
     private focusListeners: { (event: FocusEvent): void }[] = [];
-
     private blurListeners: { (event: FocusEvent): void }[] = [];
-
-    private SPECIAL_CHARS: string = '!@#$%^&*()_+{}:"<>?|[];\',./`~';
-    private LOWERCASE_CHARS: string = 'abcdefghijklmnopqrstuvwxyz';
-    private UPPERCASE_CHARS: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    private DIGIT_CHARS: string = '0123456789';
 
     constructor() {
         super('div', 'password-generator');
 
-        const inputWrapper = new DivEl('input-wrapper');
-        this.appendChild(inputWrapper);
+        this.initElements();
+        this.initListeners();
+    }
 
-        const strengthMeter = new DivEl('strength-meter');
-        inputWrapper.appendChild(strengthMeter);
+    private initElements() {
+        this.input = new InputEl('password-input');
+        this.passwordStrengthBlock = new PasswordStrengthBlock();
+        this.showLink = new AEl('show-link');
+        this.toggleShowLink(true);
+        this.generateLink = new AEl('generate-link');
+        this.generateLink.setHtml(i18n('field.pswGenerator.generate'));
+    }
 
-        this.input = new PasswordInput();
+    private initListeners() {
         this.initFocusEvents(this.input);
+
         this.input.onInput(() => {
             this.assessComplexity(this.input.getValue());
             this.notifyValidityChanged(this.input.isValid());
         });
-        inputWrapper.appendChild(this.input);
 
-        this.showLink = new AEl('show-link');
-        this.toggleShowLink(true);
         this.initFocusEvents(this.showLink);
-        this.showLink.onClicked((event: MouseEvent) => {
 
+        this.showLink.onClicked((event: MouseEvent) => {
             this.toggleClass('unlocked');
 
             const unlocked = this.hasClass('unlocked');
@@ -66,11 +67,9 @@ export class PasswordGenerator
             event.preventDefault();
             return false;
         });
-        this.appendChild(this.showLink);
 
-        this.generateLink = new AEl();
-        this.generateLink.setHtml(i18n('field.pswGenerator.generate'));
         this.initFocusEvents(this.generateLink);
+
         this.generateLink.onClicked((event: MouseEvent) => {
             this.generatePassword();
             this.assessComplexity(this.input.getValue());
@@ -79,7 +78,6 @@ export class PasswordGenerator
             event.preventDefault();
             return false;
         });
-        this.appendChild(this.generateLink);
     }
 
     setValue(value: string, silent?: boolean, userInput?: boolean): PasswordGenerator {
@@ -105,15 +103,6 @@ export class PasswordGenerator
         return this;
     }
 
-    setPlaceholder(value: string): PasswordGenerator {
-        this.input.setPlaceholder(value);
-        return this;
-    }
-
-    getPlaceholder(): string {
-        return this.input.getPlaceholder();
-    }
-
     private toggleShowLink(locked: boolean) {
         this.showLink.getEl().setAttribute('data-i18n', i18n(`field.pswGenerator.${locked ? 'show' : 'hide'}`));
     }
@@ -124,134 +113,50 @@ export class PasswordGenerator
     }
 
     private assessComplexity(value: string) {
-        const isValid = this.input.isValid();
-
-        if (this.complexity) {
-            this.removeClass(this.complexity);
-            this.complexity = null;
+        if (this.passwordStrength) {
+            this.removeClass(this.passwordStrength);
+            this.passwordStrength = null;
         }
 
-        this.toggleClass('invalid', !isValid);
-
-        if (!isValid) {
-            this.getEl().setAttribute('data-i18n', i18n('field.password.invalid'));
-        } else {
-            if (this.isExtreme(value)) {
-                this.complexity = 'extreme';
-            } else if (this.isStrong(value)) {
-                this.complexity = 'strong';
-            } else if (this.isGood(value)) {
-                this.complexity = 'good';
-            } else if (this.isWeak(value)) {
-                this.complexity = 'weak';
-            }
-            if (this.complexity) {
-                this.addClass(this.complexity);
-                this.getEl().setAttribute('data-i18n', i18n(`field.pswGenerator.complexity.${this.complexity}`));
-            }
+        if (StringHelper.isEmpty(value)) {
+            this.getEl().removeAttribute('data-i18n');
+            return;
         }
+
+        const testResult: owasp.TestResult = owasp.test(value);
+        this.passwordStrengthBlock.setTestResult(testResult);
+
+        this.passwordStrength = this.getPasswordStrength(testResult);
+        this.getEl().setAttribute('data-i18n', i18n(`field.pswGenerator.complexity.${this.passwordStrength}`));
+        this.addClass(this.passwordStrength);
+    }
+
+    private getPasswordStrength(testResult: owasp.TestResult): PasswordStrength {
+        if (testResult.errors.length === 0) {
+            return PasswordStrength.GOOD;
+        }
+
+        if (testResult.errors.length === 1) {
+            return PasswordStrength.ALMOST_GOOD;
+        }
+
+        if (testResult.errors.length === 2) {
+            return PasswordStrength.NOT_GOOD;
+        }
+
+        if (testResult.errors.length === 3) {
+            return PasswordStrength.BAD;
+        }
+
+        return PasswordStrength.VERY_BAD;
     }
 
     private generatePassword() {
-        let length = NumberHelper.randomBetween(14, 16);
-        let maxSpecials = NumberHelper.randomBetween(1, 3);
-        let specials = 0;
-        let maxDigits = NumberHelper.randomBetween(2, 4);
-        let digits = 0;
-        let maxUppercase = NumberHelper.randomBetween(2, 4);
-        let uppercase = 0;
-        let maxLowercase = length - maxSpecials - maxDigits - maxUppercase;
-        let lowercase = 0;
-
-        let result = '';
-        let types = [CharType.SPECIAL, CharType.DIGIT, CharType.UPPERCASE, CharType.LOWERCASE];
-
-        for (let i = 0; i < length; i++) {
-            let type = types[NumberHelper.randomBetween(0, types.length - 1)];
-            switch (type) {
-            case CharType.SPECIAL:
-                if (specials < maxSpecials) {
-                    result += this.SPECIAL_CHARS.charAt(NumberHelper.randomBetween(0, this.SPECIAL_CHARS.length - 1));
-                    specials++;
-                } else {
-                    i--;
-                    ArrayHelper.removeValue(CharType.SPECIAL, types);
-                }
-                break;
-            case CharType.DIGIT:
-                if (digits < maxDigits) {
-                    result += this.DIGIT_CHARS.charAt(NumberHelper.randomBetween(0, this.DIGIT_CHARS.length - 1));
-                    digits++;
-                } else {
-                    i--;
-                    ArrayHelper.removeValue(CharType.DIGIT, types);
-                }
-                break;
-            case CharType.UPPERCASE:
-                if (uppercase < maxUppercase) {
-                    result += this.UPPERCASE_CHARS.charAt(NumberHelper.randomBetween(0, this.UPPERCASE_CHARS.length - 1));
-                    uppercase++;
-                } else {
-                    i--;
-                    ArrayHelper.removeValue(CharType.UPPERCASE, types);
-                }
-                break;
-            case CharType.LOWERCASE:
-                if (lowercase < maxLowercase) {
-                    result += this.LOWERCASE_CHARS.charAt(NumberHelper.randomBetween(0, this.LOWERCASE_CHARS.length - 1));
-                    lowercase++;
-                } else {
-                    i--;
-                    ArrayHelper.removeValue(CharType.LOWERCASE, types);
-                }
-                break;
-            }
-        }
-        this.input.setValue(result);
+        this.input.setValue(nanoid());
     }
 
     isValid(): boolean {
-        return !!this.getValue() && this.getValue().length > 0 && this.input.isValid();
-    }
-
-    private isWeak(value: string): boolean {
-        return !StringHelper.isBlank(value) &&
-               (value.length < 8 || StringHelper.isLowerCase(value) || StringHelper.isUpperCase(value));
-    }
-
-    private isGood(value: string): boolean {
-        return !StringHelper.isBlank(value) &&
-               (value.length >= 8 || (value.length >= 6 &&
-                                      StringHelper.isMixedCase(value) &&
-                                      this.containsNonAlphabetChars(value)));
-    }
-
-    private isStrong(value: string): boolean {
-        return !StringHelper.isBlank(value) &&
-               value.length >= 10 &&
-               StringHelper.isMixedCase(value) &&
-               this.containsNonAlphabetChars(value);
-    }
-
-    private isExtreme(value: string): boolean {
-        return !StringHelper.isBlank(value) &&
-               value.length >= 14 &&
-               StringHelper.isMixedCase(value) &&
-               this.containsDigits(value) &&
-               this.containsSpecialChars(value);
-
-    }
-
-    private containsDigits(value: string): boolean {
-        return /\d/.test(value);
-    }
-
-    private containsSpecialChars(value: string): boolean {
-        return /[^a-z0-9\s]/i.test(value);
-    }
-
-    private containsNonAlphabetChars(value: string): boolean {
-        return /[^a-z\s]/i.test(value);
+        return !!this.getValue() && this.getValue().length > 0 && this.input.isValid() && this.passwordStrength === PasswordStrength.GOOD;
     }
 
     private initFocusEvents(el: Element) {
@@ -261,6 +166,21 @@ export class PasswordGenerator
 
         el.onBlur((event: FocusEvent) => {
             this.notifyBlurred(event);
+        });
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            const inputWrapper = new DivEl('input-wrapper');
+            this.appendChild(inputWrapper);
+            inputWrapper.appendChild(this.input);
+
+            const toolbarWrapper = new DivEl('toolbar-wrapper');
+            toolbarWrapper.appendChildren(this.showLink, this.generateLink);
+            toolbarWrapper.appendChild(this.passwordStrengthBlock);
+            this.appendChild(toolbarWrapper);
+
+            return rendered;
         });
     }
 
