@@ -5,7 +5,9 @@
     "types": [
       "core-js",
       "hasher",
-      "q"
+      "q",
+      "nanoid",
+      "owasp-password-strength-test"
     ]
   },
   "exclude": [
