@@ -4,28 +4,28 @@ import * as owasp from 'owasp-password-strength-test';
 
 export class PasswordStrengthBlock extends DivEl {
 
-    private errorBlocks: SpanEl[] = [];
-
-    private testResult: owasp.TestResult;
+    private static BLOCKS_COUNT: number = 5;
 
     constructor() {
         super('password-complexity');
     }
 
     public setTestResult(testResult: owasp.TestResult) {
-        this.testResult = testResult;
-        this.evaluate();
+      if (testResult.errors.length > 0) {
+          this.setTitle(testResult.errors[0]);
+      } else {
+          this.setTitle('');
+      }
     }
 
-    private evaluate() {
-        this.errorBlocks.forEach((errorBlock: SpanEl) => this.removeChild(errorBlock));
-        this.errorBlocks = [];
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            for (let i = 0; i < PasswordStrengthBlock.BLOCKS_COUNT; i++) {
+                const errorBlock: SpanEl = new SpanEl('error-block');
+                this.appendChild(errorBlock);
+            }
 
-        this.testResult.errors.forEach((error: string) => {
-            const errorBlock: SpanEl = new SpanEl('error-block');
-            errorBlock.setTitle(error);
-            this.errorBlocks.push(errorBlock);
-            this.appendChild(errorBlock);
+            return rendered;
         });
     }
 }
