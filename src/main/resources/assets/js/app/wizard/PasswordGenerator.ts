@@ -10,11 +10,11 @@ import {PasswordStrengthBlock} from './PasswordStrengthBlock';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 
 export enum PasswordStrength {
+    STRONG = 'strong',
     GOOD = 'good',
-    ALMOST_GOOD = 'almostgood',
-    NOT_GOOD = 'notgood',
-    BAD = 'bad',
-    VERY_BAD = 'verybad'
+    MEDIUM = 'medium',
+    WEAK = 'weak',
+    BAD = 'bad'
 }
 
 export class PasswordGenerator
@@ -25,6 +25,7 @@ export class PasswordGenerator
     private generateLink: AEl;
     private passwordStrengthBlock: PasswordStrengthBlock;
     private passwordStrength: PasswordStrength;
+    private helpTextBlock: DivEl;
 
     private focusListeners: { (event: FocusEvent): void }[] = [];
     private blurListeners: { (event: FocusEvent): void }[] = [];
@@ -43,6 +44,8 @@ export class PasswordGenerator
         this.toggleShowLink(true);
         this.generateLink = new AEl('generate-link');
         this.generateLink.setHtml(i18n('field.pswGenerator.generate'));
+        this.helpTextBlock = new DivEl('help-text-block');
+        this.helpTextBlock.setHtml(i18n('field.pswGenerator.helpText'));
     }
 
     private initListeners() {
@@ -133,22 +136,22 @@ export class PasswordGenerator
 
     private getPasswordStrength(testResult: owasp.TestResult): PasswordStrength {
         if (testResult.errors.length === 0) {
-            return PasswordStrength.GOOD;
+            return PasswordStrength.STRONG;
         }
 
         if (testResult.errors.length === 1) {
-            return PasswordStrength.ALMOST_GOOD;
+            return PasswordStrength.GOOD;
         }
 
         if (testResult.errors.length === 2) {
-            return PasswordStrength.NOT_GOOD;
+            return PasswordStrength.MEDIUM;
         }
 
         if (testResult.errors.length === 3) {
-            return PasswordStrength.BAD;
+            return PasswordStrength.WEAK;
         }
 
-        return PasswordStrength.VERY_BAD;
+        return PasswordStrength.BAD;
     }
 
     private generatePassword() {
@@ -160,9 +163,9 @@ export class PasswordGenerator
     }
 
     private isPasswordValid(): boolean {
-        return this.passwordStrength === PasswordStrength.GOOD ||
-               this.passwordStrength === PasswordStrength.ALMOST_GOOD ||
-               this.passwordStrength === PasswordStrength.NOT_GOOD;
+        return this.passwordStrength === PasswordStrength.STRONG ||
+               this.passwordStrength === PasswordStrength.GOOD ||
+               this.passwordStrength === PasswordStrength.MEDIUM;
     }
 
     private initFocusEvents(el: Element) {
@@ -185,6 +188,7 @@ export class PasswordGenerator
             toolbarWrapper.appendChildren(this.showLink, this.generateLink);
             toolbarWrapper.appendChild(this.passwordStrengthBlock);
             this.appendChild(toolbarWrapper);
+            this.appendChild(this.helpTextBlock);
 
             return rendered;
         });
