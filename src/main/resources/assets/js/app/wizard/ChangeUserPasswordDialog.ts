@@ -21,8 +21,6 @@ export class ChangeUserPasswordDialog
 
     private principal: Principal;
 
-    private userPath: H6El;
-
     private changePasswordButton: DialogButton;
 
     constructor() {
@@ -32,10 +30,10 @@ export class ChangeUserPasswordDialog
 
         this.getEl().addClass('change-password-dialog');
 
-        this.userPath = new H6El().addClass('user-path');
-        let descMessage = new H6El().addClass('desc-message').setHtml(i18n('dialog.changePassword.msg'));
+        const userPath = new H6El().addClass('user-path');
+        const descMessage = new H6El().addClass('desc-message').setHtml(i18n('dialog.changePassword.msg'));
 
-        this.appendChildToContentPanel(this.userPath);
+        this.appendChildToHeader(userPath);
         this.appendChildToContentPanel(descMessage);
 
         this.password = new PasswordGenerator();
@@ -58,7 +56,7 @@ export class ChangeUserPasswordDialog
 
         OpenChangePasswordDialogEvent.on((event) => {
             this.principal = event.getPrincipal();
-            this.userPath.setHtml(this.principal.getKey().toPath());
+            userPath.setHtml(this.principal.getKey().toPath());
             this.open();
         });
 
