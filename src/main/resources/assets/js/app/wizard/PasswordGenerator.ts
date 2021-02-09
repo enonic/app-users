@@ -10,8 +10,8 @@ import {PasswordStrengthBlock} from './PasswordStrengthBlock';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 
 export enum PasswordStrength {
+    EXCELLENT = 'excellent',
     STRONG = 'strong',
-    GOOD = 'good',
     MEDIUM = 'medium',
     WEAK = 'weak',
     BAD = 'bad'
@@ -136,11 +136,11 @@ export class PasswordGenerator
 
     private getPasswordStrength(testResult: owasp.TestResult): PasswordStrength {
         if (testResult.errors.length === 0) {
-            return PasswordStrength.STRONG;
+            return PasswordStrength.EXCELLENT;
         }
 
         if (testResult.errors.length === 1) {
-            return PasswordStrength.GOOD;
+            return PasswordStrength.STRONG;
         }
 
         if (testResult.errors.length === 2) {
@@ -163,8 +163,8 @@ export class PasswordGenerator
     }
 
     private isPasswordValid(): boolean {
-        return this.passwordStrength === PasswordStrength.STRONG ||
-               this.passwordStrength === PasswordStrength.GOOD ||
+        return this.passwordStrength === PasswordStrength.EXCELLENT ||
+               this.passwordStrength === PasswordStrength.STRONG ||
                this.passwordStrength === PasswordStrength.MEDIUM;
     }
 

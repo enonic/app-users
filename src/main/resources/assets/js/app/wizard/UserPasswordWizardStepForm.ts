@@ -38,8 +38,7 @@ export class UserPasswordWizardStepForm
         this.createPasswordFormItem = new FormItemBuilder(this.password)
             .setLabel(i18n('field.password')).setValidator(Validators.required).build();
 
-        this.updatePasswordFormItem = new FormItemBuilder(this.changePasswordButton)
-            .setLabel(i18n('field.password')).build();
+        this.updatePasswordFormItem = new FormItemBuilder(this.changePasswordButton).build();
 
         this.fieldSet = new Fieldset();
         this.fieldSet.add(this.createPasswordFormItem);
