@@ -13,12 +13,13 @@ describe('User Wizard negative spec ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("GIVEN wizard for new User is opened WHEN name and e-mail have been typed THEN red circle should be displayed in the wizard page",
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             //Type an email and displayName:
             await userWizard.typeEmail(testUser.email);
@@ -32,7 +33,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             let isRedIconNotPresent = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
@@ -43,7 +44,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             //password has been cleared:
@@ -56,7 +57,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             //e-mail has been cleared:
@@ -69,7 +70,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", 'notvalid@@@mail.com', null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, 'notvalid@@@mail.com', null);
             await testUtils.clickOnSystemOpenUserWizard();
             //Type all data and email is not valid:
             await userWizard.typeData(testUser);

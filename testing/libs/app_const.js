@@ -30,6 +30,12 @@ module.exports = Object.freeze({
     PROVIDER_CREATED_NOTIFICATION: 'Id provider was created',
     STANDARD_ID_PROVIDER: 'Standard ID Provider',
 
+    PASSWORD: {
+        MEDIUM: "password123",
+        STRONG: "password123=",
+        WEAK: "password",
+        WITH_SPACES: " password123 "
+    },
     roles: {
         CM_ADMIN: 'Content Manager Administrator',
         ADMIN_CONSOLE: 'Administration Console Login',

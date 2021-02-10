@@ -15,6 +15,7 @@ describe('Save User specification - save an user', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     //verifies  https://github.com/enonic/lib-admin-ui/issues/614
     //User Wizard - confirmation about unsaved changes after changes were saved
@@ -24,7 +25,7 @@ describe('Save User specification - save an user', function () {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
             let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             //1. Open new user-wizard and type a name, email and password:
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
@@ -49,7 +50,7 @@ describe('Save User specification - save an user', function () {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             //1. Open new wizard and save the user:
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
@@ -70,7 +71,7 @@ describe('Save User specification - save an user', function () {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             //1. Open new wizard and type username, password and email:
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);

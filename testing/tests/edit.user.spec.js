@@ -15,6 +15,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("GIVEN 'User' with a role has been saved WHEN the user has been clicked THEN correct role should be displayed in the statistic panel",
         async () => {
@@ -23,7 +24,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userStatisticsPanel = new UserStatisticsPanel();
             let userName = userItemsBuilder.generateRandomName('user');
             let roles = [appConst.roles.CM_ADMIN, appConst.roles.USERS_ADMINISTRATOR];
-            testUser = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName), roles);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
             //1. Select System folder and open User Wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             testUtils.saveScreenshot('edit_user_wizard1');
