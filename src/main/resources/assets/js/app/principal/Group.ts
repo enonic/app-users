@@ -4,39 +4,21 @@ import {GroupJson} from './GroupJson';
 import {assert} from 'lib-admin-ui/util/Assert';
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {Membership, MembershipBuilder} from './Membership';
 
 export class Group
-    extends Principal {
+    extends Membership {
 
-    private members: PrincipalKey[];
-
-    private memberships: Principal[];
+    private readonly memberships: Principal[];
 
     constructor(builder: GroupBuilder) {
         super(builder);
         assert(this.getKey().isGroup(), 'Expected PrincipalKey of type Group');
-        this.members = builder.members || [];
         this.memberships = builder.memberships || [];
     }
 
-    getMembers(): PrincipalKey[] {
-        return this.members;
-    }
-
-    setMembers(members: PrincipalKey[]): void {
-        this.members = members || [];
-    }
-
-    addMember(member: PrincipalKey): void {
-        this.members.push(member);
-    }
-
     getMemberships(): Principal[] {
-        return this.memberships;
-    }
-
-    setMemberships(memberships: Principal[]) {
-        this.memberships = memberships;
+        return this.memberships.slice(0);
     }
 
     equals(o: Equitable): boolean {
@@ -44,9 +26,8 @@ export class Group
             return false;
         }
 
-        let other = <Group> o;
+        const other: Group = <Group> o;
         return super.equals(o) &&
-               ObjectHelper.arrayEquals(this.members, other.getMembers()) &&
                ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
     }
 
@@ -68,9 +49,7 @@ export class Group
 }
 
 export class GroupBuilder
-    extends PrincipalBuilder {
-
-    members: PrincipalKey[] = [];
+    extends MembershipBuilder {
 
     memberships: Principal[] = [];
 
@@ -85,17 +64,10 @@ export class GroupBuilder
     fromJson(json: GroupJson): GroupBuilder {
         super.fromJson(json);
 
-        if (json.members) {
-            this.members = json.members.map((memberStr) => PrincipalKey.fromString(memberStr));
-        }
         if (json.memberships) {
             this.memberships = json.memberships.map((principalJson) => Principal.fromJson(principalJson));
         }
-        return this;
-    }
 
-    setMembers(members: PrincipalKey[]): GroupBuilder {
-        this.members = members || [];
         return this;
     }
 

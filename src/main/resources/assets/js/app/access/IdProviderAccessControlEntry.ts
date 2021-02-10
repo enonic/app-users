@@ -34,7 +34,7 @@ export class IdProviderAccessControlEntry
     }
 
     getId(): string {
-        return this.principal.getKey().toString();
+        return `${this.principal.getKey().toString()}.${IdProviderAccess[this.access]}`;
     }
 
     equals(o: Equitable): boolean {
