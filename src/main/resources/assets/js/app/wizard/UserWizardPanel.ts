@@ -2,7 +2,7 @@ import * as Q from 'q';
 import {PrincipalWizardPanel} from './PrincipalWizardPanel';
 import {UserEmailWizardStepForm} from './UserEmailWizardStepForm';
 import {UserPasswordWizardStepForm} from './UserPasswordWizardStepForm';
-import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardStepForm';
+import {UserMembershipsWizardStepForm} from './UserMembershipsWizardStepForm';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {CreateUserRequest} from '../../graphql/principal/user/CreateUserRequest';
 import {UpdateUserRequest} from '../../graphql/principal/user/UpdateUserRequest';
@@ -22,7 +22,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
     private userEmailWizardStepForm: UserEmailWizardStepForm;
     private userPasswordWizardStepForm: UserPasswordWizardStepForm;
-    private membershipsWizardStepForm: MembershipsWizardStepForm;
+    private userMembershipsWizardStepForm: UserMembershipsWizardStepForm;
 
     constructor(params: PrincipalWizardPanelParams) {
 
@@ -50,13 +50,13 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
         this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams().idProvider.getKey(), this.isSystemUserItem());
         this.userPasswordWizardStepForm = new UserPasswordWizardStepForm();
-        this.membershipsWizardStepForm = new MembershipsWizardStepForm(MembershipsType.ALL);
+        this.userMembershipsWizardStepForm = new UserMembershipsWizardStepForm();
 
         if (!this.isSystemUserItem()) {
             steps.push(new WizardStep(i18n('field.user'), this.userEmailWizardStepForm));
         }
         steps.push(new WizardStep(i18n('field.authentication'), this.userPasswordWizardStepForm));
-        steps.push(new WizardStep(i18n('field.rolesAndGroups'), this.membershipsWizardStepForm));
+        steps.push(new WizardStep(i18n('field.rolesAndGroups'), this.userMembershipsWizardStepForm));
 
         return steps;
     }
@@ -97,7 +97,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
                 this.decorateDeletedAction(principal.getKey());
                 this.userEmailWizardStepForm.layout(principal);
                 this.userPasswordWizardStepForm.layout(principal);
-                this.membershipsWizardStepForm.layout(principal);
+                this.userMembershipsWizardStepForm.layout(principal);
             }
         });
     }
@@ -112,7 +112,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
             showFeedback(i18n('notify.create.user'));
             this.notifyPrincipalNamed(principal);
 
-            this.membershipsWizardStepForm.layout(principal);
+            this.userMembershipsWizardStepForm.layout(principal);
             this.userEmailWizardStepForm.layout(principal);
             this.userPasswordWizardStepForm.layout(principal);
 
@@ -132,7 +132,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         const name = wizardHeader.getDisplayName();
         const email = this.userEmailWizardStepForm.getEmail();
         const password = this.userPasswordWizardStepForm.getPassword();
-        const memberships = this.membershipsWizardStepForm.getMemberships().map(el => el.getKey());
+        const memberships = this.userMembershipsWizardStepForm.getMembershipsKeys();
         return new CreateUserRequest()
             .setKey(key)
             .setDisplayName(name)
@@ -145,7 +145,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     updatePersistedItem(): Q.Promise<Principal> {
         return super.updatePersistedItem().then((principal: Principal) => {
             //remove after users event handling is configured and layout is updated on receiving upd from server
-            this.membershipsWizardStepForm.layout(principal);
+            this.userMembershipsWizardStepForm.layout(principal);
             this.userEmailWizardStepForm.layout(principal);
             this.userPasswordWizardStepForm.layout(principal);
             return principal;
@@ -179,7 +179,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         return <Principal>new UserBuilder(this.getPersistedItem() ? <User>this.getPersistedItem() : null)
             .setEmail(this.userEmailWizardStepForm.getEmail())
             .setLogin(wizardHeader.getName())
-            .setMemberships(this.membershipsWizardStepForm.getMemberships())
+            .setMemberships(this.userMembershipsWizardStepForm.getMemberships())
             .setDisplayName(wizardHeader.getDisplayName())
             .build();
     }
@@ -243,7 +243,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         const wizardHeader = this.getWizardHeader();
         const email = this.userEmailWizardStepForm.getEmail();
         const password = this.userPasswordWizardStepForm.getPassword();
-        const memberships = this.membershipsWizardStepForm.getMemberships();
+        const memberships = this.userMembershipsWizardStepForm.getMemberships();
 
         return wizardHeader.getName() !== '' ||
                wizardHeader.getDisplayName() !== '' ||

@@ -8,13 +8,14 @@ import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
 import {Form} from 'lib-admin-ui/ui/form/Form';
+import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
+import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
 
 export class SecurityWizardStepForm
     extends WizardStepForm {
 
     private inheritance: DivEl;
     private comboBox: IdProviderAccessControlComboBox;
-    private idProvider: IdProvider;
 
     constructor() {
         super('security-wizard-step-form');
@@ -46,27 +47,50 @@ export class SecurityWizardStepForm
     }
 
     layout(idProvider: IdProvider, defaultIdProvider: IdProvider) {
-        this.idProvider = idProvider;
+        if (this.comboBox.isDirty()) {
+            if (this.isNewPermissionsListEqualToCurrent(idProvider, defaultIdProvider)) {
+                this.comboBox.resetBaseValues();
+            }
+        } else {
+            this.doLayout(idProvider, defaultIdProvider);
+        }
+    }
+
+    private isNewPermissionsListEqualToCurrent(idProvider: IdProvider, defaultIdProvider: IdProvider): boolean {
+        const defaultEntries: IdProviderAccessControlEntry[] = defaultIdProvider?.getPermissions().getEntries() || [];
+        const entries: IdProviderAccessControlEntry[] = idProvider.getPermissions().getEntries();
+
+        const currentPermissions: IdProviderAccessControlEntry[]  = this.comboBox.getSelectedDisplayValues();
+        const newPermissions: IdProviderAccessControlEntry[] = ArrayHelper.removeDuplicates([...defaultEntries, ...entries],
+            (item: IdProviderAccessControlEntry) => item.toString());
+
+        return newPermissions.length === currentPermissions.length &&
+               ArrayHelper.difference(newPermissions, currentPermissions,
+                   (a: IdProviderAccessControlEntry, b: IdProviderAccessControlEntry) => a.equals(b)).length === 0;
+    }
+
+    private doLayout(idProvider: IdProvider, defaultIdProvider: IdProvider) {
+        const defaultEntries: IdProviderAccessControlEntry[] = defaultIdProvider?.getPermissions().getEntries() || [];
+        const entries: IdProviderAccessControlEntry[] = idProvider.getPermissions().getEntries();
 
         this.comboBox.clearSelection(true);
 
         if (defaultIdProvider) {
-            defaultIdProvider.getPermissions().getEntries().forEach((item) => {
-                this.comboBox.select(item, true);
+            defaultEntries.forEach((item: IdProviderAccessControlEntry) => {
+                this.comboBox.select(item, true, true);
+                this.comboBox.resetBaseValues();
             });
         }
 
-        idProvider.getPermissions().getEntries().forEach((item) => {
+        entries.forEach((item: IdProviderAccessControlEntry) => {
             if (!this.comboBox.isSelected(item)) {
-                this.comboBox.select(item);
+                this.comboBox.select(item, false, true);
+                this.comboBox.resetBaseValues();
             }
         });
-
     }
 
     layoutReadOnly(idProvider: IdProvider) {
-        this.idProvider = idProvider;
-
         this.comboBox.clearSelection();
         idProvider.getPermissions().getEntries().forEach((item) => {
             if (!this.comboBox.isSelected(item)) {

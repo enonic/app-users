@@ -1,8 +1,5 @@
-import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
+import {MembershipJson} from './MembershipJson';
 
 export interface RoleJson
-    extends PrincipalJson {
-
-    members?: string[];
-
+    extends MembershipJson {
 }

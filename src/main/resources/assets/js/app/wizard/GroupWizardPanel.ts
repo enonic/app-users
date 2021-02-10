@@ -1,9 +1,7 @@
-import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
+import {MembershipWizardPanel} from './MembershipWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
-import {GroupMembersWizardStepForm} from './GroupMembersWizardStepForm';
 import {CreateGroupRequest} from '../../graphql/principal/group/CreateGroupRequest';
 import {UpdateGroupRequest} from '../../graphql/principal/group/UpdateGroupRequest';
-import {MembershipsType, MembershipsWizardStepForm} from './MembershipsWizardStepForm';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {Group, GroupBuilder} from '../principal/Group';
 import {Principal} from 'lib-admin-ui/security/Principal';
@@ -13,14 +11,17 @@ import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
 import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {MembershipWizardStepForm} from './MembershipWizardStepForm';
+import {Membership} from '../principal/Membership';
+import {RolesWizardStepForm} from './RolesWizardStepForm';
 
-export class GroupWizardPanel extends GroupRoleWizardPanel {
+export class GroupWizardPanel extends MembershipWizardPanel {
 
-    private membershipsWizardStepForm: MembershipsWizardStepForm;
+    private rolesWizardStepForm: RolesWizardStepForm;
 
     constructor(params: PrincipalWizardPanelParams) {
 
-        super(new GroupMembersWizardStepForm(), params);
+        super(new MembershipWizardStepForm(), params);
 
         this.addClass('group-wizard-panel');
     }
@@ -30,20 +31,20 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
 
         const descriptionStep = this.getDescriptionWizardStepForm();
         const membersStep = this.getMembersWizardStepForm();
-        this.membershipsWizardStepForm = new MembershipsWizardStepForm(MembershipsType.ROLES);
+        this.rolesWizardStepForm = new RolesWizardStepForm();
 
         steps.push(new WizardStep(i18n('field.groups'), descriptionStep));
         steps.push(new WizardStep(i18n('field.members'), membersStep));
-        steps.push(new WizardStep(i18n('field.roles'), this.membershipsWizardStepForm));
+        steps.push(new WizardStep(i18n('field.roles'), this.rolesWizardStepForm));
 
         return steps;
     }
 
-    protected doLayoutPersistedItem(principal: Principal): Q.Promise<void> {
+    protected doLayoutPersistedItem(principal: Membership): Q.Promise<void> {
 
         return super.doLayoutPersistedItem(principal).then(() => {
             if (principal) {
-                this.membershipsWizardStepForm.layout(principal);
+                this.rolesWizardStepForm.layout(principal);
             }
         });
     }
@@ -67,9 +68,9 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
         wizardHeader.normalizeNames();
         const key = PrincipalKey.ofGroup(this.getIdProvider().getKey(), wizardHeader.getName());
         const name = wizardHeader.getDisplayName();
-        const members = this.getMembersWizardStepForm().getMembers().map(el => el.getKey());
+        const members = this.getMembersWizardStepForm().getMembersKeys();
         const description = this.getDescriptionWizardStepForm().getDescription();
-        const memberships = this.membershipsWizardStepForm.getMemberships().map(el => el.getKey());
+        const memberships = this.rolesWizardStepForm.getRolesKeys();
         return new CreateGroupRequest()
             .setKey(key)
             .setDisplayName(name)
@@ -81,7 +82,7 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
     updatePersistedItem(): Q.Promise<Principal> {
         return super.updatePersistedItem().then((principal: Principal) => {
             //remove after users event handling is configured and layout is updated on receiving upd from server
-            this.membershipsWizardStepForm.layout(principal);
+            this.rolesWizardStepForm.layout(principal);
             return principal;
         });
     }
@@ -117,9 +118,9 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
         // group might be a member of other group, but that is not reflected in group wizard
         const groupMemberships: any = persistedGroup.getMemberships().filter((principal: Principal) => principal.isGroup());
 
-        return <Principal>new GroupBuilder(persistedGroup)
-            .setMembers(this.getMembersWizardStepForm().getMembers().map(el => el.getKey()))
-            .setMemberships(this.membershipsWizardStepForm.getMemberships().concat(groupMemberships))
+        return <Membership>new GroupBuilder(persistedGroup)
+            .setMemberships(this.rolesWizardStepForm.getRoles().concat(groupMemberships))
+            .setMembers(this.getMembersWizardStepForm().getMembersKeys())
             .setDisplayName(this.getWizardHeader().getDisplayName())
             .setDescription(this.getDescriptionWizardStepForm().getDescription())
             .build();
@@ -138,6 +139,6 @@ export class GroupWizardPanel extends GroupRoleWizardPanel {
     }
 
     isNewChanged(): boolean {
-        return super.isNewChanged() || this.membershipsWizardStepForm.getMemberships().length !== 0;
+        return super.isNewChanged() || this.rolesWizardStepForm.getRoles().length !== 0;
     }
 }

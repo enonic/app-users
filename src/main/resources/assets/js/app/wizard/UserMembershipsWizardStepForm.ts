@@ -10,39 +10,24 @@ import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
 import {Form} from 'lib-admin-ui/ui/form/Form';
 import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
-export enum MembershipsType {
-    GROUPS,
-    ROLES,
-    ALL
-}
-
-export class MembershipsWizardStepForm
+export class UserMembershipsWizardStepForm
     extends WizardStepForm {
 
     private groups: PrincipalComboBox;
 
     private roles: PrincipalComboBox;
 
-    private principal: Principal;
-
-    private rolesLoaded: boolean;
-
-    private type: MembershipsType;
-
-    constructor(type: MembershipsType) {
+    constructor() {
         super('user-memberships');
-
-        this.type = type;
 
         const fieldSet = new Fieldset();
 
-        if (type !== MembershipsType.GROUPS) {
-            this.initRoles(fieldSet);
-        }
-        if (type !== MembershipsType.ROLES) {
-            this.initGroups(fieldSet);
-        }
+        this.initRoles(fieldSet);
+
+        this.initGroups(fieldSet);
 
         const form = new Form().add(fieldSet);
 
@@ -70,8 +55,6 @@ export class MembershipsWizardStepForm
     }
 
     private initRoles(fieldSet: Fieldset) {
-        this.rolesLoaded = false;
-
         const rolesLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.ROLE]).skipPrincipals([RoleKeys.EVERYONE,
             RoleKeys.AUTHENTICATED]);
 
@@ -83,44 +66,65 @@ export class MembershipsWizardStepForm
     }
 
     layout(principal: Principal) {
-        this.principal = principal;
-        this.selectMembership();
-    }
+        const rolesKeys: PrincipalKey[] = this.getRolesKeysFromUser(<User>principal);
 
-    private selectMembership(): void {
-        const isGroupsReady = this.type !== MembershipsType.ROLES; //&& this.groupsLoaded;
-        const isRolesReady = this.type !== MembershipsType.GROUPS; //&& this.rolesLoaded;
-
-        if (this.principal && isGroupsReady) {
-
-            const groups = this.getMembershipsFromPrincipal().filter(el => el.isGroup()).map(el => el.getKey().toString());
-
-            this.groups.setValue(groups.join(';'));
-        }
-
-        if (this.principal && isRolesReady) {
-
-            const roles = this.getMembershipsFromPrincipal().filter(el => el.isRole()).map(el => el.getKey().toString());
-
-            this.roles.setValue(roles.join(';'));
-        }
-    }
-
-    getMembershipsFromPrincipal(): Principal[] {
-        if (this.principal && this.principal.isUser()) {
-            return (<User>this.principal).getMemberships();
-        } else if (this.principal && this.principal.isGroup()) {
-            return (<Group>this.principal).getMemberships();
+        if (this.roles.isDirty()) {
+            if (ObjectHelper.arrayEquals(this.getRolesKeys(), rolesKeys)) {
+                this.roles.resetBaseValues();
+            }
         } else {
-            return [];
+            this.roles.setValue(rolesKeys.join(';'));
         }
+
+        const groupKeys: PrincipalKey[] = this.getGroupsKeysFromUser(<User>principal);
+
+        if (this.groups.isDirty()) {
+            if (ObjectHelper.arrayEquals(this.getGroupsKeys(), groupKeys)) {
+                this.groups.resetBaseValues();
+            }
+        } else {
+            this.groups.setValue(groupKeys.join(';'));
+        }
+    }
+
+    getRoles(): Principal[] {
+        return this.roles.getSelectedDisplayValues();
+    }
+
+    getRolesKeys(): PrincipalKey[] {
+        return this.getRoles().map((role: Principal) => role.getKey());
+    }
+
+    private getRolesFromUser(user: User): Principal[] {
+        return user.getMemberships().filter((membership: Principal) => membership.isRole());
+    }
+
+    private getRolesKeysFromUser(user: User): PrincipalKey[] {
+        return this.getRolesFromUser(user).map((role: Principal) => role.getKey());
+    }
+
+    private getGroupsFromUser(user: User): Principal[] {
+        return user.getMemberships().filter((membership: Principal) => membership.isGroup());
+    }
+
+    private getGroupsKeysFromUser(user: User): PrincipalKey[] {
+        return this.getGroupsFromUser(user).map((group: Principal) => group.getKey());
+    }
+
+    getGroups(): Principal[] {
+        return this.groups.getSelectedDisplayValues();
+    }
+
+    getGroupsKeys(): PrincipalKey[] {
+        return this.getGroups().map((role: Principal) => role.getKey());
     }
 
     getMemberships(): Principal[] {
-        const groups = this.type !== MembershipsType.ROLES ? this.groups.getSelectedDisplayValues() : [];
-        const roles = this.type !== MembershipsType.GROUPS ? this.roles.getSelectedDisplayValues() : [];
+        return [...this.getGroups(), ...this.getRoles()];
+    }
 
-        return [...groups, ...roles].map(Principal.fromPrincipal);
+    getMembershipsKeys(): PrincipalKey[] {
+        return this.getMemberships().map((principal: Principal) => principal.getKey());
     }
 
     giveFocus(): boolean {

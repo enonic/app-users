@@ -1,6 +1,5 @@
-import {GroupRoleWizardPanel} from './GroupRoleWizardPanel';
+import {MembershipWizardPanel} from './MembershipWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
-import {RoleMembersWizardStepForm} from './RoleMembersWizardStepForm';
 import {CreateRoleRequest} from '../../graphql/principal/role/CreateRoleRequest';
 import {UpdateRoleRequest} from '../../graphql/principal/role/UpdateRoleRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
@@ -11,13 +10,14 @@ import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
 import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {MembershipWizardStepForm} from './MembershipWizardStepForm';
 
 export class RoleWizardPanel
-    extends GroupRoleWizardPanel {
+    extends MembershipWizardPanel {
 
     constructor(params: PrincipalWizardPanelParams) {
 
-        super(new RoleMembersWizardStepForm(), params);
+        super(new MembershipWizardStepForm(), params);
 
         this.addClass('role-wizard-panel');
     }
@@ -54,7 +54,7 @@ export class RoleWizardPanel
         wizardHeader.normalizeNames();
         let key = PrincipalKey.ofRole(wizardHeader.getName());
         let name = wizardHeader.getDisplayName();
-        let members = this.getMembersWizardStepForm().getMembers().map(el => el.getKey());
+        let members = this.getMembersWizardStepForm().getMembersKeys();
         let description = this.getDescriptionWizardStepForm().getDescription();
         return new CreateRoleRequest().setKey(key).setDisplayName(name).setMembers(members).setDescription(description);
     }
@@ -76,11 +76,10 @@ export class RoleWizardPanel
     }
 
     assembleViewedItem(): Principal {
-        return new RoleBuilder(<Role>this.getPersistedItem()).setMembers(
-            this.getMembersWizardStepForm().getMembers().map((el) => {
-                return el.getKey();
-            })).setDisplayName(this.getWizardHeader().getDisplayName()).setDescription(
-            this.getDescriptionWizardStepForm().getDescription()).build();
+        return new RoleBuilder(<Role>this.getPersistedItem())
+            .setMembers(this.getMembersWizardStepForm().getMembersKeys())
+            .setDisplayName(this.getWizardHeader().getDisplayName())
+            .setDescription(this.getDescriptionWizardStepForm().getDescription()).build();
     }
 
     isPersistedEqualsViewed(): boolean {

@@ -11,6 +11,7 @@ import {FormView} from 'lib-admin-ui/form/FormView';
 import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
 import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class UserEmailWizardStepForm
     extends WizardStepForm {
@@ -29,16 +30,18 @@ export class UserEmailWizardStepForm
         this.email.setIdProviderKey(this.idProviderKey);
         this.isSystemUser = isSystemUser;
 
-        let emailFormItem = new FormItemBuilder(this.email).setLabel(i18n('field.email')).setValidator(Validators.required).build();
+        const emailFormItem: FormItem =
+            new FormItemBuilder(this.email).setLabel(i18n('field.email')).setValidator(Validators.required).build();
 
-        let fieldSet = new Fieldset();
+        const fieldSet: Fieldset = new Fieldset();
         fieldSet.add(emailFormItem);
 
-        let form = new Form(FormView.VALIDATION_CLASS).add(fieldSet);
+        const form: Form = new Form(FormView.VALIDATION_CLASS).add(fieldSet);
 
         form.onFocus((event) => {
             this.notifyFocused(event);
         });
+
         form.onBlur((event) => {
             this.notifyBlurred(event);
         });
@@ -52,8 +55,13 @@ export class UserEmailWizardStepForm
     }
 
     layout(principal: Principal) {
-        let user = (<User>principal);
-        if (user) {
+        const user: User = (<User>principal);
+
+        if (this.email.isDirty()) {
+            if (ObjectHelper.stringEquals(this.email.getValue(), user.getEmail())) {
+                this.email.resetBaseValues();
+            }
+        } else {
             this.email.setValue(user.getEmail());
             this.email.setName(user.getEmail());
             this.email.setOriginEmail(user.getEmail());

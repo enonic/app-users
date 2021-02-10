@@ -22,11 +22,12 @@ import {ApplicationConfig} from 'lib-admin-ui/application/ApplicationConfig';
 import {ValidationRecording} from 'lib-admin-ui/form/ValidationRecording';
 import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class IdProviderWizardStepForm
     extends WizardStepForm {
 
-    private descriptionInput: TextInput;
+    private description: TextInput;
 
     private applicationComboBox: AuthApplicationComboBox;
 
@@ -57,8 +58,8 @@ export class IdProviderWizardStepForm
     }
 
     private createDescriptionFormItem(): FormItem {
-        this.descriptionInput = new TextInput('middle');
-        return new FormItemBuilder(this.descriptionInput).setLabel(i18n('field.description')).build();
+        this.description = new TextInput('middle');
+        return new FormItemBuilder(this.description).setLabel(i18n('field.description')).build();
     }
 
     private createIdProviderFormItem(): FormItem {
@@ -102,8 +103,24 @@ export class IdProviderWizardStepForm
             return;
         }
 
-        this.descriptionInput.setValue(idProvider.getDescription());
-        this.layoutApplicationCombobox(idProvider);
+        const description: string = !!idProvider.getDescription() ? idProvider.getDescription() : '';
+
+        if (this.description.isDirty()) {
+            if (ObjectHelper.stringEquals(this.description.getValue(), description)) {
+                this.description.resetBaseValues();
+            }
+        } else {
+            this.description.setValue(description);
+        }
+
+        if (this.applicationComboBox.isDirty()) {
+            if (ObjectHelper.stringEquals(this.applicationComboBox.getValue(),
+                idProvider.getIdProviderConfig()?.getApplicationKey().toString())) {
+                this.applicationComboBox.resetBaseValues();
+            }
+        } else {
+            this.layoutApplicationCombobox(idProvider);
+        }
     }
 
     private layoutApplicationCombobox(idProvider: IdProvider) {
@@ -157,10 +174,10 @@ export class IdProviderWizardStepForm
     }
 
     getDescription(): string {
-        return this.descriptionInput.getValue();
+        return this.description.getValue();
     }
 
     giveFocus(): boolean {
-        return this.descriptionInput.giveFocus();
+        return this.description.giveFocus();
     }
 }

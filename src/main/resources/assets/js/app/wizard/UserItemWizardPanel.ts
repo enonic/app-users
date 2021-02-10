@@ -36,7 +36,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     private lockChangedListeners: { (value: boolean): void }[] = [];
 
-    constructor(params: UserItemWizardPanelParams<USER_ITEM_TYPE>) {
+    protected constructor(params: UserItemWizardPanelParams<USER_ITEM_TYPE>) {
 
         super(params);
 
@@ -176,6 +176,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
         this.onRemoved(() => {
             handler.unUserItemDeleted(deleteHandler);
+            handler.unUserItemUpdated(updateHandler);
         });
     }
 

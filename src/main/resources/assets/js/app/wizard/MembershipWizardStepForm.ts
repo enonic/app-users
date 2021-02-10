@@ -8,55 +8,57 @@ import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
 import {Form} from 'lib-admin-ui/ui/form/Form';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {Membership} from '../principal/Membership';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {FormItem} from 'lib-admin-ui/ui/form/FormItem';
 
-export class PrincipalMembersWizardStepForm
+export class MembershipWizardStepForm
     extends WizardStepForm {
 
     private principals: PrincipalComboBox;
 
-    private principal: Principal;
-
     private loader: PrincipalLoader;
+
+    private form: Form;
 
     constructor() {
         super();
 
+        this.initElements();
+        this.initListeners();
+    }
+
+    private initElements() {
         this.loader =
             new PrincipalLoader().setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER]).skipPrincipals([PrincipalKey.ofAnonymous()]);
 
         this.principals = <PrincipalComboBox>PrincipalComboBox.create().setLoader(this.loader).build();
 
-        let principalsFormItem = new FormItemBuilder(this.principals).setLabel(i18n('field.members')).build();
-
-        let fieldSet = new Fieldset();
+        const principalsFormItem: FormItem = new FormItemBuilder(this.principals).setLabel(i18n('field.members')).build();
+        const fieldSet: Fieldset = new Fieldset();
         fieldSet.add(principalsFormItem);
 
-        let form = new Form().add(fieldSet);
+        this.form = new Form().add(fieldSet);
+    }
 
-        form.onFocus((event) => {
+    private initListeners() {
+        this.form.onFocus((event) => {
             this.notifyFocused(event);
         });
-        form.onBlur((event) => {
+
+        this.form.onBlur((event) => {
             this.notifyBlurred(event);
         });
-
-        this.appendChild(form);
-
     }
 
-    layout(principal: Principal) {
-        this.principal = principal;
-        this.loader.skipPrincipal(principal.getKey());
-        this.selectMembers();
-    }
-
-    private selectMembers(): void {
-
-        if (!!this.principal) {
-            let value = this.getPrincipalMembers().map((key: PrincipalKey) => {
-                return key.toString();
-            }).join(';');
-
+    layout(principal: Membership) {
+        if (this.principals.isDirty()) {
+            if (ObjectHelper.arrayEquals(this.getMembersKeys(), principal.getMembers())) {
+                this.principals.resetBaseValues();
+            }
+        } else {
+            this.loader.skipPrincipal(principal.getKey());
+            const value: string = principal.getMembers().map((key: PrincipalKey) => key.toString()).join(';');
             this.principals.setValue(value);
         }
     }
@@ -65,16 +67,8 @@ export class PrincipalMembersWizardStepForm
         return this.principals.getSelectedDisplayValues();
     }
 
-    getPrincipals(): PrincipalComboBox {
-        return this.principals;
-    }
-
-    getPrincipal(): Principal {
-        return this.principal;
-    }
-
-    getPrincipalMembers(): PrincipalKey[] {
-        throw new Error('Must be implemented by inheritors');
+    getMembersKeys(): PrincipalKey[] {
+        return this.getMembers().map((principal: Principal) => principal.getKey());
     }
 
     giveFocus(): boolean {
@@ -83,5 +77,13 @@ export class PrincipalMembersWizardStepForm
 
     getLoader(): PrincipalLoader {
         return this.loader;
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.appendChild(this.form);
+
+            return rendered;
+        });
     }
 }
