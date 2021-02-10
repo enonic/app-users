@@ -120,7 +120,7 @@ export class UserBrowsePanel
     }
 
     protected enableSelectionMode() {
-        this.filterPanel.setSelectedItems(this.treeGrid.getSelectedDataList());
+        this.filterPanel.setSelectedItems(this.treeGrid.getSelectedItems());
     }
 
     protected disableSelectionMode() {
