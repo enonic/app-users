@@ -15,13 +15,14 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("GIVEN new user is saved WHEN Delete button in toolbar has been pressed THEN Confirmation dialog should appear",
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
             let confirmationDialog = new ConfirmationDialog();
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             //1. Open new user-wizard, save the data:
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
@@ -38,7 +39,7 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             //1. Save the user:
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
@@ -57,7 +58,7 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName("user");
             let confirmationDialog = new ConfirmationDialog();
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             //1. Add and select new user:
             await testUtils.addSystemUser(testUser);
             await testUtils.findAndSelectItem(testUser.displayName);

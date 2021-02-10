@@ -21,13 +21,13 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
     let TEST_GROUP;
     let TEST_ROLE;
     let TEST_PROVIDER;
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it(`GIVEN new user-wizard is opened AND data has been typed WHEN 'Ctrl+s' has been pressed THEN the user should be saved`,
         async () => {
             let userWizard = new UserWizard();
-            let password = '1q2w3e';
             let userName = userItemsBuilder.generateRandomName('user');
-            TEST_USER = userItemsBuilder.buildUser(userName, password, userItemsBuilder.generateEmail(userName), null);
+            TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             //User-wizard is opened:
             await testUtils.clickOnSystemOpenUserWizard();
             //User's data has been typed:

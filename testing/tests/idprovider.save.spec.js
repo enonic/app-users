@@ -18,6 +18,7 @@ describe('Id Provider specification - save and edit a provider', function () {
     let ID_PROVIDER;
     let ID_PROVIDER_2;
     let TEST_USER;
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it(`GIVEN wizard for new 'Id Provider' is opened WHEN name has been typed AND 'Save' button pressed THEN expected notification message should appear`,
         async () => {
@@ -135,7 +136,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             let userName = userItemsBuilder.generateRandomName('user');
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            TEST_USER = userItemsBuilder.buildUser(userName, '1q2w3e', userItemsBuilder.generateEmail(userName));
+            TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName));
             //1. Select existing ID Provider and add new user:
             await testUtils.clickOnIdProviderAndOpenUserWizard(ID_PROVIDER_2.displayName);
             await userWizard.typeData(TEST_USER);

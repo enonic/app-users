@@ -15,6 +15,7 @@ describe("User Wizard and 'Confirmation dialog'", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("GIVEN user-wizard is opened AND display name has been typed WHEN close button pressed THEN Confirmation dialog should appear",
         async () => {
@@ -34,7 +35,7 @@ describe("User Wizard and 'Confirmation dialog'", function () {
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName("user");
             let roles = [appConst.roles.CM_ADMIN, appConst.roles.USERS_ADMINISTRATOR];
-            testUser = userItemsBuilder.buildUser(userName, "1q2w3e", userItemsBuilder.generateEmail(userName), roles);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
             await testUtils.addSystemUser(testUser);
             await testUtils.typeNameInFilterPanel(userName);
 

@@ -31,7 +31,7 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     get passwordInput() {
-        return XPATH.container + "//input[@type = 'password']";
+        return XPATH.container + "//input[@type = 'text' and contains(@class,'password-input')]";
     }
 
     get groupOptionsFilterInput() {

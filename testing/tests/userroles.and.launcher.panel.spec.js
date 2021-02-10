@@ -19,7 +19,7 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
     webDriverHelper.setupBrowser();
     let testUser;
     let userName;
-    let password = '1q2w3e';
+    let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("WHEN new user with required roles has been added THEN the user should be searchable",
         async () => {
@@ -27,7 +27,7 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
             userName = userItemsBuilder.generateRandomName('user');
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            testUser = userItemsBuilder.buildUser(userName, password, userItemsBuilder.generateEmail(userName), permissions);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), permissions);
             await testUtils.navigateToUsersApp();
             //1. Open user-wizard and save the data:
             await testUtils.clickOnSystemOpenUserWizard();
