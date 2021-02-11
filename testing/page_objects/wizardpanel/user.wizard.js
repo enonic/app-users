@@ -234,6 +234,15 @@ class UserWizard extends wizards.WizardPanel {
             throw new Error('User Wizard is not loaded! ' + err);
         });
     }
+
+    async getPasswordStatus() {
+        let status = await this.getAttribute(XPATH.container + XPATH.passwordGenerator, 'data-i18n');
+        if (!status) {
+            throw new Error("Password status was not found!");
+        }
+        return status;
+    }
 }
+
 module.exports = UserWizard;
 

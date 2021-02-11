@@ -33,7 +33,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             //User's data has been typed:
             await userWizard.typeDisplayName(TEST_USER.displayName);
             await userWizard.typeEmail(TEST_USER.email);
-            await userWizard.typePassword(password);
+            await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
             //keyboard shortcut to Save button has been pressed:
             await userWizard.hotKeySave();

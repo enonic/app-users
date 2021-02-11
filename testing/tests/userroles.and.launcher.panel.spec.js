@@ -48,7 +48,7 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
             await testUtils.doCloseUsersApp();
             await launcherPanel.clickOnLogoutLink();
             //1. Do login with just created user:
-            await loginPage.doLogin(userName, password);
+            await loginPage.doLogin(userName, PASSWORD);
             await launcherPanel.waitForPanelDisplayed();
             testUtils.saveScreenshot("user_has_no_admin");
 

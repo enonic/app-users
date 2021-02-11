@@ -78,6 +78,8 @@ describe('User Browse Panel specification', function () {
             assert.equal(names[0], 'System Id Provider', 'The name of the folder should be System Id Provider');
         });
 
+    //Verifies https://github.com/enonic/lib-admin-ui/issues/1790
+    //Case 2: Grid gets empty after openein/closing Details Panel (or resizing the browser window)
     it("GIVEN 'Selection Controller' checkbox has been clicked WHEN 'Selection Toggler' has been clicked THEN grid gets filtered - only provider-folders should be present in grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
