@@ -14,6 +14,8 @@ describe('User Wizard and Change Password dialog spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
+    const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
+
     it("WHEN user-wizard is opened THEN red circle should be present in the wizard, because required inputs are empty",
         async () => {
             let userWizard = new UserWizard();
@@ -46,7 +48,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let displayName = userItemsBuilder.generateRandomName('user');
             let email = userItemsBuilder.generateEmail(displayName);
-            testUser = userItemsBuilder.buildUser(displayName, 'password', email, null, null);
+            testUser = userItemsBuilder.buildUser(displayName, MEDIUM_PASSWORD, email, null, null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             let result = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
@@ -60,7 +62,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let displayName = userItemsBuilder.generateRandomName('user');
             let email = userItemsBuilder.generateEmail(displayName);
-            testUser = userItemsBuilder.buildUser(displayName, 'password', email, null, null);
+            testUser = userItemsBuilder.buildUser(displayName, MEDIUM_PASSWORD, email, null, null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
@@ -110,7 +112,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             assert.isTrue(isDisplayed, 'Show Password Link should be displayed');
         });
 
-    it("WHEN `Change Password Dialog` is opened THEN `Show password` link has been clicked THEN `Hide` button should appear",
+    it("WHEN 'Change Password Dialog' is opened THEN 'Show password' link has been clicked THEN 'Hide' button should appear",
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();

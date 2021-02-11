@@ -7,7 +7,7 @@ const appConst = require('../../libs/app_const');
 
 const XPATH = {
     container: "//div[contains(@id,'ChangeUserPasswordDialog')]",
-    passwordInput: "//input[contains(@id,'PasswordInput')]",
+    passwordInput: "//input[contains(@class,'password-input') and @type='text']",
     changePasswordButton: "//button[contains(@id,'DialogButton') and child::span[text()='Change Password']]",
     cancelButton: "//button[contains(@id,'DialogButton')]/span[text()='Cancel']",
     showPasswordLink: "//a[contains(@class,'show-link')]",

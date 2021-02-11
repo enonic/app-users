@@ -13,13 +13,48 @@ describe('User Wizard negative spec ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let testUser;
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    let MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
+    let WEAK_PASSWORD = appConst.PASSWORD.WEAK;
+
+    it("GIVEN wizard for new User is opened WHEN data with weak password has been typed THEN 'Save' button should be disabled",
+        async () => {
+            let userWizard = new UserWizard();
+            let userName = userItemsBuilder.generateRandomName('user');
+            testUser = userItemsBuilder.buildUser(userName, WEAK_PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            //1. Type a data with weak password:
+            await userWizard.typeData(testUser);
+            //2. Verify that Weak state of the password is displayed
+            let status = await userWizard.getPasswordStatus();
+            assert.equal(status, appConst.PASSWORD_STATE.WEAK, "Weak state of password should be displayed");
+            //3. Verify that 'Save' button is disabled:
+            await userWizard.waitForSaveButtonDisabled();
+            //4. Verify that user is not valid:
+            await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
+        });
+
+    it("GIVEN wizard for new User is opened WHEN data with medium password has been typed THEN 'Save' button should be enabled",
+        async () => {
+            let userWizard = new UserWizard();
+            let userName = userItemsBuilder.generateRandomName('user');
+            testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            await testUtils.clickOnSystemOpenUserWizard();
+            //1. Type a data with medium password:
+            await userWizard.typeData(testUser);
+            //2. Verify that 'Save' button is enabled:
+            await userWizard.waitForSaveButtonEnabled();
+            //3. Verify that Medium state of the password is displayed
+            let status = await userWizard.getPasswordStatus();
+            assert.equal(status, appConst.PASSWORD_STATE.MEDIUM, "Medium state of password should be displayed");
+            //4. Verify that red icon is not visible and the user is valid
+            await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
+        });
 
     it("GIVEN wizard for new User is opened WHEN name and e-mail have been typed THEN red circle should be displayed in the wizard page",
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             //Type an email and displayName:
             await userWizard.typeEmail(testUser.email);
@@ -33,7 +68,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             let isRedIconNotPresent = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
@@ -44,7 +79,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             //password has been cleared:
@@ -57,7 +92,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             //e-mail has been cleared:
@@ -70,7 +105,7 @@ describe('User Wizard negative spec ', function () {
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, 'notvalid@@@mail.com', null);
+            testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, 'notvalid@@@mail.com', null);
             await testUtils.clickOnSystemOpenUserWizard();
             //Type all data and email is not valid:
             await userWizard.typeData(testUser);
