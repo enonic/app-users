@@ -3,66 +3,40 @@ import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
 import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
 import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
 import {User} from '../principal/User';
-import {Group} from '../principal/Group';
-import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
-import {Form} from 'lib-admin-ui/ui/form/Form';
-import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class UserMembershipsWizardStepForm
-    extends WizardStepForm {
+    extends UserItemWizardStepForm {
 
     private groups: PrincipalComboBox;
 
     private roles: PrincipalComboBox;
 
     constructor() {
-        super('user-memberships');
-
-        const fieldSet = new Fieldset();
-
-        this.initRoles(fieldSet);
-
-        this.initGroups(fieldSet);
-
-        const form = new Form().add(fieldSet);
-
-        this.appendChild(form);
-
-        form.onFocus((event) => {
-            this.notifyFocused(event);
-        });
-        form.onBlur((event) => {
-            this.notifyBlurred(event);
-        });
-
-        this.appendChild(form);
+        super('user-memberships-wizard-step-form');
     }
 
-    private initGroups(fieldSet: Fieldset) {
+    protected initElements() {
+        super.initElements();
 
         const groupsLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.GROUP]);
-
         this.groups = <PrincipalComboBox>PrincipalComboBox.create().setLoader(groupsLoader).build();
 
-        const formItem = new FormItemBuilder(this.groups).setLabel(i18n('field.groups')).build();
-
-        fieldSet.add(formItem);
-    }
-
-    private initRoles(fieldSet: Fieldset) {
         const rolesLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.ROLE]).skipPrincipals([RoleKeys.EVERYONE,
             RoleKeys.AUTHENTICATED]);
-
         this.roles = <PrincipalComboBox>PrincipalComboBox.create().setLoader(rolesLoader).build();
+    }
 
-        const formItem = new FormItemBuilder(this.roles).setLabel(i18n('field.roles')).build();
+    protected createFormItems(): FormItem[] {
+        const groupsFormItem: FormItem = new FormItemBuilder(this.groups).setLabel(i18n('field.groups')).build();
+        const rolesFormItem: FormItem = new FormItemBuilder(this.roles).setLabel(i18n('field.roles')).build();
 
-        fieldSet.add(formItem);
+        return [rolesFormItem, groupsFormItem];
     }
 
     layout(principal: Principal) {

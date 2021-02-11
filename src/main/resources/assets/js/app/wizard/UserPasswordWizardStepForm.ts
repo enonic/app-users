@@ -11,9 +11,10 @@ import {Form} from 'lib-admin-ui/ui/form/Form';
 import {FormView} from 'lib-admin-ui/form/FormView';
 import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
 import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class UserPasswordWizardStepForm
-    extends WizardStepForm {
+    extends UserItemWizardStepForm {
 
     private password: PasswordGenerator;
 
@@ -25,29 +26,35 @@ export class UserPasswordWizardStepForm
 
     private principal: Principal;
 
-    private fieldSet: Fieldset;
-
     constructor() {
-        super();
+        super('user-password-wizard-step-form');
+    }
+
+    protected initElements() {
+        super.initElements();
 
         this.password = new PasswordGenerator();
-
         this.changePasswordButton = new Button(i18n('action.changePassword'));
-        this.changePasswordButton.addClass('change-password-button');
+    }
 
+    protected postInitElements() {
+        super.postInitElements();
+
+        this.updatePasswordFormItem.setVisible(false);
+    }
+
+    protected createFormItems(): FormItem[] {
         this.createPasswordFormItem = new FormItemBuilder(this.password)
             .setLabel(i18n('field.password')).setValidator(Validators.required).build();
 
         this.updatePasswordFormItem = new FormItemBuilder(this.changePasswordButton).build();
+        return [this.createPasswordFormItem, this.updatePasswordFormItem];
+    }
 
-        this.fieldSet = new Fieldset();
-        this.fieldSet.add(this.createPasswordFormItem);
-        this.fieldSet.add(this.updatePasswordFormItem);
+    protected initListeners() {
+        super.initListeners();
 
-        let passwordForm = new Form(FormView.VALIDATION_CLASS).add(this.fieldSet);
-
-        passwordForm.onValidityChanged((event: ValidityChangedEvent) => {
-            this.notifyValidityChanged(new WizardStepValidityChangedEvent(event.isValid()));
+        this.form.onValidityChanged((event: ValidityChangedEvent) => {
             this.createPasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
             this.updatePasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
         });
@@ -55,8 +62,6 @@ export class UserPasswordWizardStepForm
         this.changePasswordButton.onClicked(() => {
             new OpenChangePasswordDialogEvent(this.principal).fire();
         });
-        this.updatePasswordFormItem.setVisible(false);
-        this.appendChild(passwordForm);
     }
 
     layout(principal: Principal) {
@@ -65,6 +70,7 @@ export class UserPasswordWizardStepForm
 
     updatePrincipal(principal: Principal) {
         this.principal = principal;
+
         if (principal) {
             this.fieldSet.removeItem(this.createPasswordFormItem);
             this.updatePasswordFormItem.setVisible(true);
@@ -81,5 +87,13 @@ export class UserPasswordWizardStepForm
 
     giveFocus(): boolean {
         return this.password.giveFocus();
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.changePasswordButton.addClass('change-password-button');
+
+            return rendered;
+        });
     }
 }

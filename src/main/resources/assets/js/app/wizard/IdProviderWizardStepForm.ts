@@ -23,9 +23,10 @@ import {ValidationRecording} from 'lib-admin-ui/form/ValidationRecording';
 import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class IdProviderWizardStepForm
-    extends WizardStepForm {
+    extends UserItemWizardStepForm {
 
     private description: TextInput;
 
@@ -33,36 +34,17 @@ export class IdProviderWizardStepForm
 
     private idProviderFormContext: SecurityFormContext;
 
+    private selectedOptionsView: AuthApplicationSelectedOptionsView;
+
     constructor() {
-        super();
-
-        this.appendChild(this.createForm());
+        super('idprovider-wizard-step-form');
     }
 
-    private createForm(): Form {
-        const fieldSet: Fieldset = new Fieldset();
-        fieldSet.add(this.createDescriptionFormItem());
-        fieldSet.add(this.createIdProviderFormItem());
+    protected initElements() {
+        super.initElements();
 
-        const form: Form = new Form().add(fieldSet);
-
-        form.onFocus((event) => {
-            this.notifyFocused(event);
-        });
-
-        form.onBlur((event) => {
-            this.notifyBlurred(event);
-        });
-
-        return form;
-    }
-
-    private createDescriptionFormItem(): FormItem {
         this.description = new TextInput('middle');
-        return new FormItemBuilder(this.description).setLabel(i18n('field.description')).build();
-    }
 
-    private createIdProviderFormItem(): FormItem {
         const propertyArray: PropertyArray = PropertyArray.create()
             .setName('idProviderConfig')
             .setType(new ValueTypePropertySet())
@@ -70,19 +52,20 @@ export class IdProviderWizardStepForm
             .build();
 
         this.idProviderFormContext = SecurityFormContext.create().build();
-
-        const selectedOptionsView: AuthApplicationSelectedOptionsView =
-            new AuthApplicationSelectedOptionsView(new ApplicationConfigProvider(propertyArray),
-                this.idProviderFormContext, false);
+        this.selectedOptionsView =
+            new AuthApplicationSelectedOptionsView(new ApplicationConfigProvider(propertyArray), this.idProviderFormContext, false);
 
         this.applicationComboBox = <AuthApplicationComboBox>new AuthApplicationComboBoxBuilder()
-            .setSelectedOptionsView(selectedOptionsView)
+            .setSelectedOptionsView(this.selectedOptionsView)
             .build();
-        this.applicationComboBox.addClass('application-configurator');
+    }
+
+    protected initListeners() {
+        super.initListeners();
 
         this.applicationComboBox.onOptionSelected(() => {
             const selectedIdProviderOptionView: AuthApplicationSelectedOptionView =
-                <AuthApplicationSelectedOptionView>selectedOptionsView.getSelectedOptions()[0].getOptionView();
+                <AuthApplicationSelectedOptionView>this.selectedOptionsView.getSelectedOptions()[0].getOptionView();
 
             selectedIdProviderOptionView.getFormView().onValidityChanged((event: FormValidityChangedEvent) => {
                 this.previousValidation = event.getRecording();
@@ -94,8 +77,12 @@ export class IdProviderWizardStepForm
             this.previousValidation = new ValidationRecording();
             this.notifyValidityChanged(new WizardStepValidityChangedEvent(true));
         });
+    }
 
-        return new FormItemBuilder(this.applicationComboBox).setLabel(i18n('field.application')).build();
+    protected createFormItems(): FormItem[] {
+        const descriptionFormItem: FormItem = new FormItemBuilder(this.description).setLabel(i18n('field.description')).build();
+        const appComboBox: FormItem = new FormItemBuilder(this.applicationComboBox).setLabel(i18n('field.application')).build();
+        return [descriptionFormItem, appComboBox];
     }
 
     layout(idProvider: IdProvider) {
@@ -179,5 +166,14 @@ export class IdProviderWizardStepForm
 
     giveFocus(): boolean {
         return this.description.giveFocus();
+    }
+
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.applicationComboBox.addClass('application-configurator');
+
+            return rendered;
+        });
     }
 }

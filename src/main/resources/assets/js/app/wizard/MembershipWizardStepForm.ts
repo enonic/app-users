@@ -11,44 +11,30 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {Membership} from '../principal/Membership';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {FormItem} from 'lib-admin-ui/ui/form/FormItem';
+import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class MembershipWizardStepForm
-    extends WizardStepForm {
+    extends UserItemWizardStepForm {
 
     private principals: PrincipalComboBox;
 
     private loader: PrincipalLoader;
 
-    private form: Form;
-
     constructor() {
-        super();
-
-        this.initElements();
-        this.initListeners();
+        super('membership-wizard-step-form');
     }
 
-    private initElements() {
+    protected initElements() {
+        super.initElements();
+
         this.loader =
             new PrincipalLoader().setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER]).skipPrincipals([PrincipalKey.ofAnonymous()]);
-
         this.principals = <PrincipalComboBox>PrincipalComboBox.create().setLoader(this.loader).build();
-
-        const principalsFormItem: FormItem = new FormItemBuilder(this.principals).setLabel(i18n('field.members')).build();
-        const fieldSet: Fieldset = new Fieldset();
-        fieldSet.add(principalsFormItem);
-
-        this.form = new Form().add(fieldSet);
     }
 
-    private initListeners() {
-        this.form.onFocus((event) => {
-            this.notifyFocused(event);
-        });
-
-        this.form.onBlur((event) => {
-            this.notifyBlurred(event);
-        });
+    protected createFormItems(): FormItem[] {
+        const principalsFormItem: FormItem = new FormItemBuilder(this.principals).setLabel(i18n('field.members')).build();
+        return [principalsFormItem];
     }
 
     layout(principal: Membership) {
