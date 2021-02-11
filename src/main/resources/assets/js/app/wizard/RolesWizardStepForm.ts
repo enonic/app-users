@@ -3,51 +3,34 @@ import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
 import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
 import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
-import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
-import {Form} from 'lib-admin-ui/ui/form/Form';
-import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class RolesWizardStepForm
-    extends WizardStepForm {
+    extends UserItemWizardStepForm {
 
     private roles: PrincipalComboBox;
 
     constructor() {
-        super();
-
-        const fieldSet = new Fieldset();
-
-        this.initRoles(fieldSet);
-
-        const form = new Form().add(fieldSet);
-
-        this.appendChild(form);
-
-        form.onFocus((event) => {
-            this.notifyFocused(event);
-        });
-        form.onBlur((event) => {
-            this.notifyBlurred(event);
-        });
-
-        this.appendChild(form);
+        super('roles-wizard-step-form');
     }
 
-    private initRoles(fieldSet: Fieldset) {
-        const rolesLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.ROLE]).skipPrincipals([RoleKeys.EVERYONE,
+    protected initElements() {
+        super.initElements();
+
+        const rolesLoader: PrincipalLoader = new PrincipalLoader().setAllowedTypes([PrincipalType.ROLE]).skipPrincipals([RoleKeys.EVERYONE,
             RoleKeys.AUTHENTICATED]);
-
         this.roles = <PrincipalComboBox>PrincipalComboBox.create().setLoader(rolesLoader).build();
+    }
 
-        const formItem = new FormItemBuilder(this.roles).setLabel(i18n('field.roles')).build();
-
-        fieldSet.add(formItem);
+    protected createFormItems(): FormItem[] {
+        const formItem: FormItem = new FormItemBuilder(this.roles).setLabel(i18n('field.roles')).build();
+        return [formItem];
     }
 
     layout(principal: Principal) {

@@ -3,47 +3,36 @@ import {IdProvider} from '../principal/IdProvider';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {Validators} from 'lib-admin-ui/ui/form/Validators';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
-import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
-import {Form} from 'lib-admin-ui/ui/form/Form';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
 import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
+import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class SecurityWizardStepForm
-    extends WizardStepForm {
+    extends UserItemWizardStepForm {
 
     private inheritance: DivEl;
+
     private comboBox: IdProviderAccessControlComboBox;
 
     constructor() {
         super('security-wizard-step-form');
+    }
+
+    protected initElements() {
+        super.initElements();
 
         this.inheritance = new DivEl(/*'inheritance'*/);
-
         this.comboBox = new IdProviderAccessControlComboBox();
-        this.comboBox.addClass('principal-combobox');
+    }
 
-        let accessComboBoxFormItem = new FormItemBuilder(this.comboBox)
+    protected createFormItems(): FormItem[] {
+        const accessComboBoxFormItem: FormItem = new FormItemBuilder(this.comboBox)
             .setValidator(Validators.required)
             .setLabel(i18n('field.permissions')).build();
 
-        let fieldSet = new Fieldset();
-        fieldSet.add(accessComboBoxFormItem);
-
-        let form = new Form().add(fieldSet);
-
-        form.onFocus((event) => {
-            this.notifyFocused(event);
-        });
-        form.onBlur((event) => {
-            this.notifyBlurred(event);
-        });
-
-        this.appendChild(this.inheritance);
-        this.appendChild(form);
-
+        return [accessComboBoxFormItem];
     }
 
     layout(idProvider: IdProvider, defaultIdProvider: IdProvider) {
@@ -108,4 +97,13 @@ export class SecurityWizardStepForm
         return new IdProviderAccessControlList(this.comboBox.getSelectedDisplayValues());
     }
 
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.comboBox.addClass('principal-combobox');
+
+            this.prependChild(this.inheritance);
+
+            return rendered;
+        });
+    }
 }
