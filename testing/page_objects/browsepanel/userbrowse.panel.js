@@ -150,7 +150,7 @@ class UserBrowsePanel extends Page {
         return this.clickOnElement(this.appHomeButton).catch(err => {
             throw new Error('err: AppHome button ' + err);
         }).then(() => {
-            return this.pause(500);
+            return this.pause(1000);
         })
     }
 

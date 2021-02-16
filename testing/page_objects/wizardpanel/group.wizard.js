@@ -13,8 +13,8 @@ const XPATH = {
     roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]",
     rolesLink: `//li[child::a[text()='Roles']]`,
     membersLink: `//li[child::a[text()='Members']]`,
-    membersStepForm: `//div[contains(@id,'GroupMembersWizardStepForm')]`,
-    rolesStepForm: `//div[contains(@id,'MembershipsWizardStepForm')]`
+    membersStepForm: `//div[contains(@id,'MembershipWizardStepForm')]`,
+    rolesStepForm: `//div[contains(@id,'RolesWizardStepForm')]`
 };
 
 class GroupWizard extends WizardPanel {
