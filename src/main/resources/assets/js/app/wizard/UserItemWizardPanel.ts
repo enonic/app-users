@@ -61,6 +61,8 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         });
 
         this.wizardActions.getDeleteAction().onExecuted(this.handleDelete.bind(this));
+
+        this.handleServerEvents();
     }
 
     protected getParams(): UserItemWizardPanelParams<USER_ITEM_TYPE> {
@@ -147,16 +149,15 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
                 responsiveItem.update();
             });
 
-            this.handleServerEvents();
-
             return nextRendered;
         });
     }
 
     private handleServerEvents() {
         const deleteHandler = (ids: string[]) => {
-            const item = this.getPersistedItem();
-            if (!!item && ids.indexOf(item.getKey().toString()) >= 0) {
+            const id: string = this.isDataLoaded() ? this.getPersistedItem()?.getKey().toString() : this.params.tabId.getId();
+
+            if (!!id && ids.indexOf(id) >= 0) {
                 this.close();
             }
         };
@@ -165,7 +166,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         handler.onUserItemDeleted(deleteHandler);
 
         const updateHandler = (principal: Principal, idProvider: IdProvider) => {
-            if (!this.isItemPersisted()) {
+            if (!this.isItemPersisted() || !this.isDataLoaded()) {
                 return;
             }
 
