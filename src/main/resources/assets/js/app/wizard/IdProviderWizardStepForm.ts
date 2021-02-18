@@ -4,10 +4,8 @@ import {PropertySet} from 'lib-admin-ui/data/PropertySet';
 import {PropertyTree} from 'lib-admin-ui/data/PropertyTree';
 import {SecurityFormContext} from './SecurityFormContext';
 import {IdProvider} from '../principal/IdProvider';
-import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {FormState} from 'lib-admin-ui/app/wizard/WizardPanel';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {Form} from 'lib-admin-ui/ui/form/Form';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
 import {TextInput} from 'lib-admin-ui/ui/text/TextInput';
 import {
     AuthApplicationComboBox,
@@ -36,8 +34,10 @@ export class IdProviderWizardStepForm
 
     private selectedOptionsView: AuthApplicationSelectedOptionsView;
 
-    constructor() {
+    constructor(formState: FormState) {
         super('idprovider-wizard-step-form');
+
+        this.idProviderFormContext.setFormState(formState);
     }
 
     protected initElements() {
