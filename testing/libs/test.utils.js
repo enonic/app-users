@@ -161,8 +161,11 @@ module.exports = {
         let browsePanel = new UserBrowsePanel();
         let newPrincipalDialog = new NewPrincipalDialog();
         let groupWizard = new GroupWizard();
-        //1. Select System ID Provider folder:
-        await browsePanel.clickOnRowByName('system');
+        let result = await browsePanel.isRowHighlighted('System Id Provider');
+        if (!result) {
+            //1. Select System ID Provider folder:
+            await browsePanel.clickOnRowByName('system');
+        }
         //2. Open New Principal dialog:
         await browsePanel.waitForNewButtonEnabled();
         await browsePanel.clickOnNewButton();

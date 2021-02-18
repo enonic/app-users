@@ -16,7 +16,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
     webDriverHelper.setupBrowser();
     let testRole;
 
-    it('GIVEN role has been saved WHEN `App home` button has been clicked and `Roles` folder expanded THEN new role should be present',
+    it("GIVEN role has been saved WHEN 'App home' button has been clicked and 'Roles' folder expanded THEN new role should be present",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let roleWizard = new RoleWizard();
@@ -32,7 +32,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             assert.isTrue(result, 'new role should be present in the grid')
         });
 
-    it('GIVEN `Role` is saved in wizard WHEN Delete button on wizard-toolbar has been pressed THEN Confirmation dialog should appear',
+    it("GIVEN new 'Role' is saved WHEN 'Delete' button in wizard-toolbar has been pressed THEN Confirmation dialog should appear",
         async () => {
             let name = userItemsBuilder.generateRandomName('role');
             testRole = userItemsBuilder.buildRole(name, 'test role 2');
@@ -50,7 +50,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it('GIVEN existing role is opened WHEN `Ctrl+del` has been pressed THEN Confirmation dialog should appear',
+    it("GIVEN existing role is opened WHEN 'Ctrl+del' has been pressed THEN Confirmation dialog should appear",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let roleWizard = new RoleWizard();
@@ -66,7 +66,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it('GIVEN saved role is opened in the wizard WHEN the role has been deleted THEN expected notification message should appear',
+    it('GIVEN existing role is opened WHEN the role has been deleted in the wizard THEN expected notification message should appear',
         async () => {
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();

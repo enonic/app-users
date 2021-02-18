@@ -357,6 +357,14 @@ class UserBrowsePanel extends Page {
             throw new Error('error when click on selection_controller ' + err);
         }
     }
+
+    async isRowHighlighted(name) {
+        let locator = `${lib.itemByDisplayName(name)}` +
+                      `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]`;
+        await this.waitForElementDisplayed(locator, appConst.TIMEOUT_2);
+        let attribute = await this.getAttribute(locator, "class");
+        return attribute.includes("highlight");
+    }
 }
 
 module.exports = UserBrowsePanel;

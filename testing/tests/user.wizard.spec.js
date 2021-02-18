@@ -102,7 +102,6 @@ describe('User Wizard and Change Password dialog spec', function () {
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
             //Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
-
             await changePasswordDialog.waitForDialogLoaded();
             let isDisplayed = await changePasswordDialog.isPasswordInputDisplayed();
             assert.isTrue(isDisplayed, 'Password Input should be displayed');

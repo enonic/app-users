@@ -68,9 +68,17 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     clickOnChangePasswordButton() {
-        return this.clickOnElement(this.changePasswordButton).then(() => {
+        return this.clickOnElement(XPATH.changePasswordButton).then(() => {
             return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
         });
+    }
+
+    waitForChangePasswordButtonEnabled() {
+        return this.waitForElementEnabled(XPATH.container, appConst.mediumTimeout);
+    }
+
+    waitForChangePasswordButtonDisabled() {
+        return this.waitForElementDisabled(XPATH.container, appConst.mediumTimeout);
     }
 
     async clickOnShowPasswordLink() {
