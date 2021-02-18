@@ -23,11 +23,11 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
 
     it("WHEN new user with required roles has been added THEN the user should be searchable",
         async () => {
-            let permissions = ['Administration Console Login', 'Content Manager App'];
+            let roles = ['Administration Console Login', 'Content Manager App'];
             userName = userItemsBuilder.generateRandomName('user');
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), permissions);
+            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
             await testUtils.navigateToUsersApp();
             //1. Open user-wizard and save the data:
             await testUtils.clickOnSystemOpenUserWizard();

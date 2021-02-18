@@ -10,6 +10,7 @@ const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const UserStatisticsPanel = require('../page_objects/browsepanel/user.statistics.panel');
+const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
 
 describe('edit.user.spec: Edit an user - change e-mail, name and roles', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -74,6 +75,31 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
             assert.equal(actualRoles.length, 1, 'one role should be present on the statistics panel');
             assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
+        });
+
+    //Verifies Updating a password clears unsaved roles and groups #511
+    //https://github.com/enonic/app-users/issues/511
+    it("GIVEN existing user is opened WHEN new role has been added AND password has been changed THEN unsaved role should not be cleared after updating password",
+        async () => {
+            let userWizard = new UserWizard();
+            let changePasswordDialog = new ChangePasswordDialog();
+            //1. Open existing user:
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //2. Add new role:
+            await userWizard.filterOptionsAndAddRole(appConst.roles.USERS_ADMINISTRATOR);
+            //3. Change the password:
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            await changePasswordDialog.clickOnGeneratePasswordLink();
+            await changePasswordDialog.waitForChangePasswordButtonEnabled();
+            await changePasswordDialog.clickOnChangePasswordButton();
+            //4. Click on Save button:
+            await userWizard.waitAndClickOnSave();
+            await userWizard.waitForNotificationMessage();
+            //5. Verify that unsaved role is not cleared in the form:
+            let actualRoles = await userWizard.getSelectedRoles();
+            assert.equal(actualRoles[1], appConst.roles.USERS_ADMINISTRATOR, "Content Manager Administrator role should be present");
+            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, 'Content Manager Administrator role should be present');
         });
 
     it("GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail should be present in the statistics panel",

@@ -180,6 +180,12 @@ class UserWizard extends wizards.WizardPanel {
         return result;
     }
 
+    async getSelectedRoles() {
+        let selectedOptions = "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + lib.PRINCIPAL_SELECTED_OPTION +
+                              lib.H6_DISPLAY_NAME;
+        return this.getTextInElements(selectedOptions)
+    }
+
     filterOptionsAndAddRole(roleDisplayName) {
         let loaderComboBox = new LoaderComboBox();
         return this.typeTextInInput(XPATH.roleOptionsFilterInput, roleDisplayName).then(() => {
@@ -191,6 +197,14 @@ class UserWizard extends wizards.WizardPanel {
         }).catch(err => {
             throw new Error('Error when selecting the role-option: ' + roleDisplayName + ' ' + err);
         })
+    }
+
+    async filterOptionsAndAddGroup(groupDisplayName) {
+        let loaderComboBox = new LoaderComboBox();
+        await this.typeTextInInput(XPATH.groupOptionsFilterInput, groupDisplayName);
+        await loaderComboBox.waitForOptionVisible(XPATH.container, groupDisplayName);
+        await loaderComboBox.clickOnOption(XPATH.container, groupDisplayName);
+        return await this.pause(500);
     }
 
     typeEmail(email) {
