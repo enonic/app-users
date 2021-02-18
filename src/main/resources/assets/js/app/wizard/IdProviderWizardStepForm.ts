@@ -5,6 +5,7 @@ import {PropertyTree} from 'lib-admin-ui/data/PropertyTree';
 import {SecurityFormContext} from './SecurityFormContext';
 import {IdProvider} from '../principal/IdProvider';
 import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
+import {FormState} from 'lib-admin-ui/app/wizard/WizardPanel';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {Form} from 'lib-admin-ui/ui/form/Form';
 import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
@@ -32,16 +33,16 @@ export class IdProviderWizardStepForm
 
     private idProviderFormContext: SecurityFormContext;
 
-    constructor() {
+    constructor(formState: FormState) {
         super();
 
-        this.appendChild(this.createForm());
+        this.appendChild(this.createForm(formState));
     }
 
-    private createForm(): Form {
+    private createForm(formState: FormState): Form {
         const fieldSet: Fieldset = new Fieldset();
         fieldSet.add(this.createDescriptionFormItem());
-        fieldSet.add(this.createIdProviderFormItem());
+        fieldSet.add(this.createIdProviderFormItem(formState));
 
         const form: Form = new Form().add(fieldSet);
 
@@ -61,14 +62,14 @@ export class IdProviderWizardStepForm
         return new FormItemBuilder(this.descriptionInput).setLabel(i18n('field.description')).build();
     }
 
-    private createIdProviderFormItem(): FormItem {
+    private createIdProviderFormItem(formState: FormState): FormItem {
         const propertyArray: PropertyArray = PropertyArray.create()
             .setName('idProviderConfig')
             .setType(new ValueTypePropertySet())
             .setParent(new PropertyTree().getRoot())
             .build();
 
-        this.idProviderFormContext = SecurityFormContext.create().build();
+        this.idProviderFormContext = <SecurityFormContext>SecurityFormContext.create().setFormState(formState).build();
 
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
             new AuthApplicationSelectedOptionsView(new ApplicationConfigProvider(propertyArray),
