@@ -40,7 +40,8 @@ module.exports = Object.freeze({
         MEDIUM: "Medium",
         STRONG: "Strong",
         WEAK: "Weak",
-        EXCELLENT: "Excellent"
+        EXCELLENT: "Excellent",
+        BAD: "Bad"
     },
     roles: {
         CM_ADMIN: 'Content Manager Administrator',

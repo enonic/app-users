@@ -15,6 +15,7 @@ describe('User Wizard and Change Password dialog spec', function () {
     webDriverHelper.setupBrowser();
     let testUser;
     const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
+    const BAD_PASSWORD = "123";
 
     it("WHEN user-wizard is opened THEN red circle should be present in the wizard, because required inputs are empty",
         async () => {
@@ -109,6 +110,40 @@ describe('User Wizard and Change Password dialog spec', function () {
             assert.isTrue(isDisplayed, 'Generate Link should be displayed');
             isDisplayed = await changePasswordDialog.isShowLinkDisplayed();
             assert.isTrue(isDisplayed, 'Show Password Link should be displayed');
+            //Verify than Change Password button is disabled:
+            await changePasswordDialog.waitForChangePasswordButtonDisabled();
+        });
+
+    it("GIVEN 'Change Password Dialog' is opened WHEN '123' password has been typed THEN 'Bad' password status appears AND Change button is disabled",
+        async () => {
+            let userWizard = new UserWizard();
+            let changePasswordDialog = new ChangePasswordDialog();
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //Open 'Change Password Dialog'
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            await changePasswordDialog.typePassword(BAD_PASSWORD);
+            let status = await changePasswordDialog.getPasswordStatus();
+            testUtils.saveScreenshot('change_pass_bad_status');
+            assert.equal(status, appConst.PASSWORD_STATE.BAD, "bad password's status should be displayed");
+            //Verify than Change Password button is disabled:
+            await changePasswordDialog.waitForChangePasswordButtonDisabled();
+        });
+
+    it("GIVEN 'Change Password Dialog' is opened WHEN new password has been generated THEN 'Excellent' password status appears AND Change button gets enabled",
+        async () => {
+            let userWizard = new UserWizard();
+            let changePasswordDialog = new ChangePasswordDialog();
+            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            //Open 'Change Password Dialog'
+            await userWizard.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            await changePasswordDialog.clickOnGeneratePasswordLink();
+            let status = await changePasswordDialog.getPasswordStatus();
+            testUtils.saveScreenshot('change_pass_excellent_status');
+            assert.equal(status, appConst.PASSWORD_STATE.EXCELLENT, "Excellent password's status should be displayed");
+            //Verify than Change Password button is enabled:
+            await changePasswordDialog.waitForChangePasswordButtonEnabled();
         });
 
     it("WHEN 'Change Password Dialog' is opened THEN 'Show password' link has been clicked THEN 'Hide' button should appear",
