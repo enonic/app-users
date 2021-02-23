@@ -13,7 +13,9 @@ const XPATH = {
     showPasswordLink: "//a[contains(@class,'show-link')]",
     generatePasswordLink: "//a[text()='Generate']",
     userPath: "//h6[@class='user-path']",
+    passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
 };
+
 class ChangeUserPasswordDialog extends Page {
 
     get passwordInput() {
@@ -38,6 +40,10 @@ class ChangeUserPasswordDialog extends Page {
 
     get userPath() {
         return XPATH.container + XPATH.userPath;
+    }
+
+    get changePasswordButton() {
+        return XPATH.container + XPATH.changePasswordButton;
     }
 
     isPasswordInputDisplayed() {
@@ -74,11 +80,11 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     waitForChangePasswordButtonEnabled() {
-        return this.waitForElementEnabled(XPATH.container, appConst.mediumTimeout);
+        return this.waitForElementEnabled(this.changePasswordButton, appConst.mediumTimeout);
     }
 
     waitForChangePasswordButtonDisabled() {
-        return this.waitForElementDisabled(XPATH.container, appConst.mediumTimeout);
+        return this.waitForElementDisabled(this.changePasswordButton, appConst.mediumTimeout);
     }
 
     async clickOnShowPasswordLink() {
@@ -98,6 +104,11 @@ class ChangeUserPasswordDialog extends Page {
         return this.getTextInInput(this.passwordInput)
     }
 
+    //Sets value in password-input
+    typePassword(password) {
+        return this.typeTextInInput(this.passwordInput, password);
+    }
+
     async clickOnGeneratePasswordLink() {
         await this.clickOnElement(this.generatePasswordLink);
         return await this.pause(400);
@@ -110,7 +121,16 @@ class ChangeUserPasswordDialog extends Page {
     waitForDialogLoaded() {
         return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
     }
+
+    async getPasswordStatus() {
+        let status = await this.getAttribute(XPATH.container + XPATH.passwordGenerator, 'data-i18n');
+        if (!status) {
+            throw new Error("Password status was not found!");
+        }
+        return status;
+    }
 }
+
 module.exports = ChangeUserPasswordDialog;
 
 
