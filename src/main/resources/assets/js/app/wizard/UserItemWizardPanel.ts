@@ -7,7 +7,7 @@ import {ResponsiveItem} from 'lib-admin-ui/ui/responsive/ResponsiveItem';
 import {FormIcon} from 'lib-admin-ui/app/wizard/FormIcon';
 import {
     WizardHeaderWithDisplayNameAndName,
-    WizardHeaderWithDisplayNameAndNameBuilder
+    WizardHeaderWithDisplayNameAndNameOptions
 } from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
 import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
 import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
@@ -87,12 +87,11 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     }
 
     protected createWizardHeader(): WizardHeaderWithDisplayNameAndName {
-        let wizardHeader = new WizardHeaderWithDisplayNameAndNameBuilder().build();
+        const wizardHeader: WizardHeaderWithDisplayNameAndName = new WizardHeaderWithDisplayNameAndName();
+        const existing: USER_ITEM_TYPE = this.getPersistedItem();
+        const name: string = this.getWizardNameValue();
 
-        const existing = this.getPersistedItem();
-        const name = this.getWizardNameValue();
-
-        let displayName = '';
+        let displayName: string = '';
 
         if (existing) {
             displayName = existing.getDisplayName();
