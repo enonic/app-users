@@ -16,7 +16,7 @@ describe('Id Provider, provider-dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it(`GIVEN wizard for new Id Provider is opened WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Confirmation' dialog should appear after 'Close' has been clicked`,
+    it(`GIVEN provider's data is filled WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Confirmation' dialog should appear after 'Close' has been clicked`,
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
@@ -35,7 +35,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it("GIVEN new ID provider with invalid configuration WHEN click on close icon AND click on 'Yes' button in the modal dialog THEN error notification message should appear",
+    it("GIVEN new ID provider with invalid configuration WHEN click on close icon THEN click on 'Yes' button in confirmation dialog THEN error notification message should appear",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
