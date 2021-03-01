@@ -41,7 +41,7 @@ dependencies {
     include "com.enonic.lib:lib-mustache:2.0.0"
     testCompile "${group}:testing:${xpVersion}"
     testCompile 'junit:junit:4.13.2'
-    testCompile 'org.mockito:mockito-core:3.7.7'
+    testCompile 'org.mockito:mockito-core:3.8.0'
 }
 
 configurations.all {
