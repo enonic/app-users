@@ -13,7 +13,7 @@ const XPATH = {
     proxyHostInput: "//input[contains(@id,'TextInput') and contains(@name,'host')]",
     clientIdInput: "//input[contains(@id,'TextInput') and contains(@name,'clientId')]",
     applyButton: `//button[contains(@id,'DialogButton')]/span[text()='Apply']`,
-    addProxyButton: "//div[contains(@id,'FormItemSetView')]//button[child::span[text()='Add Proxy']]",
+    addProxyButton: "//div[contains(@id,'FormItemSetView')]//button[@title='Add Proxy' and child::span[text()='Add']]",
     cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
     selectedProviderView: `//div[contains(@id,'AuthApplicationSelectedOptionView')]`,
     idProviderTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Id Provider')]]",
