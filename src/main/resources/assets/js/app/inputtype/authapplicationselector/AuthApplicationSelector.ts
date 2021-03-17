@@ -130,11 +130,11 @@ export class AuthApplicationSelector
             .build();
 
         // creating selected option might involve property changes
-        comboBox.onBeforeOptionCreated(() => this.ignorePropertyChange = true);
-        comboBox.onAfterOptionCreated(() => this.ignorePropertyChange = false);
+        comboBox.onBeforeOptionCreated(() => this.ignorePropertyChange(true));
+        comboBox.onAfterOptionCreated(() => this.ignorePropertyChange(false));
 
         const forcedValidate = () => {
-            this.ignorePropertyChange = false;
+            this.ignorePropertyChange(false);
             this.validate(false);
         };
         const saveAndForceValidate = (selectedOption: SelectedOption<Application>) => {
@@ -144,7 +144,7 @@ export class AuthApplicationSelector
         };
 
         comboBox.onOptionDeselected((event: SelectedOptionEvent<Application>) => {
-            this.ignorePropertyChange = true;
+            this.ignorePropertyChange(true);
 
             this.getPropertyArray().remove(event.getSelectedOption().getIndex());
 
@@ -154,7 +154,7 @@ export class AuthApplicationSelector
         comboBox.onOptionSelected((event: SelectedOptionEvent<Application>) => {
             this.fireFocusSwitchEvent(event);
 
-            this.ignorePropertyChange = true;
+            this.ignorePropertyChange(true);
 
             const selectedOption = event.getSelectedOption();
             const key = selectedOption.getOption().getDisplayValue().getApplicationKey();
