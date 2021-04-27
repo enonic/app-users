@@ -182,31 +182,17 @@ export class AuthApplicationSelector
         return comboBox;
     }
 
-    displayValidationErrors(value: boolean) {
-        this.comboBox.getSelectedOptionViews().forEach((view: AuthApplicationSelectedOptionView) => {
-            view.getFormView().displayValidationErrors(value);
-        });
-    }
-
     protected getNumberOfValids(): number {
+
         return this.comboBox.countSelected();
     }
 
-    validate(silent: boolean = true): InputValidationRecording {
-        let recording = new InputValidationRecording();
-
+    validate(silent: boolean = true) {
         this.comboBox.getSelectedOptionViews().forEach((view: AuthApplicationSelectedOptionView) => {
-
-            let validationRecording = view.getFormView().validate(true);
-            if (!validationRecording.isMinimumOccurrencesValid()) {
-                recording.setBreaksMinimumOccurrences(true);
-            }
-            if (!validationRecording.isMaximumOccurrencesValid()) {
-                recording.setBreaksMaximumOccurrences(true);
-            }
+            view.getFormView().validate(true);
         });
 
-        return super.validate(silent, recording);
+        super.validate(silent);
     }
 
     giveFocus(): boolean {
