@@ -122,7 +122,7 @@ export class AuthApplicationSelector
         const value = this.getValueFromPropertyArray(this.getPropertyArray());
         const applicationConfigFormsToDisplay = value.split(';');
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
-            new AuthApplicationSelectedOptionsView(applicationConfigProvider, this.formContext, this.readOnly);
+            new AuthApplicationSelectedOptionsView(applicationConfigProvider, this.readOnly);
 
         const comboBox: AuthApplicationComboBox = <AuthApplicationComboBox>AuthApplicationComboBox.create()
             .setMaximumOccurrences(input.getOccurrences().getMaximum() || 0)

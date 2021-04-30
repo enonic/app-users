@@ -19,14 +19,11 @@ export class AuthApplicationSelectedOptionsView
 
     private afterOptionCreatedListeners: { (optionView: AuthApplicationSelectedOptionView): void }[] = [];
 
-    private formContext: FormContext;
-
     private items: AuthApplicationSelectedOptionView[] = [];
 
-    constructor(applicationConfigProvider: ApplicationConfigProvider, formContext: FormContext, readOnly: boolean) {
+    constructor(applicationConfigProvider: ApplicationConfigProvider, readOnly: boolean) {
         super();
         this.applicationConfigProvider = applicationConfigProvider;
-        this.formContext = formContext;
         this.setReadonly(readOnly);
 
         this.applicationConfigProvider.onPropertyChanged(() => {
@@ -47,7 +44,7 @@ export class AuthApplicationSelectedOptionsView
         this.notifyBeforeOptionCreated();
 
         let applicationConfig = this.applicationConfigProvider.getConfig(option.getDisplayValue().getApplicationKey());
-        let optionView = new AuthApplicationSelectedOptionView(option, applicationConfig, this.formContext, this.readonly);
+        let optionView = new AuthApplicationSelectedOptionView(option, applicationConfig, this.readonly);
 
         optionView.onApplicationConfigFormDisplayed((applicationKey: ApplicationKey) => {
             this.notifyApplicationConfigFormDisplayed(applicationKey, optionView.getFormView());
