@@ -13,6 +13,7 @@ import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEve
 import {NamesAndIconView, NamesAndIconViewBuilder} from 'lib-admin-ui/app/NamesAndIconView';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {NamesAndIconViewSize} from 'lib-admin-ui/app/NamesAndIconViewSize';
+import {FormState} from 'lib-admin-ui/app/wizard/WizardPanel';
 
 export class AuthApplicationSelectedOptionView
     extends BaseSelectedOptionView<Application> {
@@ -25,15 +26,12 @@ export class AuthApplicationSelectedOptionView
 
     private applicationConfigFormDisplayedListeners: { (applicationKey: ApplicationKey): void }[] = [];
 
-    private formContext: FormContext;
-
     private formValidityChangedHandler: { (event: FormValidityChangedEvent): void };
 
     private readOnly: boolean;
 
     constructor(option: Option<Application>,
                 applicationConfig: ApplicationConfig,
-                formContext: FormContext,
                 readOnly: boolean = false) {
 
         super(option);
@@ -47,7 +45,6 @@ export class AuthApplicationSelectedOptionView
 
         this.application = option.getDisplayValue();
         this.applicationConfig = applicationConfig;
-        this.formContext = formContext;
     }
 
     doRender(): Q.Promise<boolean> {
@@ -164,7 +161,8 @@ export class AuthApplicationSelectedOptionView
     }
 
     private createFormView(applicationConfig: ApplicationConfig): FormView {
-        const formView = new FormView(this.formContext, this.application.getIdProviderForm(), applicationConfig.getConfig());
+        const context: FormContext = FormContext.create().setFormState(new FormState(false)).build();
+        const formView = new FormView(context, this.application.getIdProviderForm(), applicationConfig.getConfig());
         formView.addClass('site-form');
 
         formView.onLayoutFinished(() => {
