@@ -29,12 +29,12 @@ import {Path} from 'lib-admin-ui/rest/Path';
 import {ShowBrowsePanelEvent} from 'lib-admin-ui/app/ShowBrowsePanelEvent';
 import {PropertyChangedEvent} from 'lib-admin-ui/PropertyChangedEvent';
 import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
-import {ContentUnnamed} from 'lib-admin-ui/content/ContentUnnamed';
 import {WizardPanel} from 'lib-admin-ui/app/wizard/WizardPanel';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {showError} from 'lib-admin-ui/notify/MessageBus';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {NamePrettyfier} from 'lib-admin-ui/NamePrettyfier';
 import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
 import {Event} from 'lib-admin-ui/event/Event';
 
@@ -162,7 +162,7 @@ export class UserAppPanel
 
     private handleWizardCreated(wizard: UserItemWizardPanel<UserItem>, tabName: string) {
         let tabMenuItem = new AppBarTabMenuItemBuilder()
-            .setLabel(ContentUnnamed.prettifyUnnamed(tabName))
+            .setLabel(NamePrettyfier.prettifyUnnamed(tabName))
             .setTabId(wizard.getTabId())
             .setCloseAction(wizard.getCloseAction())
             .build();
@@ -181,7 +181,7 @@ export class UserAppPanel
     }
 
     private getPrettyNameForWizardPanel(wizard: WizardPanel<UserItem>): string {
-        return ContentUnnamed.prettifyUnnamed((<UserItemWizardPanel<UserItem>>wizard).getUserItemType());
+        return NamePrettyfier.prettifyUnnamed((<UserItemWizardPanel<UserItem>>wizard).getUserItemType());
     }
 
     private handleWizardUpdated(wizard: UserItemWizardPanel<UserItem>, tabMenuItem: AppBarTabMenuItem) {
