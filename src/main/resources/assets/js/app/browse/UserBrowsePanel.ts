@@ -80,6 +80,10 @@ export class UserBrowsePanel
             if (this.isVisible()) {
                 this.refreshFilter();
             }
+
+            if (this.treeGrid.hasSelectedOrHighlightedNode()) {
+                this.updateBrowseActions();
+            }
         });
 
         serverHandler.onUserItemUpdated((principal: Principal, idProvider: IdProvider) => {

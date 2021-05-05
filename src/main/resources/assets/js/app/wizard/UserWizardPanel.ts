@@ -17,6 +17,7 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
 
 export class UserWizardPanel extends PrincipalWizardPanel {
 
@@ -25,7 +26,6 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     private userMembershipsWizardStepForm: UserMembershipsWizardStepForm;
 
     constructor(params: PrincipalWizardPanelParams) {
-
         super(params);
 
         this.addClass('user-wizard-panel');
@@ -46,7 +46,7 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     createSteps(principal?: Principal): WizardStep[] {
-        let steps: WizardStep[] = [];
+        const steps: WizardStep[] = [];
 
         this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams().idProvider.getKey(), this.isSystemUserItem());
         this.userPasswordWizardStepForm = new UserPasswordWizardStepForm();
@@ -62,14 +62,11 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     doLayout(persistedPrincipal: Principal): Q.Promise<void> {
-
         return super.doLayout(persistedPrincipal).then(() => {
-
             if (this.isRendered()) {
+                const viewedPrincipal: Principal = this.assembleViewedItem();
 
-                let viewedPrincipal = this.assembleViewedItem();
                 if (!this.isPersistedEqualsViewed()) {
-
                     console.warn(`Received Principal from server differs from what's viewed:`);
                     console.warn(' viewedPrincipal: ', viewedPrincipal);
                     console.warn(' persistedPrincipal: ', persistedPrincipal);
@@ -90,10 +87,8 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     protected doLayoutPersistedItem(principal: Principal): Q.Promise<void> {
-
         return super.doLayoutPersistedItem(principal).then(() => {
             if (principal) {
-
                 this.decorateDeletedAction(principal.getKey());
                 this.userEmailWizardStepForm.layout(principal);
                 this.userPasswordWizardStepForm.layout(principal);
@@ -104,7 +99,6 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
     persistNewItem(): Q.Promise<Principal> {
         return this.produceCreateUserRequest().sendAndParse().then((principal: Principal) => {
-
             this.decorateDeletedAction(principal.getKey());
 
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
@@ -195,17 +189,18 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     private showEmailErrors() {
-        let formEmail = this.userEmailWizardStepForm.getEmail();
+        const formEmail: string = this.userEmailWizardStepForm.getEmail();
+
         if (StringHelper.isEmpty(formEmail)) {
             throw i18n('notify.empty.email');
         } else if (!this.userEmailWizardStepForm.isValid()) {
             throw `${i18n('field.email.invalid')}.`;
         }
-
     }
 
     private showPasswordErrors() {
-        let password = this.userPasswordWizardStepForm.getPassword();
+        const password: string = this.userPasswordWizardStepForm.getPassword();
+
         if (StringHelper.isEmpty(password)) {
             throw i18n('notify.empty.password');
         } else if (!this.userPasswordWizardStepForm.isValid()) {
@@ -240,10 +235,10 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     isNewChanged(): boolean {
-        const wizardHeader = this.getWizardHeader();
-        const email = this.userEmailWizardStepForm.getEmail();
-        const password = this.userPasswordWizardStepForm.getPassword();
-        const memberships = this.userMembershipsWizardStepForm.getMemberships();
+        const wizardHeader: WizardHeaderWithDisplayNameAndName = this.getWizardHeader();
+        const email: string = this.userEmailWizardStepForm.getEmail();
+        const password: string = this.userPasswordWizardStepForm.getPassword();
+        const memberships: Principal[] = this.userMembershipsWizardStepForm.getMemberships();
 
         return wizardHeader.getName() !== '' ||
                wizardHeader.getDisplayName() !== '' ||
