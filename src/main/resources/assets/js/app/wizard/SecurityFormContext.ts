@@ -4,7 +4,6 @@ import {FormContext, FormContextBuilder} from 'lib-admin-ui/form/FormContext';
 import {PropertyPath} from 'lib-admin-ui/data/PropertyPath';
 import {Input} from 'lib-admin-ui/form/Input';
 import {InputTypeViewContext} from 'lib-admin-ui/form/inputtype/InputTypeViewContext';
-import {ContentPath} from 'lib-admin-ui/content/ContentPath';
 
 export class SecurityFormContext
     extends FormContext {
@@ -31,13 +30,8 @@ export class SecurityFormContext
             formContext: this,
             input: input,
             inputConfig: inputTypeConfig,
-            parentDataPath: parentPropertyPath,
-            contentPath: this.getContentPath(),
+            parentDataPath: parentPropertyPath
         };
-    }
-
-    private getContentPath(): ContentPath {
-        return new ContentPath([this.idProvider.getKey().toString()]);
     }
 
     static create(): SecurityFormContextBuilder {
