@@ -61,7 +61,7 @@ export class RolesWizardStepForm
         }
 
         if (principal && principal.isGroup()) {
-            return (<Group>principal).getMemberships().map((p: Principal) => p.getKey());
+            return (<Group>principal).getMemberships().filter((m: Principal) => m.isRole()).map((p: Principal) => p.getKey());
         }
 
         return [];

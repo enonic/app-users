@@ -4,10 +4,10 @@ import {GroupJson} from './GroupJson';
 import {assert} from 'lib-admin-ui/util/Assert';
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {Membership, MembershipBuilder} from './Membership';
+import {Members, MembersBuilder} from './Members';
 
 export class Group
-    extends Membership {
+    extends Members {
 
     private readonly memberships: Principal[];
 
@@ -27,8 +27,8 @@ export class Group
         }
 
         const other: Group = <Group> o;
-        return super.equals(o) &&
-               ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
+
+        return super.equals(o) && ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
     }
 
     clone(): Group {
@@ -49,12 +49,13 @@ export class Group
 }
 
 export class GroupBuilder
-    extends MembershipBuilder {
+    extends MembersBuilder {
 
     memberships: Principal[] = [];
 
     constructor(source?: Group) {
         super(source);
+
         if (source) {
             this.members = source.getMembers().slice(0);
             this.memberships = source.getMemberships().slice(0);
