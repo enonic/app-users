@@ -1,8 +1,8 @@
 import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
-import {MembershipJson} from './MembershipJson';
+import {MembersJson} from './MembersJson';
 
 export interface GroupJson
-    extends MembershipJson {
+    extends MembersJson {
 
     memberships?: PrincipalJson[];
 

@@ -16,10 +16,11 @@ import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
-export class UserWizardPanel extends PrincipalWizardPanel {
+export class UserWizardPanel
+    extends PrincipalWizardPanel {
 
     private userEmailWizardStepForm: UserEmailWizardStepForm;
     private userPasswordWizardStepForm: UserPasswordWizardStepForm;
@@ -27,14 +28,12 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
     constructor(params: PrincipalWizardPanelParams) {
         super(params);
-
         this.addClass('user-wizard-panel');
     }
 
     saveChanges(): Q.Promise<Principal> {
         if (!this.isRendered() ||
             (this.userEmailWizardStepForm.isValid() && this.userPasswordWizardStepForm.isValid())) {
-
             return super.saveChanges();
         } else {
             return Q.fcall(() => {
@@ -74,15 +73,15 @@ export class UserWizardPanel extends PrincipalWizardPanel {
                     new ConfirmationDialog()
                         .setQuestion(i18n('dialog.principal.update'))
                         .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal.clone()))
-                        .setNoCallback(() => { /* empty */ })
+                        .setNoCallback(() => { /* empty */
+                        })
                         .show();
                 }
 
                 return Q<void>(null);
-            } else {
-                return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
             }
 
+            return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
         });
     }
 
@@ -94,6 +93,8 @@ export class UserWizardPanel extends PrincipalWizardPanel {
                 this.userPasswordWizardStepForm.layout(principal);
                 this.userMembershipsWizardStepForm.layout(principal);
             }
+
+            return Q(null);
         });
     }
 
@@ -147,16 +148,18 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     produceUpdateRequest(viewedPrincipal: Principal): UpdateUserRequest {
-        const user = <User>viewedPrincipal;
-        const key = user.getKey();
-        const displayName = user.getDisplayName();
-        const email = user.getEmail();
-        const login = user.getLogin();
+        const user: User = <User>viewedPrincipal;
+        const key: PrincipalKey = user.getKey();
+        const displayName: string = user.getDisplayName();
+        const email: string = user.getEmail();
+        const login: string = user.getLogin();
 
-        const oldMemberships = (<User>this.getPersistedItem()).getMemberships().map(value => value.getKey());
-        const newMemberships = user.getMemberships().map(value => value.getKey());
-        const addMemberships = ArrayHelper.difference(newMemberships, oldMemberships, (a, b) => (a.toString() === b.toString()));
-        const removeMemberships = ArrayHelper.difference(oldMemberships, newMemberships, (a, b) => (a.toString() === b.toString()));
+        const oldMemberships: PrincipalKey[] = (<User>this.getPersistedItem()).getMemberships().map(value => value.getKey());
+        const newMemberships: PrincipalKey[] = user.getMemberships().map(value => value.getKey());
+        const addMemberships: PrincipalKey[] = ArrayHelper.difference(newMemberships, oldMemberships,
+            (a, b) => (a.toString() === b.toString()));
+        const removeMemberships: PrincipalKey[] = ArrayHelper.difference(oldMemberships, newMemberships,
+            (a, b) => (a.toString() === b.toString()));
 
         return new UpdateUserRequest()
             .setKey(key)
@@ -168,12 +171,13 @@ export class UserWizardPanel extends PrincipalWizardPanel {
     }
 
     assembleViewedItem(): Principal {
-        const wizardHeader = this.getWizardHeader();
+        const wizardHeader: WizardHeaderWithDisplayNameAndName = this.getWizardHeader();
         wizardHeader.normalizeNames();
+
         return <Principal>new UserBuilder(this.getPersistedItem() ? <User>this.getPersistedItem() : null)
             .setEmail(this.userEmailWizardStepForm.getEmail())
             .setLogin(wizardHeader.getName())
-            .setMemberships(this.userMembershipsWizardStepForm.getMemberships())
+            .setMemberships(this.userMembershipsWizardStepForm.getMemberships().sort(this.sortMemberships))
             .setDisplayName(wizardHeader.getDisplayName())
             .build();
     }
@@ -208,30 +212,13 @@ export class UserWizardPanel extends PrincipalWizardPanel {
         }
     }
 
-    isPersistedEqualsViewed(): boolean {
-        const persistedPrincipal = (<User>this.getPersistedItem());
-        const viewedPrincipal = (<User>this.assembleViewedItem());
-        // Group/User order can be different for viewed and persisted principal
-        viewedPrincipal.getMemberships().sort((a, b) => {
-            return a.getKey().toString().localeCompare(b.getKey().toString());
-        });
-        persistedPrincipal.getMemberships().sort((a, b) => {
-            return a.getKey().toString().localeCompare(b.getKey().toString());
-        });
+    protected assemblePersistedItem(): Principal {
+        const persistedUser: User = (<User>this.getPersistedItem());
 
-        // #hack - The newly added members will have different modifiedData
-        let viewedMembershipsKeys = viewedPrincipal.getMemberships().map((el) => {
-            return el.getKey();
-        });
-        let persistedMembershipsKeys = persistedPrincipal.getMemberships().map((el) => {
-            return el.getKey();
-        });
-
-        if (ObjectHelper.arrayEquals(viewedMembershipsKeys, persistedMembershipsKeys)) {
-            viewedPrincipal.setMemberships(persistedPrincipal.getMemberships());
-        }
-
-        return viewedPrincipal.equals(persistedPrincipal);
+        return persistedUser
+            .newBuilder()
+            .setMemberships(persistedUser.getMemberships().sort(this.sortMemberships))
+            .build();
     }
 
     isNewChanged(): boolean {
@@ -249,5 +236,9 @@ export class UserWizardPanel extends PrincipalWizardPanel {
 
     private decorateDeletedAction(principalKey: PrincipalKey) {
         this.wizardActions.getDeleteAction().setEnabled(!principalKey.isSystem());
+    }
+
+    private sortMemberships(a: Principal, b: Principal): number {
+        return a.getKey().getId().localeCompare(b.getKey().getId());
     }
 }

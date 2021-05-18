@@ -1,14 +1,14 @@
 import {Principal, PrincipalBuilder} from 'lib-admin-ui/security/Principal';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {MembershipJson} from './MembershipJson';
+import {MembersJson} from './MembersJson';
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
-export abstract class Membership extends Principal {
+export abstract class Members extends Principal {
 
     protected readonly members: PrincipalKey[];
 
-    protected constructor(builder: MembershipBuilder) {
+    protected constructor(builder: MembersBuilder) {
         super(builder);
         this.members = builder.members || [];
     }
@@ -18,30 +18,30 @@ export abstract class Membership extends Principal {
     }
 
     equals(o: Equitable): boolean {
-        if (!ObjectHelper.iFrameSafeInstanceOf(o, Membership)) {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, Members)) {
             return false;
         }
 
-        const other: Membership = <Membership> o;
+        const other: Members = <Members> o;
         return super.equals(o) && ObjectHelper.arrayEquals(this.members, other.getMembers());
     }
 
-    abstract clone(): Membership;
+    abstract clone(): Members;
 }
 
-export abstract class MembershipBuilder
+export abstract class MembersBuilder
     extends PrincipalBuilder {
 
     members: PrincipalKey[] = [];
 
-    protected constructor(source?: Membership) {
+    protected constructor(source?: Members) {
         super(source);
         if (source) {
             this.members = source.getMembers().slice(0);
         }
     }
 
-    fromJson(json: MembershipJson): MembershipBuilder {
+    fromJson(json: MembersJson): MembersBuilder {
         super.fromJson(json);
 
         if (json.members) {
@@ -51,10 +51,10 @@ export abstract class MembershipBuilder
         return this;
     }
 
-    setMembers(members: PrincipalKey[]): MembershipBuilder {
+    setMembers(members: PrincipalKey[]): MembersBuilder {
         this.members = members || [];
         return this;
     }
 
-    abstract build(): Membership;
+    abstract build(): Members;
 }

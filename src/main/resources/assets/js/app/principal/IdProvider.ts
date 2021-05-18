@@ -13,11 +13,11 @@ import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 export class IdProvider
     extends UserItem {
 
-    private idProviderConfig: IdProviderConfig;
+    private readonly idProviderConfig: IdProviderConfig;
 
-    private idProviderMode: IdProviderMode;
+    private readonly idProviderMode: IdProviderMode;
 
-    private permissions: IdProviderAccessControlList;
+    private readonly permissions: IdProviderAccessControlList;
 
     constructor(builder: IdProviderBuilder) {
         super(builder);

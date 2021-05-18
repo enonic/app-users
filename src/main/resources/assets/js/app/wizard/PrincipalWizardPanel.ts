@@ -19,6 +19,7 @@ import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult'
 import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
 import {DeletePrincipalRequest} from '../../graphql/principal/DeletePrincipalRequest';
 import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemRequest';
+import {User} from '../principal/User';
 
 export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
@@ -179,6 +180,10 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         throw new Error('Must be implemented by inheritors');
     }
 
+    protected assemblePersistedItem(): Principal {
+        throw new Error('Must be implemented by inheritors');
+    }
+
     protected handleServerUpdate(principal: Principal, idProvider: IdProvider) {
         if (principal && this.getPersistedItem().getKey().equals(principal.getKey())) {
             this.setPersistedItem(principal);
@@ -205,8 +210,10 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
     }
 
     isPersistedEqualsViewed(): boolean {
-        const viewedPrincipal = this.assembleViewedItem();
-        return viewedPrincipal.equals(this.getPersistedItem());
+        const persistedPrincipal: Principal = this.assemblePersistedItem();
+        const viewedPrincipal: Principal = this.assembleViewedItem();
+
+        return viewedPrincipal.equals(persistedPrincipal);
     }
 
     isNewChanged(): boolean {

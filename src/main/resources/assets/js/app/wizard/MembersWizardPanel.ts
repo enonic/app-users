@@ -2,22 +2,24 @@ import * as Q from 'q';
 import {PrincipalDescriptionWizardStepForm} from './PrincipalDescriptionWizardStepForm';
 import {PrincipalWizardPanel} from './PrincipalWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
-import {MembershipWizardStepForm} from './MembershipWizardStepForm';
-import {Principal} from 'lib-admin-ui/security/Principal';
+import {MembersWizardStepForm} from './MembersWizardStepForm';
 import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {Membership} from '../principal/Membership';
+import {Members} from '../principal/Members';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {Principal} from 'lib-admin-ui/security/Principal';
 
-export class MembershipWizardPanel extends PrincipalWizardPanel {
+export class MembersWizardPanel extends PrincipalWizardPanel {
 
     private readonly descriptionWizardStepForm: PrincipalDescriptionWizardStepForm;
-    private readonly membersWizardStepForm: MembershipWizardStepForm;
+    private readonly membersWizardStepForm: MembersWizardStepForm;
 
-    constructor(membersWizardStepForm: MembershipWizardStepForm, params: PrincipalWizardPanelParams) {
+    constructor(params: PrincipalWizardPanelParams) {
         super(params);
 
         this.descriptionWizardStepForm = new PrincipalDescriptionWizardStepForm();
-        this.membersWizardStepForm = membersWizardStepForm;
+        this.membersWizardStepForm = new MembersWizardStepForm();
 
         this.addClass('membership-wizard-panel');
     }
@@ -26,19 +28,16 @@ export class MembershipWizardPanel extends PrincipalWizardPanel {
         return this.descriptionWizardStepForm;
     }
 
-    getMembersWizardStepForm(): MembershipWizardStepForm {
+    getMembersWizardStepForm(): MembersWizardStepForm {
         return this.membersWizardStepForm;
     }
 
-    doLayout(persistedPrincipal: Membership): Q.Promise<void> {
-
+    doLayout(persistedPrincipal: Members): Q.Promise<void> {
         return super.doLayout(persistedPrincipal).then(() => {
-
             if (this.isRendered()) {
+                const viewedPrincipal: Principal = this.assembleViewedItem();
 
-                let viewedPrincipal = this.assembleViewedItem();
                 if (!this.isPersistedEqualsViewed()) {
-
                     console.warn(`Received Principal from server differs from what's viewed:`);
                     console.warn(' viewedPrincipal: ', viewedPrincipal);
                     console.warn(' persistedPrincipal: ', persistedPrincipal);
@@ -51,28 +50,33 @@ export class MembershipWizardPanel extends PrincipalWizardPanel {
                 }
 
                 return Q<void>(null);
-            } else {
-                return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
             }
 
+            return this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
         });
     }
 
-    protected doLayoutPersistedItem(principal: Membership): Q.Promise<void> {
-
+    protected doLayoutPersistedItem(principal: Members): Q.Promise<void> {
         return super.doLayoutPersistedItem(principal).then(() => {
             if (!!principal) {
                 this.getDescriptionWizardStepForm().layout(principal);
                 this.getMembersWizardStepForm().layout(principal);
             }
+
+            return Q(null);
         });
     }
 
     isNewChanged(): boolean {
-        const wizardHeader = this.getWizardHeader();
+        const wizardHeader: WizardHeaderWithDisplayNameAndName = this.getWizardHeader();
+
         return wizardHeader.getName() !== '' ||
                wizardHeader.getDisplayName() !== '' ||
                this.descriptionWizardStepForm.getDescription() !== '' ||
                this.membersWizardStepForm.getMembersKeys().length !== 0;
+    }
+
+    protected sortMembers(a: PrincipalKey, b: PrincipalKey): number {
+        return a.getId().localeCompare(b.getId());
     }
 }
