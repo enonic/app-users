@@ -131,6 +131,8 @@ describe('Id Provider specification - save and edit a provider', function () {
             await userBrowsePanel.isEditButtonEnabled();
         });
 
+    //Verifies https://github.com/enonic/app-users/issues/461
+    //Delete button remains enabled after adding a user in ID provider #461
     it(`GIVEN existing 'Id Provider'(with an user) is selected WHEN new user has been added THEN 'Delete' button(in browse panel) gets disabled`,
         async () => {
             let userName = userItemsBuilder.generateRandomName('user');
