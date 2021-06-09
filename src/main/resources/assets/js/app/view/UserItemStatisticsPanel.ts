@@ -26,13 +26,12 @@ import {CheckboxBuilder} from 'lib-admin-ui/ui/Checkbox';
 import {Element} from 'lib-admin-ui/dom/Element';
 import {Button} from 'lib-admin-ui/ui/button/Button';
 import {UserItemStatisticsHeader} from './UserItemStatisticsHeader';
+import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel {
 
     private readonly userDataContainer: DivEl;
-
-    private isAdminPromise: Q.Promise<boolean>;
 
     private reportServicePath: string;
 
@@ -40,8 +39,6 @@ export class UserItemStatisticsPanel
 
     constructor() {
         super('principal-item-statistics-panel');
-
-        this.isAdminPromise = new IsAuthenticatedRequest().sendAndParse().then(result => this.isAdmin(result.getPrincipals()));
 
         this.userDataContainer = new DivEl('user-data-container');
 
@@ -144,13 +141,13 @@ export class UserItemStatisticsPanel
             this.appendTransitiveSwitch(principal.getKey(), rolesAndGroupsGroup, mems.length > 0);
             this.appendRolesAndGroups(mems, rolesAndGroupsGroup);
 
-            return this.isAdminPromise.then(isAdmin => {
-                if (isAdmin) {
+            return new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
+                if (this.isAdmin(loginResult.getPrincipals())) {
                     addedGroups.push(this.createReportGroup(principal));
                 }
+
                 return addedGroups;
             });
-
         });
     }
 
