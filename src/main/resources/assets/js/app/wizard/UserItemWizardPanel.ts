@@ -5,10 +5,7 @@ import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandle
 import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
 import {ResponsiveItem} from 'lib-admin-ui/ui/responsive/ResponsiveItem';
 import {FormIcon} from 'lib-admin-ui/app/wizard/FormIcon';
-import {
-    WizardHeaderWithDisplayNameAndName,
-    WizardHeaderWithDisplayNameAndNameOptions
-} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
 import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
 import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 import {UserItem} from 'lib-admin-ui/security/UserItem';
@@ -37,7 +34,6 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     private lockChangedListeners: { (value: boolean): void }[] = [];
 
     protected constructor(params: UserItemWizardPanelParams<USER_ITEM_TYPE>) {
-
         super(params);
 
         this.initListeners();
@@ -101,7 +97,8 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         }
 
         wizardHeader.setPath(this.getParams().persistedPath);
-        wizardHeader.initNames(displayName, name, false);
+        wizardHeader.setDisplayName(displayName);
+        wizardHeader.setName(name);
 
         return wizardHeader;
     }
@@ -130,7 +127,6 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     }
 
     doRenderOnDataLoaded(rendered: boolean): Q.Promise<boolean> {
-
         return super.doRenderOnDataLoaded(rendered).then((nextRendered) => {
             this.addClass('principal-wizard-panel');
 

@@ -54,8 +54,8 @@ export class IdProviderWizardPanel
             if (IdProviderWizardPanel.debug) {
                 console.debug('IdProviderWizardPanel.doRenderOnDataLoaded');
             }
-            this.addClass('principal-wizard-panel id-provider-wizard-panel');
 
+            this.addClass('principal-wizard-panel id-provider-wizard-panel');
             this.getFormIcon().addClass('icon-address-book');
 
             return nextRendered;
@@ -174,7 +174,8 @@ export class IdProviderWizardPanel
 
     protected doLayoutPersistedItem(persistedItem: IdProvider): Q.Promise<void> {
         if (!!persistedItem) {
-            this.getWizardHeader().initNames(persistedItem.getDisplayName(), this.getWizardNameValue(), false);
+            this.getWizardHeader().setDisplayName(persistedItem.getDisplayName());
+            this.getWizardHeader().setName(this.getWizardNameValue());
             this.idProviderWizardStepForm.layout(persistedItem);
             this.permissionsWizardStepForm.layout(persistedItem, this.defaultIdProvider);
         } else {

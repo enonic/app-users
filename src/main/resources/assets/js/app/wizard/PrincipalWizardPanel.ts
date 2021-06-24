@@ -114,7 +114,6 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
     }
 
     doLayout(persistedPrincipal: Principal): Q.Promise<void> {
-
         return super.doLayout(persistedPrincipal).then(() => {
 
             let viewedPrincipal;
@@ -145,7 +144,8 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
     protected doLayoutPersistedItem(principal: Principal): Q.Promise<void> {
         if (principal) {
-            this.getWizardHeader().initNames(principal.getDisplayName(), this.getWizardNameValue(), false);
+            this.getWizardHeader().setDisplayName(principal.getDisplayName());
+            this.getWizardHeader().setName(this.getWizardNameValue());
         }
 
         return Q<void>(null);
