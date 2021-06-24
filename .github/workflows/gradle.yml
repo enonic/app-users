@@ -79,5 +79,5 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: ${{ matrix.repo }}
-          event-type: app-applications
+          event-type: app-users
           client-payload: '{"ref": "${{ github.ref }}"}'
