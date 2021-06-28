@@ -397,8 +397,7 @@ export class UserAppPanel
             .setPersistedType(principal.getType())
             .setPersistedPath(principal.getKey().toPath(true))
             .setTabId(tabId)
-            .setPersistedDisplayName(principal.getDisplayName())
-            .setPersistedItem(principal);
+            .setPersistedDisplayName(principal.getDisplayName());
 
         let wizard = this.resolvePrincipalWizardPanel(wizardParams);
 
