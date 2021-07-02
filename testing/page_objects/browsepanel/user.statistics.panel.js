@@ -23,7 +23,7 @@ class UserStatisticsPanel extends UserItemStatisticsPanel {
 
     getDisplayNameOfRoles() {
         let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
-        return this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_user_statistic');
             throw new Error("Roles & Groups was not loaded!" + err);
         }).then(() => {
