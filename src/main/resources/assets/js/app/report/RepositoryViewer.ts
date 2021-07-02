@@ -19,8 +19,4 @@ export class RepositoryViewer
 
         return super.setObject(report);
     }
-
-    getPreferredHeight(): number {
-        return 40;
-    }
 }
