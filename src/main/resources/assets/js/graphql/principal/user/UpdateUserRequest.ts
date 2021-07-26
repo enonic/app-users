@@ -54,7 +54,7 @@ export class UpdateUserRequest
         return vars;
     }
 
-    // tslint:disable max-line-length
+    /* eslint-disable max-len */
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $addMemberships: [String], $removeMemberships: [String]) {
             updateUser(key: $key, displayName: $displayName, email: $email, login: $login, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
@@ -70,7 +70,8 @@ export class UpdateUserRequest
             }
         }`;
     }
-    // tslint:enable max-line-length
+
+    /* eslint-enable max-len */
 
     sendAndParse(): Q.Promise<User> {
         return this.mutate().then(json => this.fromJson(json.updateUser, json.error));

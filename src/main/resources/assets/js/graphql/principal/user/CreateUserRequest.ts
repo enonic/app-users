@@ -54,7 +54,7 @@ export class CreateUserRequest
         return vars;
     }
 
-    // tslint:disable max-line-length
+    /* eslint-disable max-len */
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String!, $memberships: [String]) {
             createUser(key: $key, displayName: $displayName, email: $email, login: $login, password: $password, memberships: $memberships) {
@@ -70,7 +70,8 @@ export class CreateUserRequest
             }
         }`;
     }
-    // tslint:enable max-line-length
+
+    /* eslint-enable max-len */
 
     sendAndParse(): Q.Promise<User> {
         return this.mutate().then(json => this.fromJson(json.createUser, json.error));

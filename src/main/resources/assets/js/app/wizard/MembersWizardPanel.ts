@@ -38,7 +38,7 @@ export class MembersWizardPanel extends PrincipalWizardPanel {
                 const viewedPrincipal: Principal = this.assembleViewedItem();
 
                 if (!this.isPersistedEqualsViewed()) {
-                    console.warn(`Received Principal from server differs from what's viewed:`);
+                    console.warn('Received Principal from server differs from what\'s viewed:');
                     console.warn(' viewedPrincipal: ', viewedPrincipal);
                     console.warn(' persistedPrincipal: ', persistedPrincipal);
 
