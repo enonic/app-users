@@ -44,7 +44,9 @@ export class MembersWizardPanel extends PrincipalWizardPanel {
 
                     new ConfirmationDialog()
                         .setQuestion(i18n('dialog.principal.update'))
-                        .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null))
+                        .setYesCallback(() => {
+                            void this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
+                        })
                         .setNoCallback(() => { /* empty */ })
                         .show();
                 }

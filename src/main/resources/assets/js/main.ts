@@ -21,7 +21,7 @@ const body = Body.get();
 
 // Dynamically import and execute all input types, since they are used
 // on-demand, when parsing XML schemas and has not real usage in app
-declare var require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
+declare let require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
 const importAll = r => r.keys().forEach(r);
 importAll(require.context('./app/inputtype', true, /^(?!\.[\/\\]ui).*/));
 

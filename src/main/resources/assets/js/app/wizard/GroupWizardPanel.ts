@@ -7,7 +7,6 @@ import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {Group, GroupBuilder} from '../principal/Group';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
 import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
 import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
 import {i18n} from 'lib-admin-ui/util/Messages';
@@ -57,7 +56,7 @@ export class GroupWizardPanel
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
             this.notifyPrincipalNamed(principal);
 
-            (<PrincipalLoader>this.getMembersWizardStepForm().getLoader()).skipPrincipal(principal.getKey());
+            (this.getMembersWizardStepForm().getLoader()).skipPrincipal(principal.getKey());
 
             return principal;
         });

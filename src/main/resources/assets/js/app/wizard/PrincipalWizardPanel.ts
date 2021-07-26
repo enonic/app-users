@@ -123,13 +123,15 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
                 viewedPrincipal = this.assembleViewedItem();
                 if (!viewedPrincipal.equals(persistedPrincipal)) {
 
-                    console.warn(`Received Principal from server differs from what's viewed:`);
+                    console.warn('Received Principal from server differs from what\'s viewed:');
                     console.warn(' viewedPrincipal: ', viewedPrincipal);
                     console.warn(' persistedPrincipal: ', persistedPrincipal);
 
                     new ConfirmationDialog()
                         .setQuestion(i18n('dialog.principal.update'))
-                        .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null))
+                        .setYesCallback(() => {
+                            void this.doLayoutPersistedItem(persistedPrincipal ? persistedPrincipal.clone() : null);
+                        })
                         .setNoCallback(() => { /* empty */
                         })
                         .show();
