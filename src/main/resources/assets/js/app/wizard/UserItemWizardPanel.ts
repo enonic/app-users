@@ -12,7 +12,6 @@ import {UserItem} from 'lib-admin-ui/security/UserItem';
 import {WizardPanel} from 'lib-admin-ui/app/wizard/WizardPanel';
 import {ImgEl} from 'lib-admin-ui/dom/ImgEl';
 import {ElementShownEvent} from 'lib-admin-ui/dom/ElementShownEvent';
-import {Error} from 'tslint/lib/error';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {Action} from 'lib-admin-ui/ui/Action';
 import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';

@@ -44,7 +44,7 @@ export class SaveIdProviderRequest
         return vars;
     }
 
-    // tslint:disable max-line-length
+    /* eslint-disable max-len */
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $description: String, $idProviderConfig: IdProviderConfigInput, $permissions: [IdProviderAccessControlInput]) {
             ${this.mutationType}(key: $key, displayName: $displayName, description: $description, idProviderConfig: $idProviderConfig, permissions: $permissions) {
@@ -67,7 +67,7 @@ export class SaveIdProviderRequest
         }`;
     }
 
-    // tslint:enable max-line-length
+    /* eslint-enable max-len */
 
     setKey(idProviderKey: IdProviderKey): SaveIdProviderRequest {
         this.idProviderKey = idProviderKey;

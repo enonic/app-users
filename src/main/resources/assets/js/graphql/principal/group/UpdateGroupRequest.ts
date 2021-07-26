@@ -63,7 +63,7 @@ export class UpdateGroupRequest
         return vars;
     }
 
-    // tslint:disable max-line-length
+    /* eslint-disable max-len */
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String], $addMemberships: [String], $removeMemberships: [String]) {
             updateGroup(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
@@ -79,7 +79,8 @@ export class UpdateGroupRequest
             }
         }`;
     }
-    // tslint:enable max-line-length
+
+    /* eslint-enable max-len */
 
     sendAndParse(): Q.Promise<Group> {
         return this.mutate().then(json => this.fromJson(json.updateGroup, json.error));
