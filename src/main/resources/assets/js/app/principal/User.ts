@@ -8,13 +8,13 @@ import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 export class User
     extends Principal {
 
-    private email: string;
+    private readonly email: string;
 
-    private login: string;
+    private readonly login: string;
 
-    private loginDisabled: boolean;
+    private readonly loginDisabled: boolean;
 
-    private memberships: Principal[];
+    private readonly memberships: Principal[];
 
     constructor(builder: UserBuilder) {
         super(builder);
@@ -38,11 +38,7 @@ export class User
     }
 
     getMemberships(): Principal[] {
-        return this.memberships;
-    }
-
-    setMemberships(memberships: Principal[]) {
-        this.memberships = memberships;
+        return this.memberships.slice(0);
     }
 
     equals(o: Equitable): boolean {
@@ -56,7 +52,6 @@ export class User
                this.loginDisabled === other.isDisabled() &&
                this.email === other.getEmail() &&
                this.login === other.getLogin() &&
-               //                   this.password === other.getPassword() &&
                ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
     }
 

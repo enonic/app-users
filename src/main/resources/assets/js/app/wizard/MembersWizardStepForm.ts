@@ -8,12 +8,12 @@ import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
 import {Form} from 'lib-admin-ui/ui/form/Form';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {Membership} from '../principal/Membership';
+import {Members} from '../principal/Members';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {FormItem} from 'lib-admin-ui/ui/form/FormItem';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
-export class MembershipWizardStepForm
+export class MembersWizardStepForm
     extends UserItemWizardStepForm {
 
     private principals: PrincipalComboBox;
@@ -37,7 +37,7 @@ export class MembershipWizardStepForm
         return [principalsFormItem];
     }
 
-    layout(principal: Membership) {
+    layout(principal: Members) {
         if (this.principals.isDirty()) {
             if (ObjectHelper.arrayEquals(this.getMembersKeys(), principal.getMembers())) {
                 this.principals.resetBaseValues();

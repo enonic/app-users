@@ -2,10 +2,10 @@ import {RoleJson} from './RoleJson';
 import {assert} from 'lib-admin-ui/util/Assert';
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {Membership, MembershipBuilder} from './Membership';
+import {Members, MembersBuilder} from './Members';
 
 export class Role
-    extends Membership {
+    extends Members {
 
     constructor(builder: RoleBuilder) {
         super(builder);
@@ -38,7 +38,7 @@ export class Role
 }
 
 export class RoleBuilder
-    extends MembershipBuilder {
+    extends MembersBuilder {
 
     constructor(source?: Role) {
         super(source);

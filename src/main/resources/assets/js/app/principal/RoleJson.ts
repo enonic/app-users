@@ -1,5 +1,5 @@
-import {MembershipJson} from './MembershipJson';
+import {MembersJson} from './MembersJson';
 
 export interface RoleJson
-    extends MembershipJson {
+    extends MembersJson {
 }
