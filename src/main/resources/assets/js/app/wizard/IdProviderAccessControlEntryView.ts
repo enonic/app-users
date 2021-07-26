@@ -27,7 +27,7 @@ export class IdProviderAccessControlEntryView
     public setItem(ace: IdProviderAccessControlEntry) {
         super.setItem(ace);
 
-        let principal: Principal = <Principal>Principal.create().setKey(ace.getPrincipal().getKey()).setModifiedTime(
+        let principal: Principal = Principal.create().setKey(ace.getPrincipal().getKey()).setModifiedTime(
             ace.getPrincipal().getModifiedTime()).setDisplayName(
             ace.getPrincipal().getDisplayName()).build();
         this.setObject(principal);

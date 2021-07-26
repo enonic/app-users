@@ -2,7 +2,6 @@ import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {UserBrowseToolbar} from './UserBrowseToolbar';
 import {UserTreeGridItem, UserTreeGridItemType} from './UserTreeGridItem';
 import {UserBrowseItemPanel} from './UserBrowseItemPanel';
-import {UserTreeGridActions} from './UserTreeGridActions';
 import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
@@ -106,7 +105,7 @@ export class UserBrowsePanel
     }
 
     protected createToolbar(): UserBrowseToolbar {
-        let browseActions = <UserTreeGridActions> this.treeGrid.getTreeGridActions();
+        let browseActions = this.treeGrid.getTreeGridActions();
 
         return new UserBrowseToolbar(browseActions);
     }

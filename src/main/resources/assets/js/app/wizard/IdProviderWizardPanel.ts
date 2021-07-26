@@ -195,7 +195,7 @@ export class IdProviderWizardPanel
     }
 
     private assembleViewedIdProvider(): IdProvider {
-        return <IdProvider>new IdProviderBuilder()
+        return new IdProviderBuilder()
             .setIdProviderConfig(this.idProviderWizardStepForm.getIdProviderConfig())
             .setPermissions(this.permissionsWizardStepForm.getPermissions())
             .setKey(this.getPersistedItem().getKey().toString())

@@ -309,7 +309,7 @@ export class UserItemsTreeGrid
     }
 
     private fetchPrincipals(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
-        const folder: UserTreeGridItem = <UserTreeGridItem>parentNode.getData();
+        const folder: UserTreeGridItem = parentNode.getData();
         const principalType: PrincipalType = this.getPrincipalTypeForFolderItem(folder.getType());
 
         return this.loadChildren(parentNode, [principalType]);

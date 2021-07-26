@@ -66,15 +66,16 @@ export class UserWizardPanel
                 const viewedPrincipal: Principal = this.assembleViewedItem();
 
                 if (!this.isPersistedEqualsViewed()) {
-                    console.warn(`Received Principal from server differs from what's viewed:`);
+                    console.warn('Received Principal from server differs from what\'s viewed:');
                     console.warn(' viewedPrincipal: ', viewedPrincipal);
                     console.warn(' persistedPrincipal: ', persistedPrincipal);
 
                     new ConfirmationDialog()
                         .setQuestion(i18n('dialog.principal.update'))
-                        .setYesCallback(() => this.doLayoutPersistedItem(persistedPrincipal.clone()))
-                        .setNoCallback(() => { /* empty */
+                        .setYesCallback(() => {
+                            void this.doLayoutPersistedItem(persistedPrincipal.clone());
                         })
+                        .setNoCallback(() => { /* empty */ })
                         .show();
                 }
 
@@ -173,8 +174,7 @@ export class UserWizardPanel
     assembleViewedItem(): Principal {
         const wizardHeader: WizardHeaderWithDisplayNameAndName = this.getWizardHeader();
         wizardHeader.normalizeNames();
-
-        return <Principal>new UserBuilder(this.getPersistedItem() ? <User>this.getPersistedItem() : null)
+        return new UserBuilder(this.getPersistedItem() ? <User>this.getPersistedItem() : null)
             .setEmail(this.userEmailWizardStepForm.getEmail())
             .setLogin(wizardHeader.getName())
             .setMemberships(this.userMembershipsWizardStepForm.getMemberships().sort(this.sortMemberships))

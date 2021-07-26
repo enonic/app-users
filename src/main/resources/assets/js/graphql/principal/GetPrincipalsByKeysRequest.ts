@@ -41,7 +41,7 @@ export class GetPrincipalsByKeysRequest
     }
 
     getQuery(): string {
-        return `query ($keys: [String]!` + this.getDynamicVariables() + `) {
+        return 'query ($keys: [String]!' + this.getDynamicVariables() + `) {
                     principals (keys: $keys) {
                         key
                         name

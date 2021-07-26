@@ -78,10 +78,10 @@ export class GetPrincipalByKeyRequest
                       login` + this.getMembershipsField(includeMemberships);
             break;
         case PrincipalType.GROUP:
-            fields = `members` + this.getMembershipsField(includeMemberships);
+            fields = 'members' + this.getMembershipsField(includeMemberships);
             break;
         case PrincipalType.ROLE:
-            fields = `members`;
+            fields = 'members';
             break;
         }
         return fields;
@@ -93,7 +93,7 @@ export class GetPrincipalByKeyRequest
                 key
                 displayName
                 description
-            }` : ``;
+            }` : '';
     }
 
     sendAndParse(): Q.Promise<Principal> {

@@ -27,7 +27,7 @@ export class IdProviderAccessSelector
         super('access-selector');
 
         IdProviderAccessSelector.OPTIONS.forEach((option: IdProviderAccessSelectorOption) => {
-            let menuItem = (<TabMenuItemBuilder>new TabMenuItemBuilder().setLabel(option.name)).build();
+            let menuItem = (new TabMenuItemBuilder().setLabel(option.name)).build();
             this.addNavigationItem(menuItem);
         });
 
