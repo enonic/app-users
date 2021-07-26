@@ -14,6 +14,7 @@ import {NamesAndIconView, NamesAndIconViewBuilder} from 'lib-admin-ui/app/NamesA
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {NamesAndIconViewSize} from 'lib-admin-ui/app/NamesAndIconViewSize';
 import {FormState} from 'lib-admin-ui/app/wizard/WizardPanel';
+import {BaseSelectedOptionViewBuilder} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
 
 export class AuthApplicationSelectedOptionView
     extends BaseSelectedOptionView<Application> {
@@ -34,7 +35,7 @@ export class AuthApplicationSelectedOptionView
                 applicationConfig: ApplicationConfig,
                 readOnly: boolean = false) {
 
-        super(option);
+        super(new BaseSelectedOptionViewBuilder<Application>().setOption(option));
 
         this.readOnly = readOnly;
 
@@ -71,7 +72,7 @@ export class AuthApplicationSelectedOptionView
         }
 
         if (!this.readOnly) {
-            this.appendActionButtons(header);
+            this.appendActionButtons();
         }
 
         this.formValidityChangedHandler = (event: FormValidityChangedEvent) => {
