@@ -47,7 +47,7 @@ dependencies {
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:3.8.0'
+    testImplementation 'org.mockito:mockito-core:3.11.2'
 }
 
 configurations.all {
@@ -62,7 +62,7 @@ repositories {
 
 node {
     download = true
-    version = '15.8.0'
+    version = '16.0.0'
 }
 
 task copyDevResources {

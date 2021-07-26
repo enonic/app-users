@@ -116,7 +116,7 @@ export class UserWizardPanel
     }
 
     protected getWizardNameValue(): string {
-        return this.getPersistedItem() ? (<User>this.getPersistedItem()).getLogin() : '';
+        return (<User>this.getPersistedItem())?.getLogin() || super.getWizardNameValue();
     }
 
     produceCreateUserRequest(): CreateUserRequest {

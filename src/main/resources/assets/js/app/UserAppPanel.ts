@@ -391,7 +391,7 @@ export class UserAppPanel
     private createPrincipalWizardPanelForEdit(principal: Principal, idProvider: IdProvider, tabId: AppBarTabId,
                                               tabMenuItem: AppBarTabMenuItem) {
 
-        let wizardParams = <PrincipalWizardPanelParams> new PrincipalWizardPanelParams()
+        const wizardParams: PrincipalWizardPanelParams = <PrincipalWizardPanelParams> new PrincipalWizardPanelParams()
             .setIdProvider(idProvider)
             .setPrincipalKey(principal.getKey()) // user principal key to load persisted item
             .setPersistedType(principal.getType())
