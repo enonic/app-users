@@ -77,7 +77,7 @@ task copyDevResources {
 
 npmInstall.dependsOn copyDevResources
 
-task flush( type: org.gradle.api.tasks.Delete, dependsOn: clean ) {
+task flush( type: Delete, dependsOn: clean ) {
     description = 'Clean the project from built sources and dependencies'
     delete '.xp'
 }
@@ -87,7 +87,7 @@ task npmInstallForce( type: NpmTask ) {
     args = ['install', '--force']
 }
 
-task cleanNode( type: org.gradle.api.tasks.Delete ) {
+task cleanNode( type: Delete ) {
     delete 'node_modules'
 }
 
