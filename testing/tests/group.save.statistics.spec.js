@@ -11,7 +11,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const GroupStatisticsPanel = require('../page_objects/browsepanel/group.statistics.panel');
 
-describe('group.save.statistics.panel: Save a group and check the info in Statistics Panel', function () {
+describe('group.save.statistics.spec: Save a group and check the info in Statistics Panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
     let groupWithRoleAndMember;
@@ -29,7 +29,7 @@ describe('group.save.statistics.panel: Save a group and check the info in Statis
             await groupWizard.waitAndClickOnSave();
             // 3. wait for the notification message:
             let message = await groupWizard.waitForNotificationMessage();
-            testUtils.saveScreenshot("group_is_saved");
+            await testUtils.saveScreenshot("group_is_saved");
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Expected notification message should appear");
         });
 
@@ -100,7 +100,7 @@ describe('group.save.statistics.panel: Save a group and check the info in Statis
             await groupWizard.pause(1000);
             //3. Verify that actual members and expected are equal:
             let actualMembers = await groupWizard.getMembers();
-            testUtils.saveScreenshot("group_member_added");
+            await testUtils.saveScreenshot("group_member_added");
             assert.equal(actualMembers[0], appConst.SUPER_USER_DISPLAY_NAME);
         });
 
@@ -130,7 +130,7 @@ describe('group.save.statistics.panel: Save a group and check the info in Statis
             await groupWizard.waitAndClickOnSave();
             //2. Verify roles:
             let actualRoles = await groupWizard.getRoles();
-            testUtils.saveScreenshot("group_wizard_role_removed");
+            await testUtils.saveScreenshot("group_wizard_role_removed");
             assert.equal(actualRoles.length, 0, "Empty list of roles should be in the wizard-step");
         });
 
