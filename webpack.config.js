@@ -1,7 +1,6 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const path = require('path');
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -21,6 +20,11 @@ module.exports = {
     },
     module: {
         rules: [
+            {
+                test: /\.js$/,
+                enforce: 'pre',
+                use: ['source-map-loader'],
+            },
             {
                 test: /\.tsx?$/,
                 use: [{loader: 'ts-loader', options: {configFile: 'tsconfig.build.json'}}]
@@ -62,9 +66,8 @@ module.exports = {
             exclude: /a\.js|node_modules/,
             failOnError: true
         }),
-        //new ErrorLoggerPlugin({showColumn: false})
     ],
     mode: isProd ? 'production' : 'development',
-    devtool: isProd ? false : 'source-map',
-    performance: { hints: false }
+    devtool: isProd ? false : 'eval-source-map',
+    performance: {hints: false}
 };
