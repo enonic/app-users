@@ -26,7 +26,7 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
             await this.clickOnElement(this.transitiveCheckBox);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot("err_transitive_checkbox");
+            await this.saveScreenshot("err_transitive_checkbox");
             throw new Error("Error when clicking on Transitive checkbox  " + err);
         }
     }
@@ -37,7 +37,7 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
             await this.waitForElementDisplayed(XPATH.membersDataGroup, 1000);
             return await this.getTextInElements(items);
         } catch (err) {
-            this.saveScreenshot('err_member_list');
+            await this.saveScreenshot('err_member_list');
             throw new Error('Members data-group is not present on the page!');
         }
     }
