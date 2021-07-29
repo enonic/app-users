@@ -11,7 +11,6 @@ import {AuthApplicationComboBox} from './AuthApplicationComboBox';
 import {BaseSelectedOptionView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
 import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
 import {NamesAndIconView, NamesAndIconViewBuilder} from 'lib-admin-ui/app/NamesAndIconView';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {NamesAndIconViewSize} from 'lib-admin-ui/app/NamesAndIconViewSize';
 import {FormState} from 'lib-admin-ui/app/wizard/WizardPanel';
 import {BaseSelectedOptionViewBuilder} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
@@ -19,7 +18,7 @@ import {BaseSelectedOptionViewBuilder} from 'lib-admin-ui/ui/selector/combobox/B
 export class AuthApplicationSelectedOptionView
     extends BaseSelectedOptionView<Application> {
 
-    private application: Application;
+    private readonly application: Application;
 
     private formView: FormView;
 
@@ -29,32 +28,32 @@ export class AuthApplicationSelectedOptionView
 
     private formValidityChangedHandler: { (event: FormValidityChangedEvent): void };
 
-    private readOnly: boolean;
-
     constructor(option: Option<Application>,
                 applicationConfig: ApplicationConfig,
                 readOnly: boolean = false) {
 
         super(new BaseSelectedOptionViewBuilder<Application>().setOption(option));
 
-        this.readOnly = readOnly;
-
-        if (this.readOnly) {
-            this.setEditable(false);
-            this.setRemovable(false);
-        }
-
         this.application = option.getDisplayValue();
         this.applicationConfig = applicationConfig;
+
+        this.setReadonly(readOnly);
+
+        if (readOnly) {
+            this.setEditable(false);
+            this.setRemovable(false);
+        } else {
+            this.setEditable(this.application.getIdProviderForm()?.getFormItems().length > 0);
+        }
     }
 
     doRender(): Q.Promise<boolean> {
 
-        let header = new DivEl('header');
-
-        let namesAndIconView = new NamesAndIconView(new NamesAndIconViewBuilder().setSize(
-            NamesAndIconViewSize.small)).setMainName(this.application.getDisplayName()).setSubName(
-            this.application.getName() + '-' + this.application.getVersion()).setIconClass('icon-xlarge icon-puzzle');
+        const namesAndIconView = new NamesAndIconView(new NamesAndIconViewBuilder()
+            .setSize(NamesAndIconViewSize.small))
+            .setMainName(this.application.getDisplayName())
+            .setSubName(this.application.getName() + '-' + this.application.getVersion())
+            .setIconClass('icon-xlarge icon-puzzle');
 
         if (this.application.getIconUrl()) {
             namesAndIconView.setIconUrl(this.application.getIconUrl());
@@ -64,14 +63,9 @@ export class AuthApplicationSelectedOptionView
             namesAndIconView.setSubName(this.application.getDescription());
         }
 
-        header.appendChild(namesAndIconView);
+        this.appendChild(namesAndIconView);
 
-        this.appendChild(header);
-        if (this.application.getIdProviderForm().getFormItems().length === 0) {
-            this.setEditable(false);
-        }
-
-        if (!this.readOnly) {
+        if (this.isEditable() || this.isRemovable()) {
             this.appendActionButtons();
         }
 
