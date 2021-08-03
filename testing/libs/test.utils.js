@@ -16,6 +16,9 @@ const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 const appConst = require("./app_const");
 const webDriverHelper = require("./WebDriverHelper");
 const itemBuilder = require('./userItems.builder');
+const addContext = require('mochawesome/addContext');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 
@@ -292,10 +295,17 @@ module.exports = {
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },
-    saveScreenshot: function (name) {
-        let path = require('path');
-        let screenshotsDir = path.join(__dirname, '/../build/screenshots/');
+    saveScreenshot: function (name, that) {
+
+        let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
+        if (!fs.existsSync(screenshotsDir)) {
+            fs.mkdirSync(screenshotsDir, { recursive: true });
+        }
         return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
+            if (that) {
+                addContext(that, 'screenshots/' + name + '.png');
+            }
+
             return console.log('screenshot saved ' + name);
         }).catch(err => {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);
