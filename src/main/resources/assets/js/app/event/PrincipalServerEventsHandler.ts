@@ -141,12 +141,25 @@ export class PrincipalServerEventsHandler {
         const eventType: NodeServerChangeType = event.getType();
 
         event.getNodeChange().getChangeItems()
-            .filter((item: PrincipalServerChangeItem) => !this.isIgnoredItem(item) && !this.isAlreadyDeleted(item))
+            .filter((item: PrincipalServerChangeItem) => this.isItemAllowedToProcess(item, eventType))
             .forEach((item: PrincipalServerChangeItem) => {
                 this.doLoadUserItem(item)
                     .then((result: PrincipalAndIdProvider) => this.handleUserItem(result, eventType))
+                    .then(() => this.cleanUp(item, eventType))
                     .catch(DefaultErrorHandler.handle);
             });
+    }
+
+    private isItemAllowedToProcess(item: PrincipalServerChangeItem, eventType: NodeServerChangeType): boolean {
+        if (this.isIgnoredItem(item)) {
+            return false;
+        }
+
+        if (eventType === NodeServerChangeType.UPDATE && this.isAlreadyDeleted(item)) { // issue with update event coming after delete
+            return false;
+        }
+
+        return true;
     }
 
     private doLoadUserItem(item: PrincipalServerChangeItem): Q.Promise<PrincipalAndIdProvider> {
@@ -226,6 +239,12 @@ export class PrincipalServerEventsHandler {
         this.userItemUpdatedListeners.forEach((listener: (principal: Principal, idProvider: IdProvider) => void) => {
             listener(principal, idProvider);
         });
+    }
+
+    private cleanUp(item: PrincipalServerChangeItem, eventType: NodeServerChangeType) {
+        if (eventType === NodeServerChangeType.CREATE) {
+            this.deletedItemsIds = this.deletedItemsIds.filter((deletedId: string) => deletedId !== this.getId(item));
+        }
     }
 
     onUserItemDeleted(listener: (ids: string[]) => void) {
