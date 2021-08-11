@@ -41,7 +41,6 @@ export class IdProviderAccessControlEntryView
 
     doLayout(object: Principal) {
         super.doLayout(object);
-        this.addClass('idprovider-access-control-entry');
 
         if (IdProviderAccessControlEntryView.debug) {
             console.debug('IdProviderAccessControlEntryView.doLayout');
