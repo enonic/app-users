@@ -6,9 +6,9 @@ import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 import {RichComboBox, RichComboBoxBuilder} from 'lib-admin-ui/ui/selector/combobox/RichComboBox';
-import {AuthApplicationLoader} from 'lib-admin-ui/security/auth/AuthApplicationLoader';
 import {BaseLoader} from 'lib-admin-ui/util/loader/BaseLoader';
 import {Viewer} from 'lib-admin-ui/ui/Viewer';
+import {AuthApplicationLoader} from './AuthApplicationLoader';
 
 export class AuthApplicationComboBox
     extends RichComboBox<Application> {

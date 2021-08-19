@@ -26,6 +26,7 @@ configurations {
 }
 
 dependencies {
+    implementation "com.enonic.xp:jaxrs-api:${xpVersion}"
     implementation "com.enonic.xp:core-api:${xpVersion}"
     implementation "com.enonic.xp:portal-api:${xpVersion}"
     include "com.enonic.xp:lib-admin:${xpVersion}"
@@ -46,8 +47,11 @@ dependencies {
     include "com.enonic.lib:lib-mustache:2.0.0"
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:3.11.2'
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+    testImplementation( testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" ) )
 }
 
 configurations.all {
