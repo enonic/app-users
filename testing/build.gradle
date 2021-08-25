@@ -26,15 +26,15 @@ ext {
     unpackDir = "$buildDir/install"
     distroDir = "$unpackDir/enonic-xp-generic-$version"
     deployDir = "$distroDir/home/deploy"
-    mochaResultsDir = "$buildDir/mochawesome-report"
     testDataDir = "$projectDir/test-data/common-config"
-    resDir = "$projectDir${File.separator}test-data"
+    resDir = "$projectDir/test-data"
     appDir = "$projectDir/test-data/test-applications"
     xpHome = "$distroDir/home"
     configDir = "$xpHome/config"
     xpServer = new ServerInstance()
-    appFile = "$distroDir/system/40/app-users-${version}.jar"
-    appUrl = project.hasProperty('appUrl') ? appUrl : "file:///$projectDir/../build/libs/app-users.jar"
+    appName = "app-users"
+    appFile = "$distroDir/system/40/${appName}-${version}.jar"
+    appUrl = project.hasProperty('appUrl') ? appUrl : "file:///$projectDir/../build/libs/${appName}.jar"
 }
 
 dependencies {
@@ -58,47 +58,33 @@ task copyConfig( type: Copy ) {
 }
 
 task copyApps( type: Copy ) {
-    println '*********************************************************'
-    println '* task started:copyApps  *'
-    println '*********************************************************'
     println appDir
     from file( appDir )
     include '*.jar'
     into file( deployDir )
-    mustRunAfter 'startServer'
+    mustRunAfter unpackDistro
 }
 
 task deployApp( type: DefaultTask ) {
     outputs.files( appFile )
+    outputs.upToDateWhen { false }
     doLast {
         def f = new File( appFile )
-        f.delete(  )
+        println "Deleting  ${appFile}. Exists ${f.exists()}"
+
+        f.delete()
+
+        println "Copying from ${appUrl} to ${appFile}"
         new URL( appUrl ).withInputStream { i -> f.withOutputStream { it << i } }
     }
     mustRunAfter unpackDistro
 }
 
-task zipReport( type: Zip ) {
-    from mochaResultsDir
-    include '*'
-    include '*/*'
-    classifier 'mochaReport'
-}
-
-publishing {
-    publications {
-        mavenJava( MavenPublication ) {
-            artifact zipReport
-        }
-    }
-}
-
-task startServer( dependsOn: [unpackDistro, copyConfig, deployApp] ) {
+task startServer( dependsOn: unpackDistro ) {
     doLast {
         xpServer.installDir = file( distroDir )
         xpServer.start()
     }
-    mustRunAfter npmInstall
 }
 
 task stopServer {
@@ -107,12 +93,12 @@ task stopServer {
     }
 }
 
-task testUsersApp( type: NpmTask, dependsOn: [npmInstall, startServer, copyApps] ) {
+task testUsersApp( type: NpmTask, dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
     args = ['test']
     finalizedBy stopServer
 }
 
-task testUsersAppAppLocally( type: NpmTask, dependsOn: [npmInstall] ) {
+task testUsersAppLocally( type: NpmTask, dependsOn: [npmInstall] ) {
     args = ['test']
 }
 
