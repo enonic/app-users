@@ -13,7 +13,7 @@ export class ListIdProviderApplicationsRequest
     }
 
     getPostfixUri(): string {
-        return UrlHelper.getCmsRestUri('');
+        return UrlHelper.getRestUri('');
     }
 
     protected parseResponse(response: JsonResponse<ApplicationListResult>): Application[] {
