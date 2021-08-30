@@ -6,7 +6,7 @@
       "description": "Application description",
       "displayName": "application display name",
       "editable": false,
-      "iconUrl": "/admin/rest/application/icon/testapplication",
+      "iconUrl": "/admin/rest-v2/users/application/icon/testapplication",
       "idProviderConfig": {
         "formItems": [
           {

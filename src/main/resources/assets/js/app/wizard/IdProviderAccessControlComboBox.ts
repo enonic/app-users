@@ -4,11 +4,12 @@ import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEnt
 import {PrincipalContainerCombobox, PrincipalContainerComboboxBuilder} from 'lib-admin-ui/ui/security/PrincipalContainerCombobox';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalContainerSelectedOptionsView} from 'lib-admin-ui/ui/security/PrincipalContainerSelectedOptionsView';
+import {UsersPrincipalLoader} from '../principal/UsersPrincipalLoader';
 
 export class IdProviderAccessControlComboBox
     extends PrincipalContainerCombobox<IdProviderAccessControlEntry> {
 
-    constructor(builder: IdProviderAccessControlComboBoxBuilder = new IdProviderAccessControlComboBoxBuilder()) {
+    constructor(builder: IdProviderAccessControlComboBoxBuilder) {
         super(builder);
     }
 
@@ -31,4 +32,9 @@ export class IdProviderAccessControlComboBoxBuilder
 
     selectedOptionsView: IdProviderACESelectedOptionsView = new IdProviderACESelectedOptionsView();
 
+    loader: UsersPrincipalLoader = new UsersPrincipalLoader();
+
+    build(): IdProviderAccessControlComboBox {
+        return new IdProviderAccessControlComboBox(this);
+    }
 }

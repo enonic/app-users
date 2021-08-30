@@ -1,4 +1,4 @@
-import {IdProviderAccessControlComboBox} from './IdProviderAccessControlComboBox';
+import {IdProviderAccessControlComboBox, IdProviderAccessControlComboBoxBuilder} from './IdProviderAccessControlComboBox';
 import {IdProvider} from '../principal/IdProvider';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {Validators} from 'lib-admin-ui/ui/form/Validators';
@@ -24,7 +24,7 @@ export class SecurityWizardStepForm
         super.initElements();
 
         this.inheritance = new DivEl(/*'inheritance'*/);
-        this.comboBox = new IdProviderAccessControlComboBox();
+        this.comboBox = new IdProviderAccessControlComboBoxBuilder().build();
     }
 
     protected createFormItems(): FormItem[] {

@@ -10,7 +10,7 @@ import com.enonic.xp.icon.Icon;
 public final class ApplicationIconUrlResolver
     extends IconUrlResolver
 {
-    private static final String REST_SCHEMA_ICON_URL = ResourceConstants.REST_ROOT + "/application/icon/";
+    private static final String REST_SCHEMA_ICON_URL = ResourceConstants.REST_ROOT + "application/icon/";
 
     public String resolve( final ApplicationKey applicationKey, final ApplicationDescriptor applicationDescriptor )
     {

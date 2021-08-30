@@ -48,6 +48,7 @@ dependencies {
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
@@ -121,6 +122,12 @@ jar {
     outputs.dir "${buildDir}/resources/main"
 
     dependsOn webpack
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty 'java.awt.headless', 'true'
+    jvmArgs '-noverify', '-XX:TieredStopAtLevel=1'
 }
 
 if ( hasProperty( 'env' ) )
