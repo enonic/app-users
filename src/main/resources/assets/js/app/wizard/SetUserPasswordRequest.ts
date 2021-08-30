@@ -4,6 +4,7 @@ import {UserJson} from '../principal/UserJson';
 import {User} from '../principal/User';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
 import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
+import {UrlHelper} from '../../util/UrlHelper';
 
 export class SetUserPasswordRequest
     extends SecurityResourceRequest<User> {
@@ -32,6 +33,10 @@ export class SetUserPasswordRequest
             key: this.key.toString(),
             password: this.password
         };
+    }
+
+    protected getPostfixUri(): string {
+        return UrlHelper.getRestUri('');
     }
 
     protected parseResponse(response: JsonResponse<UserJson>): User {

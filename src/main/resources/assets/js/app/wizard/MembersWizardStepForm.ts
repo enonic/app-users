@@ -3,15 +3,12 @@ import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
 import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
-import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
-import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
-import {Form} from 'lib-admin-ui/ui/form/Form';
+import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {Members} from '../principal/Members';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {FormItem} from 'lib-admin-ui/ui/form/FormItem';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {UsersPrincipalLoader} from '../principal/UsersPrincipalLoader';
 
 export class MembersWizardStepForm
     extends UserItemWizardStepForm {
@@ -28,7 +25,9 @@ export class MembersWizardStepForm
         super.initElements();
 
         this.loader =
-            new PrincipalLoader().setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER]).skipPrincipals([PrincipalKey.ofAnonymous()]);
+            new UsersPrincipalLoader()
+                .setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER])
+                .skipPrincipals([PrincipalKey.ofAnonymous()]);
         this.principals = <PrincipalComboBox>PrincipalComboBox.create().setLoader(this.loader).build();
     }
 

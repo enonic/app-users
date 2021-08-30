@@ -5,10 +5,10 @@ import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {User} from '../principal/User';
 import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
-import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {UrlHelper} from '../../util/UrlHelper';
 
 export class UserEmailWizardStepForm
     extends UserItemWizardStepForm {
@@ -31,7 +31,7 @@ export class UserEmailWizardStepForm
     protected initElements() {
         super.initElements();
 
-        this.email = new EmailInput();
+        this.email = new EmailInput(UrlHelper.getRestUri('security/principals/emailAvailable'));
         this.email.setIdProviderKey(this.idProviderKey);
     }
 
