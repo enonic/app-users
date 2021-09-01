@@ -1,21 +1,21 @@
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
 import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
 import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {Members} from '../principal/Members';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
-import {UsersPrincipalLoader} from '../principal/UsersPrincipalLoader';
+import {PrincipalLoader as BasePrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {PrincipalLoader} from '../principal/PrincipalLoader';
 
 export class MembersWizardStepForm
     extends UserItemWizardStepForm {
 
     private principals: PrincipalComboBox;
 
-    private loader: PrincipalLoader;
+    private loader: BasePrincipalLoader;
 
     constructor() {
         super('membership-wizard-step-form');
@@ -24,8 +24,7 @@ export class MembersWizardStepForm
     protected initElements() {
         super.initElements();
 
-        this.loader =
-            new UsersPrincipalLoader()
+        this.loader = new PrincipalLoader()
                 .setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER])
                 .skipPrincipals([PrincipalKey.ofAnonymous()]);
         this.principals = <PrincipalComboBox>PrincipalComboBox.create().setLoader(this.loader).build();
@@ -60,7 +59,7 @@ export class MembersWizardStepForm
         return this.principals.giveFocus();
     }
 
-    getLoader(): PrincipalLoader {
+    getLoader(): BasePrincipalLoader {
         return this.loader;
     }
 
