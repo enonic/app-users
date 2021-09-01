@@ -8,12 +8,11 @@ import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
-import {UrlHelper} from '../../util/UrlHelper';
 
 export class UserEmailWizardStepForm
     extends UserItemWizardStepForm {
 
-    private email: EmailInput;
+    private emailInput: EmailInput;
 
     private emailFormItem: FormItem;
 
@@ -31,8 +30,7 @@ export class UserEmailWizardStepForm
     protected initElements() {
         super.initElements();
 
-        this.email = new EmailInput(UrlHelper.getRestUri('security/principals/emailAvailable'));
-        this.email.setIdProviderKey(this.idProviderKey);
+        this.emailInput = new EmailInput().setIdProviderKey(this.idProviderKey);
     }
 
     protected initListeners() {
@@ -45,33 +43,33 @@ export class UserEmailWizardStepForm
 
     protected createFormItems(): FormItem[] {
         this.emailFormItem =
-            new FormItemBuilder(this.email).setLabel(i18n('field.email')).setValidator(Validators.required).build();
+            new FormItemBuilder(this.emailInput).setLabel(i18n('field.email')).setValidator(Validators.required).build();
         return [this.emailFormItem];
     }
 
     layout(principal: Principal) {
         const user: User = (<User>principal);
 
-        if (this.email.isDirty()) {
-            if (ObjectHelper.stringEquals(this.email.getValue(), user.getEmail())) {
-                this.email.resetBaseValues();
+        if (this.emailInput.isDirty()) {
+            if (ObjectHelper.stringEquals(this.emailInput.getValue(), user.getEmail())) {
+                this.emailInput.resetBaseValues();
             }
         } else {
-            this.email.setValue(user.getEmail());
-            this.email.setName(user.getEmail());
-            this.email.setOriginEmail(user.getEmail());
+            this.emailInput.setValue(user.getEmail());
+            this.emailInput.setName(user.getEmail());
+            this.emailInput.setOriginEmail(user.getEmail());
         }
     }
 
     isValid(): boolean {
-        return this.isSystemUser || this.email.isValid();
+        return this.isSystemUser || this.emailInput.isValid();
     }
 
     getEmail(): string {
-        return this.email.getValue();
+        return this.emailInput.getValue();
     }
 
     giveFocus(): boolean {
-        return this.email.giveFocus();
+        return this.emailInput.giveFocus();
     }
 }

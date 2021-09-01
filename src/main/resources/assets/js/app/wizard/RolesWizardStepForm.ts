@@ -1,6 +1,5 @@
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {PrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
 import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
 import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
 import {User} from '../principal/User';
@@ -10,7 +9,8 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
-import {UsersPrincipalLoader} from '../principal/UsersPrincipalLoader';
+import {PrincipalLoader as BasePrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {PrincipalLoader} from '../principal/PrincipalLoader';
 
 export class RolesWizardStepForm
     extends UserItemWizardStepForm {
@@ -24,7 +24,7 @@ export class RolesWizardStepForm
     protected initElements() {
         super.initElements();
 
-        const rolesLoader: PrincipalLoader = new UsersPrincipalLoader()
+        const rolesLoader: BasePrincipalLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.ROLE])
             .skipPrincipals([RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED]);
         this.roles = <PrincipalComboBox>PrincipalComboBox.create().setLoader(rolesLoader).build();
