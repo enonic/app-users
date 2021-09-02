@@ -8,6 +8,8 @@ import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {UrlHelper} from '../../util/UrlHelper';
+import {CheckEmailAvailabilityRequest} from 'lib-admin-ui/security/CheckEmailAvailabilityRequest';
 
 export class UserEmailWizardStepForm
     extends UserItemWizardStepForm {
@@ -30,7 +32,10 @@ export class UserEmailWizardStepForm
     protected initElements() {
         super.initElements();
 
-        this.emailInput = new EmailInput().setIdProviderKey(this.idProviderKey);
+        this.emailInput = new EmailInput();
+        this.whenRendered(() => {
+            this.emailInput.setRequest(new CheckEmailAvailabilityRequest(this.idProviderKey, UrlHelper.getRestUri('')));
+        });
     }
 
     protected initListeners() {
