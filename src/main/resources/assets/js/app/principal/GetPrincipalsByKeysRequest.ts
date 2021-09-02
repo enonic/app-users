@@ -4,7 +4,7 @@ import {UrlHelper} from '../../util/UrlHelper';
 export class GetPrincipalsByKeysRequest
     extends BaseGetPrincipalsByKeysRequest {
 
-    protected getPostfixUri() {
+    protected getPostfixUri(): string {
         return UrlHelper.getRestUri('');
     }
 }

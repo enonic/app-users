@@ -4,7 +4,7 @@ import {UrlHelper} from '../../util/UrlHelper';
 export class FindPrincipalsRequest
     extends BaseFindPrincipalsRequest {
 
-    protected getPostfixUri() {
+    protected getPostfixUri(): string {
         return UrlHelper.getRestUri('');
     }
 }
