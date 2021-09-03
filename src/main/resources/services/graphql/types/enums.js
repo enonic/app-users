@@ -1,6 +1,6 @@
-var graphQl = require('/lib/graphql');
+var schemaGenerator = require('../schemaUtil').schemaGenerator;
 
-exports.IdProviderModeEnum = graphQl.createEnumType({
+exports.IdProviderModeEnum = schemaGenerator.createEnumType({
     name: 'IdProviderMode',
     description: 'Enumeration of Id provider modes',
     values: {
@@ -10,7 +10,7 @@ exports.IdProviderModeEnum = graphQl.createEnumType({
     }
 });
 
-exports.SortModeEnum = graphQl.createEnumType({
+exports.SortModeEnum = schemaGenerator.createEnumType({
     name: 'SortMode',
     description: 'Enumeration of sort modes',
     values: {
@@ -19,7 +19,7 @@ exports.SortModeEnum = graphQl.createEnumType({
     }
 });
 
-exports.UserItemTypeEnum = graphQl.createEnumType({
+exports.UserItemTypeEnum = schemaGenerator.createEnumType({
     name: 'UserItemType',
     description: 'Enumeration of user item types',
     values: {
@@ -30,7 +30,7 @@ exports.UserItemTypeEnum = graphQl.createEnumType({
     }
 });
 
-exports.PrincipalTypeEnum = graphQl.createEnumType({
+exports.PrincipalTypeEnum = schemaGenerator.createEnumType({
     name: 'PrincipalType',
     description: 'Enumeration of principal types',
     values: {
@@ -40,7 +40,7 @@ exports.PrincipalTypeEnum = graphQl.createEnumType({
     }
 });
 
-exports.PermissionEnum = graphQl.createEnumType({
+exports.PermissionEnum = schemaGenerator.createEnumType({
     name: 'Permission',
     description: 'Enumeration of permissions',
     values: {
@@ -54,7 +54,7 @@ exports.PermissionEnum = graphQl.createEnumType({
     }
 });
 
-exports.IdProviderAccessEnum = graphQl.createEnumType({
+exports.IdProviderAccessEnum = schemaGenerator.createEnumType({
     name: 'IdProviderAccess',
     description: 'Enumeration of id provider access permissions',
     values: {

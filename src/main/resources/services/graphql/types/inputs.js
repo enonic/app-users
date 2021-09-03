@@ -1,9 +1,11 @@
 var graphQl = require('/lib/graphql');
 
+var schemaGenerator = require('../schemaUtil').schemaGenerator;
+
 var graphQlEnums = require('./enums');
 
 // eslint-disable-next-line no-unused-vars
-var PrincipalInput = graphQl.createInputObjectType({
+var PrincipalInput = schemaGenerator.createInputObjectType({
     name: 'PrincipalInput',
     description: 'Input definition for principal',
     fields: {
@@ -16,7 +18,7 @@ var PrincipalInput = graphQl.createInputObjectType({
     }
 });
 
-exports.IdProviderAccessControlInput = graphQl.createInputObjectType({
+exports.IdProviderAccessControlInput = schemaGenerator.createInputObjectType({
     name: 'IdProviderAccessControlInput',
     description: 'Input definition for id provider access control entry',
     fields: {
@@ -29,7 +31,7 @@ exports.IdProviderAccessControlInput = graphQl.createInputObjectType({
     }
 });
 
-exports.IdProviderConfigInput = graphQl.createInputObjectType({
+exports.IdProviderConfigInput = schemaGenerator.createInputObjectType({
     name: 'IdProviderConfigInput',
     description: 'Input definition for id provider auth config',
     fields: {
