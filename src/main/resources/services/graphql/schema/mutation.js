@@ -6,10 +6,12 @@ var users = require('/lib/users');
 var groups = require('/lib/groups');
 var roles = require('/lib/roles');
 
+var schemaGenerator = require('../schemaUtil').schemaGenerator;
+
 var graphQlObjectTypes = require('../types').objects;
 var graphQlInputTypes = require('../types').inputs;
 
-module.exports = graphQl.createObjectType({
+module.exports = schemaGenerator.createObjectType({
     name: 'Mutation',
     fields: {
         // Principal

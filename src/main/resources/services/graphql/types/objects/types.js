@@ -2,7 +2,9 @@ var graphQl = require('/lib/graphql');
 
 var graphQlAggregations = require('./aggregations');
 
-exports.TypesType = graphQl.createObjectType({
+var schemaGenerator = require('../../schemaUtil').schemaGenerator;
+
+exports.TypesType = schemaGenerator.createObjectType({
     name: 'Types',
     fields: {
         totalCount: {

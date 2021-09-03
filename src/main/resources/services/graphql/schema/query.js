@@ -6,11 +6,13 @@ var principals = require('/lib/principals');
 var useritems = require('/lib/useritems');
 var repositories = require('/lib/repositories');
 
+var schemaGenerator = require('../schemaUtil').schemaGenerator;
+
 var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
 
 
-module.exports = graphQl.createObjectType({
+module.exports = schemaGenerator.createObjectType({
     name: 'Query',
     fields: {
         idProviders: {

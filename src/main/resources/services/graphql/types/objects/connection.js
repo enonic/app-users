@@ -1,8 +1,9 @@
 var graphQl = require('/lib/graphql');
 var graphQlUtils = require('../../utils');
 var createAggregationsFiled = require('./aggregations').createAggregationsFiled;
+var schemaGenerator = require('../../schemaUtil').schemaGenerator;
 
-var pageInfoType = graphQl.createObjectType({
+var pageInfoType = schemaGenerator.createObjectType({
     name: 'PageInfo',
     fields: {
         startCursor: {
@@ -24,7 +25,7 @@ var pageInfoType = graphQl.createObjectType({
 });
 
 function createEdgeType(name, type) {
-    return graphQl.createObjectType({
+    return schemaGenerator.createObjectType({
         name: name + 'Edge',
         fields: {
             node: {
@@ -41,7 +42,7 @@ function createEdgeType(name, type) {
 }
 
 exports.createConnectionType = function(name, type) {
-    return graphQl.createObjectType({
+    return schemaGenerator.createObjectType({
         name: name + 'Connection',
         fields: {
             totalCount: {

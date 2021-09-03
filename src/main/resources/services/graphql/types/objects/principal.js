@@ -2,12 +2,14 @@ var graphQl = require('/lib/graphql');
 
 var principals = require('/lib/principals');
 
+var schemaGenerator = require('../../schemaUtil').schemaGenerator;
+
 var graphQlEnums = require('../enums');
 var graphQlUtils = require('../../utils');
 
 var graphQlUserItem = require('./userItem');
 
-var PrincipalAccessControlEntryType = graphQl.createObjectType({
+var PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
     name: 'PrincipalAccessControlEntry',
     description: 'Domain representation of access control entry',
     fields: {
@@ -26,7 +28,7 @@ var PrincipalAccessControlEntryType = graphQl.createObjectType({
     }
 });
 
-exports.PrincipalType = graphQl.createObjectType({
+exports.PrincipalType = schemaGenerator.createObjectType({
     name: 'Principal',
     description: 'Domain representation of a principal',
     interfaces: [graphQlUserItem.UserItemType],
@@ -100,7 +102,7 @@ exports.PrincipalType = graphQl.createObjectType({
 });
 graphQlUserItem.typeResolverMap.principalType = exports.PrincipalType;
 
-exports.PrincipalDeleteType = graphQl.createObjectType({
+exports.PrincipalDeleteType = schemaGenerator.createObjectType({
     name: 'PrincipalDelete',
     description: 'Result of a principal delete operation',
     fields: {

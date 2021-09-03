@@ -6,7 +6,9 @@ var graphQlUserItem = require('./userItem');
 
 var idprovidersLib = require('/lib/idproviders');
 
-var IdProviderAccessControlEntryType = graphQl.createObjectType({
+var schemaGenerator = require('../../schemaUtil').schemaGenerator;
+
+var IdProviderAccessControlEntryType = schemaGenerator.createObjectType({
     name: 'IdProviderAccessControlEntry',
     description: 'Domain representation of id provider access control entry',
     fields: {
@@ -19,7 +21,7 @@ var IdProviderAccessControlEntryType = graphQl.createObjectType({
     }
 });
 
-exports.IdProviderConfig = graphQl.createObjectType({
+exports.IdProviderConfig = schemaGenerator.createObjectType({
     name: 'IdProviderConfig',
     description: 'Domain representation of auth config for id provider',
     fields: {
@@ -36,7 +38,7 @@ exports.IdProviderConfig = graphQl.createObjectType({
     }
 });
 
-exports.IdProviderType = graphQl.createObjectType({
+exports.IdProviderType = schemaGenerator.createObjectType({
     name: 'IdProvider',
     description: 'Domain representation of an id provider',
     interfaces: [graphQlUserItem.UserItemType],
@@ -95,7 +97,7 @@ exports.IdProviderType = graphQl.createObjectType({
 });
 graphQlUserItem.typeResolverMap.idProviderType = exports.IdProviderType;
 
-exports.IdProviderDeleteType = graphQl.createObjectType({
+exports.IdProviderDeleteType = schemaGenerator.createObjectType({
     name: 'IdProviderDelete',
     description: 'Result of an idProvider delete operation',
     fields: {

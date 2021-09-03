@@ -43,7 +43,7 @@ dependencies {
     include "com.enonic.xp:lib-event:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    include "com.enonic.lib:lib-graphql:1.2.0"
+    include "com.enonic.lib:lib-graphql:2.0.0"
     include "com.enonic.lib:lib-mustache:2.0.0"
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"

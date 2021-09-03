@@ -1,6 +1,8 @@
 var graphQl = require('/lib/graphql');
 
-var BucketType = graphQl.createObjectType({
+var schemaGenerator = require('../../schemaUtil').schemaGenerator;
+
+var BucketType = schemaGenerator.createObjectType({
     name: 'Bucket',
     description: 'Aggregated result for specific key',
     fields: {
@@ -13,7 +15,7 @@ var BucketType = graphQl.createObjectType({
     }
 });
 
-var AggregationType = graphQl.createObjectType({
+var AggregationType = schemaGenerator.createObjectType({
     name: 'Aggregation',
     description: 'List of buckets',
     fields: {

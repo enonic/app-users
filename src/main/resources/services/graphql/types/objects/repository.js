@@ -1,7 +1,9 @@
 var graphQl = require('/lib/graphql');
 var graphQlUtils = require('../../utils');
 
-exports.RepositoryType = graphQl.createObjectType({
+var schemaGenerator = require('../../schemaUtil').schemaGenerator;
+
+exports.RepositoryType = schemaGenerator.createObjectType({
     name: 'Repository',
     description: 'Domain representation of a repository',
     fields: {
