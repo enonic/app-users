@@ -39,7 +39,7 @@ class ConfirmationDialog extends Page {
 
     waitForDialogLoaded() {
         return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
-            throw  new Error("Confirmation dialog was not loaded! " + err);
+            throw new Error("Confirmation dialog was not loaded! " + err);
         })
     }
 
@@ -55,6 +55,7 @@ class ConfirmationDialog extends Page {
         return this.waitForElementDisplayed(this.warningMessage, appConst.mediumTimeout);
     }
 }
+
 module.exports = ConfirmationDialog;
 
 

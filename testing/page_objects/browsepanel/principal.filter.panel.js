@@ -14,6 +14,7 @@ const xpath = {
     idProviderAggregationCheckbox: "//div[contains(@id,'Checkbox') and child::label[contains(.,'Id Provider (')]]",
     userAggregationItems: "//div[contains(@id,'BucketView')]//div[contains(@id,'Checkbox') ]/label",
 };
+
 class BrowseFilterPanel extends Page {
 
     get clearFilterLink() {
@@ -24,14 +25,23 @@ class BrowseFilterPanel extends Page {
         return xpath.container + xpath.searchInput;
     }
 
-    getNumberAggregatedUsers() {
-        let userSelector = xpath.container + xpath.aggregationGroupView + xpath.userAggregationCheckbox + `/label`;
-        return this.getText(userSelector);
+    async getNumberInUserAggregationCheckbox() {
+        let userAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.userAggregationCheckbox + `/label`;
+        let text = await this.getText(userAggregationLocator);
+        let startIndex = text.indexOf('(');
+        let endIndex = text.indexOf(')');
+        return text.substring(startIndex + 1, endIndex);
     }
-
-    getNumberAggregatedRoles() {
-        let userSelector = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + `/label`;
-        return this.getText(userSelector).then(result => {
+    async getNumberInGroupAggregationCheckbox() {
+        let groupAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.groupAggregationCheckbox + `/label`;
+        let text = await this.getText(groupAggregationLocator);
+        let startIndex = text.indexOf('(');
+        let endIndex = text.indexOf(')');
+        return text.substring(startIndex + 1, endIndex);
+    }
+    getNumberInRoleAggregationCheckbox() {
+        let roleAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + `/label`;
+        return this.getText(roleAggregationLocator).then(result => {
             let startIndex = result.indexOf('(');
             let endIndex = result.indexOf(')');
             return result.substring(startIndex + 1, endIndex);
@@ -43,26 +53,28 @@ class BrowseFilterPanel extends Page {
         return this.getTextInElements(selector);
     }
 
-    clickOnUserAggregation() {
+    async clickOnUserAggregation() {
         let selector = xpath.container + xpath.aggregationGroupView + xpath.userAggregationCheckbox + '/label';
-        return this.clickOnElement(selector);
+        await  this.clickOnElement(selector);
+        return await this.pause(400);
     }
 
-    clickOnGroupAggregation() {
+    async clickOnGroupAggregation() {
         let locator = xpath.container + xpath.aggregationGroupView + xpath.groupAggregationCheckbox + '/label';
-        return this.clickOnElement(locator);
+        await this.clickOnElement(locator);
+        return await this.pause(400);
     }
 
     async clickOnRoleAggregation() {
         let selector = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + '/label';
         await this.clickOnElement(selector);
-        await this.pause(400);
+        return await this.pause(400);
     }
 
     async clickOnIdProviderAggregation() {
         let selector = xpath.container + xpath.aggregationGroupView + xpath.idProviderAggregationCheckbox + '/label';
         await this.clickOnElement(selector);
-        await this.pause(400);
+        return await this.pause(400);
     }
 
     waitForOpened() {
@@ -101,5 +113,6 @@ class BrowseFilterPanel extends Page {
         return this.isElementDisplayed(xpath.container);
     }
 }
+
 module.exports = BrowseFilterPanel;
 
