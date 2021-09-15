@@ -27,6 +27,10 @@ class Page {
             return elements.filter((el, i) => result[i]);
         });
     }
+    // value: string | string[]
+    keys(value) {
+        return this.browser.keys(value);
+    }
 
     pause(ms) {
         return this.browser.pause(ms);
@@ -209,6 +213,11 @@ class Page {
         let elem = await this.findElement(selector);
         return await elem.isSelected();
     }
+    async pressEscKey() {
+        await this.keys('Escape');
+        return await this.pause(300);
+    }
+
 }
 
 module.exports = Page;

@@ -59,7 +59,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             await testUtils.openWizardAndSaveGroup(testGroup);
             //2. Click on New button(System ID Provider is selected in browse-panel):
             await userBrowsePanel.clickOnNewButton();
-            testUtils.saveScreenshot("new_principal_dialog_should_be_loaded");
+            await testUtils.saveScreenshot("new_principal_dialog_should_be_loaded");
             //3. 'New Principal' dialog should be loaded:
             await newPrincipalDialog.waitForDialogLoaded()
         });

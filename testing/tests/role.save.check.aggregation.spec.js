@@ -29,7 +29,7 @@ describe('Role - save a role and check the number in aggregations', function () 
             //1. Click on Role-checkbox:
             await filterPanel.clickOnRoleAggregation();
             //2. Get the initial number of roles:
-            initialNumber = await filterPanel.getNumberAggregatedRoles();
+            initialNumber = await filterPanel.getNumberInRoleAggregationCheckbox();
             //3. Open new wizard and save new role:
             await testUtils.clickOnRolesFolderAndOpenWizard();
             await roleWizard.typeDisplayName(roleName);
@@ -37,7 +37,7 @@ describe('Role - save a role and check the number in aggregations', function () 
             await roleWizard.pause(1000);
             //4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
-            let result = await filterPanel.getNumberAggregatedRoles();
+            let result = await filterPanel.getNumberInRoleAggregationCheckbox();
             assert.isTrue(result - initialNumber === 1, "Number of roles in Filter panel should be increased ");
         });
 

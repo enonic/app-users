@@ -1,9 +1,8 @@
 const path = require('path');
-const fs = require('fs');
 const Mocha = require('mocha');
 const glob = require('glob');
 const selenium = require('selenium-standalone');
-const testFilesGlob = glob.sync('../tests/*.js', { cwd: __dirname });
+const testFilesGlob = glob.sync('../tests/*.js', {cwd: __dirname});
 const PropertiesReader = require('properties-reader');
 const file = path.join(__dirname, '/../browser.properties');
 const properties = PropertiesReader(file);
@@ -25,14 +24,14 @@ function execute() {
             if (failures === 0) {
                 return resolve();
             }
-            process.on('exit', () => process.exit(failures));
+            process.exit(failures);
         });
     });
 }
 
 function addFiles() {
     return new Promise((resolve) => {
-        testFilesGlob.forEach(function(file) {
+        testFilesGlob.forEach(function (file) {
             file = path.join(__dirname, file);
             mocha.addFile(file);
         });
@@ -48,7 +47,7 @@ async function runTests() {
 async function uiTests() {
     console.log("Download chrome driver");
     await selenium.install({
-        version: '3.141.59',
+        version: seleniumVersion,
         baseURL: 'https://selenium-release.storage.googleapis.com',
         drivers: {
             chrome: {
@@ -68,7 +67,7 @@ async function uiTests() {
         }
     });
     await runTests();
-    seleniumChildProcess.kill();
+    await seleniumChildProcess.kill();
 }
 
 uiTests();

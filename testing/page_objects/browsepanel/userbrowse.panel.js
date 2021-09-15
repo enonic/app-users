@@ -118,14 +118,16 @@ class UserBrowsePanel extends Page {
         });
     }
 
-    clickOnRowByName(name) {
-        let nameXpath = xpath.rowByName(name);
-        return this.clickOnElement(nameXpath).catch(err => {
-            this.saveScreenshot('err_find_' + name);
+    async clickOnRowByName(name) {
+        try {
+            let nameXpath = xpath.rowByName(name);
+            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
+            await this.clickOnElement(nameXpath);
+            return await this.pause(500);
+        } catch (err) {
+            await this.saveScreenshot('err_find_' + name);
             throw Error('Row with the name ' + name + ' was not found.  ' + err);
-        }).then(() => {
-            return this.pause(500);
-        });
+        }
     }
 
     waitForFolderUsersVisible() {
@@ -154,20 +156,14 @@ class UserBrowsePanel extends Page {
         })
     }
 
-    clickOnEditButton() {
-        return this.waitForEditButtonEnabled().then(() => {
-            return this.clickOnElement(this.editButton);
-        }).catch(err => {
-            this.saveScreenshot('err_browsepanel_edit');
-            throw new Error('Error when clicking on Edit button ! ' + err);
-        })
+    async clickOnEditButton() {
+        await this.waitForEditButtonEnabled();
+        return await this.clickOnElement(this.editButton);
     }
 
-    clickOnDeleteButton() {
-        return this.clickOnElement(this.deleteButton).catch(err => {
-            this.saveScreenshot('err_browsepanel_delete_button');
-            throw new Error('Error when clicking on Delete button ! ' + err);
-        })
+    async clickOnDeleteButton() {
+        await this.waitForDeleteButtonEnabled();
+        return await this.clickOnElement(this.deleteButton);
     }
 
     isSearchButtonDisplayed() {
@@ -179,7 +175,10 @@ class UserBrowsePanel extends Page {
     }
 
     waitForEditButtonEnabled() {
-        return this.waitForElementEnabled(this.editButton, appConst.mediumTimeout);
+        return this.waitForElementEnabled(this.editButton, appConst.mediumTimeout).catch(err => {
+            this.saveScreenshot("err_edit_button_not_enabled");
+            throw new Error('Edit button is not enabled ! ' + err);
+        });
     }
 
     waitForDeleteButtonEnabled() {
@@ -209,14 +208,16 @@ class UserBrowsePanel extends Page {
         })
     }
 
-    clickCheckboxAndSelectRowByDisplayName(displayName) {
-        let displayNameXpath = xpath.checkboxByDisplayName(displayName);
-        return this.waitForElementDisplayed(displayNameXpath, appConst.TIMEOUT_2).then(() => {
-            return this.clickOnElement(displayNameXpath);
-        }).catch(err => {
-            this.saveScreenshot('err_find_item');
+    async clickCheckboxAndSelectRowByDisplayName(displayName) {
+        try {
+            let displayNameXpath = xpath.checkboxByDisplayName(displayName);
+            await this.waitForElementDisplayed(displayNameXpath, appConst.TIMEOUT_2);
+            await this.clickOnElement(displayNameXpath);
+            return await this.pause(300);
+        } catch (err) {
+            await this.saveScreenshot('err_find_item');
             throw Error('Row with the displayName ' + displayName + ' was not found')
-        })
+        }
     }
 
     doClickOnCloseTabButton(displayName) {
