@@ -37,6 +37,7 @@ import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {NamePrettyfier} from 'lib-admin-ui/NamePrettyfier';
 import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
 import {Event} from 'lib-admin-ui/event/Event';
+import {Exception} from 'lib-admin-ui/Exception';
 
 interface PrincipalData {
 
@@ -247,11 +248,6 @@ export class UserAppPanel
                 principalPath = PrincipalKey.ofRole('none').toPath(true);
                 tabName = i18n('field.role');
                 break;
-            case UserTreeGridItemType.PRINCIPAL:
-                principalType = userItem.getPrincipal().getType();
-                principalPath = userItem.getPrincipal().getKey().toPath(true);
-                tabName = i18n(`field.${PrincipalType[principalType].toLowerCase()}`);
-                break;
             case UserTreeGridItemType.ID_PROVIDER:
                 tabName = i18n('field.idProvider');
                 break;
@@ -293,7 +289,7 @@ export class UserAppPanel
         }
 
         return promise
-            .catch((reason: any) => {
+            .catch((reason: Error | Exception) => {
                 DefaultErrorHandler.handle(reason);
             }).finally(() => {
                 this.mask.hide();

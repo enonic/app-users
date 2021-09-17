@@ -16,11 +16,11 @@ export class ShowNewPrincipalDialogEvent
         return this.selection;
     }
 
-    static on(handler: (event: ShowNewPrincipalDialogEvent) => void) {
+    static on(handler: (event: ShowNewPrincipalDialogEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }
 
-    static un(handler?: (event: ShowNewPrincipalDialogEvent) => void) {
+    static un(handler?: (event: ShowNewPrincipalDialogEvent) => void): void {
         Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

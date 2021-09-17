@@ -4,7 +4,7 @@ import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
 import {ListItemsRequest} from './ListItemsRequest';
 
 export class ListTypesRequest
-    extends ListItemsRequest {
+    extends ListItemsRequest<BucketAggregation> {
 
     getQuery(): string {
         return `query ($query: String, $itemIds: [String], $start: Int, $count: Int) {

@@ -23,7 +23,7 @@ export type ListUserItemsRequestResult = {
 };
 
 export class ListUserItemsRequest
-    extends ListItemsRequest {
+    extends ListItemsRequest<ListUserItemsRequestResult> {
 
     private types: UserItemType[];
 

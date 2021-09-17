@@ -12,15 +12,15 @@ export class OpenChangePasswordDialogEvent
         this.principal = principal;
     }
 
-    getPrincipal() {
+    getPrincipal(): Principal {
         return this.principal;
     }
 
-    static on(handler: (event: OpenChangePasswordDialogEvent) => void, contextWindow: Window = window) {
+    static on(handler: (event: OpenChangePasswordDialogEvent) => void, contextWindow: Window = window): void {
         Event.bind(ClassHelper.getFullName(this), handler, contextWindow);
     }
 
-    static un(handler?: (event: OpenChangePasswordDialogEvent) => void, contextWindow: Window = window) {
+    static un(handler?: (event: OpenChangePasswordDialogEvent) => void, contextWindow: Window = window): void {
         Event.unbind(ClassHelper.getFullName(this), handler, contextWindow);
     }
 }
