@@ -10,7 +10,7 @@ export class PasswordStrengthBlock extends DivEl {
         super('password-complexity');
     }
 
-    public setTestResult(testResult: owasp.TestResult) {
+    public setTestResult(testResult: owasp.TestResult): void {
       if (testResult.errors.length > 0) {
           this.setTitle(testResult.errors[0]);
       } else {

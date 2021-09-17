@@ -17,7 +17,7 @@ export class RepositoryComboBox
         super(builder);
     }
 
-    clearSelection(forceClear: boolean = false) {
+    clearSelection(forceClear: boolean = false): void {
         this.getLoader().search('');
         super.clearSelection(forceClear);
         (<ReportSelectedOptionView>this.getSelectedOptions()[0].getOptionView()).getBranch();

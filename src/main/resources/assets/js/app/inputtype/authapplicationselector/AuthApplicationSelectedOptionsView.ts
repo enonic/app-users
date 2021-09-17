@@ -55,17 +55,17 @@ export class AuthApplicationSelectedOptionsView
         return new SelectedOption<Application>(optionView, this.count());
     }
 
-    removeOption(optionToRemove: Option<Application>, silent: boolean = false) {
+    removeOption(optionToRemove: Option<Application>, silent: boolean = false): void {
         this.items = this.items.filter(
             item => !item.getSiteConfig().getApplicationKey().equals(optionToRemove.getDisplayValue().getApplicationKey()));
         super.removeOption(optionToRemove, silent);
     }
 
-    onApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }) {
+    onApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }): void {
         this.applicationConfigFormDisplayedListeners.push(listener);
     }
 
-    unApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }) {
+    unApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }): void {
         this.applicationConfigFormDisplayedListeners =
             this.applicationConfigFormDisplayedListeners.filter((curr) => (curr !== listener));
     }
@@ -74,11 +74,11 @@ export class AuthApplicationSelectedOptionsView
         this.applicationConfigFormDisplayedListeners.forEach((listener) => listener(applicationKey, formView));
     }
 
-    onBeforeOptionCreated(listener: () => void) {
+    onBeforeOptionCreated(listener: () => void): void {
         this.beforeOptionCreatedListeners.push(listener);
     }
 
-    unBeforeOptionCreated(listener: () => void) {
+    unBeforeOptionCreated(listener: () => void): void {
         this.beforeOptionCreatedListeners = this.beforeOptionCreatedListeners.filter((curr) => {
             return listener !== curr;
         });
@@ -88,11 +88,11 @@ export class AuthApplicationSelectedOptionsView
         this.beforeOptionCreatedListeners.forEach((listener) => listener());
     }
 
-    onAfterOptionCreated(listener: (optionView: AuthApplicationSelectedOptionView) => void) {
+    onAfterOptionCreated(listener: (optionView: AuthApplicationSelectedOptionView) => void): void {
         this.afterOptionCreatedListeners.push(listener);
     }
 
-    unAfterOptionCreated(listener: (optionView: AuthApplicationSelectedOptionView) => void) {
+    unAfterOptionCreated(listener: (optionView: AuthApplicationSelectedOptionView) => void): void {
         this.afterOptionCreatedListeners = this.afterOptionCreatedListeners.filter((curr) => {
             return listener !== curr;
         });

@@ -43,15 +43,15 @@ export class UserTreeGridItem
         return new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
     }
 
-    setIdProvider(idProvider: IdProvider) {
+    setIdProvider(idProvider: IdProvider): void {
         this.idProvider = idProvider;
     }
 
-    setPrincipal(principal: Principal) {
+    setPrincipal(principal: Principal): void {
         this.principal = principal;
     }
 
-    setType(type: UserTreeGridItemType) {
+    setType(type: UserTreeGridItemType): void {
         this.type = type;
     }
 
