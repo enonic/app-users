@@ -110,7 +110,7 @@ export class PasswordGenerator
         this.showLink.getEl().setAttribute('data-i18n', i18n(`field.pswGenerator.${locked ? 'show' : 'hide'}`));
     }
 
-    reset() {
+    reset(): void {
         this.setValue('');
         this.toggleShowLink(true);
     }
@@ -194,29 +194,29 @@ export class PasswordGenerator
         });
     }
 
-    onInput(listener: (event: Event) => void) {
+    onInput(listener: (event: Event) => void): void {
         this.input.onInput(listener);
     }
 
-    unInput(listener: (event: Event) => void) {
+    unInput(listener: (event: Event) => void): void {
         this.input.unInput(listener);
     }
 
-    onFocus(listener: (event: FocusEvent) => void) {
+    onFocus(listener: (event: FocusEvent) => void): void {
         this.focusListeners.push(listener);
     }
 
-    unFocus(listener: (event: FocusEvent) => void) {
+    unFocus(listener: (event: FocusEvent) => void): void {
         this.focusListeners = this.focusListeners.filter((curr) => {
             return curr !== listener;
         });
     }
 
-    onBlur(listener: (event: FocusEvent) => void) {
+    onBlur(listener: (event: FocusEvent) => void): void {
         this.blurListeners.push(listener);
     }
 
-    unBlur(listener: (event: FocusEvent) => void) {
+    unBlur(listener: (event: FocusEvent) => void): void {
         this.blurListeners = this.blurListeners.filter((curr) => {
             return curr !== listener;
         });

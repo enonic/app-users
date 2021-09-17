@@ -2,6 +2,12 @@ import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 
+type GetPrincipalsTotalResult = {
+    principalsConnection: {
+        totalCount: number
+    }
+};
+
 export class GetPrincipalsTotalRequest
     extends ListGraphQlRequest<number> {
 
@@ -39,7 +45,7 @@ export class GetPrincipalsTotalRequest
     }
 
     sendAndParse(): Q.Promise<number> {
-        return this.query().then((response: any) => {
+        return this.query().then((response: GetPrincipalsTotalResult) => {
             const data = response.principalsConnection;
             return data.totalCount;
         });

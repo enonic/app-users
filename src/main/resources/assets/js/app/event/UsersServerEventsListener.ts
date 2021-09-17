@@ -22,7 +22,7 @@ export class UsersServerEventsListener
         }
 
         if (ReportServerEvent.is(<NodeEventJson>eventJson)) {
-            const event: ReportServerEvent = ReportServerEvent.fromJson(<NodeEventJson>eventJson);
+            const event = ReportServerEvent.fromJson(<NodeEventJson>eventJson);
             this.fireEvent(event);
         }
     }

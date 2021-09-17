@@ -4,7 +4,7 @@ import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 
 export class UserItemTypesRowFormatter {
 
-    public static nameFormatter({}: any, {}: any, {}: any, {}: any, dataContext: TreeNode<UserTypeTreeGridItem>) {
+    public static nameFormatter({}: Object, {}: Object, {}: Object, {}: Object, dataContext: TreeNode<UserTypeTreeGridItem>): string {
         let viewer: UserTypesTreeGridItemViewer = <UserTypesTreeGridItemViewer>dataContext.getViewer('displayName');
         if (!viewer) {
             const isRootNode = dataContext.calcLevel() === 1;

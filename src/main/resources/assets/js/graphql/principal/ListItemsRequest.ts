@@ -1,19 +1,19 @@
 import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {FulltextSearchExpression} from 'lib-admin-ui/query/FulltextSearchExpression';
 
-export abstract class ListItemsRequest
-    extends ListGraphQlRequest<any> {
+export abstract class ListItemsRequest<TYPE>
+    extends ListGraphQlRequest<TYPE> {
 
     protected searchQuery: string;
 
     protected itemIds: string[];
 
-    setQuery(query: string): ListItemsRequest {
+    setQuery(query: string): ListItemsRequest<TYPE> {
         this.searchQuery = query;
         return this;
     }
 
-    setItems(items: string[]): ListItemsRequest {
+    setItems(items: string[]): ListItemsRequest<TYPE> {
         this.itemIds = items;
         return this;
     }

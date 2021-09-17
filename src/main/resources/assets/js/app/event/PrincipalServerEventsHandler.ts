@@ -81,22 +81,22 @@ export class PrincipalServerEventsHandler {
         return false;
     }
 
-    onUserItemCreated(listener: (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => void) {
+    onUserItemCreated(listener: (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => void): void {
         this.userItemCreatedListeners.push(listener);
     }
 
-    unUserItemCreated(listener: (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => void) {
+    unUserItemCreated(listener: (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => void): void {
         this.userItemCreatedListeners =
             this.userItemCreatedListeners.filter(currentListener => {
                 return currentListener !== listener;
             });
     }
 
-    onUserItemUpdated(listener: (principal: Principal, idProvider: IdProvider) => void) {
+    onUserItemUpdated(listener: (principal: Principal, idProvider: IdProvider) => void): void {
         this.userItemUpdatedListeners.push(listener);
     }
 
-    unUserItemUpdated(listener: (principal: Principal, idProvider: IdProvider) => void) {
+    unUserItemUpdated(listener: (principal: Principal, idProvider: IdProvider) => void): void {
         this.userItemUpdatedListeners =
             this.userItemUpdatedListeners.filter((currentListener: (principal: Principal, idProvider: IdProvider) => void) => {
                 return currentListener !== listener;

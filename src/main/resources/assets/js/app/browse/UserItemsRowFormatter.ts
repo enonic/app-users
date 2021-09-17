@@ -4,7 +4,8 @@ import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 
 export class UserItemsRowFormatter {
 
-    public static nameFormatter({}: any, {}: any, {}: any, {}: any, dataContext: TreeNode<UserTreeGridItem>) {
+    // why 4 random empty objects?
+    public static nameFormatter({}: Object, {}: Object, {}: Object, {}: Object, dataContext: TreeNode<UserTreeGridItem>): string {
         let viewer = <UserTreeGridItemViewer>dataContext.getViewer('displayName');
         if (!viewer) {
             viewer = new UserTreeGridItemViewer();

@@ -28,11 +28,11 @@ export class PrincipalDuplicatedEvent
         return this.nextToSource;
     }
 
-    static on(handler: (event: PrincipalDuplicatedEvent) => void) {
+    static on(handler: (event: PrincipalDuplicatedEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }
 
-    static un(handler?: (event: PrincipalDuplicatedEvent) => void) {
+    static un(handler?: (event: PrincipalDuplicatedEvent) => void): void {
         Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }
