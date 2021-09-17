@@ -9,6 +9,12 @@ type GetPrincipalsTotalResult = {
     }
 };
 
+type GetPrincipalsTotalResult = {
+    principalsConnection: {
+        totalCount: number
+    }
+};
+
 export class GetPrincipalsTotalRequest
     extends ListGraphQlRequest<number> {
 
