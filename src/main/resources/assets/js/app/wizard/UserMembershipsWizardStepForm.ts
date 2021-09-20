@@ -21,7 +21,7 @@ export class UserMembershipsWizardStepForm
         super('user-memberships-wizard-step-form');
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         const groupsLoader = new PrincipalLoader()
@@ -41,7 +41,7 @@ export class UserMembershipsWizardStepForm
         return [rolesFormItem, groupsFormItem];
     }
 
-    layout(principal: Principal) {
+    layout(principal: Principal): void {
         const rolesKeys: PrincipalKey[] = this.getRolesKeysFromUser(<User>principal);
 
         if (this.roles.isDirty()) {

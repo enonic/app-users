@@ -1,7 +1,7 @@
 import * as hasher from 'hasher';
 
 export class Router {
-    static setHash(path: string) {
+    static setHash(path: string): void {
         hasher.changed.active = false;
         hasher.setHash(path);
         hasher.changed.active = true;

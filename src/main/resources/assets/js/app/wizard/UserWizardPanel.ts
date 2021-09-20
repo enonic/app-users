@@ -198,7 +198,7 @@ export class UserWizardPanel
         if (StringHelper.isEmpty(formEmail)) {
             throw i18n('notify.empty.email');
         } else if (!this.userEmailWizardStepForm.isValid()) {
-            throw `${i18n('field.email.invalid')}.`;
+            throw `${i18n('field.email.invalid') || 'invalid'}.`;
         }
     }
 
@@ -208,7 +208,7 @@ export class UserWizardPanel
         if (StringHelper.isEmpty(password)) {
             throw i18n('notify.empty.password');
         } else if (!this.userPasswordWizardStepForm.isValid()) {
-            throw `${i18n('field.password.invalid')}.`;
+            throw `${i18n('field.password.invalid') || 'invalid'}.`;
         }
     }
 
