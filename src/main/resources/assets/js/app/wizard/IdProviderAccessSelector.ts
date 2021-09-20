@@ -64,11 +64,11 @@ export class IdProviderAccessSelector
         return undefined;
     }
 
-    onValueChanged(listener: (event: ValueChangedEvent) => void) {
+    onValueChanged(listener: (event: ValueChangedEvent) => void): void {
         this.valueChangedListeners.push(listener);
     }
 
-    unValueChanged(listener: (event: ValueChangedEvent) => void) {
+    unValueChanged(listener: (event: ValueChangedEvent) => void): void {
         this.valueChangedListeners = this.valueChangedListeners.filter((curr) => {
             return curr !== listener;
         });

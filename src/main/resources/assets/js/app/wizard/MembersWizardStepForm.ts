@@ -21,7 +21,7 @@ export class MembersWizardStepForm
         super('membership-wizard-step-form');
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         this.loader = new PrincipalLoader()

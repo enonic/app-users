@@ -1,6 +1,18 @@
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
+interface ReportData {
+    _id : string;
+    id: string;
+    taskId: string;
+    principalKey: string;
+    principalDisplayName: string;
+    repositoryId: string;
+    finished: string;
+    url: string;
+    reportBranch: string;
+}
+
 export class Report
     implements Equitable {
     private id: string;
@@ -48,7 +60,7 @@ export class Report
         return this.id === other.id;
     }
 
-    static fromJson(json: any): Report {
+    static fromJson(json: ReportData): Report {
         const r = new Report();
         r.id = json.id || json._id;
         r.principalKey = json.principalKey ? PrincipalKey.fromString(json.principalKey) : null;

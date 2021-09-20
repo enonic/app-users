@@ -11,9 +11,16 @@ import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 
-export type ListPrincipalsResult = {
+export type ListPrincipalsData = {
     total: number;
     principals: Principal[];
+};
+
+type ListPrincipalsResult = {
+    principalsConnection: {
+        totalCount: number,
+        edges: [{ node: PrincipalJson }],
+    };
 };
 
 export class ListPrincipalsRequest
@@ -71,8 +78,8 @@ export class ListPrincipalsRequest
                 }`;
     }
 
-    sendAndParse(): Q.Promise<ListPrincipalsResult> {
-        return this.query().then((response: any) => {
+    sendAndParse(): Q.Promise<ListPrincipalsData> {
+        return this.query().then((response: ListPrincipalsResult) => {
             const data = response.principalsConnection;
             return {
                 total: data.totalCount,

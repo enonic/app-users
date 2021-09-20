@@ -4,7 +4,7 @@ import {UserTreeGridActions} from './UserTreeGridActions';
 import {EditPrincipalEvent} from './EditPrincipalEvent';
 import {UserItemsRowFormatter} from './UserItemsRowFormatter';
 import {ListIdProvidersRequest} from '../../graphql/idprovider/ListIdProvidersRequest';
-import {ListPrincipalsRequest, ListPrincipalsResult} from '../../graphql/principal/ListPrincipalsRequest';
+import {ListPrincipalsRequest, ListPrincipalsData} from '../../graphql/principal/ListPrincipalsRequest';
 import {PrincipalBrowseSearchData} from './filter/PrincipalBrowseSearchData';
 import {UserItemType} from './UserItemType';
 import {ListUserItemsRequest} from '../../graphql/principal/ListUserItemsRequest';
@@ -331,7 +331,7 @@ export class UserItemsTreeGrid
             .setStart(from)
             .setCount(10)
             .sendAndParse()
-            .then((result: ListPrincipalsResult) => {
+            .then((result: ListPrincipalsData) => {
                 const principals: Principal[] = result.principals;
 
                 principals.forEach((principal: Principal) => {

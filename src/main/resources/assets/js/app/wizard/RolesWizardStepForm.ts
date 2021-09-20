@@ -21,7 +21,7 @@ export class RolesWizardStepForm
         super('roles-wizard-step-form');
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         const rolesLoader: BasePrincipalLoader = new PrincipalLoader()
@@ -35,7 +35,7 @@ export class RolesWizardStepForm
         return [formItem];
     }
 
-    layout(principal: Principal) {
+    layout(principal: Principal): void {
         const rolesKeys: PrincipalKey[] = this.getRolesKeysFromPrincipal(principal);
 
         if (this.roles.isDirty()) {

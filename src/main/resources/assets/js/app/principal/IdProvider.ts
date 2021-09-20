@@ -4,7 +4,7 @@ import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
 import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
-import {ListPrincipalsRequest, ListPrincipalsResult} from '../../graphql/principal/ListPrincipalsRequest';
+import {ListPrincipalsRequest, ListPrincipalsData} from '../../graphql/principal/ListPrincipalsRequest';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {IdProviderJson} from './IdProviderJson';
 import {Equitable} from 'lib-admin-ui/Equitable';
@@ -43,7 +43,7 @@ export class IdProvider
             .setIdProviderKey(this.getKey())
             .setTypes([PrincipalType.USER, PrincipalType.GROUP])
             .sendAndParse()
-            .then((result: ListPrincipalsResult) => (result.total === 0));
+            .then((result: ListPrincipalsData) => (result.total === 0));
     }
 
     static create(): IdProviderBuilder {

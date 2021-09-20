@@ -81,7 +81,7 @@ export class IdProviderWizardPanel
     }
 
     protected getPersistedItemPath(): string {
-        return `/${this.getPersistedItem().getKey().toString()}`;
+        return `/${this.getPersistedItem().getKey().toString() || ''}`;
     }
 
     getUserItemType(): string {
@@ -186,7 +186,7 @@ export class IdProviderWizardPanel
         return Q<void>(null);
     }
 
-    protected updateHash() {
+    protected updateHash(): void {
         if (this.getPersistedItem()) {
             Router.setHash('edit/' + this.getPersistedItem().getKey());
         } else {
@@ -280,7 +280,7 @@ export class IdProviderWizardPanel
             .setPermissions(permissions);
     }
 
-    protected handleServerUpdate(principal: Principal, idProvider: IdProvider) {
+    protected handleServerUpdate(principal: Principal, idProvider: IdProvider): void {
         if (idProvider && this.getPersistedItem().getKey().equals(idProvider.getKey())) {
             this.setPersistedItem(idProvider);
             this.doLayoutPersistedItem(idProvider);

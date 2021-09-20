@@ -88,7 +88,7 @@ export class AuthApplicationSelector
         }
     }
 
-    reset() {
+    reset(): void {
         this.comboBox.resetBaseValues();
     }
 
@@ -187,7 +187,7 @@ export class AuthApplicationSelector
         return this.comboBox.countSelected();
     }
 
-    validate(silent: boolean = true) {
+    validate(silent: boolean = true): void {
         this.comboBox.getSelectedOptionViews().forEach((view: AuthApplicationSelectedOptionView) => {
             view.getFormView().validate(true);
         });

@@ -3,6 +3,13 @@ import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggreg
 import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
 import {ListItemsRequest} from './ListItemsRequest';
 
+type ListTypeData = {
+    types: {
+        totalCount: number;
+        aggregations: UserItemBucketAggregationJson[];
+    };
+};
+
 export class ListTypesRequest
     extends ListItemsRequest<BucketAggregation> {
 
@@ -22,7 +29,7 @@ export class ListTypesRequest
     }
 
     sendAndParse(): Q.Promise<BucketAggregation> {
-        return this.query().then((response: any) => {
+        return this.query().then((response: ListTypeData) => {
             const data = response.types;
             return this.fromJsonToAggregation(data.aggregations);
         });
