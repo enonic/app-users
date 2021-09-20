@@ -231,24 +231,22 @@ export class UserAppPanel
         let tabName;
 
         if (userItem) {
-            switch (userItem.getType()) {
+            principalType = userItem.getPrincipal().getType();
+            switch (principalType) {
 
-            case UserTreeGridItemType.USERS:
-                principalType = PrincipalType.USER;
+            case PrincipalType.USER:
                 principalPath = PrincipalKey.ofUser(userItem.getIdProvider().getKey(), 'none').toPath(true);
                 tabName = i18n('field.user');
                 break;
-            case UserTreeGridItemType.GROUPS:
-                principalType = PrincipalType.GROUP;
+            case PrincipalType.GROUP:
                 principalPath = PrincipalKey.ofGroup(userItem.getIdProvider().getKey(), 'none').toPath(true);
                 tabName = i18n('field.group');
                 break;
-            case UserTreeGridItemType.ROLES:
-                principalType = PrincipalType.ROLE;
+            case PrincipalType.ROLE:
                 principalPath = PrincipalKey.ofRole('none').toPath(true);
                 tabName = i18n('field.role');
                 break;
-            case UserTreeGridItemType.ID_PROVIDER:
+            default:
                 tabName = i18n('field.idProvider');
                 break;
             }
