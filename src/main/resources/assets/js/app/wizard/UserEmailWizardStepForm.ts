@@ -29,7 +29,7 @@ export class UserEmailWizardStepForm
         this.isSystemUser = isSystemUser;
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         this.emailInput = new EmailInput();
@@ -38,7 +38,7 @@ export class UserEmailWizardStepForm
         });
     }
 
-    protected initListeners() {
+    protected initListeners(): void {
         super.initListeners();
 
         this.form.onValidityChanged((event: ValidityChangedEvent) => {
@@ -52,7 +52,7 @@ export class UserEmailWizardStepForm
         return [this.emailFormItem];
     }
 
-    layout(principal: Principal) {
+    layout(principal: Principal): void {
         const user: User = (<User>principal);
 
         if (this.emailInput.isDirty()) {

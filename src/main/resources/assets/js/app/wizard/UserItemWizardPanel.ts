@@ -176,7 +176,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     }
 
     protected handleServerUpdate(principal: Principal, idProvider: IdProvider) {
-        //
+        // TODO ?
     }
 
     protected getPersistedItemPath(): string {

@@ -29,11 +29,11 @@ export class UserItemCreatedEvent
         return this.parentOfSameType;
     }
 
-    static on(handler: (event: UserItemCreatedEvent) => void) {
+    static on(handler: (event: UserItemCreatedEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }
 
-    static un(handler?: (event: UserItemCreatedEvent) => void) {
+    static un(handler?: (event: UserItemCreatedEvent) => void): void {
         Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

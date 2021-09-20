@@ -122,11 +122,11 @@ export class UserBrowsePanel
         return new PrincipalBrowseFilterPanel();
     }
 
-    protected enableSelectionMode() {
+    protected enableSelectionMode(): void {
         this.filterPanel.setSelectedItems(this.treeGrid.getSelectedItems());
     }
 
-    protected disableSelectionMode() {
+    protected disableSelectionMode(): void {
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
         super.disableSelectionMode();

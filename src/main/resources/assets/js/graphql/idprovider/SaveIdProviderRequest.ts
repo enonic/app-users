@@ -98,7 +98,7 @@ export class SaveIdProviderRequest
         return this.mutate().then(json => this.idProviderfromJson(json[this.mutationType], json.error));
     }
 
-    idProviderfromJson(us: IdProviderJson, error: string) {
+    idProviderfromJson(us: IdProviderJson, error: string): IdProvider {
         if (error) {
             throw new Exception(error);
         } else if (!us) {

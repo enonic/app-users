@@ -41,7 +41,7 @@ export class GraphQlRequest<PARSED_TYPE>
         throw 'getMutation() should be overridden to use mutate()';
     }
 
-    validate() {
+    validate(): boolean {
         // Override to ensure any validation of ResourceRequest before sending.
         return true;
     }

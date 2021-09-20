@@ -79,17 +79,17 @@ export class AuthApplicationSelectedOptionView
         return Q(true);
     }
 
-    setSiteConfig(applicationConfig: ApplicationConfig) {
+    setSiteConfig(applicationConfig: ApplicationConfig): void {
         this.applicationConfig = applicationConfig;
     }
 
-    protected onEditButtonClicked(e: MouseEvent) {
+    protected onEditButtonClicked(e: MouseEvent): boolean {
         this.initAndOpenConfigureDialog();
 
         return super.onEditButtonClicked(e);
     }
 
-    initAndOpenConfigureDialog(comboBoxToUndoSelectionOnCancel?: AuthApplicationComboBox) {
+    initAndOpenConfigureDialog(comboBoxToUndoSelectionOnCancel?: AuthApplicationComboBox): void {
 
         if (this.application.getIdProviderForm().getFormItems().length === 0) {
             return;
@@ -193,11 +193,11 @@ export class AuthApplicationSelectedOptionView
         return this.formView;
     }
 
-    onApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey): void; }) {
+    onApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey): void; }): void {
         this.applicationConfigFormDisplayedListeners.push(listener);
     }
 
-    unApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey): void; }) {
+    unApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey): void; }): void {
         this.applicationConfigFormDisplayedListeners =
             this.applicationConfigFormDisplayedListeners.filter((curr) => (curr !== listener));
     }

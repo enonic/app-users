@@ -16,6 +16,7 @@ import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {UserItem} from 'lib-admin-ui/security/UserItem';
 import {SearchInputValues} from 'lib-admin-ui/query/SearchInputValues';
+import {Exception} from 'lib-admin-ui/Exception';
 
 export class PrincipalBrowseFilterPanel
     extends BrowseFilterPanel<UserTreeGridItem> {
@@ -34,7 +35,7 @@ export class PrincipalBrowseFilterPanel
     private initHitsCounter() {
         new ListUserItemsRequest().sendAndParse().then((result: ListUserItemsRequestResult) => {
             this.updateHitsCounter(result.userItems ? result.userItems.length : 0, true);
-        }).catch((reason: any) => {
+        }).catch((reason: Error | Exception) => {
             DefaultErrorHandler.handle(reason);
         });
     }

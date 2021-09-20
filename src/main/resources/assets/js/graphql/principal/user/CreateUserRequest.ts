@@ -3,6 +3,15 @@ import {User} from '../../../app/principal/User';
 import {UserJson} from '../../../app/principal/UserJson';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
+type CreateUserRequestData = {
+    key: PrincipalKey;
+    displayName: string;
+    email: string;
+    login: string;
+    password: string;
+    memberships: PrincipalKey[];
+};
+
 export class CreateUserRequest
     extends GraphQlRequest<User> {
 
@@ -43,7 +52,7 @@ export class CreateUserRequest
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
+    getVariables(): { [key: string]: CreateUserRequestData } {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;
