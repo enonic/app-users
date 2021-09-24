@@ -199,13 +199,13 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         return this.getParams().persistedDisplayName;
     }
 
-    lock() {
+    lock(): void {
         this.locked = true;
         this.formMask.show();
         this.notifyLockChanged(this.locked);
     }
 
-    unlock() {
+    unlock(): void {
         this.locked = false;
 
         this.formMask.hide();
@@ -229,7 +229,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         return super.saveChanges();
     }
 
-    close(checkCanClose: boolean = false) {
+    close(checkCanClose: boolean = false): void {
         if (!checkCanClose || this.canClose()) {
             super.close(checkCanClose);
         }
@@ -296,7 +296,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         return this.wizardActions.getCloseAction();
     }
 
-    protected updateHash() {
+    protected updateHash(): void {
         throw new Error('Must be implemented by inheritors');
     }
 
@@ -308,7 +308,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         throw new Error('Must be implemented by inheritors');
     }
 
-    protected handleDelete() {
+    protected handleDelete(): void {
         new ConfirmationDialog()
             .setQuestion(i18n('dialog.delete.question'))
             .setNoCallback(null)
@@ -328,7 +328,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     protected abstract produceDeleteRequest(): DeleteUserItemRequest;
 
-    protected handleDeletedResult(results: DeleteUserItemResult[]) {
+    protected handleDeletedResult(results: DeleteUserItemResult[]): void {
         if (!results || results.length === 0) {
             return;
         }
@@ -346,11 +346,11 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     protected abstract handleSuccessfulDelete(results: DeleteUserItemResult[]);
 
-    onLockChanged(listener: (value: boolean) => void) {
+    onLockChanged(listener: (value: boolean) => void): void {
         this.lockChangedListeners.push(listener);
     }
 
-    unLockChanged(listener: (value: boolean) => void) {
+    unLockChanged(listener: (value: boolean) => void): void {
         this.lockChangedListeners = this.lockChangedListeners.filter((curr: (value: boolean) => void) => {
             return listener !== curr;
         });

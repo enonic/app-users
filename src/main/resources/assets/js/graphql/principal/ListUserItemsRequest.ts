@@ -14,13 +14,17 @@ import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelpe
 import {UserItemType} from '../../app/browse/UserItemType';
 import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
-import {ListItemsRequest} from './ListItemsRequest';
+import {ListItemsProperties, ListItemsRequest} from './ListItemsRequest';
 
 export type ListUserItemsRequestResult = {
     total: number,
     userItems: UserItem[],
     aggregations: BucketAggregation[]
 };
+
+interface ListUserItemsProperties extends ListItemsProperties {
+    types: string[];
+}
 
 export class ListUserItemsRequest
     extends ListItemsRequest<ListUserItemsRequestResult> {
@@ -32,8 +36,8 @@ export class ListUserItemsRequest
         return this;
     }
 
-    getVariables(): {[key: string]: any} {
-        const vars = super.getVariables();
+    getVariables(): ListUserItemsProperties {
+        const vars = <ListUserItemsProperties>super.getVariables();
 
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => UserItemType[type]);

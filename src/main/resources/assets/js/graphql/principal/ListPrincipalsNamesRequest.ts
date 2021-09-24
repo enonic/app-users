@@ -1,4 +1,4 @@
-import {ListGraphQlRequest} from '../ListGraphQlRequest';
+import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 
@@ -6,8 +6,13 @@ export type ListPrincipalsKeysResult = {
     displayNames: string[];
 };
 
+export interface ListPrincipalsProperties extends ListGraphQlProperties {
+    types: string[];
+    idProviderKey: IdProviderKey;
+} 
+
 export class ListPrincipalsNamesRequest
-    extends ListGraphQlRequest<any> {
+    extends ListGraphQlRequest<ListPrincipalsKeysResult> {
 
     private types: PrincipalType[];
     private idProviderKey: IdProviderKey;
@@ -22,8 +27,8 @@ export class ListPrincipalsNamesRequest
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
+    getVariables(): ListPrincipalsProperties {
+        let vars = <ListPrincipalsProperties>super.getVariables();
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }
@@ -46,7 +51,7 @@ export class ListPrincipalsNamesRequest
                 }`;
     }
 
-    sendAndParse(): Q.Promise<ListPrincipalsKeysResult> {
+    override sendAndParse(): Q.Promise<ListPrincipalsKeysResult> {
         return this.query().then((response: any) => {
             const data = response.principalsConnection;
             return {

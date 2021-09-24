@@ -1,5 +1,10 @@
-import {ListGraphQlRequest} from '../ListGraphQlRequest';
+import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
 import {FulltextSearchExpression} from 'lib-admin-ui/query/FulltextSearchExpression';
+
+export interface ListItemsProperties extends ListGraphQlProperties {
+    query: string;
+    itemsIds: string[];
+}
 
 export abstract class ListItemsRequest<TYPE>
     extends ListGraphQlRequest<TYPE> {
@@ -18,8 +23,8 @@ export abstract class ListItemsRequest<TYPE>
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
-        const vars = super.getVariables();
+    getVariables(): ListItemsProperties {
+        const vars = <ListItemsProperties>super.getVariables();
 
         if (this.searchQuery) {
             vars['query'] = FulltextSearchExpression.escapeString(this.searchQuery);
