@@ -79,16 +79,16 @@ export class ChangeUserPasswordDialog
         this.changePasswordButton.setEnabled(this.password.isValid());
     }
 
-    open() {
+    open(): void {
         super.open();
     }
 
-    show() {
+    show(): void {
         this.password.reset();
         super.show();
     }
 
-    close() {
+    close(): void {
         super.close();
         this.remove();
     }

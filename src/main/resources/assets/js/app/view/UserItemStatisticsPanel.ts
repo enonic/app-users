@@ -230,10 +230,10 @@ export class UserItemStatisticsPanel
     }
 
     private downloadReport(principal: Principal, repo: Repository, branch: string) {
-        const params: { [name: string]: any } = {
+        const params: { [name: string]: string } = {
             principalKey: principal.getKey().toString(),
             repositoryId: repo.getId(),
-            branch: branch
+            branch
         };
         const uri: string = UriHelper.appendUrlParams(this.getReportServicePath(), params);
         const reportName: string = `perm-report-${repo.getName()}(${branch}).csv`;

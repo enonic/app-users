@@ -1,6 +1,7 @@
 import {ListGraphQlRequest} from '../ListGraphQlRequest';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {ListPrincipalsProperties} from './ListPrincipalsNamesRequest';
 
 type GetPrincipalsTotalResult = {
     principalsConnection: {
@@ -24,8 +25,8 @@ export class GetPrincipalsTotalRequest
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
+    getVariables(): ListPrincipalsProperties {
+        let vars = <ListPrincipalsProperties>super.getVariables();
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }

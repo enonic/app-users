@@ -15,7 +15,7 @@ export class PrincipalDescriptionWizardStepForm
         super('principal-description-wizard-step-form');
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         this.description = new TextInput('middle');
@@ -27,7 +27,7 @@ export class PrincipalDescriptionWizardStepForm
         return [descriptionFormItem];
     }
 
-    layout(principal: Principal) {
+    layout(principal: Principal): void {
         const description: string = !!principal.getDescription() ? principal.getDescription() : '';
 
         if (this.description.isDirty()) {

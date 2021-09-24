@@ -287,7 +287,7 @@ export class IdProviderWizardPanel
         }
     }
 
-    protected handleSuccessfulDelete(results: DeleteUserItemResult[]) {
+    protected handleSuccessfulDelete(results: DeleteUserItemResult[]): void {
         const keys: UserItemKey[] = results.filter(result => result.isDeleted()).map(result => result.getKey());
         const msg = keys.length === 1 ?
             i18n('notify.delete.idprovider.single', keys[0]) :

@@ -1,5 +1,11 @@
 import {Equitable} from 'lib-admin-ui/Equitable';
 
+type RepositoryData = {
+    id: string;
+    name: string;
+    branches: string[];
+};
+
 export class Repository
     implements Equitable {
     private id: string;
@@ -22,7 +28,7 @@ export class Repository
         return this.id === other.id;
     }
 
-    static fromJson(json: any): Repository {
+    static fromJson(json: RepositoryData): Repository {
         const r = new Repository();
         r.id = json.id;
         r.name = json.name;
