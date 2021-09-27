@@ -10,6 +10,7 @@ import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
 import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {ListPrincipalsProperties} from './ListPrincipalsNamesRequest';
 
 export type ListPrincipalsData = {
     total: number;
@@ -24,7 +25,7 @@ type ListPrincipalsResult = {
 };
 
 export class ListPrincipalsRequest
-    extends ListGraphQlRequest<any> {
+    extends ListGraphQlRequest<ListPrincipalsData> {
 
     private types: PrincipalType[];
     private idProviderKey: IdProviderKey;
@@ -39,8 +40,8 @@ export class ListPrincipalsRequest
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
-        const vars = super.getVariables();
+    getVariables(): ListPrincipalsProperties {
+        const vars = <ListPrincipalsProperties>super.getVariables();
 
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
@@ -78,7 +79,7 @@ export class ListPrincipalsRequest
                 }`;
     }
 
-    sendAndParse(): Q.Promise<ListPrincipalsData> {
+    override sendAndParse(): Q.Promise<ListPrincipalsData> {
         return this.query().then((response: ListPrincipalsResult) => {
             const data = response.principalsConnection;
             return {

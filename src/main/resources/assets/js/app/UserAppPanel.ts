@@ -114,7 +114,7 @@ export class UserAppPanel
         }
     }
 
-    addWizardPanel(tabMenuItem: AppBarTabMenuItem, wizardPanel: UserItemWizardPanel<any>) {
+    addWizardPanel(tabMenuItem: AppBarTabMenuItem, wizardPanel: UserItemWizardPanel<UserItem>): void {
         super.addWizardPanel(tabMenuItem, wizardPanel);
 
         wizardPanel.onRendered(() => {

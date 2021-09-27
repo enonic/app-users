@@ -26,7 +26,7 @@ export class UserMembershipsWizardStepForm
 
         const groupsLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.GROUP]);
-        this.groups = <PrincipalComboBox>PrincipalComboBox.create().setLoader(groupsLoader).build();
+        this.groups = <PrincipalComboBox>(PrincipalComboBox.create().setLoader(groupsLoader).build());
 
         const rolesLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.ROLE])

@@ -166,7 +166,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
                 this.notifyPrincipalNamed(principal);
             }
 
-            const principalTypeName = i18n(`field.${PrincipalType[principal.getType()].toLowerCase()}`);
+            const principalTypeName = i18n(`field.${PrincipalType[principal.getType()].toLowerCase() || ''}`);
             showFeedback(i18n('notify.update.any', principalTypeName, principal.getDisplayName()));
             new UserItemUpdatedEvent(principal, this.getIdProvider()).fire();
 

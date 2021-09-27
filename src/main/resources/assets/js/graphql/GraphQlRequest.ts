@@ -29,7 +29,7 @@ export class GraphQlRequest<PARSED_TYPE>
         return params;
     }
 
-    getVariables(): { [key: string]: any } {
+    getVariables(): {} {
         return {};
     }
 

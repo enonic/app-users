@@ -1,5 +1,11 @@
 import {GraphQlRequest} from './GraphQlRequest';
 
+export interface ListGraphQlProperties {
+    start: number;
+    count: number;
+    sort: string;
+}
+
 export class ListGraphQlRequest<PARSED_TYPE>
     extends GraphQlRequest<PARSED_TYPE> {
 
@@ -22,8 +28,8 @@ export class ListGraphQlRequest<PARSED_TYPE>
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
+    override getVariables(): ListGraphQlProperties {
+        let vars = <ListGraphQlProperties>super.getVariables();
         if (this.start > 0) {
             vars['start'] = this.start;
         }

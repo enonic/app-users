@@ -30,14 +30,14 @@ export class UserPasswordWizardStepForm
         super('user-password-wizard-step-form');
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         this.password = new PasswordGenerator();
         this.changePasswordButton = new Button(i18n('action.changePassword'));
     }
 
-    protected postInitElements() {
+    protected postInitElements(): void {
         super.postInitElements();
 
         this.updatePasswordFormItem.setVisible(false);
@@ -51,7 +51,7 @@ export class UserPasswordWizardStepForm
         return [this.createPasswordFormItem, this.updatePasswordFormItem];
     }
 
-    protected initListeners() {
+    protected initListeners(): void {
         super.initListeners();
 
         this.form.onValidityChanged((event: ValidityChangedEvent) => {
@@ -64,11 +64,11 @@ export class UserPasswordWizardStepForm
         });
     }
 
-    layout(principal: Principal) {
+    layout(principal: Principal): void {
         this.updatePrincipal(principal);
     }
 
-    updatePrincipal(principal: Principal) {
+    updatePrincipal(principal: Principal): void {
         this.principal = principal;
 
         if (principal) {

@@ -119,13 +119,13 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         });
     }
 
-    setIdProvider(idProvider: IdProvider) {
+    setIdProvider(idProvider: IdProvider): void {
         this.idProviders = [idProvider];
         this.manualidProvider = true;
         this.addClass('flat');
     }
 
-    clearidProviders() {
+    clearidProviders(): void {
         this.idProviders = null;
         this.manualidProvider = false;
         this.removeClass('flat');

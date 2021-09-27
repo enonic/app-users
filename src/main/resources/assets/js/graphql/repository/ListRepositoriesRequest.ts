@@ -1,6 +1,10 @@
-import {ListGraphQlRequest} from '../ListGraphQlRequest';
+import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
 import {Repository} from '../../app/report/Repository';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+
+interface ListRepositoriesProperties extends ListGraphQlProperties {
+    query: string;
+}
 
 export class ListRepositoriesRequest
     extends ListGraphQlRequest<Repository[]> {
@@ -21,8 +25,8 @@ export class ListRepositoriesRequest
         return this;
     }
 
-    getVariables(): { [p: string]: any } {
-        const vars = super.getVariables();
+    getVariables(): ListRepositoriesProperties {
+        const vars = <ListRepositoriesProperties>super.getVariables();
         if (!StringHelper.isEmpty(this.searchQuery)) {
             vars['query'] = this.searchQuery;
         }
