@@ -15,7 +15,7 @@ export class IdProviderAccessControlEntryView
         super(ace, readonly);
     }
 
-    setEditable(editable: boolean) {
+    setEditable(editable: boolean): void {
         super.setEditable(editable);
 
         this.toggleClass('readonly', !editable);
@@ -24,7 +24,7 @@ export class IdProviderAccessControlEntryView
         }
     }
 
-    public setItem(ace: IdProviderAccessControlEntry) {
+    public setItem(ace: IdProviderAccessControlEntry): void {
         super.setItem(ace);
 
         let principal: Principal = Principal.create().setKey(ace.getPrincipal().getKey()).setModifiedTime(
@@ -39,7 +39,7 @@ export class IdProviderAccessControlEntryView
         return new IdProviderAccessControlEntry(this.item.getPrincipal(), this.item.getAccess());
     }
 
-    doLayout(object: Principal) {
+    doLayout(object: Principal): void {
         super.doLayout(object);
 
         if (IdProviderAccessControlEntryView.debug) {

@@ -12,7 +12,7 @@ export class UserItemAggregationHelper {
         return agg;
     }
 
-    static updatePrincipalTypeAggregation(aggregation: BucketAggregation) {
+    static updatePrincipalTypeAggregation(aggregation: BucketAggregation): void {
         if (aggregation) {
             aggregation.getBuckets().forEach(bucket => bucket.setKey(StringHelper.capitalize(bucket.getKey())));
         }

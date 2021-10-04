@@ -22,11 +22,11 @@ export abstract class UserItemWizardStepForm
         this.initListeners();
     }
 
-    protected initElements() {
+    protected initElements(): void {
         this.form = new Form(FormView.VALIDATION_CLASS);
     }
 
-    protected postInitElements() {
+    protected postInitElements(): void {
         this.fieldSet = new Fieldset();
         this.createFormItems().forEach((formItem: FormItem) => this.fieldSet.add(formItem));
         this.form.add(this.fieldSet);
@@ -34,7 +34,7 @@ export abstract class UserItemWizardStepForm
 
     protected abstract createFormItems(): FormItem[];
 
-    protected initListeners() {
+    protected initListeners(): void {
         this.form.onFocus((event) => {
             this.notifyFocused(event);
         });

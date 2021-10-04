@@ -14,9 +14,9 @@ export class RepositoryViewer
         this.appendChild(this.namesView);
     }
 
-    setObject(report: Repository) {
+    setObject(report: Repository): void {
         this.namesView.setMainName(report.getName());
 
-        return super.setObject(report);
+        super.setObject(report);
     }
 }

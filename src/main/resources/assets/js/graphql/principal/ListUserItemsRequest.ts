@@ -16,14 +16,30 @@ import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
 import {ListItemsProperties, ListItemsRequest} from './ListItemsRequest';
 
+// UserItems does not map "name" property. Missing type? or wrong graph query?
 export type ListUserItemsRequestResult = {
     total: number,
-    userItems: UserItem[],
+    userItems: UserItem[], 
     aggregations: BucketAggregation[]
 };
 
 interface ListUserItemsProperties extends ListItemsProperties {
     types: string[];
+}
+
+interface ListUserItemsGraph {
+    userItemsConnection: {
+        totalCount: number;
+        edges: [{
+            node: {
+                key: string;
+                name: string;
+                description: string;
+                displayName: string;
+            }
+        }], 
+        aggregations: UserItemBucketAggregationJson[];
+    }
 }
 
 export class ListUserItemsRequest
@@ -70,7 +86,7 @@ export class ListUserItemsRequest
     }
 
     sendAndParse(): Q.Promise<ListUserItemsRequestResult> {
-        return this.query().then((response: any) => {
+        return this.query().then((response: ListUserItemsGraph) => {
             const data = response.userItemsConnection;
             const result: ListUserItemsRequestResult = {
                 total: data.totalCount,

@@ -20,13 +20,13 @@ export class NewPrincipalDialog
         });
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         this.grid = new UserItemTypesTreeGrid();
     }
 
-    protected initListeners() {
+    protected initListeners(): void {
         super.initListeners();
 
         this.grid.onDataChanged(() => ResponsiveManager.fireResizeEvent());
