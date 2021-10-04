@@ -33,27 +33,27 @@ export class AuthApplicationComboBox
         return views;
     }
 
-    onSiteConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }) {
+    onSiteConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView) }): void {
         this.authApplicationSelectedOptionsView.onApplicationConfigFormDisplayed(listener);
     }
 
-    unSiteConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }) {
+    unSiteConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView) }): void {
         this.authApplicationSelectedOptionsView.unApplicationConfigFormDisplayed(listener);
     }
 
-    onBeforeOptionCreated(listener: () => void) {
+    onBeforeOptionCreated(listener: () => void): void {
         this.authApplicationSelectedOptionsView.onBeforeOptionCreated(listener);
     }
 
-    unBeforeOptionCreated(listener: () => void) {
+    unBeforeOptionCreated(listener: () => void): void {
         this.authApplicationSelectedOptionsView.unBeforeOptionCreated(listener);
     }
 
-    onAfterOptionCreated(listener: () => void) {
+    onAfterOptionCreated(listener: () => void): void {
         this.authApplicationSelectedOptionsView.onAfterOptionCreated(listener);
     }
 
-    unAfterOptionCreated(listener: () => void) {
+    unAfterOptionCreated(listener: () => void): void {
         this.authApplicationSelectedOptionsView.unAfterOptionCreated(listener);
     }
 }

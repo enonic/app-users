@@ -81,7 +81,7 @@ export class IdProviderWizardPanel
     }
 
     protected getPersistedItemPath(): string {
-        return `/${this.getPersistedItem().getKey().toString() || ''}`;
+        return `/${this.getPersistedItem().getKey().toString()}`;
     }
 
     getUserItemType(): string {

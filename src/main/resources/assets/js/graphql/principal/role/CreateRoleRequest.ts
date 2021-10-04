@@ -3,6 +3,13 @@ import {Role} from '../../../app/principal/Role';
 import {RoleJson} from '../../../app/principal/RoleJson';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
+interface CreateRoleProperties {
+    key: PrincipalKey;
+    displayName: string;
+    description: string;
+    members: PrincipalKey[];
+}
+
 export class CreateRoleRequest
     extends GraphQlRequest<Role> {
 
@@ -31,12 +38,12 @@ export class CreateRoleRequest
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
-        vars['key'] = this.key.toString();
-        vars['displayName'] = this.displayName;
-        vars['description'] = this.description;
-        vars['members'] = this.members.map(key => key.toString());
+    getVariables(): CreateRoleProperties {
+        let vars = <CreateRoleProperties>super.getVariables();
+        vars.key = PrincipalKey.fromString(this.key.toString());
+        vars.displayName = this.displayName;
+        vars.description = this.description;
+        vars.members = this.members.map(key => PrincipalKey.fromString(key.toString()));
         return vars;
     }
 

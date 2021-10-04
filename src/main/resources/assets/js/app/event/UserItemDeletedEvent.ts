@@ -28,11 +28,11 @@ export class UserItemDeletedEvent
         return new UserItemDeletedEventBuilder();
     }
 
-    static on(handler: (event: UserItemDeletedEvent) => void) {
+    static on(handler: (event: UserItemDeletedEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }
 
-    static un(handler?: (event: UserItemDeletedEvent) => void) {
+    static un(handler?: (event: UserItemDeletedEvent) => void): void {
         Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

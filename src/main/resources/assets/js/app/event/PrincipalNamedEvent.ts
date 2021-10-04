@@ -23,11 +23,11 @@ export class PrincipalNamedEvent
         return this.principal;
     }
 
-    static on(handler: (event: PrincipalNamedEvent) => void) {
+    static on(handler: (event: PrincipalNamedEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }
 
-    static un(handler?: (event: PrincipalNamedEvent) => void) {
+    static un(handler?: (event: PrincipalNamedEvent) => void): void {
         Event.unbind(ClassHelper.getFullName(this), handler);
     }
 

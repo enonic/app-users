@@ -31,7 +31,7 @@ export class IdProviderWizardStepForm
         super('idprovider-wizard-step-form');
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         this.description = new TextInput('middle');
@@ -50,7 +50,7 @@ export class IdProviderWizardStepForm
             .build();
     }
 
-    protected initListeners() {
+    protected initListeners(): void {
         super.initListeners();
 
         this.applicationComboBox.onOptionSelected(() => {
@@ -75,7 +75,7 @@ export class IdProviderWizardStepForm
         return [descriptionFormItem, appComboBox];
     }
 
-    layout(idProvider: IdProvider) {
+    layout(idProvider: IdProvider): void {
         if (!idProvider) {
             return;
         }

@@ -20,7 +20,7 @@ export class SecurityWizardStepForm
         super('security-wizard-step-form');
     }
 
-    protected initElements() {
+    protected initElements(): void {
         super.initElements();
 
         this.inheritance = new DivEl(/*'inheritance'*/);
@@ -35,7 +35,7 @@ export class SecurityWizardStepForm
         return [accessComboBoxFormItem];
     }
 
-    layout(idProvider: IdProvider, defaultIdProvider: IdProvider) {
+    layout(idProvider: IdProvider, defaultIdProvider: IdProvider): void {
         if (this.comboBox.isDirty()) {
             if (this.isNewPermissionsListEqualToCurrent(idProvider, defaultIdProvider)) {
                 this.comboBox.resetBaseValues();
@@ -79,7 +79,7 @@ export class SecurityWizardStepForm
         });
     }
 
-    layoutReadOnly(idProvider: IdProvider) {
+    layoutReadOnly(idProvider: IdProvider): void {
         this.comboBox.clearSelection();
         idProvider.getPermissions().getEntries().forEach((item) => {
             if (!this.comboBox.isSelected(item)) {

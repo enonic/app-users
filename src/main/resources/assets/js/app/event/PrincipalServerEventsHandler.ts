@@ -39,14 +39,14 @@ export class PrincipalServerEventsHandler {
         return this.instance;
     }
 
-    start() {
+    start(): void {
         if (!this.handler) {
             this.handler = this.principalServerEventHandler.bind(this);
         }
         PrincipalServerEvent.on(this.handler);
     }
 
-    stop() {
+    stop(): void {
         if (this.handler) {
             PrincipalServerEvent.un(this.handler);
             this.handler = null;
@@ -247,11 +247,11 @@ export class PrincipalServerEventsHandler {
         }
     }
 
-    onUserItemDeleted(listener: (ids: string[]) => void) {
+    onUserItemDeleted(listener: (ids: string[]) => void): void {
         this.userItemDeletedListeners.push(listener);
     }
 
-    unUserItemDeleted(listener: (ids: string[]) => void) {
+    unUserItemDeleted(listener: (ids: string[]) => void): void {
         this.userItemDeletedListeners =
             this.userItemDeletedListeners.filter((currentListener: (ids: string[]) => void) => {
                 return currentListener !== listener;

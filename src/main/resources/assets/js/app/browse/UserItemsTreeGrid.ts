@@ -145,7 +145,7 @@ export class UserItemsTreeGrid
         this.invalidate();
     }
 
-    appendUserItemNode(principal: Principal, idProvider: IdProvider) {
+    appendUserItemNode(principal: Principal, idProvider: IdProvider): void {
         if (!principal) {
             this.appendIdProviderNode(idProvider);
         } else {
