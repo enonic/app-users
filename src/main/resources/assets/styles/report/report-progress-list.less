@@ -29,12 +29,13 @@
     .buttons {
       display: flex;
 
-      .icon-report-download, .icon-report-delete {
+      .icon-report-download,
+      .icon-report-delete {
         margin: 0 5px;
         color: @admin-dark-gray;
         line-height: 22px;
 
-        &:before {
+        &::before {
           display: none;
         }
       }
@@ -44,7 +45,8 @@
       flex-direction: column;
 
       .buttons {
-        .icon-report-download, .icon-report-delete {
+        .icon-report-download,
+        .icon-report-delete {
           text-decoration: none;
 
           span {
@@ -56,7 +58,6 @@
             font-size: 18px;
           }
         }
-
       }
     }
 
@@ -64,7 +65,10 @@
       .progress-bar {
         display: none;
       }
-      .timestamp, .icon-report-download, .icon-report-delete {
+
+      .timestamp, 
+      .icon-report-download,
+      .icon-report-delete {
         display: block;
       }
     }
