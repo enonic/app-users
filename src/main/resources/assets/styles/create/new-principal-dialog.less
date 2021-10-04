@@ -1,17 +1,6 @@
 .new-principal-dialog {
 
   .tree-grid {
-    &.flat {
-      .slick-cell .toggle {
-        display: none !important;
-      }
-      .viewer.root-viewer {
-        .names-and-icon-view {
-          padding-left: 6px;
-        }
-      }
-    }
-
     .viewer {
       .names-and-icon-view {
         .@{_COMMON_PREFIX}main-name {
@@ -24,14 +13,26 @@
       }
     }
 
+    &.flat {
+      .slick-cell .toggle {
+        display: none !important;
+      }
+      
+      .viewer.root-viewer {
+        .names-and-icon-view {
+          padding-left: 6px;
+        }
+      }
+    }
+
     .slick-cell.selected {
       .names-and-icon-view {
         h6,
         p {
           color: @admin-black;
         }
-
       }
+
       background-color: transparent;
       color: inherit;
     }
