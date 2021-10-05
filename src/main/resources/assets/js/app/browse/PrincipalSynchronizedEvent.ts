@@ -17,11 +17,11 @@ export class PrincipalSynchronizedEvent
         return this.principal;
     }
 
-    static on(handler: (event: PrincipalSynchronizedEvent) => void) {
+    static on(handler: (event: PrincipalSynchronizedEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }
 
-    static un(handler?: (event: PrincipalSynchronizedEvent) => void) {
+    static un(handler?: (event: PrincipalSynchronizedEvent) => void): void {
         Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

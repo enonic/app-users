@@ -25,12 +25,12 @@ export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem>
         this.setActions(this.save, this.delete, this.close);
     }
 
-    enableActionsForNew() {
+    enableActionsForNew(): void {
         this.save.setEnabled(false);
         this.delete.setEnabled(false);
     }
 
-    enableActionsForExisting(userItem: UserItem) {
+    enableActionsForExisting(userItem: UserItem): void {
         this.save.setEnabled(false);
         this.delete.setEnabled(!userItem.getKey().isSystem());
     }

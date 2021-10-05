@@ -53,14 +53,14 @@ export class NewPrincipalDialog
         return this;
     }
 
-    open() {
+    open(): void {
         this.grid.reload();
         this.grid.getGrid().resizeCanvas();
         Body.get().appendChild(this);
         super.open();
     }
 
-    close() {
+    close(): void {
         this.grid.clearidProviders();
         super.close();
         this.remove();

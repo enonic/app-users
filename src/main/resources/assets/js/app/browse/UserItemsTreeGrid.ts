@@ -100,7 +100,7 @@ export class UserItemsTreeGrid
         });
     }
 
-    protected editItem(node: TreeNode<UserTreeGridItem>) {
+    protected editItem(node: TreeNode<UserTreeGridItem>): void {
         if (this.isUserItemEditable(node.getData())) {
             new EditPrincipalEvent([node.getData()]).fire();
         }
@@ -118,7 +118,7 @@ export class UserItemsTreeGrid
         return this.treeGridActions;
     }
 
-    updateUserNode(principal: Principal, idProvider: IdProvider) {
+    updateUserNode(principal: Principal, idProvider: IdProvider): void {
         if (!principal && !idProvider) {
             return;
         }

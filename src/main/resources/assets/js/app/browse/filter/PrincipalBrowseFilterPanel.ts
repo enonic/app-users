@@ -176,7 +176,7 @@ export class PrincipalBrowseFilterPanel
             });
     }
 
-    updateAggregations(aggregations: BucketAggregation[], doUpdateAll?: boolean) {
+    updateAggregations(aggregations: BucketAggregation[], doUpdateAll?: boolean): void {
         this.initPrincipalTypeBuckets(aggregations);
 
         super.updateAggregations(aggregations, doUpdateAll);
