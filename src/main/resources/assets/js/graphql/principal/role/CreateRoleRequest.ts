@@ -3,11 +3,12 @@ import {Role} from '../../../app/principal/Role';
 import {RoleJson} from '../../../app/principal/RoleJson';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 
+// Key and members should be PrincipalsKeys?
 interface CreateRoleProperties {
-    key: PrincipalKey;
+    key: string; 
     displayName: string;
     description: string;
-    members: PrincipalKey[];
+    members: string[];
 }
 
 export class CreateRoleRequest
@@ -40,10 +41,10 @@ export class CreateRoleRequest
 
     getVariables(): CreateRoleProperties {
         let vars = <CreateRoleProperties>super.getVariables();
-        vars.key = PrincipalKey.fromString(this.key.toString());
+        vars.key = this.key.toString();
         vars.displayName = this.displayName;
         vars.description = this.description;
-        vars.members = this.members.map(key => PrincipalKey.fromString(key.toString()));
+        vars.members = this.members.map(key => key.toString());
         return vars;
     }
 
