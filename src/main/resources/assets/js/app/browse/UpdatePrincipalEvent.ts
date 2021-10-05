@@ -14,11 +14,11 @@ export class UpdatePrincipalEvent extends Event {
         return this.principals;
     }
 
-    static on(handler: (event: UpdatePrincipalEvent) => void) {
+    static on(handler: (event: UpdatePrincipalEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }
 
-    static un(handler?: (event: UpdatePrincipalEvent) => void) {
+    static un(handler?: (event: UpdatePrincipalEvent) => void): void {
         Event.unbind(ClassHelper.getFullName(this), handler);
     }
 }

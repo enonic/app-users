@@ -24,7 +24,7 @@ export class RepositoryLoader
         return this.load();
     }
 
-    setSearchString(value: string) {
+    setSearchString(value: string): void {
         super.setSearchString(value);
         this.getRequest().setSearchQuery(value);
     }

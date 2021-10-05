@@ -186,24 +186,24 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         throw new Error('Must be implemented by inheritors');
     }
 
-    protected handleServerUpdate(principal: Principal, idProvider: IdProvider) {
+    protected handleServerUpdate(principal: Principal, idProvider: IdProvider): void {
         if (principal && this.getPersistedItem().getKey().equals(principal.getKey())) {
             this.setPersistedItem(principal);
             this.doLayoutPersistedItem(principal);
         }
     }
 
-    onPrincipalNamed(listener: (event: PrincipalNamedEvent) => void) {
+    onPrincipalNamed(listener: (event: PrincipalNamedEvent) => void): void {
         this.principalNamedListeners.push(listener);
     }
 
-    notifyPrincipalNamed(principal: Principal) {
+    notifyPrincipalNamed(principal: Principal): void {
         this.principalNamedListeners.forEach((listener: (event: PrincipalNamedEvent) => void) => {
             listener.call(this, new PrincipalNamedEvent(this, principal));
         });
     }
 
-    protected updateHash() {
+    protected updateHash(): void {
         if (this.getPersistedItem()) {
             Router.setHash('edit/' + this.getPersistedItem().getKey());
         } else {
@@ -226,7 +226,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         return new DeletePrincipalRequest().setKeys([this.getPersistedItem().getKey()]);
     }
 
-    protected handleSuccessfulDelete(results: DeleteUserItemResult[]) {
+    protected handleSuccessfulDelete(results: DeleteUserItemResult[]): void {
         const keys: UserItemKey[] = results.filter(result => result.isDeleted()).map(result => result.getKey());
         const msg: string =
             i18n(`notify.delete.principal.${keys.length === 1 ? 'single' : 'multiple'}`, keys.join(', '));

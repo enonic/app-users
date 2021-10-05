@@ -27,7 +27,7 @@ export class RolesWizardStepForm
         const rolesLoader: BasePrincipalLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.ROLE])
             .skipPrincipals([RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED]);
-        this.roles = <PrincipalComboBox>PrincipalComboBox.create().setLoader(rolesLoader).build();
+        this.roles = <PrincipalComboBox>(PrincipalComboBox.create().setLoader(rolesLoader).build());
     }
 
     protected createFormItems(): FormItem[] {

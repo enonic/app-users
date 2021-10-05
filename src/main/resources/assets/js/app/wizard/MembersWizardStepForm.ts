@@ -35,7 +35,7 @@ export class MembersWizardStepForm
         return [principalsFormItem];
     }
 
-    layout(principal: Members) {
+    layout(principal: Members): void {
         if (this.principals.isDirty()) {
             if (ObjectHelper.arrayEquals(this.getMembersKeys(), principal.getMembers())) {
                 this.principals.resetBaseValues();

@@ -139,7 +139,7 @@ export class UserAppPanel
         });
     }
 
-    protected handleGlobalEvents() {
+    protected handleGlobalEvents(): void {
         super.handleGlobalEvents();
 
         NewPrincipalEvent.on((event) => {
@@ -151,7 +151,7 @@ export class UserAppPanel
         });
     }
 
-    handleBrowse() {
+    handleBrowse(): void {
         super.handleBrowse();
 
         this.getAppBarTabMenu().deselectNavigationItem();
@@ -175,7 +175,7 @@ export class UserAppPanel
     private getWizardPanelItemDisplayName(wizardPanel: WizardPanel<UserItem>): string {
         let displayName;
         if (!!wizardPanel.getPersistedItem()) {
-            displayName = (<any>wizardPanel.getPersistedItem()).getDisplayName();
+            displayName = wizardPanel.getPersistedItem().getDisplayName();
         }
 
         return displayName || this.getPrettyNameForWizardPanel(wizardPanel);
