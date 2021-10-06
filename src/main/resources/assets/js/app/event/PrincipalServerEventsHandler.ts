@@ -71,7 +71,7 @@ export class PrincipalServerEventsHandler {
         if (!id) {
             return true;
         }
-        const path: Path = Path.fromString(item.getPath());
+        const path: Path = item.getPath()
         const name: string = path.getElement(path.getElements().length - 1);
 
         if (name === 'groups' || name === 'users' || name === 'roles') {
@@ -127,7 +127,7 @@ export class PrincipalServerEventsHandler {
      * @returns {string}
      */
     private getId(changeItem: PrincipalServerChangeItem): string {
-        const path: Path = Path.fromString(changeItem.getPath());
+        const path: Path = changeItem.getPath();
         const name: string = path.getElement(path.getElements().length - 1);
 
         if (path.hasParent()) {
@@ -163,7 +163,7 @@ export class PrincipalServerEventsHandler {
     }
 
     private doLoadUserItem(item: PrincipalServerChangeItem): Q.Promise<PrincipalAndIdProvider> {
-        const path: Path = Path.fromString(item.getPath());
+        const path: Path = item.getPath();
         const id: string = this.getId(item);
 
         if (!path.hasParent()) {
