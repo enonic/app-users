@@ -1,7 +1,6 @@
 import {PrincipalServerChange} from './PrincipalServerChange';
 import {NodeEventJson, NodeServerEvent} from 'lib-admin-ui/event/NodeServerEvent';
 import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
-import {PrincipalServerChangeItem} from './PrincipalServerChangeItem';
 
 export class PrincipalServerEvent
     extends NodeServerEvent {
