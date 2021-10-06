@@ -4,14 +4,8 @@ import {NodeEventNodeJson} from 'lib-admin-ui/event/NodeServerEvent';
 export class PrincipalServerChangeItem
     extends NodeServerChangeItem {
 
-    public static pathPrefix: string = '/identity';
-
     constructor(builder: PrincipalServerChangeItemBuilder) {
         super(builder);
-    }
-
-    protected processPath(path: string): string {
-        return path.substr(PrincipalServerChangeItem.pathPrefix.length);
     }
 
     static fromJson(json: NodeEventNodeJson): PrincipalServerChangeItem {

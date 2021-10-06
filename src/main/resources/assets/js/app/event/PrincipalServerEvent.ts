@@ -11,7 +11,7 @@ export class PrincipalServerEvent
     }
 
     static is(eventJson: NodeEventJson): boolean {
-        return eventJson.data.nodes.some(node => node.path.indexOf(PrincipalServerChangeItem.pathPrefix) === 0);
+        return eventJson.data.nodes.some(node => node.path.indexOf('/identity') === 0);
     }
 
     static fromJson(nodeEventJson: NodeEventJson): PrincipalServerEvent {

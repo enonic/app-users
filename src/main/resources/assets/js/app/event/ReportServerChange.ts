@@ -21,10 +21,6 @@ export class ReportServerChangeBuilder
         return new ReportServerChange(this);
     }
 
-    getPathPrefix(): string {
-        return ReportServerChangeItem.pathPrefix;
-    }
-
     nodeJsonToChangeItem(node: NodeEventNodeJson): ReportServerChangeItem {
         return ReportServerChangeItem.fromJson(node);
     }
