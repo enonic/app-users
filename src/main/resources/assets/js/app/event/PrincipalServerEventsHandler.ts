@@ -71,7 +71,7 @@ export class PrincipalServerEventsHandler {
         if (!id) {
             return true;
         }
-        const path: Path = item.getPath()
+        const path: Path = item.getPath();
         const name: string = path.getElement(path.getElements().length - 1);
 
         if (name === 'groups' || name === 'users' || name === 'roles') {
