@@ -5,14 +5,22 @@ import {NodePath} from 'lib-admin-ui/NodePath';
 export class PrincipalServerChangeItem
     extends NodeServerChangeItem {
 
-    private static pathPrefix: string = '/identity';
-
     constructor(builder: PrincipalServerChangeItemBuilder) {
         super(builder);
     }
 
     protected processPath(path: string): NodePath {
-        return super.processPath(path?.substr(PrincipalServerChangeItem.pathPrefix.length));
+        if (!path) {
+            return null;
+        }
+
+        const fullPathWithRoot: NodePath = NodePath.create().fromString(path).build();
+        const pathNoRoot: NodePath = <NodePath>fullPathWithRoot
+            .newBuilder()
+            .setElements(fullPathWithRoot.getElements().slice(1))
+            .build();
+
+        return pathNoRoot;
     }
 
     static fromJson(json: NodeEventNodeJson): PrincipalServerChangeItem {
