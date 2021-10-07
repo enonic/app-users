@@ -15,10 +15,10 @@ export class PrincipalServerChangeItem
         }
 
         const fullPathWithRoot: NodePath = NodePath.create().fromString(path).build();
-        const pathNoRoot: NodePath = fullPathWithRoot
+        const pathNoRoot: NodePath = <NodePath>(fullPathWithRoot
             .newBuilder()
             .setElements(fullPathWithRoot.getElements().slice(1))
-            .build() as NodePath;
+            .build());
 
         return pathNoRoot;
     }
