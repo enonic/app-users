@@ -15,10 +15,11 @@ export class PrincipalServerChangeItem
         }
 
         const fullPathWithRoot: NodePath = NodePath.create().fromString(path).build();
-        const pathNoRoot: NodePath = <NodePath>(fullPathWithRoot
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        const pathNoRoot: NodePath = <NodePath>fullPathWithRoot
             .newBuilder()
             .setElements(fullPathWithRoot.getElements().slice(1))
-            .build());
+            .build();
 
         return pathNoRoot;
     }
