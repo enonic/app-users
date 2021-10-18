@@ -27,6 +27,7 @@ module.exports = {
         'quotes': ['error', 'single', {'avoidEscape': true}],
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': ['off'],
+        '@typescript-eslint/no-unsafe-argument': ['off'],
         'semi': 'off',
         '@typescript-eslint/semi': ['error'],
         'no-control-regex': 'off',
