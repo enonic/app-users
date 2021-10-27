@@ -22,6 +22,7 @@ function execute() {
     return new Promise((resolve) => {
         mocha.run((failures) => {
             if (failures === 0) {
+                console.log("All tests are passed");
                 return resolve();
             }
             process.exit(failures);
@@ -73,6 +74,7 @@ async function uiTests() {
     }
     await runTests();
     await seleniumChildProcess.kill();
+    process.exit(0);
 }
 
 uiTests();
