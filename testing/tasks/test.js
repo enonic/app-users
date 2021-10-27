@@ -46,8 +46,8 @@ async function runTests() {
 }
 
 async function uiTests() {
-    try {
-        console.log("Download chrome driver");
+
+    console.log("Download chrome driver");
         await selenium.install({
             version: seleniumVersion,
             baseURL: 'https://selenium-release.storage.googleapis.com',
@@ -68,13 +68,8 @@ async function uiTests() {
                 },
             }
         });
-    } catch (err) {
-        console.log("Selenium error############: " + err);
-        process.exit(1);
-    }
     await runTests();
     await seleniumChildProcess.kill();
-    process.exit();
 }
 
 uiTests();
