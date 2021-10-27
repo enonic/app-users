@@ -268,7 +268,8 @@ class UserBrowsePanel extends Page {
             let closeIcon = xpath.closeItemTabButton(displayName);
             await this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_2);
             await this.waitForElementEnabled(closeIcon, appConst.TIMEOUT_2);
-            return await this.clickOnElement(closeIcon);
+            await this.clickOnElement(closeIcon);
+            return await this.pause(500);
         } catch (err) {
             await this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
             throw new Error('Item Tab Button was not found!' + displayName + "  " + err);
