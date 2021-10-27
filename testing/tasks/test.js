@@ -45,27 +45,32 @@ async function runTests() {
 }
 
 async function uiTests() {
-    console.log("Download chrome driver");
-    await selenium.install({
-        version: seleniumVersion,
-        baseURL: 'https://selenium-release.storage.googleapis.com',
-        drivers: {
-            chrome: {
-                version: driverVersion,
-                arch: process.arch,
-                baseURL: 'https://chromedriver.storage.googleapis.com'
-            },
-        }
-    });
+    try {
+        console.log("Download chrome driver");
+        await selenium.install({
+            version: seleniumVersion,
+            baseURL: 'https://selenium-release.storage.googleapis.com',
+            drivers: {
+                chrome: {
+                    version: driverVersion,
+                    arch: process.arch,
+                    baseURL: 'https://chromedriver.storage.googleapis.com'
+                },
+            }
+        });
 
-    console.log("Start selenium server");
-    const seleniumChildProcess = await selenium.start({
-        drivers: {
-            chrome: {
-                version: driverVersion,
-            },
-        }
-    });
+        console.log("Start selenium server");
+        const seleniumChildProcess = await selenium.start({
+            drivers: {
+                chrome: {
+                    version: driverVersion,
+                },
+            }
+        });
+    } catch (err) {
+        console.log("Selenium error############: " + err);
+        process.exit(1);
+    }
     await runTests();
     await seleniumChildProcess.kill();
 }

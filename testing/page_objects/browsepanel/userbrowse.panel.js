@@ -268,9 +268,9 @@ class UserBrowsePanel extends Page {
             let closeIcon = xpath.closeItemTabButton(displayName);
             await this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_2);
             await this.waitForElementEnabled(closeIcon, appConst.TIMEOUT_2);
-            await this.clickOnElement(closeIcon);
+            return await this.clickOnElement(closeIcon);
         } catch (err) {
-            this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
+            await this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
             throw new Error('Item Tab Button was not found!' + displayName + "  " + err);
         }
         await this.pause(300);
@@ -354,7 +354,7 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(this.selectionControllerCheckBox);
             return await this.pause(300);
         } catch (err) {
-            this.saveScreenshot('err_click_on_selection_controller');
+            await this.saveScreenshot('err_click_on_selection_controller');
             throw new Error('error when click on selection_controller ' + err);
         }
     }
