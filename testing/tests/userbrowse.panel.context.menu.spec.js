@@ -91,7 +91,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             //2. Verify that 'Delete' menu item is disabled:
             await gridContextMenu.waitForDeleteMenuItemDisabled();
             //3. 'Edit' and 'New...' should be enabled:
-            testUtils.saveScreenshot('system_provider_context_menu');
+            await testUtils.saveScreenshot('system_provider_context_menu');
             let isDisabled = await gridContextMenu.isEditMenuItemDisabled();
             assert.isFalse(isDisabled, "'Edit' menu item should be enabled");
             isDisabled = await gridContextMenu.isNewMenuItemDisabled();
@@ -119,7 +119,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             await userBrowsePanel.rightClickOnRowByDisplayName('Groups');
             await gridContextMenu.waitForContextMenuVisible();
             let items = await gridContextMenu.getGridContextMenuItems();
-            testUtils.saveScreenshot("groups_context_menu");
+            await testUtils.saveScreenshot("groups_context_menu");
             assert.equal(items[0], 'New User Group', "`New User Group` menu item should be first");
         });
 
@@ -131,12 +131,12 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             //1. Open the wizard and save new provider:
             await testUtils.openWizardAndSaveIdProvider(idProvider);
             await userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
-            testUtils.saveScreenshot("provider1_saved");
+            await testUtils.saveScreenshot("provider_saved_" + idProvider.displayName);
             //2. Go to browse panel and do right click on the provider:
             await userBrowsePanel.rightClickOnRowByDisplayName(idProvider.displayName);
             await gridContextMenu.waitForContextMenuVisible();
             let result = await gridContextMenu.isDeleteMenuItemDisabled();
-            testUtils.saveScreenshot("provider_context_menu");
+            await testUtils.saveScreenshot("provider_context_menu");
             assert.isFalse(result, "'Delete' menu item should be enabled, because the Id Provider is empty");
         });
 
