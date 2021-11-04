@@ -37,5 +37,6 @@ module.exports = Object.freeze({
     },
     REMOVE_ICON: `//a[@class='remove']`,
     EDIT_ICON: `//a[@class='edit']`,
-    CHECKBOX: `//div[contains(@id,'Checkbox')]`
+    CHECKBOX: `//div[contains(@id,'Checkbox')]`,
+    NOTIFICATION_TEXT: "//div[@class='notification-text']",
 });
