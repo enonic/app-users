@@ -50,7 +50,7 @@ var queryRepositoryNodes = function (repositoryId, branch, filters) {
     var repoConn = common.newConnection(repositoryId, branch);
 
     return repoConn.query({
-        count: 1024, //TODO Batch
+        count: -1, // TODO Batch
         query: `_path LIKE '/content*'`,
         filters: filters
     }).hits.map(function (nodeHit) {

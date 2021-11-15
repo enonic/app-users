@@ -177,7 +177,7 @@ export class UserItemStatisticsPanel
                 addedGroups.splice(1, 0, rolesGroup);
             }
 
-            const membersKeys = (<Group | Role>p).getMembers().slice(0, 100);
+            const membersKeys = (<Group | Role>p).getMembers();
             return this.getMembersByKeys(membersKeys).then((results) => {
                 membersGroup.addDataElements(null, results.map(el => this.createPrincipalViewer(el)));
                 return addedGroups;

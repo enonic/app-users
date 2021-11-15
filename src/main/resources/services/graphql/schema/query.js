@@ -81,11 +81,6 @@ module.exports = schemaGenerator.createObjectType({
             },
             resolve: function (env) {
                 var keys = env.args.keys;
-                if (keys.length >= 100) {
-                    throw new Error(
-                        'Invalid field argument keys: The number of keys must be inferior to 100'
-                    );
-                }
                 return principals.getByKeys(keys);
             }
         },
