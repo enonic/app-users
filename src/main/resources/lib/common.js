@@ -3,7 +3,7 @@ var namePrettyfier = Java.type('com.enonic.xp.name.NamePrettyfier');
 
 var REPO_NAME = 'system-repo';
 var REPO_BRANCH = 'master';
-var MAX_COUNT = 100;
+var MAX_COUNT = -1;
 var SYSTEM_ADMIN = 'role:system.admin';
 
 var UserItemType = exports.UserItemType = {
@@ -217,7 +217,7 @@ exports.update = function (params, repo) {
 
 exports.queryAll = function queryAll(params, repo) {
     var start = params.start || 0;
-    var count = params.count || MAX_COUNT;
+    var count = params.count == null ? MAX_COUNT : params.count;
 
     var repoConn = newConnection(repo);
     var queryResult = repoConn.query({
