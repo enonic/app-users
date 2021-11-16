@@ -4,7 +4,6 @@ import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {Router} from '../Router';
 import {PrincipalWizardDataLoader} from './PrincipalWizardDataLoader';
 import {GraphQlRequest} from '../../graphql/GraphQlRequest';
-import {PrincipalNamedEvent} from '../event/PrincipalNamedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
 import {IdProvider} from '../principal/IdProvider';
 import {Principal} from 'lib-admin-ui/security/Principal';
@@ -19,13 +18,10 @@ import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult'
 import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
 import {DeletePrincipalRequest} from '../../graphql/principal/DeletePrincipalRequest';
 import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemRequest';
-import {User} from '../principal/User';
 
 export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
 
     protected params: PrincipalWizardPanelParams;
-
-    protected principalNamedListeners: { (event: PrincipalNamedEvent): void }[];
 
     public static debug: boolean = false;
 
@@ -33,7 +29,6 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
         super(params);
 
         this.addClass('principal-wizard-panel');
-        this.principalNamedListeners = [];
     }
 
     protected getParams(): PrincipalWizardPanelParams {
@@ -163,7 +158,7 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
     updatePersistedItem(): Q.Promise<Principal> {
         return this.produceUpdateRequest(this.assembleViewedItem()).sendAndParse().then((principal: Principal) => {
             if (!this.getPersistedItem().getDisplayName() && !!principal.getDisplayName()) {
-                this.notifyPrincipalNamed(principal);
+                this.notifyUserItemNamed(principal);
             }
 
             const principalTypeName = i18n(`field.${PrincipalType[principal.getType()].toLowerCase()}`);
@@ -191,16 +186,6 @@ export class PrincipalWizardPanel extends UserItemWizardPanel<Principal> {
             this.setPersistedItem(principal);
             this.doLayoutPersistedItem(principal);
         }
-    }
-
-    onPrincipalNamed(listener: (event: PrincipalNamedEvent) => void): void {
-        this.principalNamedListeners.push(listener);
-    }
-
-    notifyPrincipalNamed(principal: Principal): void {
-        this.principalNamedListeners.forEach((listener: (event: PrincipalNamedEvent) => void) => {
-            listener.call(this, new PrincipalNamedEvent(this, principal));
-        });
     }
 
     protected updateHash(): void {
