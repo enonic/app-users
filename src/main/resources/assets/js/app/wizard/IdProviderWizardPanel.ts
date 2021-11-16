@@ -106,6 +106,8 @@ export class IdProviderWizardPanel
             showFeedback('Id provider was created');
             new UserItemCreatedEvent(null, idProvider).fire();
 
+            this.notifyUserItemNamed(idProvider);
+
             return idProvider;
         }).finally(this.unlock.bind(this));
     }

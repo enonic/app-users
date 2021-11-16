@@ -17,7 +17,6 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class UserWizardPanel
     extends PrincipalWizardPanel {
@@ -106,7 +105,7 @@ export class UserWizardPanel
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
 
             showFeedback(i18n('notify.create.user'));
-            this.notifyPrincipalNamed(principal);
+            this.notifyUserItemNamed(principal);
 
             this.userMembershipsWizardStepForm.layout(principal);
             this.userEmailWizardStepForm.layout(principal);

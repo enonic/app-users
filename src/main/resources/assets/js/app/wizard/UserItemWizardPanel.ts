@@ -20,6 +20,7 @@ import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemReques
 import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
 import {IdProvider} from '../principal/IdProvider';
 import {Principal} from 'lib-admin-ui/security/Principal';
+import {UserItemNamedEvent} from '../event/UserItemNamedEvent';
 
 export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     extends WizardPanel<USER_ITEM_TYPE> {
@@ -30,10 +31,15 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     private locked: boolean;
 
-    private lockChangedListeners: { (value: boolean): void }[] = [];
+    private lockChangedListeners: { (value: boolean): void }[];
+
+    private userItemNamedListeners: { (event: UserItemNamedEvent): void }[];
 
     protected constructor(params: UserItemWizardPanelParams<USER_ITEM_TYPE>) {
         super(params);
+
+        this.lockChangedListeners = [];
+        this.userItemNamedListeners = [];
 
         this.initListeners();
     }
@@ -359,6 +365,16 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     private notifyLockChanged(value: boolean) {
         this.lockChangedListeners.forEach((listener: (value: boolean) => void) => {
             listener(value);
+        });
+    }
+
+    onUserItemNamed(listener: (event: UserItemNamedEvent) => void): void {
+        this.userItemNamedListeners.push(listener);
+    }
+
+    protected notifyUserItemNamed(userItem: UserItem): void {
+        this.userItemNamedListeners.forEach((listener: (event: UserItemNamedEvent) => void) => {
+            listener.call(this, new UserItemNamedEvent(this, userItem));
         });
     }
 }

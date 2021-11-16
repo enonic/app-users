@@ -13,7 +13,7 @@ import {UserWizardPanel} from './wizard/UserWizardPanel';
 import {GroupWizardPanel} from './wizard/GroupWizardPanel';
 import {GetIdProviderByKeyRequest} from '../graphql/idprovider/GetIdProviderByKeyRequest';
 import {GetPrincipalByKeyRequest} from '../graphql/principal/GetPrincipalByKeyRequest';
-import {PrincipalNamedEvent} from './event/PrincipalNamedEvent';
+import {UserItemNamedEvent} from './event/UserItemNamedEvent';
 import {IdProvider} from './principal/IdProvider';
 import {NavigatedAppPanel} from 'lib-admin-ui/app/NavigatedAppPanel';
 import {AppBarTabMenuItem, AppBarTabMenuItemBuilder} from 'lib-admin-ui/app/bar/AppBarTabMenuItem';
@@ -29,14 +29,11 @@ import {Path} from 'lib-admin-ui/rest/Path';
 import {ShowBrowsePanelEvent} from 'lib-admin-ui/app/ShowBrowsePanelEvent';
 import {PropertyChangedEvent} from 'lib-admin-ui/PropertyChangedEvent';
 import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
-import {WizardPanel} from 'lib-admin-ui/app/wizard/WizardPanel';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {showError} from 'lib-admin-ui/notify/MessageBus';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {NamePrettyfier} from 'lib-admin-ui/NamePrettyfier';
 import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
-import {Event} from 'lib-admin-ui/event/Event';
 import {Exception} from 'lib-admin-ui/Exception';
 
 interface PrincipalData {
@@ -162,7 +159,11 @@ export class UserAppPanel
     }
 
     private handleWizardCreated(wizard: UserItemWizardPanel<UserItem>, tabName: string) {
-        let tabMenuItem = new AppBarTabMenuItemBuilder()
+        wizard.onUserItemNamed((event: UserItemNamedEvent) => {
+            this.handleUserItemNamedEvent(event);
+        });
+
+        const tabMenuItem = new AppBarTabMenuItemBuilder()
             .setLabel(NamePrettyfier.prettifyUnnamed(tabName))
             .setTabId(wizard.getTabId())
             .setCloseAction(wizard.getCloseAction())
@@ -172,17 +173,16 @@ export class UserAppPanel
 
     }
 
-    private getWizardPanelItemDisplayName(wizardPanel: WizardPanel<UserItem>): string {
-        let displayName;
-        if (!!wizardPanel.getPersistedItem()) {
-            displayName = wizardPanel.getPersistedItem().getDisplayName();
+    private getWizardPanelItemDisplayName(wizardPanel: UserItemWizardPanel<UserItem>): string {
+        if (wizardPanel.getPersistedItem()) {
+            return wizardPanel.getPersistedItem().getDisplayName();
         }
 
-        return displayName || this.getPrettyNameForWizardPanel(wizardPanel);
+        return this.getPrettyNameForWizardPanel(wizardPanel);
     }
 
-    private getPrettyNameForWizardPanel(wizard: WizardPanel<UserItem>): string {
-        return NamePrettyfier.prettifyUnnamed((<UserItemWizardPanel<UserItem>>wizard).getUserItemType());
+    private getPrettyNameForWizardPanel(wizard: UserItemWizardPanel<UserItem>): string {
+        return NamePrettyfier.prettifyUnnamed((wizard).getUserItemType());
     }
 
     private handleWizardUpdated(wizard: UserItemWizardPanel<UserItem>, tabMenuItem: AppBarTabMenuItem) {
@@ -320,17 +320,13 @@ export class UserAppPanel
             .setPersistedPath(data.principalPath)
             .setTabId(tabId);
 
-        let wizard = this.resolvePrincipalWizardPanel(wizardParams);
-
-        wizard.onPrincipalNamed((event: PrincipalNamedEvent) => {
-            this.handlePrincipalNamedEvent(event);
-        });
+        const wizard = this.resolvePrincipalWizardPanel(wizardParams);
 
         this.handleWizardCreated(wizard, data.tabName);
     }
 
     private handleIdProviderNew(tabId: AppBarTabId, tabName: string) {
-        let wizardParams = <IdProviderWizardPanelParams> new IdProviderWizardPanelParams().setTabId(tabId);
+        const wizardParams = new IdProviderWizardPanelParams().setTabId(tabId) as IdProviderWizardPanelParams;
         this.handleWizardCreated(new IdProviderWizardPanel(wizardParams), tabName);
     }
 
@@ -423,20 +419,17 @@ export class UserAppPanel
         return wizard;
     }
 
-    private handlePrincipalNamedEvent(event: Event) {
-        let e = <PrincipalNamedEvent>event;
-        let wizard = e.getWizard();
-        let tabMenuItem = this.getAppBarTabMenu().getNavigationItemById(wizard.getTabId());
+    private handleUserItemNamedEvent(event: UserItemNamedEvent) {
+        const wizard = event.getWizard();
+        const userItem = event.getUserItem();
+        const tabMenuItem = this.getAppBarTabMenu().getNavigationItemById(wizard.getTabId());
         // update tab id so that new wizard for the same content type can be created
-        let newTabId = AppBarTabId.forEdit(e.getPrincipal().getKey().toString());
+        const newTabId = AppBarTabId.forEdit(userItem.getKey().toString());
         tabMenuItem.setTabId(newTabId);
         wizard.setTabId(newTabId);
 
-        let name = e.getPrincipal().getDisplayName();
-        if (ObjectHelper.iFrameSafeInstanceOf(wizard, PrincipalWizardPanel)) {
-            name = name || this.getPrettyNameForWizardPanel(wizard);
-        }
-        this.getAppBarTabMenu().getNavigationItemById(newTabId).setLabel(name, !e.getPrincipal().getDisplayName());
+        const name = userItem.getDisplayName() || this.getPrettyNameForWizardPanel(wizard);
+        this.getAppBarTabMenu().getNavigationItemById(newTabId).setLabel(name, !userItem.getDisplayName());
     }
 
     private resolveTabMenuItem(userItem: UserTreeGridItem): AppBarTabMenuItem {
