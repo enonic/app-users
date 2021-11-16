@@ -54,7 +54,7 @@ export class GroupWizardPanel
         return this.produceCreateGroupRequest().sendAndParse().then((principal: Principal) => {
             showFeedback(i18n('notify.create.group'));
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
-            this.notifyPrincipalNamed(principal);
+            this.notifyUserItemNamed(principal);
 
             (this.getMembersWizardStepForm().getLoader()).skipPrincipal(principal.getKey());
 

@@ -38,7 +38,7 @@ export class RoleWizardPanel
 
             showFeedback(i18n('notify.create.role'));
             new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
-            this.notifyPrincipalNamed(principal);
+            this.notifyUserItemNamed(principal);
 
             return principal;
         });
