@@ -33,7 +33,7 @@ function nullOrValue(value) {
  */
 exports.getIdProvider = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProviderHandler');
-    bean.idProviderKey = required(params, 'key');
+    bean.setIdProviderKey(required(params, 'key'));
     return __.toNativeObject(bean.getIdProvider());
 };
 
@@ -56,7 +56,7 @@ exports.getIdProviders = function () {
  */
 exports.getIdProviderMode = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProviderModeHandler');
-    bean.applicationKey = required(params, 'key');
+    bean.setApplicationKey(required(params, 'key'));
     return bean.getIdProviderMode();
 };
 
@@ -69,7 +69,7 @@ exports.getIdProviderMode = function (params) {
  */
 exports.getPermissions = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetPermissionsHandler');
-    bean.idProviderKey = required(params, 'key');
+    bean.setIdProviderKey(required(params, 'key'));
     return __.toNativeObject(bean.getPermissions());
 };
 
@@ -95,11 +95,11 @@ exports.defaultPermissions = function () {
 exports.createIdProvider = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.CreateIdProviderHandler');
 
-    bean.name = required(params, 'name');
-    bean.displayName = nullOrValue(params.displayName);
-    bean.description = nullOrValue(params.description);
-    bean.idProviderConfig = __.toScriptValue(params.idProviderConfig);
-    bean.permissions = __.toScriptValue(params.permissions);
+    bean.setName(required(params, 'name'));
+    bean.setDisplayName(nullOrValue(params.displayName));
+    bean.setDescription(nullOrValue(params.description));
+    bean.setIdProviderConfig(__.toScriptValue(params.idProviderConfig));
+    bean.setPermissions(__.toScriptValue(params.permissions));
 
     return __.toNativeObject(bean.createIdProvider());
 };
@@ -116,9 +116,9 @@ exports.createIdProvider = function (params) {
 exports.modifyIdProvider = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.ModifyIdProviderHandler');
 
-    bean.idProviderKey = required(params, 'key');
-    bean.editor = __.toScriptValue(required(params, 'editor'));
-    bean.permissions = __.toScriptValue(params.permissions);
+    bean.setIdProviderKey(required(params, 'key'));
+    bean.setEditor(__.toScriptValue(required(params, 'editor')));
+    bean.setPermissions(__.toScriptValue(params.permissions));
 
     return __.toNativeObject(bean.modifyIdProvider());
 };
@@ -132,7 +132,7 @@ exports.modifyIdProvider = function (params) {
  */
 exports.deleteIdProviders = function (params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DeleteIdProvidersHandler');
-    bean.idProviderKeys = __.toScriptValue(required(params, 'keys'));
+    bean.setIdProviderKeys(__.toScriptValue(required(params, 'keys')));
     return __.toNativeObject(bean.deleteIdProviders());
 };
 
