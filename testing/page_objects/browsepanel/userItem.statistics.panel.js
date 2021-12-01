@@ -35,7 +35,7 @@ class UserItemStatisticsPanel extends Page {
 
     getItemName() {
         let itemName = XPATH.container + XPATH.header + XPATH.itemName;
-        return this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.TIMEOUT_2).then(() => {
+        return this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout).then(() => {
             return this.getText(itemName);
         }).catch(err => {
             this.saveScreenshot('err_statistic_item_name');
@@ -44,7 +44,7 @@ class UserItemStatisticsPanel extends Page {
     }
 
     getItemPath() {
-        return this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.TIMEOUT_2).then(() => {
+        return this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout).then(() => {
             return this.getText(XPATH.container + XPATH.header + XPATH.itemPath);
         }).catch(err => {
             this.saveScreenshot('err_statistic_item_path');
@@ -53,7 +53,7 @@ class UserItemStatisticsPanel extends Page {
     }
 
     waitForPanelLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.TIMEOUT_2).then(() => {
+        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).then(() => {
             return this.waitForSpinnerNotVisible();
         }).then(() => {
             return console.log('user statistics panel is loaded')
