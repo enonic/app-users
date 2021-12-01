@@ -80,7 +80,7 @@ module.exports = {
     },
     navigateToUsersApp: function (userName, password) {
         let launcherPanel = new LauncherPanel();
-        return launcherPanel.waitForPanelDisplayed(3000).then(result => {
+        return launcherPanel.waitForPanelDisplayed(appConst.mediumTimeout).then(result => {
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Users` link...");
                 return launcherPanel.clickOnUsersLink();
@@ -296,7 +296,6 @@ module.exports = {
         return await userWizard.waitForOpened();
     },
     saveScreenshot: function (name, that) {
-
         let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, { recursive: true });

@@ -43,6 +43,7 @@ class NewPrincipalDialog extends Page {
         try {
             return await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
         } catch (err) {
+            await this.saveScreenshot('err_principal_dialog_load');
             throw new Error("New Principal dialog is not loaded in: " + appConst.mediumTimeout + " ms  " + err);
         }
     }
@@ -72,9 +73,9 @@ class NewPrincipalDialog extends Page {
 
     async waitForDialogClosed() {
         try {
-            return await this.waitForElementNotDisplayed(XPATH.container, appConst.TIMEOUT_2);
+            return await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
         } catch (err) {
-            this.saveScreenshot('err_principal_dialog_close');
+            await this.saveScreenshot('err_principal_dialog_close');
             throw new Error("New Principal Dialog was not closed  " + err);
         }
     }
@@ -87,7 +88,7 @@ class NewPrincipalDialog extends Page {
 
     waitForProviderNameDisplayed(name) {
         let selector = XPATH.container + XPATH.itemViewer + lib.itemByName(name);
-        return this.waitForElementDisplayed(selector, appConst.TIMEOUT_2);
+        return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
     }
 }
 module.exports = NewPrincipalDialog;

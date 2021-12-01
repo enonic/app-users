@@ -104,24 +104,13 @@ class WizardPanel extends Page {
 
     hotKeySave() {
         return this.getBrowser().status().then(status => {
-            if (status.os.name.toLowerCase().includes('wind') || status.os.name.toLowerCase().includes('linux')) {
-                return this.getBrowser().keys(['Control', 's']);
-            }
-            if (status.os.name.toLowerCase().includes('mac')) {
-                return this.getBrowser().keys(['Command', 's']);
-
-            }
+            return this.getBrowser().keys(['Control', 's']);
         })
     }
 
     hotKeyDelete() {
         return this.getBrowser().status().then(status => {
-            if (status.os.name.toLowerCase().includes('wind') || status.os.name.toLowerCase().includes('linux')) {
-                return this.getBrowser().keys(['Control', 'Delete']);
-            }
-            if (status.os.name.toLowerCase().includes('mac')) {
-                return this.getBrowser().keys(['Command', 'Delete']);
-            }
+            return this.getBrowser().keys(['Control', 'Delete']);
         })
     }
 }

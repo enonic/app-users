@@ -105,14 +105,14 @@ class UserBrowsePanel extends Page {
     }
 
     isItemDisplayed(itemName) {
-        return this.waitForElementDisplayed(xpath.rowByName(itemName), appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout).catch(err => {
             console.log("item is not displayed:" + itemName + +" " + err);
             return false;
         });
     }
 
     waitForItemNotDisplayed(itemName) {
-        return this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout).catch(err => {
             console.log("item is still displayed:" + itemName);
             return false;
         });
@@ -130,11 +130,13 @@ class UserBrowsePanel extends Page {
         }
     }
 
-    waitForFolderUsersVisible() {
-        return this.waitForElementDisplayed(xpath.rowByName('users'), appConst.TIMEOUT_2).catch(() => {
-            console.log("element is not visible: row with Users");
+    async waitForFolderUsersVisible() {
+        try {
+            return this.waitForElementDisplayed(xpath.rowByName('users'), appConst.mediumTimeout);
+        } catch (err) {
+            await this.saveScreenshot('err_users_folder');
             throw new Error(`Users folder was not found! ` + err);
-        });
+        }
     }
 
     clickOnSearchButton() {
@@ -148,12 +150,10 @@ class UserBrowsePanel extends Page {
         })
     }
 
-    clickOnAppHomeButton() {
-        return this.clickOnElement(this.appHomeButton).catch(err => {
-            throw new Error('err: AppHome button ' + err);
-        }).then(() => {
-            return this.pause(1000);
-        })
+    async clickOnAppHomeButton() {
+        await this.waitForElementEnabled(this.appHomeButton, appConst.mediumTimeout);
+        await this.clickOnElement(this.appHomeButton);
+        return await this.pause(1000);
     }
 
     async clickOnEditButton() {
@@ -193,11 +193,11 @@ class UserBrowsePanel extends Page {
     }
 
     isEditButtonEnabled() {
-        return this.waitForElementEnabled(this.editButton, appConst.TIMEOUT_2);
+        return this.waitForElementEnabled(this.editButton, appConst.mediumTimeout);
     }
 
     waitForEditButtonDisabled() {
-        return this.waitForElementDisabled(this.editButton, appConst.TIMEOUT_2);
+        return this.waitForElementDisabled(this.editButton, appConst.mediumTimeout);
     }
 
     waitForRowByNameVisible(name) {
@@ -211,7 +211,7 @@ class UserBrowsePanel extends Page {
     async clickCheckboxAndSelectRowByDisplayName(displayName) {
         try {
             let displayNameXpath = xpath.checkboxByDisplayName(displayName);
-            await this.waitForElementDisplayed(displayNameXpath, appConst.TIMEOUT_2);
+            await this.waitForElementDisplayed(displayNameXpath, appConst.mediumTimeout);
             await this.clickOnElement(displayNameXpath);
             return await this.pause(300);
         } catch (err) {
@@ -232,12 +232,8 @@ class UserBrowsePanel extends Page {
 
     hotKeyNew() {
         return this.browser.status().then(status => {
-            if (status.os.name.toLowerCase().includes('wind') || status.os.name.toLowerCase().includes('linux')) {
-                return this.browser.keys(['Control', 'Alt', 'n']);
-            }
-            if (status.os.name.toLowerCase().includes('mac')) {
-                return this.browser.keys(['Command', 'Alt', 'n']);
-            }
+            console.log("browser status:" + status);
+            return this.browser.keys(['Control', 'Alt', 'n']);
         })
     }
 
@@ -247,12 +243,7 @@ class UserBrowsePanel extends Page {
 
     hotKeyDelete() {
         return this.browser.status().then(status => {
-            if (status.os.name.toLowerCase().includes('wind') || status.os.name.toLowerCase().includes('linux')) {
-                return this.browser.keys(['Control', 'Delete']);
-            }
-            if (status.os.name.toLowerCase().includes('mac')) {
-                return this.browser.keys(['Command', 'Delete']);
-            }
+            return this.browser.keys(['Control', 'Delete']);
         })
     }
 
@@ -266,8 +257,8 @@ class UserBrowsePanel extends Page {
     async doClickOnCloseTabAndWaitGrid(displayName) {
         try {
             let closeIcon = xpath.closeItemTabButton(displayName);
-            await this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_2);
-            await this.waitForElementEnabled(closeIcon, appConst.TIMEOUT_2);
+            await this.waitForElementDisplayed(closeIcon, appConst.mediumTimeout);
+            await this.waitForElementEnabled(closeIcon, appConst.mediumTimeout);
             await this.clickOnElement(closeIcon);
             return await this.pause(500);
         } catch (err) {
@@ -340,7 +331,7 @@ class UserBrowsePanel extends Page {
         await this.getBrowser().waitUntil(async () => {
             let text = await this.getAttribute(selector, "class");
             return text.includes('partial');
-        }, {timeout: appConst.TIMEOUT_2, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
         return true;
     }
 
@@ -363,7 +354,7 @@ class UserBrowsePanel extends Page {
     async isRowHighlighted(name) {
         let locator = `${lib.itemByDisplayName(name)}` +
                       `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]`;
-        await this.waitForElementDisplayed(locator, appConst.TIMEOUT_2);
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         let attribute = await this.getAttribute(locator, "class");
         return attribute.includes("highlight");
     }

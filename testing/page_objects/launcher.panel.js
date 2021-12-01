@@ -44,13 +44,13 @@ class LauncherPanel extends Page {
     }
 
     isApplicationsLinkDisplayed() {
-        return this.waitForElementDisplayed(this.applicationsLink, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(this.applicationsLink, appConst.shortTimeout).catch(err => {
             return false;
         })
     }
 
     isUsersLinkDisplayed() {
-        return this.waitForElementDisplayed(this.usersLink, appConst.TIMEOUT_2).catch(err => {
+        return this.waitForElementDisplayed(this.usersLink, appConst.mediumTimeout).catch(err => {
             return false;
         })
     }
