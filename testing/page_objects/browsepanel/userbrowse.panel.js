@@ -232,11 +232,10 @@ class UserBrowsePanel extends Page {
 
     hotKeyNew() {
         return this.browser.status().then(status => {
-            if (status.nodes[0].osInfo.name.toLowerCase().includes('wind') || status.nodes[0].osInfo.name.toLowerCase().includes('linux')) {
-                return this.browser.keys(['Control', 'Alt', 'n']);
-            }
             if (status.nodes[0].osInfo.name.toLowerCase().includes('mac')) {
                 return this.browser.keys(['Command', 'Alt', 'n']);
+            } else {
+                return this.browser.keys(['Control', 'Alt', 'n']);
             }
         })
     }
@@ -247,9 +246,7 @@ class UserBrowsePanel extends Page {
 
     hotKeyDelete() {
         return this.browser.status().then(status => {
-            if (status.nodes[0].osInfo.name.toLowerCase().includes('wind') || status.nodes[0].osInfo.name.toLowerCase().includes('linux')) {
-                return this.browser.keys(['Control', 'Delete']);
-            }
+            return this.browser.keys(['Control', 'Delete']);
         })
     }
 
