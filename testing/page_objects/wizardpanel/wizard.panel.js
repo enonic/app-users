@@ -110,11 +110,7 @@ class WizardPanel extends Page {
 
     hotKeyDelete() {
         return this.getBrowser().status().then(status => {
-            if (status.nodes[0].osInfo.name.toLowerCase().includes('mac')) {
-                return this.getBrowser().keys(['Command', 'Delete']);
-            } else {
-                return this.getBrowser().keys(['Control', 'Delete']);
-            }
+            return this.getBrowser().keys(['Control', 'Delete']);
         })
     }
 }

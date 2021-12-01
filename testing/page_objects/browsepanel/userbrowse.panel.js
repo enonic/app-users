@@ -232,11 +232,8 @@ class UserBrowsePanel extends Page {
 
     hotKeyNew() {
         return this.browser.status().then(status => {
-            if (status.nodes[0].osInfo.name.toLowerCase().includes('mac')) {
-                return this.browser.keys(['Command', 'Alt', 'n']);
-            } else {
-                return this.browser.keys(['Control', 'Alt', 'n']);
-            }
+            console.log("browser status:" + status);
+            return this.browser.keys(['Control', 'Alt', 'n']);
         })
     }
 
