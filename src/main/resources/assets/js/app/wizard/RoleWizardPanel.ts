@@ -11,6 +11,7 @@ import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
 import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
 
 export class RoleWizardPanel
     extends MembersWizardPanel {
@@ -62,11 +63,9 @@ export class RoleWizardPanel
         const displayName: string = role.getDisplayName();
         const description: string = role.getDescription();
         const oldMembers: PrincipalKey[] = (<Role>this.getPersistedItem()).getMembers();
-        const oldMembersIds: string[] = oldMembers.map(el => el.getId());
         const newMembers: PrincipalKey[] = role.getMembers();
-        const newMembersIds: string[] = newMembers.map(el => el.getId());
-        const addMembers: PrincipalKey[] = newMembers.filter(el => oldMembersIds.indexOf(el.getId()) < 0);
-        const removeMembers: PrincipalKey[] = oldMembers.filter(el => newMembersIds.indexOf(el.getId()) < 0);
+        const addMembers: PrincipalKey[] = ArrayHelper.difference(newMembers, oldMembers, (a, b) => a.equals(b));
+        const removeMembers: PrincipalKey[] = ArrayHelper.difference(oldMembers, newMembers, (a, b) => a.equals(b));
 
         return new UpdateRoleRequest()
             .setKey(key)
