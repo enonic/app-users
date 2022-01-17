@@ -19,7 +19,7 @@
     "hasher": "^1.2.0",
     "jquery": "^3.6.0",
     "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
-    "nanoid": "^3.1.30",
+    "nanoid": "^3.2.0",
     "owasp-password-strength-test": "^1.3.0",
     "q": "^1.5.1"
   },
