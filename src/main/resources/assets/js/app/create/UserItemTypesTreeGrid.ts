@@ -19,6 +19,7 @@ import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
+import {KeyHelper} from 'lib-admin-ui/ui/KeyHelper';
 
 export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
 
@@ -94,7 +95,10 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
                         .setDisplayName(i18n('field.role'))
                         .build()).build(),
             ])
-        ]);
+        ]).then(items => {
+            setTimeout(() => { this.addAccessibilityToSlickGridItems(); }, 1);
+            return items;
+        });
     }
 
     getDataId(data: UserTypeTreeGridItem): string {
@@ -166,6 +170,16 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
                     new NewPrincipalEvent([item]).fire();
                 }
             }
+        });
+    }
+
+    private addAccessibilityToSlickGridItems() {
+        const childItems = Array.prototype.slice.call(this.getGrid().getSlickGrid().getCanvasNode().children);
+        childItems.forEach((c: HTMLElement) => {
+            c.setAttribute('tabindex', '0');
+            c.addEventListener('keydown', (event: KeyboardEvent) =>
+                KeyHelper.isEnterKey(event) && (c.firstChild as HTMLElement).click()
+            );
         });
     }
 }
