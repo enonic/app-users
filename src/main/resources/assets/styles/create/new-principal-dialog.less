@@ -1,5 +1,9 @@
 .new-principal-dialog {
 
+  .modal-dialog-body:focus {
+    outline: none;
+  }
+
   .tree-grid {
     .viewer {
       .names-and-icon-view {
@@ -30,14 +34,6 @@
     }
 
     .slick-cell.selected {
-      .names-and-icon-view {
-        h6,
-        p {
-          color: @admin-black;
-        }
-      }
-
-      background-color: transparent;
       color: inherit;
     }
 
