@@ -6,6 +6,7 @@ import {PEl} from 'lib-admin-ui/dom/PEl';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {Body} from 'lib-admin-ui/dom/Body';
 import {ModalDialog, ModalDialogConfig} from 'lib-admin-ui/ui/dialog/ModalDialog';
+import {KeyBinding} from 'lib-admin-ui/ui/KeyBinding';
 
 export class NewPrincipalDialog
     extends ModalDialog {
@@ -24,18 +25,28 @@ export class NewPrincipalDialog
         super.initElements();
 
         this.grid = new UserItemTypesTreeGrid();
+        this.addCancelButtonToBottom(null, true);
     }
 
     protected initListeners(): void {
         super.initListeners();
 
         this.grid.onDataChanged(() => ResponsiveManager.fireResizeEvent());
+        this.grid.onSelectionChanged(() => {
+            !!this.grid.hasSelectedItems() ? this.getCancelButton().giveBlur() : this.getCancelButton().giveFocus();
+        });
+
         NewPrincipalEvent.on(() => this.isVisible() && this.close());
     }
 
+    protected postInitElements(): void {
+        super.postInitElements();
+
+        this.setElementToFocusOnShow(this.getCancelButton());
+    }
+
     doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered) => {
-            this.addCancelButtonToBottom(null, true);
+        return super.doRender().then((rendered: boolean) => {
             this.getContentPanel().appendChild(this.grid);
 
             return rendered;
@@ -43,14 +54,19 @@ export class NewPrincipalDialog
     }
 
     setSelection(selection: UserTreeGridItem[]): NewPrincipalDialog {
-        const isidProvider = selection.length === 1 && selection[0].getType() === UserTreeGridItemType.ID_PROVIDER;
-        if (isidProvider) {
+        const isIdProvider: boolean = selection.length === 1 && selection[0].getType() === UserTreeGridItemType.ID_PROVIDER;
+
+        if (isIdProvider) {
             this.grid.setIdProvider(selection[0].getIdProvider());
             this.setPath(selection[0].getItemDisplayName());
         } else if (this.pathEl) {
             this.pathEl.hide();
         }
         return this;
+    }
+
+    protected addKeyBindings(): KeyBinding[] {
+        return [];
     }
 
     open(): void {
@@ -61,13 +77,13 @@ export class NewPrincipalDialog
     }
 
     close(): void {
-        this.grid.clearidProviders();
+        this.grid.reset();
         super.close();
         this.remove();
     }
 
     private createPathEl(): PEl {
-        const pathEl = new PEl('path');
+        const pathEl: PEl = new PEl('path');
         pathEl.getEl().setAttribute('data-desc', `${i18n('dialog.newContent.pathDescription')}:`);
         this.header.appendChild(pathEl);
 
