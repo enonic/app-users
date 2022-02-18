@@ -1,29 +1,20 @@
-var admin = require('/lib/xp/admin');
-var mustache = require('/lib/mustache');
-var portal = require('/lib/xp/portal');
+const admin = require('/lib/xp/admin');
+const mustache = require('/lib/mustache');
+const portal = require('/lib/xp/portal');
+const i18n = require('/lib/xp/i18n');
 
 function handleGet() {
-    var graphQlUrl = portal.serviceUrl({
-        service: 'graphql'
-    });
+    const view = resolve('./main.html');
 
-    var view = resolve('./main.html');
-
-    var params = {
-        adminUrl: admin.getBaseUri(),
-        assetsUri: portal.assetUrl({
-            path: ''
+    const params = {
+        assetsUri: portal.assetUrl({path: ''}),
+        appName: i18n.localize({
+            key: 'admin.tool.displayName',
+            bundles: ['i18n/phrases'],
+            locale: admin.getLocales()
         }),
-        graphQlUrl: graphQlUrl,
-        appName: 'Users',
-        appId: app.name,
-        xpVersion: app.version,
         launcherPath: admin.getLauncherPath(),
-        launcherUrl: admin.getLauncherUrl(),
-        reportServiceUrl: portal.serviceUrl({
-            service: 'permissionReport'
-        }),
-        i18nUrl: portal.serviceUrl({service: 'i18n'})
+        configServiceUrl: portal.serviceUrl({service: 'config'})
     };
 
     return {

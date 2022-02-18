@@ -27,6 +27,7 @@ import {Element} from 'lib-admin-ui/dom/Element';
 import {Button} from 'lib-admin-ui/ui/button/Button';
 import {UserItemStatisticsHeader} from './UserItemStatisticsHeader';
 import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -282,7 +283,7 @@ export class UserItemStatisticsPanel
 
     private getReportServicePath(): string {
         if (!this.reportServicePath) {
-            this.reportServicePath = Path.fromString(window['CONFIG'] && window['CONFIG']['reportServiceUrl']).toString();
+            this.reportServicePath = Path.fromString(CONFIG.getString('services.reportServiceUrl')).toString();
         }
 
         return this.reportServicePath;
