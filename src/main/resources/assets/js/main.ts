@@ -24,11 +24,12 @@ const importAll = r => r.keys().forEach(r);
 importAll(require.context('./app/inputtype', true, /^(?!\.[\/\\]ui).*/));
 
 function getApplication(): Application {
+    const assetsUri: string = CONFIG.getString('assetsUri');
     const application = new Application(
         CONFIG.getString('appId'),
         i18n('admin.tool.displayName'),
         i18n('app.abbr'),
-        `${CONFIG.getString('assetsUri')}/icons/icon-white.svg`
+        `${assetsUri}/icons/icon-white.svg`
     );
     application.setPath(Path.fromString(Router.getPath()));
     application.setWindow(window);
