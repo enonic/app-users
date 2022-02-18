@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "target": "es5",
     "sourceMap": true,
     "types": [
       "core-js",
@@ -8,6 +9,11 @@
       "q",
       "nanoid",
       "owasp-password-strength-test"
+    ],
+    "lib": [
+      "es2015",
+      "es2015.promise",
+      "dom"
     ]
   },
   "exclude": [

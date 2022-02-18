@@ -10,12 +10,10 @@ import {Application} from 'lib-admin-ui/app/Application';
 import {Path} from 'lib-admin-ui/rest/Path';
 import {ConnectionDetector} from 'lib-admin-ui/system/ConnectionDetector';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {UriHelper} from 'lib-admin-ui/util/UriHelper';
 import {TabbedAppBar} from 'lib-admin-ui/app/bar/TabbedAppBar';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
-
-declare const CONFIG;
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 const body = Body.get();
 
@@ -26,7 +24,12 @@ const importAll = r => r.keys().forEach(r);
 importAll(require.context('./app/inputtype', true, /^(?!\.[\/\\]ui).*/));
 
 function getApplication(): Application {
-    let application = new Application('user-manager', 'Users', 'UM', CONFIG.appIconUrl);
+    const application = new Application(
+        CONFIG.getString('appId'),
+        i18n('admin.tool.displayName'),
+        i18n('app.abbr'),
+        `${CONFIG.getString('assetsUri')}/icons/icon-white.svg`
+    );
     application.setPath(Path.fromString(Router.getPath()));
     application.setWindow(window);
 
@@ -36,7 +39,7 @@ function getApplication(): Application {
 function startLostConnectionDetector() {
     ConnectionDetector.get()
         .setAuthenticated(true)
-        .setSessionExpireRedirectUrl(UriHelper.getToolUri(''))
+        .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
         .setNotificationMessage(i18n('notify.connection.loss'))
         .startPolling(true);
 }
@@ -70,13 +73,15 @@ function startApplication() {
     });
 }
 
-const renderListener = () => {
-    i18nInit(CONFIG.i18nUrl).then(() => startApplication());
-    body.unRendered(renderListener);
-};
-
-if (body.isRendered()) {
-    renderListener();
-} else {
-    body.onRendered(renderListener);
-}
+(async () => {
+    if (!document.currentScript) {
+        throw 'Legacy browsers are not supported';
+    }
+    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
+    if (!configServiceUrl) {
+        throw 'Unable to fetch app config';
+    }
+    await CONFIG.init(configServiceUrl);
+    await i18nInit(CONFIG.getString('services.i18nUrl'));
+    startApplication();
+})();

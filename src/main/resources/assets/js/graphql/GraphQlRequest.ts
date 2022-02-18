@@ -3,6 +3,7 @@ import {StringHelper} from 'lib-admin-ui/util/StringHelper';
 import {HttpRequest} from 'lib-admin-ui/rest/HttpRequest';
 import {PostRequest} from 'lib-admin-ui/rest/PostRequest';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import {CONFIG} from 'lib-admin-ui/util/Config';
 import * as Q from 'q';
 
 export class GraphQlRequest<PARSED_TYPE>
@@ -11,7 +12,7 @@ export class GraphQlRequest<PARSED_TYPE>
     private readonly path: Path;
 
     constructor() {
-        this.path = Path.fromString(window['CONFIG'] && window['CONFIG']['graphQlUrl']);
+        this.path = Path.fromString(CONFIG.getString('services.graphQlUrl'));
     }
 
     private getParams(query: string, mutation: string): Object {
