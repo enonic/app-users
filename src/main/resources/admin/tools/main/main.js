@@ -19,7 +19,10 @@ function handleGet() {
 
     return {
         contentType: 'text/html',
-        body: mustache.render(view, params)
+        body: mustache.render(view, params),
+        headers: {
+            'Content-Security-Policy': 'default-src \'self\'; script-src \'self\' \'unsafe-eval\'; style-src \'self\' \'unsafe-inline\'; object-src \'none\'; img-src \'self\' data:'
+        }
     };
 }
 
