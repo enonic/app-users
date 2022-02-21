@@ -233,12 +233,12 @@ class UserBrowsePanel extends Page {
     hotKeyNew() {
         return this.browser.status().then(status => {
             console.log("browser status:" + status);
-            return this.browser.keys(['Control', 'Alt', 'n']);
+            return this.browser.keys(['Alt', 'n']);
         })
     }
 
     hotKeyEdit() {
-        return this.browser.keys(['F4']);
+        return this.browser.keys(['Control', 'e']);
     }
 
     hotKeyDelete() {
