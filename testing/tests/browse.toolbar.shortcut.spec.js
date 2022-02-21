@@ -16,7 +16,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
 
-    it(`GIVEN user browse panel is opened WHEN 'Ctrl+Alt+n' has been pressed THEN New Principal Dialog should appear`,
+    it(`GIVEN user browse panel is opened WHEN 'Alt+n' has been pressed THEN New Principal Dialog should appear`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let newPrincipalDialog = new NewPrincipalDialog();
@@ -25,7 +25,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             await newPrincipalDialog.waitForDialogLoaded();
         });
 
-    it(`GIVEN system Id provider is selected WHEN 'f4' has been pressed THEN System Id Provider wizard should be loaded`,
+    it(`GIVEN system Id provider is selected WHEN 'Ctrl+e' has been pressed THEN System Id Provider wizard should be loaded`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
