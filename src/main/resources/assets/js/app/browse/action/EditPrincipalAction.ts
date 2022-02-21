@@ -7,7 +7,7 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 export class EditPrincipalAction extends Action {
 
     constructor(grid: UserItemsTreeGrid) {
-        super(i18n('action.edit'), 'f4');
+        super(i18n('action.edit'), 'mod+e');
         this.setEnabled(false);
         this.onExecuted(() => {
             let principals: UserTreeGridItem[] = grid.getSelectedDataList();
