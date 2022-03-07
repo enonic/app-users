@@ -66,6 +66,9 @@ export class ChangeUserPasswordDialog
     private initializeActions() {
 
         this.changePasswordButton = this.addAction(new Action(i18n('action.changePassword'), '').onExecuted(() => {
+            if (!this.password.isValid()) {
+                return;
+            }
             new SetUserPasswordRequest().setKey(this.principal.getKey()).setPassword(
                 this.password.getValue()).sendAndParse().then(() => {
                 showFeedback(i18n('notify.change.password'));
