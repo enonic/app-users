@@ -14,6 +14,9 @@ import {TabbedAppBar} from 'lib-admin-ui/app/bar/TabbedAppBar';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
 import {CONFIG} from 'lib-admin-ui/util/Config';
+import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
+import {InputTypeManager} from 'lib-admin-ui/form/inputtype/InputTypeManager';
+import {Class} from 'lib-admin-ui/Class';
 
 const body = Body.get();
 
@@ -86,3 +89,5 @@ function startApplication() {
     await i18nInit(CONFIG.getString('services.i18nUrl'));
     startApplication();
 })();
+
+InputTypeManager.register(new Class('PrincipalSelector', PrincipalSelector), true);
