@@ -14,6 +14,9 @@ import {UriHelper} from 'lib-admin-ui/util/UriHelper';
 import {TabbedAppBar} from 'lib-admin-ui/app/bar/TabbedAppBar';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
+import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
+import {InputTypeManager} from 'lib-admin-ui/form/inputtype/InputTypeManager';
+import {Class} from 'lib-admin-ui/Class';
 
 declare const CONFIG;
 
@@ -80,3 +83,5 @@ if (body.isRendered()) {
 } else {
     body.onRendered(renderListener);
 }
+
+InputTypeManager.register(new Class('PrincipalSelector', PrincipalSelector), true);
