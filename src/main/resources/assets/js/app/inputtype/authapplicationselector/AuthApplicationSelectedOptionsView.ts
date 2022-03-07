@@ -5,7 +5,6 @@ import {Option} from 'lib-admin-ui/ui/selector/Option';
 import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {BaseSelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
 import {ApplicationConfigProvider} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
-import {FormContext} from 'lib-admin-ui/form/FormContext';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 
 export class AuthApplicationSelectedOptionsView
