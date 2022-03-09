@@ -46,8 +46,8 @@ class LoaderComboBox extends Page {
         return this.typeTextInInput(xpath + this.optionsFilterInput, optionDisplayName).then(() => {
             return this.clickOnElement(optionSelector)
         }).catch(err => {
-            this.saveScreenshot('err_clicking_on_option');
-            throw new Error('Error when clicking on the option in loadercombobox!' + optionDisplayName + " " + err);
+            this.saveScreenshot('err_combobox');
+            throw new Error('Error when selecting an option in loadercombobox!' + optionDisplayName + " " + err);
         }).then(() => {
             return this.pause(500);
         });

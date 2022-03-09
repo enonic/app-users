@@ -220,14 +220,16 @@ class UserBrowsePanel extends Page {
         }
     }
 
-    doClickOnCloseTabButton(displayName) {
-        let closeIcon = `${xpath.closeItemTabButton(displayName)}`;
-        return this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_4).then(() => {
-            return this.clickOnElement(closeIcon);
-        }).catch(err => {
-            this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
-            throw new Error('itemTabButton was not found! ' + displayName + '  ' + err);
-        })
+    async doClickOnCloseTabButton(displayName) {
+        try {
+            let closeIcon = `${xpath.closeItemTabButton(displayName)}`;
+            await this.waitForElementDisplayed(closeIcon, appConst.TIMEOUT_4);
+            await this.clickOnElement(closeIcon);
+            return await this.pause(500);
+        } catch (err) {
+            await this.saveScreenshot(itemBuilder.generateRandomNumber('err_close'));
+            throw new Error('itemTabButton was not found! ' + err);
+        }
     }
 
     hotKeyNew() {
