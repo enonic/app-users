@@ -1,16 +1,16 @@
 /**
  * Created on 20.03.2018.
  */
-
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
+const PrincipalComboBox = require('../inputs/principal.compobox');
 const XPATH = {
     container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
     domainInput: "//input[contains(@id,'TextInput') and contains(@name,'appDomain')]",
     clientIdInput: "//input[contains(@id,'TextInput') and contains(@name,'appClientId')]",
     clientSecretInput: "//input[contains(@id,'TextInput') and contains(@name,'appSecret')]",
-    applyButton: `//button[contains(@id,'DialogButton')]/span[text()='Apply']`,
+    applyButton: `//button[contains(@id,'DialogButton') and child::span[text()='Apply']]`,
     cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
     selectedProviderView: `//div[contains(@id,'AuthApplicationSelectedOptionView')]`,
     idProviderTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Id Provider')]]",
@@ -48,8 +48,15 @@ class IdProviderConfiguratorDialog extends Page {
     }
 
     clickOnApplyButton() {
-
         return this.clickOnElement(this.applyButton);
+    }
+
+    waitForApplyButtonEnabled() {
+        return this.waitForElementEnabled(this.applyButton, appConst.mediumTimeout);
+    }
+
+    waitForApplyButtonDisabled() {
+        return this.waitForElementDisabled(this.applyButton, appConst.mediumTimeout);
     }
 
     clickOnCancelButton() {
@@ -91,7 +98,15 @@ class IdProviderConfiguratorDialog extends Page {
         });
     }
 
-    async openDialogFillRequiredInputs(domain, clientId, clientSecret) {
+    async openDialogFillRequiredInputsAndApply(domain, clientId, clientSecret) {
+        await this.openDialogFillRequiredInputs(domain, clientId, clientSecret);
+        await this.waitForApplyButtonEnabled();
+        await this.clickOnApplyButton();
+        await this.waitForClosed();
+        return await this.pause(500);
+    }
+
+    async openProviderConfigDialog() {
         let editButton = XPATH.selectedProviderView + lib.EDIT_ICON;
         await this.clickOnElement(XPATH.permissionsTabItem);
         await this.clickOnElement(XPATH.idProviderTabItem);
@@ -99,12 +114,29 @@ class IdProviderConfiguratorDialog extends Page {
         await this.waitForElementDisplayed(editButton, appConst.mediumTimeout);
         await this.clickOnElement(editButton);
         await this.waitForDialogOpened();
+    }
+
+    async openDialogFillRequiredInputs(domain, clientId, clientSecret) {
+        await this.openProviderConfigDialog();
         await this.typeInDomainInput(domain);
         await this.typeInClientIdInput(clientId);
         await this.typeInClientSecretInput(clientSecret);
-        await this.clickOnApplyButton();
-        await this.waitForClosed();
+    }
+
+    async selectGroup(groupName) {
+        let principalComboBox = new PrincipalComboBox();
+        //await this.typeTextInInput(XPATH.container + lib.COMBO_BOX_OPTION_FILTER_INPUT, groupName)
+        await principalComboBox.typeTextAndSelectOption(groupName, XPATH.container);
         return await this.pause(500);
+    }
+
+    async getSelectedGroups() {
+        try {
+            let selectedOptions = XPATH.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
+            return await this.getTextInElements(selectedOptions);
+        } catch (err) {
+            throw new Error('Error when getting selected Groups in the form: ' + err);
+        }
     }
 }
 
