@@ -74,10 +74,7 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
             await idProviderWizard.waitAndClickOnSave();
             let message = await idProviderWizard.waitForNotificationMessage();
             assert.equal(message, appConst.PROVIDER_CREATED_NOTIFICATION, "'Id provider was created' - this message should appear");
-
         });
-    //TODO add tests to verify issue https://github.com/enonic/lib-admin-ui/issues/1822
-    //TODO add tests to verify issue https://github.com/enonic/lib-admin-ui/issues/1815
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

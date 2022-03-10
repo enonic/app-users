@@ -138,6 +138,18 @@ class IdProviderConfiguratorDialog extends Page {
             throw new Error('Error when getting selected Groups in the form: ' + err);
         }
     }
+
+    async clickOnAddKeyButton() {
+        let locator = XPATH.container + "//button[@title='Add site key']";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        await this.clickOnElement(locator);
+        return await this.pause(500);
+    }
+
+    async waitForOccurrencesMenuButtonDisplayed(label) {
+        let locator = XPATH.container;
+        return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+    }
 }
 
 module.exports = IdProviderConfiguratorDialog;

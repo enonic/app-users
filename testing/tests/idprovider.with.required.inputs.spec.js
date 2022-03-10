@@ -59,13 +59,13 @@ describe('Id Provider, provider-dialog specification', function () {
 
     it(`GIVEN Provider-configuration dialog is opened WHEN required inputs in Provider-dialog are filled THEN the Id Provider is getting valid`,
         async () => {
-            let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
-            let idProviderWizard = new IdProviderWizard();
-            let providerConfigDialog = new ProviderConfigDialog();
-            //1. Open new id provider wizard, type the data:
-            await testUtils.openIdProviderWizard(testIdProvider);
-            await idProviderWizard.typeData(testIdProvider);
+                let name = userItemsBuilder.generateRandomName('provider');
+                let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+                let idProviderWizard = new IdProviderWizard();
+                let providerConfigDialog = new ProviderConfigDialog();
+                //1. Open new id provider wizard, type the data:
+                await testUtils.openIdProviderWizard(testIdProvider);
+                await idProviderWizard.typeData(testIdProvider);
                 await idProviderWizard.pause(700);
                 //2. Open app-configuration dialog and fill required inputs:
                 await providerConfigDialog.openDialogFillRequiredInputsAndApply('domain', 'id', 'secret');
@@ -128,15 +128,14 @@ describe('Id Provider, provider-dialog specification', function () {
                     await providerConfigDialog.openDialogFillRequiredInputs('domain', 'id', 'secret');
                     //5. Select a group:
                     await providerConfigDialog.selectGroup(groupName);
+                    await testUtils.saveScreenshot("idprovider_config_group_selected");
                     //6. Verify the selected option:
                     let actualGroups = await providerConfigDialog.getSelectedGroups();
                     assert.equal(actualGroups[0], groupName, "Expected group should be present in selected options");
             });
 
-
         it(`GIVEN Provider Config Dialog is opened WHEN required inputs are not filled THEN Apply button should be disabled`,
             async () => {
-                    let userBrowsePanel = new UserBrowsePanel();
                     let providerConfigDialog = new ProviderConfigDialog();
                     let name = userItemsBuilder.generateRandomName('provider');
                     let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
@@ -146,18 +145,46 @@ describe('Id Provider, provider-dialog specification', function () {
                     await testUtils.openIdProviderWizard(testIdProvider);
                     await idProviderWizard.typeData(testIdProvider);
                     await idProviderWizard.pause(700);
-                    //2. Open the configuration dialog and fill required inputs:
+                    //2. Open the configuration dialog:
                     await providerConfigDialog.openProviderConfigDialog();
-                    //3. Verify that Apply button is disabled
+                    //3. Verify that 'Apply' button is disabled
                     await providerConfigDialog.waitForApplyButtonDisabled();
                     //4. Fill in the required inputs:
                     await providerConfigDialog.typeInDomainInput('domain');
                     await providerConfigDialog.typeInClientSecretInput('secret');
                     await providerConfigDialog.typeInClientIdInput('id');
-                    //5. Verify that Apply button gets enabled
+                    //5. Verify that 'Apply' button gets enabled
                     await testUtils.saveScreenshot("idprovider_config_apply_enabled");
                     await providerConfigDialog.waitForApplyButtonEnabled();
             });
+
+        //Verifies Site/provider Configurator - incorrect validation after adding occurrences of required inputs #1964
+        //https://github.com/enonic/lib-admin-ui/issues/1964
+        it(`GIVEN Provider Config Dialog is opened AND all required inputs are filled in WHEN occurrence of required input has been added THEN 'Apply' button gets disabled`,
+            async () => {
+                    let providerConfigDialog = new ProviderConfigDialog();
+                    let name = userItemsBuilder.generateRandomName('provider');
+                    let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+                    let idProviderWizard = new IdProviderWizard();
+
+                    //1. Open new id provider wizard, fill in the display name input, select the application :
+                    await testUtils.openIdProviderWizard(testIdProvider);
+                    await idProviderWizard.typeData(testIdProvider);
+                    await idProviderWizard.pause(700);
+                    //2. Open the configuration dialog:
+                    await providerConfigDialog.openProviderConfigDialog();
+                    //3. Fill in the required inputs:
+                    await providerConfigDialog.typeInDomainInput('domain');
+                    await providerConfigDialog.typeInClientSecretInput('secret');
+                    await providerConfigDialog.typeInClientIdInput('id');
+                    //4. Verify that 'Apply' button gets enabled:
+                    await providerConfigDialog.waitForApplyButtonEnabled();
+                    await providerConfigDialog.clickOnAddKeyButton();
+                    await testUtils.saveScreenshot("idprovider_config_apply_disabled_2");
+                    await providerConfigDialog.waitForApplyButtonDisabled();
+            });
+
+        //TODO add tests to verify issue https://github.com/enonic/lib-admin-ui/issues/1822
 
         beforeEach(() => testUtils.navigateToUsersApp());
         afterEach(() => testUtils.doCloseUsersApp());
