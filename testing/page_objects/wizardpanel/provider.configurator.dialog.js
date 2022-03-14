@@ -14,7 +14,8 @@ const XPATH = {
     cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
     selectedProviderView: `//div[contains(@id,'AuthApplicationSelectedOptionView')]`,
     idProviderTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Id Provider')]]",
-    permissionsTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Permissions')]]"
+    permissionsTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Permissions')]]",
+    occurrenceMoreButton: label => `//div[contains(@id,'FormItemSetView') and descendant::h5[text()='${label}']]//button[contains(@id,'MoreButton')]`
 };
 
 class IdProviderConfiguratorDialog extends Page {
@@ -144,6 +145,18 @@ class IdProviderConfiguratorDialog extends Page {
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         await this.clickOnElement(locator);
         return await this.pause(500);
+    }
+
+    async clickOnOccurrenceMenuButton(label) {
+        let locator = XPATH.container + `//div[contains(@id,'FormItemSetView') and descendant::h5[text()='${label}']]` +
+                      "//button[contains(@id,'MoreButton')]";
+        return await this.clickOnElement(locator);
+    }
+
+    async clickOnOccurrenceMenuItem(label, menuItem) {
+        let locator = XPATH.container + XPATH.occurrenceMoreButton(label) + `//li[contains(@id,'MenuItem') and text()='${menuItem}']`;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.clickOnElement(locator);
     }
 
     async waitForOccurrencesMenuButtonDisplayed(label) {
