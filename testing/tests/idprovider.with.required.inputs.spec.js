@@ -184,7 +184,37 @@ describe('Id Provider, provider-dialog specification', function () {
             await providerConfigDialog.waitForApplyButtonDisabled();
         });
 
-    //TODO add tests to verify issue https://github.com/enonic/lib-admin-ui/issues/1822
+    //Verify issue https://github.com/enonic/lib-admin-ui/issues/1822
+    //Site/Provider configurator - menu button is not displayed in occurrence view #1822
+    it(`GIVEN occurrence of required input has been added WHEN 'Menu button' in the occurrence has been clicked AND 'Delete' item clicked THEN 'Apply' button gets disabled`,
+        async () => {
+            let providerConfigDialog = new ProviderConfigDialog();
+            let name = userItemsBuilder.generateRandomName('provider');
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let idProviderWizard = new IdProviderWizard();
+
+            //1. Open new id provider wizard, fill in the display name input, select the application :
+            await testUtils.openIdProviderWizard(testIdProvider);
+            await idProviderWizard.typeData(testIdProvider);
+            await idProviderWizard.pause(700);
+            //2. Open the configuration dialog:
+            await providerConfigDialog.openProviderConfigDialog();
+            //3. Fill in the required inputs:
+            await providerConfigDialog.typeInDomainInput('domain');
+            await providerConfigDialog.typeInClientSecretInput('secret');
+            await providerConfigDialog.typeInClientIdInput('id');
+            //4. Click on 'Add' button, add the form:
+            await providerConfigDialog.clickOnAddKeyButton();
+            //5. Click on 'Menu button' in the occurrence and expand the menu:
+            await providerConfigDialog.clickOnOccurrenceMenuButton("site key");
+            await testUtils.saveScreenshot("idprovider_config_occur_menu");
+            //6. Click on 'Delete' menu item:
+            await providerConfigDialog.clickOnOccurrenceMenuItem("site key", "Delete");
+            await testUtils.saveScreenshot("idprovider_config_apply_enabled_2");
+            //7. Verify that 'Apply' button gets enabled after deleting the form with required inputs:
+            await providerConfigDialog.waitForApplyButtonEnabled();
+        });
+
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
