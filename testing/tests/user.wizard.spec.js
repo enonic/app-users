@@ -67,8 +67,9 @@ describe('User Wizard and Change Password dialog spec', function () {
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
-            let isDisplayed = await userWizard.isChangePasswordButtonDisplayed();
-            await assert.isTrue(isDisplayed, "'Change Password' button gets visible");
+            await testUtils.saveScreenshot("user_change_password_button_displayed");
+            //Verify 'Change Password' button is visible
+            await userWizard.waitForChangePasswordButtonDisplayed();
         });
 
     it('GIVEN existing user is opened WHEN name input has been cleared THEN red circle should appears in the tab',
@@ -144,7 +145,8 @@ describe('User Wizard and Change Password dialog spec', function () {
             //3. Check the password's status:
             let status = await changePasswordDialog.getPasswordStatus();
             await testUtils.saveScreenshot('change_password_strong_status');
-            assert.equal(status, appConst.PASSWORD_STATE.STRONG, "Strong password's status should be displayed");
+            assert.isTrue(status == appConst.PASSWORD_STATE.STRONG || status == appConst.PASSWORD_STATE.EXCELLENT,
+                "Strong or Excellent password's status should be displayed");
             //4. Verify that 'Change Password' button is enabled:
             await changePasswordDialog.waitForChangePasswordButtonEnabled();
         });

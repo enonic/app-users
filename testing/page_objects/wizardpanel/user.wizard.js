@@ -78,6 +78,10 @@ class UserWizard extends wizards.WizardPanel {
         return this.isElementDisplayed(this.changePasswordButton);
     }
 
+    waitForChangePasswordButtonDisplayed() {
+        return this.waitForElementDisplayed(this.changePasswordButton, appConst.mediumTimeout);
+    }
+
     isGenerateDisplayed() {
         return this.isElementDisplayed(this.generateLink);
     }
