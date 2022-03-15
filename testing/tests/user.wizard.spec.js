@@ -110,7 +110,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             assert.isTrue(isDisplayed, 'Generate Link should be displayed');
             isDisplayed = await changePasswordDialog.isShowLinkDisplayed();
             assert.isTrue(isDisplayed, 'Show Password Link should be displayed');
-            //Verify than Change Password button is disabled:
+            //Verify that 'Change Password' button is disabled:
             await changePasswordDialog.waitForChangePasswordButtonDisabled();
         });
 
@@ -119,30 +119,33 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            //Open 'Change Password Dialog'
+            //1. Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
+            //2. Insert an easy password:
             await changePasswordDialog.typePassword(BAD_PASSWORD);
             let status = await changePasswordDialog.getPasswordStatus();
-            testUtils.saveScreenshot('change_pass_bad_status');
+            testUtils.saveScreenshot('change_password_bad_status');
             assert.equal(status, appConst.PASSWORD_STATE.BAD, "bad password's status should be displayed");
-            //Verify than Change Password button is disabled:
+            //Verify than 'Change Password' button is disabled:
             await changePasswordDialog.waitForChangePasswordButtonDisabled();
         });
 
-    it("GIVEN 'Change Password Dialog' is opened WHEN new password has been generated THEN 'Excellent' password status appears AND Change button gets enabled",
+    it("GIVEN 'Change Password Dialog' is opened WHEN new password has been generated THEN 'Strong' password status appears AND Change button gets enabled",
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            //Open 'Change Password Dialog'
+            //1. Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
+            //2. Generate new password:
             await changePasswordDialog.clickOnGeneratePasswordLink();
+            //3. Check the password's status:
             let status = await changePasswordDialog.getPasswordStatus();
-            testUtils.saveScreenshot('change_pass_excellent_status');
-            assert.equal(status, appConst.PASSWORD_STATE.EXCELLENT, "Excellent password's status should be displayed");
-            //Verify than Change Password button is enabled:
+            await testUtils.saveScreenshot('change_password_strong_status');
+            assert.equal(status, appConst.PASSWORD_STATE.STRONG, "Strong password's status should be displayed");
+            //4. Verify that 'Change Password' button is enabled:
             await changePasswordDialog.waitForChangePasswordButtonEnabled();
         });
 
