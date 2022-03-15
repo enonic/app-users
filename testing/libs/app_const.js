@@ -41,6 +41,7 @@ module.exports = Object.freeze({
         STRONG: "Strong",
         WEAK: "Weak",
         EXCELLENT: "Excellent",
+        STRONG: "Strong",
         BAD: "Bad"
     },
     roles: {
