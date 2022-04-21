@@ -6,6 +6,7 @@ import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {BaseSelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
 import {ApplicationConfigProvider} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
+import {ApplicationConfig} from 'lib-admin-ui/application/ApplicationConfig';
 
 export class AuthApplicationSelectedOptionsView
     extends BaseSelectedOptionsView<Application> {
@@ -22,36 +23,42 @@ export class AuthApplicationSelectedOptionsView
 
     constructor(applicationConfigProvider: ApplicationConfigProvider, readOnly: boolean) {
         super();
-        this.applicationConfigProvider = applicationConfigProvider;
+
+        this.setApplicationConfigProvider(applicationConfigProvider);
         this.setReadonly(readOnly);
-
-        this.applicationConfigProvider.onPropertyChanged(() => {
-
-            this.items.forEach((optionView) => {
-                let newConfig = this.applicationConfigProvider.getConfig(optionView.getSiteConfig().getApplicationKey(), false);
-                if (newConfig) {
-                    optionView.setSiteConfig(newConfig);
-                }
-            });
-
-        });
-
         this.setOccurrencesSortable(true);
     }
 
     createSelectedOption(option: Option<Application>): SelectedOption<Application> {
         this.notifyBeforeOptionCreated();
 
-        let applicationConfig = this.applicationConfigProvider.getConfig(option.getDisplayValue().getApplicationKey());
-        let optionView = new AuthApplicationSelectedOptionView(option, applicationConfig, this.readonly);
+        const applicationConfig: ApplicationConfig = this.applicationConfigProvider.getConfig(option.getDisplayValue().getApplicationKey());
+        const optionView: AuthApplicationSelectedOptionView =
+            new AuthApplicationSelectedOptionView(option, applicationConfig, this.readonly);
 
         optionView.onApplicationConfigFormDisplayed((applicationKey: ApplicationKey) => {
             this.notifyApplicationConfigFormDisplayed(applicationKey, optionView.getFormView());
         });
+
         this.items.push(optionView);
 
         this.notifyAfterOptionCreated(optionView);
         return new SelectedOption<Application>(optionView, this.count());
+    }
+
+    setApplicationConfigProvider(value: ApplicationConfigProvider): void {
+        this.applicationConfigProvider = value;
+
+        this.applicationConfigProvider.onPropertyChanged(() => {
+            this.items.forEach((optionView: AuthApplicationSelectedOptionView) => {
+                const newConfig: ApplicationConfig =
+                    this.applicationConfigProvider.getConfig(optionView.getSiteConfig().getApplicationKey(), false);
+
+                if (newConfig) {
+                    optionView.setSiteConfig(newConfig);
+                }
+            });
+        });
     }
 
     removeOption(optionToRemove: Option<Application>, silent: boolean = false): void {
