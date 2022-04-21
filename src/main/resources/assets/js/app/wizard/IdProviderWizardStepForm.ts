@@ -36,14 +36,8 @@ export class IdProviderWizardStepForm
 
         this.description = new TextInput('middle');
 
-        const propertyArray: PropertyArray = PropertyArray.create()
-            .setName('idProviderConfig')
-            .setType(new ValueTypePropertySet())
-            .setParent(new PropertyTree().getRoot())
-            .build();
-
         this.selectedOptionsView =
-            new AuthApplicationSelectedOptionsView(new ApplicationConfigProvider(propertyArray), false);
+            new AuthApplicationSelectedOptionsView(this.createApplicationConfigProvider(), false);
 
         this.applicationComboBox = <AuthApplicationComboBox>new AuthApplicationComboBoxBuilder()
             .setSelectedOptionsView(this.selectedOptionsView)
@@ -73,6 +67,16 @@ export class IdProviderWizardStepForm
         const descriptionFormItem: FormItem = new FormItemBuilder(this.description).setLabel(i18n('field.description')).build();
         const appComboBox: FormItem = new FormItemBuilder(this.applicationComboBox).setLabel(i18n('field.application')).build();
         return [descriptionFormItem, appComboBox];
+    }
+
+    private createApplicationConfigProvider(): ApplicationConfigProvider {
+        const propertyArray: PropertyArray = PropertyArray.create()
+            .setName('idProviderConfig')
+            .setType(new ValueTypePropertySet())
+            .setParent(new PropertyTree().getRoot())
+            .build();
+
+        return new ApplicationConfigProvider(propertyArray);
     }
 
     layout(idProvider: IdProvider): void {
@@ -106,6 +110,7 @@ export class IdProviderWizardStepForm
         this.applicationComboBox.getSelectedOptionView().setReadonly(idProvider.getKey().isSystem());
 
         if (!config) {
+            this.selectedOptionsView.setApplicationConfigProvider(this.createApplicationConfigProvider());
             return;
         }
 
