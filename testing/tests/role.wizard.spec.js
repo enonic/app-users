@@ -97,7 +97,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
             //1.Type the name and select the role in browse panel:
             await testUtils.findAndSelectItem(TEST_ROLE.displayName);
             await roleStatisticsPanel.waitForPanelLoaded();
-
+            //2. Verify the data in Statistics Panel
             let actualName = await roleStatisticsPanel.getItemName();
             assert.equal(actualName, TEST_ROLE.displayName, "Expected and actual names should be equal");
             let actualItemPath = await roleStatisticsPanel.getItemPath();

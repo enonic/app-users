@@ -24,12 +24,13 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             //1. Open new wizard and type the data:
             await testUtils.openIdProviderWizard();
             await idProviderWizard.typeData(idProvider);
+            //2. Save the provider:
             await idProviderWizard.waitAndClickOnSave();
             await idProviderWizard.waitForSpinnerNotVisible();
             await idProviderWizard.pause(1000);
-            //2. Click on delete button:
+            //3. Click on Delete button:
             await idProviderWizard.clickOnDelete();
-            testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
+            await testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
             let confirmationDialog = new ConfirmationDialog();
             //"Confirmation Dialog" should appear:
             await confirmationDialog.waitForDialogLoaded();
@@ -49,7 +50,6 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             await idProviderWizard.pause(1000);
             //3. Click on the selected option (Everyone) and show menu options:
             await idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
-
             //4. Click on "Administrator" menu item
             await idProviderWizard.clickOnAceMenuOperation('Administrator');
             //5. save the Id Provider
@@ -107,7 +107,7 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             //Select the provider and click on Delete button:
             await testUtils.selectAndDeleteItem(idProvider.displayName);
             let actualMessage = await userBrowsePanel.waitForNotificationMessage();
-            testUtils.saveScreenshot("store_deleted_notification_mes2");
+            await testUtils.saveScreenshot("store_deleted_notification_mes2");
             let expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
             //Expected message: Id Provider "${displayName}" is deleted
             assert.strictEqual(actualMessage, expectedMessage, 'expected notification message should be displayed');

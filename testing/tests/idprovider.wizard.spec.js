@@ -42,17 +42,17 @@ describe("Id Provider wizard - validation and inputs", function () {
         async () => {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
-            await idProviderWizard.filterOptionsAndSelectApplication(appConst.STANDARD_ID_PROVIDER);
+            await idProviderWizard.filterOptionsAndSelectApplication(appConst.ID_PROVIDERS.STANDARD_ID_PROVIDER);
             let result = await idProviderWizard.isAuthApplicationsOptionsFilterInputDisplayed();
             assert.isFalse(result, "'Provider Options Filter' input gets not visible");
         });
 
-    it("GIVEN wizard is opened and `Standard ID Provider` is selected WHEN the application has been removed THEN 'Provider Options Filter' input gets visible",
+    it("GIVEN wizard for new provider is opened and `Standard ID Provider` is selected WHEN the application has been removed THEN 'Provider Options Filter' input gets visible",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
-            //1. Open existing ID Provider:
-            await idProviderWizard.filterOptionsAndSelectApplication(appConst.STANDARD_ID_PROVIDER);
+            //1. Select 'Standard ID Provider' option:
+            await idProviderWizard.filterOptionsAndSelectApplication(appConst.ID_PROVIDERS.STANDARD_ID_PROVIDER);
             //2. remove the selected application:
             await idProviderWizard.removeAuthApplication();
             let result = await idProviderWizard.isAuthApplicationsOptionsFilterInputDisplayed();

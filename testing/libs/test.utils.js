@@ -176,7 +176,21 @@ module.exports = {
         //3. Click on Group item in the modal dialog:
         await newPrincipalDialog.clickOnItem('Group');
         return await groupWizard.waitForOpened();
-
+    },
+    async selectIdProviderAndClickOnMenuItem(providerName, menuItem) {
+        let browsePanel = new UserBrowsePanel();
+        let newPrincipalDialog = new NewPrincipalDialog();
+        let result = await browsePanel.isRowHighlighted(providerName);
+        if (!result) {
+            //1. click on the ID Provider folder:
+            await browsePanel.clickOnRowByName(providerName);
+        }
+        //2. Open New Principal dialog:
+        await browsePanel.waitForNewButtonEnabled();
+        await browsePanel.clickOnNewButton();
+        await newPrincipalDialog.waitForDialogLoaded();
+        //3. Click on Group item in the modal dialog:
+        await newPrincipalDialog.clickOnItem(menuItem);
     },
     //Click on Save button and close the wizard:
     async saveAndCloseWizard(displayName) {
@@ -298,7 +312,7 @@ module.exports = {
     saveScreenshot: function (name, that) {
         let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
-            fs.mkdirSync(screenshotsDir, { recursive: true });
+            fs.mkdirSync(screenshotsDir, {recursive: true});
         }
         return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
             if (that) {

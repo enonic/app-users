@@ -71,7 +71,7 @@ describe("Role Wizard - 'Confirmation' dialog specification", function () {
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it('GIVEN existing role is opened WHEN member has been added AND `Close` button pressed THEN Confirmation dialog should appear',
+    it('GIVEN existing role is opened WHEN new member has been added AND `Close` button pressed THEN Confirmation dialog should appear',
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let roleWizard = new RoleWizard();
@@ -79,7 +79,9 @@ describe("Role Wizard - 'Confirmation' dialog specification", function () {
             //1. Open existing role and update members:
             await testUtils.selectRoleAndOpenWizard(TEST_ROLE.displayName);
             await roleWizard.filterOptionsAndAddMember('Super User');
+            //2. Click on Close-tab icon:
             await userBrowsePanel.doClickOnCloseTabButton(TEST_ROLE.displayName);
+            //3. Verify that Confirmation dialog is loaded:
             await confirmationDialog.waitForDialogLoaded();
         });
 

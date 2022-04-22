@@ -16,11 +16,15 @@ const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 describe('Id Provider, provider-dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
     webDriverHelper.setupBrowser();
+    const APP_PROVIDER_WITH_CONFIG = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
+    let TEST_ID_PROVIDER_NAME;
+    const NOTIFICATION_MESSAGE = "The application selected for this id provider does not allow to create users.";
+    const GROUP_NAME = userItemsBuilder.generateRandomName('group');
 
     it(`GIVEN provider's data is filled WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Confirmation' dialog should appear after 'Close' has been clicked`,
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
             //1. Open new ID Provider wizard and type the data:
@@ -39,7 +43,7 @@ describe('Id Provider, provider-dialog specification', function () {
     it("GIVEN new ID provider with invalid configuration WHEN click on close icon THEN click on 'Yes' button in confirmation dialog THEN error notification message should appear",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
             //1. Open new ID Provider wizard and select the provider with invalid configuration:
@@ -60,7 +64,7 @@ describe('Id Provider, provider-dialog specification', function () {
     it(`GIVEN Provider-configuration dialog is opened WHEN required inputs in Provider-dialog are filled THEN the Id Provider is getting valid`,
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfigDialog = new ProviderConfigDialog();
             //1. Open new id provider wizard, type the data:
@@ -78,8 +82,9 @@ describe('Id Provider, provider-dialog specification', function () {
     it(`GIVEN wizard for new Id Provider is opened AND required inputs in provider-configuration dialog are filled WHEN Save and close the wizard THEN 'Save Before' dialog should not appear`,
         async () => {
             let confirmationDialog = new ConfirmationDialog();
-            let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            TEST_ID_PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
+            let testIdProvider = userItemsBuilder.buildIdProvider(TEST_ID_PROVIDER_NAME, 'test Id provider', APP_PROVIDER_WITH_CONFIG,
+                null);
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let providerConfigDialog = new ProviderConfigDialog();
@@ -100,6 +105,33 @@ describe('Id Provider, provider-dialog specification', function () {
             assert.isFalse(result, "Confirmation dialog should not appear");
         });
 
+    it(`GIVEN id provider with a configuration is selected WHEN Create New User menu item has been clicked THEN expected notification message should appear`,
+        async () => {
+            let userBrowsePanel = new UserBrowsePanel();
+            //1. Select an existing provider with configurator then click on Create User menu item in the modal dialog:
+            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, "User");
+            //2. Verify the actual notification message - The application does not allow to create users
+            let actualMessage = await userBrowsePanel.waitForNotificationMessage();
+            await testUtils.saveScreenshot("app_does_not_allow_users");
+            assert.equal(actualMessage, NOTIFICATION_MESSAGE, "The application does not allow to create users");
+        });
+
+    it(`GIVEN id provider with a configuration is selected WHEN Create New User Group menu item has been clicked THEN expected notification message should appear`,
+        async () => {
+            //1. Select an existing provider with configurator then click on Create User Group menu item in the modal dialog:
+            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, "User Group");
+            let groupWizard = new GroupWizard();
+            //2. Group Wizard should be loaded:
+            await groupWizard.waitForOpened();
+            await groupWizard.typeDisplayName(GROUP_NAME);
+            //3. Save the group:
+            await groupWizard.waitAndClickOnSave();
+            await testUtils.saveScreenshot("group_saved_in_provider");
+            //4. Verify that group is saved:
+            let message = await groupWizard.waitForNotificationMessage();
+            assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message should be displayed");
+        });
+
     //Verify Error in group selector inside ID providers config form #940
     //https://github.com/enonic/app-users/issues/940
     it(`GIVEN Provider Config Dialog is opened WHEN existing group has been selected in the dialog THEN expected group should be present in selected options`,
@@ -109,7 +141,7 @@ describe('Id Provider, provider-dialog specification', function () {
             //1. Create new test group:
             let groupName = userItemsBuilder.generateRandomName("group")
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let idProviderWizard = new IdProviderWizard();
             let groupWizard = new GroupWizard();
             await testUtils.clickOnSystemAndOpenGroupWizard();
@@ -138,7 +170,7 @@ describe('Id Provider, provider-dialog specification', function () {
         async () => {
             let providerConfigDialog = new ProviderConfigDialog();
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let idProviderWizard = new IdProviderWizard();
 
             //1. Open new id provider wizard, fill in the display name input, select the application :
@@ -164,9 +196,8 @@ describe('Id Provider, provider-dialog specification', function () {
         async () => {
             let providerConfigDialog = new ProviderConfigDialog();
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let idProviderWizard = new IdProviderWizard();
-
             //1. Open new id provider wizard, fill in the display name input, select the application :
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
@@ -190,7 +221,7 @@ describe('Id Provider, provider-dialog specification', function () {
         async () => {
             let providerConfigDialog = new ProviderConfigDialog();
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let idProviderWizard = new IdProviderWizard();
 
             //1. Open new id provider wizard, fill in the display name input, select the application :
@@ -214,7 +245,6 @@ describe('Id Provider, provider-dialog specification', function () {
             //7. Verify that 'Apply' button gets enabled after deleting the form with required inputs:
             await providerConfigDialog.waitForApplyButtonEnabled();
         });
-
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

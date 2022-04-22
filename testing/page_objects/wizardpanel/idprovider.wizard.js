@@ -92,17 +92,16 @@ class IdProviderWizard extends WizardPanel {
         return result;
     }
 
-    filterOptionsAndSelectPermission(permissionDisplayName) {
+    async filterOptionsAndSelectPermission(permissionDisplayName) {
         let loaderComboBox = new LoaderComboBox();
-        return this.typeTextInInput(XPATH.permissionsFilterInput, permissionDisplayName).then(() => {
-            return loaderComboBox.waitForOptionVisible(XPATH.container, permissionDisplayName);
-        }).then(() => {
-            return loaderComboBox.clickOnOption(XPATH.container, permissionDisplayName);
-        }).then(() => {
-            return this.pause(300);
-        }).catch(err => {
+        try {
+            await this.typeTextInInput(XPATH.permissionsFilterInput, permissionDisplayName);
+            await loaderComboBox.waitForOptionVisible(XPATH.container, permissionDisplayName);
+            await loaderComboBox.clickOnOption(XPATH.container, permissionDisplayName);
+            return await this.pause(300);
+        } catch (err) {
             throw new Error('Error when selecting the ACL-entry: ' + permissionDisplayName + ' ' + err);
-        })
+        }
     }
 
     async clearPrincipalOptionsFilterInput() {
@@ -143,7 +142,7 @@ class IdProviderWizard extends WizardPanel {
             await loaderComboBox.clickOnOption(XPATH.container, authAppName);
             return await this.pause(300);
         } catch (err) {
-            this.saveScreenshot('err_select_application');
+            await this.saveScreenshot('err_select_application');
             throw new Error('ID Provider - Error when selecting the auth-application: ' + authAppName + ' ' + err);
         }
     }

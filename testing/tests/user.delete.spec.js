@@ -31,7 +31,7 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             await userWizard.clickOnDelete();
             //"Confirmation Dialog" should be loaded:
             await confirmationDialog.waitForDialogLoaded();
-            testUtils.saveScreenshot("user_wizard_confirm_delete1");
+            await testUtils.saveScreenshot("user_wizard_confirm_delete1");
         });
 
     it("GIVEN new User is saved  WHEN the User has been deleted THEN expected notification message should appear",
@@ -65,7 +65,7 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             await userBrowsePanel.waitForDeleteButtonEnabled();
             //2. Click on Delete button:
             await userBrowsePanel.clickOnDeleteButton();
-            testUtils.saveScreenshot("user_confirm_delete2");
+            await testUtils.saveScreenshot("user_confirm_delete2");
             //3. "Confirmation Dialog" should be loaded
             await confirmationDialog.waitForDialogLoaded();
         });
@@ -76,7 +76,7 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             //Delete existing user:
             await testUtils.selectAndDeleteItem(testUser.displayName);
             let result = await userBrowsePanel.waitForNotificationMessage();
-            testUtils.saveScreenshot("user_deleted_notification_mes2");
+            await testUtils.saveScreenshot("user_deleted_notification_mes2");
             let expectedMsg = appConst.userDeletedMessage(testUser.displayName);
             assert.strictEqual(result, expectedMsg, "'Principal 'user:system:userName' is deleted' the  message should appear");
         });
