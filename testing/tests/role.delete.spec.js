@@ -55,13 +55,13 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             let userBrowsePanel = new UserBrowsePanel();
             let roleWizard = new RoleWizard();
             let confirmationDialog = new ConfirmationDialog();
-            //1. Open existing role:
+            //1. Open an existing role:
             await testUtils.findAndSelectItem(testRole.displayName);
             await userBrowsePanel.clickOnEditButton();
             await roleWizard.waitForLoaded();
             //2. Click on Ctrl+Del
             await roleWizard.hotKeyDelete();
-            testUtils.saveScreenshot("role_wizard_shortcut_delete");
+            await testUtils.saveScreenshot("role_wizard_shortcut_delete");
             //"Confirmation Dialog" should be loaded
             await confirmationDialog.waitForDialogLoaded();
         });

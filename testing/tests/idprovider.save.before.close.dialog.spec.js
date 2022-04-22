@@ -29,7 +29,7 @@ describe("Id Provider - checks unsaved changes", function () {
             assert.isFalse(result, "Confirmation dialog must not be loaded");
         });
 
-    it("GIVEN `IdProvider` wizard is opened WHEN description has been typed AND `close` icon pressed THEN Confirmation dialog should appear",
+    it("GIVEN 'IdProvider' wizard is opened WHEN description has been typed AND `close` icon pressed THEN Confirmation dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -45,16 +45,19 @@ describe("Id Provider - checks unsaved changes", function () {
     it("GIVEN Id Provider wizard is opened AND name and idProvider have been typed WHEN 'close' icon has been pressed THEN 'Confirmation' dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
+            let providerName = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
             let name = userItemsBuilder.generateRandomName('provider');
             let userBrowsePanel = new UserBrowsePanel();
-            let testStore = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'First Selenium App', null);
-            await testUtils.openIdProviderWizard(testStore);
-            await idProviderWizard.typeData(testStore);
-
-            testUtils.saveScreenshot("application_should_be_selected");
-            await userBrowsePanel.doClickOnCloseTabButton(testStore.displayName);
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', providerName, null);
+            //1. Wizard for new provider has been opened:
+            await testUtils.openIdProviderWizard(idProvider);
+            //2. type a data:
+            await idProviderWizard.typeData(idProvider);
+            await testUtils.saveScreenshot("application_should_be_selected");
+            //3. Click on close wizard icon:
+            await userBrowsePanel.doClickOnCloseTabButton(idProvider.displayName);
             let confirmationDialog = new ConfirmationDialog();
-            //'Confirmation' dialog should appear, otherwise exception will be thrown:
+            //4. Verify that 'Confirmation' dialog should appear, otherwise exception will be thrown:
             await confirmationDialog.waitForDialogLoaded();
         });
 

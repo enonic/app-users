@@ -19,12 +19,13 @@ describe('New Principal dialog specification', function () {
         async () => {
             let newPrincipalDialog = new NewPrincipalDialog();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Open New Content Dialog:
+            //1. Open New Principal dialog:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
-            testUtils.saveScreenshot("new_principal_dialog_loaded");
+            await testUtils.saveScreenshot("new_principal_dialog_loaded");
             //2. Click on Cancel button:
             await newPrincipalDialog.clickOnCancelButtonTop();
+            //3. Verify that dialog is closed:
             await newPrincipalDialog.waitForDialogClosed();
         });
 
@@ -32,7 +33,7 @@ describe('New Principal dialog specification', function () {
         async () => {
             let newPrincipalDialog = new NewPrincipalDialog();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Open New Content Dialog:
+            //1. Open New Principal Dialog:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
             let header = await newPrincipalDialog.getHeaderText();
@@ -58,7 +59,7 @@ describe('New Principal dialog specification', function () {
             //2. Click on New button:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
-            testUtils.saveScreenshot("new_principal_dialog_2_items");
+            await testUtils.saveScreenshot("new_principal_dialog_2_items");
             //3. Two items should be present in the modal dialog:
             let items = await newPrincipalDialog.getItemNames();
             assert.equal(items.length, 2, "Two items should be present");

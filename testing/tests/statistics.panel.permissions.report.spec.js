@@ -16,7 +16,7 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
         async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
             await testUtils.findAndSelectItem('su');
-            testUtils.saveScreenshot('generate_report_button_is_disabled');
+            await testUtils.saveScreenshot('generate_report_button_is_disabled');
             let isDisabled = await userStatisticsPanel.waitForGenerateButtonDisabled();
             assert.isTrue(isDisabled, '`Generate Report` button should be disabled');
         });
@@ -26,7 +26,7 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
             let userStatisticsPanel = new UserStatisticsPanel();
             await testUtils.findAndSelectItem('su');
             await userStatisticsPanel.selectRepository('com.enonic.cms.default');
-            testUtils.saveScreenshot('generate_report_button_getting_enabled');
+            await testUtils.saveScreenshot('generate_report_button_getting_enabled');
             let result = await userStatisticsPanel.waitForGenerateButtonEnabled();
             assert.isTrue(result, '`Generate Report` button gets enabled');
         });

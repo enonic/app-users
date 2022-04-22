@@ -30,6 +30,11 @@ module.exports = Object.freeze({
     PROVIDER_CREATED_NOTIFICATION: 'Id provider was created',
     STANDARD_ID_PROVIDER: 'Standard ID Provider',
 
+    ID_PROVIDERS: {
+        STANDARD_ID_PROVIDER: 'Standard ID Provider',
+        FIRST_SELENIUM_APP: 'First Selenium App',
+    },
+
     PASSWORD: {
         MEDIUM: "password123",
         STRONG: "password123=",
