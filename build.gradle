@@ -51,7 +51,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:4.4.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.4.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.5.1'
     testImplementation( testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" ) )
 }
 
