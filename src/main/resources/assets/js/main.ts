@@ -51,8 +51,7 @@ function startLostConnectionDetector() {
 function startApplication() {
 
     const application: Application = getApplication();
-    const appBar = new TabbedAppBar(application);
-    appBar.setHomeIconAction();
+    const appBar = new TabbedAppBar(application, true);
 
     const newPrincipalDialog = new NewPrincipalDialog();
     const appPanel = new UserAppPanel(appBar, application.getPath());
