@@ -1,7 +1,6 @@
 /**
  * Created on 26.02.2021.
  */
-
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
@@ -76,7 +75,6 @@ class AdfsIdProviderConfiguratorDialog extends Page {
     }
 
     clickOnApplyButton() {
-
         return this.clickOnElement(this.applyButton);
     }
 
