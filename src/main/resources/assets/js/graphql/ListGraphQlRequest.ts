@@ -33,7 +33,7 @@ export class ListGraphQlRequest<PARSED_TYPE>
         if (this.start > 0) {
             vars['start'] = this.start;
         }
-        if (this.count > 0) {
+        if (this.count >= 0) {
             vars['count'] = this.count;
         }
         if (!!this.sort) {

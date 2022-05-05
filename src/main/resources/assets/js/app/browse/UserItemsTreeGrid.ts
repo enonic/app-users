@@ -24,7 +24,7 @@ import {Body} from 'lib-admin-ui/dom/Body';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ListPrincipalsKeysResult, ListPrincipalsNamesRequest} from '../../graphql/principal/ListPrincipalsNamesRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {GetPrincipalsTotalRequest} from '../../graphql/principal/GetPrincipalsTotalRequest';
+import {GetPrincipalsExistenceRequest} from '../../graphql/principal/GetPrincipalsExistenceRequest';
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -288,24 +288,33 @@ export class UserItemsTreeGrid
 
     private addUsersGroupsToIdProvider(parentItem: UserTreeGridItem): Q.Promise<UserTreeGridItem[]> {
         const idProvider: IdProvider = parentItem.getIdProvider();
-        const promises: Q.Promise<number>[] = [];
+        const promises: Q.Promise<boolean>[] = [];
 
         promises.push(this.getTotalPrincipals(idProvider.getKey(), PrincipalType.USER));
         promises.push(this.getTotalPrincipals(idProvider.getKey(), PrincipalType.GROUP));
 
-        return Q.all(promises).spread((totalUsers: number, totalGroups: number) => {
+        return Q.all(promises).spread((hasUsers: boolean, hasGroups: boolean) => {
             const userFolderItem: UserTreeGridItem =
-                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USERS).setHasChildren(
-                    totalUsers > 0).build();
+                new UserTreeGridItemBuilder()
+                        .setIdProvider(idProvider)
+                        .setType(UserTreeGridItemType.USERS)
+                        .setHasChildren(hasUsers)
+                        .build();
             const groupFolderItem: UserTreeGridItem =
-                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.GROUPS).setHasChildren(
-                    totalGroups > 0).build();
+                new UserTreeGridItemBuilder()
+                        .setIdProvider(idProvider)
+                        .setType(UserTreeGridItemType.GROUPS)
+                        .setHasChildren(hasGroups)
+                        .build();
             return [userFolderItem, groupFolderItem];
         });
     }
 
-    private getTotalPrincipals(idProviderKey: IdProviderKey, type: PrincipalType): Q.Promise<number> {
-        return new GetPrincipalsTotalRequest().setIdProviderKey(idProviderKey).setTypes([type]).sendAndParse();
+    private getTotalPrincipals(idProviderKey: IdProviderKey, type: PrincipalType): Q.Promise<boolean> {
+        return new GetPrincipalsExistenceRequest()
+            .setIdProviderKey(idProviderKey)
+            .setTypes([type])
+            .sendAndParse();
     }
 
     private fetchPrincipals(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {

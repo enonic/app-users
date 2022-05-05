@@ -3,24 +3,29 @@ import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
 import {ListPrincipalsProperties} from './ListPrincipalsNamesRequest';
 
-type GetPrincipalsTotalResult = {
+type GetPrincipalsExistenceRequestResult = {
     principalsConnection: {
         totalCount: number
     }
 };
 
-export class GetPrincipalsTotalRequest
-    extends ListGraphQlRequest<number> {
+export class GetPrincipalsExistenceRequest
+    extends ListGraphQlRequest<boolean> {
 
     private types: PrincipalType[];
     private idProviderKey: IdProviderKey;
 
-    setTypes(types: PrincipalType[]): GetPrincipalsTotalRequest {
+    constructor() {
+        super();
+        this.setCount(0);
+    }
+
+    setTypes(types: PrincipalType[]): GetPrincipalsExistenceRequest {
         this.types = types;
         return this;
     }
 
-    setIdProviderKey(key: IdProviderKey): GetPrincipalsTotalRequest {
+    setIdProviderKey(key: IdProviderKey): GetPrincipalsExistenceRequest {
         this.idProviderKey = key;
         return this;
     }
@@ -45,10 +50,9 @@ export class GetPrincipalsTotalRequest
                 }`;
     }
 
-    sendAndParse(): Q.Promise<number> {
-        return this.query().then((response: GetPrincipalsTotalResult) => {
-            const data = response.principalsConnection;
-            return data.totalCount;
+    sendAndParse(): Q.Promise<boolean> {
+        return this.query().then((response: GetPrincipalsExistenceRequestResult) => {
+            return response.principalsConnection.totalCount > 0;
         });
     }
 }
