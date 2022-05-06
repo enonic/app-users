@@ -13,6 +13,12 @@ type ListTypeData = {
 export class ListTypesRequest
     extends ListItemsRequest<BucketAggregation> {
 
+    constructor(){
+        super();
+        // No need to go through everything since the only data used in the response is from aggregations
+        this.setCount(1);
+    }
+
     getQuery(): string {
         return `query ($query: String, $itemIds: [String], $start: Int, $count: Int) {
                     types (query: $query, itemIds: $itemIds, start: $start, count: $count) {
@@ -30,8 +36,7 @@ export class ListTypesRequest
 
     sendAndParse(): Q.Promise<BucketAggregation> {
         return this.query().then((response: ListTypeData) => {
-            const data = response.types;
-            return this.fromJsonToAggregation(data.aggregations);
+            return this.fromJsonToAggregation(response.types.aggregations);
         });
     }
 
