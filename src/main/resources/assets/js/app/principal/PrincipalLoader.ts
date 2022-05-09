@@ -7,7 +7,7 @@ export class PrincipalLoader
     extends BasePrincipalLoader {
 
     protected createRequest(): FindPrincipalsRequest {
-        return <FindPrincipalsRequest>new FindPrincipalsRequest().setSize(-1);
+        return <FindPrincipalsRequest>new FindPrincipalsRequest().setSize(30);
     }
 
     protected createPreLoadRequest(principalKeys: PrincipalKey[]): GetPrincipalsByKeysRequest {

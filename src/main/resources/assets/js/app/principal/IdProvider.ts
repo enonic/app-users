@@ -39,9 +39,11 @@ export class IdProvider
     }
 
     isDeletable(): Q.Promise<boolean> {
+        // setCount(1): Only total is used, so there's no need to traverse everything.
         return new ListPrincipalsRequest()
             .setIdProviderKey(this.getKey())
             .setTypes([PrincipalType.USER, PrincipalType.GROUP])
+            .setCount(0)
             .sendAndParse()
             .then((result: ListPrincipalsData) => (result.total === 0));
     }
