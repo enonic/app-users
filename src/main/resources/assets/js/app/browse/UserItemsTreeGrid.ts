@@ -25,6 +25,8 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {ListPrincipalsKeysResult, ListPrincipalsNamesRequest} from '../../graphql/principal/ListPrincipalsNamesRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {GetPrincipalsExistenceRequest} from '../../graphql/principal/GetPrincipalsExistenceRequest';
+import {UserFilteredDataScrollEvent} from '../event/UserFilteredDataScrollEvent';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -76,6 +78,17 @@ export class UserItemsTreeGrid
     }
 
     private initEventHandlers() {
+        const triggerFilteredDataScrollEvent = AppHelper.debounce(() => {
+
+            const currentNumberOfItems = this.getRoot().getCurrentRoot().getChildren().length;
+            const numberOfItemsToAdd = 30;
+            const nextNumberOfItems = currentNumberOfItems + numberOfItemsToAdd;
+
+            if(this.getGrid().getViewport().bottom === currentNumberOfItems){
+                new UserFilteredDataScrollEvent(nextNumberOfItems).fire();
+            }
+        }, 100);
+
         BrowseFilterSearchEvent.on((event: BrowseFilterSearchEvent<PrincipalBrowseSearchData>) => {
             const data = event.getData();
             const items = data.getUserItems().map((userItem: UserItem) => {
@@ -85,10 +98,14 @@ export class UserItemsTreeGrid
             this.searchTypes = data.getTypes();
             this.filter(items);
             this.notifyLoaded();
+
+            this.getGrid().subscribeOnScroll(triggerFilteredDataScrollEvent);
         });
 
         BrowseFilterResetEvent.on(() => {
             this.resetFilter();
+
+            this.getGrid().unsubscribeOnScroll(triggerFilteredDataScrollEvent);
         });
 
         this.getGrid().subscribeOnDblClick((event, data) => {
@@ -251,7 +268,7 @@ export class UserItemsTreeGrid
     }
 
     private fetchFilteredItems(): Q.Promise<UserTreeGridItem[]> {
-        return new ListUserItemsRequest().setTypes(this.searchTypes).setQuery(this.searchString).sendAndParse()
+        return new ListUserItemsRequest().setCount(100).setTypes(this.searchTypes).setQuery(this.searchString).sendAndParse()
             .then((result) => {
                 return result.userItems.map(item => new UserTreeGridItemBuilder().setAny(item).build());
             });
