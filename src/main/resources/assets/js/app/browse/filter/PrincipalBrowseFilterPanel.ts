@@ -42,8 +42,7 @@ export class PrincipalBrowseFilterPanel
     }
 
     private initHitsCounter() {
-        // setCount(1): Only total is used, so there's no need to traverse everything.
-        new ListUserItemsRequest().setCount(1).sendAndParse().then((result: ListUserItemsRequestResult) => {
+        new ListUserItemsRequest().sendAndParse().then((result: ListUserItemsRequestResult) => {
             this.updateHitsCounter(result.total, true);
         }).catch((reason: Error | Exception) => {
             DefaultErrorHandler.handle(reason);
@@ -76,8 +75,7 @@ export class PrincipalBrowseFilterPanel
     }
 
     protected resetFacets(suppressEvent?: boolean, doResetAll?: boolean): Q.Promise<void> {
-        // setCount(1): Only total and aggregations are used, so there's no need to traverse everything.
-        return new ListUserItemsRequest().setCount(1).sendAndParse().then((result: ListUserItemsRequestResult) => {
+        return new ListUserItemsRequest().sendAndParse().then((result: ListUserItemsRequestResult) => {
             return this.fetchAndUpdateAggregations().then(() => {
                 this.updateHitsCounter(result.total, true);
                 this.toggleAggregationsVisibility(result.aggregations);
