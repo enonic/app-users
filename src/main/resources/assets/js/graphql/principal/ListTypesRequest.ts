@@ -15,8 +15,6 @@ export class ListTypesRequest
 
     constructor(){
         super();
-        // No need to go through everything since the only data used in the response is from aggregations
-        this.setCount(1);
     }
 
     getQuery(): string {
