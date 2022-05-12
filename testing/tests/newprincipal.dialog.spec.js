@@ -12,7 +12,10 @@ const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.di
 
 describe('New Principal dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let ITEMS_NUMBER = 4;
 
     it('GIVEN `NewPrincipal` dialog is opened WHEN `Cancel` button(top) has been pressed  THEN the dialog should be closed',
@@ -80,7 +83,8 @@ describe('New Principal dialog specification', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
-    })
+    });
 });

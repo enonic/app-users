@@ -4,10 +4,14 @@ const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.panel');
+const appConst = require('../libs/app_const');
 
 describe('User Browse Panel specification', function () {
-    this.timeout(0);
-    webDriverHelper.setupBrowser();
+    this.timeout(appConst.TIMEOUT_SUITE);
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("WHEN Browse panel is opened THEN 'roles' and '/system' folders should be present",
         async () => {
@@ -102,7 +106,8 @@ describe('User Browse Panel specification', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

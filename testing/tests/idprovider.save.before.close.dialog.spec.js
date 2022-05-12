@@ -13,7 +13,10 @@ const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe("Id Provider - checks unsaved changes", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     //Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
     it("GIVEN wizard for new Id Provider is opened WHEN no changes in the wizard AND 'close' icon pressed THEN Confirmation dialog must not be loaded",
@@ -63,7 +66,8 @@ describe("Id Provider - checks unsaved changes", function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

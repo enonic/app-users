@@ -13,7 +13,10 @@ const appConst = require('../libs/app_const');
 
 describe("Role Wizard - 'Confirmation' dialog specification", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let TEST_ROLE;
 
     it('GIVEN role-wizard is opened AND display name has been typed WHEN close button pressed THEN Confirmation dialog should appear',
@@ -87,7 +90,8 @@ describe("Role Wizard - 'Confirmation' dialog specification", function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

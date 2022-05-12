@@ -12,7 +12,10 @@ const appConst = require('../libs/app_const');
 
 describe('Id Provider Permissions spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     //verifies the lib-admin-ui#147
     it(`GIVEN 'Id Provider' wizard is opened AND Acl-entry has been added WHEN filter input has been cleared AND drop-down handle clicked THEN number of options should be more than 1`,
@@ -42,7 +45,8 @@ describe('Id Provider Permissions spec', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

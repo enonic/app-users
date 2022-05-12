@@ -22,6 +22,13 @@ const path = require('path');
 
 module.exports = {
 
+    getBrowser() {
+        if (typeof browser !== "undefined") {
+            return browser;
+        } else {
+            return webDriverHelper.browser;
+        }
+    },
     generateRandomName: function (part) {
         return part + Math.round(Math.random() * 1000000);
     },
@@ -106,7 +113,7 @@ module.exports = {
     doSwitchToUsersApp: function () {
         console.log('testUtils:switching to users app...');
         let browsePanel = new UserBrowsePanel();
-        return webDriverHelper.browser.switchWindow("Users - Enonic XP Admin").then(() => {
+        return this.getBrowser().switchWindow("Users - Enonic XP Admin").then(() => {
             console.log("switched to Users app...");
             return browsePanel.waitForSpinnerNotVisible();
         }).then(() => {
@@ -117,7 +124,7 @@ module.exports = {
     },
 
     doSwitchToHome: function () {
-        return webDriverHelper.browser.switchWindow("Enonic XP Home").then(() => {
+        return this.getBrowser().switchWindow("Enonic XP Home").then(() => {
             console.log("switched to Home...");
         }).then(() => {
             let homePage = new HomePage();
@@ -125,16 +132,16 @@ module.exports = {
         });
     },
     switchAndCheckTitle: function (handle, reqTitle) {
-        return webDriverHelper.browser.switchWindow(handle).then(() => {
-            return webDriverHelper.browser.getTitle().then(title => {
+        return this.getBrowser().switchWindow(handle).then(() => {
+            return this.getBrowser().getTitle().then(title => {
                 return title == reqTitle;
             })
         });
     },
     doCloseUsersApp: function () {
-        return webDriverHelper.browser.getTitle().then(title => {
+        return this.getBrowser().getTitle().then(title => {
             if (title == "Users - Enonic XP Admin") {
-                return webDriverHelper.browser.closeWindow();
+                return this.getBrowser().closeWindow();
             }
         }).then(() => {
             return this.doSwitchToHome();
@@ -314,7 +321,7 @@ module.exports = {
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, {recursive: true});
         }
-        return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
+        return this.getBrowser().saveScreenshot(screenshotsDir + name + '.png').then(() => {
             if (that) {
                 addContext(that, 'screenshots/' + name + '.png');
             }

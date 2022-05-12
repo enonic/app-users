@@ -13,7 +13,10 @@ const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe('Deleting of a role - confirm and delete it in wizard and in browse panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testRole;
 
     it("GIVEN role has been saved WHEN 'App home' button has been clicked and 'Roles' folder expanded THEN new role should be present",
@@ -116,7 +119,8 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

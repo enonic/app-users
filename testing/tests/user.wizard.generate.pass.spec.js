@@ -10,7 +10,10 @@ const appConst = require('../libs/app_const');
 
 describe("User Wizard generate password spec", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("WHEN 'User' wizard is opened THEN 'generate' and 'show' links should be displayed",
         async () => {
@@ -50,7 +53,8 @@ describe("User Wizard generate password spec", function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

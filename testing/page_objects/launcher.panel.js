@@ -4,7 +4,7 @@
 const Page = require('./page');
 const appConst = require('../libs/app_const');
 const XPATH = {
-    container: `//div[contains(@class,'launcher-main-container')]`
+    container: `//div[contains(@class,'launcher-panel')]`,
 };
 class LauncherPanel extends Page {
 
@@ -13,8 +13,9 @@ class LauncherPanel extends Page {
     }
 
     get usersLink() {
-        return XPATH.container + "//a[contains(@data-id,'app.users')]";
+        return XPATH.container + "//a[contains(@data-id,'app.users')]//p[@class='app-name']";
     }
+
 
     get contentStudioLink() {
         return XPATH.container + "//a[contains(@data-id,'contentstudio')]";

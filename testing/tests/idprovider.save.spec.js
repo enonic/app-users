@@ -14,7 +14,10 @@ const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.di
 
 describe('Id Provider specification - save and edit a provider', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let ID_PROVIDER;
     let ID_PROVIDER_2;
     let TEST_USER;
@@ -177,7 +180,8 @@ describe('Id Provider specification - save and edit a provider', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

@@ -12,7 +12,10 @@ const appConst = require('../libs/app_const');
 
 describe("Id Provider wizard - validation and inputs", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("WHEN 'IdProvider' wizard is opened THEN red circle should be present, because required input is empty",
         async () => {
@@ -101,8 +104,9 @@ describe("Id Provider wizard - validation and inputs", function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log("specification starting: " + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });
 

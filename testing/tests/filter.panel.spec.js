@@ -9,7 +9,10 @@ const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.
 
 describe('filter.panel.spec Principal Filter Panel specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `hide filter panel` has been clicked THEN the panel should be closed',
         async () => {
@@ -72,7 +75,8 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

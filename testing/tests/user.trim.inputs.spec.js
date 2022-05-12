@@ -13,7 +13,10 @@ const appConst = require('../libs/app_const');
 
 describe('user.trim.inputs.spec Save user, trim the password and display name', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("GIVEN user wizard is opened WHEN user-name with white spaces has been typed and the user saved THEN name without spaces should be displayed in the grid",
@@ -56,7 +59,8 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

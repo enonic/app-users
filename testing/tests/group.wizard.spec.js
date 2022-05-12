@@ -11,7 +11,10 @@ const appConst = require('../libs/app_const');
 
 describe("group.wizard.spec - validation and check inputs", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testGroup;
     it("WHEN 'Group' wizard is opened  THEN red circle should be present, because required input is empty",
         async () => {
@@ -78,7 +81,8 @@ describe("group.wizard.spec - validation and check inputs", function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log("specification starting: " + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });

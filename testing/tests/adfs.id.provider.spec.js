@@ -13,7 +13,10 @@ const AdfsIdProviderConfiguratorDialog = require('../page_objects/wizardpanel/as
 
 describe('ADFS Id Provider, tests for provider configuration dialog with item set', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     //Verifies:https://github.com/enonic/app-users/issues/533
     //Empty form in the ID Provider config #533
@@ -78,7 +81,8 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

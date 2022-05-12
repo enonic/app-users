@@ -12,7 +12,10 @@ const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.
 
 describe("Check 'Selection Controller' and 'Show Selection' elements in filtered grid", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let GROUP_1;
     let GROUP_2;
 
@@ -76,7 +79,8 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             assert.isTrue(gridItems.includes(GROUP_1.displayName), "The second group should be present in User Browse Panel");
         });
 
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
     beforeEach(() => testUtils.navigateToUsersApp());

@@ -100,4 +100,21 @@ task testUsersApp( type: NpmTask, dependsOn: [npmInstall, unpackDistro, copyConf
 task testUsersAppLocally( type: NpmTask, dependsOn: [npmInstall] ) {
     args = ['test']
 }
+/////////////////////////
+task installGeckoService(type: NpmTask) {
+    // install the express package only
+    args = ['install', 'wdio-geckodriver-service', '--save-dev']
+}
+task installGeckoDriver(type: NpmTask) {
+    // install the express package only
+    args = ['install', 'geckodriver', '--save-dev']
+}
+task testUsersAppFirefox( type: NpmTask, dependsOn: [npmInstall,installGeckoService, installGeckoDriver, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
+    args = ['run-script', 'test:firefox']
+    finalizedBy stopServer
+}
+
+task testUsersAppFirefoxLocally( type: NpmTask, dependsOn: [npmInstall] ) {
+    args = ['run-script', 'test:firefox']
+}
 

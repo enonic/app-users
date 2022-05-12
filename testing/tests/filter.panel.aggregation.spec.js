@@ -4,10 +4,14 @@ const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.panel');
+const appConst = require('../libs/app_const');
 
 describe('filter.panel.aggregation.spec Principal Aggregation specification', function () {
-    this.timeout(0);
-    webDriverHelper.setupBrowser();
+    this.timeout(appConst.TIMEOUT_SUITE);
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("GIVEN 'Principal Filter Panel' is opened WHEN 'User' aggregation has been clicked THEN Roles and Id Provider should not be displayed",
         async () => {
@@ -20,7 +24,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             //3. user-items should be filtered: Roles and System ID provider folders should not be displayed:
             await userBrowsePanel.waitForItemNotDisplayed('roles');
             await userBrowsePanel.waitForItemNotDisplayed('/system');
-            testUtils.saveScreenshot('aggregation_in_users');
+            await testUtils.saveScreenshot('aggregation_in_users');
             let isDisplayed = await userBrowsePanel.isItemDisplayed('/system/users/su');
             assert.isTrue(isDisplayed, "SU should be displayed in the filtered panel");
         });
@@ -35,7 +39,7 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             let result = await userBrowsePanel.waitForItemNotDisplayed('/system');
             //Verify that 'System Id Provider' is not displayed in the filtered grid:
             assert.isFalse(result, "System folder should not be displayed");
-            testUtils.saveScreenshot('aggregation_in_role');
+            await testUtils.saveScreenshot('aggregation_in_role');
             //Verify that 'Users Administrator' role is displayed:
             let isDisplayed = await userBrowsePanel.isItemDisplayed('/roles/system.user.admin');
             assert.isTrue(isDisplayed, "expected role should be displayed in the filtered panel");
@@ -49,14 +53,15 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             //Click on 'Provider' checkbox:
             await filterPanel.clickOnIdProviderAggregation();
             await userBrowsePanel.waitForItemNotDisplayed('roles');
-            testUtils.saveScreenshot('aggregation_in_provider');
+            await testUtils.saveScreenshot('aggregation_in_provider');
             let isDisplayed = await userBrowsePanel.isItemDisplayed('/system');
             assert.isTrue(isDisplayed, "roles are not displayed but System folder should be displayed in the filtered panel");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });
