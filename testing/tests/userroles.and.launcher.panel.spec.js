@@ -16,7 +16,10 @@ const LauncherPanel = require('../page_objects/launcher.panel');
 
 describe('Checks links in Launcher Panel when an user has no administrator role', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testUser;
     let userName;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
@@ -58,7 +61,8 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
             await assert.isFalse(isDisplayed, 'Users link should not be displayed, because the user has no Admin-role');
         });
 
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

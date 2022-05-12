@@ -14,7 +14,10 @@ const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe('User Browse panel, toolbar shortcut spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it(`GIVEN user browse panel is opened WHEN 'Alt+n' has been pressed THEN New Principal Dialog should appear`,
         async () => {
@@ -50,7 +53,8 @@ describe('User Browse panel, toolbar shortcut spec', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log('specification is starting: ' + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });

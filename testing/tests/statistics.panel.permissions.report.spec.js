@@ -10,7 +10,10 @@ const UserStatisticsPanel = require('../page_objects/browsepanel/user.statistics
 
 describe('statistics.panel.permissions.report.spec: Generate Report specification ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("GIVEN 'su' is selected WHEN repository is not selected in the statistic panel THEN 'Generate Report' button should be disabled",
         async () => {
@@ -47,7 +50,8 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

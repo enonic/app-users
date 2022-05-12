@@ -14,7 +14,10 @@ const FilterPanel = require('../page_objects/browsepanel/principal.filter.panel'
 
 describe('group.delete.spec: confirm and delete a group in wizard and in Browse Panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let TEST_GROUP;
 
     it("GIVEN new group is saved WHEN 'Delete' button in toolbar(wizard) has been pressed THEN Confirmation dialog should appear",
@@ -116,7 +119,8 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log("specification starting: " + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });

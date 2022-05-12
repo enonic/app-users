@@ -9,7 +9,10 @@ const appConst = require('../libs/app_const');
 
 describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("GIVEN navigate to the browse panel WHEN do right click on the 'Roles' folder THEN 'New role' menu item should be first",
         async () => {
@@ -142,7 +145,8 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

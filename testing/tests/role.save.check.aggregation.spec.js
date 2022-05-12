@@ -14,7 +14,10 @@ const FilterPanel = require('../page_objects/browsepanel/principal.filter.panel'
 
 describe('Role - save a role and check the number in aggregations', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     //verifies https://github.com/enonic/app-users/issues/214
     //Filter panel is not updated when the grid is filtered by role  and a new role is added
@@ -43,7 +46,8 @@ describe('Role - save a role and check the number in aggregations', function () 
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

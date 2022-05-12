@@ -12,7 +12,10 @@ const appConst = require('../libs/app_const');
 
 describe('User Wizard and Change Password dialog spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testUser;
     const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
     const BAD_PASSWORD = "123";
@@ -205,7 +208,8 @@ describe('User Wizard and Change Password dialog spec', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

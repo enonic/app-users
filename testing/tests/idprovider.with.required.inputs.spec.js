@@ -15,7 +15,10 @@ const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 
 describe('Id Provider, provider-dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     const APP_PROVIDER_WITH_CONFIG = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
     let TEST_ID_PROVIDER_NAME;
     const NOTIFICATION_MESSAGE = "The application selected for this id provider does not allow to create users.";
@@ -248,7 +251,8 @@ describe('Id Provider, provider-dialog specification', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

@@ -13,7 +13,10 @@ const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe("user.delete.spec:User - confirm and delete it in the wizard and in the browse panel", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testUser;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
@@ -83,7 +86,8 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log("specification starting: " + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });

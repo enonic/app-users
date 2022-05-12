@@ -11,7 +11,10 @@ const appConst = require('../libs/app_const');
 
 describe('Id Provider wizard, Access Control Entry - expand and collapse menu-operations', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it(`GIVEN Access Control Entry is added WHEN 'Entry-operations' has been clicked THEN menu with operations gets visible`,
         async () => {
@@ -58,7 +61,8 @@ describe('Id Provider wizard, Access Control Entry - expand and collapse menu-op
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

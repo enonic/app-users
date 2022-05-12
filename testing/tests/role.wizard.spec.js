@@ -14,7 +14,10 @@ const RoleStatisticsPanel = require('../page_objects/browsepanel/role.statistics
 
 describe('Role Wizard and Statistics Panel spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let TEST_ROLE;
 
     it('GIVEN `Roles` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN `Role was created` message should appear',
@@ -120,7 +123,8 @@ describe('Role Wizard and Statistics Panel spec', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

@@ -14,7 +14,13 @@ const ChangePasswordDialog = require('../page_objects/wizardpanel/change.passwor
 
 describe('edit.user.spec: Edit an user - change e-mail, name and roles', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    } else {
+        //const elementRef =  browser.findElement('xpath', '//div')
+        //browser.setWindowSize("1970","1000");
+    }
     let testUser;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
@@ -123,7 +129,8 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

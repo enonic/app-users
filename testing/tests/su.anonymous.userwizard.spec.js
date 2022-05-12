@@ -11,7 +11,10 @@ const appConst = require('../libs/app_const');
 
 describe("su and anonymous users specification: empty email is allowed, validation lets empty email through when saving.", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("WHEN 'su' is opened THEN email input should be hidden AND 'Delete' button should be disabled",
         async () => {
@@ -46,7 +49,8 @@ describe("su and anonymous users specification: empty email is allowed, validati
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

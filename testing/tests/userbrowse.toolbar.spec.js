@@ -11,7 +11,10 @@ const appConst = require('../libs/app_const');
 
 describe("User Browse panel, toolbar spec", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     it("WHEN 'su' user has been selected THEN Delete button should be disabled",
         async () => {
@@ -92,7 +95,8 @@ describe("User Browse panel, toolbar spec", function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

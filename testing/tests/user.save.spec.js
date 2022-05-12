@@ -13,7 +13,10 @@ const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe('Save User specification - save an user', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testUser;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
@@ -104,7 +107,8 @@ describe('Save User specification - save an user', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

@@ -14,7 +14,10 @@ const LauncherPanel = require('../page_objects/launcher.panel');
 
 describe("Create an user with generated password and log in the user", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testUser;
     let userName;
     let PASSWORD;
@@ -54,7 +57,8 @@ describe("Create an user with generated password and log in the user", function 
             await launcherPanel.waitForPanelDisplayed();
         });
 
-    before(() => {
-        return console.log("specification starting: " + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });

@@ -13,7 +13,10 @@ const appConst = require('../libs/app_const');
 
 describe('Group Wizard - checks unsaved changes ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testGroup;
 
     it('GIVEN group-wizard is opened AND display name has been typed WHEN close button pressed THEN Confirmation dialog should appear',
@@ -79,7 +82,8 @@ describe('Group Wizard - checks unsaved changes ', function () {
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
     beforeEach(() => testUtils.navigateToUsersApp());

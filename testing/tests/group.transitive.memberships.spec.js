@@ -13,7 +13,10 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 
 describe("group.transitive.memberships.spec: checks transitive memberships", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     let group1;
     let group2;
@@ -105,7 +108,8 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

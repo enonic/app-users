@@ -13,7 +13,10 @@ const appConst = require('../libs/app_const');
 
 describe("User Wizard and 'Confirmation dialog'", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testUser;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
@@ -86,7 +89,8 @@ describe("User Wizard and 'Confirmation dialog'", function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

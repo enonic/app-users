@@ -15,7 +15,10 @@ const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`, function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
 
     let TEST_USER;
     let TEST_GROUP;
@@ -141,7 +144,8 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log('specification is starting: ' + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });

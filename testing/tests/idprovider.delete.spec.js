@@ -13,7 +13,10 @@ const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe("Confirm and delete 'Id Provider' in wizard and in browse panel", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let idProvider;
 
     //Verifies https://github.com/enonic/app-users/issues/281  Delete button does not get enabled after saving of new provider
@@ -115,7 +118,8 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
         return console.log('specification starting: ' + this.title);
     });
 });

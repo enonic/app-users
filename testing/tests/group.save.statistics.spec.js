@@ -13,7 +13,10 @@ const GroupStatisticsPanel = require('../page_objects/browsepanel/group.statisti
 
 describe('group.save.statistics.spec: Save a group and check the info in Statistics Panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let groupWithRoleAndMember;
     let testGroup;
 
@@ -136,7 +139,8 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log('specification is starting: ' + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });

@@ -14,7 +14,10 @@ const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.di
 
 describe('group.create.with.role Create a Group with a just created new Role', function () {
     this.timeout(70000);
-    webDriverHelper.setupBrowser();
+
+    if (typeof browser === "undefined") {
+        webDriverHelper.setupBrowser();
+    }
     let testRole;
 
     it("WHEN 'Role' with a description has been saved THEN the role should be searchable",
@@ -66,7 +69,8 @@ describe('group.create.with.role Create a Group with a just created new Role', f
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(() => {
-        return console.log('specification is starting: ' + this.title);
+    before(async () => {
+        await testUtils.getBrowser().maximizeWindow();
+        return console.log('specification starting: ' + this.title);
     });
 });
