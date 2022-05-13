@@ -1,7 +1,6 @@
 import * as Q from 'q';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
 import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
-import {GetPrincipalsByKeysRequest} from '../../graphql/principal/GetPrincipalsByKeysRequest';
 import {RepositoryComboBox} from '../report/RepositoryComboBox';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
@@ -28,6 +27,7 @@ import {Button} from 'lib-admin-ui/ui/button/Button';
 import {UserItemStatisticsHeader} from './UserItemStatisticsHeader';
 import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
 import {CONFIG} from 'lib-admin-ui/util/Config';
+import {MembersListing} from './MembersListing';
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -37,8 +37,6 @@ export class UserItemStatisticsPanel
     private reportServicePath: string;
 
     private readonly header: UserItemStatisticsHeader;
-
-    private static BATCH_SIZE = 10;
 
     constructor() {
         super('principal-item-statistics-panel');
@@ -106,7 +104,7 @@ export class UserItemStatisticsPanel
 
         if (type) {
             const mainGroup = new ItemDataGroup(i18n(`field.${type}`), type);
-            let metaGroups: Q.Promise<ItemDataGroup[]>;
+            let metaGroups: Q.Promise<(ItemDataGroup | MembersListing)[]>;
 
             switch (principal.getType()) {
             case PrincipalType.USER:
@@ -121,48 +119,61 @@ export class UserItemStatisticsPanel
             }
 
             metaGroups.then((groups: ItemDataGroup[]) => {
+                let groupsToAppend = groups;
+                const principalType = principal.getType();
+                const principalDescription = principal.getDescription();
+
+                // If Group or Role doesn't have a description, then there's no need to show main group.
+                if((principalType === PrincipalType.GROUP || principalType === PrincipalType.ROLE) && !principalDescription){
+                    groupsToAppend = groups.slice(1);
+                }
+
                 this.userDataContainer.removeChildren();
-                this.userDataContainer.appendChildren(...groups);
+                this.userDataContainer.appendChildren(...groupsToAppend);
             }).catch((reason: any) => {
                 DefaultErrorHandler.handle(reason);
             }).done();
         }
     }
 
-    private createUserMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<ItemDataGroup[]> {
+    private createUserMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<(ItemDataGroup)[]> {
         const membershipsGroup = new ItemDataGroup(i18n('field.rolesAndGroups'), 'memberships');
 
-        return this.fetchPrincipal(principal.getKey()).then((user: Principal) => {
+        return this.fetchPrincipal(principal.getKey()).then(async (user: Principal) => {
             const memberships = (user as User).getMemberships();
             mainGroup.addDataList(i18n('field.email'), (user as User).getEmail());
             this.appendTransitiveSwitch(principal.getKey(), membershipsGroup, memberships.length > 0);
             this.appendRolesAndGroups(memberships, membershipsGroup);
-
-            return this.addReportGroup(principal, [mainGroup, membershipsGroup]);
+            const reportGroup = await this.createReportGroup(principal);
+            return [mainGroup, membershipsGroup, reportGroup].filter(group => !!group);
         });
     }
 
-    private createGroupMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<ItemDataGroup[]> {
-        this.addMainGroupDescription(principal, mainGroup);
+    private createGroupMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<(ItemDataGroup | MembersListing)[]> {
+        this.addMainGroupDescriptionIfExists(principal, mainGroup);
 
-        return this.fetchPrincipal(principal.getKey()).then((group: Principal) => {
+        return this.fetchPrincipal(principal.getKey()).then(async (group: Principal) => {
             const membershipsGroup = this.createMembershipsGroup(group as Group);
-            return this.createMembersGroup(group as Group)
-                .then(membersGroup => this.addReportGroup(group, [mainGroup, membershipsGroup, membersGroup]));
+            const membersGroup = this.createMembersGroup(group as Group);
+            const reportGroup = await this.createReportGroup(principal);
+            return [mainGroup, reportGroup, membershipsGroup, membersGroup].filter(group => !!group);
         });
     }
 
-    private createRoleMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<ItemDataGroup[]> {
-        this.addMainGroupDescription(principal, mainGroup);
+    private createRoleMetadataGroups(principal: Principal, mainGroup: ItemDataGroup): Q.Promise<(ItemDataGroup | MembersListing)[]> {
+        this.addMainGroupDescriptionIfExists(principal, mainGroup);
 
-        return this.fetchPrincipal(principal.getKey()).then((role: Principal) => {
-            return this.createMembersGroup(role as Role)
-                .then(membersGroup => this.addReportGroup(role, [mainGroup, membersGroup]));
+        return this.fetchPrincipal(principal.getKey()).then(async (role: Principal) => {
+            const membersGroup = this.createMembersGroup(role as Role);
+            const reportGroup = await this.createReportGroup(principal);
+            return [mainGroup, reportGroup, membersGroup].filter(group => !!group);
         });
     }
 
-    private addMainGroupDescription(principal: Principal, mainGroup: ItemDataGroup): void {
-        mainGroup.appendChild(new DivEl('description').setHtml(principal.getDescription()));
+    private addMainGroupDescriptionIfExists(principal: Principal, mainGroup: ItemDataGroup): void {
+        if(principal.getDescription()) {
+            mainGroup.appendChild(new DivEl('description').setHtml(principal.getDescription()));
+        }
     }
 
     private createMembershipsGroup(group: Group): ItemDataGroup {
@@ -176,65 +187,21 @@ export class UserItemStatisticsPanel
         return membershipsGroup;
     }
 
-    private createMembersGroup(groupOrRole: Group | Role): Q.Promise<ItemDataGroup> {
-        const membersGroup = new ItemDataGroup(i18n('field.members'), 'members');
+    private createMembersGroup(groupOrRole: Group | Role): MembersListing {
+        const membersListing = new MembersListing(i18n('field.members'), 'members item-data-group');
+        membersListing.setParent(this);
+        membersListing.setMembersKeys(groupOrRole.getMembers());
+        membersListing.populateList();
+        return membersListing;
+    }
 
-        const membersKeys = groupOrRole.getMembers();
-        const totalMembers = membersKeys.length;
-        // Make sure we don't have < 10 members to loader later
-        // Otherwise just load them all at once
-        const minMembersToLoadLater = 10;
-        const hasMoreMembers = totalMembers > UserItemStatisticsPanel.BATCH_SIZE + minMembersToLoadLater;
-        const membersToLoad = hasMoreMembers ? membersKeys.slice(0, UserItemStatisticsPanel.BATCH_SIZE) : membersKeys;
-
-        return this.getMembersByKeys(membersToLoad).then((principals) => {
-            const dataElements: Element[] = principals.map(el => UserItemStatisticsPanel.createPrincipalViewer(el));
-
-            if (hasMoreMembers) {
-                const remainedMembers = membersKeys.slice(UserItemStatisticsPanel.BATCH_SIZE);
-
-                const loadMoreButton = new Button(i18n('action.loadMore', remainedMembers.length));
-                loadMoreButton.addClass('principal-button large');
-                loadMoreButton.onClicked(() => {
-                    loadMoreButton.setEnabled(false);
-                    loadMoreButton.addClass('loading icon-spinner');
-                    void this.getMembersByKeys(remainedMembers).then((remainingPrincipals) => {
-                        membersGroup.clearList();
-                        const allPrincipals = [...principals, ...remainingPrincipals];
-                        membersGroup.addDataElements(null, allPrincipals.map(el => UserItemStatisticsPanel.createPrincipalViewer(el)));
-                    });
-                });
-
-                dataElements.push(loadMoreButton);
-            }
-
-            membersGroup.addDataElements(null, dataElements);
-
-            return membersGroup;
+    private async createReportGroup(principal: Principal): Promise<ItemDataGroup | null> {
+        const isAdmin = await new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
+            return loginResult.getPrincipals().some(key => key.equals(RoleKeys.ADMIN));
         });
-    }
 
-    private getMembersByKeys(keys: PrincipalKey[]): Q.Promise<Principal[]> {
-        if (!keys || keys.length === 0) {
-            return Q([]);
-        } else {
-            return new GetPrincipalsByKeysRequest(keys).sendAndParse();
-        }
-    }
+        if(!isAdmin) { return Q(null); }
 
-    private addReportGroup(principal: Principal, groups: ItemDataGroup[]): Q.Promise<ItemDataGroup[]> {
-        return new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
-            const isAdmin = loginResult.getPrincipals().some(key => key.equals(RoleKeys.ADMIN));
-            if (isAdmin) {
-                const reportGroup = this.createReportGroup(principal);
-                groups.push(reportGroup);
-            }
-
-            return groups;
-        });
-    }
-
-    private createReportGroup(principal: Principal): ItemDataGroup {
         const reportsGroup = new ItemDataGroup(i18n('field.report'), 'reports');
 
         const reportsCombo = new RepositoryComboBox();
@@ -266,7 +233,7 @@ export class UserItemStatisticsPanel
 
         reportsGroup.addDataElements(i18n('field.repository.select'), [comboAndButton]);
 
-        return reportsGroup;
+        return Q(reportsGroup);
     }
 
     private downloadReport(principal: Principal, repo: Repository, branch: string): void {
