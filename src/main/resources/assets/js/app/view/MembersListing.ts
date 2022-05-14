@@ -30,14 +30,14 @@ export class MembersListing extends DivEl {
         this.ulList = new UlEl('data-list');
     }
 
-    setParent(parent: Element) {
+    setParent(parent: Element): void {
         this.parent = parent;
 
         let chunkIndex = 1;
         const scrollHandler = AppHelper.debounce(async (event:Event) => {
             const element = event.target as HTMLElement;
             const isScrollNearBottom = element.scrollTop >= 0.95 * (element.scrollHeight - element.clientHeight);
-            if(isScrollNearBottom && chunkIndex < this.membersKeysChunks.length) {
+            if (isScrollNearBottom && chunkIndex < this.membersKeysChunks.length) {
                 await this.populateList(chunkIndex);
                 chunkIndex += 1;
             }
@@ -46,7 +46,7 @@ export class MembersListing extends DivEl {
         this.parent.onScroll(scrollHandler);
     }
 
-    setMembersKeys(membersKeys: PrincipalKey[]) {
+    setMembersKeys(membersKeys: PrincipalKey[]): void {
         function chunkArray<T>(arr: T[], size: number) {
             return arr.length > size ? [arr.slice(0, size), ...chunkArray(arr.slice(size), size)] : [arr];
         }
@@ -54,7 +54,8 @@ export class MembersListing extends DivEl {
         this.membersKeysChunks = chunkArray<PrincipalKey>(membersKeys, MembersListing.CHUNK_SIZE);
     }
 
-    async populateList(chunkIndex = 0) {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async populateList(chunkIndex: number = 0) {
         const memberKeys = this.parent
             ? this.membersKeysChunks[chunkIndex]
             : this.membersKeysChunks.reduce((a,b) => a.concat(b));
@@ -76,9 +77,9 @@ export class MembersListing extends DivEl {
     private getMembersByKeys(keys: PrincipalKey[]): Q.Promise<Principal[]> {
         if (!keys || keys.length === 0) {
             return Q([]);
-        } else {
-            return new GetPrincipalsByKeysRequest(keys).sendAndParse();
         }
+
+        return new GetPrincipalsByKeysRequest(keys).sendAndParse();
     }
 
     private static createPrincipalViewer(principal: Principal): PrincipalViewer {
