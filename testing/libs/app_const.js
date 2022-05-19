@@ -2,6 +2,9 @@
  * Created  on 15.09.2017.
  */
 module.exports = Object.freeze({
+    generateRandomName: function (part) {
+        return part + Math.round(Math.random() * 1000000);
+    },
     //waitForTimeout
     mediumTimeout: 3500,
     TIMEOUT_4: 4000,
