@@ -10,7 +10,7 @@ const XPATH = {
     header: "//div[contains(@id,'ItemStatisticsHeader')]",
     itemName: "//h1[@class='title']",
     itemPath: "//h4[@class='path']",
-    membersDataGroup: "//div[contains(@id,'MembersListing') and child::h2[text()='Members']]",
+    membersDataGroup: "//div[contains(@id,'MembersListing') and child::h2[contains(.,'Members')]]",
     memberList: "//ul[@class='data-list' and child::li[text()='Members']]"
 };
 
