@@ -3,12 +3,13 @@
  */
 const UserItemStatisticsPanel = require('./userItem.statistics.panel');
 const lib = require('../../libs/elements');
+const appConst = require('../../libs/app_const');
 
 const XPATH = {
     container: "//div[contains(@id,'UserItemStatisticsPanel')]",
-    membersDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]",
+    membersDataGroup: "//div[contains(@id,'MembersListing') and child::h2[text()='Members']]",
     rolesAndGroupDataGroup: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]",
-    memberList: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Members']]//ul[@class='data-list']",
+    memberList: "//div[contains(@id,'MembersListing') and child::h2[text()='Members']]//ul[@class='data-list']",
     roleList: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list' and child::li[text()='Roles']]",
     groupList: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//ul[@class='data-list' and child::li[text()='Groups']]",
     transitiveCheckBox: "//div[contains(@id,'ItemDataGroup') and child::h2[text()='Roles & Groups']]//div[contains(@id,'Checkbox' ) and contains(@class,'transitive-switch')]"
@@ -26,7 +27,7 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
             await this.clickOnElement(this.transitiveCheckBox);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot("err_transitive_checkbox");
+            await this.saveScreenshot(appConst.generateRandomName("err_transitive_checkbox"));
             throw new Error("Error when clicking on Transitive checkbox  " + err);
         }
     }
@@ -37,15 +38,20 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
             await this.waitForElementDisplayed(XPATH.membersDataGroup, 1000);
             return await this.getTextInElements(items);
         } catch (err) {
-            await this.saveScreenshot('err_member_list');
-            throw new Error('Members data-group is not present on the page!');
+            await this.saveScreenshot(appConst.generateRandomName('err_member_list'));
+            throw new Error('Members data-group is not present on the page! ' + err);
         }
     }
 
     async getDisplayNameOfRoles() {
-        let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
-        await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, 2000);
-        return await this.getTextInElements(items);
+        try {
+            let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
+            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, 2000);
+            return await this.getTextInElements(items);
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName('err_role_list'));
+            throw new Error('Members data-group is not present on the page! ' + err);
+        }
     }
 
     async getDisplayNamesInGroupList() {
@@ -58,4 +64,5 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
         }
     }
 }
+
 module.exports = GroupStatisticsPanel;
