@@ -18,12 +18,12 @@ export class PrincipalLoader
         return new GetPrincipalsByKeysRequest(principalKeys);
     }
 
-    // If the data is less than {MAX_TO_APPEND}, then just execute the "preLoadRequest".
-    // Otherwise, to improve performance, lib-admin-ui will not append items after {MAX_TO_APPEND}th one
-    // so there's no need to execute a request for those items to get the display name, therefore
-    // the data is a mix of the first {MAX_TO_APPEND} ones from the request and the remaining ones built directly
-    // from the keys in the searchString.
-    preData(searchString: string): Q.Promise<Principal[]> {
+    /* If the data is less than {MAX_TO_APPEND}, then just execute the "preLoadRequest".
+    Otherwise, to improve performance, lib-admin-ui will not append items after {MAX_TO_APPEND}th one
+    so there's no need to execute a request for those items to get the display name, therefore
+    the data is a mix of the first {MAX_TO_APPEND} ones from the request and the remaining ones built directly
+    from the keys in the searchString. */
+    preLoadData(searchString: string): Q.Promise<Principal[]> {
         const separator = ComboBox.VALUE_SEPARATOR;
         const max_to_append = BaseSelectedOptionsView.MAX_TO_APPEND;
 
