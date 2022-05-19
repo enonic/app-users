@@ -4,11 +4,6 @@ import {Event} from 'lib-admin-ui/event/Event';
 export class UserItemsStopScrollEvent
     extends Event {
 
-
-    constructor() {
-        super();
-    }
-
     static on(handler: (event: UserItemsStopScrollEvent) => void): void {
         Event.bind(ClassHelper.getFullName(this), handler);
     }

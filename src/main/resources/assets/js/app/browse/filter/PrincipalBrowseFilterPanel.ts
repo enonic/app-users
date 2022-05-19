@@ -100,7 +100,7 @@ export class PrincipalBrowseFilterPanel
     }
 
     // setCount(100): Initially get only 100 users. The UserFilteredDataScrollEvent will request more if necessary.
-    private searchDataAndHandleResponse(prevCount:number = 0, count: number = 100): Q.Promise<void> {
+    private searchDataAndHandleResponse(prevCount: number = 0, count: number = 100): Q.Promise<void> {
         const types: UserItemType[] = this.getCheckedTypes();
         const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
         const itemIds: string[] = this.getSelectedItemIds();

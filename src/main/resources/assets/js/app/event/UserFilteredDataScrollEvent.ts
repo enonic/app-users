@@ -7,7 +7,7 @@ export class UserFilteredDataScrollEvent
     private prevCount: number;
     private count: number;
 
-    constructor(prevCount:number, count: number) {
+    constructor(prevCount: number, count: number) {
         super();
         this.prevCount = prevCount;
         this.count = count;
