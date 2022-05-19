@@ -26,7 +26,9 @@ import {ListPrincipalsKeysResult, ListPrincipalsNamesRequest} from '../../graphq
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {GetPrincipalsExistenceRequest} from '../../graphql/principal/GetPrincipalsExistenceRequest';
 import {UserFilteredDataScrollEvent} from '../event/UserFilteredDataScrollEvent';
+import {UserItemsStopScrollEvent} from '../event/UserItemsStopScrollEvent';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {LoadMask} from 'lib-admin-ui/ui/mask/LoadMask';
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -34,6 +36,7 @@ export class UserItemsTreeGrid
     private treeGridActions: UserTreeGridActions;
     private searchString: string;
     private searchTypes: UserItemType[];
+    private loadMask: LoadMask;
 
     constructor() {
 
@@ -70,6 +73,8 @@ export class UserItemsTreeGrid
 
         this.setContextMenu(new TreeGridContextMenu(this.treeGridActions));
 
+        this.loadMask = new LoadMask(this);
+
         this.initEventHandlers();
     }
 
@@ -84,8 +89,11 @@ export class UserItemsTreeGrid
             const numberOfItemsToAdd = 30;
             const nextNumberOfItems = currentNumberOfItems + numberOfItemsToAdd;
 
-            if(this.getGrid().getViewport().bottom === currentNumberOfItems){
-                new UserFilteredDataScrollEvent(nextNumberOfItems).fire();
+            if (this.getGrid().getViewport().bottom === currentNumberOfItems) {
+                this.loadMask.show();
+                new UserFilteredDataScrollEvent(currentNumberOfItems, nextNumberOfItems).fire();
+            } else {
+                this.loadMask.hide();
             }
         }, 100);
 
@@ -104,6 +112,12 @@ export class UserItemsTreeGrid
 
         BrowseFilterResetEvent.on(() => {
             this.resetFilter();
+
+            this.getGrid().unsubscribeOnScroll(triggerFilteredDataScrollEvent);
+        });
+
+        UserItemsStopScrollEvent.on(() => {
+            this.loadMask.hide();
 
             this.getGrid().unsubscribeOnScroll(triggerFilteredDataScrollEvent);
         });

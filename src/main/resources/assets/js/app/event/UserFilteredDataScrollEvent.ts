@@ -4,11 +4,17 @@ import {Event} from 'lib-admin-ui/event/Event';
 export class UserFilteredDataScrollEvent
     extends Event {
 
+    private prevCount: number;
     private count: number;
 
-    constructor(count: number) {
+    constructor(prevCount:number, count: number) {
         super();
+        this.prevCount = prevCount;
         this.count = count;
+    }
+
+    public getPrevCount(): number {
+        return this.prevCount;
     }
 
     public getCount(): number {

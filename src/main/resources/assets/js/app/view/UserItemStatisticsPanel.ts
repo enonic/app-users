@@ -188,9 +188,10 @@ export class UserItemStatisticsPanel
     }
 
     private createMembersGroup(groupOrRole: Group | Role): MembersListing {
-        const membersListing = new MembersListing(i18n('field.members'), 'members item-data-group');
+        const memberKeys = groupOrRole.getMembers();
+        const membersListing = new MembersListing(i18n('field.members') + ` (${memberKeys.length})`, 'members item-data-group');
         membersListing.setParent(this);
-        membersListing.setMembersKeys(groupOrRole.getMembers());
+        membersListing.setMembersKeys(memberKeys);
         membersListing.populateList();
         return membersListing;
     }
