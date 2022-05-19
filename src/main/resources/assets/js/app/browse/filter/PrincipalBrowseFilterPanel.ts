@@ -18,6 +18,7 @@ import {UserItem} from 'lib-admin-ui/security/UserItem';
 import {SearchInputValues} from 'lib-admin-ui/query/SearchInputValues';
 import {Exception} from 'lib-admin-ui/Exception';
 import {UserFilteredDataScrollEvent} from '../../event/UserFilteredDataScrollEvent';
+import {UserItemsStopScrollEvent} from '../../event/UserItemsStopScrollEvent';
 
 export class PrincipalBrowseFilterPanel
     extends BrowseFilterPanel<UserTreeGridItem> {
@@ -36,8 +37,7 @@ export class PrincipalBrowseFilterPanel
 
     private initEventHandlers() {
         UserFilteredDataScrollEvent.on((event) => {
-            const newCounterAfterScroll = event.getCount();
-            this.searchDataAndHandleResponse(newCounterAfterScroll);
+            this.searchDataAndHandleResponse(event.getPrevCount(), event.getCount());
         });
     }
 
@@ -100,7 +100,7 @@ export class PrincipalBrowseFilterPanel
     }
 
     // setCount(100): Initially get only 100 users. The UserFilteredDataScrollEvent will request more if necessary.
-    private searchDataAndHandleResponse(count: number = 100): Q.Promise<void> {
+    private searchDataAndHandleResponse(prevCount:number = 0, count: number = 100): Q.Promise<void> {
         const types: UserItemType[] = this.getCheckedTypes();
         const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
         const itemIds: string[] = this.getSelectedItemIds();
@@ -112,6 +112,10 @@ export class PrincipalBrowseFilterPanel
             .setItems(itemIds)
             .sendAndParse()
             .then((result: ListUserItemsRequestResult) => {
+                if(result.total === prevCount) {
+                    new UserItemsStopScrollEvent().fire();
+                    return;
+                }
                 this.handleDataSearchResult(result, types, searchString);
             }).catch((reason: any) => {
                 DefaultErrorHandler.handle(reason);

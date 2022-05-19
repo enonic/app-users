@@ -9,6 +9,7 @@ import {Principal} from 'lib-admin-ui/security/Principal';
 import {PrincipalViewer} from 'lib-admin-ui/ui/security/PrincipalViewer';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 import {GetPrincipalsByKeysRequest} from '../../graphql/principal/GetPrincipalsByKeysRequest';
+import {LoadMask} from 'lib-admin-ui/ui/mask/LoadMask';
 
 export class MembersListing extends DivEl {
 
@@ -32,13 +33,20 @@ export class MembersListing extends DivEl {
 
     setParent(parent: Element): void {
         this.parent = parent;
+        this.addScrollToParent();
+    }
 
+    private addScrollToParent(){
         let chunkIndex = 1;
+
         const scrollHandler = AppHelper.debounce(async (event:Event) => {
             const element = event.target as HTMLElement;
             const isScrollNearBottom = element.scrollTop >= 0.95 * (element.scrollHeight - element.clientHeight);
             if (isScrollNearBottom && chunkIndex < this.membersKeysChunks.length) {
+                const mask = new LoadMask(this.ulList.getLastChild());
+                mask.show();
                 await this.populateList(chunkIndex);
+                mask.hide();
                 chunkIndex += 1;
             }
         }, 100);
