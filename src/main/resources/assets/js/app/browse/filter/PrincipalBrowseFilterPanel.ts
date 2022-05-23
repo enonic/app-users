@@ -169,17 +169,17 @@ export class PrincipalBrowseFilterPanel
             .setItems(itemIds)
             .sendAndParse()
             .then((typeAggregation) => {
-                this.updateAggregations([typeAggregation], true);
+                this.updateAggregations([typeAggregation]);
                 this.toggleAggregationsVisibility([typeAggregation]);
             }).catch((reason: any) => {
                 DefaultErrorHandler.handle(reason);
             });
     }
 
-    updateAggregations(aggregations: BucketAggregation[], doUpdateAll?: boolean): void {
+    updateAggregations(aggregations: BucketAggregation[]): void {
         this.initPrincipalTypeBuckets(aggregations);
 
-        super.updateAggregations(aggregations, doUpdateAll);
+        super.updateAggregations(aggregations);
     }
 
     private getPrincipalTypeDisplayName(key: string) {
