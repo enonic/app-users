@@ -19,7 +19,7 @@ import {ListItemsProperties, ListItemsRequest} from './ListItemsRequest';
 // UserItems does not map "name" property. Missing type? or wrong graph query?
 export type ListUserItemsRequestResult = {
     total: number,
-    userItems: UserItem[], 
+    userItems: UserItem[],
     aggregations: BucketAggregation[]
 };
 
@@ -37,7 +37,7 @@ interface ListUserItemsGraph {
                 description: string;
                 displayName: string;
             }
-        }], 
+        }],
         aggregations: UserItemBucketAggregationJson[];
     }
 }
@@ -46,6 +46,15 @@ export class ListUserItemsRequest
     extends ListItemsRequest<ListUserItemsRequestResult> {
 
     private types: UserItemType[];
+
+    constructor(){
+        super();
+    }
+
+    setCount(value: number): ListUserItemsRequest {
+        this.count = value;
+        return this;
+    }
 
     setTypes(types: UserItemType[]): ListUserItemsRequest {
         this.types = types;

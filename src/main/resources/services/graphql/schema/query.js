@@ -12,6 +12,14 @@ var graphQlObjectTypes = require('../types').objects;
 var graphQlEnums = require('../types').enums;
 
 
+function getUserItems(args, types) {
+    var query = args.query;
+    var itemIds = args.itemIds;
+    var count = args.count || 0;
+    var start = args.start || 0;
+    return useritems.list(types, query, itemIds, start, count);
+}
+
 module.exports = schemaGenerator.createObjectType({
     name: 'Query',
     fields: {
@@ -94,12 +102,7 @@ module.exports = schemaGenerator.createObjectType({
                 count: graphQl.GraphQLInt
             },
             resolve: function (env) {
-                var types = env.args.types;
-                var query = env.args.query;
-                var itemIds = env.args.itemIds;
-                var count = env.args.count || Number.MAX_SAFE_INTEGER;
-                var start = env.args.start || 0;
-                return useritems.list(types, query, itemIds, start, count);
+                return getUserItems(env.args, env.args.types);
             }
         },
         types: {
@@ -111,11 +114,7 @@ module.exports = schemaGenerator.createObjectType({
                 count: graphQl.GraphQLInt
             },
             resolve: function (env) {
-                var query = env.args.query;
-                var itemIds = env.args.itemIds;
-                var count = env.args.count || Number.MAX_SAFE_INTEGER;
-                var start = env.args.start || 0;
-                return useritems.list(null, query, itemIds, start, count);
+                return getUserItems(env.args, null);
             }
         },
         repository: {
