@@ -26,7 +26,8 @@ export class MembersWizardStepForm
 
         this.loader = new PrincipalLoader()
                 .setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER])
-                .skipPrincipals([PrincipalKey.ofAnonymous()]);
+                .skipPrincipals([PrincipalKey.ofAnonymous()])
+                .setUseDataPreLoad(true);
         this.principals = <PrincipalComboBox>(PrincipalComboBox.create().setLoader(this.loader).build());
     }
 

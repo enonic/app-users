@@ -24,7 +24,11 @@ import {Body} from 'lib-admin-ui/dom/Body';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {ListPrincipalsKeysResult, ListPrincipalsNamesRequest} from '../../graphql/principal/ListPrincipalsNamesRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {GetPrincipalsTotalRequest} from '../../graphql/principal/GetPrincipalsTotalRequest';
+import {GetPrincipalsExistenceRequest} from '../../graphql/principal/GetPrincipalsExistenceRequest';
+import {UserFilteredDataScrollEvent} from '../event/UserFilteredDataScrollEvent';
+import {UserItemsStopScrollEvent} from '../event/UserItemsStopScrollEvent';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {LoadMask} from 'lib-admin-ui/ui/mask/LoadMask';
 
 export class UserItemsTreeGrid
     extends TreeGrid<UserTreeGridItem> {
@@ -32,6 +36,7 @@ export class UserItemsTreeGrid
     private treeGridActions: UserTreeGridActions;
     private searchString: string;
     private searchTypes: UserItemType[];
+    private loadMask: LoadMask;
 
     constructor() {
 
@@ -68,6 +73,8 @@ export class UserItemsTreeGrid
 
         this.setContextMenu(new TreeGridContextMenu(this.treeGridActions));
 
+        this.loadMask = new LoadMask(this);
+
         this.initEventHandlers();
     }
 
@@ -76,6 +83,20 @@ export class UserItemsTreeGrid
     }
 
     private initEventHandlers() {
+        const triggerFilteredDataScrollEvent = AppHelper.debounce(() => {
+
+            const currentNumberOfItems = this.getRoot().getCurrentRoot().getChildren().length;
+            const numberOfItemsToAdd = 30;
+            const nextNumberOfItems = currentNumberOfItems + numberOfItemsToAdd;
+
+            if (this.getGrid().getViewport().bottom === currentNumberOfItems) {
+                this.loadMask.show();
+                new UserFilteredDataScrollEvent(currentNumberOfItems, nextNumberOfItems).fire();
+            } else {
+                this.loadMask.hide();
+            }
+        }, 100);
+
         BrowseFilterSearchEvent.on((event: BrowseFilterSearchEvent<PrincipalBrowseSearchData>) => {
             const data = event.getData();
             const items = data.getUserItems().map((userItem: UserItem) => {
@@ -85,10 +106,20 @@ export class UserItemsTreeGrid
             this.searchTypes = data.getTypes();
             this.filter(items);
             this.notifyLoaded();
+
+            this.getGrid().subscribeOnScroll(triggerFilteredDataScrollEvent);
         });
 
         BrowseFilterResetEvent.on(() => {
             this.resetFilter();
+
+            this.getGrid().unsubscribeOnScroll(triggerFilteredDataScrollEvent);
+        });
+
+        UserItemsStopScrollEvent.on(() => {
+            this.loadMask.hide();
+
+            this.getGrid().unsubscribeOnScroll(triggerFilteredDataScrollEvent);
         });
 
         this.getGrid().subscribeOnDblClick((event, data) => {
@@ -251,7 +282,7 @@ export class UserItemsTreeGrid
     }
 
     private fetchFilteredItems(): Q.Promise<UserTreeGridItem[]> {
-        return new ListUserItemsRequest().setTypes(this.searchTypes).setQuery(this.searchString).sendAndParse()
+        return new ListUserItemsRequest().setCount(100).setTypes(this.searchTypes).setQuery(this.searchString).sendAndParse()
             .then((result) => {
                 return result.userItems.map(item => new UserTreeGridItemBuilder().setAny(item).build());
             });
@@ -288,24 +319,33 @@ export class UserItemsTreeGrid
 
     private addUsersGroupsToIdProvider(parentItem: UserTreeGridItem): Q.Promise<UserTreeGridItem[]> {
         const idProvider: IdProvider = parentItem.getIdProvider();
-        const promises: Q.Promise<number>[] = [];
+        const promises: Q.Promise<boolean>[] = [];
 
         promises.push(this.getTotalPrincipals(idProvider.getKey(), PrincipalType.USER));
         promises.push(this.getTotalPrincipals(idProvider.getKey(), PrincipalType.GROUP));
 
-        return Q.all(promises).spread((totalUsers: number, totalGroups: number) => {
+        return Q.all(promises).spread((hasUsers: boolean, hasGroups: boolean) => {
             const userFolderItem: UserTreeGridItem =
-                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.USERS).setHasChildren(
-                    totalUsers > 0).build();
+                new UserTreeGridItemBuilder()
+                        .setIdProvider(idProvider)
+                        .setType(UserTreeGridItemType.USERS)
+                        .setHasChildren(hasUsers)
+                        .build();
             const groupFolderItem: UserTreeGridItem =
-                new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.GROUPS).setHasChildren(
-                    totalGroups > 0).build();
+                new UserTreeGridItemBuilder()
+                        .setIdProvider(idProvider)
+                        .setType(UserTreeGridItemType.GROUPS)
+                        .setHasChildren(hasGroups)
+                        .build();
             return [userFolderItem, groupFolderItem];
         });
     }
 
-    private getTotalPrincipals(idProviderKey: IdProviderKey, type: PrincipalType): Q.Promise<number> {
-        return new GetPrincipalsTotalRequest().setIdProviderKey(idProviderKey).setTypes([type]).sendAndParse();
+    private getTotalPrincipals(idProviderKey: IdProviderKey, type: PrincipalType): Q.Promise<boolean> {
+        return new GetPrincipalsExistenceRequest()
+            .setIdProviderKey(idProviderKey)
+            .setTypes([type])
+            .sendAndParse();
     }
 
     private fetchPrincipals(parentNode: TreeNode<UserTreeGridItem>): Q.Promise<UserTreeGridItem[]> {
