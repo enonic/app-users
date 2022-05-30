@@ -31,6 +31,7 @@ class LauncherPanel extends Page {
 
     async clickOnUsersLink() {
         await this.waitForElementDisplayed(this.usersLink, appConst.mediumTimeout);
+        await this.pause(300);
         return await this.clickOnElement(this.usersLink);
     }
 
