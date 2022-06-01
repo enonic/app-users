@@ -114,8 +114,8 @@ export class PrincipalBrowseFilterPanel
             .then((result: ListUserItemsRequestResult) => {
                 if(result.total === prevCount) {
                     new UserItemsStopScrollEvent().fire();
-                    return;
                 }
+
                 this.handleDataSearchResult(result, types, searchString);
             }).catch((reason: any) => {
                 DefaultErrorHandler.handle(reason);
