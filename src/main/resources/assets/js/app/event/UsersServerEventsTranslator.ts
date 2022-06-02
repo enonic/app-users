@@ -1,7 +1,7 @@
-import {EventJson} from 'lib-admin-ui/event/EventJson';
-import {Event} from 'lib-admin-ui/event/Event';
-import {NodeEventJson} from 'lib-admin-ui/event/NodeServerEvent';
-import {ServerEventsTranslator} from 'lib-admin-ui/event/ServerEventsTranslator';
+import {EventJson} from '@enonic/lib-admin-ui/event/EventJson';
+import {Event} from '@enonic/lib-admin-ui/event/Event';
+import {NodeEventJson} from '@enonic/lib-admin-ui/event/NodeServerEvent';
+import {ServerEventsTranslator} from '@enonic/lib-admin-ui/event/ServerEventsTranslator';
 import {PrincipalServerEvent} from './PrincipalServerEvent';
 
 export class UsersServerEventsTranslator

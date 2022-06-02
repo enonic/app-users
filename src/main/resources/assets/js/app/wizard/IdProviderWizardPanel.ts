@@ -11,22 +11,22 @@ import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {UserItemDeletedEvent} from '../event/UserItemDeletedEvent';
 import {UserItemUpdatedEvent} from '../event/UserItemUpdatedEvent';
 import {IdProvider, IdProviderBuilder} from '../principal/IdProvider';
-import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
-import {FormIcon} from 'lib-admin-ui/app/wizard/FormIcon';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {WizardStep} from '@enonic/lib-admin-ui/app/wizard/WizardStep';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {FormIcon} from '@enonic/lib-admin-ui/app/wizard/FormIcon';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {IdProviderWizardActions} from './IdProviderWizardActions';
-import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
-import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
+import {WizardHeaderWithDisplayNameAndName} from '@enonic/lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {IdProviderConfig} from '@enonic/lib-admin-ui/security/IdProviderConfig';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
-import {Principal} from 'lib-admin-ui/security/Principal';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemRequest';
 import {DeleteIdProviderRequest} from '../../graphql/idprovider/DeleteIdProviderRequest';
 import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
-import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
+import {UserItemKey} from '@enonic/lib-admin-ui/security/UserItemKey';
 
 export class IdProviderWizardPanel
     extends UserItemWizardPanel<IdProvider> {

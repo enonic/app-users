@@ -1,13 +1,13 @@
-import {FormInputEl} from 'lib-admin-ui/dom/FormInputEl';
-import {Element} from 'lib-admin-ui/dom/Element';
-import {AEl} from 'lib-admin-ui/dom/AEl';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {FormInputEl} from '@enonic/lib-admin-ui/dom/FormInputEl';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {nanoid} from 'nanoid';
-import {InputEl} from 'lib-admin-ui/dom/InputEl';
+import {InputEl} from '@enonic/lib-admin-ui/dom/InputEl';
 import * as owasp from 'owasp-password-strength-test';
 import {PasswordStrengthBlock} from './PasswordStrengthBlock';
-import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 
 export enum PasswordStrength {
     EXCELLENT = 'excellent',

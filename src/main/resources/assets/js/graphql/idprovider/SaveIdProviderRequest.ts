@@ -3,9 +3,9 @@ import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderAccessControlList} from '../../app/access/IdProviderAccessControlList';
 import {IdProviderAccess} from '../../app/access/IdProviderAccess';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
-import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
-import {Exception} from 'lib-admin-ui/Exception';
+import {IdProviderConfig} from '@enonic/lib-admin-ui/security/IdProviderConfig';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {Exception} from '@enonic/lib-admin-ui/Exception';
 
 export type SaveMutation = 'updateIdProvider' | 'createIdProvider';
 

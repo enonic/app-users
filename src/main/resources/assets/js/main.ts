@@ -5,18 +5,18 @@ import {ShowNewPrincipalDialogEvent} from './app/browse/ShowNewPrincipalDialogEv
 import {NewPrincipalDialog} from './app/create/NewPrincipalDialog';
 import {PrincipalServerEventsHandler} from './app/event/PrincipalServerEventsHandler';
 import {UsersServerEventsListener} from './app/event/UsersServerEventsListener';
-import {Body} from 'lib-admin-ui/dom/Body';
-import {Application} from 'lib-admin-ui/app/Application';
-import {Path} from 'lib-admin-ui/rest/Path';
-import {ConnectionDetector} from 'lib-admin-ui/system/ConnectionDetector';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {TabbedAppBar} from 'lib-admin-ui/app/bar/TabbedAppBar';
-import {AppHelper} from 'lib-admin-ui/util/AppHelper';
-import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {Body} from '@enonic/lib-admin-ui/dom/Body';
+import {Application} from '@enonic/lib-admin-ui/app/Application';
+import {Path} from '@enonic/lib-admin-ui/rest/Path';
+import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {TabbedAppBar} from '@enonic/lib-admin-ui/app/bar/TabbedAppBar';
+import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
+import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
-import {InputTypeManager} from 'lib-admin-ui/form/inputtype/InputTypeManager';
-import {Class} from 'lib-admin-ui/Class';
+import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
+import {Class} from '@enonic/lib-admin-ui/Class';
 
 const body = Body.get();
 

@@ -4,12 +4,12 @@ import {DeletePrincipalRequest} from '../../../graphql/principal/DeletePrincipal
 import {DeleteIdProviderRequest} from '../../../graphql/idprovider/DeleteIdProviderRequest';
 import {UserItemDeletedEvent} from '../../event/UserItemDeletedEvent';
 import {IdProvider} from '../../principal/IdProvider';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {ConfirmationDialog} from '@enonic/lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {DeleteUserItemResult} from '../../../graphql/useritem/DeleteUserItemResult';
 
 export class DeletePrincipalAction

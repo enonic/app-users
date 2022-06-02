@@ -1,5 +1,5 @@
 import {UserItemType} from '../UserItemType';
-import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
 
 export class PrincipalBrowseSearchData {
 

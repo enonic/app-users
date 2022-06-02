@@ -1,6 +1,6 @@
-import {UserItem} from 'lib-admin-ui/security/UserItem';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
-import {AppBarTabId} from 'lib-admin-ui/app/bar/AppBarTabId';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {AppBarTabId} from '@enonic/lib-admin-ui/app/bar/AppBarTabId';
 
 export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
 

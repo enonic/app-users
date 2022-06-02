@@ -1,8 +1,8 @@
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {IdProviderAccessControlEntry} from './IdProviderAccessControlEntry';
 import {IdProviderAccessControlEntryJson} from './IdProviderAccessControlEntryJson';
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 
 export class IdProviderAccessControlList
     implements Equitable {

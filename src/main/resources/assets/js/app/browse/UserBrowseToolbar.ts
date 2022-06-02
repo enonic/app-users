@@ -1,5 +1,5 @@
 import {UserTreeGridActions} from './UserTreeGridActions';
-import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
+import {Toolbar} from '@enonic/lib-admin-ui/ui/toolbar/Toolbar';
 
 export class UserBrowseToolbar
     extends Toolbar {

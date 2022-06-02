@@ -1,6 +1,6 @@
 import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
 import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggregationJson';
-import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
+import {BucketAggregation} from '@enonic/lib-admin-ui/aggregation/BucketAggregation';
 import {ListItemsRequest} from './ListItemsRequest';
 
 type ListTypeData = {

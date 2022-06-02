@@ -1,7 +1,7 @@
-import {Event} from 'lib-admin-ui/event/Event';
-import {ClassHelper} from 'lib-admin-ui/ClassHelper';
+import {Event} from '@enonic/lib-admin-ui/event/Event';
+import {ClassHelper} from '@enonic/lib-admin-ui/ClassHelper';
 import {UserItemWizardPanel} from '../wizard/UserItemWizardPanel';
-import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
 
 export class UserItemNamedEvent
     extends Event {

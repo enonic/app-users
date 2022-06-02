@@ -1,6 +1,6 @@
 import {Repository} from './Repository';
-import {Viewer} from 'lib-admin-ui/ui/Viewer';
-import {NamesView} from 'lib-admin-ui/app/NamesView';
+import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
+import {NamesView} from '@enonic/lib-admin-ui/app/NamesView';
 
 export class RepositoryViewer
     extends Viewer<Repository> {

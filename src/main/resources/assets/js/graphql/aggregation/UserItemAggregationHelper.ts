@@ -1,7 +1,7 @@
-import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
-import {BucketJson} from 'lib-admin-ui/aggregation/BucketJson';
-import {Bucket} from 'lib-admin-ui/aggregation/Bucket';
-import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {BucketAggregation} from '@enonic/lib-admin-ui/aggregation/BucketAggregation';
+import {BucketJson} from '@enonic/lib-admin-ui/aggregation/BucketJson';
+import {Bucket} from '@enonic/lib-admin-ui/aggregation/Bucket';
+import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 import {UserItemBucketAggregationJson} from './UserItemBucketAggregationJson';
 
 export class UserItemAggregationHelper {

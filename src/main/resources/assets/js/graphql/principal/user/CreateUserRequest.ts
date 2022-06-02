@@ -1,7 +1,7 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
 import {User} from '../../../app/principal/User';
 import {UserJson} from '../../../app/principal/UserJson';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
 type CreateUserRequestData = {
     key: PrincipalKey;

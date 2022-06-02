@@ -1,15 +1,15 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {EmailInput} from 'lib-admin-ui/ui/text/EmailInput';
-import {Validators} from 'lib-admin-ui/ui/form/Validators';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {EmailInput} from '@enonic/lib-admin-ui/ui/text/EmailInput';
+import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {User} from '../principal/User';
-import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {UrlHelper} from '../../util/UrlHelper';
-import {CheckEmailAvailabilityRequest} from 'lib-admin-ui/security/CheckEmailAvailabilityRequest';
+import {CheckEmailAvailabilityRequest} from '@enonic/lib-admin-ui/security/CheckEmailAvailabilityRequest';
 
 export class UserEmailWizardStepForm
     extends UserItemWizardStepForm {

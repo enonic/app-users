@@ -1,21 +1,21 @@
-import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
-import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {PropertySet} from 'lib-admin-ui/data/PropertySet';
-import {PropertyTree} from 'lib-admin-ui/data/PropertyTree';
+import {IdProviderConfig} from '@enonic/lib-admin-ui/security/IdProviderConfig';
+import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {PropertySet} from '@enonic/lib-admin-ui/data/PropertySet';
+import {PropertyTree} from '@enonic/lib-admin-ui/data/PropertyTree';
 import {IdProvider} from '../principal/IdProvider';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {TextInput} from 'lib-admin-ui/ui/text/TextInput';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {TextInput} from '@enonic/lib-admin-ui/ui/text/TextInput';
 import {AuthApplicationComboBox, AuthApplicationComboBoxBuilder} from '../inputtype/authapplicationselector/AuthApplicationComboBox';
-import {ApplicationConfigProvider} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
-import {PropertyArray} from 'lib-admin-ui/data/PropertyArray';
-import {ValueTypePropertySet} from 'lib-admin-ui/data/ValueTypePropertySet';
+import {ApplicationConfigProvider} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
+import {PropertyArray} from '@enonic/lib-admin-ui/data/PropertyArray';
+import {ValueTypePropertySet} from '@enonic/lib-admin-ui/data/ValueTypePropertySet';
 import {AuthApplicationSelectedOptionView} from '../inputtype/authapplicationselector/AuthApplicationSelectedOptionView';
 import {AuthApplicationSelectedOptionsView} from '../inputtype/authapplicationselector/AuthApplicationSelectedOptionsView';
-import {ApplicationConfig} from 'lib-admin-ui/application/ApplicationConfig';
-import {ValidationRecording} from 'lib-admin-ui/form/ValidationRecording';
-import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
-import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {ApplicationConfig} from '@enonic/lib-admin-ui/application/ApplicationConfig';
+import {ValidationRecording} from '@enonic/lib-admin-ui/form/ValidationRecording';
+import {WizardStepValidityChangedEvent} from '@enonic/lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {FormValidityChangedEvent} from '@enonic/lib-admin-ui/form/FormValidityChangedEvent';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class IdProviderWizardStepForm

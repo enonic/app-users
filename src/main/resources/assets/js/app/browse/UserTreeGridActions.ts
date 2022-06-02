@@ -7,11 +7,11 @@ import {NewPrincipalAction} from './action/NewPrincipalAction';
 import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {User} from '../principal/User';
 import {IdProvider} from '../principal/IdProvider';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 
 export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
 

@@ -1,9 +1,9 @@
-import {Option} from 'lib-admin-ui/ui/selector/Option';
+import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
 import {IdProviderAccessControlEntryView} from './IdProviderAccessControlEntryView';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
-import {PrincipalContainerCombobox, PrincipalContainerComboboxBuilder} from 'lib-admin-ui/ui/security/PrincipalContainerCombobox';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalContainerSelectedOptionsView} from 'lib-admin-ui/ui/security/PrincipalContainerSelectedOptionsView';
+import {PrincipalContainerCombobox, PrincipalContainerComboboxBuilder} from '@enonic/lib-admin-ui/ui/security/PrincipalContainerCombobox';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalContainerSelectedOptionsView} from '@enonic/lib-admin-ui/ui/security/PrincipalContainerSelectedOptionsView';
 import {PrincipalLoader} from '../principal/PrincipalLoader';
 
 export class IdProviderAccessControlComboBox

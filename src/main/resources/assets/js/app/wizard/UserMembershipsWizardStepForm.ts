@@ -1,12 +1,12 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
-import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {RoleKeys} from '@enonic/lib-admin-ui/security/RoleKeys';
+import {PrincipalComboBox} from '@enonic/lib-admin-ui/ui/security/PrincipalComboBox';
 import {User} from '../principal/User';
-import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {PrincipalLoader} from '../principal/PrincipalLoader';
 

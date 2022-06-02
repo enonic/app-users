@@ -1,9 +1,9 @@
-import {Principal, PrincipalBuilder} from 'lib-admin-ui/security/Principal';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {Principal, PrincipalBuilder} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {GroupJson} from './GroupJson';
-import {assert} from 'lib-admin-ui/util/Assert';
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {assert} from '@enonic/lib-admin-ui/util/Assert';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {Members, MembersBuilder} from './Members';
 
 export class Group

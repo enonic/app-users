@@ -1,7 +1,7 @@
 import {GraphQlRequest} from '../GraphQlRequest';
 import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 
 export class GetIdProviderByKeyRequest
     extends GraphQlRequest<IdProvider> {

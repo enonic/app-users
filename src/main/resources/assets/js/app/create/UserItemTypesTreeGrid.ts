@@ -8,20 +8,20 @@ import {IdProvider, IdProviderBuilder} from '../principal/IdProvider';
 import {User, UserBuilder} from '../principal/User';
 import {Group, GroupBuilder} from '../principal/Group';
 import {Role, RoleBuilder} from '../principal/Role';
-import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
-import {IsAuthenticatedRequest} from 'lib-admin-ui/security/auth/IsAuthenticatedRequest';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
-import {KeyBinding} from 'lib-admin-ui/ui/KeyBinding';
-import {UserItem} from 'lib-admin-ui/security/UserItem';
-import {KeyHelper} from 'lib-admin-ui/ui/KeyHelper';
+import {TreeGrid} from '@enonic/lib-admin-ui/ui/treegrid/TreeGrid';
+import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
+import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {ResponsiveManager} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveManager';
+import {IsAuthenticatedRequest} from '@enonic/lib-admin-ui/security/auth/IsAuthenticatedRequest';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {LoginResult} from '@enonic/lib-admin-ui/security/auth/LoginResult';
+import {KeyBinding} from '@enonic/lib-admin-ui/ui/KeyBinding';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
+import {KeyHelper} from '@enonic/lib-admin-ui/ui/KeyHelper';
 
 export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
 

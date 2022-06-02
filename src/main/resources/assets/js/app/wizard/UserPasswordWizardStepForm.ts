@@ -1,16 +1,16 @@
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
 import {PasswordGenerator} from './PasswordGenerator';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {Validators} from 'lib-admin-ui/ui/form/Validators';
-import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
-import {Button} from 'lib-admin-ui/ui/button/Button';
-import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {Form} from 'lib-admin-ui/ui/form/Form';
-import {FormView} from 'lib-admin-ui/form/FormView';
-import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
-import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
+import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
+import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
+import {WizardStepForm} from '@enonic/lib-admin-ui/app/wizard/WizardStepForm';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
+import {FormView} from '@enonic/lib-admin-ui/form/FormView';
+import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
+import {WizardStepValidityChangedEvent} from '@enonic/lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class UserPasswordWizardStepForm

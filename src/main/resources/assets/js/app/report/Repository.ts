@@ -1,4 +1,4 @@
-import {Equitable} from 'lib-admin-ui/Equitable';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 
 type RepositoryData = {
     id: string;

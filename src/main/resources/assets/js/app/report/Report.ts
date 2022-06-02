@@ -1,5 +1,5 @@
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
 interface ReportData {
     _id : string;

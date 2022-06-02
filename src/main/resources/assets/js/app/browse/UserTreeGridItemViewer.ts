@@ -1,6 +1,6 @@
 import {UserTreeGridItem, UserTreeGridItemType} from './UserTreeGridItem';
-import {NamesAndIconViewer} from 'lib-admin-ui/ui/NamesAndIconViewer';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {NamesAndIconViewer} from '@enonic/lib-admin-ui/ui/NamesAndIconViewer';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class UserTreeGridItemViewer
     extends NamesAndIconViewer<UserTreeGridItem> {

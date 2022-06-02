@@ -1,7 +1,7 @@
 import * as Q from 'q';
 import {Repository} from './Repository';
 import {ListRepositoriesRequest} from '../../graphql/repository/ListRepositoriesRequest';
-import {BaseLoader} from 'lib-admin-ui/util/loader/BaseLoader';
+import {BaseLoader} from '@enonic/lib-admin-ui/util/loader/BaseLoader';
 
 export class RepositoryLoader
     extends BaseLoader<Repository> {

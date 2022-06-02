@@ -5,15 +5,15 @@ import {CreateGroupRequest} from '../../graphql/principal/group/CreateGroupReque
 import {UpdateGroupRequest} from '../../graphql/principal/group/UpdateGroupRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {Group, GroupBuilder} from '../principal/Group';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
-import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {WizardStep} from '@enonic/lib-admin-ui/app/wizard/WizardStep';
+import {ArrayHelper} from '@enonic/lib-admin-ui/util/ArrayHelper';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {Members} from '../principal/Members';
 import {RolesWizardStepForm} from './RolesWizardStepForm';
-import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {WizardHeaderWithDisplayNameAndName} from '@enonic/lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
 
 export class GroupWizardPanel
     extends MembersWizardPanel {

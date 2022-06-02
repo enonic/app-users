@@ -1,9 +1,9 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {IdProviderAccess} from './IdProviderAccess';
 import {IdProviderAccessControlEntryJson} from './IdProviderAccessControlEntryJson';
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {PrincipalContainer} from 'lib-admin-ui/ui/security/PrincipalContainer';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {PrincipalContainer} from '@enonic/lib-admin-ui/ui/security/PrincipalContainer';
 
 export class IdProviderAccessControlEntry
     extends PrincipalContainer

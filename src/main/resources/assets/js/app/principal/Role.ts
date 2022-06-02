@@ -1,7 +1,7 @@
 import {RoleJson} from './RoleJson';
-import {assert} from 'lib-admin-ui/util/Assert';
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {assert} from '@enonic/lib-admin-ui/util/Assert';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {Members, MembersBuilder} from './Members';
 
 export class Role

@@ -1,13 +1,13 @@
-import {Application} from 'lib-admin-ui/application/Application';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {ApplicationViewer} from 'lib-admin-ui/application/ApplicationViewer';
-import {FormView} from 'lib-admin-ui/form/FormView';
-import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {ApplicationViewer} from '@enonic/lib-admin-ui/application/ApplicationViewer';
+import {FormView} from '@enonic/lib-admin-ui/form/FormView';
+import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
-import {RichComboBox, RichComboBoxBuilder} from 'lib-admin-ui/ui/selector/combobox/RichComboBox';
-import {BaseLoader} from 'lib-admin-ui/util/loader/BaseLoader';
-import {Viewer} from 'lib-admin-ui/ui/Viewer';
+import {RichComboBox, RichComboBoxBuilder} from '@enonic/lib-admin-ui/ui/selector/combobox/RichComboBox';
+import {BaseLoader} from '@enonic/lib-admin-ui/util/loader/BaseLoader';
+import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
 import {AuthApplicationLoader} from './AuthApplicationLoader';
 
 export class AuthApplicationComboBox

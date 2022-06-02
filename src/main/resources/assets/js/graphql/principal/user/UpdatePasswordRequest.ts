@@ -1,5 +1,5 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
 export class UpdatePasswordRequest
     extends GraphQlRequest<Boolean> {

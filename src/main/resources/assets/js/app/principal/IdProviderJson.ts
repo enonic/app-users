@@ -1,5 +1,5 @@
-import {IdProviderConfigJson} from 'lib-admin-ui/security/IdProviderConfigJson';
-import {UserItemJson} from 'lib-admin-ui/security/UserItemJson';
+import {IdProviderConfigJson} from '@enonic/lib-admin-ui/security/IdProviderConfigJson';
+import {UserItemJson} from '@enonic/lib-admin-ui/security/UserItemJson';
 import {IdProviderAccessControlEntryJson} from '../access/IdProviderAccessControlEntryJson';
 
 export interface IdProviderJson

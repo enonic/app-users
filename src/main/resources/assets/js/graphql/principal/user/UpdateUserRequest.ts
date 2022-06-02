@@ -1,6 +1,6 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
 import {User} from '../../../app/principal/User';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {UserJson} from '../../../app/principal/UserJson';
 
 export class UpdateUserRequest

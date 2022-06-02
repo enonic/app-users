@@ -5,11 +5,11 @@ import {Role} from '../../app/principal/Role';
 import {UserJson} from '../../app/principal/UserJson';
 import {GroupJson} from '../../app/principal/GroupJson';
 import {RoleJson} from '../../app/principal/RoleJson';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {ListPrincipalsProperties} from './ListPrincipalsNamesRequest';
 
 export type ListPrincipalsData = {

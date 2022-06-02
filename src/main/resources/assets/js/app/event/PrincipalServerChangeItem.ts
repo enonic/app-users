@@ -1,6 +1,6 @@
-import {NodeServerChangeItem, NodeServerChangeItemBuilder} from 'lib-admin-ui/event/NodeServerChangeItem';
-import {NodeEventNodeJson} from 'lib-admin-ui/event/NodeServerEvent';
-import {NodePath} from 'lib-admin-ui/NodePath';
+import {NodeServerChangeItem, NodeServerChangeItemBuilder} from '@enonic/lib-admin-ui/event/NodeServerChangeItem';
+import {NodeEventNodeJson} from '@enonic/lib-admin-ui/event/NodeServerEvent';
+import {NodePath} from '@enonic/lib-admin-ui/NodePath';
 
 export class PrincipalServerChangeItem
     extends NodeServerChangeItem {

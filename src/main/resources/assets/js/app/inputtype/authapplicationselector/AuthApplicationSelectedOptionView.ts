@@ -1,19 +1,19 @@
 import * as Q from 'q';
-import {PropertyTree} from 'lib-admin-ui/data/PropertyTree';
-import {Option} from 'lib-admin-ui/ui/selector/Option';
-import {FormView} from 'lib-admin-ui/form/FormView';
-import {Application} from 'lib-admin-ui/application/Application';
-import {ApplicationKey} from 'lib-admin-ui/application/ApplicationKey';
-import {ApplicationConfig} from 'lib-admin-ui/application/ApplicationConfig';
-import {ApplicationConfiguratorDialog} from 'lib-admin-ui/form/inputtype/appconfig/ApplicationConfiguratorDialog';
-import {FormContext} from 'lib-admin-ui/form/FormContext';
+import {PropertyTree} from '@enonic/lib-admin-ui/data/PropertyTree';
+import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
+import {FormView} from '@enonic/lib-admin-ui/form/FormView';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {ApplicationConfig} from '@enonic/lib-admin-ui/application/ApplicationConfig';
+import {ApplicationConfiguratorDialog} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfiguratorDialog';
+import {FormContext} from '@enonic/lib-admin-ui/form/FormContext';
 import {AuthApplicationComboBox} from './AuthApplicationComboBox';
-import {BaseSelectedOptionView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
-import {FormValidityChangedEvent} from 'lib-admin-ui/form/FormValidityChangedEvent';
-import {NamesAndIconView, NamesAndIconViewBuilder} from 'lib-admin-ui/app/NamesAndIconView';
-import {NamesAndIconViewSize} from 'lib-admin-ui/app/NamesAndIconViewSize';
-import {FormState} from 'lib-admin-ui/app/wizard/WizardPanel';
-import {BaseSelectedOptionViewBuilder} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
+import {BaseSelectedOptionView} from '@enonic/lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
+import {FormValidityChangedEvent} from '@enonic/lib-admin-ui/form/FormValidityChangedEvent';
+import {NamesAndIconView, NamesAndIconViewBuilder} from '@enonic/lib-admin-ui/app/NamesAndIconView';
+import {NamesAndIconViewSize} from '@enonic/lib-admin-ui/app/NamesAndIconViewSize';
+import {FormState} from '@enonic/lib-admin-ui/app/wizard/WizardPanel';
+import {BaseSelectedOptionViewBuilder} from '@enonic/lib-admin-ui/ui/selector/combobox/BaseSelectedOptionView';
 
 export class AuthApplicationSelectedOptionView
     extends BaseSelectedOptionView<Application> {

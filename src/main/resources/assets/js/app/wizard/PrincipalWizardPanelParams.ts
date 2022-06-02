@@ -1,8 +1,8 @@
 import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
 import {IdProvider} from '../principal/IdProvider';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
 export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Principal> {
 

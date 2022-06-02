@@ -1,9 +1,9 @@
-import {Path} from 'lib-admin-ui/rest/Path';
-import {StringHelper} from 'lib-admin-ui/util/StringHelper';
-import {HttpRequest} from 'lib-admin-ui/rest/HttpRequest';
-import {PostRequest} from 'lib-admin-ui/rest/PostRequest';
-import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {Path} from '@enonic/lib-admin-ui/rest/Path';
+import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
+import {HttpRequest} from '@enonic/lib-admin-ui/rest/HttpRequest';
+import {PostRequest} from '@enonic/lib-admin-ui/rest/PostRequest';
+import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import * as Q from 'q';
 
 export class GraphQlRequest<PARSED_TYPE>
