@@ -1,9 +1,9 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {TextInput} from 'lib-admin-ui/ui/text/TextInput';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {Validators} from 'lib-admin-ui/ui/form/Validators';
-import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {TextInput} from '@enonic/lib-admin-ui/ui/text/TextInput';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
+import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class PrincipalDescriptionWizardStepForm

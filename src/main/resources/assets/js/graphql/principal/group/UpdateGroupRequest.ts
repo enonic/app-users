@@ -1,6 +1,6 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
 import {Group} from '../../../app/principal/Group';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {GroupJson} from '../../../app/principal/GroupJson';
 
 export class UpdateGroupRequest

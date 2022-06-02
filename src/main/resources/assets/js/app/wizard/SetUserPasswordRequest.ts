@@ -1,9 +1,9 @@
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {SecurityResourceRequest} from 'lib-admin-ui/security/SecurityResourceRequest';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {SecurityResourceRequest} from '@enonic/lib-admin-ui/security/SecurityResourceRequest';
 import {UserJson} from '../principal/UserJson';
 import {User} from '../principal/User';
-import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
-import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
+import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
+import {HttpMethod} from '@enonic/lib-admin-ui/rest/HttpMethod';
 import {UrlHelper} from '../../util/UrlHelper';
 
 export class SetUserPasswordRequest

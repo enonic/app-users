@@ -1,14 +1,14 @@
-import {Option} from 'lib-admin-ui/ui/selector/Option';
-import {SelectedOption} from 'lib-admin-ui/ui/selector/combobox/SelectedOption';
-import {Dropdown, DropdownConfig} from 'lib-admin-ui/ui/selector/dropdown/Dropdown';
+import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
+import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
+import {Dropdown, DropdownConfig} from '@enonic/lib-admin-ui/ui/selector/dropdown/Dropdown';
 import {RepositoryViewer} from './RepositoryViewer';
 import {Repository} from './Repository';
 import {RepositoryLoader} from './RepositoryLoader';
-import {RichComboBox, RichComboBoxBuilder} from 'lib-admin-ui/ui/selector/combobox/RichComboBox';
-import {SelectedOptionView} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionView';
-import {BaseSelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
-import {Viewer} from 'lib-admin-ui/ui/Viewer';
-import {SelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/SelectedOptionsView';
+import {RichComboBox, RichComboBoxBuilder} from '@enonic/lib-admin-ui/ui/selector/combobox/RichComboBox';
+import {SelectedOptionView} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOptionView';
+import {BaseSelectedOptionsView} from '@enonic/lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
+import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
+import {SelectedOptionsView} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOptionsView';
 
 export class RepositoryComboBox
     extends RichComboBox<Repository> {

@@ -1,11 +1,11 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {UserItem} from 'lib-admin-ui/security/UserItem';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
 import {IdProvider} from '../principal/IdProvider';
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {ViewItem} from '@enonic/lib-admin-ui/app/view/ViewItem';
 
 export enum UserTreeGridItemType {
     ID_PROVIDER,

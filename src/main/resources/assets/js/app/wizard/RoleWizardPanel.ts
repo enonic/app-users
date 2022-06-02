@@ -4,14 +4,14 @@ import {CreateRoleRequest} from '../../graphql/principal/role/CreateRoleRequest'
 import {UpdateRoleRequest} from '../../graphql/principal/role/UpdateRoleRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {Role, RoleBuilder} from '../principal/Role';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {RoleKeys} from 'lib-admin-ui/security/RoleKeys';
-import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
-import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
-import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {RoleKeys} from '@enonic/lib-admin-ui/security/RoleKeys';
+import {WizardStep} from '@enonic/lib-admin-ui/app/wizard/WizardStep';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {WizardHeaderWithDisplayNameAndName} from '@enonic/lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {ArrayHelper} from '@enonic/lib-admin-ui/util/ArrayHelper';
 
 export class RoleWizardPanel
     extends MembersWizardPanel {

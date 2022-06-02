@@ -1,4 +1,4 @@
-import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
+import {UserItemKey} from '@enonic/lib-admin-ui/security/UserItemKey';
 
 export class DeleteUserItemResult {
 

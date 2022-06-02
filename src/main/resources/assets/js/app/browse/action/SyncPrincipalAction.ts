@@ -1,7 +1,7 @@
 import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem} from '../UserTreeGridItem';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class SyncPrincipalAction extends Action {
 

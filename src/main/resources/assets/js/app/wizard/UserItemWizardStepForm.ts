@@ -1,10 +1,10 @@
-import {WizardStepForm} from 'lib-admin-ui/app/wizard/WizardStepForm';
-import {FormItem} from 'lib-admin-ui/ui/form/FormItem';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
-import {Form} from 'lib-admin-ui/ui/form/Form';
-import {FormView} from 'lib-admin-ui/form/FormView';
-import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
-import {WizardStepValidityChangedEvent} from 'lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {WizardStepForm} from '@enonic/lib-admin-ui/app/wizard/WizardStepForm';
+import {FormItem} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
+import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
+import {FormView} from '@enonic/lib-admin-ui/form/FormView';
+import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
+import {WizardStepValidityChangedEvent} from '@enonic/lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 
 export abstract class UserItemWizardStepForm
     extends WizardStepForm {

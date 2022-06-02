@@ -1,4 +1,4 @@
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {DeleteUserItemRequest} from '../useritem/DeleteUserItemRequest';
 
 export class DeleteIdProviderRequest

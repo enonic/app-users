@@ -1,13 +1,13 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {PrincipalComboBox} from 'lib-admin-ui/ui/security/PrincipalComboBox';
-import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {PrincipalComboBox} from '@enonic/lib-admin-ui/ui/security/PrincipalComboBox';
+import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Members} from '../principal/Members';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
-import {PrincipalLoader as BasePrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {PrincipalLoader as BasePrincipalLoader} from '@enonic/lib-admin-ui/security/PrincipalLoader';
 import {PrincipalLoader} from '../principal/PrincipalLoader';
 
 export class MembersWizardStepForm

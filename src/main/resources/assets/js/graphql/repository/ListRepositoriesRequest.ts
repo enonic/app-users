@@ -1,6 +1,6 @@
 import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
 import {Repository} from '../../app/report/Repository';
-import {StringHelper} from 'lib-admin-ui/util/StringHelper';
+import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 
 interface ListRepositoriesProperties extends ListGraphQlProperties {
     query: string;

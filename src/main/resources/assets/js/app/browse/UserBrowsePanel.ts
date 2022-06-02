@@ -6,11 +6,11 @@ import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';
 import {IdProvider} from '../principal/IdProvider';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
-import {AppHelper} from 'lib-admin-ui/util/AppHelper';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {BrowsePanel} from '@enonic/lib-admin-ui/app/browse/BrowsePanel';
+import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class UserBrowsePanel
     extends BrowsePanel {

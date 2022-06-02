@@ -1,5 +1,5 @@
 import {UserTreeGridItem} from './UserTreeGridItem';
-import {Event} from 'lib-admin-ui/event/Event';
+import {Event} from '@enonic/lib-admin-ui/event/Event';
 
 export class BaseUserEvent
     extends Event {

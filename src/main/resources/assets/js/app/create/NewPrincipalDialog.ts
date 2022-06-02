@@ -1,12 +1,12 @@
 import {UserItemTypesTreeGrid} from './UserItemTypesTreeGrid';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-import {ResponsiveManager} from 'lib-admin-ui/ui/responsive/ResponsiveManager';
-import {PEl} from 'lib-admin-ui/dom/PEl';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {Body} from 'lib-admin-ui/dom/Body';
-import {ModalDialog, ModalDialogConfig} from 'lib-admin-ui/ui/dialog/ModalDialog';
-import {KeyBinding} from 'lib-admin-ui/ui/KeyBinding';
+import {ResponsiveManager} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveManager';
+import {PEl} from '@enonic/lib-admin-ui/dom/PEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {Body} from '@enonic/lib-admin-ui/dom/Body';
+import {ModalDialog, ModalDialogConfig} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
+import {KeyBinding} from '@enonic/lib-admin-ui/ui/KeyBinding';
 
 export class NewPrincipalDialog
     extends ModalDialog {

@@ -1,6 +1,6 @@
 import * as Q from 'q';
-import {BaseLoader} from 'lib-admin-ui/util/loader/BaseLoader';
-import {Application} from 'lib-admin-ui/application/Application';
+import {BaseLoader} from '@enonic/lib-admin-ui/util/loader/BaseLoader';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {ListIdProviderApplicationsRequest} from '../../resource/ListIdProviderApplicationsRequest';
 
 

@@ -1,8 +1,8 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {ValueChangedEvent} from 'lib-admin-ui/ValueChangedEvent';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {ValueChangedEvent} from '@enonic/lib-admin-ui/ValueChangedEvent';
 import {IdProviderAccessSelector} from './IdProviderAccessSelector';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
-import {PrincipalContainerSelectedEntryView} from 'lib-admin-ui/ui/security/PrincipalContainerSelectedEntryView';
+import {PrincipalContainerSelectedEntryView} from '@enonic/lib-admin-ui/ui/security/PrincipalContainerSelectedEntryView';
 
 export class IdProviderAccessControlEntryView
     extends PrincipalContainerSelectedEntryView<IdProviderAccessControlEntry> {

@@ -3,7 +3,7 @@ import {IdProvider} from '../principal/IdProvider';
 import {User} from '../principal/User';
 import {Group} from '../principal/Group';
 import {Role} from '../principal/Role';
-import {NamesAndIconViewer} from 'lib-admin-ui/ui/NamesAndIconViewer';
+import {NamesAndIconViewer} from '@enonic/lib-admin-ui/ui/NamesAndIconViewer';
 
 export class UserTypesTreeGridItemViewer
     extends NamesAndIconViewer<UserTypeTreeGridItem> {

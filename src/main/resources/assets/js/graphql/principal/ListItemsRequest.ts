@@ -1,5 +1,5 @@
 import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
-import {FulltextSearchExpression} from 'lib-admin-ui/query/FulltextSearchExpression';
+import {FulltextSearchExpression} from '@enonic/lib-admin-ui/query/FulltextSearchExpression';
 
 export interface ListItemsProperties extends ListGraphQlProperties {
     query: string;

@@ -1,4 +1,4 @@
-import {ItemStatisticsHeader} from 'lib-admin-ui/app/view/ItemStatisticsHeader';
+import {ItemStatisticsHeader} from '@enonic/lib-admin-ui/app/view/ItemStatisticsHeader';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
 
 export class UserItemStatisticsHeader

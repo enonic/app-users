@@ -1,11 +1,11 @@
 import * as Q from 'q';
-import {PrincipalLoader as BasePrincipalLoader} from 'lib-admin-ui/security/PrincipalLoader';
+import {PrincipalLoader as BasePrincipalLoader} from '@enonic/lib-admin-ui/security/PrincipalLoader';
 import {FindPrincipalsRequest} from './FindPrincipalsRequest';
 import {GetPrincipalsByKeysRequest} from './GetPrincipalsByKeysRequest';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {ComboBox} from 'lib-admin-ui/ui/selector/combobox/ComboBox';
-import {BaseSelectedOptionsView} from 'lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {ComboBox} from '@enonic/lib-admin-ui/ui/selector/combobox/ComboBox';
+import {BaseSelectedOptionsView} from '@enonic/lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
 
 export class PrincipalLoader
     extends BasePrincipalLoader {

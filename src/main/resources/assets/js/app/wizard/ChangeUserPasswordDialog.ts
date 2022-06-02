@@ -1,18 +1,18 @@
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
 import {SetUserPasswordRequest} from './SetUserPasswordRequest';
 import {PasswordGenerator} from './PasswordGenerator';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {DialogButton} from 'lib-admin-ui/ui/dialog/DialogButton';
-import {Validators} from 'lib-admin-ui/ui/form/Validators';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
-import {H6El} from 'lib-admin-ui/dom/H6El';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {Fieldset} from 'lib-admin-ui/ui/form/Fieldset';
-import {Form} from 'lib-admin-ui/ui/form/Form';
-import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
-import {Action} from 'lib-admin-ui/ui/Action';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {DialogButton} from '@enonic/lib-admin-ui/ui/dialog/DialogButton';
+import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
+import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
+import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
+import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
 
 export class ChangeUserPasswordDialog
     extends ModalDialog {

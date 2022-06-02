@@ -3,12 +3,12 @@ import {PrincipalDescriptionWizardStepForm} from './PrincipalDescriptionWizardSt
 import {PrincipalWizardPanel} from './PrincipalWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {MembersWizardStepForm} from './MembersWizardStepForm';
-import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {ConfirmationDialog} from '@enonic/lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Members} from '../principal/Members';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
-import {Principal} from 'lib-admin-ui/security/Principal';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {WizardHeaderWithDisplayNameAndName} from '@enonic/lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 
 export class MembersWizardPanel extends PrincipalWizardPanel {
 

@@ -1,5 +1,5 @@
 import {GraphQlRequest} from '../GraphQlRequest';
-import {UserItemKey} from 'lib-admin-ui/security/UserItemKey';
+import {UserItemKey} from '@enonic/lib-admin-ui/security/UserItemKey';
 import {DeleteUserItemJson} from './DeleteUserItemJson';
 import {DeleteUserItemResult} from './DeleteUserItemResult';
 

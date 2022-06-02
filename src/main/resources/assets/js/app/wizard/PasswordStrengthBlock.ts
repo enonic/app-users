@@ -1,5 +1,5 @@
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import * as owasp from 'owasp-password-strength-test';
 
 export class PasswordStrengthBlock extends DivEl {

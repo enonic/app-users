@@ -15,26 +15,26 @@ import {GetIdProviderByKeyRequest} from '../graphql/idprovider/GetIdProviderByKe
 import {GetPrincipalByKeyRequest} from '../graphql/principal/GetPrincipalByKeyRequest';
 import {UserItemNamedEvent} from './event/UserItemNamedEvent';
 import {IdProvider} from './principal/IdProvider';
-import {NavigatedAppPanel} from 'lib-admin-ui/app/NavigatedAppPanel';
-import {AppBarTabMenuItem, AppBarTabMenuItemBuilder} from 'lib-admin-ui/app/bar/AppBarTabMenuItem';
-import {AppBarTabId} from 'lib-admin-ui/app/bar/AppBarTabId';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {UserItem} from 'lib-admin-ui/security/UserItem';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
-import {LoadMask} from 'lib-admin-ui/ui/mask/LoadMask';
-import {TabbedAppBar} from 'lib-admin-ui/app/bar/TabbedAppBar';
-import {Path} from 'lib-admin-ui/rest/Path';
-import {ShowBrowsePanelEvent} from 'lib-admin-ui/app/ShowBrowsePanelEvent';
-import {PropertyChangedEvent} from 'lib-admin-ui/PropertyChangedEvent';
-import {ValidityChangedEvent} from 'lib-admin-ui/ValidityChangedEvent';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {showError} from 'lib-admin-ui/notify/MessageBus';
-import {NamePrettyfier} from 'lib-admin-ui/NamePrettyfier';
-import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
-import {Exception} from 'lib-admin-ui/Exception';
+import {NavigatedAppPanel} from '@enonic/lib-admin-ui/app/NavigatedAppPanel';
+import {AppBarTabMenuItem, AppBarTabMenuItemBuilder} from '@enonic/lib-admin-ui/app/bar/AppBarTabMenuItem';
+import {AppBarTabId} from '@enonic/lib-admin-ui/app/bar/AppBarTabId';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
+import {TabbedAppBar} from '@enonic/lib-admin-ui/app/bar/TabbedAppBar';
+import {Path} from '@enonic/lib-admin-ui/rest/Path';
+import {ShowBrowsePanelEvent} from '@enonic/lib-admin-ui/app/ShowBrowsePanelEvent';
+import {PropertyChangedEvent} from '@enonic/lib-admin-ui/PropertyChangedEvent';
+import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {showError} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {NamePrettyfier} from '@enonic/lib-admin-ui/NamePrettyfier';
+import {IdProviderMode} from '@enonic/lib-admin-ui/security/IdProviderMode';
+import {Exception} from '@enonic/lib-admin-ui/Exception';
 
 interface PrincipalData {
 

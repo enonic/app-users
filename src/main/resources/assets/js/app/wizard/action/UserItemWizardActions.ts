@@ -1,10 +1,10 @@
 import {UserItemWizardPanel} from '../UserItemWizardPanel';
 import {DeleteUserItemAction} from './DeleteUserItemAction';
-import {UserItem} from 'lib-admin-ui/security/UserItem';
-import {WizardActions} from 'lib-admin-ui/app/wizard/WizardActions';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {SaveAction} from 'lib-admin-ui/app/wizard/SaveAction';
-import {CloseAction} from 'lib-admin-ui/app/wizard/CloseAction';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
+import {WizardActions} from '@enonic/lib-admin-ui/app/wizard/WizardActions';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {SaveAction} from '@enonic/lib-admin-ui/app/wizard/SaveAction';
+import {CloseAction} from '@enonic/lib-admin-ui/app/wizard/CloseAction';
 
 export class UserItemWizardActions<USER_ITEM_TYPE extends UserItem>
     extends WizardActions<USER_ITEM_TYPE> {

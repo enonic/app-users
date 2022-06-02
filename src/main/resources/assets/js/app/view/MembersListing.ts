@@ -1,15 +1,15 @@
 import Q = require('q');
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {Element} from 'lib-admin-ui/dom/Element';
-import {H2El} from 'lib-admin-ui/dom/H2El';
-import {UlEl} from 'lib-admin-ui/dom/UlEl';
-import {LiEl} from 'lib-admin-ui/dom/LiEl';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalViewer} from 'lib-admin-ui/ui/security/PrincipalViewer';
-import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import {H2El} from '@enonic/lib-admin-ui/dom/H2El';
+import {UlEl} from '@enonic/lib-admin-ui/dom/UlEl';
+import {LiEl} from '@enonic/lib-admin-ui/dom/LiEl';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalViewer} from '@enonic/lib-admin-ui/ui/security/PrincipalViewer';
+import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {GetPrincipalsByKeysRequest} from '../../graphql/principal/GetPrincipalsByKeysRequest';
-import {LoadMask} from 'lib-admin-ui/ui/mask/LoadMask';
+import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 
 export class MembersListing extends DivEl {
 

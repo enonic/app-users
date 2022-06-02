@@ -1,6 +1,6 @@
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {Event} from 'lib-admin-ui/event/Event';
-import {ClassHelper} from 'lib-admin-ui/ClassHelper';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {Event} from '@enonic/lib-admin-ui/event/Event';
+import {ClassHelper} from '@enonic/lib-admin-ui/ClassHelper';
 import {IdProvider} from '../principal/IdProvider';
 
 export class UserItemUpdatedEvent

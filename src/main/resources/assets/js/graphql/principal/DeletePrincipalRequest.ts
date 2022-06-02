@@ -1,4 +1,4 @@
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {DeleteUserItemRequest} from '../useritem/DeleteUserItemRequest';
 
 export class DeletePrincipalRequest

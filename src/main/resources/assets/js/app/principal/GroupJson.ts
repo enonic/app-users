@@ -1,4 +1,4 @@
-import {PrincipalJson} from 'lib-admin-ui/security/PrincipalJson';
+import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 import {MembersJson} from './MembersJson';
 
 export interface GroupJson

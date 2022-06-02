@@ -1,12 +1,12 @@
 import {IdProviderAccessControlComboBox, IdProviderAccessControlComboBoxBuilder} from './IdProviderAccessControlComboBox';
 import {IdProvider} from '../principal/IdProvider';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
-import {Validators} from 'lib-admin-ui/ui/form/Validators';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {FormItem, FormItemBuilder} from 'lib-admin-ui/ui/form/FormItem';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
-import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
+import {ArrayHelper} from '@enonic/lib-admin-ui/util/ArrayHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
 export class SecurityWizardStepForm

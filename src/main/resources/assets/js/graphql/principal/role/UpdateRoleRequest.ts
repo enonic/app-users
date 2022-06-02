@@ -1,6 +1,6 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
 import {Role} from '../../../app/principal/Role';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {RoleJson} from '../../../app/principal/RoleJson';
 
 export class UpdateRoleRequest

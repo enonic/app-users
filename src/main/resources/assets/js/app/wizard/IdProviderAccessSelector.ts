@@ -1,8 +1,8 @@
 import {IdProviderAccess} from '../access/IdProviderAccess';
-import {TabMenu} from 'lib-admin-ui/ui/tab/TabMenu';
-import {ValueChangedEvent} from 'lib-admin-ui/ValueChangedEvent';
-import {TabMenuItem, TabMenuItemBuilder} from 'lib-admin-ui/ui/tab/TabMenuItem';
-import {NavigatorEvent} from 'lib-admin-ui/ui/NavigatorEvent';
+import {TabMenu} from '@enonic/lib-admin-ui/ui/tab/TabMenu';
+import {ValueChangedEvent} from '@enonic/lib-admin-ui/ValueChangedEvent';
+import {TabMenuItem, TabMenuItemBuilder} from '@enonic/lib-admin-ui/ui/tab/TabMenuItem';
+import {NavigatorEvent} from '@enonic/lib-admin-ui/ui/NavigatorEvent';
 
 interface IdProviderAccessSelectorOption {
     value: IdProviderAccess;

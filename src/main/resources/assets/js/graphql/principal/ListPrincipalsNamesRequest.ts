@@ -1,6 +1,6 @@
 import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 
 export type ListPrincipalsKeysResult = {
     displayNames: string[];

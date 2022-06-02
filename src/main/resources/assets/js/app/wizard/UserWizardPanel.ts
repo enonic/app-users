@@ -8,15 +8,15 @@ import {CreateUserRequest} from '../../graphql/principal/user/CreateUserRequest'
 import {UpdateUserRequest} from '../../graphql/principal/user/UpdateUserRequest';
 import {UserItemCreatedEvent} from '../event/UserItemCreatedEvent';
 import {User, UserBuilder} from '../principal/User';
-import {Principal} from 'lib-admin-ui/security/Principal';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
-import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
-import {WizardStep} from 'lib-admin-ui/app/wizard/WizardStep';
-import {ArrayHelper} from 'lib-admin-ui/util/ArrayHelper';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {showFeedback} from 'lib-admin-ui/notify/MessageBus';
-import {StringHelper} from 'lib-admin-ui/util/StringHelper';
-import {WizardHeaderWithDisplayNameAndName} from 'lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {ConfirmationDialog} from '@enonic/lib-admin-ui/ui/dialog/ConfirmationDialog';
+import {WizardStep} from '@enonic/lib-admin-ui/app/wizard/WizardStep';
+import {ArrayHelper} from '@enonic/lib-admin-ui/util/ArrayHelper';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
+import {WizardHeaderWithDisplayNameAndName} from '@enonic/lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
 
 export class UserWizardPanel
     extends PrincipalWizardPanel {

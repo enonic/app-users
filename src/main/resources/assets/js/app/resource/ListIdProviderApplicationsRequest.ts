@@ -1,7 +1,7 @@
-import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
-import {ApplicationResourceRequest} from 'lib-admin-ui/application/ApplicationResourceRequest';
-import {ApplicationListResult} from 'lib-admin-ui/application/ApplicationListResult';
-import {Application} from 'lib-admin-ui/application/Application';
+import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
+import {ApplicationResourceRequest} from '@enonic/lib-admin-ui/application/ApplicationResourceRequest';
+import {ApplicationListResult} from '@enonic/lib-admin-ui/application/ApplicationListResult';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {UrlHelper} from '../../util/UrlHelper';
 
 export class ListIdProviderApplicationsRequest

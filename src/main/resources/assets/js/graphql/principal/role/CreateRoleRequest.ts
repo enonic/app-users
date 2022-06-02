@@ -1,7 +1,7 @@
 import {GraphQlRequest} from '../../GraphQlRequest';
 import {Role} from '../../../app/principal/Role';
 import {RoleJson} from '../../../app/principal/RoleJson';
-import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
 // Key and members should be PrincipalsKeys?
 interface CreateRoleProperties {

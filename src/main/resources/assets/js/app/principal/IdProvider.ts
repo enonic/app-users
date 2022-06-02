@@ -1,14 +1,14 @@
 import * as Q from 'q';
-import {UserItem, UserItemBuilder} from 'lib-admin-ui/security/UserItem';
-import {IdProviderConfig} from 'lib-admin-ui/security/IdProviderConfig';
-import {IdProviderMode} from 'lib-admin-ui/security/IdProviderMode';
-import {PrincipalType} from 'lib-admin-ui/security/PrincipalType';
-import {IdProviderKey} from 'lib-admin-ui/security/IdProviderKey';
+import {UserItem, UserItemBuilder} from '@enonic/lib-admin-ui/security/UserItem';
+import {IdProviderConfig} from '@enonic/lib-admin-ui/security/IdProviderConfig';
+import {IdProviderMode} from '@enonic/lib-admin-ui/security/IdProviderMode';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {ListPrincipalsRequest, ListPrincipalsData} from '../../graphql/principal/ListPrincipalsRequest';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {IdProviderJson} from './IdProviderJson';
-import {Equitable} from 'lib-admin-ui/Equitable';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 
 export class IdProvider
     extends UserItem {
