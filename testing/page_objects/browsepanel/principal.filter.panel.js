@@ -32,6 +32,7 @@ class BrowseFilterPanel extends Page {
         let endIndex = text.indexOf(')');
         return text.substring(startIndex + 1, endIndex);
     }
+
     async getNumberInGroupAggregationCheckbox() {
         let groupAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.groupAggregationCheckbox + `/label`;
         let text = await this.getText(groupAggregationLocator);
@@ -39,6 +40,7 @@ class BrowseFilterPanel extends Page {
         let endIndex = text.indexOf(')');
         return text.substring(startIndex + 1, endIndex);
     }
+
     getNumberInRoleAggregationCheckbox() {
         let roleAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + `/label`;
         return this.getText(roleAggregationLocator).then(result => {
@@ -55,7 +57,7 @@ class BrowseFilterPanel extends Page {
 
     async clickOnUserAggregation() {
         let selector = xpath.container + xpath.aggregationGroupView + xpath.userAggregationCheckbox + '/label';
-        await  this.clickOnElement(selector);
+        await this.clickOnElement(selector);
         return await this.pause(400);
     }
 
@@ -88,17 +90,24 @@ class BrowseFilterPanel extends Page {
         })
     }
 
-    typeSearchText(text) {
-        return this.typeTextInInput(this.searchTextInput, text).catch(err => {
-            throw new Error("Filter Panel - " + err);
-        })
+    async typeSearchText(text) {
+        try {
+            await this.waitForElementDisplayed(this.searchTextInput, appConst.mediumTimeout);
+            await this.typeTextInInput(this.searchTextInput, text);
+            return await this.pause(300);
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName("err_search_input"));
+            throw new Error("Filter Panel, search input - " + err);
+        }
     }
 
-    waitForClearLinkVisible() {
-        return this.waitForElementDisplayed(this.clearFilterLink, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_clear_link_filter_panel');
+    async waitForClearLinkVisible() {
+        try {
+            await this.waitForElementDisplayed(this.clearFilterLink, appConst.mediumTimeout)
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName('err_clear_link'));
             throw new Error('Clear link should be visible: ' + err);
-        })
+        }
     }
 
     waitForClearLinkNotVisible() {
