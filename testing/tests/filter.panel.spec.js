@@ -10,6 +10,7 @@ const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.
 describe('filter.panel.spec Principal Filter Panel specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
+    const NON_EXISTENT_ITEM = appConst.generateRandomName("test");
     if (typeof browser === "undefined") {
         webDriverHelper.setupBrowser();
     }
@@ -26,15 +27,22 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await filterPanel.waitForClosed();
         });
 
-    it('GIVEN `Principal Filter Panel` is opened WHEN search-text has been typed THEN `Clear` link should appear',
+    //Verify issue https://github.com/enonic/app-users/issues/1075
+    //Incorrect behavior of filtering #1075
+    it("GIVEN 'Filter Panel' is opened WHEN non existent name has been typed THEN grid should be empty",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let filterPanel = new BrowseFilterPanel();
+            //1. Open Filter Panel:
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
-            await filterPanel.typeSearchText('test');
-            //Clear button should appear:
+            //2. Type a non existent name:
+            await filterPanel.typeSearchText(NON_EXISTENT_ITEM);
+            //3. Verify that 'Clear' button should appear:
             await filterPanel.waitForClearLinkVisible();
+            //4. Verify that grid in  Browse panel is empty:
+            let result = await userBrowsePanel.getGridItemDisplayNames();
+            assert.isTrue(result.length === 0, "Grid should be empty")
         });
 
     it('GIVEN `Principal Filter Panel` is opened  and search text typed WHEN `Clear` has been clicked THEN the link should not be displayed',
