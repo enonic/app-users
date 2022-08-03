@@ -40,7 +40,7 @@ export class AuthApplicationSelector
     private readOnly: boolean;
 
     constructor(config: AuthApplicationSelectorConfig) {
-        super('application-configurator');
+        super(config, 'application-configurator');
         this.readConfig(config.inputConfig);
         this.formContext = config.formContext;
     }
