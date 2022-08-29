@@ -8,7 +8,7 @@
     "test:firefox": "npx wdio ./wdio.conf.js"
   },
   "dependencies": {
-    "wdio-geckodriver-service": "^3.0.3"
+    "wdio-geckodriver-service": "^3.0.4"
   },
   "devDependencies": {
     "assert": "^2.0.0",
