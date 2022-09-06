@@ -1,6 +1,5 @@
 package com.enonic.xp.app.users.lib.auth;
 
-import com.enonic.xp.lib.common.PrincipalMapper;
 import com.enonic.xp.script.serializer.MapGenerator;
 import com.enonic.xp.script.serializer.MapSerializable;
 import com.enonic.xp.security.Principal;
