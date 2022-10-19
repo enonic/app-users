@@ -52,7 +52,7 @@ export class AuthApplicationSelectedOptionsView
         this.applicationConfigProvider.onPropertyChanged(() => {
             this.items.forEach((optionView: AuthApplicationSelectedOptionView) => {
                 const newConfig: ApplicationConfig =
-                    this.applicationConfigProvider.getConfig(optionView.getSiteConfig().getApplicationKey(), false);
+                    this.applicationConfigProvider.getConfig(optionView.getSiteConfig().getApplicationKey());
 
                 if (newConfig) {
                     optionView.setSiteConfig(newConfig);

@@ -116,10 +116,12 @@ export class AuthApplicationSelectedOptionView
             }
         };
 
-        let applicationConfiguratorDialog = new ApplicationConfiguratorDialog(this.application,
-            this.formView,
+        const applicationConfiguratorDialog = new ApplicationConfiguratorDialog({
+            application: this.application,
+            formView: this.formView,
             okCallback,
-            cancelCallback);
+            cancelCallback
+        });
 
         applicationConfiguratorDialog.open();
     }
