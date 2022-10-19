@@ -32,7 +32,9 @@ export class AuthApplicationSelectedOptionsView
     createSelectedOption(option: Option<Application>): SelectedOption<Application> {
         this.notifyBeforeOptionCreated();
 
-        const applicationConfig: ApplicationConfig = this.applicationConfigProvider.getConfig(option.getDisplayValue().getApplicationKey());
+        const key: ApplicationKey = option.getDisplayValue().getApplicationKey();
+        const applicationConfig: ApplicationConfig =
+            this.applicationConfigProvider.getConfig(key) || this.applicationConfigProvider.addConfig(key);
         const optionView: AuthApplicationSelectedOptionView =
             new AuthApplicationSelectedOptionView(option, applicationConfig, this.readonly);
 
