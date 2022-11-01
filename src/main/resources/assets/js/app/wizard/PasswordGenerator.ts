@@ -48,7 +48,7 @@ export class PasswordGenerator
         this.helpTextBlock.setHtml(i18n('field.pswGenerator.helpText'));
     }
 
-    private initListeners() {
+    private initListeners(): void {
         this.initFocusEvents(this.input);
 
         this.input.onInput(() => {
@@ -59,12 +59,7 @@ export class PasswordGenerator
         this.initFocusEvents(this.showLink);
 
         this.showLink.onClicked((event: MouseEvent) => {
-            this.toggleClass('unlocked');
-
-            const unlocked = this.hasClass('unlocked');
-
-            this.toggleShowLink(!unlocked);
-            this.input.setType(unlocked ? 'text' : 'password');
+            this.toggleUnlocked(!this.hasClass('unlocked'));
 
             event.stopPropagation();
             event.preventDefault();
@@ -81,6 +76,12 @@ export class PasswordGenerator
             event.preventDefault();
             return false;
         });
+    }
+
+    private toggleUnlocked(unlocked: boolean): void {
+        this.toggleClass('unlocked', unlocked);
+        this.toggleShowLink(!unlocked);
+        this.input.setType(unlocked ? 'text' : 'password');
     }
 
     setValue(value: string, silent?: boolean, userInput?: boolean): PasswordGenerator {
@@ -112,7 +113,7 @@ export class PasswordGenerator
 
     reset(): void {
         this.setValue('');
-        this.toggleShowLink(true);
+        this.toggleUnlocked(false);
     }
 
     private assessComplexity(value: string) {
