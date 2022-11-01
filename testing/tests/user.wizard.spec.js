@@ -108,6 +108,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             //Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
+            await testUtils.saveScreenshot("change_password_dialog");
             let isDisplayed = await changePasswordDialog.isPasswordInputDisplayed();
             assert.isTrue(isDisplayed, 'Password Input should be displayed');
             isDisplayed = await changePasswordDialog.isGenerateLinkDisplayed();
@@ -126,10 +127,11 @@ describe('User Wizard and Change Password dialog spec', function () {
             //1. Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
+            await testUtils.saveScreenshot("change_password_dialog_2");
             //2. Insert an easy password:
             await changePasswordDialog.typePassword(BAD_PASSWORD);
             let status = await changePasswordDialog.getPasswordStatus();
-            testUtils.saveScreenshot('change_password_bad_status');
+            await testUtils.saveScreenshot('change_password_bad_status');
             assert.equal(status, appConst.PASSWORD_STATE.BAD, "bad password's status should be displayed");
             //Verify than 'Change Password' button is disabled:
             await changePasswordDialog.waitForChangePasswordButtonDisabled();
@@ -175,6 +177,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
+            await testUtils.saveScreenshot("change_password_dialog_3");
             //Click on 'Generate' button:
             await changePasswordDialog.clickOnGeneratePasswordLink();
             let password = await changePasswordDialog.getPasswordString();
