@@ -27,6 +27,10 @@ exports.update = function updateRole(params) {
     var key = common.required(params, 'key');
     var displayName = common.required(params, 'displayName');
 
+    if (isSuperUserToBeRemovedFromAdmins(key, params.removeMembers)) {
+        throw new Error('Can\'t remove Super User from Administrators');
+    }
+
     var modifiedRole = authLib.modifyRole({
         key: key,
         editor: function(role) {
@@ -43,6 +47,10 @@ exports.update = function updateRole(params) {
 
     return modifiedRole;
 };
+
+function isSuperUserToBeRemovedFromAdmins(key, removeMembers) {
+    return key === 'role:system.admin' && !!removeMembers && removeMembers.some((member) => member === 'user:system:su');
+}
 
 function populateMembers(role) {
     // eslint-disable-next-line no-param-reassign
