@@ -28,7 +28,7 @@
     "@types/hasher": "0.0.32",
     "@types/q": "^1.5.5",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
-    "@typescript-eslint/parser": "^5.42.1",
+    "@typescript-eslint/parser": "^5.43.0",
     "autoprefixer": "^10.4.13",
     "browserslist": "^4.21.4",
     "browserslist-config-enonic": "^1.0.6",
