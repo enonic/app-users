@@ -129,28 +129,27 @@ class UserWizard extends wizards.WizardPanel {
         })
     }
 
-    clickOnDelete() {
-        return this.waitForDeleteButtonEnabled().then(() => {
-            return this.clickOnElement(this.deleteButton);
-        }).catch(err => {
-            this.saveScreenshot('err_delete_in_user_wizard', err);
-            throw new Error("Error when clicking on Delete button");
-        });
+    async clickOnDelete() {
+        try {
+            await this.waitForDeleteButtonEnabled();
+            await this.clickOnElement(this.deleteButton);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName("err_delete_btn");
+            await this.saveScreenshot(screenshot);
+            throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + "  " + err);
+        }
     }
 
-    waitForDeleteButtonEnabled() {
-        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_delete_user_button_disabled', err);
-            throw new Error(err);
-        });
+    async waitForDeleteButtonEnabled() {
+        await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout);
     }
 
-    clearPasswordInput() {
-        return this.clearInputText(this.passwordInput).then(() => {
-            return this.typeTextInInput(this.passwordInput, 'a');
-        }).then(() => {
-            return this.getBrowser().keys('\uE003');
-        });
+    async clearPasswordInput() {
+        await this.clearInputText(this.passwordInput);
+        //insert a letter:
+        await this.typeTextInInput(this.passwordInput, 'a');
+        //press on BACKSPACE, remove the letter:
+        return await this.getBrowser().keys('\uE003');
     }
 
     clearEmailInput() {
@@ -169,11 +168,15 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     //clicks on Remove icon and removes the role
-    removeRole(roleDisplayName) {
-        let removeIconSelector = XPATH.container + `${lib.selectedPrincipalByDisplayName(roleDisplayName)}` + lib.REMOVE_ICON;
-        return this.clickOnElement(removeIconSelector).then(() => {
-            return this.pause(500);
-        })
+    async removeRole(roleDisplayName) {
+        let removeIconLocator = XPATH.container + `${lib.selectedPrincipalByDisplayName(roleDisplayName)}` + lib.REMOVE_ICON;
+        await this.clickOnElement(removeIconLocator);
+        return await this.pause(300);
+    }
+
+    async waitForRemoveRoleIconNotDisplayed(roleDisplayName) {
+        let removeIconLocator = XPATH.container + `${lib.selectedPrincipalByDisplayName(roleDisplayName)}` + lib.REMOVE_ICON;
+        return await this.waitForElementNotDisplayed(removeIconLocator, appConst.mediumTimeout);
     }
 
     addRoles(roleDisplayNames) {
@@ -187,20 +190,21 @@ class UserWizard extends wizards.WizardPanel {
     async getSelectedRoles() {
         let selectedOptions = "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + lib.PRINCIPAL_SELECTED_OPTION +
                               lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selectedOptions)
+        return this.getTextInElements(selectedOptions);
     }
 
-    filterOptionsAndAddRole(roleDisplayName) {
-        let loaderComboBox = new LoaderComboBox();
-        return this.typeTextInInput(XPATH.roleOptionsFilterInput, roleDisplayName).then(() => {
-            return loaderComboBox.waitForOptionVisible(XPATH.container, roleDisplayName);
-        }).then(() => {
-            return loaderComboBox.clickOnOption(XPATH.container, roleDisplayName);
-        }).then(() => {
-            return this.pause(500);
-        }).catch(err => {
-            throw new Error('Error when selecting the role-option: ' + roleDisplayName + ' ' + err);
-        })
+    async filterOptionsAndAddRole(roleDisplayName) {
+        try {
+            let loaderComboBox = new LoaderComboBox();
+            await this.typeTextInInput(XPATH.roleOptionsFilterInput, roleDisplayName);
+            await loaderComboBox.waitForOptionVisible(XPATH.container, roleDisplayName);
+            await loaderComboBox.clickOnOption(XPATH.container, roleDisplayName);
+            await this.pause(500);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_role_selector');
+            await this.saveScreenshot(screenshot);
+            throw new Error('Error when selecting the role-option, screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     async filterOptionsAndAddGroup(groupDisplayName) {
@@ -219,18 +223,14 @@ class UserWizard extends wizards.WizardPanel {
         return this.typeTextInInput(this.passwordInput, password);
     }
 
-    typeDataAndGeneratePassword(user) {
-        return this.typeDisplayName(user.displayName).then(() => {
-            return this.typeEmail(user.email);
-        }).then(() => {
-            return this.clickOnGenerateLink();
-        }).then(() => {
-            return this.pause(500);
-        }).then(() => {
-            if (user.roles != null) {
-                return this.addRoles(user.roles);
-            }
-        })
+    async typeDataAndGeneratePassword(user) {
+        await this.typeDisplayName(user.displayName);
+        await this.typeEmail(user.email);
+        await this.clickOnGenerateLink();
+        await this.pause(500);
+        if (user.roles != null) {
+            await this.addRoles(user.roles);
+        }
     }
 
     typeData(user) {

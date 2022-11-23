@@ -79,7 +79,7 @@ describe('Save User specification - save an user', function () {
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
+            await userBrowsePanel.closeTabAndWaitForGrid(userName);
             await userBrowsePanel.pause(500);
             //2. Expand System  then Users folders:
             await userBrowsePanel.clickOnExpanderIcon("system");

@@ -5,7 +5,6 @@ const chai = require('chai');
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
-const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
@@ -24,7 +23,6 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
-            let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
             let providerConfig = new AdfsIdProviderConfiguratorDialog();
             //1. Open new ID Provider wizard and type the data:
@@ -41,7 +39,6 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
-            let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
             let providerConfig = new AdfsIdProviderConfiguratorDialog();
             //1. Open new ID Provider wizard and type the data:

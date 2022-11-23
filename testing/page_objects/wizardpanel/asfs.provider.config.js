@@ -92,15 +92,18 @@ class AdfsIdProviderConfiguratorDialog extends Page {
 
     waitForClosed() {
         return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(error => {
-            throw new Error('ID Provider config Dialog was not closed');
+            throw new Error('ID Provider config Dialog was not closed' + err);
         });
     }
 
-    typeInDomainInput(domain) {
-        return this.typeTextInInput(this.domainInput, domain).catch(err => {
-            this.saveScreenshot('err_type_domainInput');
-            throw new Error(err);
-        })
+    async typeInDomainInput(domain) {
+        try {
+            await this.typeTextInInput(this.domainInput, domain);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_domain_input');
+            await this.saveScreenshot(screenshot);
+            throw new Error("Error in domain input screenshot: " + screenshot + " " + err);
+        }
     }
 
     typeInClientSecretInput(text) {

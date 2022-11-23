@@ -1,9 +1,6 @@
 /**
  * Created on 21/05/2018.
- *
  */
-const chai = require('chai');
-const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -34,7 +31,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.findAndSelectItem('/system');
             await userBrowsePanel.hotKeyEdit();
-            testUtils.saveScreenshot('hot_key_edit_system');
+            await testUtils.saveScreenshot('hot_key_edit_system');
             //'Id Provider wizard should be loaded'
             await idProviderWizard.waitForOpened();
         });
@@ -45,7 +42,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             let roleName = 'cms.cm.app';
             await testUtils.findAndSelectItem(roleName);
             await userBrowsePanel.hotKeyDelete();
-            testUtils.saveScreenshot('hot_key_delete_role');
+            await testUtils.saveScreenshot('hot_key_delete_role');
             //Confirmation Dialog should be loaded:
             let confirmationDialog = new ConfirmationDialog();
             await confirmationDialog.waitForDialogLoaded();

@@ -37,7 +37,7 @@ describe("Create an user with generated password and log in the user", function 
             PASSWORD = await userWizard.getTextInPasswordInput();
             //4. Save the user:
             await userWizard.waitAndClickOnSave();
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
+            await userBrowsePanel.closeTabAndWaitForGrid(userName);
 
             await testUtils.typeNameInFilterPanel(userName);
             let result = await userBrowsePanel.isItemDisplayed(userName);
