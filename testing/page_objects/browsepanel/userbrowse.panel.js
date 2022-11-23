@@ -118,7 +118,29 @@ class UserBrowsePanel extends Page {
         } catch (err) {
             let screenshot = appConst.generateRandomName('err_item');
             await this.saveScreenshot(screenshot);
-            throw new Error("The item should not be displaed, screenshot:" + screenshot + "  " + err);
+            throw new Error("The item should not be displayed, screenshot:" + screenshot + "  " + err);
+
+        }
+    }
+
+    async waitForItemByDisplayNameNotDisplayed(itemDisplayName) {
+        try {
+            await this.waitForElementNotDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_item');
+            await this.saveScreenshot(screenshot);
+            throw new Error("The item should not be displayed, screenshot:" + screenshot + "  " + err);
+
+        }
+    }
+
+    async waitForItemByDisplayNameDisplayed(itemDisplayName) {
+        try {
+            await this.waitForElementDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_item');
+            await this.saveScreenshot(screenshot);
+            throw new Error("The item should be displayed, screenshot:" + screenshot + "  " + err);
 
         }
     }
