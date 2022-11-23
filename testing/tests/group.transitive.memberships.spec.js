@@ -62,7 +62,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             let roles = await groupStatisticsPanel.getDisplayNameOfRoles();
             //2. One role should be present in Statistics Panel:
             assert.equal(roles.length, 1, "One role should be displayed in Statistics Panel");
-            assert.equal(roles[0], appConst.roles.USERS_APP, "expected role - 'Users App' should be present in the panel");
+            assert.equal(roles[0], appConst.ROLES_DISPLAY_NAME.USERS_APP, "expected role - 'Users App' should be present in the panel");
         });
 
     it("GIVEN group1 is selected WHEN 'transitive checkbox' has been checked THEN one transitive role should be added in roles-list",
@@ -76,8 +76,9 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             let roles = await groupStatisticsPanel.getDisplayNameOfRoles();
             //3. Two roles should be displayed in the Statistics Panel:
             assert.equal(roles.length, 2, "Two roles should be displayed");
-            assert.isTrue(roles.includes(appConst.roles.USERS_APP), '`Users App` role should be present on the panel');
-            assert.isTrue(roles.includes(appConst.roles.ADMIN_CONSOLE), 'Transitive role should be present on the panel as well');
+            assert.isTrue(roles.includes(appConst.ROLES_DISPLAY_NAME.USERS_APP), '`Users App` role should be present on the panel');
+            assert.isTrue(roles.includes(appConst.ROLES_DISPLAY_NAME.ADMIN_CONSOLE),
+                'Transitive role should be present on the panel as well');
             //4. One group should be displayed
             let groups = await groupStatisticsPanel.getDisplayNamesInGroupList();
             assert.equal(groups.length, 1, "One group should be visible in the group-list in Statistics Panel");

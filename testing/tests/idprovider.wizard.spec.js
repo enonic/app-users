@@ -70,9 +70,9 @@ describe("Id Provider wizard - validation and inputs", function () {
             //three default ACL entry should be displayed:
             let result = await idProviderWizard.getPermissions();
             assert.equal(result.length, 3);
-            assert.equal(result[0], appConst.roles.AUTHENTICATED);
-            assert.equal(result[1], appConst.roles.ADMINISTRATOR);
-            assert.equal(result[2], appConst.roles.USERS_ADMINISTRATOR);
+            assert.equal(result[0], appConst.ROLES_DISPLAY_NAME.AUTHENTICATED);
+            assert.equal(result[1], appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR);
+            assert.equal(result[2], appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
         });
 
     it("GIVEN wizard for 'Id Provider Wizard' is opened WHEN default permissions for 'Everyone' role has been added THEN 'Permissions Options Filter' input should be displayed",
@@ -83,10 +83,10 @@ describe("Id Provider wizard - validation and inputs", function () {
             let result = await idProviderWizard.isPermissionsOptionsFilterInputDisplayed();
             assert.isTrue(result, "'Permissions Options Filter' input should not be displayed");
             let perm = await idProviderWizard.getPermissions();
-            assert.equal(perm[0], appConst.roles.AUTHENTICATED);
-            assert.equal(perm[1], appConst.roles.ADMINISTRATOR);
-            assert.equal(perm[2], appConst.roles.USERS_ADMINISTRATOR);
-            assert.equal(perm[3], appConst.roles.EVERYONE);
+            assert.equal(perm[0], appConst.ROLES_DISPLAY_NAME.AUTHENTICATED);
+            assert.equal(perm[1], appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR);
+            assert.equal(perm[2], appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
+            assert.equal(perm[3], appConst.ROLES_DISPLAY_NAME.EVERYONE);
         });
 
     it("GIVEN new wizard for 'Id Provider Wizard' is opened WHEN name has been typed THEN red icon gets not visible",

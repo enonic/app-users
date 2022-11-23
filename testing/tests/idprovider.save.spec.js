@@ -58,7 +58,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             //2. Click on the expander-icon in Users Group menu item:
             await newPrincipalDialog.clickOnExpanderIcon("User Group");
             //3. 2 id-providers should be present in the expanded menu:
-            testUtils.saveScreenshot('User_Group_row_expanded');
+            await testUtils.saveScreenshot('User_Group_row_expanded');
             await newPrincipalDialog.waitForProviderNameDisplayed(ID_PROVIDER.displayName);
         });
 
@@ -84,9 +84,9 @@ describe('Id Provider specification - save and edit a provider', function () {
             ID_PROVIDER_2 = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
             //1. Save new ID Provider:
             await testUtils.openWizardAndSaveIdProvider(ID_PROVIDER_2);
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(ID_PROVIDER_2.displayName);
+            await userBrowsePanel.closeTabAndWaitForGrid(ID_PROVIDER_2.displayName);
             await userBrowsePanel.pause(1000);
-
+            //2. new Id Provider should be present in browse panel:
             let isDisplayed = await userBrowsePanel.isItemDisplayed(ID_PROVIDER_2.displayName);
             assert.isTrue(isDisplayed, 'new Id provider should be present in the grid');
         });
@@ -106,7 +106,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             await idProviderWizard.waitForSpinnerNotVisible();
             await idProviderWizard.pause(1500);
             //3. Close the wizard-tab:
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(testProvider.displayName);
+            await userBrowsePanel.closeTabAndWaitForGrid(testProvider.displayName);
             let result = await userBrowsePanel.isItemDisplayed(testProvider.displayName);
             assert.isTrue(result, 'new Id provider should be present in browse panel');
         });
@@ -170,12 +170,12 @@ describe('Id Provider specification - save and edit a provider', function () {
             let userBrowsePanel = new UserBrowsePanel();
             //1. Select and delete the user:
             await testUtils.selectAndDeleteItem(TEST_USER.displayName);
-            let result = await userBrowsePanel.waitForItemNotDisplayed(TEST_USER.displayName);
-            assert.isTrue(result, 'the user should not be present in the grid');
+            //Verify that the user is not present in the grid:
+            await userBrowsePanel.waitForItemNotDisplayed(TEST_USER.displayName);
             //2. User is deleted, so ID Provider can be deleted now:
             await testUtils.selectAndDeleteItem(ID_PROVIDER_2.displayName);
-            let isPresent = await userBrowsePanel.waitForItemNotDisplayed(ID_PROVIDER_2.displayName);
-            assert.isTrue(isPresent, 'the ID provider should not be present in browse panel');
+            // Verify: the ID provider is not displayed in browse panel
+            await userBrowsePanel.waitForItemNotDisplayed(ID_PROVIDER_2.displayName);
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

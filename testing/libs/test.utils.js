@@ -15,7 +15,6 @@ const FilterPanel = require("../page_objects/browsepanel/principal.filter.panel"
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 const appConst = require("./app_const");
 const webDriverHelper = require("./WebDriverHelper");
-const itemBuilder = require('./userItems.builder');
 const addContext = require('mochawesome/addContext');
 const fs = require('fs');
 const path = require('path');
@@ -85,23 +84,23 @@ module.exports = {
             throw new Error('Error in Confirm Delete: ' + err);
         }
     },
-    navigateToUsersApp: function (userName, password) {
-        let launcherPanel = new LauncherPanel();
-        return launcherPanel.waitForPanelDisplayed(appConst.mediumTimeout).then(result => {
+    async navigateToUsersApp(userName, password) {
+        try {
+            let launcherPanel = new LauncherPanel();
+            let result = await launcherPanel.waitForPanelDisplayed(appConst.mediumTimeout);
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Users` link...");
-                return launcherPanel.clickOnUsersLink();
+                await launcherPanel.clickOnUsersLink();
             } else {
                 console.log("Login Page is opened, type a password and name...");
-                return this.doLoginAndClickOnUsersLink(userName, password);
+                await this.doLoginAndClickOnUsersLink(userName, password);
             }
-        }).then(() => {
-            return this.doSwitchToUsersApp();
-        }).catch(err => {
-            console.log('tried to navigate to Users app, but: ' + err);
-            this.saveScreenshot("err_navigate_to_users" + itemBuilder.generateRandomNumber());
-            throw new Error('error when navigate to Users app ' + err);
-        });
+            await this.doSwitchToUsersApp();
+        } catch (err) {
+            let screenshot = appConst.generateRandomName("err_navigation");
+            await this.saveScreenshot(screenshot);
+            throw new Error('error during navigation to Users app, screenshot ' + screenshot + "  " + err);
+        }
     },
     async doLoginAndClickOnUsersLink(userName, password) {
         let loginPage = new LoginPage();
@@ -110,17 +109,17 @@ module.exports = {
         await launcherPanel.clickOnUsersLink();
         return await loginPage.pause(1000);
     },
-    doSwitchToUsersApp: function () {
-        console.log('testUtils:switching to users app...');
-        let browsePanel = new UserBrowsePanel();
-        return this.getBrowser().switchWindow("Users - Enonic XP Admin").then(() => {
+    async doSwitchToUsersApp() {
+        try {
+            console.log('testUtils:switching to users app...');
+            let browsePanel = new UserBrowsePanel();
+            await this.getBrowser().switchWindow("Users - Enonic XP Admin");
             console.log("switched to Users app...");
-            return browsePanel.waitForSpinnerNotVisible();
-        }).then(() => {
+            await browsePanel.waitForSpinnerNotVisible();
             return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
-        }).catch(err => {
+        } catch (err) {
             throw new Error("Error when switching to Users App " + err);
-        })
+        }
     },
 
     doSwitchToHome: function () {
@@ -134,7 +133,7 @@ module.exports = {
     switchAndCheckTitle: function (handle, reqTitle) {
         return this.getBrowser().switchWindow(handle).then(() => {
             return this.getBrowser().getTitle().then(title => {
-                return title == reqTitle;
+                return title === reqTitle;
             })
         });
     },
@@ -206,7 +205,7 @@ module.exports = {
         await wizardPanel.waitAndClickOnSave();
         await wizardPanel.pause(700);
         //Click on Close icon and close the wizard:
-        return await browsePanel.doClickOnCloseTabAndWaitGrid(displayName);
+        return await browsePanel.closeTabAndWaitForGrid(displayName);
     },
     async openWizardAndSaveRole(role) {
         let roleWizard = new RoleWizard();

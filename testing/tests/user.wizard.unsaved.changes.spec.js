@@ -37,7 +37,7 @@ describe("User Wizard and 'Confirmation dialog'", function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName("user");
-            let roles = [appConst.roles.CM_ADMIN, appConst.roles.USERS_ADMINISTRATOR];
+            let roles = [appConst.ROLES_DISPLAY_NAME.CM_ADMIN, appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR];
             testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
             await testUtils.addSystemUser(testUser);
             await testUtils.typeNameInFilterPanel(userName);
@@ -80,7 +80,7 @@ describe("User Wizard and 'Confirmation dialog'", function () {
             let confirmationDialog = new ConfirmationDialog();
             //1. Select and open existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            await userWizard.removeRole(appConst.roles.USERS_ADMINISTRATOR);
+            await userWizard.removeRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
             //2. Click on close-icon
             await userBrowsePanel.doClickOnCloseTabButton(testUser.displayName);
             //Verify the Confirmation dialog:

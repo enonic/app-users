@@ -78,15 +78,18 @@ describe('User Wizard negative spec ', function () {
             assert.isTrue(isRedIconNotPresent, "red circle gets not visible, because all required inputs are filled");
         });
 
-    it("GIVEN wizard for new User is opened AND all data has been typed WHEN password has been cleared THEN red circle gets visible again",
+    it("GIVEN wizard for new User is opened AND all required inputs has been filled in WHEN password has been cleared THEN red circle gets visible again",
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName("user");
             testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            //1. Wizard for new user is opened:
             await testUtils.clickOnSystemOpenUserWizard();
+            //2. Fill in the name, email, password inputs:
             await userWizard.typeData(testUser);
-            //password has been cleared:
+            //3. password input has been cleared:
             await userWizard.clearPasswordInput();
+            //4. Verify that red icon appears in the wizard page
             let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
             assert.isTrue(isRedIconPresent, "red circle gets visible, because 'password' input has been cleared");
         });

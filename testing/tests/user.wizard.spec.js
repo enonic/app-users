@@ -150,7 +150,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             //3. Check the password's status:
             let status = await changePasswordDialog.getPasswordStatus();
             await testUtils.saveScreenshot('change_password_strong_status');
-            assert.isTrue(status == appConst.PASSWORD_STATE.STRONG || status == appConst.PASSWORD_STATE.EXCELLENT,
+            assert.isTrue(status === appConst.PASSWORD_STATE.STRONG || status === appConst.PASSWORD_STATE.EXCELLENT,
                 "Strong or Excellent password's status should be displayed");
             //4. Verify that 'Change Password' button is enabled:
             await changePasswordDialog.waitForChangePasswordButtonEnabled();

@@ -93,15 +93,16 @@ class UserBrowsePanel extends Page {
         });
     }
 
-    waitForUsersGridLoaded(ms) {
-        return this.waitForElementDisplayed(xpath.grid, ms).then(() => {
-            return this.waitForSpinnerNotVisible();
-        }).then(() => {
-            return console.log('user browse panel is loaded')
-        }).catch(err => {
-            this.saveScreenshot("err_load_grid");
-            throw new Error('users browse panel was not loaded in: ' + ms + " " + err);
-        });
+    async waitForUsersGridLoaded(ms) {
+        try {
+            await this.waitForElementDisplayed(xpath.grid, ms);
+            await this.waitForSpinnerNotVisible();
+            console.log('user browse panel is loaded');
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_grid');
+            await this.saveScreenshot(screenshot);
+            throw new Error('users browse panel was not loaded screenshot: ' + screenshot + " " + err);
+        }
     }
 
     isItemDisplayed(itemName) {
@@ -111,11 +112,15 @@ class UserBrowsePanel extends Page {
         });
     }
 
-    waitForItemNotDisplayed(itemName) {
-        return this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout).catch(err => {
-            console.log("item is still displayed:" + itemName);
-            return false;
-        });
+    async waitForItemNotDisplayed(itemName) {
+        try {
+            await this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_item');
+            await this.saveScreenshot(screenshot);
+            throw new Error("The item should not be displaed, screenshot:" + screenshot + "  " + err);
+
+        }
     }
 
     async clickOnRowByName(name) {
@@ -256,23 +261,17 @@ class UserBrowsePanel extends Page {
         return await this.clickOnElement(tabItem);
     }
 
-    async doClickOnCloseTabAndWaitGrid(displayName) {
-        try {
-            let closeIcon = xpath.closeItemTabButton(displayName);
-            await this.waitForElementDisplayed(closeIcon, appConst.mediumTimeout);
-            await this.waitForElementEnabled(closeIcon, appConst.mediumTimeout);
-            await this.clickOnElement(closeIcon);
-            return await this.pause(500);
-        } catch (err) {
-            await this.saveScreenshot('err_closing_' + itemBuilder.generateRandomNumber());
-            throw new Error('Item Tab Button was not found!' + displayName + "  " + err);
-        }
-        await this.pause(300);
+    async closeTabAndWaitForGrid(displayName) {
+        let closeIcon = xpath.closeItemTabButton(displayName);
+        await this.waitForElementDisplayed(closeIcon, appConst.mediumTimeout);
+        await this.waitForElementEnabled(closeIcon, appConst.mediumTimeout);
+        await this.clickOnElement(closeIcon);
+        await this.pause(500);
+
         let confirmationDialog = new ConfirmationDialog();
         let isLoaded = await confirmationDialog.isDialogLoaded();
         if (isLoaded) {
-            this.saveScreenshot('err_save_close_item');
-            console.log('confirmation dialog must not be loaded');
+            await this.saveScreenshot('err_save_close_item');
             throw new Error('Confirmation dialog should not appear when try to close the ' + displayName);
         }
         await this.waitForSpinnerNotVisible();

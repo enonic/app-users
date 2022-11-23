@@ -36,10 +36,9 @@ describe('filter.panel.aggregation.spec Principal Aggregation specification', fu
             await testUtils.openFilterPanel();
             //Click on 'Role' checkbox:
             await filterPanel.clickOnRoleAggregation();
-            let result = await userBrowsePanel.waitForItemNotDisplayed('/system');
-            //Verify that 'System Id Provider' is not displayed in the filtered grid:
-            assert.isFalse(result, "System folder should not be displayed");
             await testUtils.saveScreenshot('aggregation_in_role');
+            //Verify that 'System Id Provider' is not displayed in the filtered grid:
+            await userBrowsePanel.waitForItemNotDisplayed('/system');
             //Verify that 'Users Administrator' role is displayed:
             let isDisplayed = await userBrowsePanel.isItemDisplayed('/roles/system.user.admin');
             assert.isTrue(isDisplayed, "expected role should be displayed in the filtered panel");

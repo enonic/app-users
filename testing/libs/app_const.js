@@ -49,10 +49,9 @@ module.exports = Object.freeze({
         STRONG: "Strong",
         WEAK: "Weak",
         EXCELLENT: "Excellent",
-        STRONG: "Strong",
         BAD: "Bad"
     },
-    roles: {
+    ROLES_DISPLAY_NAME: {
         CM_ADMIN: 'Content Manager Administrator',
         ADMIN_CONSOLE: 'Administration Console Login',
         CM_APP: 'Content Manager App',
@@ -61,6 +60,11 @@ module.exports = Object.freeze({
         AUTHENTICATED: 'Authenticated',
         USERS_ADMINISTRATOR: 'Users Administrator',
         EVERYONE: 'Everyone'
+    },
+    ROLES_NAME: {
+        CM_ADMIN: 'cms.admin',
+        ADMINISTRATOR: 'system.admin',
+        USERS_APP: 'system.user.admin',
     },
     principalExistsMessage: function (displayName) {
         return `Principal [${displayName}] could not be created. A principal with that name already exists`

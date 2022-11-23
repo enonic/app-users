@@ -133,7 +133,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             let idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
             //1. Open the wizard and save new provider:
             await testUtils.openWizardAndSaveIdProvider(idProvider);
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
+            await userBrowsePanel.closeTabAndWaitForGrid(idProvider.displayName);
             await testUtils.saveScreenshot("provider_saved_" + idProvider.displayName);
             //2. Go to browse panel and do right click on the provider:
             await userBrowsePanel.rightClickOnRowByDisplayName(idProvider.displayName);

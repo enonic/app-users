@@ -62,8 +62,8 @@ describe('User Browse Panel specification', function () {
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
             await userBrowsePanel.waitForSelectionTogglerVisible();
             let result = await userBrowsePanel.getNumberInSelectionToggler();
-            testUtils.saveScreenshot('number_in_selection');
-            assert.equal(result, 1, '1 should be displayed in the selection-toggler button');
+            await testUtils.saveScreenshot('number_in_selection');
+            assert.equal(result, '1', '1 should be displayed in the selection-toggler button');
         });
 
     //Verifies - https://github.com/enonic/app-users/issues/340  Empty TreeGrid when toggling Selection

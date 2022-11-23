@@ -1,6 +1,5 @@
 /**
  * Created on 12.09.2017.
- *
  */
 const chai = require('chai');
 const assert = chai.assert;
@@ -20,6 +19,20 @@ describe('Role Wizard and Statistics Panel spec', function () {
     }
     let TEST_ROLE;
 
+    //Verifies It shouldn't be possible to unassign system.administrator role from su user
+    //https://github.com/enonic/app-users/issues/1227
+    it(`WHEN Administrator role is opened THEN remove icon should not be displayed for SU in Members form`,
+        async () => {
+            let roleWizard = new RoleWizard();
+            //1. Open Administrator role:
+            await testUtils.selectRoleAndOpenWizard(appConst.ROLES_NAME.ADMINISTRATOR);
+            //2. Super User should be displayed in the members form:
+            let members = await roleWizard.getMembers();
+            assert.isTrue(members.includes("Super User"), 'Super User should be present in members form');
+            //3. Remove icon should not be displayed for Super User in members form:
+            await roleWizard.waitForRemoveMemberIconNotDisplayed("Super User");
+        });
+
     it('GIVEN `Roles` wizard is opened WHEN name and description has been typed AND `Save` button pressed THEN `Role was created` message should appear',
         async () => {
             let roleWizard = new RoleWizard();
@@ -31,7 +44,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await roleWizard.waitForLoaded();
             await roleWizard.typeData(TEST_ROLE);
             await roleWizard.waitAndClickOnSave();
-
+            //Verify the notification message:
             let actualMessage = await roleWizard.waitForNotificationMessage();
             assert.equal(actualMessage, 'Role was created', "Expected and actual messages are equal");
         });

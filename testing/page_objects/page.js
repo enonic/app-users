@@ -71,19 +71,19 @@ class Page {
         if (value === "") {
             await inputElement.setValue(text);
         }
-        return await inputElement.pause(300);
+        return await this.pause(200);
     }
 
     async getTextInInput(selector) {
         let inputElement = await this.findElement(selector);
-        return await inputElement.getValue(selector);
+        return await inputElement.getValue();
     }
 
     async clearInputText(selector) {
         let inputElement = await this.findElement(selector);
         await inputElement.waitForDisplayed({timeout: 1000});
         await inputElement.clearValue();
-        return await inputElement.pause(300);
+        return await this.pause(200);
     }
 
     saveScreenshot(name) {
@@ -100,17 +100,17 @@ class Page {
 
     async isElementDisplayed(selector) {
         let element = await this.findElement(selector);
-        return element.isDisplayed();
+        return await element.isDisplayed();
     }
 
     async isElementEnabled(selector) {
         let element = await this.findElement(selector);
-        return element.isEnabled();
+        return await element.isEnabled();
     }
 
     async waitForElementEnabled(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForEnabled(ms);
+        return await element.waitForEnabled(ms);
     }
 
     async waitForElementDisabled(selector, ms) {
@@ -120,7 +120,7 @@ class Page {
 
     async waitForElementNotDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForDisplayed({timeout: ms, reverse: true});
+        return await element.waitForDisplayed({timeout: ms, reverse: true});
     }
 
     waitUntilElementNotDisplayed(selector, ms) {
@@ -134,7 +134,7 @@ class Page {
 
     async waitForElementDisplayed(selector, ms) {
         let element = await this.findElement(selector);
-        return element.waitForDisplayed({timeout: ms});
+        return await element.waitForDisplayed({timeout: ms});
     }
 
     waitForSpinnerNotVisible() {
@@ -159,7 +159,7 @@ class Page {
 
     async getAttribute(selector, attributeName) {
         let element = await this.findElement(selector);
-        return element.getAttribute(attributeName);
+        return await element.getAttribute(attributeName);
     }
 
     async waitForNotificationMessage() {
@@ -175,19 +175,27 @@ class Page {
         }
     }
 
-    waitForExpectedNotificationMessage(expectedMessage) {
-        let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-text') and contains(.,'${expectedMessage}')]`;
-        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_notification_mess');
-            throw new Error('expected notification message was not shown! ' + err);
-        })
+    async waitForExpectedNotificationMessage(expectedMessage) {
+        try {
+            let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-text') and contains(.,'${expectedMessage}')]`;
+            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_notification');
+            await this.saveScreenshot(screenshot);
+            throw new Error('expected notification message was not shown, screenshot ' + screenshot + "  " + err);
+        }
     }
 
-    waitForErrorNotificationMessage() {
-        let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']` + lib.NOTIFICATION_TEXT;
-        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
-            return this.getText(selector);
-        })
+    async waitForErrorNotificationMessage() {
+        try {
+            let selector = `//div[contains(@id,'NotificationMessage') and @class='notification error']` + lib.NOTIFICATION_TEXT;
+            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+            return await this.getText(selector);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_notification');
+            await this.saveScreenshot(screenshot);
+            throw new Error("Error notification message is not shown, screenshot: " + screenshot + "  " + err);
+        }
     }
 
     async doRightClick(selector) {

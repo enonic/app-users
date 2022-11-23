@@ -30,7 +30,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userBrowsePanel = new UserBrowsePanel();
             let userStatisticsPanel = new UserStatisticsPanel();
             let userName = userItemsBuilder.generateRandomName('user');
-            let roles = [appConst.roles.CM_ADMIN, appConst.roles.USERS_ADMINISTRATOR];
+            let roles = [appConst.ROLES_DISPLAY_NAME.CM_ADMIN, appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR];
             testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
             //1. Select System folder and open User Wizard:
             await testUtils.clickOnSystemOpenUserWizard();
@@ -47,8 +47,9 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             testUtils.saveScreenshot('edit_user_wizard4');
             let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
 
-            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, "`Content Manager Administrator` role should be present in the panel");
-            assert.equal(actualRoles[1], appConst.roles.USERS_ADMINISTRATOR,
+            assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.CM_ADMIN,
+                "'Content Manager Administrator' role should be present in the panel");
+            assert.equal(actualRoles[1], appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR,
                 "'Content Manager Administrator' role should be present in the panel");
 
             let actualName = await userStatisticsPanel.getItemName();
@@ -75,12 +76,13 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             //1. Open existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
             //2. Remove the role:
-            await userWizard.removeRole(appConst.roles.USERS_ADMINISTRATOR);
+            await userWizard.removeRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
             await testUtils.saveAndCloseWizard('new-name');
             //3. Number of roles should be reduced in the Statistics Panel:
             let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
             assert.equal(actualRoles.length, 1, 'one role should be present on the statistics panel');
-            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, '`Content Manager Administrator` role should be present on the panel');
+            assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.CM_ADMIN,
+                '`Content Manager Administrator` role should be present on the panel');
         });
 
     //Verifies Updating a password clears unsaved roles and groups #511
@@ -92,7 +94,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             //1. Open existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
             //2. Add new role:
-            await userWizard.filterOptionsAndAddRole(appConst.roles.USERS_ADMINISTRATOR);
+            await userWizard.filterOptionsAndAddRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
             //3. Change the password:
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
@@ -104,8 +106,9 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             await userWizard.waitForNotificationMessage();
             //5. Verify that unsaved role is not cleared in the form:
             let actualRoles = await userWizard.getSelectedRoles();
-            assert.equal(actualRoles[1], appConst.roles.USERS_ADMINISTRATOR, "Content Manager Administrator role should be present");
-            assert.equal(actualRoles[0], appConst.roles.CM_ADMIN, 'Content Manager Administrator role should be present');
+            assert.equal(actualRoles[1], appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR,
+                "Content Manager Administrator role should be present");
+            assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.CM_ADMIN, 'Content Manager Administrator role should be present');
         });
 
     it("GIVEN existing user is opened WHEN e-mail has been changed and saved THEN updated e-mail should be present in the statistics panel",

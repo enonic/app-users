@@ -36,7 +36,7 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(userName);
+            await userBrowsePanel.closeTabAndWaitForGrid(userName);
             //2. Type the user-name in Filter Panel:
             await testUtils.typeNameInFilterPanel(userName);
             let result = await userBrowsePanel.isItemDisplayed(userName);

@@ -92,7 +92,7 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             idProvider = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider3');
             //1. Save new id provider:
             await testUtils.openWizardAndSaveIdProvider(idProvider);
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(idProvider.displayName);
+            await userBrowsePanel.closeTabAndWaitForGrid(idProvider.displayName);
             //2. Go to browse panel and select the provider:
             await testUtils.findAndSelectItem(idProvider.displayName);
             await userBrowsePanel.waitForDeleteButtonEnabled();

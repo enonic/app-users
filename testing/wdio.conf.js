@@ -2,10 +2,6 @@
 const {ReportAggregator, HtmlReporter} = require('wdio-html-nice-reporter');
 exports.config = {
 
-    //
-    // ==================
-    // Specify Test Files
-    // ==================
     // Define which test specs should run. The pattern is relative to the directory
     // from which `wdio` was called. Notice that, if you are calling `wdio` from an
     // NPM script (see https://docs.npmjs.com/cli/run-script) then the current working
@@ -36,10 +32,8 @@ exports.config = {
                 "--lang=en",
                 '--disable-extensions',
                 'window-size=1970,1000'
-                //'--width:1900', '--height=1000'
             ]
         }
-
     }],
     //
     // ===================
@@ -52,9 +46,7 @@ exports.config = {
     //
     // Enables colors for log output.
     coloredLogs: true,
-    //
-    // Saves a screenshot to a given path if a command fails.
-    //screenshotPath: './errorShots/',
+
     //
     // Set a base URL in order to shorten url command calls. If your `url` parameter starts
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
@@ -76,14 +68,17 @@ exports.config = {
     services: ['geckodriver'],
 
     framework: 'mocha',
+    //
+    // Options to be passed to Mocha.
+    // See the full list at http://mochajs.org/
     mochaOpts: {
-        timeout: 70000
+        ui: 'bdd',
+        timeout: 80000
     },
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: http://webdriver.io/guide/testrunner/reporters.html
-
     reporters: ['spec',
         ["html-nice", {
             outputDir: './build/mochawesome-report/',
@@ -98,15 +93,7 @@ exports.config = {
         }
         ]
     ],
-    outputDir: __dirname+"/build/mochawesome-report/",
-
-    //
-    // Options to be passed to Mocha.
-    // See the full list at http://mochajs.org/
-    mochaOpts: {
-        ui: 'bdd',
-        timeout: 60000
-    },
+    outputDir: "./build/mochawesome-report/",
 
     // Hook that gets executed before the suite starts
     beforeSuite: function (suite) {
@@ -114,12 +101,11 @@ exports.config = {
     },
 
     onPrepare: function (config, capabilities) {
-
         reportAggregator = new ReportAggregator({
             outputDir: './build/mochawesome-report/',
-            filename: 'report.html',
-            reportTitle: 'App Applications Report',
-            browserName : capabilities.browserName,
+            filename: 'master-report.html',
+            reportTitle: 'App Users Report',
+            browserName: capabilities.browserName,
             collapseTests: true
         });
         reportAggregator.clean() ;

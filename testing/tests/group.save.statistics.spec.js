@@ -40,7 +40,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
         async () => {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Open existing group:
+            //1. Open the existing group:
             await testUtils.findAndSelectItem(groupWithRoleAndMember.displayName);
             await userBrowsePanel.clickOnEditButton();
             await groupWizard.waitForOpened();
@@ -48,7 +48,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             let description = await groupWizard.getDescription();
             assert.equal(description, groupWithRoleAndMember.description, "Expected description should be present in the wizard");
             let roles = await groupWizard.getRoles();
-            assert.equal(roles[0], appConst.roles.USERS_APP, "Expected roles should be present");
+            assert.equal(roles[0], appConst.ROLES_DISPLAY_NAME.USERS_APP, "Expected roles should be present");
             let members = await groupWizard.getMembers();
             assert.equal(members[0], 'Super User', "Expected member should be displayed");
         });
@@ -65,7 +65,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             await groupWizard.pause(300);
             await groupWizard.waitAndClickOnSave();
             //2. Close the wizard:
-            await userBrowsePanel.doClickOnCloseTabAndWaitGrid(testGroup.displayName);
+            await userBrowsePanel.closeTabAndWaitForGrid(testGroup.displayName);
             //3. Type the name in Filter Panel:
             await testUtils.typeNameInFilterPanel(testGroup.displayName);
             //4. Verify that new group is filtered:
@@ -82,11 +82,11 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             await userBrowsePanel.clickOnEditButton();
             await groupWizard.waitForOpened();
             //2. Add 'Users App' role
-            await groupWizard.filterOptionsAndAddRole(appConst.roles.USERS_APP);
+            await groupWizard.filterOptionsAndAddRole(appConst.ROLES_DISPLAY_NAME.USERS_APP);
             await groupWizard.waitAndClickOnSave();
             //3. Verify that new role should be added in roles-step:
             let actualRoles = await groupWizard.getRoles();
-            assert.equal(actualRoles[0], appConst.roles.USERS_APP, "Expected role gets visible in roles-step");
+            assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.USERS_APP, "Expected role gets visible in roles-step");
         });
 
     it("GIVEN existing 'group' is opened WHEN new member has been added THEN the member should be displayed in members-step",
@@ -117,7 +117,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             assert.equal(actualMembers[0], appConst.SUPER_USER_DISPLAY_NAME, "Expected members should be loaded");
             assert.equal(actualMembers.length, 1, "One member should be loaded");
             let actualRoles = await groupStatisticsPanel.getDisplayNameOfRoles();
-            assert.equal(actualRoles[0], appConst.roles.USERS_APP, "Expected roles should be loaded");
+            assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.USERS_APP, "Expected roles should be loaded");
             assert.equal(actualRoles.length, 1, "One roles should be loaded");
         });
 
@@ -129,7 +129,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             await testUtils.findAndSelectItem(testGroup.displayName);
             await userBrowsePanel.clickOnEditButton();
             await groupWizard.waitForOpened();
-            await groupWizard.removeRole(appConst.roles.USERS_APP);
+            await groupWizard.removeRole(appConst.ROLES_DISPLAY_NAME.USERS_APP);
             await groupWizard.waitAndClickOnSave();
             //2. Verify roles:
             let actualRoles = await groupWizard.getRoles();

@@ -33,7 +33,7 @@ class LoginPage extends Page {
         return this.browser.getTitle();
     }
 
-    async doLogin(userName,password) {
+    async doLogin(userName, password) {
         let name = userName ? userName : 'su';
         let pass = password ? password : 'password';
         let usernameInput = await this.findElement(this.usernameInput);
@@ -41,9 +41,10 @@ class LoginPage extends Page {
         await usernameInput.waitForDisplayed({timeout: 1000});
         await usernameInput.addValue(name);
         await passwordInput.addValue(pass);
-        return await this.clickOnLoginButton();
+        await this.clickOnLoginButton();
     }
 }
+
 module.exports = LoginPage;
 
 
