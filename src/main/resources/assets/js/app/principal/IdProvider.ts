@@ -1,14 +1,14 @@
-import * as Q from 'q';
-import {UserItem, UserItemBuilder} from '@enonic/lib-admin-ui/security/UserItem';
-import {IdProviderConfig} from '@enonic/lib-admin-ui/security/IdProviderConfig';
-import {IdProviderMode} from '@enonic/lib-admin-ui/security/IdProviderMode';
-import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
-import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
-import {ListPrincipalsRequest, ListPrincipalsData} from '../../graphql/principal/ListPrincipalsRequest';
-import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
-import {IdProviderJson} from './IdProviderJson';
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {IdProviderConfig} from '@enonic/lib-admin-ui/security/IdProviderConfig';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {IdProviderMode} from '@enonic/lib-admin-ui/security/IdProviderMode';
+import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
+import {UserItem, UserItemBuilder} from '@enonic/lib-admin-ui/security/UserItem';
+import * as Q from 'q';
+import {ListPrincipalsData, ListPrincipalsRequest} from '../../graphql/principal/ListPrincipalsRequest';
+import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
+import {IdProviderJson} from './IdProviderJson';
 
 export class IdProvider
     extends UserItem {
@@ -96,8 +96,8 @@ export class IdProviderBuilder
     permissions: IdProviderAccessControlList;
 
     constructor(source?: IdProvider) {
+        super(source);
         if (source) {
-            super(source);
             this.idProviderMode = source.getIdProviderMode();
             this.idProviderConfig = !!source.getIdProviderConfig() ? source.getIdProviderConfig().clone() : null;
             this.permissions = !!source.getPermissions() ? source.getPermissions().clone() : null;
