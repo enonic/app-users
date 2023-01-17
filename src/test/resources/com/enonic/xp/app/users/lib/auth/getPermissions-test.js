@@ -1,5 +1,6 @@
 var t = require('/lib/xp/testing');
 var auth = require('/lib/auth');
+var node = require('/lib/xp/node');
 
 exports.getPermissions = function () {
 
