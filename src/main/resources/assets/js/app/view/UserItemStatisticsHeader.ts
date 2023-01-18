@@ -14,7 +14,7 @@ export class UserItemStatisticsHeader
 
     }
 
-    protected getIconSize(item: UserTreeGridItem): number {
-        return item.getType() === UserTreeGridItemType.PRINCIPAL ? 128 : super.getIconSize(item);
+    protected getIconSize(): number {
+        return (<UserTreeGridItem>this.browseItem)?.getType() === UserTreeGridItemType.PRINCIPAL ? 128 : super.getIconSize();
     }
 }
