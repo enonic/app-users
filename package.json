@@ -18,7 +18,7 @@
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "hasher": "^1.2.0",
     "jquery": "^3.6.3",
-    "nanoid": "^4.0.0",
+    "nanoid": "^4.0.1",
     "owasp-password-strength-test": "^1.3.0",
     "q": "^1.5.1"
   },
