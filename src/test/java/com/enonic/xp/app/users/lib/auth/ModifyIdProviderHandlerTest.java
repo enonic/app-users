@@ -3,7 +3,7 @@ package com.enonic.xp.app.users.lib.auth;
 import java.util.Optional;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.enonic.xp.security.EditableIdProvider;

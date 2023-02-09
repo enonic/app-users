@@ -2,7 +2,7 @@ package com.enonic.xp.app.users.lib.auth;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
