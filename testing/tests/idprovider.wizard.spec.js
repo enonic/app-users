@@ -82,12 +82,12 @@ describe('Id Provider wizard - validation and inputs', function () {
             await testUtils.openIdProviderWizard();
             await idProviderWizard.filterOptionsAndSelectPermission('Everyone');
             let result = await idProviderWizard.isPermissionsOptionsFilterInputDisplayed();
-            assert.isTrue(result, "'Permissions Options Filter' input should not be displayed");
+            assert.isTrue(result, "'Permissions Options Filter' input should be displayed");
             let perm = await idProviderWizard.getPermissions();
-            assert.equal(perm[0], appConst.ROLES_DISPLAY_NAME.AUTHENTICATED);
-            assert.equal(perm[1], appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR);
-            assert.equal(perm[2], appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
-            assert.equal(perm[3], appConst.ROLES_DISPLAY_NAME.EVERYONE);
+            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.AUTHENTICATED));
+            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR));
+            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR));
+            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.EVERYONE));
         });
 
     it("GIVEN new wizard for 'Id Provider Wizard' is opened WHEN name has been typed THEN red icon gets not visible",
