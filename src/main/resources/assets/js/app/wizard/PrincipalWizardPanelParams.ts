@@ -14,6 +14,8 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
 
     principalKey: PrincipalKey;
 
+    serviceAccount: boolean;
+
     setPrincipalKey(value: PrincipalKey): PrincipalWizardPanelParams {
         this.principalKey = value;
         return this;
@@ -31,6 +33,11 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
 
     setParentOfSameType(value: boolean): PrincipalWizardPanelParams {
         this.parentOfSameType = value;
+        return this;
+    }
+
+    setServiceAccount(value: boolean): PrincipalWizardPanelParams {
+        this.serviceAccount = value;
         return this;
     }
 

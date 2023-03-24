@@ -97,6 +97,12 @@ exports.PrincipalType = schemaGenerator.createObjectType({
             resolve: function (env) {
                 return env.source._timestamp;
             }
+        },
+        profile: {
+            type: graphQl.Json,
+            resolve: function (env) {
+                return env.source.profile;
+            }
         }
     }
 });

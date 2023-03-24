@@ -47,6 +47,25 @@ module.exports = schemaGenerator.createObjectType({
                 });
             }
         },
+        createServiceAccount: {
+            type: graphQlObjectTypes.PrincipalType,
+            args: {
+                key: graphQl.nonNull(graphQl.GraphQLString),
+                displayName: graphQl.nonNull(graphQl.GraphQLString),
+                kid: graphQl.nonNull(graphQl.GraphQLString),
+                publicKey: graphQl.nonNull(graphQl.GraphQLString),
+            },
+            resolve: function (env) {
+                const bean = __.newBean('com.enonic.xp.app.users.serviceaccount.CreateServiceAccountHandler');
+
+                bean.setKey(env.args.key);
+                bean.setDisplayName(env.args.displayName);
+                bean.setKid(env.args.kid);
+                bean.setPublicKey(env.args.publicKey);
+
+                return __.toNativeObject(bean.execute());
+            }
+        },
         updateUser: {
             type: graphQlObjectTypes.PrincipalType,
             args: {

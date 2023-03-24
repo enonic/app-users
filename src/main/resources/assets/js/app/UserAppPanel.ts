@@ -314,6 +314,7 @@ export class UserAppPanel
         }
 
         let wizardParams = <PrincipalWizardPanelParams> new PrincipalWizardPanelParams()
+            .setServiceAccount(true)
             .setIdProvider(idProvider)
             .setParentOfSameType(userItem.getType() === UserTreeGridItemType.PRINCIPAL)
             .setPersistedType(data.principalType)
