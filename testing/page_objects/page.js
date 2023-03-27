@@ -7,7 +7,7 @@ const fs = require('fs');
 class Page {
 
     constructor() {
-        if (typeof browser !== "undefined") {
+        if (typeof browser !== 'undefined') {
             this.browser = browser;
         } else {
             this.browser = webDriverHelper.browser;

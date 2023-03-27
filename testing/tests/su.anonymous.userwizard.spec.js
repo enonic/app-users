@@ -31,6 +31,22 @@ describe("su and anonymous users specification: empty email is allowed, validati
             await userWizard.waitForDeleteButtonDisabled();
         });
 
+    // Verifies: It shouldn't be possible to unassign system.administrator role from su user
+    // https://github.com/enonic/app-users/issues/1227
+    it("WHEN 'su' is opened THEN Administrator role should be displayed in the roles form AND 'remove' icon should not be displayed here",
+        async () => {
+            let userWizard = new UserWizard();
+            // 1. Select and open SU:
+            await testUtils.selectUserAndOpenWizard(appConst.SUPER_USER_NAME);
+            // 2. Verify that only one role is displayed in the roles form:
+            let actualRoles = await userWizard.getSelectedRoles();
+            assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR,
+                "system Administrator role should be present in the roles form");
+            assert.equal(actualRoles.length, 1, "One role should be displayed in the roles form");
+            // 3. Verify that remove role icon is not displayed in the form:
+            await userWizard.waitForRemoveRoleIconNotDisplayed(appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR);
+        });
+
     it("WHEN 'anonymous' is opened THEN email input should be hidden AND Delete button should be disabled",
         async () => {
             let userWizard = new UserWizard();

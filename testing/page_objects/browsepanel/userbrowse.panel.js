@@ -26,23 +26,19 @@ const xpath = {
         return `${lib.itemByName(name)}` +
                `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
-
     checkboxByDisplayName: function (displayName) {
         return `${lib.itemByDisplayName(displayName)}` +
                `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
-
     expanderIconByName: function (name) {
         return this.rowByName(name) +
                `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
-
     },
     closeItemTabButton: function (name) {
         return `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${name}']]/button`;
     },
     itemTabByDisplayName:
         displayName => `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${displayName}']]`,
-
 };
 
 class UserBrowsePanel extends Page {
@@ -70,7 +66,6 @@ class UserBrowsePanel extends Page {
         return `${xpath.toolbar}/*[contains(@id, 'ActionButton') and child::span[text()='Edit']]`;
     }
 
-
     get deleteButton() {
         return `${xpath.toolbar}/*[contains(@id, 'ActionButton') and child::span[text()='Delete']]`;
     }
@@ -81,16 +76,18 @@ class UserBrowsePanel extends Page {
 
     waitForPanelVisible(ms) {
         return this.waitForElementDisplayed(xpath.toolbar, ms).catch(err => {
-            throw new Error('User browse panel was not loaded in ' + ms);
+            throw new Error('User browse panel was not loaded ' + err);
         });
     }
 
-    clickOnNewButton() {
-        return this.waitForElementEnabled(this.newButton, appConst.mediumTimeout).catch(err => {
-            throw new Error("New button is not enabled!" + err);
-        }).then(() => {
-            return this.clickOnElement(this.newButton);
-        });
+    async clickOnNewButton() {
+        try {
+            await this.waitForElementEnabled(this.newButton, appConst.mediumTimeout)
+            return await this.clickOnElement(this.newButton);
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName('err_new_btn'));
+            throw new Error("Error during clicking on New button!" + err);
+        }
     }
 
     async waitForUsersGridLoaded(ms) {
@@ -101,7 +98,7 @@ class UserBrowsePanel extends Page {
         } catch (err) {
             let screenshot = appConst.generateRandomName('err_grid');
             await this.saveScreenshot(screenshot);
-            throw new Error('users browse panel was not loaded screenshot: ' + screenshot + " " + err);
+            throw new Error('users browse panel was not loaded screenshot: ' + screenshot + ' ' + err);
         }
     }
 
@@ -118,8 +115,7 @@ class UserBrowsePanel extends Page {
         } catch (err) {
             let screenshot = appConst.generateRandomName('err_item');
             await this.saveScreenshot(screenshot);
-            throw new Error("The item should not be displayed, screenshot:" + screenshot + "  " + err);
-
+            throw new Error('The item should not be displayed, screenshot:' + screenshot + '  ' + err);
         }
     }
 
@@ -140,8 +136,7 @@ class UserBrowsePanel extends Page {
         } catch (err) {
             let screenshot = appConst.generateRandomName('err_item');
             await this.saveScreenshot(screenshot);
-            throw new Error("The item should be displayed, screenshot:" + screenshot + "  " + err);
-
+            throw new Error('The item should be displayed, screenshot:' + screenshot + "  " + err);
         }
     }
 
@@ -152,8 +147,8 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot('err_find_' + name);
-            throw Error('Row with the name ' + name + ' was not found.  ' + err);
+            await this.saveScreenshot(appConst.generateRandomName('err_find_item'));
+            throw Error('Item was not found.  ' + err);
         }
     }
 
@@ -170,11 +165,14 @@ class UserBrowsePanel extends Page {
         return this.clickOnElement(this.searchButton);
     }
 
-    clickOnHideFilterButton() {
-        return this.clickOnElement(this.hideFilterPanelButton).catch(err => {
-            this.saveScreenshot('err_click_on_hide_filter_button');
-            throw new Error(err);
-        })
+    async clickOnHideFilterButton() {
+        try {
+            await this.clickOnElement(this.hideFilterPanelButton)
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_hide_filter_button');
+            await this.saveScreenshot();
+            throw new Error('Error,screenshot: ' + screenshot + '  ' + err);
+        }
     }
 
     async clickOnAppHomeButton() {
@@ -203,14 +201,14 @@ class UserBrowsePanel extends Page {
 
     waitForEditButtonEnabled() {
         return this.waitForElementEnabled(this.editButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot("err_edit_button_not_enabled");
+            this.saveScreenshot('err_edit_button_not_enabled');
             throw new Error('Edit button is not enabled ! ' + err);
         });
     }
 
     waitForDeleteButtonEnabled() {
         return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot("err_delete_button_not_enabled");
+            this.saveScreenshot('err_delete_button_not_enabled');
             throw new Error('Delete button is not enabled ! ' + err);
         });
     }
@@ -227,12 +225,15 @@ class UserBrowsePanel extends Page {
         return this.waitForElementDisabled(this.editButton, appConst.mediumTimeout);
     }
 
-    waitForRowByNameVisible(name) {
-        let nameXpath = xpath.rowByName(name);
-        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_find_' + name);
-            throw Error('Row with the name ' + name + ' is not visible in ' + 3000 + 'ms')
-        })
+    async waitForRowByNameVisible(name) {
+        try {
+            let nameXpath = xpath.rowByName(name);
+            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout)
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_find_item');
+            await this.saveScreenshot(screenshot);
+            throw Error('Row was not found: screenshot' + screenshot + '  ' + err);
+        }
     }
 
     async clickCheckboxAndSelectRowByDisplayName(displayName) {
@@ -261,7 +262,7 @@ class UserBrowsePanel extends Page {
 
     hotKeyNew() {
         return this.browser.status().then(status => {
-            console.log("browser status:" + status);
+            console.log('browser status:' + status);
             return this.browser.keys(['Alt', 'n']);
         })
     }
@@ -289,7 +290,6 @@ class UserBrowsePanel extends Page {
         await this.waitForElementEnabled(closeIcon, appConst.mediumTimeout);
         await this.clickOnElement(closeIcon);
         await this.pause(500);
-
         let confirmationDialog = new ConfirmationDialog();
         let isLoaded = await confirmationDialog.isDialogLoaded();
         if (isLoaded) {
@@ -319,7 +319,7 @@ class UserBrowsePanel extends Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: 'expected style not present after 3s'});
     }
 
-    //Click on Show/Hide selections
+    // Click on Show/Hide selections
     async clickOnSelectionToggler() {
         let selector = xpath.container + xpath.selectionToggler;
         await this.clickOnElement(selector);
@@ -334,27 +334,29 @@ class UserBrowsePanel extends Page {
     }
 
     getNumberInSelectionToggler() {
-        let selector = xpath.selectionToggler + "/span";
+        let selector = xpath.selectionToggler + '/span';
         return this.getText(selector);
     }
 
-    rightClickOnRowByDisplayName(displayName) {
-        const selector = xpath.rowByDisplayName(displayName);
-        return this.waitForElementDisplayed(selector, appConst.mediumTimeout).then(() => {
-            return this.doRightClick(selector);
-        }).catch(err => {
-            this.saveScreenshot(`err_find_${displayName}`);
-            throw Error(`Row with the name ${displayName} was not found  ` + err);
-        })
+    async rightClickOnRowByDisplayName(displayName) {
+        try {
+            const selector = xpath.rowByDisplayName(displayName);
+            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+            return await this.doRightClick(selector);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_right_click');
+            await this.saveScreenshot(screenshot);
+            throw Error(`Error during right click on the row, screenshot:  ` + screenshot + '  ' + err);
+        }
     }
 
-    //Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
+    // Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
     async waitForSelectionControllerPartial() {
         let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         await this.getBrowser().waitUntil(async () => {
-            let text = await this.getAttribute(selector, "class");
+            let text = await this.getAttribute(selector, 'class');
             return text.includes('partial');
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Selection Controller checkBox should displayed as partial'});
         return true;
     }
 
@@ -378,8 +380,8 @@ class UserBrowsePanel extends Page {
         let locator = `${lib.itemByDisplayName(name)}` +
                       `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]`;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        let attribute = await this.getAttribute(locator, "class");
-        return attribute.includes("highlight");
+        let attribute = await this.getAttribute(locator, 'class');
+        return attribute.includes('highlight');
     }
 }
 

@@ -60,7 +60,8 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await roleWizard.waitAndClickOnSave();
             let errorMessage = await roleWizard.waitForErrorNotificationMessage();
             //3. Error message should appear:
-            let expectedMsg = `Principal [` + TEST_ROLE.displayName + `] could not be created. A principal with that name already exists`;
+            let expectedMsg = `Principal [role:` + TEST_ROLE.displayName +
+                              `] could not be created. A principal with that name already exists`;
             assert.strictEqual(errorMessage, expectedMsg, 'expected notification message should appear');
         });
 

@@ -91,27 +91,27 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             assert.strictEqual(message, expected, 'Expected message should appear: Principal "group:system:${displayName}" is deleted');
         });
 
-    //Verifies https://github.com/enonic/app-users/issues/656
-    //Grid is not refreshed after recreating group, role or user
+    // Verifies https://github.com/enonic/app-users/issues/656
+    // Grid is not refreshed after recreating group, role or user
     it("WHEN deleted group has been recreated THEN this group should be present in Groups folder",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let groupWizard = new GroupWizard();
             let filterPanel = new FilterPanel();
-            //1. Open Filter Panel:
+            // 1. Open Filter Panel:
             await testUtils.openFilterPanel();
-            await testUtils.saveScreenshot("group_number_before_recreating");
-            //2. Get the initial number of roles:
+            await testUtils.saveScreenshot('group_number_before_recreating');
+            // 2. Get the initial number of roles:
             let initialNumber = await filterPanel.getNumberInGroupAggregationCheckbox();
-            //3. Open Group Wizard and recreate the group
+            // 3. Open Group Wizard and recreate the group
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeData(TEST_GROUP);
             await groupWizard.waitAndClickOnSave();
             await groupWizard.pause(1000);
-            //4. Go to browse panel:
+            // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
             await testUtils.saveScreenshot("group_number_after_recreating");
-            //5. Verify that the number of grpoups is increased
+            // 5. Verify that the number of groups is increased
             let newNumberOfGroup = await filterPanel.getNumberInGroupAggregationCheckbox();
             assert.isTrue(newNumberOfGroup - initialNumber === 1,
                 "Number of group in Filter panel should be increased after recreating the group");

@@ -134,9 +134,9 @@ class UserWizard extends wizards.WizardPanel {
             await this.waitForDeleteButtonEnabled();
             await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_delete_btn");
+            let screenshot = appConst.generateRandomName('err_delete_btn');
             await this.saveScreenshot(screenshot);
-            throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + "  " + err);
+            throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + '  ' + err);
         }
     }
 

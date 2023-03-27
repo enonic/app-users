@@ -13,24 +13,24 @@ const AdfsIdProviderConfiguratorDialog = require('../page_objects/wizardpanel/as
 describe('ADFS Id Provider, tests for provider configuration dialog with item set', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
-    //Verifies:https://github.com/enonic/app-users/issues/533
-    //Empty form in the ID Provider config #533
+    // Verifies:https://github.com/enonic/app-users/issues/533
+    // Empty form in the ID Provider config #533
     it("GIVEN provider's data is filled WHEN Provider-configuration has been opened THEN required inputs should be loaded",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfig = new AdfsIdProviderConfiguratorDialog();
-            //1. Open new ID Provider wizard and type the data:
+            // 1. Open new ID Provider wizard and type the data:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
-            //2. Open the configurator dialog:
+            // 2. Open the configurator dialog:
             await providerConfig.openConfigurator();
-            //3. Verify that the modal dialog is loaded:
+            // 3. Verify that the modal dialog is loaded:
             await providerConfig.waitForClientIdInputDisplayed();
             await providerConfig.waitForAuthorizationUrlInputDisplayed();
         });
@@ -41,14 +41,14 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfig = new AdfsIdProviderConfiguratorDialog();
-            //1. Open new ID Provider wizard and type the data:
+            // 1. Open new ID Provider wizard and type the data:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
-            //2. Open the configurator dialog:
+            // 2. Open the configurator dialog:
             await providerConfig.openConfigurator();
-            //3. Click on Add Proxy button
+            // 3. Click on Add Proxy button
             await providerConfig.clickOnAddProxyButton();
-            //4. Verify that proxy form is loaded:
+            // 4. Verify that proxy form is loaded:
             await providerConfig.waitForProxyHostInputDisplayed();
         });
 
@@ -58,19 +58,19 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfig = new AdfsIdProviderConfiguratorDialog();
-            //1. Open new ID Provider wizard and type the data:
+            // 1. Open new ID Provider wizard and type the data:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
-            //2. Open the configurator dialog:
+            // 2. Open the configurator dialog:
             await providerConfig.openConfigurator();
-            await providerConfig.typeInClientIdInput("1234567");
-            //3. Click on 'Add Proxy' button
+            await providerConfig.typeInClientIdInput('1234567');
+            // 3. Click on 'Add Proxy' button
             await providerConfig.clickOnAddProxyButton();
-            //4. type a text in the required host-input
-            await providerConfig.typeInProxyHostInput("http://proxy.com");
-            //5.Click on 'Apply' button
+            // 4. type a text in the required host-input
+            await providerConfig.typeInProxyHostInput('http://proxy.com');
+            // 5.Click on 'Apply' button
             await providerConfig.clickOnApplyButton();
-            //6. Save the provider:
+            // 6. Save the provider:
             await idProviderWizard.waitAndClickOnSave();
             let message = await idProviderWizard.waitForNotificationMessage();
             assert.equal(message, appConst.PROVIDER_CREATED_NOTIFICATION, "'Id provider was created' - this message should appear");

@@ -91,7 +91,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
     }
 
     waitForClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(error => {
+        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
             throw new Error('ID Provider config Dialog was not closed' + err);
         });
     }
