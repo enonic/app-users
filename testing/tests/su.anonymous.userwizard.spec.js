@@ -33,7 +33,9 @@ describe("su and anonymous users specification: empty email is allowed, validati
 
     // Verifies: It shouldn't be possible to unassign system.administrator role from su user
     // https://github.com/enonic/app-users/issues/1227
-    it("WHEN 'su' is opened THEN Administrator role should be displayed in the roles form AND 'remove' icon should not be displayed here",
+    // https://github.com/enonic/app-users/issues/1311
+    it.skip(
+        "WHEN 'su' is opened THEN Administrator role should be displayed in the roles form AND 'remove' icon should not be displayed here",
         async () => {
             let userWizard = new UserWizard();
             // 1. Select and open SU:
