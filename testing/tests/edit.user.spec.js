@@ -15,12 +15,10 @@ const ChangePasswordDialog = require('../page_objects/wizardpanel/change.passwor
 describe('edit.user.spec: Edit an user - change e-mail, name and roles', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
-    } else {
-        //const elementRef =  browser.findElement('xpath', '//div')
-        //browser.setWindowSize("1970","1000");
     }
+
     let testUser;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
@@ -85,26 +83,26 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
                 '`Content Manager Administrator` role should be present on the panel');
         });
 
-    //Verifies Updating a password clears unsaved roles and groups #511
-    //https://github.com/enonic/app-users/issues/511
+    // Verifies Updating a password clears unsaved roles and groups #511
+    // https://github.com/enonic/app-users/issues/511
     it("GIVEN existing user is opened WHEN new role has been added AND password has been changed THEN unsaved role should not be cleared after updating password",
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            //1. Open existing user:
+            // 1. Open existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            //2. Add new role:
+            // 2. Add new role:
             await userWizard.filterOptionsAndAddRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
-            //3. Change the password:
+            // 3. Change the password:
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             await changePasswordDialog.clickOnGeneratePasswordLink();
             await changePasswordDialog.waitForChangePasswordButtonEnabled();
             await changePasswordDialog.clickOnChangePasswordButton();
-            //4. Click on Save button:
+            // 4. Click on Save button:
             await userWizard.waitAndClickOnSave();
             await userWizard.waitForNotificationMessage();
-            //5. Verify that unsaved role is not cleared in the form:
+            // 5. Verify that unsaved role is not cleared in the form:
             let actualRoles = await userWizard.getSelectedRoles();
             assert.equal(actualRoles[1], appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR,
                 "Content Manager Administrator role should be present");
@@ -117,17 +115,17 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userBrowsePanel = new UserBrowsePanel();
             let userStatisticsPanel = new UserStatisticsPanel();
             let newEmail = userItemsBuilder.generateEmail(testUser.displayName);
-            //1. Open existing user:
+            // 1. Open existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
             await userWizard.clearEmailInput();
-            //2. Type new email:
+            // 2. Type new email:
             await userWizard.typeEmail(newEmail);
-            //3. click on Save
+            // 3. click on Save
             await userWizard.waitAndClickOnSave();
-            //4. Go to the browse-panel:
+            // 4. Go to the browse-panel:
             await userBrowsePanel.clickOnAppHomeButton();
             let actualEmail = await userStatisticsPanel.getEmail();
-            assert.equal(actualEmail[0], newEmail, "email should be updated on the statistics panel as well");
+            assert.equal(actualEmail[0], newEmail, 'email should be updated on the statistics panel as well');
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

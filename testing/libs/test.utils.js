@@ -139,7 +139,7 @@ module.exports = {
     },
     doCloseUsersApp: function () {
         return this.getBrowser().getTitle().then(title => {
-            if (title == "Users - Enonic XP Admin") {
+            if (title === 'Users - Enonic XP Admin') {
                 return this.getBrowser().closeWindow();
             }
         }).then(() => {

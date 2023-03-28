@@ -134,9 +134,9 @@ class UserWizard extends wizards.WizardPanel {
             await this.waitForDeleteButtonEnabled();
             await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_delete_btn");
+            let screenshot = appConst.generateRandomName('err_delete_btn');
             await this.saveScreenshot(screenshot);
-            throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + "  " + err);
+            throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + '  ' + err);
         }
     }
 
@@ -175,8 +175,14 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     async waitForRemoveRoleIconNotDisplayed(roleDisplayName) {
-        let removeIconLocator = XPATH.container + `${lib.selectedPrincipalByDisplayName(roleDisplayName)}` + lib.REMOVE_ICON;
-        return await this.waitForElementNotDisplayed(removeIconLocator, appConst.mediumTimeout);
+        try {
+            let removeIconLocator = XPATH.container + `${lib.selectedPrincipalByDisplayName(roleDisplayName)}` + lib.REMOVE_ICON;
+            return await this.waitForElementNotDisplayed(removeIconLocator, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_remove_icon');
+            await this.saveScreenshot(screenshot);
+            throw new Error('Remove role icon should not be displayed, screenshot:' + screenshot + '  ' + err);
+        }
     }
 
     addRoles(roleDisplayNames) {

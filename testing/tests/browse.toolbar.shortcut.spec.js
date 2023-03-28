@@ -12,7 +12,7 @@ const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 describe('User Browse panel, toolbar shortcut spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -43,7 +43,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             await testUtils.findAndSelectItem(roleName);
             await userBrowsePanel.hotKeyDelete();
             await testUtils.saveScreenshot('hot_key_delete_role');
-            //Confirmation Dialog should be loaded:
+            // Confirmation Dialog should be loaded:
             let confirmationDialog = new ConfirmationDialog();
             await confirmationDialog.waitForDialogLoaded();
         });
