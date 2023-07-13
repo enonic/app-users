@@ -4,6 +4,7 @@ import {UserJson} from './UserJson';
 import {assert} from '@enonic/lib-admin-ui/util/Assert';
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {PublicKey} from '../browse/serviceaccount/PublicKey';
 
 export class User
     extends Principal {
@@ -16,6 +17,8 @@ export class User
 
     private readonly memberships: Principal[];
 
+    private readonly publicKeys: PublicKey[];
+
     constructor(builder: UserBuilder) {
         super(builder);
         assert(this.getKey().isUser(), 'Expected PrincipalKey of type User');
@@ -23,6 +26,7 @@ export class User
         this.login = builder.login || '';
         this.loginDisabled = builder.loginDisabled || false;
         this.memberships = builder.memberships || [];
+        this.publicKeys = builder.publicKeys || [];
     }
 
     getEmail(): string {
@@ -41,6 +45,10 @@ export class User
         return this.memberships.slice(0);
     }
 
+    getPublicKeys(): PublicKey[] {
+        return this.publicKeys.slice(0);
+    }
+
     equals(o: Equitable): boolean {
         if (!ObjectHelper.iFrameSafeInstanceOf(o, User)) {
             return false;
@@ -52,7 +60,8 @@ export class User
                this.loginDisabled === other.isDisabled() &&
                this.email === other.getEmail() &&
                this.login === other.getLogin() &&
-               ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
+               ObjectHelper.arrayEquals(this.memberships, other.getMemberships()) &&
+               ObjectHelper.arrayEquals(this.publicKeys, other.getPublicKeys());
     }
 
     clone(): User {
@@ -84,6 +93,8 @@ export class UserBuilder
 
     memberships: Principal[] = [];
 
+    publicKeys: PublicKey[] = [];
+
     constructor(source?: User) {
         super(source);
         if (source) {
@@ -94,6 +105,7 @@ export class UserBuilder
             this.loginDisabled = source.isDisabled();
             this.modifiedTime = source.getModifiedTime();
             this.memberships = source.getMemberships().slice(0);
+            this.publicKeys = source.getPublicKeys().slice(0);
         }
     }
 
@@ -106,6 +118,9 @@ export class UserBuilder
 
         if (json.memberships) {
             this.memberships = json.memberships.map((principalJson) => Principal.fromJson(principalJson));
+        }
+        if (json.publicKeys) {
+            this.publicKeys = json.publicKeys.map((publicKeyJson) => PublicKey.fromJson(publicKeyJson));
         }
         return this;
     }

@@ -60,8 +60,10 @@ export class UpdateUserRequest
 
     /* eslint-disable max-len */
     getMutation(): string {
-        return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $addMemberships: [String], $removeMemberships: [String]) {
-            updateUser(key: $key, displayName: $displayName, email: $email, login: $login, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
+        return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $addMemberships: [String],
+                          $removeMemberships: [String]) {
+            updateUser(key: $key, displayName: $displayName, email: $email, login: $login, addMemberships: $addMemberships,
+                       removeMemberships: $removeMemberships) {
                 key
                 login
                 displayName
@@ -70,6 +72,12 @@ export class UpdateUserRequest
                     key
                     displayName
                     description
+                }
+                publicKeys {
+                    kid
+                    publicKey
+                    creationTime
+                    label
                 }
             }
         }`;

@@ -1,4 +1,5 @@
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
+import {PublicKeyJson} from './PublicKeyJson';
 
 export interface UserJson
     extends PrincipalJson {
@@ -12,5 +13,7 @@ export interface UserJson
     loginDisabled: boolean;
 
     memberships?: PrincipalJson[];
+
+    publicKeys?: PublicKeyJson[];
 
 }

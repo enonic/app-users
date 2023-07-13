@@ -78,6 +78,36 @@ module.exports = schemaGenerator.createObjectType({
                 return users.updatePwd(env.args.key, env.args.password);
             }
         },
+        removePublicKey: {
+            type: graphQl.GraphQLBoolean,
+            args: {
+                userKey: graphQl.nonNull(graphQl.GraphQLString),
+                kid: graphQl.nonNull(graphQl.GraphQLString),
+            },
+            resolve: function (env) {
+                return users.removePublicKey({
+                    userKey: env.args.userKey,
+                    kid: env.args.kid,
+                });
+            }
+        },
+        addPublicKey: {
+            type: graphQlObjectTypes.PublicKeyType,
+            args: {
+                userKey: graphQl.nonNull(graphQl.GraphQLString),
+                kid: graphQl.nonNull(graphQl.GraphQLString),
+                publicKey: graphQl.nonNull(graphQl.GraphQLString),
+                label: graphQl.GraphQLString,
+            },
+            resolve: function (env) {
+                return users.addPublicKey({
+                    userKey: env.args.userKey,
+                    kid: env.args.kid,
+                    publicKey: env.args.publicKey,
+                    label: env.args.label,
+                });
+            }
+        },
 
         // Group
         createGroup: {

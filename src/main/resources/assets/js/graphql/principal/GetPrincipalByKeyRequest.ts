@@ -62,6 +62,12 @@ export class GetPrincipalByKeyRequest
                             allow
                             deny
                         }
+                        publicKeys {
+                            kid
+                            publicKey
+                            creationTime
+                            label
+                        }
                     }
                 }`;
     }

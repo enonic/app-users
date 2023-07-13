@@ -1,6 +1,7 @@
 var common = require('./common');
 var principals = require('./principals');
 var authLib = require('/lib/xp/auth');
+var utilLib = require('/lib/util');
 
 exports.create = function createUser(params) {
     var key = common.required(params, 'key');
@@ -13,7 +14,7 @@ exports.create = function createUser(params) {
         idProvider: idProviderKey,
         name: name,
         displayName: displayName,
-        email: email
+        email: email,
     });
 
     var mms = params.memberships;
@@ -35,7 +36,7 @@ exports.update = function updateUser(params) {
 
     var updatedUser = authLib.modifyUser({
         key: key,
-        editor: function(user) {
+        editor: function (user) {
             var newUser = user;
             newUser.displayName = displayName;
             newUser.email = params.email;
@@ -55,7 +56,7 @@ exports.update = function updateUser(params) {
     return updatedUser;
 };
 
-exports.updatePwd = function(key, pwd) {
+exports.updatePwd = function (key, pwd) {
     var password = pwd.replace(/\s/g, '');
     try {
         authLib.changePassword({
@@ -67,6 +68,54 @@ exports.updatePwd = function(key, pwd) {
         log.error('Could not update password for [' + key + ']');
         return false;
     }
+};
+
+exports.removePublicKey = function (params) {
+    const userKey = common.required(params, 'userKey');
+    const kid = common.required(params, 'kid');
+
+    const updatedProfile = authLib.modifyProfile({
+        key: userKey,
+        editor: function (profile) {
+            const publicKeys = utilLib.forceArray(profile.publicKeys);
+            profile.publicKeys = publicKeys.filter(key => key.kid !== kid);
+            return profile;
+        }
+    });
+
+    return utilLib.forceArray(updatedProfile.publicKeys).filter(key => key.kid === kid).length === 0;
+};
+
+exports.addPublicKey = function (params) {
+    const userKey = common.required(params, 'userKey');
+    const kid = common.required(params, 'kid');
+    const publicKey = common.required(params, 'publicKey');
+    const label = params.label;
+
+    const updatedProfile = authLib.modifyProfile({
+        key: userKey,
+        editor: function (profile) {
+            const publicKeys = utilLib.forceArray(profile.publicKeys);
+
+            const existingKeys = publicKeys.filter(key => key.kid === kid);
+            if (existingKeys.length > 0) {
+                throw new Error(`Public key with kid ${kid} already exists for user ${userKey}`);
+            }
+
+            publicKeys.push({
+                kid,
+                publicKey,
+                algorithm: 'RSA',
+                label,
+                creationTime: new Date().toISOString(),
+            });
+
+            profile.publicKeys = publicKeys;
+            return profile;
+        }
+    });
+
+    return utilLib.forceArray(updatedProfile.publicKeys).filter(key => key.kid === kid)[0];
 };
 
 function populateMemberships(user) {
