@@ -20,5 +20,6 @@ module.exports = {
         'UserItem',
         graphQlUserItem.UserItemType
     ),
-    RepositoryType: graphQlRepository.RepositoryType
+    RepositoryType: graphQlRepository.RepositoryType,
+    PublicKeyType: graphQlPrincipal.PublicKeyType,
 };

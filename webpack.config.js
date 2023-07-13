@@ -12,6 +12,7 @@ module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
     entry: {
         'js/bundle': './js/main.ts',
+        'js/crypto-worker': './js/worker/RSAKeysWorker.ts',
         'styles/main': './styles/main.less',
     },
     output: {

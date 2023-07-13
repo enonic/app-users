@@ -3,15 +3,13 @@ import {PasswordGenerator} from './PasswordGenerator';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
-import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
-import {WizardStepForm} from '@enonic/lib-admin-ui/app/wizard/WizardStepForm';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
-import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
-import {WizardStepValidityChangedEvent} from '@enonic/lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {AddPublicKeysDialog} from './AddPublicKeysDialog';
+import {User} from '../principal/User';
+import {PublicKeysGrid} from '../view/PublicKeysGrid';
 
 export class UserPasswordWizardStepForm
     extends UserItemWizardStepForm {
@@ -20,11 +18,17 @@ export class UserPasswordWizardStepForm
 
     private changePasswordButton: Button;
 
+    private addPublicKeyButton: Button;
+
     private createPasswordFormItem: FormItem;
 
     private updatePasswordFormItem: FormItem;
 
+    private addPublicKeyFormItem: FormItem;
+
     private principal: Principal;
+
+    private publicKeysGrid: PublicKeysGrid;
 
     constructor() {
         super('user-password-wizard-step-form');
@@ -35,12 +39,15 @@ export class UserPasswordWizardStepForm
 
         this.password = new PasswordGenerator();
         this.changePasswordButton = new Button(i18n('action.changePassword'));
+        this.addPublicKeyButton = new Button(i18n('action.addPublicKey'));
+        this.publicKeysGrid = new PublicKeysGrid();
     }
 
     protected postInitElements(): void {
         super.postInitElements();
 
         this.updatePasswordFormItem.setVisible(false);
+        this.addPublicKeyFormItem.setVisible(false);
     }
 
     protected createFormItems(): FormItem[] {
@@ -48,7 +55,10 @@ export class UserPasswordWizardStepForm
             .setLabel(i18n('field.password')).setValidator(Validators.required).build();
 
         this.updatePasswordFormItem = new FormItemBuilder(this.changePasswordButton).build();
-        return [this.createPasswordFormItem, this.updatePasswordFormItem];
+
+        this.addPublicKeyFormItem = new FormItemBuilder(this.addPublicKeyButton).setLabel(i18n('field.userKeys.grid.title')).build();
+
+        return [this.createPasswordFormItem, this.updatePasswordFormItem, this.addPublicKeyFormItem];
     }
 
     protected initListeners(): void {
@@ -57,10 +67,20 @@ export class UserPasswordWizardStepForm
         this.form.onValidityChanged((event: ValidityChangedEvent) => {
             this.createPasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
             this.updatePasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
+            this.addPublicKeyFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
         });
 
         this.changePasswordButton.onClicked(() => {
             new OpenChangePasswordDialogEvent(this.principal).fire();
+        });
+
+        this.addPublicKeyButton.onClicked(() => {
+            const user = this.principal as User;
+            const publicKeysDialog = new AddPublicKeysDialog(user);
+            publicKeysDialog.setCallback((publicKey) => {
+                this.publicKeysGrid.addPublicKey(user, publicKey);
+            });
+            publicKeysDialog.open();
         });
     }
 
@@ -74,6 +94,8 @@ export class UserPasswordWizardStepForm
         if (principal) {
             this.fieldSet.removeItem(this.createPasswordFormItem);
             this.updatePasswordFormItem.setVisible(true);
+            this.addPublicKeyFormItem.setVisible(true);
+            this.publicKeysGrid.setUser(principal as User);
         }
     }
 
@@ -93,6 +115,19 @@ export class UserPasswordWizardStepForm
         return super.doRender().then((rendered: boolean) => {
             this.changePasswordButton.addClass('change-password-button');
 
+            this.publicKeysGrid.insertBeforeEl(this.addPublicKeyButton);
+
+            const principal = this.principal as User;
+            if (principal) {
+                if (principal.getKey().getIdProvider().isSystem()) {
+                    this.addPublicKeyButton.show();
+                    this.publicKeysGrid.show();
+                    this.publicKeysGrid.setUser(principal);
+                } else {
+                    this.addPublicKeyButton.hide();
+                    this.publicKeysGrid.hide();
+                }
+            }
             return rendered;
         });
     }

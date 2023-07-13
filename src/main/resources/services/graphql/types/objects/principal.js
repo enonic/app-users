@@ -8,6 +8,26 @@ var graphQlEnums = require('../enums');
 var graphQlUtils = require('../../utils');
 
 var graphQlUserItem = require('./userItem');
+var utilLib = require('/lib/util');
+
+exports.PublicKeyType = schemaGenerator.createObjectType({
+    name: 'PublicKey',
+    description: 'Public key for a user',
+    fields: {
+        kid: {
+            type: graphQl.GraphQLString,
+        },
+        publicKey: {
+            type: graphQl.GraphQLString,
+        },
+        label: {
+            type: graphQl.GraphQLString,
+        },
+        creationTime: {
+            type: graphQl.GraphQLString,
+        }
+    }
+});
 
 var PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
     name: 'PrincipalAccessControlEntry',
@@ -96,6 +116,12 @@ exports.PrincipalType = schemaGenerator.createObjectType({
             type: graphQl.GraphQLString,
             resolve: function (env) {
                 return env.source._timestamp;
+            }
+        },
+        publicKeys: {
+            type: graphQl.list(exports.PublicKeyType),
+            resolve: function (env) {
+                return env.source.profile ? utilLib.forceArray(env.source.profile.publicKeys) : [];
             }
         }
     }
