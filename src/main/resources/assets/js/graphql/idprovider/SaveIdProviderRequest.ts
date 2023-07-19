@@ -1,4 +1,4 @@
-import {GraphQlRequest} from '../GraphQlRequest';
+import {GraphQlRequest, GraphQlMutationResponse} from '../GraphQlRequest';
 import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderAccessControlList} from '../../app/access/IdProviderAccessControlList';
 import {IdProviderAccess} from '../../app/access/IdProviderAccess';
@@ -8,6 +8,10 @@ import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {Exception} from '@enonic/lib-admin-ui/Exception';
 
 export type SaveMutation = 'updateIdProvider' | 'createIdProvider';
+
+type SaveIdProviderMutationResponse = GraphQlMutationResponse & {
+    mutationType: string;
+};
 
 export class SaveIdProviderRequest
     extends GraphQlRequest<IdProvider> {
@@ -95,7 +99,7 @@ export class SaveIdProviderRequest
     }
 
     sendAndParse(): Q.Promise<IdProvider> {
-        return this.mutate().then(json => this.idProviderfromJson(json[this.mutationType], json.error));
+        return this.mutate().then((json: SaveIdProviderMutationResponse) => this.idProviderfromJson(json[this.mutationType], json.error));
     }
 
     idProviderfromJson(us: IdProviderJson, error: string): IdProvider {

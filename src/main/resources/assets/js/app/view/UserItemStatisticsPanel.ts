@@ -130,7 +130,7 @@ export class UserItemStatisticsPanel
 
                 this.userDataContainer.removeChildren();
                 this.userDataContainer.appendChildren(...groupsToAppend);
-            }).catch((reason: any) => {
+            }).catch((reason) => {
                 DefaultErrorHandler.handle(reason);
             }).done();
         }

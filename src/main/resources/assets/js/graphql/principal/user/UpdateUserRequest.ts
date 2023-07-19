@@ -1,7 +1,11 @@
-import {GraphQlRequest} from '../../GraphQlRequest';
+import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {User} from '../../../app/principal/User';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {UserJson} from '../../../app/principal/UserJson';
+
+type UpdateUserMutationResponse = GraphQlMutationResponse & {
+    updateUser: UserJson;
+};
 
 export class UpdateUserRequest
     extends GraphQlRequest<User> {
@@ -74,7 +78,7 @@ export class UpdateUserRequest
     /* eslint-enable max-len */
 
     sendAndParse(): Q.Promise<User> {
-        return this.mutate().then(json => this.fromJson(json.updateUser, json.error));
+        return this.mutate().then((json: UpdateUserMutationResponse) => this.fromJson(json.updateUser, json.error));
     }
 
     fromJson(user: UserJson, error: string): User {

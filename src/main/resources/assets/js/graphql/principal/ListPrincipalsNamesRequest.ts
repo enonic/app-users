@@ -1,15 +1,22 @@
 import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 
 export type ListPrincipalsKeysResult = {
     displayNames: string[];
 };
 
+type ListPrincipalsNamesResult = {
+    principalsConnection: {
+        edges: [{ node: PrincipalJson }],
+    };
+};
+
 export interface ListPrincipalsProperties extends ListGraphQlProperties {
     types: string[];
     idProviderKey: IdProviderKey;
-} 
+}
 
 export class ListPrincipalsNamesRequest
     extends ListGraphQlRequest<ListPrincipalsKeysResult> {
@@ -52,7 +59,7 @@ export class ListPrincipalsNamesRequest
     }
 
     override sendAndParse(): Q.Promise<ListPrincipalsKeysResult> {
-        return this.query().then((response: any) => {
+        return this.query().then((response: ListPrincipalsNamesResult) => {
             const data = response.principalsConnection;
             return {
                 displayNames: data.edges.map(edge => edge.node.displayName)

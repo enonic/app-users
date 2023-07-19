@@ -85,7 +85,7 @@ export class PrincipalBrowseFilterPanel
                     new BrowseFilterResetEvent().fire();
                 }
             });
-        }).catch((reason: any) => {
+        }).catch((reason) => {
             DefaultErrorHandler.handle(reason);
         });
     }
@@ -117,7 +117,7 @@ export class PrincipalBrowseFilterPanel
                 }
 
                 this.handleDataSearchResult(result, types, searchString);
-            }).catch((reason: any) => {
+            }).catch((reason) => {
                 DefaultErrorHandler.handle(reason);
             });
     }
@@ -135,7 +135,7 @@ export class PrincipalBrowseFilterPanel
                 } else {
                     this.handleNoSearchResultOnRefresh();
                 }
-            }).catch((reason: any) => {
+            }).catch((reason) => {
                 DefaultErrorHandler.handle(reason);
             });
     }
@@ -190,7 +190,7 @@ export class PrincipalBrowseFilterPanel
             .then((typeAggregation) => {
                 this.updateAggregations([typeAggregation]);
                 this.toggleAggregationsVisibility([typeAggregation]);
-            }).catch((reason: any) => {
+            }).catch((reason) => {
                 DefaultErrorHandler.handle(reason);
             });
     }

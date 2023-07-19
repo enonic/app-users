@@ -6,6 +6,10 @@ import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import * as Q from 'q';
 
+export interface GraphQlMutationResponse {
+    error?: string;
+}
+
 export class GraphQlRequest<PARSED_TYPE>
     implements HttpRequest<PARSED_TYPE> {
 
@@ -15,15 +19,15 @@ export class GraphQlRequest<PARSED_TYPE>
         this.path = Path.fromString(CONFIG.getString('services.graphQlUrl'));
     }
 
-    private getParams(query: string, mutation: string): Object {
-        let params: any = {};
+    private getParams(query: string, mutation: string): object {
+        const params: object = {};
         if (!StringHelper.isEmpty(query)) {
             params['query'] = query;
         }
         if (!StringHelper.isEmpty(mutation)) {
             params['mutation'] = mutation;
         }
-        let vars = this.getVariables();
+        const vars = this.getVariables();
         if (vars && Object.keys(vars).length > 0) {
             params['variables'] = vars;
         }
@@ -47,22 +51,22 @@ export class GraphQlRequest<PARSED_TYPE>
         return true;
     }
 
-    query(): Q.Promise<any> {
+    query(): Q.Promise<object> {
         return this.send(this.getQuery(), null);
     }
 
-    mutate(): Q.Promise<any> {
+    mutate(): Q.Promise<object> {
         return this.send(null, this.getMutation());
     }
 
-    private send(query: string, mutation: string): Q.Promise<any> {
+    private send(query: string, mutation: string): Q.Promise<object> {
 
         if (this.validate()) {
             const jsonRequest = new PostRequest()
                 .setParams(this.getParams(query, mutation))
                 .setPath(this.path);
 
-            return jsonRequest.send().then((rawResponse: any) => {
+            return jsonRequest.send().then((rawResponse: unknown) => {
                 const json = new JsonResponse(rawResponse).getJson() || {};
                 const result = json.data || {};
                 if (json.errors) {

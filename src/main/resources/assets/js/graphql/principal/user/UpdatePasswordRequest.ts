@@ -1,5 +1,9 @@
-import {GraphQlRequest} from '../../GraphQlRequest';
+import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+
+type UpdatePwdMutationResponse = GraphQlMutationResponse & {
+    updatePwd: Boolean;
+};
 
 export class UpdatePasswordRequest
     extends GraphQlRequest<Boolean> {
@@ -31,7 +35,7 @@ export class UpdatePasswordRequest
     }
 
     sendAndParse(): Q.Promise<Boolean> {
-        return this.mutate().then(json => json.updatePwd);
+        return this.mutate().then((json: UpdatePwdMutationResponse) => json.updatePwd);
     }
 
 }

@@ -2,6 +2,10 @@ import {GraphQlRequest} from '../GraphQlRequest';
 import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
 
+type GetDefaultIdProviderResponse = {
+    defaultIdProvider: IdProviderJson;
+};
+
 export class GetDefaultIdProviderRequest
     extends GraphQlRequest<IdProvider> {
 
@@ -28,7 +32,7 @@ export class GetDefaultIdProviderRequest
     }
 
     sendAndParse(): Q.Promise<IdProvider> {
-        return this.query().then(result => this.idProviderfromJson(result.defaultIdProvider));
+        return this.query().then((result: GetDefaultIdProviderResponse) => this.idProviderfromJson(result.defaultIdProvider));
     }
 
     idProviderfromJson(us: IdProviderJson): IdProvider {
