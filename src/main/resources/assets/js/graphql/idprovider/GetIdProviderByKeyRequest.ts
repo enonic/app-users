@@ -3,6 +3,10 @@ import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 
+type GetIdProviderResponse = {
+    idProvider: IdProviderJson;
+};
+
 export class GetIdProviderByKeyRequest
     extends GraphQlRequest<IdProvider> {
 
@@ -13,8 +17,8 @@ export class GetIdProviderByKeyRequest
         this.key = key;
     }
 
-    getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
+    getVariables(): object {
+        const vars = super.getVariables();
         vars['key'] = this.key.toString();
         return vars;
     }
@@ -42,7 +46,7 @@ export class GetIdProviderByKeyRequest
     }
 
     sendAndParse(): Q.Promise<IdProvider> {
-        return this.query().then(result => this.idProviderfromJson(result.idProvider));
+        return this.query().then((result: GetIdProviderResponse) => this.idProviderfromJson(result.idProvider));
     }
 
     idProviderfromJson(us: IdProviderJson): IdProvider {

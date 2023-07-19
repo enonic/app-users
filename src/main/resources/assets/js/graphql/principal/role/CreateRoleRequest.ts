@@ -1,15 +1,19 @@
-import {GraphQlRequest} from '../../GraphQlRequest';
+import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {Role} from '../../../app/principal/Role';
 import {RoleJson} from '../../../app/principal/RoleJson';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
 // Key and members should be PrincipalsKeys?
 interface CreateRoleProperties {
-    key: string; 
+    key: string;
     displayName: string;
     description: string;
     members: string[];
 }
+
+type CreateRoleMutationResponse = GraphQlMutationResponse & {
+    createRole: RoleJson;
+};
 
 export class CreateRoleRequest
     extends GraphQlRequest<Role> {
@@ -60,7 +64,7 @@ export class CreateRoleRequest
     }
 
     sendAndParse(): Q.Promise<Role> {
-        return this.mutate().then(json => this.fromJson(json.createRole, json.error));
+        return this.mutate().then((json: CreateRoleMutationResponse) => this.fromJson(json.createRole, json.error));
     }
 
     fromJson(role: RoleJson, error: string): Role {

@@ -1,4 +1,4 @@
-import {GraphQlRequest} from '../../GraphQlRequest';
+import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {User} from '../../../app/principal/User';
 import {UserJson} from '../../../app/principal/UserJson';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
@@ -10,6 +10,10 @@ type CreateUserRequestData = {
     login: string;
     password: string;
     memberships: PrincipalKey[];
+};
+
+type CreateUserMutationResponse = GraphQlMutationResponse & {
+    createUser: UserJson;
 };
 
 export class CreateUserRequest
@@ -83,7 +87,7 @@ export class CreateUserRequest
     /* eslint-enable max-len */
 
     sendAndParse(): Q.Promise<User> {
-        return this.mutate().then(json => this.fromJson(json.createUser, json.error));
+        return this.mutate().then((json: CreateUserMutationResponse) => this.fromJson(json.createUser, json.error));
     }
 
     fromJson(user: UserJson, error: string): User {

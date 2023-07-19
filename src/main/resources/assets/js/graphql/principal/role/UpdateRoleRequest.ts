@@ -1,7 +1,11 @@
-import {GraphQlRequest} from '../../GraphQlRequest';
+import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {Role} from '../../../app/principal/Role';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {RoleJson} from '../../../app/principal/RoleJson';
+
+type UpdateRoleMutationResponse = GraphQlMutationResponse & {
+    updateRole: RoleJson;
+};
 
 export class UpdateRoleRequest
     extends GraphQlRequest<Role> {
@@ -62,7 +66,7 @@ export class UpdateRoleRequest
     /* eslint-enable max-len */
 
     sendAndParse(): Q.Promise<Role> {
-        return this.mutate().then(json => this.fromJson(json.updateRole, json.error));
+        return this.mutate().then((json: UpdateRoleMutationResponse) => this.fromJson(json.updateRole, json.error));
     }
 
     fromJson(role: RoleJson, error: string): Role {

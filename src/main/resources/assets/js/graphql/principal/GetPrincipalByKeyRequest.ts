@@ -10,6 +10,10 @@ import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 
+type GetPrincipalByKeyResponse = {
+    principal: PrincipalJson;
+};
+
 export class GetPrincipalByKeyRequest
     extends GraphQlRequest<Principal> {
 
@@ -32,8 +36,8 @@ export class GetPrincipalByKeyRequest
         return this;
     }
 
-    getVariables(): { [key: string]: any } {
-        let vars = super.getVariables();
+    getVariables(): object {
+        const vars = super.getVariables();
         if (this.key) {
             vars['key'] = this.key.toString();
         }
@@ -97,7 +101,7 @@ export class GetPrincipalByKeyRequest
     }
 
     sendAndParse(): Q.Promise<Principal> {
-        return this.query().then(result => this.fromJsonToPrincipal(result.principal));
+        return this.query().then((result: GetPrincipalByKeyResponse) => this.fromJsonToPrincipal(result.principal));
     }
 
     fromJsonToPrincipal(json: PrincipalJson): Principal {

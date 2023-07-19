@@ -1,7 +1,11 @@
-import {GraphQlRequest} from '../../GraphQlRequest';
+import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {Group} from '../../../app/principal/Group';
 import {GroupJson} from '../../../app/principal/GroupJson';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+
+type CreateGroupMutationResponse = GraphQlMutationResponse & {
+    createGroup: GroupJson;
+};
 
 export class CreateGroupRequest
     extends GraphQlRequest<Group> {
@@ -64,7 +68,7 @@ export class CreateGroupRequest
     }
 
     sendAndParse(): Q.Promise<Group> {
-        return this.mutate().then(json => this.fromJson(json.createGroup, json.error));
+        return this.mutate().then((json: CreateGroupMutationResponse) => this.fromJson(json.createGroup, json.error));
     }
 
     fromJson(group: GroupJson, error: string): Group {

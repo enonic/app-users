@@ -1,6 +1,6 @@
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 
-type RepositoryData = {
+export type RepositoryData = {
     id: string;
     name: string;
     branches: string[];

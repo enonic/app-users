@@ -1,10 +1,14 @@
 import {ListGraphQlProperties, ListGraphQlRequest} from '../ListGraphQlRequest';
-import {Repository} from '../../app/report/Repository';
+import {Repository, RepositoryData} from '../../app/report/Repository';
 import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 
 interface ListRepositoriesProperties extends ListGraphQlProperties {
     query: string;
 }
+
+type ListRepositoriesResult = {
+    repositories: RepositoryData[];
+};
 
 export class ListRepositoriesRequest
     extends ListGraphQlRequest<Repository[]> {
@@ -34,6 +38,6 @@ export class ListRepositoriesRequest
     }
 
     sendAndParse(): Q.Promise<Repository[]> {
-        return this.query().then(response => response.repositories.map(Repository.fromJson));
+        return this.query().then((response: ListRepositoriesResult) => response.repositories.map(Repository.fromJson));
     }
 }
