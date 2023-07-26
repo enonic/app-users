@@ -135,7 +135,7 @@ export class UserTreeGridItem
             return false;
         }
 
-        const other:UserTreeGridItem = <UserTreeGridItem> o;
+        const other:UserTreeGridItem = o as UserTreeGridItem;
         return this.type === other.getType() && this.principal === other.getPrincipal() && this.idProvider === other.getIdProvider();
     }
 

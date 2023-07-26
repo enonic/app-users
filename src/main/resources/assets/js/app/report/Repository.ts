@@ -1,10 +1,10 @@
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 
-export type RepositoryData = {
+export interface RepositoryData {
     id: string;
     name: string;
     branches: string[];
-};
+}
 
 export class Repository
     implements Equitable {

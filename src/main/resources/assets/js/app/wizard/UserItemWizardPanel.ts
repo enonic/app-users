@@ -31,9 +31,9 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
     private locked: boolean;
 
-    private lockChangedListeners: { (value: boolean): void }[];
+    private lockChangedListeners: ((value: boolean) => void)[];
 
-    private userItemNamedListeners: { (event: UserItemNamedEvent): void }[];
+    private userItemNamedListeners: ((event: UserItemNamedEvent) => void)[];
 
     protected constructor(params: UserItemWizardPanelParams<USER_ITEM_TYPE>) {
         super(params);
@@ -109,7 +109,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     }
 
     public getWizardHeader(): WizardHeaderWithDisplayNameAndName {
-        return <WizardHeaderWithDisplayNameAndName> super.getWizardHeader();
+        return super.getWizardHeader() as WizardHeaderWithDisplayNameAndName;
     }
 
     isSystemUserItem(): boolean {
@@ -128,7 +128,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     }
 
     public getFormIcon(): FormIcon {
-        return <FormIcon> super.getFormIcon();
+        return super.getFormIcon() as FormIcon;
     }
 
     doRenderOnDataLoaded(rendered: boolean): Q.Promise<boolean> {
@@ -193,7 +193,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         super.setPersistedItem(newPersistedItem);
 
         if (this.wizardHeader) {
-            (<WizardHeaderWithDisplayNameAndName>this.wizardHeader).toggleNameInput(false);
+            (this.wizardHeader as WizardHeaderWithDisplayNameAndName).toggleNameInput(false);
         }
     }
 

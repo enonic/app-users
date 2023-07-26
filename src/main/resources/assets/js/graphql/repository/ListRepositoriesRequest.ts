@@ -6,9 +6,9 @@ interface ListRepositoriesProperties extends ListGraphQlProperties {
     query: string;
 }
 
-type ListRepositoriesResult = {
+interface ListRepositoriesResult {
     repositories: RepositoryData[];
-};
+}
 
 export class ListRepositoriesRequest
     extends ListGraphQlRequest<Repository[]> {
@@ -30,7 +30,7 @@ export class ListRepositoriesRequest
     }
 
     getVariables(): ListRepositoriesProperties {
-        const vars = <ListRepositoriesProperties>super.getVariables();
+        const vars = super.getVariables() as ListRepositoriesProperties;
         if (!StringHelper.isEmpty(this.searchQuery)) {
             vars['query'] = this.searchQuery;
         }

@@ -3,14 +3,14 @@ import {User} from '../../../app/principal/User';
 import {UserJson} from '../../../app/principal/UserJson';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
-type CreateUserRequestData = {
+interface CreateUserRequestData {
     key: PrincipalKey;
     displayName: string;
     email: string;
     login: string;
     password: string;
     memberships: PrincipalKey[];
-};
+}
 
 type CreateUserMutationResponse = GraphQlMutationResponse & {
     createUser: UserJson;
@@ -56,7 +56,7 @@ export class CreateUserRequest
         return this;
     }
 
-    getVariables(): { [key: string]: CreateUserRequestData } {
+    getVariables(): Record<string, CreateUserRequestData> {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;

@@ -26,12 +26,12 @@ export class UserMembershipsWizardStepForm
 
         const groupsLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.GROUP]);
-        this.groups = <PrincipalComboBox>(PrincipalComboBox.create().setLoader(groupsLoader).build());
+        this.groups = (PrincipalComboBox.create().setLoader(groupsLoader).build()) as PrincipalComboBox;
 
         const rolesLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.ROLE])
             .skipPrincipals([RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED]);
-        this.roles = <PrincipalComboBox>PrincipalComboBox.create().setLoader(rolesLoader).build();
+        this.roles = PrincipalComboBox.create().setLoader(rolesLoader).build() as PrincipalComboBox;
     }
 
     protected createFormItems(): FormItem[] {
@@ -42,7 +42,7 @@ export class UserMembershipsWizardStepForm
     }
 
     layout(principal: Principal): void {
-        const rolesKeys: PrincipalKey[] = this.getRolesKeysFromUser(<User>principal);
+        const rolesKeys: PrincipalKey[] = this.getRolesKeysFromUser(principal as User);
 
         if (this.roles.isDirty()) {
             if (ObjectHelper.arrayEquals(this.getRolesKeys(), rolesKeys)) {
@@ -52,7 +52,7 @@ export class UserMembershipsWizardStepForm
             this.roles.setValue(rolesKeys.join(';'));
         }
 
-        const groupKeys: PrincipalKey[] = this.getGroupsKeysFromUser(<User>principal);
+        const groupKeys: PrincipalKey[] = this.getGroupsKeysFromUser(principal as User);
 
         if (this.groups.isDirty()) {
             if (ObjectHelper.arrayEquals(this.getGroupsKeys(), groupKeys)) {

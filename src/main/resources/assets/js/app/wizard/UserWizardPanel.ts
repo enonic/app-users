@@ -116,7 +116,7 @@ export class UserWizardPanel
     }
 
     protected getWizardNameValue(): string {
-        return (<User>this.getPersistedItem())?.getLogin() || super.getWizardNameValue();
+        return (this.getPersistedItem() as User)?.getLogin() || super.getWizardNameValue();
     }
 
     produceCreateUserRequest(): CreateUserRequest {
@@ -148,13 +148,13 @@ export class UserWizardPanel
     }
 
     produceUpdateRequest(viewedPrincipal: Principal): UpdateUserRequest {
-        const user: User = <User>viewedPrincipal;
+        const user: User = viewedPrincipal as User;
         const key: PrincipalKey = user.getKey();
         const displayName: string = user.getDisplayName();
         const email: string = user.getEmail();
         const login: string = user.getLogin();
 
-        const oldMemberships: PrincipalKey[] = (<User>this.getPersistedItem()).getMemberships().map(value => value.getKey());
+        const oldMemberships: PrincipalKey[] = (this.getPersistedItem() as User).getMemberships().map(value => value.getKey());
         const newMemberships: PrincipalKey[] = user.getMemberships().map(value => value.getKey());
         const addMemberships: PrincipalKey[] = ArrayHelper.difference(newMemberships, oldMemberships,
             (a, b) => (a.toString() === b.toString()));
@@ -173,7 +173,7 @@ export class UserWizardPanel
     assembleViewedItem(): Principal {
         const wizardHeader: WizardHeaderWithDisplayNameAndName = this.getWizardHeader();
         wizardHeader.normalizeNames();
-        return new UserBuilder(this.getPersistedItem() ? <User>this.getPersistedItem() : null)
+        return new UserBuilder(this.getPersistedItem() ? this.getPersistedItem() as User : null)
             .setEmail(this.userEmailWizardStepForm.getEmail())
             .setLogin(wizardHeader.getName())
             .setMemberships(this.userMembershipsWizardStepForm.getMemberships().sort(this.sortMemberships))
@@ -212,7 +212,7 @@ export class UserWizardPanel
     }
 
     protected assemblePersistedItem(): Principal {
-        const persistedUser: User = (<User>this.getPersistedItem());
+        const persistedUser: User = (this.getPersistedItem() as User);
 
         return persistedUser
             .newBuilder()

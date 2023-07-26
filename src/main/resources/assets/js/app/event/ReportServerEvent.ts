@@ -15,7 +15,7 @@ export class ReportServerEvent
     }
 
     getNodeChange(): ReportServerChange {
-        return <ReportServerChange>super.getNodeChange();
+        return super.getNodeChange() as ReportServerChange;
     }
 
     static is(eventJson: NodeEventJson): boolean {

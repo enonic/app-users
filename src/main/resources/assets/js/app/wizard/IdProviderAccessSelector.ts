@@ -21,7 +21,7 @@ export class IdProviderAccessSelector
     ];
 
     private value: IdProviderAccess;
-    private valueChangedListeners: { (event: ValueChangedEvent): void }[] = [];
+    private valueChangedListeners: ((event: ValueChangedEvent) => void)[] = [];
 
     constructor() {
         super('access-selector');
@@ -32,7 +32,7 @@ export class IdProviderAccessSelector
         });
 
         this.onNavigationItemSelected((event: NavigatorEvent) => {
-            let item: TabMenuItem = <TabMenuItem> event.getItem();
+            let item: TabMenuItem = event.getItem() as TabMenuItem;
             this.setValue(IdProviderAccessSelector.OPTIONS[item.getIndex()].value);
         });
 
@@ -55,13 +55,7 @@ export class IdProviderAccessSelector
     }
 
     private findOptionByValue(value: IdProviderAccess): IdProviderAccessSelectorOption {
-        for (let i = 0; i < IdProviderAccessSelector.OPTIONS.length; i++) {
-            let option = IdProviderAccessSelector.OPTIONS[i];
-            if (option.value === value) {
-                return option;
-            }
-        }
-        return undefined;
+        return IdProviderAccessSelector.OPTIONS.find((option) => option.value === value);
     }
 
     onValueChanged(listener: (event: ValueChangedEvent) => void): void {

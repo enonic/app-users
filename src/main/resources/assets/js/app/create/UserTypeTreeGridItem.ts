@@ -30,7 +30,7 @@ export class UserTypeTreeGridItem
             return false;
         }
 
-        const other = <UserTypeTreeGridItem> o;
+        const other = o as UserTypeTreeGridItem;
         return this.userItem === other.getUserItem();
     }
 

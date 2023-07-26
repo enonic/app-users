@@ -27,7 +27,7 @@ export class RolesWizardStepForm
         const rolesLoader: BasePrincipalLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.ROLE])
             .skipPrincipals([RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED]);
-        this.roles = <PrincipalComboBox>(PrincipalComboBox.create().setLoader(rolesLoader).build());
+        this.roles = (PrincipalComboBox.create().setLoader(rolesLoader).build()) as PrincipalComboBox;
     }
 
     protected createFormItems(): FormItem[] {
@@ -57,13 +57,13 @@ export class RolesWizardStepForm
 
     private getRolesKeysFromPrincipal(principal: Principal): PrincipalKey[] {
         if (principal && principal.isUser()) {
-            return (<User>principal).getMemberships()
+            return (principal as User).getMemberships()
                 .filter((membership: Principal) => membership.isRole())
                 .map((p: Principal) => p.getKey());
         }
 
         if (principal && principal.isGroup()) {
-            return (<Group>principal).getMemberships().filter((m: Principal) => m.isRole()).map((p: Principal) => p.getKey());
+            return (principal as Group).getMemberships().filter((m: Principal) => m.isRole()).map((p: Principal) => p.getKey());
         }
 
         return [];

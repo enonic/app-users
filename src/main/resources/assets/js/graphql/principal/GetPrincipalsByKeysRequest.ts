@@ -9,9 +9,9 @@ import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 
-type GetPrincipalsByKeyResponse = {
+interface GetPrincipalsByKeyResponse {
     principals: PrincipalJson[];
-};
+}
 
 export class GetPrincipalsByKeysRequest
     extends GraphQlRequest<Principal[]> {
@@ -35,7 +35,7 @@ export class GetPrincipalsByKeysRequest
         return this;
     }
 
-    getVariables(): { [keys: string]: object } {
+    getVariables(): Record<string, object> {
         const vars = super.getVariables();
         if (this.keys) {
             vars['keys'] = this.keys.map(principalKey => principalKey.toString());
@@ -90,13 +90,13 @@ export class GetPrincipalsByKeysRequest
         return principalsJson.map(principalJson => {
             let pKey: PrincipalKey = PrincipalKey.fromString(principalJson.key);
             if (pKey.isRole()) {
-                return Role.fromJson(<RoleJson>principalJson);
+                return Role.fromJson(principalJson as RoleJson);
 
             } else if (pKey.isGroup()) {
-                return Group.fromJson(<GroupJson>principalJson);
+                return Group.fromJson(principalJson as GroupJson);
 
             } else if (pKey.isUser()) {
-                return User.fromJson(<UserJson>principalJson);
+                return User.fromJson(principalJson as UserJson);
             }
         });
     }

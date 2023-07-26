@@ -29,7 +29,7 @@ export class ListGraphQlRequest<PARSED_TYPE>
     }
 
     override getVariables(): ListGraphQlProperties {
-        let vars = <ListGraphQlProperties>super.getVariables();
+        let vars = super.getVariables() as ListGraphQlProperties;
         if (this.start > 0) {
             vars['start'] = this.start;
         }

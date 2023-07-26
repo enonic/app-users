@@ -13,11 +13,11 @@ export class AuthApplicationSelectedOptionsView
 
     private applicationConfigProvider: ApplicationConfigProvider;
 
-    private applicationConfigFormDisplayedListeners: { (applicationKey: ApplicationKey, formView: FormView): void }[] = [];
+    private applicationConfigFormDisplayedListeners: ((applicationKey: ApplicationKey, formView: FormView) => void)[] = [];
 
-    private beforeOptionCreatedListeners: { (): void }[] = [];
+    private beforeOptionCreatedListeners: (() => void)[] = [];
 
-    private afterOptionCreatedListeners: { (optionView: AuthApplicationSelectedOptionView): void }[] = [];
+    private afterOptionCreatedListeners: ((optionView: AuthApplicationSelectedOptionView) => void)[] = [];
 
     private items: AuthApplicationSelectedOptionView[] = [];
 
@@ -69,11 +69,11 @@ export class AuthApplicationSelectedOptionsView
         super.removeOption(optionToRemove, silent);
     }
 
-    onApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }): void {
+    onApplicationConfigFormDisplayed(listener: (applicationKey: ApplicationKey, formView: FormView) => void): void {
         this.applicationConfigFormDisplayedListeners.push(listener);
     }
 
-    unApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView): void; }): void {
+    unApplicationConfigFormDisplayed(listener: (applicationKey: ApplicationKey, formView: FormView) => void): void {
         this.applicationConfigFormDisplayedListeners =
             this.applicationConfigFormDisplayedListeners.filter((curr) => (curr !== listener));
     }

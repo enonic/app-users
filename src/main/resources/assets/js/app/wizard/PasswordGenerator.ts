@@ -27,8 +27,8 @@ export class PasswordGenerator
     private passwordStrength: PasswordStrength;
     private helpTextBlock: DivEl;
 
-    private focusListeners: { (event: FocusEvent): void }[] = [];
-    private blurListeners: { (event: FocusEvent): void }[] = [];
+    private focusListeners: ((event: FocusEvent) => void)[] = [];
+    private blurListeners: ((event: FocusEvent) => void)[] = [];
 
     constructor() {
         super('div', 'password-generator');

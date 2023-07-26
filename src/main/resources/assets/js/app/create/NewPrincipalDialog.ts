@@ -15,10 +15,10 @@ export class NewPrincipalDialog
     private pathEl: PEl;
 
     constructor() {
-        super(<ModalDialogConfig>{
+        super({
             title: i18n('dialog.new'),
             class: 'new-principal-dialog'
-        });
+        } as ModalDialogConfig);
     }
 
     protected initElements(): void {

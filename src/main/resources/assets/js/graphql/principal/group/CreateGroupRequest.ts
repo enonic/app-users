@@ -41,7 +41,7 @@ export class CreateGroupRequest
         return this;
     }
 
-    getVariables(): { [key: string]: string | PrincipalKey | PrincipalKey[]} {
+    getVariables(): Record<string, string | PrincipalKey | PrincipalKey[]> {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;

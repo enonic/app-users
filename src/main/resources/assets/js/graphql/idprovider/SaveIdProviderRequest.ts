@@ -110,7 +110,7 @@ export class SaveIdProviderRequest
         }
 
         if (us.idProviderConfig && typeof us.idProviderConfig.config === 'string') {
-            us.idProviderConfig.config = JSON.parse(<string>us.idProviderConfig.config);
+            us.idProviderConfig.config = JSON.parse(us.idProviderConfig.config as string);
         }
         return IdProvider.fromJson(us);
     }

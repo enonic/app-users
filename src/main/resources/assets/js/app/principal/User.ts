@@ -46,7 +46,7 @@ export class User
             return false;
         }
 
-        let other = <User> o;
+        let other = o as User;
 
         return super.equals(o) &&
                this.loginDisabled === other.isDisabled() &&

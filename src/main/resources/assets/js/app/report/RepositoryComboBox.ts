@@ -20,11 +20,11 @@ export class RepositoryComboBox
     clearSelection(forceClear: boolean = false): void {
         this.getLoader().search('');
         super.clearSelection(forceClear);
-        (<ReportSelectedOptionView>this.getSelectedOptions()[0].getOptionView()).getBranch();
+        (this.getSelectedOptions()[0].getOptionView() as ReportSelectedOptionView).getBranch();
     }
 
     getSelectedBranches(): string[] {
-        return this.getSelectedOptions().map(selectedOption => (<ReportSelectedOptionView>selectedOption.getOptionView()).getBranch());
+        return this.getSelectedOptions().map(selectedOption => (selectedOption.getOptionView() as ReportSelectedOptionView).getBranch());
     }
 }
 
@@ -57,7 +57,7 @@ class ReportSelectedOptionView
     }
 
     private createBranchesDropdown(repo: Repository): Dropdown<string> {
-        const branchDropDown = new Dropdown<string>('branch', <DropdownConfig<string>>{});
+        const branchDropDown = new Dropdown<string>('branch', {} as DropdownConfig<string>);
         const masterBranch: string = 'master';
 
         repo.getBranches().forEach((branch: string) => {

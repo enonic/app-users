@@ -33,7 +33,7 @@ export class Role
     }
 
     static fromJson(json: RoleJson): Role {
-        return <Role>new RoleBuilder().fromJson(json).build();
+        return new RoleBuilder().fromJson(json).build() as Role;
     }
 }
 

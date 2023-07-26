@@ -6,7 +6,7 @@ export class UserItemTypesRowFormatter {
 
     public static nameFormatter(_row: number, _cell: number, _value: unknown,
                                 _columnDef: unknown, dataContext: TreeNode<UserTypeTreeGridItem>): string {
-        let viewer: UserTypesTreeGridItemViewer = <UserTypesTreeGridItemViewer>dataContext.getViewer('displayName');
+        let viewer: UserTypesTreeGridItemViewer = dataContext.getViewer('displayName') as UserTypesTreeGridItemViewer;
         if (!viewer) {
             const isRootNode = dataContext.calcLevel() === 1;
             viewer = new UserTypesTreeGridItemViewer(isRootNode);

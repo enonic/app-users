@@ -24,7 +24,7 @@ export abstract class ListItemsRequest<TYPE>
     }
 
     getVariables(): ListItemsProperties {
-        const vars = <ListItemsProperties>super.getVariables();
+        const vars = super.getVariables() as ListItemsProperties;
 
         if (this.searchQuery) {
             vars['query'] = FulltextSearchExpression.escapeString(this.searchQuery);

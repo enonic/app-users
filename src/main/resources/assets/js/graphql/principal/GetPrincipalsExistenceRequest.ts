@@ -3,11 +3,11 @@ import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {ListPrincipalsProperties} from './ListPrincipalsNamesRequest';
 
-type GetPrincipalsExistenceRequestResult = {
+interface GetPrincipalsExistenceRequestResult {
     principalsConnection: {
         totalCount: number
     }
-};
+}
 
 export class GetPrincipalsExistenceRequest
     extends ListGraphQlRequest<boolean> {
@@ -31,7 +31,7 @@ export class GetPrincipalsExistenceRequest
     }
 
     getVariables(): ListPrincipalsProperties {
-        let vars = <ListPrincipalsProperties>super.getVariables();
+        let vars = super.getVariables() as ListPrincipalsProperties;
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }

@@ -41,7 +41,7 @@ export class IdProviderAccessControlEntry
         if (!ObjectHelper.iFrameSafeInstanceOf(o, IdProviderAccessControlEntry)) {
             return false;
         }
-        let other = <IdProviderAccessControlEntry>o;
+        let other = o as IdProviderAccessControlEntry;
         return this.principal.equals(other.getPrincipal()) &&
                this.access === other.access;
     }

@@ -24,9 +24,9 @@ export class AuthApplicationSelectedOptionView
 
     private applicationConfig: ApplicationConfig;
 
-    private applicationConfigFormDisplayedListeners: { (applicationKey: ApplicationKey): void }[] = [];
+    private applicationConfigFormDisplayedListeners: ((applicationKey: ApplicationKey) => void)[] = [];
 
-    private formValidityChangedHandler: { (event: FormValidityChangedEvent): void };
+    private formValidityChangedHandler: (event: FormValidityChangedEvent) => void;
 
     constructor(option: Option<Application>,
                 applicationConfig: ApplicationConfig,
@@ -195,11 +195,11 @@ export class AuthApplicationSelectedOptionView
         return this.formView;
     }
 
-    onApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey): void; }): void {
+    onApplicationConfigFormDisplayed(listener: (applicationKey: ApplicationKey) => void): void {
         this.applicationConfigFormDisplayedListeners.push(listener);
     }
 
-    unApplicationConfigFormDisplayed(listener: { (applicationKey: ApplicationKey): void; }): void {
+    unApplicationConfigFormDisplayed(listener: (applicationKey: ApplicationKey) => void): void {
         this.applicationConfigFormDisplayedListeners =
             this.applicationConfigFormDisplayedListeners.filter((curr) => (curr !== listener));
     }
