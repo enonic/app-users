@@ -53,7 +53,7 @@ export class AuthApplicationSelector
         return null;
     }
 
-    private readConfig(inputConfig: { [element: string]: { [name: string]: string }[]; }): void {
+    private readConfig(inputConfig: Record<string, Record<string, string>[]>): void {
         let readOnlyConfig = inputConfig['readOnly'] && inputConfig['readOnly'][0];
         let readOnlyValue = readOnlyConfig && readOnlyConfig['value'];
         this.readOnly = readOnlyValue === 'true';
@@ -124,10 +124,10 @@ export class AuthApplicationSelector
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
             new AuthApplicationSelectedOptionsView(applicationConfigProvider, this.readOnly);
 
-        const comboBox: AuthApplicationComboBox = <AuthApplicationComboBox>AuthApplicationComboBox.create()
+        const comboBox: AuthApplicationComboBox = AuthApplicationComboBox.create()
             .setMaximumOccurrences(input.getOccurrences().getMaximum() || 0)
             .setSelectedOptionsView(selectedOptionsView)
-            .build();
+            .build() as AuthApplicationComboBox;
 
         // creating selected option might involve property changes
         comboBox.onBeforeOptionCreated(() => this.ignorePropertyChange(true));
@@ -138,7 +138,7 @@ export class AuthApplicationSelector
             this.validate(false);
         };
         const saveAndForceValidate = (selectedOption: SelectedOption<Application>) => {
-            const view: AuthApplicationSelectedOptionView = <AuthApplicationSelectedOptionView> selectedOption.getOptionView();
+            const view: AuthApplicationSelectedOptionView = selectedOption.getOptionView() as AuthApplicationSelectedOptionView;
             this.saveToSet(view.getSiteConfig(), selectedOption.getIndex());
             forcedValidate();
         };

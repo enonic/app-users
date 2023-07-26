@@ -37,7 +37,7 @@ export class ListIdProvidersRequest
     idProviderfromJson(idprovider: IdProviderJson): IdProvider {
         if (idprovider.idProviderConfig && typeof idprovider.idProviderConfig.config === 'string') {
             // config is passed as string
-            idprovider.idProviderConfig.config = JSON.parse(<string>idprovider.idProviderConfig.config);
+            idprovider.idProviderConfig.config = JSON.parse(idprovider.idProviderConfig.config as string);
         }
         return IdProvider.fromJson(idprovider);
     }

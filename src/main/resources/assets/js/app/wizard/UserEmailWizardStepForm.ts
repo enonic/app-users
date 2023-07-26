@@ -53,7 +53,7 @@ export class UserEmailWizardStepForm
     }
 
     layout(principal: Principal): void {
-        const user: User = (<User>principal);
+        const user: User = (principal as User);
 
         if (this.emailInput.isDirty()) {
             if (ObjectHelper.stringEquals(this.emailInput.getValue(), user.getEmail())) {

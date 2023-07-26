@@ -27,9 +27,9 @@ export class PrincipalServerEventsHandler {
 
     private handler: (event: PrincipalServerEvent) => void;
 
-    private userItemCreatedListeners: { (principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean): void }[] = [];
-    private userItemUpdatedListeners: { (principal: Principal, idProvider: IdProvider): void }[] = [];
-    private userItemDeletedListeners: { (ids: string[]): void }[] = [];
+    private userItemCreatedListeners: ((principal: Principal, idProvider: IdProvider, sameTypeParent?: boolean) => void)[] = [];
+    private userItemUpdatedListeners: ((principal: Principal, idProvider: IdProvider) => void)[] = [];
+    private userItemDeletedListeners: ((ids: string[]) => void)[] = [];
 
     private deletedItemsIds: string[] = [];
 

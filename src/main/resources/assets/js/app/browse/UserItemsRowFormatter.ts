@@ -7,7 +7,7 @@ export class UserItemsRowFormatter {
     // why 4 random empty objects?
     public static nameFormatter(_row: number, _cell: number, _value: unknown,
                                 _columnDef: unknown, dataContext: TreeNode<UserTreeGridItem>): string {
-        let viewer = <UserTreeGridItemViewer>dataContext.getViewer('displayName');
+        let viewer = dataContext.getViewer('displayName') as UserTreeGridItemViewer;
         if (!viewer) {
             viewer = new UserTreeGridItemViewer();
             viewer.setIsRelativePath(dataContext.calcLevel() > 1);

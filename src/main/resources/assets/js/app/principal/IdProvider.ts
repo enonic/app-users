@@ -61,7 +61,7 @@ export class IdProvider
     }
 
     getKey(): IdProviderKey {
-        return <IdProviderKey>super.getKey();
+        return super.getKey() as IdProviderKey;
     }
 
     equals(o: Equitable, ignoreEmptyValues: boolean = false): boolean {
@@ -69,7 +69,7 @@ export class IdProvider
             return false;
         }
 
-        let other = <IdProvider> o;
+        let other = o as IdProvider;
 
         return super.equals(other) &&
                ((!this.idProviderConfig && !other.idProviderConfig) ||

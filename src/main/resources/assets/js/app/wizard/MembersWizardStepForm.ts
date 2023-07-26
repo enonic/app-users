@@ -29,14 +29,14 @@ export class MembersWizardStepForm
     protected initElements(): void {
         super.initElements();
 
-        const loader: PrincipalLoader = <PrincipalLoader>new PrincipalLoader()
+        const loader: PrincipalLoader = new PrincipalLoader()
             .setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER])
             .skipPrincipals([PrincipalKey.ofAnonymous()])
-            .setUseDataPreLoad(true);
+            .setUseDataPreLoad(true) as PrincipalLoader;
 
-        const builder: PrincipalComboBoxBuilder = <PrincipalComboBoxBuilder>PrincipalComboBox.create()
+        const builder: PrincipalComboBoxBuilder = PrincipalComboBox.create()
             .setLoader(loader)
-            .setSelectedOptionsView(new MembersPrincipalSelectedOptionsView());
+            .setSelectedOptionsView(new MembersPrincipalSelectedOptionsView()) as PrincipalComboBoxBuilder;
         this.principalCombobox = new MembersPrincipalCombobox(builder);
     }
 
@@ -74,7 +74,7 @@ export class MembersWizardStepForm
     }
 
     getLoader(): PrincipalLoader {
-        return <PrincipalLoader>this.principalCombobox.getLoader();
+        return this.principalCombobox.getLoader() as PrincipalLoader;
     }
 
     doRender(): Q.Promise<boolean> {
@@ -98,7 +98,7 @@ class MembersPrincipalCombobox
     setReadOnlyItems(items: PrincipalKey[]): void {
         this.readOnlyItems = items || [];
 
-        (<MembersPrincipalSelectedOptionsView>this.getSelectedOptionView()).setReadOnlyItems(items);
+        (this.getSelectedOptionView() as MembersPrincipalSelectedOptionsView).setReadOnlyItems(items);
     }
 
     private isReadOnlyItem(key: PrincipalKey): boolean {

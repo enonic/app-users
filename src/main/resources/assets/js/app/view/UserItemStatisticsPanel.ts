@@ -90,7 +90,7 @@ export class UserItemStatisticsPanel
     }
 
     private handleUserItemEvent() {
-        const currentItem: UserTreeGridItem = <UserTreeGridItem>this.getItem();
+        const currentItem: UserTreeGridItem = this.getItem() as UserTreeGridItem;
         const isPrincipalSelected: boolean = !!currentItem && currentItem.getType() === UserTreeGridItemType.PRINCIPAL;
 
         if (isPrincipalSelected) {
@@ -238,7 +238,7 @@ export class UserItemStatisticsPanel
     }
 
     private downloadReport(principal: Principal, repo: Repository, branch: string): void {
-        const params: { [name: string]: string } = {
+        const params: Record<string, string> = {
             principalKey: principal.getKey().toString(),
             repositoryId: repo.getId(),
             branch
@@ -297,7 +297,7 @@ export class UserItemStatisticsPanel
         transitiveSwitch.addClass('transitive-switch');
         transitiveSwitch.onValueChanged(event => {
             this.fetchPrincipal(pKey, 'true' === event.getNewValue()).then(updatedP => {
-                const updatedMemberships = (<Group | User>updatedP).getMemberships();
+                const updatedMemberships = (updatedP as Group | User).getMemberships();
                 dataGroup.clearList();
                 this.appendRolesAndGroups(updatedMemberships, dataGroup);
             }).catch(DefaultErrorHandler.handle);

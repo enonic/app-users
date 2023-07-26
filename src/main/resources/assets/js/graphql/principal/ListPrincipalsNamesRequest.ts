@@ -3,15 +3,15 @@ import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 
-export type ListPrincipalsKeysResult = {
+export interface ListPrincipalsKeysResult {
     displayNames: string[];
-};
+}
 
-type ListPrincipalsNamesResult = {
+interface ListPrincipalsNamesResult {
     principalsConnection: {
         edges: [{ node: PrincipalJson }],
     };
-};
+}
 
 export interface ListPrincipalsProperties extends ListGraphQlProperties {
     types: string[];
@@ -35,7 +35,7 @@ export class ListPrincipalsNamesRequest
     }
 
     getVariables(): ListPrincipalsProperties {
-        let vars = <ListPrincipalsProperties>super.getVariables();
+        let vars = super.getVariables() as ListPrincipalsProperties;
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
         }

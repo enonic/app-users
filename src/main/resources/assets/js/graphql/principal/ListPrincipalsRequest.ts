@@ -12,17 +12,17 @@ import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {ListPrincipalsProperties} from './ListPrincipalsNamesRequest';
 
-export type ListPrincipalsData = {
+export interface ListPrincipalsData {
     total: number;
     principals: Principal[];
-};
+}
 
-type ListPrincipalsResult = {
+interface ListPrincipalsResult {
     principalsConnection: {
         totalCount: number,
         edges: [{ node: PrincipalJson }],
     };
-};
+}
 
 export class ListPrincipalsRequest
     extends ListGraphQlRequest<ListPrincipalsData> {
@@ -41,7 +41,7 @@ export class ListPrincipalsRequest
     }
 
     getVariables(): ListPrincipalsProperties {
-        const vars = <ListPrincipalsProperties>super.getVariables();
+        const vars = super.getVariables() as ListPrincipalsProperties;
 
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => PrincipalType[type]);
@@ -92,13 +92,13 @@ export class ListPrincipalsRequest
     private fromJsonToPrincipal(json: PrincipalJson): Principal {
         let pKey: PrincipalKey = PrincipalKey.fromString(json.key);
         if (pKey.isRole()) {
-            return Role.fromJson(<RoleJson>json);
+            return Role.fromJson(json as RoleJson);
 
         } else if (pKey.isGroup()) {
-            return Group.fromJson(<GroupJson>json);
+            return Group.fromJson(json as GroupJson);
 
         } else if (pKey.isUser()) {
-            return User.fromJson(<UserJson>json);
+            return User.fromJson(json as UserJson);
         }
     }
 }

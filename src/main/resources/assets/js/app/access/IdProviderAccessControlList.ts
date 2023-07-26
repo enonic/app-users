@@ -7,7 +7,7 @@ import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 export class IdProviderAccessControlList
     implements Equitable {
 
-    private entries: { [key: string]: IdProviderAccessControlEntry };
+    private entries: Record<string, IdProviderAccessControlEntry>;
 
     constructor(entries?: IdProviderAccessControlEntry[]) {
         this.entries = {};
@@ -76,7 +76,7 @@ export class IdProviderAccessControlList
             return false;
         }
 
-        let other = <IdProviderAccessControlList>o;
+        let other = o as IdProviderAccessControlList;
         return this.toString() === other.toString();
     }
 

@@ -39,9 +39,9 @@ export class IdProviderWizardStepForm
         this.selectedOptionsView =
             new AuthApplicationSelectedOptionsView(this.createApplicationConfigProvider(), false);
 
-        this.applicationComboBox = <AuthApplicationComboBox>new AuthApplicationComboBoxBuilder()
+        this.applicationComboBox = new AuthApplicationComboBoxBuilder()
             .setSelectedOptionsView(this.selectedOptionsView)
-            .build();
+            .build() as AuthApplicationComboBox;
     }
 
     protected initListeners(): void {
@@ -49,7 +49,7 @@ export class IdProviderWizardStepForm
 
         this.applicationComboBox.onOptionSelected(() => {
             const selectedIdProviderOptionView: AuthApplicationSelectedOptionView =
-                <AuthApplicationSelectedOptionView>this.selectedOptionsView.getSelectedOptions()[0].getOptionView();
+                this.selectedOptionsView.getSelectedOptions()[0].getOptionView() as AuthApplicationSelectedOptionView;
 
             selectedIdProviderOptionView.getFormView().onValidityChanged((event: FormValidityChangedEvent) => {
                 this.previousValidation = event.getRecording();
@@ -121,7 +121,7 @@ export class IdProviderWizardStepForm
         }
 
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
-            (<AuthApplicationSelectedOptionsView>this.applicationComboBox.getSelectedOptionView());
+            (this.applicationComboBox.getSelectedOptionView() as AuthApplicationSelectedOptionsView);
 
         const optionViewAddedListener = (optionView: AuthApplicationSelectedOptionView) => {
             optionView.setSiteConfig(this.createApplicationConfig(config));

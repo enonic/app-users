@@ -17,11 +17,11 @@ import {IdProviderJson} from '../../app/principal/IdProviderJson';
 import {ListItemsProperties, ListItemsRequest} from './ListItemsRequest';
 
 // UserItems does not map "name" property. Missing type? or wrong graph query?
-export type ListUserItemsRequestResult = {
+export interface ListUserItemsRequestResult {
     total: number,
     userItems: UserItem[],
     aggregations: BucketAggregation[]
-};
+}
 
 interface ListUserItemsProperties extends ListItemsProperties {
     types: string[];
@@ -62,7 +62,7 @@ export class ListUserItemsRequest
     }
 
     getVariables(): ListUserItemsProperties {
-        const vars = <ListUserItemsProperties>super.getVariables();
+        const vars = super.getVariables() as ListUserItemsProperties;
 
         if (this.types && this.types.length > 0) {
             vars['types'] = this.types.map(type => UserItemType[type]);
@@ -123,14 +123,14 @@ export class ListUserItemsRequest
         try {
             const pKey: PrincipalKey = PrincipalKey.fromString(json.key);
             if (pKey.isRole()) {
-                return Role.fromJson(<RoleJson>json);
+                return Role.fromJson(json as RoleJson);
             } else if (pKey.isGroup()) {
-                return Group.fromJson(<GroupJson>json);
+                return Group.fromJson(json as GroupJson);
             } else /*if (pKey.isUser())*/ {
-                return User.fromJson(<UserJson>json);
+                return User.fromJson(json as UserJson);
             }
         } catch (e) {
-            return IdProvider.fromJson(<IdProviderJson>json);
+            return IdProvider.fromJson(json as IdProviderJson);
         }
     }
 }

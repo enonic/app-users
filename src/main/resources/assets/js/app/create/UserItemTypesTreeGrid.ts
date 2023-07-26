@@ -163,7 +163,7 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
     }
 
     private selectNextItemInGrid(event: KeyboardEvent): void {
-        if (this.getEl().contains(<HTMLElement>event.target)) {
+        if (this.getEl().contains(event.target as HTMLElement)) {
             event.preventDefault();
             event.stopPropagation();
         }
@@ -184,7 +184,7 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
     }
 
     private selectPreviousItemInGrid(event: KeyboardEvent): void {
-        if (this.getEl().contains(<HTMLElement>event.target)) {
+        if (this.getEl().contains(event.target as HTMLElement)) {
             // not letting focus go to the unwanted grid elements
             event.preventDefault();
             event.stopPropagation();

@@ -58,11 +58,11 @@ export class RoleWizardPanel
     }
 
     produceUpdateRequest(viewedPrincipal: Principal): UpdateRoleRequest {
-        const role: Role = (<Role>viewedPrincipal);
+        const role: Role = (viewedPrincipal as Role);
         const key: PrincipalKey = role.getKey();
         const displayName: string = role.getDisplayName();
         const description: string = role.getDescription();
-        const oldMembers: PrincipalKey[] = (<Role>this.getPersistedItem()).getMembers();
+        const oldMembers: PrincipalKey[] = (this.getPersistedItem() as Role).getMembers();
         const newMembers: PrincipalKey[] = role.getMembers();
         const addMembers: PrincipalKey[] = ArrayHelper.difference(newMembers, oldMembers, (a, b) => a.equals(b));
         const removeMembers: PrincipalKey[] = ArrayHelper.difference(oldMembers, newMembers, (a, b) => a.equals(b));
@@ -76,14 +76,14 @@ export class RoleWizardPanel
     }
 
     assembleViewedItem(): Principal {
-        return new RoleBuilder(<Role>this.getPersistedItem())
+        return new RoleBuilder(this.getPersistedItem() as Role)
             .setMembers(this.getMembersWizardStepForm().getMembersKeys().sort(this.sortMembers))
             .setDisplayName(this.getWizardHeader().getDisplayName())
             .setDescription(this.getDescriptionWizardStepForm().getDescription()).build();
     }
 
     protected assemblePersistedItem(): Principal {
-        const persistedRole: Role = (<Role>this.getPersistedItem());
+        const persistedRole: Role = (this.getPersistedItem() as Role);
 
         return persistedRole
             .newBuilder()

@@ -3,9 +3,9 @@ import {IdProvider} from '../../app/principal/IdProvider';
 import {IdProviderJson} from '../../app/principal/IdProviderJson';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 
-type GetIdProviderResponse = {
+interface GetIdProviderResponse {
     idProvider: IdProviderJson;
-};
+}
 
 export class GetIdProviderByKeyRequest
     extends GraphQlRequest<IdProvider> {
@@ -55,7 +55,7 @@ export class GetIdProviderByKeyRequest
         }
         if (us.idProviderConfig && typeof us.idProviderConfig.config === 'string') {
             // config is passed as string
-            us.idProviderConfig.config = JSON.parse(<string>us.idProviderConfig.config);
+            us.idProviderConfig.config = JSON.parse(us.idProviderConfig.config as string);
         }
         return IdProvider.fromJson(us);
     }

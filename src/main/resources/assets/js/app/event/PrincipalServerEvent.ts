@@ -23,6 +23,6 @@ export class PrincipalServerEvent
     }
 
     getNodeChange(): PrincipalServerChange {
-        return <PrincipalServerChange>super.getNodeChange();
+        return super.getNodeChange() as PrincipalServerChange;
     }
 }

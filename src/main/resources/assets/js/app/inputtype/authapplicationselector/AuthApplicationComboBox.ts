@@ -28,7 +28,7 @@ export class AuthApplicationComboBox
     getSelectedOptionViews(): AuthApplicationSelectedOptionView[] {
         let views: AuthApplicationSelectedOptionView[] = [];
         this.getSelectedOptions().forEach((selectedOption: SelectedOption<Application>) => {
-            views.push(<AuthApplicationSelectedOptionView>selectedOption.getOptionView());
+            views.push(selectedOption.getOptionView() as AuthApplicationSelectedOptionView);
         });
         return views;
     }

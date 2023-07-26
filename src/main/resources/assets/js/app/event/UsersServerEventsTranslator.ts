@@ -11,8 +11,8 @@ export class UsersServerEventsTranslator
         const eventType: string = eventJson.type;
 
         if (eventType.indexOf('node.') === 0) {
-            if (PrincipalServerEvent.is(<NodeEventJson>eventJson)) {
-                return PrincipalServerEvent.fromJson(<NodeEventJson>eventJson);
+            if (PrincipalServerEvent.is(eventJson as NodeEventJson)) {
+                return PrincipalServerEvent.fromJson(eventJson as NodeEventJson);
             }
 
         }

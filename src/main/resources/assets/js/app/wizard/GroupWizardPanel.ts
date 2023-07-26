@@ -89,17 +89,17 @@ export class GroupWizardPanel
     }
 
     produceUpdateRequest(viewedPrincipal: Principal): UpdateGroupRequest {
-        const group: Group = <Group>viewedPrincipal;
+        const group: Group = viewedPrincipal as Group;
         const key: PrincipalKey = group.getKey();
         const displayName: string = group.getDisplayName();
         const description: string = group.getDescription();
 
-        const oldMembers: PrincipalKey[] = (<Group>this.getPersistedItem()).getMembers();
+        const oldMembers: PrincipalKey[] = (this.getPersistedItem() as Group).getMembers();
         const newMembers: PrincipalKey[] = group.getMembers();
         const addMembers: PrincipalKey[] = ArrayHelper.difference(newMembers, oldMembers, (a, b) => (a.toString() === b.toString()));
         const removeMembers: PrincipalKey[] = ArrayHelper.difference(oldMembers, newMembers, (a, b) => (a.toString() === b.toString()));
 
-        const oldMemberships: PrincipalKey[] = (<Group>this.getPersistedItem()).getMemberships().map(value => value.getKey());
+        const oldMemberships: PrincipalKey[] = (this.getPersistedItem() as Group).getMemberships().map(value => value.getKey());
         const newMemberships: PrincipalKey[] = group.getMemberships().map(value => value.getKey());
         const addMemberships: PrincipalKey[] = ArrayHelper.difference(newMemberships, oldMemberships,
             (a, b) => (a.toString() === b.toString()));
@@ -117,20 +117,20 @@ export class GroupWizardPanel
     }
 
     assembleViewedItem(): Principal {
-        const persistedGroup: Group = (<Group>this.getPersistedItem());
+        const persistedGroup: Group = (this.getPersistedItem() as Group);
         // group might be a member of other group, but that is not reflected in group wizard
         const groupMemberships: Principal[] = persistedGroup.getMemberships().filter((principal: Principal) => principal.isGroup());
 
-        return <Members>new GroupBuilder(persistedGroup)
+        return new GroupBuilder(persistedGroup)
             .setMemberships(this.rolesWizardStepForm.getRoles().concat(groupMemberships).sort(this.sortMemberships))
             .setMembers(this.getMembersWizardStepForm().getMembersKeys().sort(this.sortMembers))
             .setDisplayName(this.getWizardHeader().getDisplayName())
             .setDescription(this.getDescriptionWizardStepForm().getDescription())
-            .build();
+            .build() as Members;
     }
 
     protected assemblePersistedItem(): Principal {
-        const persistedGroup: Group = (<Group>this.getPersistedItem());
+        const persistedGroup: Group = (this.getPersistedItem() as Group);
 
         return persistedGroup
             .newBuilder()

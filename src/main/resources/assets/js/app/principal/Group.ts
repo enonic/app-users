@@ -26,7 +26,7 @@ export class Group
             return false;
         }
 
-        const other: Group = <Group> o;
+        const other: Group = o as Group;
 
         return super.equals(o) && ObjectHelper.arrayEquals(this.memberships, other.getMemberships());
     }

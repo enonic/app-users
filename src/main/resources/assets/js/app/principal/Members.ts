@@ -22,7 +22,7 @@ export abstract class Members extends Principal {
             return false;
         }
 
-        const other: Members = <Members> o;
+        const other: Members = o as Members;
         return super.equals(o) && ObjectHelper.arrayEquals(this.members, other.getMembers());
     }
 

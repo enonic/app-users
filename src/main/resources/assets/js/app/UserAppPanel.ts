@@ -119,8 +119,8 @@ export class UserAppPanel
 
             wizardPanel.getWizardHeader().onPropertyChanged((event: PropertyChangedEvent) => {
                 if (event.getPropertyName() === 'displayName') {
-                    let name = <string>event.getNewValue() || this.getPrettyNameForWizardPanel(wizardPanel);
-                    tabMenuItem.setLabel(name, !<string>event.getNewValue());
+                    const name = event.getNewValue() as string || this.getPrettyNameForWizardPanel(wizardPanel);
+                    tabMenuItem.setLabel(name, !(event.getNewValue()));
                 }
             });
         });
@@ -313,12 +313,12 @@ export class UserAppPanel
             return;
         }
 
-        let wizardParams = <PrincipalWizardPanelParams> new PrincipalWizardPanelParams()
+        let wizardParams = new PrincipalWizardPanelParams()
             .setIdProvider(idProvider)
             .setParentOfSameType(userItem.getType() === UserTreeGridItemType.PRINCIPAL)
             .setPersistedType(data.principalType)
             .setPersistedPath(data.principalPath)
-            .setTabId(tabId);
+            .setTabId(tabId) as PrincipalWizardPanelParams;
 
         const wizard = this.resolvePrincipalWizardPanel(wizardParams);
 
@@ -388,13 +388,13 @@ export class UserAppPanel
     private createPrincipalWizardPanelForEdit(principal: Principal, idProvider: IdProvider, tabId: AppBarTabId,
                                               tabMenuItem: AppBarTabMenuItem) {
 
-        const wizardParams: PrincipalWizardPanelParams = <PrincipalWizardPanelParams> new PrincipalWizardPanelParams()
+        const wizardParams: PrincipalWizardPanelParams = new PrincipalWizardPanelParams()
             .setIdProvider(idProvider)
             .setPrincipalKey(principal.getKey()) // user principal key to load persisted item
             .setPersistedType(principal.getType())
             .setPersistedPath(principal.getKey().toPath(true))
             .setTabId(tabId)
-            .setPersistedDisplayName(principal.getDisplayName());
+            .setPersistedDisplayName(principal.getDisplayName()) as PrincipalWizardPanelParams;
 
         let wizard = this.resolvePrincipalWizardPanel(wizardParams);
 

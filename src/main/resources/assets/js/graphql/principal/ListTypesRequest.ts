@@ -3,12 +3,12 @@ import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggreg
 import {BucketAggregation} from '@enonic/lib-admin-ui/aggregation/BucketAggregation';
 import {ListItemsRequest} from './ListItemsRequest';
 
-type ListTypeData = {
+interface ListTypeData {
     types: {
         totalCount: number;
         aggregations: UserItemBucketAggregationJson[];
     };
-};
+}
 
 export class ListTypesRequest
     extends ListItemsRequest<BucketAggregation> {

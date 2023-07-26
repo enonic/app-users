@@ -21,8 +21,8 @@ export class UsersServerEventsListener
             return;
         }
 
-        if (ReportServerEvent.is(<NodeEventJson>eventJson)) {
-            const event = ReportServerEvent.fromJson(<NodeEventJson>eventJson);
+        if (ReportServerEvent.is(eventJson as NodeEventJson)) {
+            const event = ReportServerEvent.fromJson(eventJson as NodeEventJson);
             this.fireEvent(event);
         }
     }

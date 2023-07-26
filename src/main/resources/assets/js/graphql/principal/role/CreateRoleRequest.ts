@@ -44,7 +44,7 @@ export class CreateRoleRequest
     }
 
     getVariables(): CreateRoleProperties {
-        let vars = <CreateRoleProperties>super.getVariables();
+        let vars = super.getVariables() as CreateRoleProperties;
         vars.key = this.key.toString();
         vars.displayName = this.displayName;
         vars.description = this.description;
