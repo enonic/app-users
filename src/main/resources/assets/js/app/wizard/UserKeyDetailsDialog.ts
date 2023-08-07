@@ -14,7 +14,7 @@ export class UserKeyDetailsDialog
 
         const publicKey = new TextArea('public-key', value);
         this.appendChildToContentPanel(publicKey);
-        this.addCancelButtonToBottom(i18n('dialog.userKeyDetails.closeBtn'));
+        this.addCancelButtonToBottom(i18n('action.ok'));
     }
 
     close(): void {
