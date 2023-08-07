@@ -7,7 +7,7 @@ import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
-import {AddPublicKeysDialog} from './AddPublicKeysDialog';
+import {NewPublicKeyDialog} from './NewPublicKeyDialog';
 import {User} from '../principal/User';
 import {PublicKeysGrid} from '../view/PublicKeysGrid';
 
@@ -76,7 +76,7 @@ export class UserPasswordWizardStepForm
 
         this.addPublicKeyButton.onClicked(() => {
             const user = this.principal as User;
-            const publicKeysDialog = new AddPublicKeysDialog(user);
+            const publicKeysDialog = new NewPublicKeyDialog(user);
             publicKeysDialog.setCallback((publicKey) => {
                 this.publicKeysGrid.addPublicKey(user, publicKey);
             });

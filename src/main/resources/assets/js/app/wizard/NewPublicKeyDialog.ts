@@ -8,12 +8,12 @@ import {TextInput} from '@enonic/lib-admin-ui/ui/text/TextInput';
 import {CryptoWorker} from '../../util/CryptoWorker';
 import {AddPublicKeyRequest} from '../../graphql/principal/user/AddPublicKeyRequest';
 import {User} from '../principal/User';
-import {ConfirmationOfGenerationKeysDialog} from './ConfirmationOfGenerationKeysDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {PublicKey} from '../browse/serviceaccount/PublicKey';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {showSuccess} from '@enonic/lib-admin-ui/notify/MessageBus';
 
-export class AddPublicKeysDialog
+export class NewPublicKeyDialog
     extends ModalDialog {
 
     private labelTextInput: TextInput;
@@ -31,7 +31,7 @@ export class AddPublicKeysDialog
 
         this.principal = principal;
 
-        this.getEl().addClass('add-public-keys-dialog');
+        this.getEl().addClass('new-public-key-dialog');
 
         this.labelTextInput = new TextInput('middle');
 
@@ -56,7 +56,7 @@ export class AddPublicKeysDialog
     private saveKeysToClient(user: User, event: MessageEvent): void {
         const filename = `${user.getKey().getId()}-${event.data.kid}.json`;
         this.downloadFile(this.createContentAsBlob(event, user), filename);
-        new ConfirmationOfGenerationKeysDialog(filename).open();
+        showSuccess(i18n('dialog.addUserKey.success', filename));
     }
 
     private createContentAsBlob(event: MessageEvent, user: User): Blob {
