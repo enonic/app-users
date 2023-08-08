@@ -1,5 +1,4 @@
 
-const {ReportAggregator, HtmlReporter} = require('wdio-html-nice-reporter');
 exports.config = {
 
     // Define which test specs should run. The pattern is relative to the directory
@@ -79,41 +78,18 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: http://webdriver.io/guide/testrunner/reporters.html
-    reporters: ['spec',
-        ["html-nice", {
-            outputDir: './build/mochawesome-report/',
-            filename: 'report.html',
-            reportTitle: 'Suite Report Title',
-            linkScreenshots: true,
-            //to show the report in a browser when done
-            showInBrowser: true,
-            collapseTests: false,
-            //to turn on screenshots after every test
-            useOnAfterCommandForScreenshot: false,
-        }
-        ]
+    reporters: ['spec','concise',
+        ['allure', {
+            //
+            // If you are using the "allure" reporter you should define the directory where
+            // WebdriverIO should save all allure reports.
+            outputDir: './build/reports/allureReports'
+        }],
     ],
-    outputDir: "./build/mochawesome-report/",
+    outputDir: "./build/reports/",
 
     // Hook that gets executed before the suite starts
     beforeSuite: function (suite) {
         browser.url(this.baseUrl);
-    },
-
-    onPrepare: function (config, capabilities) {
-        reportAggregator = new ReportAggregator({
-            outputDir: './build/mochawesome-report/',
-            filename: 'master-report.html',
-            reportTitle: 'App Users Report',
-            browserName: capabilities.browserName,
-            collapseTests: true
-        });
-        reportAggregator.clean() ;
-    },
-
-    onComplete: function(exitCode, config, capabilities, results) {
-        (async () => {
-            await reportAggregator.createReport();
-        })();
     },
 };
