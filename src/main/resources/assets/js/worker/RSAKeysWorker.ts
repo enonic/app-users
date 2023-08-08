@@ -13,7 +13,7 @@ async function generateRSAKeys() {
 
     const privateKey = await exportPrivateKey(keyPair.privateKey);
     const publicKey = await exportPublicKey(keyPair.publicKey);
-    const kid = generateKid();
+    const kid = await generateKid(keyPair.publicKey);
 
     self.postMessage({
         kid: kid,
@@ -40,10 +40,15 @@ async function exportPublicKey(key) {
     return `-----BEGIN RSA PUBLIC KEY-----\n${exportedAsBase64}\n-----END RSA PUBLIC KEY-----\n`;
 }
 
-function generateKid() {
-    return self.crypto.randomUUID();
-}
+async function generateKid(publicKey) {
+    const publicKeyData = new Uint8Array(await self.crypto.subtle.exportKey('spki', publicKey));
+    const publicKeyHashBuffer = await crypto.subtle.digest('SHA-512', publicKeyData);
+    const bytesArray = new Uint8Array(publicKeyHashBuffer, 0, 16);
 
+    return Array.from(bytesArray, (byte) => {
+        return ('0' + (byte & 0xff).toString(16)).slice(-2);
+    }).join('');
+}
 
 self.onmessage = (e: MessageEvent<string>) => {
     generateRSAKeys();
