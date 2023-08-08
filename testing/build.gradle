@@ -100,6 +100,15 @@ task testUsersApp( type: NpmTask, dependsOn: [npmInstall, unpackDistro, copyConf
 task testUsersAppLocally( type: NpmTask, dependsOn: [npmInstall] ) {
     args = ['test']
 }
+// wdio_chrome is a script defined in package.json
+task w_testUsersApp( type: NpmTask, dependsOn: [npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
+    args = ['run-script', 'test_users:wdio_chrome']
+    finalizedBy stopServer
+}
+
+task w_testUsersAppLocal( type: NpmTask, dependsOn: [npmInstall] ) {
+    args = ['run-script', 'test_users:wdio_chrome']
+}
 /////////////////////////
 task installGeckoService(type: NpmTask) {
     // install the express package only
