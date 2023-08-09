@@ -92,6 +92,11 @@ exports.addPublicKey = function (params) {
     const publicKey = common.required(params, 'publicKey');
     const label = params.label;
 
+    const kidVerifier = __.newBean('com.enonic.xp.app.users.handler.KidVerifierHandler');
+    if (!kidVerifier.verify(kid, publicKey)) {
+        throw new Error(`Invalid kid: ${kid}`);
+    }
+
     const updatedProfile = authLib.modifyProfile({
         key: userKey,
         editor: function (profile) {
