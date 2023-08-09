@@ -51,12 +51,6 @@ exports.config = {
 
     reporters: ['spec','concise',
         ['timeline', { outputDir: './build/reports/timeline' }]
-        // ['allure', {
-        //     //
-        //     // If you are using the "allure" reporter you should define the directory where
-        //     // WebdriverIO should save all allure reports.
-        //     outputDir: './build/reports/allureReports'
-        // }],
     ],
 
     // Hook that gets executed before the suite starts
