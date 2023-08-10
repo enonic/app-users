@@ -88,14 +88,11 @@ exports.removePublicKey = function (params) {
 
 exports.addPublicKey = function (params) {
     const userKey = common.required(params, 'userKey');
-    const kid = common.required(params, 'kid');
     const publicKey = common.required(params, 'publicKey');
     const label = params.label;
 
-    const kidVerifier = __.newBean('com.enonic.xp.app.users.handler.KidVerifierHandler');
-    if (!kidVerifier.verify(kid, publicKey)) {
-        throw new Error(`Invalid kid: ${kid}`);
-    }
+    const kidGenerator = __.newBean('com.enonic.xp.app.users.handler.KidGeneratorHandler');
+    const kid = kidGenerator.generateKid(publicKey);
 
     const updatedProfile = authLib.modifyProfile({
         key: userKey,

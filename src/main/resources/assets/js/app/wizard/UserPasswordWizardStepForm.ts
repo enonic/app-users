@@ -77,9 +77,6 @@ export class UserPasswordWizardStepForm
         this.addPublicKeyButton.onClicked(() => {
             const user = this.principal as User;
             const publicKeysDialog = new NewPublicKeyDialog(user);
-            publicKeysDialog.setCallback((publicKey) => {
-                this.publicKeysGrid.addPublicKey(user, publicKey);
-            });
             publicKeysDialog.open();
         });
     }

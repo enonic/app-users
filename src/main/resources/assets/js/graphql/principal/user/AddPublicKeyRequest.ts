@@ -1,3 +1,4 @@
+import * as Q from 'q';
 import {GraphQlMutationResponse, GraphQlRequest} from '../../GraphQlRequest';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {PublicKey} from '../../../app/browse/serviceaccount/PublicKey';
@@ -14,9 +15,7 @@ export class AddPublicKeyRequest
 
     private publicKey: string;
 
-    private kid: string;
-
-    private label?: string;
+    private label: string;
 
     setKey(key: PrincipalKey): AddPublicKeyRequest {
         this.key = key;
@@ -28,12 +27,7 @@ export class AddPublicKeyRequest
         return this;
     }
 
-    setKid(kid: string): AddPublicKeyRequest {
-        this.kid = kid;
-        return this;
-    }
-
-    setLabel(label?: string): AddPublicKeyRequest {
+    setLabel(label: string): AddPublicKeyRequest {
         this.label = label;
         return this;
     }
@@ -41,7 +35,6 @@ export class AddPublicKeyRequest
     getVariables(): Object {
         let vars = super.getVariables();
         vars['userKey'] = this.key.toString();
-        vars['kid'] = this.kid;
         vars['publicKey'] = this.publicKey;
         vars['label'] = this.label;
         return vars;
@@ -49,8 +42,8 @@ export class AddPublicKeyRequest
 
     /* eslint-disable max-len */
     getMutation(): string {
-        return `mutation ($userKey: String!, $kid: String!, $publicKey: String!, $label: String) {
-            addPublicKey(userKey: $userKey, kid: $kid, publicKey: $publicKey, label: $label) {
+        return `mutation ($userKey: String!, $publicKey: String!, $label: String!) {
+            addPublicKey(userKey: $userKey, publicKey: $publicKey, label: $label) {
                 kid
                 publicKey
                 creationTime
