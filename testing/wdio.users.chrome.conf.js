@@ -1,5 +1,5 @@
 const path = require('path')
-
+const { TimelineService } = require('wdio-timeline-reporter/timeline-service');
 exports.config = {
 
     specs: [
@@ -11,6 +11,7 @@ exports.config = {
 
     capabilities: [{
         browserName: 'chrome',
+        browserVersion: '115.0.5790.170',
         'goog:chromeOptions': {
             "args": [
                 "--headless", "--disable-gpu", "--no-sandbox",
@@ -37,7 +38,8 @@ exports.config = {
     // Default request retries count
     connectionRetryCount: 3,
 
-    services: ['chromedriver'],
+    //services: ['chromedriver'],
+    services: [[TimelineService]],
 
     framework: 'mocha',
     mochaOpts: {
@@ -48,12 +50,7 @@ exports.config = {
     outputDir: "./build/reports/logs/",
 
     reporters: ['spec','concise',
-        ['allure', {
-            //
-            // If you are using the "allure" reporter you should define the directory where
-            // WebdriverIO should save all allure reports.
-            outputDir: './build/reports/allureReports'
-        }],
+        ['timeline', { outputDir: './build/reports/timeline' }]
     ],
 
     // Hook that gets executed before the suite starts
