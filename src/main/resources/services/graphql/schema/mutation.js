@@ -95,14 +95,12 @@ module.exports = schemaGenerator.createObjectType({
             type: graphQlObjectTypes.PublicKeyType,
             args: {
                 userKey: graphQl.nonNull(graphQl.GraphQLString),
-                kid: graphQl.nonNull(graphQl.GraphQLString),
                 publicKey: graphQl.nonNull(graphQl.GraphQLString),
-                label: graphQl.GraphQLString,
+                label: graphQl.nonNull(graphQl.GraphQLString),
             },
             resolve: function (env) {
                 return users.addPublicKey({
                     userKey: env.args.userKey,
-                    kid: env.args.kid,
                     publicKey: env.args.publicKey,
                     label: env.args.label,
                 });
