@@ -108,7 +108,7 @@ export class PasswordGenerator
     }
 
     private toggleShowLink(locked: boolean) {
-        this.showLink.getEl().setAttribute('data-i18n', i18n(`field.pswGenerator.${locked ? 'show' : 'hide'}`));
+        this.showLink.getEl().setAttribute('data-i18n', i18n(`field.${locked ? 'show' : 'hide'}`));
     }
 
     reset(): void {

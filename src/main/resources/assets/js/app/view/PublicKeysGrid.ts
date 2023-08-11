@@ -58,7 +58,7 @@ export class PublicKeysGrid
         header.appendChild(this.createHeader(i18n('field.userKeys.grid.kid.column')));
         header.appendChild(this.createHeader(i18n('field.userKeys.grid.label.column')));
         header.appendChild(this.createHeader(i18n('field.userKeys.grid.creationTime.column')));
-        header.appendChild(this.createHeader(i18n('field.userKeys.grid.actions.column')));
+        header.appendChild(this.createHeader(i18n('button.remove')));
 
         return header;
     }
@@ -93,7 +93,7 @@ export class PublicKeysGrid
 
     private createShowButton(publicKey: PublicKey): AEl {
         const showButton = new AEl('show-public-key');
-        showButton.setHtml(publicKey.getKid());
+        showButton.setHtml(publicKey.getKid()).setTitle(i18n('field.show'));
         showButton.onClicked((event: MouseEvent) => {
             event.stopPropagation();
             event.preventDefault();
