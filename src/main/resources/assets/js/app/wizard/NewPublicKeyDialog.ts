@@ -56,7 +56,7 @@ export class NewPublicKeyDialog
         this.keyUploaderTextInput.getHTMLElement().setAttribute('accept', '.pem');
         this.keyUploaderTextInput.hide();
 
-        this.generateKeyAction = new Action(i18n('dialog.addUserKey.generateBtn'));
+        this.generateKeyAction = new Action(i18n('field.generate'));
         this.uploadKeyAction = new Action(i18n('dialog.addUserKey.uploadBtn'));
 
 
@@ -132,7 +132,7 @@ export class NewPublicKeyDialog
 
     private createForm(): Form {
         this.labelFormItem =
-            new FormItemBuilder(this.labelTextInput).setLabel(i18n('field.addUserKeys.label')).setValidator(Validators.required).build();
+            new FormItemBuilder(this.labelTextInput).setLabel(i18n('field.label')).setValidator(Validators.required).build();
 
         const fieldSet = new Fieldset();
         fieldSet.add(this.labelFormItem);

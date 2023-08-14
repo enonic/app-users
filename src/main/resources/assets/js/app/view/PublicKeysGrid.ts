@@ -55,9 +55,9 @@ export class PublicKeysGrid
     private createHeaderRow(): DivEl {
         const header = this.createRow();
 
-        header.appendChild(this.createHeader(i18n('field.userKeys.grid.kid.column')));
-        header.appendChild(this.createHeader(i18n('field.userKeys.grid.label.column')));
-        header.appendChild(this.createHeader(i18n('field.userKeys.grid.creationTime.column')));
+        header.appendChild(this.createHeader(i18n('field.userKeys.grid.column.kid')));
+        header.appendChild(this.createHeader(i18n('field.label')));
+        header.appendChild(this.createHeader(i18n('field.userKeys.grid.column.creationTime')));
         header.appendChild(this.createHeader(i18n('button.remove')));
 
         return header;

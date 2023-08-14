@@ -43,7 +43,7 @@ export class PasswordGenerator
         this.showLink = new AEl('show-link');
         this.toggleShowLink(true);
         this.generateLink = new AEl('generate-link');
-        this.generateLink.setHtml(i18n('field.pswGenerator.generate'));
+        this.generateLink.setHtml(i18n('field.generate'));
         this.helpTextBlock = new DivEl('help-text-block');
         this.helpTextBlock.setHtml(i18n('field.pswGenerator.helpText'));
     }

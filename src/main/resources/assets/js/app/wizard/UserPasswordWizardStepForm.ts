@@ -39,7 +39,7 @@ export class UserPasswordWizardStepForm
 
         this.password = new PasswordGenerator();
         this.changePasswordButton = new Button(i18n('action.changePassword'));
-        this.addPublicKeyButton = new Button(i18n('action.addPublicKey'));
+        this.addPublicKeyButton = new Button(i18n('action.add'));
         this.publicKeysGrid = new PublicKeysGrid();
     }
 
