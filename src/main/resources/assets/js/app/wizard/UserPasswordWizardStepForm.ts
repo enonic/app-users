@@ -91,8 +91,10 @@ export class UserPasswordWizardStepForm
         if (principal) {
             this.fieldSet.removeItem(this.createPasswordFormItem);
             this.updatePasswordFormItem.setVisible(true);
-            this.addPublicKeyFormItem.setVisible(true);
-            this.publicKeysGrid.setUser(principal as User);
+            if (principal.getKey().getIdProvider().isSystem()) {
+                this.addPublicKeyFormItem.setVisible(true);
+                this.publicKeysGrid.setUser(principal as User);
+            }
         }
     }
 
@@ -115,16 +117,10 @@ export class UserPasswordWizardStepForm
             this.publicKeysGrid.insertBeforeEl(this.addPublicKeyButton);
 
             const principal = this.principal as User;
-            if (principal) {
-                if (principal.getKey().getIdProvider().isSystem()) {
-                    this.addPublicKeyButton.show();
-                    this.publicKeysGrid.show();
-                    this.publicKeysGrid.setUser(principal);
-                } else {
-                    this.addPublicKeyButton.hide();
-                    this.publicKeysGrid.hide();
-                }
+            if (principal?.getKey().getIdProvider().isSystem()) {
+                this.publicKeysGrid.setUser(principal);
             }
+
             return rendered;
         });
     }
