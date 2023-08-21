@@ -24,7 +24,7 @@
     "wdio-chromedriver-service": "^8.1.1",
     "@wdio/cli": "^8.14.6",
     "@wdio/dot-reporter": "^8.15.0",
-    "@wdio/mocha-framework": "^8.14.0",
+    "@wdio/mocha-framework": "^8.15.4",
     "@wdio/selenium-standalone-service": "^8.14.0",
     "@wdio/allure-reporter": "^8.15.0",
     "@wdio/concise-reporter": "^8.15.0",
