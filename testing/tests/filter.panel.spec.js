@@ -72,7 +72,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
             //3. Verify aggregation items:
-            testUtils.saveScreenshot('aggregation_group_added');
+            await testUtils.saveScreenshot('aggregation_group_added');
             let result = await filterPanel.getAggregationItems();
             assert.equal(result.length, 4, 'three aggregation-checkboxes should be present on the page');
             assert.isTrue(result[0].includes('Group'), 'User aggregation-item should be present');

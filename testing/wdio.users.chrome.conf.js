@@ -1,10 +1,9 @@
-const path = require('path')
-const { TimelineService } = require('wdio-timeline-reporter/timeline-service');
+const path = require('path');
+const {TimelineService} = require('wdio-timeline-reporter/timeline-service');
 exports.config = {
 
     specs: [
         path.join(__dirname, './tests/*.spec.js')
-        //path.resolve('./specs/content-types/*.spec.js')
     ],
 
     maxInstances: 1,

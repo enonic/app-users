@@ -11,16 +11,16 @@ module.exports = Object.freeze({
     H6_DISPLAY_NAME: "//div[contains(@id,'NamesView')]//h6[contains(@class,'main-name')]",
     TEXT_INPUT: "//input[contains(@id,'TextInput')]",
     DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
-    slickRowByDisplayName: function (displayName) {
+    slickRowByDisplayName(displayName) {
         return `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
-    itemByDisplayName: function (displayName) {
+    itemByDisplayName(displayName) {
         return `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
-    itemByName: function (name) {
+    itemByName(name) {
         return ` //div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
     },
-    tabItemByDisplayName: function (displayName) {
+    tabItemByDisplayName(displayName) {
         return `//li[contains(@id,'AppBarTabMenuItem') and descendant::a[contains(.,'${displayName}')]]`
     },
     formItemByLabel: (label) => {
@@ -32,7 +32,7 @@ module.exports = Object.freeze({
 
     PRINCIPAL_SELECTED_OPTION: `//div[contains(@id,'PrincipalSelectedOptionView')]`,
 
-    selectedPrincipalByDisplayName: function (displayName) {
+    selectedPrincipalByDisplayName(displayName) {
         return `//div[contains(@id,'PrincipalSelectedOptionView') and descendant::h6[contains(@class,'main-name') and text()='${displayName}']]`
     },
     REMOVE_ICON: `//a[@class='remove']`,

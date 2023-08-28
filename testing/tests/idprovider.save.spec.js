@@ -15,7 +15,7 @@ const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.di
 describe('Id Provider specification - save and edit a provider', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let ID_PROVIDER;
@@ -152,27 +152,27 @@ describe('Id Provider specification - save and edit a provider', function () {
             await userBrowsePanel.waitForEditButtonEnabled();
         });
 
-    //Verifies issue#275 : Id Provider wizard - Delete button gets enabled after updating the provider
+    // Verifies issue#275 : Id Provider wizard - Delete button gets enabled after updating the provider
     it(`GIVEN existing 'Id Provider' (with an user) is opened WHEN description has been updated and the provider saved THEN 'Delete' button should be disabled`,
         async () => {
             let idProviderWizard = new IdProviderWizard();
-            //1. Select and open existing ID Provider:
+            // 1. Select and open existing ID Provider:
             await testUtils.selectAndOpenIdProvider(ID_PROVIDER_2.displayName);
-            //2. Update the description and save:
+            // 2. Update the description and save:
             await idProviderWizard.typeDescription("new description");
             await idProviderWizard.waitAndClickOnSave();
-            //3. Delete button should be disabled(id provider has users):
+            // 3. Delete button should be disabled(id provider has users):
             await idProviderWizard.waitForDeleteButtonDisabled();
         });
 
     it(`GIVEN existing 'Id Provider' with an user WHEN the user has been deleted THEN the ID Provider can be deleted now`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Select and delete the user:
+            // 1. Select and delete the user:
             await testUtils.selectAndDeleteItem(TEST_USER.displayName);
-            //Verify that the user is not present in the grid:
+            // Verify that the user is not present in the grid:
             await userBrowsePanel.waitForItemNotDisplayed(TEST_USER.displayName);
-            //2. User is deleted, so ID Provider can be deleted now:
+            // 2. User is deleted, so ID Provider can be deleted now:
             await testUtils.selectAndDeleteItem(ID_PROVIDER_2.displayName);
             // Verify: the ID provider is not displayed in browse panel
             await userBrowsePanel.waitForItemNotDisplayed(ID_PROVIDER_2.displayName);

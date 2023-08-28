@@ -66,19 +66,19 @@ module.exports = Object.freeze({
         ADMINISTRATOR: 'system.admin',
         USERS_APP: 'system.user.admin',
     },
-    principalExistsMessage: function (displayName) {
+    principalExistsMessage(displayName) {
         return `Principal [${displayName}] could not be created. A principal with that name already exists`
     },
-    groupDeletedMessage: function (displayName) {
+    groupDeletedMessage(displayName) {
         return `Principal "group:system:${displayName}" is deleted`
     },
-    roleDeletedMessage: function (displayName) {
+    roleDeletedMessage(displayName) {
         return `Principal "role:${displayName}" is deleted`
     },
-    userDeletedMessage: function (displayName) {
+    userDeletedMessage(displayName) {
         return `Principal "user:system:${displayName}" is deleted`
     },
-    storeDeletedMessage: function (displayName) {
+    providerDeletedMessage(displayName) {
         return `Id Provider "${displayName}" is deleted`
     },
 

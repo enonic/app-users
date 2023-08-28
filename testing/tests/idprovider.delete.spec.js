@@ -14,7 +14,7 @@ const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 describe("Confirm and delete 'Id Provider' in wizard and in browse panel", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let idProvider;
@@ -60,7 +60,7 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             await idProviderWizard.pause(1000);
             // gets selected operation
             let result = await idProviderWizard.getSelectedAceOperation('Everyone');
-            testUtils.saveScreenshot("idprovider_administrator_for_everyone");
+            await testUtils.saveScreenshot("idprovider_administrator_for_everyone");
             assert.equal(result, "Administrator", "Administrator should be present for Everyone");
         });
 
@@ -80,8 +80,8 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             await idProviderWizard.clickOnDelete();
             //3. Confirm the deleting:
             await testUtils.confirmDelete();
-            testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
-            let expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
+            await testUtils.saveScreenshot("idprovider_deleted_confirmation_mess1");
+            let expectedMessage = appConst.providerDeletedMessage(idProvider.displayName);
             //Expected notification message should appear
             await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
         });
@@ -99,7 +99,7 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             //3. Click on Delete button:
             await userBrowsePanel.clickOnDeleteButton();
             let confirmationDialog = new ConfirmationDialog();
-            testUtils.saveScreenshot("idprovider_confirm_delete2");
+            await testUtils.saveScreenshot("idprovider_confirm_delete2");
             //`Confirmation Dialog` should appear:
             await confirmationDialog.waitForDialogLoaded();
         });
@@ -107,12 +107,12 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
     it('GIVEN existing IdProvider is selected WHEN the provider has been deleted THEN expected notification should appear',
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            //Select the provider and click on Delete button:
+            // Select the provider and click on Delete button:
             await testUtils.selectAndDeleteItem(idProvider.displayName);
             let actualMessage = await userBrowsePanel.waitForNotificationMessage();
             await testUtils.saveScreenshot("store_deleted_notification_mes2");
-            let expectedMessage = appConst.storeDeletedMessage(idProvider.displayName);
-            //Expected message: Id Provider "${displayName}" is deleted
+            let expectedMessage = appConst.providerDeletedMessage(idProvider.displayName);
+            // Expected message: Id Provider "${displayName}" is deleted
             assert.strictEqual(actualMessage, expectedMessage, 'expected notification message should be displayed');
         });
 

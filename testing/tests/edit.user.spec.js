@@ -21,8 +21,9 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
 
     let testUser;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const NEW_DISPLAY_NAME = appConst.generateRandomName('user');
 
-    it("GIVEN 'User' with a role has been saved WHEN the user has been clicked THEN correct role should be displayed in the statistic panel",
+    it("GIVEN 'User' with a role has been saved WHEN the user has been clicked THEN expected role should be displayed in the statistic panel",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -30,26 +31,27 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userName = userItemsBuilder.generateRandomName('user');
             let roles = [appConst.ROLES_DISPLAY_NAME.CM_ADMIN, appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR];
             testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
-            //1. Select System folder and open User Wizard:
+            // 1. Select 'System' folder and open User Wizard:
             await testUtils.clickOnSystemOpenUserWizard();
-            testUtils.saveScreenshot('edit_user_wizard1');
+            // 2. Insert the required data:
             await userWizard.typeData(testUser);
-            //2. Save the user:
-            testUtils.saveScreenshot('edit_user_wizard2');
+            // 3. Save the user:
+            await testUtils.saveScreenshot('edit_user_wizard1');
             await userWizard.waitAndClickOnSave();
-            //3. Go to Browse Panel:
+            // 4. Go to Browse Panel:
             await userBrowsePanel.clickOnAppHomeButton();
-            //4. Select the user in the grid
+            // 5. Select the user in the grid
             await testUtils.typeNameInFilterPanel(userName);
             await userBrowsePanel.clickOnRowByName(userName);
-            testUtils.saveScreenshot('edit_user_wizard4');
+            await testUtils.saveScreenshot('edit_user_statistics_panel');
+            // 6. Expected roles should be displayed in Statistics Panel:
             let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
 
             assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.CM_ADMIN,
                 "'Content Manager Administrator' role should be present in the panel");
             assert.equal(actualRoles[1], appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR,
                 "'Content Manager Administrator' role should be present in the panel");
-
+            // 7. Expected user-name should be displayed in the Statistics Panel
             let actualName = await userStatisticsPanel.getItemName();
             assert.equal(actualName, userName, "Expected and actual name should be equal");
         });
@@ -58,11 +60,15 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
+            // 1. Select and open the existing user:
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            await userWizard.typeDisplayName('new-name');
-            await testUtils.saveAndCloseWizard('new-name');
-            //Save new display name:
-            await testUtils.typeNameInFilterPanel('new-name');
+            // 2. Update the display name:
+            await userWizard.typeDisplayName(NEW_DISPLAY_NAME);
+            // 3. Save new display name:
+            await testUtils.saveAndCloseWizard(NEW_DISPLAY_NAME);
+            // 4. Insert the new display name in Filter Panel:
+            await testUtils.typeNameInFilterPanel(NEW_DISPLAY_NAME);
+            // 5. Verify that the user's path is not updated (the initial display name is displayed):
             let isDisplayed = await userBrowsePanel.isItemDisplayed(testUser.displayName);
             assert.isTrue(isDisplayed, "User with new display name should be searchable in the grid");
         });
@@ -71,12 +77,12 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
         async () => {
             let userWizard = new UserWizard();
             let userStatisticsPanel = new UserStatisticsPanel();
-            //1. Open existing user:
+            // 1. Open the existing user ( use the initial display name in Filter Panel):
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            //2. Remove the role:
+            // 2. Remove the role:
             await userWizard.removeRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
-            await testUtils.saveAndCloseWizard('new-name');
-            //3. Number of roles should be reduced in the Statistics Panel:
+            await testUtils.saveAndCloseWizard(NEW_DISPLAY_NAME);
+            // 3. Number of roles should be reduced in the Statistics Panel:
             let actualRoles = await userStatisticsPanel.getDisplayNameOfRoles();
             assert.equal(actualRoles.length, 1, 'one role should be present on the statistics panel');
             assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.CM_ADMIN,
@@ -89,7 +95,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            // 1. Open existing user:
+            // 1. Open existing user ( use the initial display name in Filter Panel):
             await testUtils.selectUserAndOpenWizard(testUser.displayName);
             // 2. Add new role:
             await userWizard.filterOptionsAndAddRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);

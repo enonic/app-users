@@ -98,6 +98,12 @@ class Page {
         })
     }
 
+    async saveScreenshotUniqueName(namePart) {
+        let screenshotName = appConst.generateRandomName(namePart);
+        await this.saveScreenshot(screenshotName);
+        return screenshotName;
+    }
+
     async isElementDisplayed(selector) {
         let element = await this.findElement(selector);
         return await element.isDisplayed();

@@ -253,10 +253,13 @@ class UserWizard extends wizards.WizardPanel {
         })
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout).catch(err => {
-            throw new Error('User Wizard is not loaded! ' + err);
-        });
+    async waitForOpened() {
+        try {
+            return await this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_user_wizard');
+            throw new Error('User Wizard is not loaded! screenshot:' + screenshot + ' ' + err);
+        }
     }
 
     async getPasswordStatus() {

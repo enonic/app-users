@@ -33,31 +33,30 @@ class UserItemStatisticsPanel extends Page {
         return XPATH.container + XPATH.reportDataGroup + XPATH.generateButton;
     }
 
-    getItemName() {
-        let itemName = XPATH.container + XPATH.header + XPATH.itemName;
-        return this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout).then(() => {
-            return this.getText(itemName);
-        }).catch(err => {
-            this.saveScreenshot('err_statistic_item_name');
-            throw new Error('Item name string was not found');
-        })
+    async getItemName() {
+        try {
+            let itemName = XPATH.container + XPATH.header + XPATH.itemName;
+            await this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout);
+            return await this.getText(itemName);
+        } catch (err) {
+            let screenshot = this.saveScreenshotUniqueName('err_statistic_item_name');
+            throw new Error('Item name string was not found, screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
-    getItemPath() {
-        return this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout).then(() => {
-            return this.getText(XPATH.container + XPATH.header + XPATH.itemPath);
-        }).catch(err => {
-            this.saveScreenshot('err_statistic_item_path');
-            throw new Error('Item path string was not found');
-        })
+    async getItemPath() {
+        try {
+            await this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout);
+            return await this.getText(XPATH.container + XPATH.header + XPATH.itemPath);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_statistic_item_path');
+            throw new Error('Item path string was not found. screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
-    waitForPanelLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).then(() => {
-            return this.waitForSpinnerNotVisible();
-        }).then(() => {
-            return console.log('user statistics panel is loaded')
-        });
+    async waitForPanelLoaded() {
+        await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+        await this.waitForSpinnerNotVisible();
     }
 
     isReportDataGroupVisible() {
@@ -71,12 +70,13 @@ class UserItemStatisticsPanel extends Page {
         })
     }
 
-    clickOnGenerateReportButton() {
-        return this.clickOnElement(this.generateReportButton).catch(err => {
-            console.log('Click on Generate Report Button : ' + err);
-            this.saveScreenshot("err_click_on_generate_report_button");
-            throw new Error(err);
-        })
+    async clickOnGenerateReportButton() {
+        try {
+            await this.clickOnElement(this.generateReportButton);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName("err_click_on_generate_report_button");
+            throw new Error("Error generate report , screenshot" + screenshot + ' ' + err);
+        }
     }
 
     waitForGenerateButtonDisabled() {

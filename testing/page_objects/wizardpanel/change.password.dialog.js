@@ -118,16 +118,23 @@ class ChangeUserPasswordDialog extends Page {
         return this.getTextInElements(this.userPath);
     }
 
-    waitForDialogLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+    async waitForDialogLoaded() {
+        try {
+            return await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_pwd_dlg_load');
+            throw new Error("Change Password dialog was not loaded! screenshot:" + screenshot + '  ' + err);
+        }
     }
 
     async getPasswordStatus() {
-        let status = await this.getAttribute(XPATH.container + XPATH.passwordGenerator, 'data-i18n');
-        if (!status) {
-            throw new Error("Password status was not found!");
+        try {
+            let status = await this.getAttribute(XPATH.container + XPATH.passwordGenerator, 'data-i18n');
+            return status;
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_pswd_dlg');
+            throw new Error("Password status was not found! screenshot:" + screenshot + '  ' + err);
         }
-        return status;
     }
 }
 
