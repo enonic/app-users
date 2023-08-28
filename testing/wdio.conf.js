@@ -1,28 +1,16 @@
+const {TimelineService} = require('wdio-timeline-reporter/timeline-service');
+const path = require('path');
 
 exports.config = {
 
-    // Define which test specs should run. The pattern is relative to the directory
-    // from which `wdio` was called. Notice that, if you are calling `wdio` from an
-    // NPM script (see https://docs.npmjs.com/cli/run-script) then the current working
-    // directory is where your package.json resides, so `wdio` will be called from there.
-    //
     specs: [
-        __dirname + '/tests/*.spec.js'
+        path.join(__dirname, './tests/*.spec.js')
     ],
     maxInstances: 1,
     //
     // ============
     // Capabilities
     // ============
-    // Define your capabilities here. WebdriverIO can run multiple capabilities at the same
-    // time. Depending on the number of capabilities, WebdriverIO launches several test
-    // sessions. Within your capabilities you can overwrite the spec and exclude option in
-    // order to group specific specs to a specific capability.
-    //
-    // If you have trouble getting all important capabilities together, check out the
-    // Sauce Labs platform configurator - a great tool to configure your capabilities:
-    // https://docs.saucelabs.com/reference/platforms-configurator
-    //
     capabilities: [{
         browserName: 'firefox',
         'moz:firefoxOptions': {
@@ -58,35 +46,24 @@ exports.config = {
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response
-    connectionRetryTimeout: 90000,
+    connectionRetryTimeout: 160000,
     //
     // Default request retries count
     connectionRetryCount: 3,
-    // Make sure you have the wdio adapter package for the specific framework installed
-    // before running any tests.
-    services: ['geckodriver'],
-
+    services: [[TimelineService]],
     framework: 'mocha',
-    //
-    // Options to be passed to Mocha.
-    // See the full list at http://mochajs.org/
     mochaOpts: {
         ui: 'bdd',
         timeout: 80000
     },
     //
     // Test reporter for stdout.
-    // The only one supported by default is 'dot'
-    // see also: http://webdriver.io/guide/testrunner/reporters.html
-    reporters: ['spec','concise',
-        ['allure', {
-            //
-            // If you are using the "allure" reporter you should define the directory where
-            // WebdriverIO should save all allure reports.
-            outputDir: './build/reports/allureReports'
-        }],
+    // Set directory to store all logs into
+    outputDir: "./build/reports/logs/",
+
+    reporters: ['spec', 'concise',
+        ['timeline', {outputDir: './build/reports/timeline'}]
     ],
-    outputDir: "./build/reports/",
 
     // Hook that gets executed before the suite starts
     beforeSuite: function (suite) {

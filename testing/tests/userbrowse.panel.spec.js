@@ -9,7 +9,7 @@ const appConst = require('../libs/app_const');
 describe('User Browse Panel specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -58,7 +58,7 @@ describe('User Browse Panel specification', function () {
     it("WHEN checkbox 'System Id Provider' has been checked THEN SelectionPanelToggler gets visible",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Click on the checkbox:
+            // 1. Click on the checkbox:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
             await userBrowsePanel.waitForSelectionTogglerVisible();
             let result = await userBrowsePanel.getNumberInSelectionToggler();
@@ -70,14 +70,14 @@ describe('User Browse Panel specification', function () {
     it("GIVEN 'System Id Provider' checkbox is checked WHEN SelectionPanelToggler has been clicked THEN grid gets filtered - one item should be in the grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Click on the checkbox:
+            // 1. Click on the checkbox:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
             await userBrowsePanel.waitForSelectionTogglerVisible();
-            //2. Click on Show Selection:
+            // 2. Click on Show Selection:
             await userBrowsePanel.clickOnSelectionToggler();
-            //3. The grid should be filtered:
+            // 3. The grid should be filtered:
             let names = await userBrowsePanel.getGridItemDisplayNames();
-            testUtils.saveScreenshot('selection_toggler_clicked1');
+            await testUtils.saveScreenshot('selection_toggler_clicked1');
             assert.equal(names.length, 1, 'only System Id Provider folder should be present in the grid');
             assert.equal(names[0], 'System Id Provider', 'The name of the folder should be System Id Provider');
         });
@@ -88,19 +88,19 @@ describe('User Browse Panel specification', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let browseFilterPanel = new BrowseFilterPanel();
-            //1. Click on the Controller Checkbox(select all items):
+            // 1. Click on the Controller Checkbox(select all items):
             await userBrowsePanel.clickOnSelectionControllerCheckbox();
             await userBrowsePanel.waitForSelectionTogglerVisible();
-            //2. Click on 'Show Selection':
+            // 2. Click on 'Show Selection':
             await userBrowsePanel.clickOnSelectionToggler();
             await testUtils.openFilterPanel();
             let aggregationItems = await browseFilterPanel.getAggregationItems();
             assert.equal(aggregationItems.length, 1, "one aggregation item should be present in Filter Panel - 'Id provider'");
             assert.isTrue(aggregationItems[0].includes('Id Provider'),
                 "one aggregation item should be present in Filter Panel - 'Id provider'");
-            //3. The grid should be filtered: one item remains in the grid
+            // 3. The grid should be filtered: one item remains in the grid
             let names = await userBrowsePanel.getGridItemDisplayNames();
-            testUtils.saveScreenshot('selection_toggler_clicked2');
+            await testUtils.saveScreenshot('selection_toggler_clicked2');
             assert.isTrue(names.includes('System Id Provider'), "Row with 'System Id Provider' should be present in the grid");
         });
 

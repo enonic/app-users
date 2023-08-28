@@ -6,7 +6,7 @@ const testUtils = require('../libs/test.utils');
 const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.panel');
 const appConst = require('../libs/app_const');
 
-describe('filter.panel.aggregation.spec Principal Aggregation specification', function () {
+describe('filter.panel.aggregation.spec - tests for Principal Aggregation', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
     if (typeof browser === 'undefined') {

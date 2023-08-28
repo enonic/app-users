@@ -58,7 +58,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await groupWizard.clickOnDelete();
             //3. Confirm:
             await testUtils.confirmDelete();
-            testUtils.saveScreenshot("group_deleted_confirmation_mess1");
+            await testUtils.saveScreenshot("group_deleted_confirmation_mess1");
             let expectedMessage = appConst.groupDeletedMessage(groupToDelete.displayName);
             //Message : Principal "group:system:${displayName}" is deleted - should appear
             await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
@@ -75,7 +75,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             //2. Click on Delete button:
             await userBrowsePanel.waitForDeleteButtonEnabled();
             await userBrowsePanel.clickOnDeleteButton();
-            testUtils.saveScreenshot("group_confirm_dialog_appears");
+            await testUtils.saveScreenshot("group_confirm_dialog_appears");
             //Verify that Confirmation Dialog appears:
             await confirmationDialog.waitForDialogLoaded();
         });

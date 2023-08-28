@@ -10,7 +10,7 @@ const appConst = require('../libs/app_const');
 describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -18,14 +18,14 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
         async () => {
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Do right click on Roles-folder:
+            // 1. Do right click on Roles-folder:
             await userBrowsePanel.rightClickOnRowByDisplayName(appConst.ROLES);
             await gridContextMenu.waitForContextMenuVisible();
             let items = await gridContextMenu.getGridContextMenuItems();
             assert.equal(items[0], 'New Role', "New Role menu item should be first");
-            //2.'Delete menu item should be disabled,otherwise exception will be thrown in 3 seconds:
+            // 2.'Delete menu item should be disabled,otherwise exception will be thrown in 3 seconds:
             await gridContextMenu.waitForDeleteMenuItemDisabled();
-            //3. 'Edit' menu item should be disabled, otherwise exception will be thrown in 3 seconds:
+            // 3. 'Edit' menu item should be disabled, otherwise exception will be thrown in 3 seconds:
             await gridContextMenu.waitForEditMenuItemDisabled();
         });
 
@@ -45,10 +45,10 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
             await testUtils.findAndSelectItem('anonymous');
-            //Do right click on 'Anonymous User'
+            // Do right click on 'Anonymous User'
             await userBrowsePanel.rightClickOnRowByDisplayName('Anonymous User');
             await gridContextMenu.waitForContextMenuVisible();
-            testUtils.saveScreenshot('anonymous_context_menu');
+            await testUtils.saveScreenshot('anonymous_context_menu');
             let result = await gridContextMenu.waitForDeleteMenuItemDisabled();
             assert.isTrue(result, 'Delete menu item should be disabled');
         });
@@ -58,10 +58,10 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
             await testUtils.findAndSelectItem(appConst.SUPER_USER_NAME);
-            //Do right click on 'Super User'
+            // Do right click on 'Super User'
             await userBrowsePanel.rightClickOnRowByDisplayName(appConst.SUPER_USER_DISPLAY_NAME);
             await gridContextMenu.waitForContextMenuVisible();
-            testUtils.saveScreenshot('su_context_menu');
+            await testUtils.saveScreenshot('su_context_menu');
             let result = await gridContextMenu.waitForDeleteMenuItemDisabled();
             assert.isTrue(result, 'Delete menu item should be disabled');
         });
@@ -71,15 +71,15 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
             await testUtils.findAndSelectItem("system.auditlog");
-            //1. Do right click on 'system.auditlog' role
+            // 1. Do right click on 'system.auditlog' role
             await userBrowsePanel.rightClickOnRowByDisplayName("Audit Log");
             await gridContextMenu.waitForContextMenuVisible();
-            testUtils.saveScreenshot('auditlog_context_menu');
-            //2. Verify that 'Delete' menu item is disabled:
+            await testUtils.saveScreenshot('auditlog_context_menu');
+            // 2. Verify that 'Delete' menu item is disabled:
             await gridContextMenu.waitForDeleteMenuItemDisabled();
             let isDisabled = await gridContextMenu.isEditMenuItemDisabled();
             assert.isFalse(isDisabled, 'Edit menu item should be enabled');
-            //3. Verify that 'New Role' menu item is displayed and enabled
+            // 3. Verify that 'New Role' menu item is displayed and enabled
             isDisabled = await gridContextMenu.isNewRoleMenuItemDisabled();
             assert.isFalse(isDisabled, 'New Role menu item should be enabled');
         });
@@ -88,12 +88,12 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
         async () => {
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Do right click on System Id Provider:
+            // 1. Do right click on System Id Provider:
             await userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider');
             await gridContextMenu.waitForContextMenuVisible();
-            //2. Verify that 'Delete' menu item is disabled:
+            // 2. Verify that 'Delete' menu item is disabled:
             await gridContextMenu.waitForDeleteMenuItemDisabled();
-            //3. 'Edit' and 'New...' should be enabled:
+            // 3. 'Edit' and 'New...' should be enabled:
             await testUtils.saveScreenshot('system_provider_context_menu');
             let isDisabled = await gridContextMenu.isEditMenuItemDisabled();
             assert.isFalse(isDisabled, "'Edit' menu item should be enabled");
@@ -106,7 +106,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnExpanderIcon('/system');
-            //Do right click on 'Users'
+            // Do right click on 'Users'
             await userBrowsePanel.rightClickOnRowByDisplayName('Users');
             await gridContextMenu.waitForContextMenuVisible();
             let items = await gridContextMenu.getGridContextMenuItems();

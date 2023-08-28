@@ -96,8 +96,8 @@ class BrowseFilterPanel extends Page {
             await this.typeTextInInput(this.searchTextInput, text);
             return await this.pause(300);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_search_input"));
-            throw new Error("Filter Panel, search input - " + err);
+            let screenshot = await this.saveScreenshotUniqueName("err_search_input");
+            throw new Error("Filter Panel, search input - screenshot:" + screenshot + ' ' + err);
         }
     }
 

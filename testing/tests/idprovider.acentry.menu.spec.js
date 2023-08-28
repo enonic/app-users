@@ -22,16 +22,16 @@ describe('Id Provider wizard, Access Control Entry - expand and collapse menu-op
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');
             let testProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', null, permissions);
-            //1. Open new wizard:
+            // 1. Open new wizard:
             await testUtils.openIdProviderWizard(testProvider);
             await idProviderWizard.typeData(testProvider);
-            //2. Click on 'Everyone' acl-entry and expand the menu:
+            // 2. Click on 'Everyone' acl-entry and expand the menu:
             await idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
-            testUtils.saveScreenshot('store_ace_menu_expanded');
-            //3. Verify that ECE-menu is expanded:
+            await testUtils.saveScreenshot('store_ace_menu_expanded');
+            // 3. Verify that ECE-menu is expanded:
             let isExpanded = await idProviderWizard.isAceMenuOptionsExpanded('Everyone');
             assert.isTrue(isExpanded, 'menu with operations gets visible');
-            //4. Verify all operations in the expanded menu:
+            // 4. Verify all operations in the expanded menu:
             let actualOperations = await idProviderWizard.getAceMenuOperations();
             assert.equal(actualOperations[0], "Read");
             assert.equal(actualOperations[1], "Create Users");
@@ -44,16 +44,16 @@ describe('Id Provider wizard, Access Control Entry - expand and collapse menu-op
     it(`GIVEN 'System Id Provider' is opened AND menu for Everyone-ACE is expanded WHEN click outside the menu THEN the menu gets collapsed`,
         async () => {
             let idProviderWizard = new IdProviderWizard();
-            //1. Open system ID provider:
+            // 1. Open system ID provider:
             await testUtils.selectSystemIdProviderAndOpenWizard();
             await idProviderWizard.clickOnPermissionsTabItem();
-            //2. Add new ACE:
+            // 2. Add new ACE:
             await idProviderWizard.addPrincipals(['Everyone']);
-            //3. Click on 'Everyone' ACE and open the menu:
+            // 3. Click on 'Everyone' ACE and open the menu:
             await idProviderWizard.clickOnSelectedACEAndShowMenuOperations('Everyone');
             let isExpanded = await idProviderWizard.isAceMenuOptionsExpanded('Everyone');
             assert.isTrue(isExpanded, 'the menu should be expanded');
-            //4. Click outside the expanded menu:
+            // 4. Click outside the expanded menu:
             await idProviderWizard.clickOnPermissionsTabItem();
             isExpanded = await idProviderWizard.isAceMenuOptionsExpanded('Everyone');
             assert.isFalse(isExpanded, 'the menu should be collapsed, after clicking outside the expanded menu');

@@ -3,7 +3,8 @@
  */
 const Page = require('../page');
 const lib = require('../../libs/elements');
-const xpath = {
+const appConst = require('../../libs/app_const');
+const XPATH = {
     container: `//div[contains(@id,'LoaderComboBox')]`,
     optionDisplayName: "//div[contains(@class,'slick-viewport')]" + `${lib.H6_DISPLAY_NAME}`,
 };
@@ -11,7 +12,7 @@ const xpath = {
 class LoaderComboBox extends Page {
 
     get optionsFilterInput() {
-        return `${xpath.container}` + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+        return `${XPATH.container}` + lib.COMBO_BOX_OPTION_FILTER_INPUT;
     }
 
     typeTextInOptionFilterInput(selector, text) {
@@ -34,23 +35,35 @@ class LoaderComboBox extends Page {
 
     getOptionDisplayNames(panelDiv) {
         return this.waitForListExpanded(panelDiv).then(() => {
-            return this.getTextInElements(panelDiv + `${xpath.optionDisplayName}`)
+            return this.getTextInElements(panelDiv + `${XPATH.optionDisplayName}`)
         });
     };
 
-    typeTextAndSelectOption(optionDisplayName, xpath) {
-        let optionSelector = lib.slickRowByDisplayName(optionDisplayName);
-        if (xpath === undefined) {
-            xpath = '';
+    async typeTextAndSelectOption(optionDisplayName, xpath) {
+        try {
+            let optionLocator = lib.slickRowByDisplayName(optionDisplayName);
+            if (xpath === undefined) {
+                xpath = '';
+            }
+
+            let elems = await this.getDisplayedElements(xpath + this.optionsFilterInput);
+            if (elems.length === 0) {
+                await this.waitForElementDisplayed(xpath + this.optionsFilterInput, appConst.mediumTimeout);
+                elems = await this.getDisplayedElements(xpath + this.optionsFilterInput);
+            }
+            //Set text in the options filter input:
+            await elems[0].setValue(optionDisplayName);
+            //wait for required options is filtered and displayed:
+            await this.waitForElementDisplayed(optionLocator, appConst.mediumTimeout);
+            await this.pause(300);
+            //click on the option in the dropdown list
+            await this.clickOnElement(optionLocator);
+            return await this.pause(800);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_combobox');
+            throw new Error("Loader Combobox error, screenshot: " + screenshot + ' ' + err);
         }
-        return this.typeTextInInput(xpath + this.optionsFilterInput, optionDisplayName).then(() => {
-            return this.clickOnElement(optionSelector)
-        }).catch(err => {
-            this.saveScreenshot('err_combobox');
-            throw new Error('Error when selecting an option in loadercombobox!' + optionDisplayName + " " + err);
-        }).then(() => {
-            return this.pause(500);
-        });
     }
 }
+
 module.exports = LoaderComboBox;
