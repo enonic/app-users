@@ -74,13 +74,14 @@ class WizardPanel extends Page {
         });
     }
 
-    isItemInvalid(displayName) {
-        let selector = lib.tabItemByDisplayName(displayName);
-        return this.getAttribute(selector, 'class').then(result => {
-            return result.includes("invalid");
-        }).catch(err => {
+    async isItemInvalid(displayName) {
+        try {
+            let selector = lib.tabItemByDisplayName(displayName);
+            let result = await this.getAttribute(selector, 'class');
+            return result.includes('invalid');
+        } catch (err) {
             throw new Error('tabItem: ' + err);
-        });
+        }
     }
 
     waitUntilInvalidIconAppears(displayName) {

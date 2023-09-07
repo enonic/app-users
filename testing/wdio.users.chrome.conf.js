@@ -37,7 +37,6 @@ exports.config = {
     // Default request retries count
     connectionRetryCount: 3,
 
-    //services: ['chromedriver'],
     services: [[TimelineService]],
 
     framework: 'mocha',
@@ -48,8 +47,7 @@ exports.config = {
     // Set directory to store all logs into
     outputDir: "./build/reports/logs/",
 
-    reporters: ['spec','concise',
-        ['timeline', { outputDir: './build/reports/timeline' }]
+    reporters: ['spec', ['timeline', { outputDir: './build/reports/timeline' }]
     ],
 
     // Hook that gets executed before the suite starts

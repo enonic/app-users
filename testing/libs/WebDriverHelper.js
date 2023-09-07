@@ -1,4 +1,3 @@
-const appConst = require('./app_const');
 const path = require('path');
 
 /**

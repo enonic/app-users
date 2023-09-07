@@ -9,7 +9,7 @@ module.exports = Object.freeze({
     SLICK_ROW: "//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row')]",
     SLICK_ROW_BY_NAME: "//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::p[contains(@class,'sub-name') and contains(.,'%s')]]",
     H6_DISPLAY_NAME: "//div[contains(@id,'NamesView')]//h6[contains(@class,'main-name')]",
-    TEXT_INPUT: "//input[contains(@id,'TextInput')]",
+    TEXT_INPUT: "//input[@type='text']",
     DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
     slickRowByDisplayName(displayName) {
         return `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
@@ -39,4 +39,12 @@ module.exports = Object.freeze({
     EDIT_ICON: `//a[@class='edit']`,
     CHECKBOX: `//div[contains(@id,'Checkbox')]`,
     NOTIFICATION_TEXT: "//div[@class='notification-text']",
+    BUTTONS: {
+        BUTTON_WITH_SPAN_ADD: "//button[child::span[text()='Add']]",
+        DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
+        actionButton: (label) => `//button[contains(@id,'ActionButton') and child::span[contains(.,'${label}')]]`,
+        dialogButton: label => `//button[contains(@id,'DialogButton') and child::span[contains(.,'${label}')]]`,
+        dialogButtonStrict: label => `//button[contains(@id,'DialogButton') and child::span[text()='${label}']]`,
+        togglerButton: (label) => `//button[contains(@id,'TogglerButton') and child::span[text()='${label}']]`,
+    },
 });
