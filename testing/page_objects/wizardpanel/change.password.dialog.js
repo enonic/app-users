@@ -8,8 +8,6 @@ const appConst = require('../../libs/app_const');
 const XPATH = {
     container: "//div[contains(@id,'ChangeUserPasswordDialog')]",
     passwordInput: "//input[contains(@class,'password-input')]",
-    changePasswordButton: "//button[contains(@id,'DialogButton') and child::span[text()='Change Password']]",
-    cancelButton: "//button[contains(@id,'DialogButton')]/span[text()='Cancel']",
     showPasswordLink: "//a[contains(@class,'show-link')]",
     generatePasswordLink: "//a[text()='Generate']",
     userPath: "//h6[@class='user-path']",
@@ -31,7 +29,7 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     get cancelButton() {
-        return XPATH.container + XPATH.cancelButton;
+        return XPATH.container + lib.BUTTONS.dialogButton('Cancel');
     }
 
     get cancelButtonTop() {
@@ -43,7 +41,7 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     get changePasswordButton() {
-        return XPATH.container + XPATH.changePasswordButton;
+        return XPATH.container + lib.BUTTONS.dialogButton('Change Password');
     }
 
     isPasswordInputDisplayed() {
@@ -52,10 +50,6 @@ class ChangeUserPasswordDialog extends Page {
 
     isShowLinkDisplayed() {
         return this.isElementDisplayed(this.showPasswordLink);
-    }
-
-    waitForLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
     }
 
     waitForClosed() {
@@ -73,10 +67,10 @@ class ChangeUserPasswordDialog extends Page {
         return this.isElementDisplayed(this.generatePasswordLink);
     }
 
-    clickOnChangePasswordButton() {
-        return this.clickOnElement(XPATH.changePasswordButton).then(() => {
-            return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
-        });
+    async clickOnChangePasswordButton() {
+        await this.waitForChangePasswordButtonEnabled();
+        await this.clickOnElement(XPATH.changePasswordButton);
+        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
     }
 
     waitForChangePasswordButtonEnabled() {

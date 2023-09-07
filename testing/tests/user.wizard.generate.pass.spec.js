@@ -45,7 +45,7 @@ describe("User Wizard generate password spec", function () {
             // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Click on Show Password button:
-            await userWizard.clickOnShowLink();
+            await userWizard.clickOnShowPasswordLink();
             await testUtils.saveScreenshot('show_password_link_clicked');
             let result = await userWizard.isHidePasswordLinkDisplayed();
             assert.isTrue(result, "'Hide' link gets displayed");
