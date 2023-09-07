@@ -69,7 +69,7 @@ class ChangeUserPasswordDialog extends Page {
 
     async clickOnChangePasswordButton() {
         await this.waitForChangePasswordButtonEnabled();
-        await this.clickOnElement(XPATH.changePasswordButton);
+        await this.clickOnElement(this.changePasswordButton);
         return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
     }
 

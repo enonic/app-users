@@ -13,22 +13,22 @@ const NewPrincipalDialog = require('../page_objects/browsepanel/new.principal.di
 describe('New Principal dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let ITEMS_NUMBER = 4;
+    const ITEMS_NUMBER = 4;
 
     it('GIVEN `NewPrincipal` dialog is opened WHEN `Cancel` button(top) has been pressed  THEN the dialog should be closed',
         async () => {
             let newPrincipalDialog = new NewPrincipalDialog();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Open New Principal dialog:
+            // 1. Open New Principal dialog:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
-            await testUtils.saveScreenshot("new_principal_dialog_loaded");
-            //2. Click on Cancel button:
+            await testUtils.saveScreenshot('new_principal_dialog_loaded');
+            // 2. Click on Cancel button:
             await newPrincipalDialog.clickOnCancelButtonTop();
-            //3. Verify that dialog is closed:
+            // 3. Verify that dialog is closed:
             await newPrincipalDialog.waitForDialogClosed();
         });
 
@@ -36,7 +36,7 @@ describe('New Principal dialog specification', function () {
         async () => {
             let newPrincipalDialog = new NewPrincipalDialog();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Open New Principal Dialog:
+            // 1. Open New Principal Dialog:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
             let header = await newPrincipalDialog.getHeaderText();
@@ -44,7 +44,7 @@ describe('New Principal dialog specification', function () {
 
             let result = await newPrincipalDialog.isCancelButtonDisplayed();
             assert.isTrue(result, '`Cancel` button should be present');
-            //2. Expected items should be present in the dialog:
+            // 2. Expected items should be present in the dialog:
             let items = await newPrincipalDialog.getItemNames();
             assert.equal(items[0], appConst.USER, '`User` item should be present on the dialog');
             assert.equal(items[1], appConst.USER_GROUP, '`User Group` item should be present on the dialog');
@@ -57,13 +57,13 @@ describe('New Principal dialog specification', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let newPrincipalDialog = new NewPrincipalDialog();
-            //1. Select System ID Provider:
+            // 1. Select System ID Provider:
             await userBrowsePanel.clickOnRowByName('/system');
-            //2. Click on New button:
+            // 2. Click on New button:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
             await testUtils.saveScreenshot("new_principal_dialog_2_items");
-            //3. Two items should be present in the modal dialog:
+            // 3. Two items should be present in the modal dialog:
             let items = await newPrincipalDialog.getItemNames();
             assert.equal(items.length, 2, "Two items should be present");
             assert.equal(items[0], appConst.USER, '`User` item should be present on the dialog');
@@ -73,11 +73,11 @@ describe('New Principal dialog specification', function () {
     it(`GIVEN 'Roles' folder is selected WHEN 'New' button has been clicked THEN Role Wizard should be loaded`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Roles folder has been selected:
+            // 1. Roles folder has been selected:
             await userBrowsePanel.clickOnRowByName('roles');
             await userBrowsePanel.clickOnNewButton();
             let roleWizard = new RoleWizard();
-            //2. Role Wizard should be loaded
+            // 2. Role Wizard should be loaded
             await roleWizard.waitForLoaded();
         });
 

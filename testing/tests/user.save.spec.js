@@ -18,7 +18,7 @@ describe('Save User specification - save an user', function () {
         webDriverHelper.setupBrowser();
     }
     let testUser;
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const PASSWORD = appConst.PASSWORD.MEDIUM;
 
     // verifies  https://github.com/enonic/lib-admin-ui/issues/614
     // User Wizard - confirmation about unsaved changes after changes were saved

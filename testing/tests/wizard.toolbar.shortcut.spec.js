@@ -16,7 +16,7 @@ const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`, function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -24,37 +24,37 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
     let TEST_GROUP;
     let TEST_ROLE;
     let TEST_PROVIDER;
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it(`GIVEN new user-wizard is opened AND data has been typed WHEN 'Ctrl+s' has been pressed THEN the user should be saved`,
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName('user');
             TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
-            //User-wizard is opened:
+            // 1.  User-wizard is opened:
             await testUtils.clickOnSystemOpenUserWizard();
-            //User's data has been typed:
+            // 2. User's data has been typed:
             await userWizard.typeDisplayName(TEST_USER.displayName);
             await userWizard.typeEmail(TEST_USER.email);
             await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
-            //keyboard shortcut to Save button has been pressed:
+            // 3. keyboard shortcut to Save button has been pressed:
             await userWizard.hotKeySave();
-            testUtils.saveScreenshot("user_shortcut_save");
-
+            await testUtils.saveScreenshot('user_shortcut_save');
+            // 4. Verify the notification message:
             let message = await userWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.USER_WAS_CREATED_MESSAGE, "User was created - message should appear");
+            assert.equal(message, appConst.USER_WAS_CREATED_MESSAGE, 'User was created - message should appear');
         });
     it(`GIVEN existing user is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
         async () => {
             let userWizard = new UserWizard();
             let confirmationDialog = new ConfirmationDialog();
-            //User-wizard is opened:
+            // 1.  existing user is opened:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
-            //keyboard shortcut to Delete button has been pressed:
+            // 2. keyboard shortcut to Delete button has been pressed:
             await userWizard.hotKeyDelete();
-            testUtils.saveScreenshot("user_shortcut_delete");
-            //Confirmation dialog should be loaded:
+            await testUtils.saveScreenshot('user_shortcut_delete');
+            // 3. Verify that 'Confirmation dialog' should be loaded:
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -65,16 +65,15 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let description = 'test group1';
             let groupWizard = new GroupWizard();
             TEST_GROUP = userItemsBuilder.buildGroup(name, description, null, roles);
-            //Group-wizard is opened:
+            // 1. New Group-wizard is opened:
             await testUtils.clickOnSystemAndOpenGroupWizard();
-            //Group's data has been typed:
+            // 2. Group's data has been typed:
             await groupWizard.typeDisplayName(TEST_GROUP.displayName);
-
             await groupWizard.waitForSaveButtonEnabled();
-            //keyboard shortcut to save button has been pressed:
+            // 3. keyboard shortcut to save button has been pressed:
             await groupWizard.hotKeySave();
-            testUtils.saveScreenshot("group_shortcut_save");
-
+            await testUtils.saveScreenshot("group_shortcut_save");
+            // 4. Verify the notification message
             let message = await groupWizard.waitForNotificationMessage();
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message should appear");
         });
@@ -83,12 +82,12 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
         async () => {
             let groupWizard = new GroupWizard();
             let confirmationDialog = new ConfirmationDialog();
-            //User-wizard is opened:
+            // 1. existing group is opened:
             await testUtils.selectGroupAndOpenWizard(TEST_GROUP.displayName);
-            //keyboard shortcut to Delete button has been pressed:
+            // 2. keyboard shortcut to Delete button has been pressed:
             await groupWizard.hotKeyDelete();
-            testUtils.saveScreenshot("group_shortcut_delete");
-            //Confirmation dialog should be loaded:
+            await testUtils.saveScreenshot("group_shortcut_delete");
+            // 3. Confirmation dialog should be loaded:
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -97,30 +96,29 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let roleWizard = new RoleWizard();
             let roleName = userItemsBuilder.generateRandomName('role');
             TEST_ROLE = userItemsBuilder.buildRole(roleName, 'description', null);
-            //Role-wizard is opened:
+            // 1. Role-wizard is opened:
             await testUtils.clickOnRolesFolderAndOpenWizard();
-            //Role's data has been typed:
+            // 2. Role's data has been typed:
             await roleWizard.typeDisplayName(TEST_ROLE.displayName);
             await roleWizard.waitForSaveButtonEnabled();
-
-            //keyboard shortcut to Save button has been pressed:
+            // 3. keyboard shortcut to Save button has been pressed:
             await roleWizard.hotKeySave();
-            testUtils.saveScreenshot("role_shortcut_save");
-
+            await testUtils.saveScreenshot('role_shortcut_save');
+            // 4. Verify the notification message:
             let message = await roleWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.ROLE_WAS_CREATED_MESSAGE, "Role was created - message should appear");
+            assert.equal(message, appConst.ROLE_WAS_CREATED_MESSAGE, 'Role was created - message should appear');
         });
 
     it(`GIVEN existing role is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
         async () => {
             let roleWizard = new RoleWizard();
             let confirmationDialog = new ConfirmationDialog();
-            //Role-wizard is opened:
+            // 1. Existing Role is opened:
             await testUtils.selectRoleAndOpenWizard(TEST_ROLE.displayName);
-            //keyboard shortcut to Delete button has been pressed:
+            // 2. keyboard shortcut to Delete button has been pressed:
             await roleWizard.hotKeyDelete();
-            testUtils.saveScreenshot("group_shortcut_delete");
-            //Confirmation dialog should be loaded:
+            await testUtils.saveScreenshot("group_shortcut_delete");
+            // 3. Confirmation dialog should be loaded:
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -129,15 +127,15 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let name = userItemsBuilder.generateRandomName('provider');
             TEST_PROVIDER = userItemsBuilder.buildIdProvider(name, 'test Id provider', null, null);
             let idProviderWizard = new IdProviderWizard();
-            //new ID provider-wizard is opened:
+            // 1. new ID provider-wizard is opened:
             await testUtils.openIdProviderWizard();
-            // data has been typed:
+            // 2. data has been typed:
             await idProviderWizard.typeDisplayName(TEST_PROVIDER.displayName);
             await idProviderWizard.waitForSaveButtonEnabled();
-            //keyboard shortcut to Save button has been pressed:
+            // 3. keyboard shortcut to Save button has been pressed:
             await idProviderWizard.hotKeySave();
-            testUtils.saveScreenshot("provider_shortcut_save");
-
+            await testUtils.saveScreenshot('provider_shortcut_save');
+            // 4. Verify the notification message:
             let message = await idProviderWizard.waitForNotificationMessage();
             assert.equal(message, appConst.PROVIDER_CREATED_NOTIFICATION, "Id provider was created - message should appear");
         });

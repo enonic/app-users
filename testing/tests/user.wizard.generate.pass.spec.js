@@ -18,7 +18,7 @@ describe("User Wizard generate password spec", function () {
     it("WHEN 'User' wizard is opened THEN 'generate' and 'show' links should be displayed",
         async () => {
             let userWizard = new UserWizard();
-            //1. Open new user-wizard:
+            // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             let result = await userWizard.isGenerateDisplayed();
             await testUtils.saveScreenshot('generate_password_link');
