@@ -62,6 +62,18 @@ repositories {
     xp.enonicRepo( 'dev' )
 }
 
+tasks.register('npmCheck', NpmTask) {
+	dependsOn npmInstall
+	args = [
+		'run',
+		'check:types'
+	]
+	environment = [
+		'FORCE_COLOR': 'true',
+	]
+}
+check.dependsOn npmCheck
+
 tasks.withType(Copy) {
   includeEmptyDirs = false
 }
