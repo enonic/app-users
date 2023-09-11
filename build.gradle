@@ -62,6 +62,16 @@ repositories {
     xp.enonicRepo( 'dev' )
 }
 
+tasks.withType(Copy) {
+  includeEmptyDirs = false
+}
+
+task bunInstall( type: NpxTask ) {
+  // Running this should not create a package-lock.json file
+  command  = 'bun'
+  args = ['install']
+}
+
 tasks.register('lint', NpmTask) {
     dependsOn ( 'npmInstall' )
     group "verification"
@@ -71,30 +81,37 @@ tasks.register('lint', NpmTask) {
 
 check.dependsOn lint
 
-tasks.register('webpack', NpmTask) {
+tasks.register('npmBuild', NpmTask) {
     dependsOn( 'npmInstall' )
-    environment = ['NODE_ENV': nodeEnvironment()]
+    environment = [
+        'FORCE_COLOR': 'true',
+        'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
+        'NODE_ENV': nodeEnvironment()
+    ]
     description = 'Build UI resources (ts, css, etc).'
-    args = ['run', 'build']
+    args = ['run', '--silent', 'build']
     inputs.dir '.xp/dev'
-    inputs.dir 'src/main/resources/assets'
-    inputs.file 'webpack.config.js'
+    inputs.dir 'src/main/resources'
     outputs.dir "$buildDir/build/resources/main"
+    inputs.file 'tsup.config.ts'
 }
 
-jar {
+processResources {
     exclude 'assets/**/*.ts'
-    exclude 'assets/**/*.less'
-    exclude 'assets/styles/*.js'
+    exclude 'assets/**/*.less' // lessc and postcss will handle this
+    exclude 'assets/**/*.woff' // postcss-url will copy
+    exclude 'assets/**/*.woff2' // postcss-url will copy
 
     if ( isProd() )
     {
         exclude 'assets/**/*.map'
     }
+}
 
+jar {
     outputs.dir "$buildDir/resources/main"
 
-    dependsOn( 'webpack', 'javadoc', 'test' )
+    dependsOn( 'npmBuild', 'javadoc', 'test' )
 }
 
 test {

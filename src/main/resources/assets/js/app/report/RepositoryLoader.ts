@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {Repository} from './Repository';
 import {ListRepositoriesRequest} from '../../graphql/repository/ListRepositoriesRequest';
 import {BaseLoader} from '@enonic/lib-admin-ui/util/loader/BaseLoader';

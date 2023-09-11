@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
 import {GetIdProviderByKeyRequest} from '../../graphql/idprovider/GetIdProviderByKeyRequest';
 import {GetDefaultIdProviderRequest} from '../../graphql/idprovider/GetDefaultIdProviderRequest';

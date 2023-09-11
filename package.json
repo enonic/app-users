@@ -8,11 +8,14 @@
     "url": "https://github.com/enonic/app-users"
   },
   "scripts": {
-    "build": "run-p build:js build:typecheck",
-    "build:js": "webpack --color --stats-error-details",
-    "build:typecheck": "tsc --pretty --skipLibCheck --noEmit",
+    "build": "concurrently -c auto -g --timings npm:build:*",
+    "build:css": "postcss -o build/resources/main/assets/styles/main.css build/less/main.css",
+    "build:js": "tsup",
+    "check:types": "tsc --pretty --skipLibCheck --noEmit",
+    "fix": "eslint --fix **/*.ts --cache",
+    "less": "lessc --source-map src/main/resources/assets/styles/main.less build/less/main.css",
     "lint": "eslint **/*.ts --quiet --cache",
-    "fix": "eslint --fix **/*.ts --cache"
+    "prebuild:css": "npm run less"
   },
   "dependencies": {
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
@@ -34,19 +37,24 @@
     "autoprefixer": "^10.4.15",
     "browserslist-config-enonic": "^1.0.7",
     "circular-dependency-plugin": "^5.2.2",
+    "concurrently": "^8.2.1",
     "css-loader": "^6.8.1",
     "cssnano": "^6.0.1",
     "enonic-admin-artifacts": "^1.8.3",
     "eslint": "^8.49.0",
+    "less": "^4.2.0",
     "less-loader": "^11.1.3",
     "mini-css-extract-plugin": "^2.7.6",
     "npm-run-all": "^4.1.5",
+    "postcss-cli": "^10.1.0",
     "postcss-loader": "^7.3.3",
     "postcss-normalize": "^10.0.1",
     "postcss-sort-media-queries": "^5.2.0",
+    "postcss-url": "^10.1.3",
     "source-map-loader": "^4.0.1",
     "swc-loader": "^0.2.3",
     "terser-webpack-plugin": "^5.3.9",
+    "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4"

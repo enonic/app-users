@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
 import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
 import {RepositoryComboBox} from '../report/RepositoryComboBox';

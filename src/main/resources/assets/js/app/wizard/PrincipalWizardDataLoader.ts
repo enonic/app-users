@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {GetPrincipalByKeyRequest} from '../../graphql/principal/GetPrincipalByKeyRequest';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
