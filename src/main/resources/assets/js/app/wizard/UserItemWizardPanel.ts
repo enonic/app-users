@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {UserItemWizardActions} from './action/UserItemWizardActions';
 import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
 import {PrincipalServerEventsHandler} from '../event/PrincipalServerEventsHandler';

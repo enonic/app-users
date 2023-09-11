@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
 import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';

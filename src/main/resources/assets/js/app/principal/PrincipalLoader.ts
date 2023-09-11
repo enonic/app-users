@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {PrincipalLoader as BasePrincipalLoader} from '@enonic/lib-admin-ui/security/PrincipalLoader';
 import {FindPrincipalsRequest} from './FindPrincipalsRequest';
 import {GetPrincipalsByKeysRequest} from './GetPrincipalsByKeysRequest';

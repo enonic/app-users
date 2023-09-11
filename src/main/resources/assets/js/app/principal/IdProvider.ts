@@ -5,7 +5,7 @@ import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {IdProviderMode} from '@enonic/lib-admin-ui/security/IdProviderMode';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 import {UserItem, UserItemBuilder} from '@enonic/lib-admin-ui/security/UserItem';
-import * as Q from 'q';
+import Q from 'q';
 import {ListPrincipalsData, ListPrincipalsRequest} from '../../graphql/principal/ListPrincipalsRequest';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {IdProviderJson} from './IdProviderJson';

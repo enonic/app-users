@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {Router} from '../Router';
 import {UserItemWizardPanel} from './UserItemWizardPanel';
 import {SecurityWizardStepForm} from './SecurityWizardStepForm';

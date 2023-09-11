@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {UserItemWizardPanel} from './UserItemWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {Router} from '../Router';

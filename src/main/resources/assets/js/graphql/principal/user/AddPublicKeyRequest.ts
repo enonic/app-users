@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {GraphQlMutationResponse, GraphQlRequest} from '../../GraphQlRequest';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {PublicKey} from '../../../app/browse/serviceaccount/PublicKey';
