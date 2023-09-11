@@ -90,7 +90,6 @@ tasks.register('lint', NpmTask) {
     args = ['run', 'lint']
     outputs.upToDateWhen { false }
 }
-
 check.dependsOn lint
 
 tasks.register('npmBuild', NpmTask) {
@@ -122,7 +121,6 @@ processResources {
 
 jar {
     outputs.dir "$buildDir/resources/main"
-
     dependsOn( 'npmBuild', 'javadoc', 'test' )
 }
 
