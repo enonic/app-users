@@ -1,9 +1,9 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.enonic.defaults' version '2.0.1'
-    id 'com.enonic.xp.app' version '3.2.0'
-    id "com.github.node-gradle.node" version '3.4.0'
+    id 'com.enonic.defaults' version '2.1.2'
+    id 'com.enonic.xp.app' version '3.4.0'
+    id "com.github.node-gradle.node" version '7.0.0'
 }
 
 def xpVersion=version
@@ -62,21 +62,24 @@ repositories {
     xp.enonicRepo( 'dev' )
 }
 
-task lint( type: NpmTask, group: "verification", dependsOn: npmInstall ) {
+tasks.register('lint', NpmTask) {
+    dependsOn ( 'npmInstall' )
+    group "verification"
     args = ['run', 'lint']
     outputs.upToDateWhen { false }
 }
 
 check.dependsOn lint
 
-task webpack( type: NpmTask, dependsOn: npmInstall ) {
+tasks.register('webpack', NpmTask) {
+    dependsOn( 'npmInstall' )
     environment = ['NODE_ENV': nodeEnvironment()]
     description = 'Build UI resources (ts, css, etc).'
     args = ['run', 'build']
     inputs.dir '.xp/dev'
     inputs.dir 'src/main/resources/assets'
     inputs.file 'webpack.config.js'
-    outputs.dir "$buildDir/build/resources/main/assets"
+    outputs.dir "$buildDir/build/resources/main"
 }
 
 jar {
@@ -91,8 +94,7 @@ jar {
 
     outputs.dir "$buildDir/resources/main"
 
-    dependsOn += test
-    dependsOn += webpack
+    dependsOn( 'webpack', 'javadoc', 'test' )
 }
 
 test {
