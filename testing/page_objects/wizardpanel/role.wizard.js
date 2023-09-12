@@ -22,12 +22,15 @@ class RoleWizard extends WizardPanel {
         return xpath.container + baseXpath.deleteButton;
     }
 
+    getDisplayName() {
+        return this.getTextInInput(this.displayNameInput);
+    }
+
     async waitForLoaded() {
         try {
             await this.waitForElementDisplayed(xpath.container + this.displayNameInput, appConst.mediumTimeout);
         } catch (e) {
-            let screenshot = appConst.generateRandomName('err_role_wizard');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_role_wizard');
             throw new Error("Role wizard was not loaded! Screenshot " + screenshot + " " + e);
         }
     }
@@ -59,11 +62,14 @@ class RoleWizard extends WizardPanel {
         });
     }
 
-    getMembers() {
-        let selectedOptions = xpath.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selectedOptions).catch(err => {
-            throw new Error('Error when getting text from elements ')
-        });
+    async getMembers() {
+        try {
+            let selectedOptions = xpath.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
+            return await this.getTextInElements(selectedOptions);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_role_members');
+            throw new Error('Error when getting text from elements, screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     async removeMember(displayName) {
@@ -72,8 +78,7 @@ class RoleWizard extends WizardPanel {
             await this.clickOnElement(selector);
             return await this.pause(300);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_remove_member');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_remove_member');
             throw new Error('Error - remove-icon for the role, screenshot: ' + screenshot + ' ' + err);
         }
     }
@@ -83,8 +88,7 @@ class RoleWizard extends WizardPanel {
             let locator = xpath.container + lib.selectedPrincipalByDisplayName(roleDisplayName) + lib.REMOVE_ICON;
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_remove_member');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_remove_member');
             throw new Error('Error - remove-icon should be displayed for the role, screenshot: ' + screenshot + ' ' + err);
         }
     }
@@ -94,8 +98,7 @@ class RoleWizard extends WizardPanel {
             let locator = xpath.container + lib.selectedPrincipalByDisplayName(roleDisplayName) + lib.REMOVE_ICON;
             return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_remove_member');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName(screenshot);
             throw new Error('Error - remove-icon should not be displayed for the role, screenshot: ' + screenshot + ' ' + err);
         }
     }
@@ -107,12 +110,10 @@ class RoleWizard extends WizardPanel {
             await loaderComboBox.waitForOptionVisible(xpath.container, displayName);
             await loaderComboBox.clickOnOption(xpath.container, displayName);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_role_member');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_role_member');
             throw new Error('Error selecting the option, screenshot:  ' + screenshot + ' ' + err);
         }
     }
 }
 
 module.exports = RoleWizard;
-

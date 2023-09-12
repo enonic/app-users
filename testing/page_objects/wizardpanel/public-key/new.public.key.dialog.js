@@ -44,6 +44,7 @@ class NewPublicKeyDialog extends Page {
             throw new Error('Generate Button, should be enabled, screenshot:' + screenshot + ' ' + err);
         }
     }
+
     async waitForGenerateButtonDisabled() {
         try {
             await this.waitForGenerateButtonDisplayed();
@@ -90,11 +91,20 @@ class NewPublicKeyDialog extends Page {
     typeKeyLabel(keyLabel) {
         return this.typeTextInInput(this.publicKeyLabelInput, keyLabel);
     }
+
+    async waitForMnuItemDisplayed() {
+        let locator = XPATH.container + lib.MENU_ITEM
+    }
+
+    async clickOnMenuDropdownHandle() {
+        try {
+            await this.waitForElementEnabled(this.menuDropdownHandle, appConst.mediumTimeout);
+            await this.clickOnElement(this.menuDropdownHandle);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('key_menu_dropdown');
+            throw  new Error("New public key - menu dropdown button, screenshot:" + screenshot + ' ' + err);
+        }
+    }
 }
 
 module.exports = NewPublicKeyDialog;
-
-
-
-
-

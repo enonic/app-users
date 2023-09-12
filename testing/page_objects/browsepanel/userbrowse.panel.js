@@ -5,7 +5,6 @@ const Page = require('../page');
 const ConfirmationDialog = require('../confirmation.dialog');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const itemBuilder = require('../../libs/userItems.builder');
 
 const xpath = {
     container: "//div[contains(@id,'UserBrowsePanel')]",
@@ -17,24 +16,24 @@ const xpath = {
     searchButton: "//button[contains(@class, 'icon-search')]",
     hideFilterPanelButton: "//span[contains(@class, 'hide-filter-panel-button')]",
     appHomeButton: "//div[contains(@id,'TabbedAppBar')]/div[contains(@class,'home-button')]",
-    rowByName: function (name) {
+    rowByName(name) {
         return `//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
     },
     rowByDisplayName:
         displayName => `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
-    checkboxByName: function (name) {
+    checkboxByName(name) {
         return `${lib.itemByName(name)}` +
                `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
-    checkboxByDisplayName: function (displayName) {
+    checkboxByDisplayName(displayName) {
         return `${lib.itemByDisplayName(displayName)}` +
                `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
-    expanderIconByName: function (name) {
+    expanderIconByName(name) {
         return this.rowByName(name) +
                `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
     },
-    closeItemTabButton: function (name) {
+    closeItemTabButton(name) {
         return `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${name}']]/button`;
     },
     itemTabByDisplayName:
@@ -96,9 +95,8 @@ class UserBrowsePanel extends Page {
             await this.waitForSpinnerNotVisible();
             console.log('user browse panel is loaded');
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_grid');
-            await this.saveScreenshot(screenshot);
-            throw new Error('users browse panel was not loaded screenshot: ' + screenshot + ' ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_grid');
+            throw new Error('Users browse panel was not loaded screenshot: ' + screenshot + ' ' + err);
         }
     }
 
@@ -113,8 +111,7 @@ class UserBrowsePanel extends Page {
         try {
             await this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_item');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_item');
             throw new Error('The item should not be displayed, screenshot:' + screenshot + '  ' + err);
         }
     }
@@ -123,10 +120,8 @@ class UserBrowsePanel extends Page {
         try {
             await this.waitForElementNotDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_item');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_item');
             throw new Error("The item should not be displayed, screenshot:" + screenshot + "  " + err);
-
         }
     }
 
@@ -134,8 +129,7 @@ class UserBrowsePanel extends Page {
         try {
             await this.waitForElementDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_item');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_item');
             throw new Error('The item should be displayed, screenshot:' + screenshot + "  " + err);
         }
     }
@@ -147,8 +141,8 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_find_item'));
-            throw Error('Item was not found.  ' + err);
+            let screeenshot = await this.saveScreenshotUniqueName('err_find_item');
+            throw Error('Item was not found. screenshot: ' + screeenshot + ' ' + err);
         }
     }
 
@@ -156,8 +150,8 @@ class UserBrowsePanel extends Page {
         try {
             return this.waitForElementDisplayed(xpath.rowByName('users'), appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_users_folder');
-            throw new Error(`Users folder was not found! ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_users_folder');
+            throw new Error(`Users folder was not found! screenshot: ` + screenshot + ' ' + err);
         }
     }
 
@@ -169,8 +163,7 @@ class UserBrowsePanel extends Page {
         try {
             await this.clickOnElement(this.hideFilterPanelButton)
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_hide_filter_button');
-            await this.saveScreenshot();
+            let screenshot = await this.saveScreenshotUniqueName('err_hide_filter_button');
             throw new Error('Error,screenshot: ' + screenshot + '  ' + err);
         }
     }
@@ -230,8 +223,7 @@ class UserBrowsePanel extends Page {
             let nameXpath = xpath.rowByName(name);
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_find_item');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_find_item');
             throw Error('Row was not found: screenshot' + screenshot + '  ' + err);
         }
     }
@@ -243,8 +235,8 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(displayNameXpath);
             return await this.pause(300);
         } catch (err) {
-            await this.saveScreenshot('err_find_item');
-            throw Error('Row with the displayName ' + displayName + ' was not found')
+            let screenshot = await this.saveScreenshotUniqueName('err_find_item');
+            throw Error('Row checkbox, screenshot: ' + screenshot + ' ' + err);
         }
     }
 
@@ -255,8 +247,8 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(closeIcon);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot(itemBuilder.generateRandomNumber('err_close'));
-            throw new Error('itemTabButton was not found! ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_close');
+            throw new Error('itemTabButton was not found! screenshot: ' + screenshot + ' ' + err);
         }
     }
 
@@ -344,8 +336,7 @@ class UserBrowsePanel extends Page {
             await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
             return await this.doRightClick(selector);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_right_click');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_right_click');
             throw Error(`Error during right click on the row, screenshot:  ` + screenshot + '  ' + err);
         }
     }

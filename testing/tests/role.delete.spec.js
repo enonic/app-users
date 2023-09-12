@@ -10,6 +10,7 @@ const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
+const GridContextMenu = require('../page_objects/browsepanel/grid.context.menu');
 
 describe('Deleting of a role - confirm and delete it in wizard and in browse panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -17,7 +18,26 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let testRole;
+    let TEST_ROLE;
+    const SYSTEM_ROLE = 'Authenticated';
+
+    it("GIVEN existing role is filtered WHEN 'Edit' menu item in context menu has been clicked THEN role wizard should be loaded",
+        async () => {
+            let userBrowsePanel = new UserBrowsePanel();
+            let gridContextMenu = new GridContextMenu();
+            let roleWizard = new RoleWizard();
+            // 1. type 'Authenticated' role in the Filter Panel:
+            await testUtils.typeNameInFilterPanel(SYSTEM_ROLE);
+            // 2. Open the context menu for the user
+            await userBrowsePanel.rightClickOnRowByDisplayName(SYSTEM_ROLE);
+            await gridContextMenu.waitForContextMenuVisible();
+            // 3. Click on 'Edit' menu item
+            await gridContextMenu.clickOnMenuItem('Edit');
+            // 4. Role Wizard should be loaded:
+            await roleWizard.waitForLoaded();
+            let roleDisplayName = await roleWizard.getDisplayName();
+            assert.equal(roleDisplayName, SYSTEM_ROLE, 'Expected wizard should be loaded');
+        });
 
     it("GIVEN role has been saved WHEN 'App home' button has been clicked and 'Roles' folder expanded THEN new role should be present",
         async () => {
@@ -38,12 +58,12 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
     it("GIVEN new 'Role' is saved WHEN 'Delete' button in wizard-toolbar has been pressed THEN Confirmation dialog should appear",
         async () => {
             let name = userItemsBuilder.generateRandomName('role');
-            testRole = userItemsBuilder.buildRole(name, 'test role 2');
+            TEST_ROLE = userItemsBuilder.buildRole(name, 'test role 2');
             let confirmationDialog = new ConfirmationDialog();
             let roleWizard = new RoleWizard();
             // 1. Open new role-wizard:
             await testUtils.clickOnRolesFolderAndOpenWizard();
-            await roleWizard.typeData(testRole);
+            await roleWizard.typeData(TEST_ROLE);
             // 2. Save the role:
             await roleWizard.waitAndClickOnSave();
             // 3. Click on Delete button:
@@ -59,7 +79,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             let roleWizard = new RoleWizard();
             let confirmationDialog = new ConfirmationDialog();
             // 1. Open an existing role:
-            await testUtils.findAndSelectItem(testRole.displayName);
+            await testUtils.findAndSelectItem(TEST_ROLE.displayName);
             await userBrowsePanel.clickOnEditButton();
             await roleWizard.waitForLoaded();
             // 2. Click on Ctrl+Del
@@ -74,10 +94,10 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let name = userItemsBuilder.generateRandomName('role');
-            testRole = userItemsBuilder.buildRole(name, 'test role 3');
+            TEST_ROLE = userItemsBuilder.buildRole(name, 'test role 3');
             // 1. Save ne role:
             await testUtils.clickOnRolesFolderAndOpenWizard();
-            await roleWizard.typeData(testRole);
+            await roleWizard.typeData(TEST_ROLE);
             await roleWizard.waitAndClickOnSave();
             await roleWizard.pause(500);
             // 2. Click on Delete and confirm the deleting:
@@ -85,7 +105,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             await testUtils.confirmDelete();
             await testUtils.saveScreenshot('role_deleted_confirmation_mess1');
             //Wait for "Principal "role:${displayName}" is deleted"
-            let expectedMessage = appConst.roleDeletedMessage(testRole.displayName);
+            let expectedMessage = appConst.roleDeletedMessage(TEST_ROLE.displayName);
             await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
         });
 
@@ -94,11 +114,11 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             let confirmationDialog = new ConfirmationDialog();
             let userBrowsePanel = new UserBrowsePanel();
             let name = userItemsBuilder.generateRandomName('role');
-            testRole = userItemsBuilder.buildRole(name, 'test role 2');
+            TEST_ROLE = userItemsBuilder.buildRole(name, 'test role 2');
             // 1. Save new role:
-            await testUtils.openWizardAndSaveRole(testRole);
+            await testUtils.openWizardAndSaveRole(TEST_ROLE);
             // 2. select the role in browse-panel:
-            await testUtils.findAndSelectItem(testRole.displayName);
+            await testUtils.findAndSelectItem(TEST_ROLE.displayName);
             await userBrowsePanel.waitForDeleteButtonEnabled();
             // 3. Click on Delete:
             await userBrowsePanel.clickOnDeleteButton();
@@ -111,11 +131,11 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             // 1. Delete existing role:
-            await testUtils.selectAndDeleteItem(testRole.displayName);
+            await testUtils.selectAndDeleteItem(TEST_ROLE.displayName);
             let message = await userBrowsePanel.waitForNotificationMessage();
             await testUtils.saveScreenshot('role_deleted_notification_mes2');
             // 2. Verify the notification message:
-            let expectedMsg = appConst.roleDeletedMessage(testRole.displayName);
+            let expectedMsg = appConst.roleDeletedMessage(TEST_ROLE.displayName);
             assert.strictEqual(message, expectedMsg, `'Principal "role:roleName" is deleted' this message should be displayed`);
         });
 
