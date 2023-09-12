@@ -3,10 +3,10 @@
  */
 const Page = require('../page');
 const appConst = require('../../libs/app_const');
+const lib = require('../../libs/elements');
 
 const XPATH = {
     container: `//ul[contains(@id,'TreeGridContextMenu')]`,
-    contextMenuItems: `//li[contains(@id,'MenuItem')]`,
     deleteMenuItem: `//li[contains(@id,'MenuItem') and text()='Delete']`,
     editMenuItem: `//li[contains(@id,'MenuItem') and text()='Edit']`,
     newMenuItem: `//li[contains(@id,'MenuItem') and text()='New...']`,
@@ -20,8 +20,8 @@ class GridContextMenu extends Page {
             await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
             return await this.pause(400);
         } catch (err) {
-            this.saveScreenshot('err_grid_context_menu');
-            throw new Error(`tree grid context menu is not loaded ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_grid_context_menu');
+            throw new Error(`tree grid context menu is not loaded, screenshot: ` + screenshot + '  ' + err);
         }
     }
 
@@ -49,41 +49,37 @@ class GridContextMenu extends Page {
         });
     }
 
-    isNewRoleMenuItemDisabled() {
-        return this.getAttribute(XPATH.container + XPATH.newRoleMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
+    async isNewRoleMenuItemDisabled() {
+        let result = await this.getAttribute(XPATH.container + XPATH.newRoleMenuItem, 'class');
+        return result.includes('disabled');
     }
 
-    isDeleteMenuItemDisabled() {
-        return this.getAttribute(XPATH.deleteMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
+    async isDeleteMenuItemDisabled() {
+        let result = await this.getAttribute(XPATH.deleteMenuItem, 'class');
+        return result.includes('disabled');
     }
 
-    isNewMenuItemDisabled() {
-        return this.getAttribute(XPATH.container + XPATH.newMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
+    async isNewMenuItemDisabled() {
+        let result = await this.getAttribute(XPATH.container + XPATH.newMenuItem, 'class');
+        return result.includes('disabled');
     }
 
-    //returns array with menu-items
+    // returns array with menu-items
     getGridContextMenuItems() {
-        let selector = XPATH.container + XPATH.contextMenuItems;
+        let selector = XPATH.container + lib.LI_MENU_ITEM;
         return this.getTextInElements(selector);
     }
 
-    clickOnMenuItem(menuItem) {
-        //TODO finish it
-        let nameXpath = XPATH.itemByName(menuItem);
-        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).then(() => {
-            return this.clickOnElement(nameXpath);
-        }).then(() => {
-            return this.pause(500);
-        }).catch(err => {
-            this.saveScreenshot('err_find_' + menuItem);
-            throw Error('Item  ' + menuItem + ' was not found. ' + err);
-        })
+    async clickOnMenuItem(menuItem) {
+        try {
+            let menuItemLocator = XPATH.container + lib.menuItemByName(menuItem);
+            await this.waitForElementDisplayed(menuItemLocator, appConst.mediumTimeout);
+            await this.clickOnElement(menuItemLocator);
+            await this.pause(500);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_menu_item');
+            throw Error('Menu Item, screenshot  ' + screenshot + ' ' + err);
+        }
     }
 }
 

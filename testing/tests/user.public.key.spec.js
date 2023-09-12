@@ -67,7 +67,41 @@ describe('user.public.key.spec: ui-tests for public key modal dialog', function 
             // 5. Verify the notification message:
             let message = await userWizard.waitForNotificationMessage();
             assert.isTrue(message.includes("A file with the private key was stored on your computer"),
-                "Expected notification message should appear");
+                'Expected notification message should appear');
+        });
+
+    it("GIVEN New PublicKey Dialog is opened WHEN label input has been filled AND dropdown button has been pressed THEN 'Upload' menu item gets available",
+        async () => {
+            let userWizard = new UserWizard();
+            let newPublicKeyDialog = new NewPublicKeyDialog();
+            // 1. Select and open the existing user:
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
+            // 2. Click on 'Add' public key button:
+            await userWizard.clickOnAddPublicKeyButton();
+            await newPublicKeyDialog.waitForLoaded();
+            await newPublicKeyDialog.typeKeyLabel(KEY_LABEL_1);
+            // 3. Expand the menu:
+            await newPublicKeyDialog.clickOnMenuDropdownHandle();
+            await testUtils.saveScreenshot('public_key_dialog_upload_btn');
+            // 4. Verify that Upload menu item is available
+            await newPublicKeyDialog.waitForMnuItemDisplayed('Upload');
+        });
+
+    it("GIVEN existing user is opened WHEN 'Show key details' link has been pressed THEN 'user Key Details Dialog' should be loaded",
+        async () => {
+            let userWizard = new UserWizard();
+            let userKeyDetailsDialog = new UserKeyDetailsDialog();
+            // 1. Select and open the existing user:
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
+            // 2. Click on 'Show key details' link:
+            await userWizard.clickOnShowKeyDetailsLink(KEY_LABEL_1);
+            // 3. Verify that Key Details modal dialog is loaded:
+            await userKeyDetailsDialog.waitForLoaded();
+            await testUtils.saveScreenshot('key_details_dialog');
+            // 4. Verify the key-text in the text area:
+            let text = await userKeyDetailsDialog.getTextInTextArea();
+            assert.isTrue(text.includes('BEGIN PUBLIC KEY'), "Expected text should be displayed in the modal dialog");
+            assert.isTrue(text.includes('END PUBLIC KEY'), "Expected text should be displayed in the modal dialog");
         });
 
     it("GIVEN existing user is opened WHEN public key has been removed THEN the row with key should not be present in the table",
@@ -89,7 +123,7 @@ describe('user.public.key.spec: ui-tests for public key modal dialog', function 
             await testUtils.saveScreenshot('key_row_removed');
             // 4. Verify that the table gets empty:
             result = await userWizard.getNumberOfKeyRows();
-            assert.equal(result,0, "empty table should be displayed in the key-form");
+            assert.equal(result, 0, 'empty table should be displayed in the key-form');
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

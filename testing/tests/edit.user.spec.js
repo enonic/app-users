@@ -11,6 +11,8 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const UserStatisticsPanel = require('../page_objects/browsepanel/user.statistics.panel');
 const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
+const GridContextMenu = require('../page_objects/browsepanel/grid.context.menu');
+const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe('edit.user.spec: Edit an user - change e-mail, name and roles', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -19,7 +21,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
         webDriverHelper.setupBrowser();
     }
 
-    let testUser;
+    let TEST_USER;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
     const NEW_DISPLAY_NAME = appConst.generateRandomName('user');
 
@@ -30,11 +32,11 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userStatisticsPanel = new UserStatisticsPanel();
             let userName = userItemsBuilder.generateRandomName('user');
             let roles = [appConst.ROLES_DISPLAY_NAME.CM_ADMIN, appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR];
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
+            TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
             // 1. Select 'System' folder and open User Wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Insert the required data:
-            await userWizard.typeData(testUser);
+            await userWizard.typeData(TEST_USER);
             // 3. Save the user:
             await testUtils.saveScreenshot('edit_user_wizard1');
             await userWizard.waitAndClickOnSave();
@@ -56,12 +58,47 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             assert.equal(actualName, userName, "Expected and actual name should be equal");
         });
 
+    it("GIVEN existing user is filtered WHEN Delete menu item in context menu has been clicked THEN Confirmation dialog should be loaded",
+        async () => {
+            let confirmationDialog = new ConfirmationDialog();
+            let userBrowsePanel = new UserBrowsePanel();
+            let gridContextMenu = new GridContextMenu();
+            // 1. type the display name in the Filter Panel:
+            await testUtils.typeNameInFilterPanel(TEST_USER.displayName);
+            // 2. Open the context menu for the user
+            await userBrowsePanel.rightClickOnRowByDisplayName(TEST_USER.displayName);
+            await gridContextMenu.waitForContextMenuVisible();
+            await testUtils.saveScreenshot('user_context_menu_1');
+            // 3. Click on Delete menu item
+            await gridContextMenu.clickOnMenuItem('Delete');
+            // 4. Confirmation dialog should be loaded:
+            await confirmationDialog.waitForDialogLoaded();
+        });
+
+    it("GIVEN existing user is opened WHEN 'Edit' menu item in context menu has been clicked THEN the user-data should be loaded in the wizard",
+        async () => {
+            let userWizard = new UserWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            let gridContextMenu = new GridContextMenu();
+            // 1. type the display name in the Filter Panel:
+            await testUtils.typeNameInFilterPanel(TEST_USER.displayName);
+            await userBrowsePanel.rightClickOnRowByDisplayName(TEST_USER.displayName);
+            // 2. Open the context menu for the user
+            await gridContextMenu.waitForContextMenuVisible();
+            // 3. Click on Edit menu item
+            await gridContextMenu.clickOnMenuItem('Edit');
+            // 4. User Wizard should be loaded:
+            await userWizard.waitForOpened();
+            let userDisplayName = await userWizard.getUserName();
+            assert.equal(userDisplayName, TEST_USER.displayName, 'Expected wizard should be loaded');
+        });
+
     it("GIVEN existing user is opened WHEN display name has been changed THEN user should be searchable with the new display name",
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             // 1. Select and open the existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Update the display name:
             await userWizard.typeDisplayName(NEW_DISPLAY_NAME);
             // 3. Save new display name:
@@ -69,7 +106,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             // 4. Insert the new display name in Filter Panel:
             await testUtils.typeNameInFilterPanel(NEW_DISPLAY_NAME);
             // 5. Verify that the user's path is not updated (the initial display name is displayed):
-            let isDisplayed = await userBrowsePanel.isItemDisplayed(testUser.displayName);
+            let isDisplayed = await userBrowsePanel.isItemDisplayed(TEST_USER.displayName);
             assert.isTrue(isDisplayed, "User with new display name should be searchable in the grid");
         });
 
@@ -78,7 +115,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userWizard = new UserWizard();
             let userStatisticsPanel = new UserStatisticsPanel();
             // 1. Open the existing user ( use the initial display name in Filter Panel):
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Remove the role:
             await userWizard.removeRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
             await testUtils.saveAndCloseWizard(NEW_DISPLAY_NAME);
@@ -96,7 +133,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
             // 1. Open existing user ( use the initial display name in Filter Panel):
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Add new role:
             await userWizard.filterOptionsAndAddRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
             // 3. Change the password:
@@ -120,9 +157,9 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userStatisticsPanel = new UserStatisticsPanel();
-            let newEmail = userItemsBuilder.generateEmail(testUser.displayName);
+            let newEmail = userItemsBuilder.generateEmail(TEST_USER.displayName);
             // 1. Open existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             await userWizard.clearEmailInput();
             // 2. Type new email:
             await userWizard.typeEmail(newEmail);
