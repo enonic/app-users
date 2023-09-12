@@ -15,7 +15,7 @@ export default defineConfig(() => {
         platform: 'browser',
 		silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
         // splitting: false,
-        sourcemap: process.env.NODE_ENV === 'development' ? false : true,
+        sourcemap: process.env.NODE_ENV === 'development' ? true : false,
         tsconfig: 'src/main/resources/assets/tsconfig.json',
     };
 });
