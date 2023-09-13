@@ -24,4 +24,4 @@ tasks.register('copyDevResources') {
     }
 }
 
-npmInstall.dependsOn copyDevResources
+npmInstall.dependsOn( 'copyDevResources' )
