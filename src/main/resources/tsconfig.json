@@ -1,0 +1,31 @@
+{
+    // This file is used by your code editor and the build system,
+    // for TypeScript files except for those under ./assets/.
+    // https://www.typescriptlang.org/tsconfig
+    "compilerOptions": {
+        "baseUrl": ".",
+        "lib": [
+            "ES5"
+        ],
+        "paths": {
+            "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
+            "/*": ["./*"]
+        },
+        "rootDir": ".",
+        "skipLibCheck": true,
+        // "typeRoots": [
+        //     "node_modules/@types",
+        //     "node_modules/@enonic-types"
+        // ],
+        "types": [
+            "@enonic-types/global"
+            // "global" // When typeRoots is set the prefix @enonic-types/ must be removed.
+        ]
+    },
+    "exclude": [
+        "./assets/**/*",
+    ],
+    "include": [
+        "./**/*.ts"
+    ]
+}

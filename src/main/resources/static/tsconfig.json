@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "esModuleInterop": true, // Needed for the 'q' npm module
+        "module": "commonjs",
+        "lib": [
+            "DOM",
+            "ES2020",
+            "ES2015.Promise"
+        ],
+        "moduleResolution": "node",
+        "paths": {},
+        "rootDir": ".",
+        "skipLibCheck": true,
+        "target": "es5", // Modern browsers
+        "types": [
+            "hasher",
+            "q",
+            "nanoid",
+            "owasp-password-strength-test"
+          ],
+    },
+    "include": [
+        "./**/*.ts"
+    ],
+}
