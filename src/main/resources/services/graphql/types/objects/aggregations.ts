@@ -1,40 +1,44 @@
-var graphQl = require('/lib/graphql');
+import {
+    GraphQLInt,
+    GraphQLString,
+    list
+    // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
+} from '/lib/graphql';
+import { schemaGenerator } from '../../schemaUtil';
 
-var schemaGenerator = require('../../schemaUtil').schemaGenerator;
 
 var BucketType = schemaGenerator.createObjectType({
     name: 'Bucket',
     description: 'Aggregated result for specific key',
     fields: {
         key: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         docCount: {
-            type: graphQl.GraphQLInt
+            type: GraphQLInt
         }
     }
 });
 
-var AggregationType = schemaGenerator.createObjectType({
+export const AggregationType = schemaGenerator.createObjectType({
     name: 'Aggregation',
     description: 'List of buckets',
     fields: {
         name: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         buckets: {
-            type: graphQl.list(BucketType),
+            type: list(BucketType),
             resolve: function(env) {
                 return env.source.aggregation;
             }
         }
     }
 });
-exports.AggregationType = AggregationType;
 
-exports.createAggregationsFiled = function createAggregationsFiled() {
+export function createAggregationsField() {
     return {
-        type: graphQl.list(AggregationType),
+        type: list(AggregationType),
         resolve: function(env) {
             var aggregations = env.source.aggregations;
             var aggs = [];
@@ -47,4 +51,4 @@ exports.createAggregationsFiled = function createAggregationsFiled() {
             return aggs;
         }
     };
-};
+}

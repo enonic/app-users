@@ -1,11 +1,14 @@
-var common = require('./common');
+import {
+    getByIds,
+    queryAll
+} from './common';
 
-exports.getById = function (id) {
-    return common.getByIds(id)
+export function getById(id) {
+    return getByIds(id);
 };
 
-exports.list = function (search, start, count, sort) {
-    var queryResult = common.queryAll({
+export function list(search, start, count, sort) {
+    var queryResult = queryAll({
         query: createRepoQuery(search),
         start: start,
         count: count,

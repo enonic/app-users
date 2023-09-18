@@ -1,20 +1,24 @@
-var graphQl = require('/lib/graphql');
+import {
+    GraphQLInt,
+    list,
+    nonNull
+    // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
+} from '/lib/graphql';
+import { AggregationType } from './aggregations';
+import { schemaGenerator } from '../../schemaUtil';
 
-var graphQlAggregations = require('./aggregations');
 
-var schemaGenerator = require('../../schemaUtil').schemaGenerator;
-
-exports.TypesType = schemaGenerator.createObjectType({
+export = schemaGenerator.createObjectType({
     name: 'Types',
     fields: {
         totalCount: {
-            type: graphQl.nonNull(graphQl.GraphQLInt),
+            type: nonNull(GraphQLInt),
             resolve: function(env) {
                 return env.source.total;
             }
         },
         aggregations: {
-            type: graphQl.list(graphQlAggregations.AggregationType),
+            type: list(AggregationType),
             resolve: function(env) {
                 var aggregations = env.source.aggregations;
                 var aggs = [];

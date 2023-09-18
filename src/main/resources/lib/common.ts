@@ -1,50 +1,49 @@
-var nodeLib = require('/lib/xp/node');
-var namePrettyfier = Java.type('com.enonic.xp.name.NamePrettyfier');
+import { connect } from '/lib/xp/node';
 
-var REPO_NAME = 'system-repo';
-var REPO_BRANCH = 'master';
-var MAX_COUNT = -1;
-var SYSTEM_ADMIN = 'role:system.admin';
+const namePrettyfier = Java.type('com.enonic.xp.name.NamePrettyfier');
 
-var UserItemType = exports.UserItemType = {
+const REPO_NAME = 'system-repo';
+const REPO_BRANCH = 'master';
+const MAX_COUNT = -1;
+const SYSTEM_ADMIN = 'role:system.admin';
+
+export const UserItemType = {
     ROLE: 'ROLE',
     USER: 'USER',
     GROUP: 'GROUP',
-    ID_PROVIDER: 'ID_PROVIDER'
-};
-exports.UserItemType.all = function () {
-    return [
-        UserItemType.ROLE,
-        UserItemType.USER,
-        UserItemType.GROUP,
-        UserItemType.ID_PROVIDER
-    ];
+    ID_PROVIDER: 'ID_PROVIDER',
+    all: () => {
+        return [
+            UserItemType.ROLE,
+            UserItemType.USER,
+            UserItemType.GROUP,
+            UserItemType.ID_PROVIDER
+        ];
+    }
 };
 
-var PrincipalType = exports.PrincipalType = {
+export const PrincipalType = {
     ROLE: 'ROLE',
     USER: 'USER',
-    GROUP: 'GROUP'
-};
-exports.PrincipalType.all = function () {
-    return [PrincipalType.ROLE, PrincipalType.USER, PrincipalType.GROUP];
+    GROUP: 'GROUP',
+    all: () => {
+        return [PrincipalType.ROLE, PrincipalType.USER, PrincipalType.GROUP];
+    }
 };
 
-exports.singleOrArray = function (value) {
+export function singleOrArray(value) {
     return value && value.length === 1 ? value[0] : value;
 };
 
-function isString(str) {
+export function isString(str) {
     return (typeof str === 'string') || (str instanceof String);
 }
 
-exports.isString = isString;
-
-exports.refresh = function (repo) {
+export function refresh(repo) {
     newConnection(repo).refresh('SEARCH');
 };
 
-exports.required = function (params, name, skipTrimming) {
+export function required(params, name, skipTrimming?: boolean) {
     var value = params[name];
     if (value === undefined || value === null) {
         throw new Error("Parameter '" + name + "' is required");
@@ -55,7 +54,7 @@ exports.required = function (params, name, skipTrimming) {
     return value;
 };
 
-exports.default = function (params, name, defaultValue) {
+export default function(params, name, defaultValue) {
     var value = params[name];
     if (value === undefined || value === null) {
         return defaultValue;
@@ -63,15 +62,16 @@ exports.default = function (params, name, defaultValue) {
     return value;
 };
 
-exports.getByIds = function (ids, repo) {
+export function getByIds(ids, repo?: string) {
     return newConnection(repo).get(ids);
 };
 
-exports.delete = function (ids, repo) {
+function _delete(ids, repo) {
     return newConnection(repo).delete(ids);
-};
+}
+export { _delete as delete };
 
-exports.keysToPaths = function (keys) {
+export function keysToPaths(keys) {
     return keys.map(function (key) {
         if (isIdProvider(key)) {
             return '/identity/' + idProviderFromKey(key);
@@ -99,27 +99,27 @@ exports.keysToPaths = function (keys) {
     });
 };
 
-exports.isUser = function isUser(key) {
-    return exports.typeFromKey(key).toUpperCase() === PrincipalType.USER;
+export function isUser(key) {
+    return typeFromKey(key).toUpperCase() === PrincipalType.USER;
 };
 
-exports.isGroup = function isGroup(key) {
-    return exports.typeFromKey(key).toUpperCase() === PrincipalType.GROUP;
+export function isGroup(key) {
+    return typeFromKey(key).toUpperCase() === PrincipalType.GROUP;
 };
 
-exports.isRole = function isRole(key) {
-    return exports.typeFromKey(key).toUpperCase() === PrincipalType.ROLE;
+export function isRole(key) {
+    return typeFromKey(key).toUpperCase() === PrincipalType.ROLE;
 };
 
-exports.isIdProvider = function isIdProvider(key) {
+export function isIdProvider(key) {
     return splitKey(key).length === 1;
 };
 
-exports.isSystemAdmin = function isSystemAdmin(key) {
+export function isSystemAdmin(key) {
     return key === SYSTEM_ADMIN;
 }
 
-exports.createQueryByField = function (field, values) {
+export function createQueryByField(field, values) {
     if (!values || !field) {
         return null;
     }
@@ -137,7 +137,7 @@ function serializeValue(value) {
     return typeof value === 'string' ? '"' + value + '"' : value;
 }
 
-exports.extensionFromMimeType = function (mimeType) {
+export function extensionFromMimeType (mimeType) {
     var ext = '';
     if (mimeType.indexOf('image/png') > -1) {
         ext = '.png';
@@ -167,7 +167,7 @@ function splitKey(key) {
     return parts;
 }
 
-exports.idProviderFromKey = function idProviderFromKey(key) {
+export function idProviderFromKey(key) {
     var parts = splitKey(key);
     if (parts[0].toUpperCase() === PrincipalType.ROLE) {
         throw new Error(
@@ -177,7 +177,7 @@ exports.idProviderFromKey = function idProviderFromKey(key) {
     return parts.length === 1 ? parts[0] : parts[1];
 };
 
-exports.nameFromKey = function nameFromKey(key) {
+export function nameFromKey(key) {
     var parts = splitKey(key);
     if (parts.length === 1) {
         throw new Error("Key don't have name [" + key + ']');
@@ -185,7 +185,7 @@ exports.nameFromKey = function nameFromKey(key) {
     return parts[0].toUpperCase() !== PrincipalType.ROLE ? parts[2] : parts[1];
 };
 
-exports.typeFromKey = function typeFromKey(key) {
+export function typeFromKey(key) {
     var parts = splitKey(key);
     if (parts.length === 1) {
         throw new Error("Key don't have type [" + key + ']');
@@ -193,11 +193,11 @@ exports.typeFromKey = function typeFromKey(key) {
     return parts[0];
 };
 
-exports.prettifyName = function (text) {
+export function prettifyName(text) {
     return namePrettyfier.create(text);
 };
 
-exports.querySingle = function (query, repo) {
+export function querySingle(query, repo) {
     var results = queryAll({
         start: 0,
         count: 1,
@@ -207,15 +207,15 @@ exports.querySingle = function (query, repo) {
     return results.total === 1 ? results.hits[0] : null;
 };
 
-exports.create = function (params, repo) {
+export function create(params, repo) {
     return newConnection(repo).create(params);
 };
 
-exports.update = function (params, repo) {
+export function update(params, repo) {
     return newConnection(repo).modify(params);
 };
 
-exports.queryAll = function queryAll(params, repo) {
+export function queryAll(params, repo?: string) {
     var start = params.start || 0;
     var count = params.count == null ? MAX_COUNT : params.count;
 
@@ -245,11 +245,9 @@ exports.queryAll = function queryAll(params, repo) {
     };
 };
 
-function newConnection(repo, branch) {
-    return nodeLib.connect({
+export function newConnection(repo: string, branch?: string) {
+    return connect({
         repoId: repo || REPO_NAME,
         branch: branch || REPO_BRANCH
     });
 }
-
-exports.newConnection = newConnection;

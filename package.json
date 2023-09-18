@@ -31,8 +31,10 @@
   "devDependencies": {
     "@enonic-types/global": "^7.13.2",
     "@enonic-types/lib-admin": "^7.13.2",
+    "@enonic-types/lib-auth": "^7.13.2",
     "@enonic-types/lib-i18n": "^7.13.2",
     "@enonic-types/lib-io": "^7.13.2",
+    "@enonic-types/lib-node": "^7.13.2",
     "@enonic-types/lib-portal": "^7.13.2",
     "@enonic/esbuild-plugin-copy-with-hash": "^0.0.1",
     "@enonic/eslint-config": "^1.2.0",
