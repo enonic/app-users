@@ -3,10 +3,11 @@
 // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 import { execute } from '/lib/graphql';
 import { schemaGenerator } from './schemaUtil';
+import * as graphQlSchema from './schema';
 
+let schema;
 Java.type('com.enonic.xp.app.users.GraphQLSchemaSynchronizer').sync(__.toScriptValue(function() {
-    var graphQlSchema = require('./schema');
-    var schema = schemaGenerator.createSchema(graphQlSchema);
+    schema = schemaGenerator.createSchema(graphQlSchema);
 }));
 
 export function post(req) {

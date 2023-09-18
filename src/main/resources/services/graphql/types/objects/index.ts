@@ -1,25 +1,26 @@
-var graphQlConnection = require('./connection');
+import { createConnectionType } from './connection';
+import { PrincipalType } from './principal';
+import {UserItemType} from './userItem';
 
-var graphQlIdProvider = require('./idProvider');
-var graphQlPrincipal = require('./principal');
-var graphQlUserItem = require('./userItem');
-var graphQlTypes = require('./types');
-var graphQlRepository = require('./repository');
+export {
+    IdProviderDeleteType,
+    IdProviderType
+} from './idProvider';
+export {
+    PrincipalDeleteType,
+    PublicKeyType
+} from './principal';
+export { TypesType } from './types';
+export { RepositoryType } from './repository';
 
-export = {
-    IdProviderType: graphQlIdProvider.IdProviderType,
-    IdProviderDeleteType: graphQlIdProvider.IdProviderDeleteType,
-    PrincipalType: graphQlPrincipal.PrincipalType,
-    PrincipalDeleteType: graphQlPrincipal.PrincipalDeleteType,
-    TypesType: graphQlTypes.TypesType,
-    PrincipalConnectionType: graphQlConnection.createConnectionType(
-        'Principal',
-        graphQlPrincipal.PrincipalType
-    ),
-    UserItemConnectionType: graphQlConnection.createConnectionType(
-        'UserItem',
-        graphQlUserItem.UserItemType
-    ),
-    RepositoryType: graphQlRepository.RepositoryType,
-    PublicKeyType: graphQlPrincipal.PublicKeyType,
-};
+export { PrincipalType };
+
+export const PrincipalConnectionType = createConnectionType(
+    'Principal',
+    PrincipalType
+);
+
+export const UserItemConnectionType = createConnectionType(
+    'UserItem',
+    UserItemType
+);

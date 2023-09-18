@@ -1,12 +1,22 @@
-var common = require('./common');
-var principals = require('./principals');
+import {
+    idProviderFromKey,
+    nameFromKey,
+    required
+} from './common';
+import {
+    addMembers,
+    getMembers,
+    getMemberships,
+    updateMembers,
+    updateMemberships
+} from './principals';
 var authLib = require('/lib/xp/auth');
 
-exports.create = function createGroup(params) {
-    var key = common.required(params, 'key');
-    var idProviderKey = common.idProviderFromKey(key);
-    var name = common.nameFromKey(key);
-    var displayName = common.required(params, 'displayName');
+export function create(params) {
+    var key = required(params, 'key');
+    var idProviderKey = idProviderFromKey(key);
+    var name = nameFromKey(key);
+    var displayName = required(params, 'displayName');
 
     var createdGroup = authLib.createGroup({
         idProvider: idProviderKey,
@@ -17,21 +27,21 @@ exports.create = function createGroup(params) {
 
     var ms = params.members;
     if (ms && ms.length > 0) {
-        principals.addMembers(key, ms);
+        addMembers(key, ms);
     }
 
     populateMembers(createdGroup);
 
-    principals.updateMemberships(key, params.memberships);
+    updateMemberships(key, params.memberships);
 
     populateMemberships(createdGroup);
 
     return createdGroup;
 };
 
-exports.update = function updateGroup(params) {
-    var key = common.required(params, 'key');
-    var displayName = common.required(params, 'displayName');
+export function update(params) {
+    var key = required(params, 'key');
+    var displayName = required(params, 'displayName');
 
     var updatedGroup = authLib.modifyGroup({
         key: key,
@@ -43,11 +53,11 @@ exports.update = function updateGroup(params) {
         }
     });
 
-    principals.updateMembers(key, params.addMembers, params.removeMembers);
+    updateMembers(key, params.addMembers, params.removeMembers);
 
     populateMembers(updatedGroup);
 
-    principals.updateMemberships(
+    updateMemberships(
         key,
         params.addMemberships,
         params.removeMemberships
@@ -60,8 +70,7 @@ exports.update = function updateGroup(params) {
 
 function populateMembers(group) {
     // eslint-disable-next-line no-param-reassign
-    group.member = principals
-        .getMembers(group.key || group._id)
+    group.member = getMembers(group.key || group._id)
         .map(function(member) {
             return member.key;
         });
@@ -69,5 +78,5 @@ function populateMembers(group) {
 
 function populateMemberships(group) {
     // eslint-disable-next-line no-param-reassign
-    group.memberships = principals.getMemberships(group.key || group._id);
+    group.memberships = getMemberships(group.key || group._id);
 }

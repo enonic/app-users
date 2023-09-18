@@ -2,9 +2,12 @@
 import { GraphQLString } from '/lib/graphql';
 import { schemaGenerator } from '../../schemaUtil';
 
+import {IdProviderType} from './idProvider';
+import {PrincipalType} from './principal';
+
 export const typeResolverMap = {
-    principalType: null,
-    idProviderType: null
+    principalType: PrincipalType,
+    idProviderType: IdProviderType
 };
 
 export const UserItemType = schemaGenerator.createInterfaceType({
