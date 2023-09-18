@@ -6,7 +6,7 @@ var graphQlUserItem = require('./userItem');
 var graphQlTypes = require('./types');
 var graphQlRepository = require('./repository');
 
-module.exports = {
+export = {
     IdProviderType: graphQlIdProvider.IdProviderType,
     IdProviderDeleteType: graphQlIdProvider.IdProviderDeleteType,
     PrincipalType: graphQlPrincipal.PrincipalType,

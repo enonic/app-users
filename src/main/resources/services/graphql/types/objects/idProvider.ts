@@ -1,35 +1,44 @@
-var graphQl = require('/lib/graphql');
+import {
+    GraphQLBoolean,
+    GraphQLString,
+    list,
+    reference
+    // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
+} from '/lib/graphql';
+import {
+    IdProviderAccessEnum,
+    IdProviderModeEnum
+} from '../enums';
+import { UserItemType } from './userItem';
+import {
+    getIdProviderMode,
+    getPermissions
+} from '/lib/idproviders';
+import { schemaGenerator } from '../../schemaUtil';
 
-var graphQlEnums = require('../enums');
-
-var graphQlUserItem = require('./userItem');
-
-var idprovidersLib = require('/lib/idproviders');
-
-var schemaGenerator = require('../../schemaUtil').schemaGenerator;
 
 var IdProviderAccessControlEntryType = schemaGenerator.createObjectType({
     name: 'IdProviderAccessControlEntry',
     description: 'Domain representation of id provider access control entry',
     fields: {
         principal: {
-            type: graphQl.reference('Principal')
+            type: reference('Principal')
         },
         access: {
-            type: graphQlEnums.IdProviderAccessEnum
+            type: IdProviderAccessEnum
         }
     }
 });
 
-exports.IdProviderConfig = schemaGenerator.createObjectType({
+export const IdProviderConfig = schemaGenerator.createObjectType({
     name: 'IdProviderConfig',
     description: 'Domain representation of auth config for id provider',
     fields: {
         applicationKey: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         config: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function(env) {
                 return JSON.stringify(env.source.config);
                 // TODO Create object type for property array
@@ -38,80 +47,83 @@ exports.IdProviderConfig = schemaGenerator.createObjectType({
     }
 });
 
-exports.IdProviderType = schemaGenerator.createObjectType({
+export const IdProviderType = schemaGenerator.createObjectType({
     name: 'IdProvider',
     description: 'Domain representation of an id provider',
-    interfaces: [graphQlUserItem.UserItemType],
+    interfaces: [UserItemType],
     fields: {
         key: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function(env) {
                 return env.source.key || env.source._name;
             }
         },
         name: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function(env) {
                 return env.source.key || env.source._name;
             }
         },
         path: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function(env) {
                 return '/identity/' + (env.source.key || env.source._name);
             }
         },
         displayName: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         description: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         idProviderConfig: {
-            type: exports.IdProviderConfig
+            type: IdProviderConfig
         },
         idProviderMode: {
-            type: graphQlEnums.IdProviderModeEnum,
+            type: IdProviderModeEnum,
             resolve: function(env) {
                 var idProviderKey =
                     env.source.idProviderConfig &&
                     env.source.idProviderConfig.applicationKey;
                 return idProviderKey
-                       ? idprovidersLib.getIdProviderMode(idProviderKey)
+                       ? getIdProviderMode(idProviderKey)
                        : null;
             }
         },
         permissions: {
-            type: graphQl.list(IdProviderAccessControlEntryType),
+            type: list(IdProviderAccessControlEntryType),
             resolve: function(env) {
-                return idprovidersLib.getPermissions(env.source.key);
+                return getPermissions(env.source.key);
             }
         },
         modifiedTime: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function(env) {
                 return env.source._timestamp;
             }
         }
     }
 });
+
+// This seems like very bad code, trying to overwrite the state inside another module?
+// Perhaps this worked when things are bundled into one file?
 graphQlUserItem.typeResolverMap.idProviderType = exports.IdProviderType;
 
-exports.IdProviderDeleteType = schemaGenerator.createObjectType({
+export const IdProviderDeleteType = schemaGenerator.createObjectType({
     name: 'IdProviderDelete',
     description: 'Result of an idProvider delete operation',
     fields: {
         key: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function (env) {
                 return env.source.idProviderKey;
             }
         },
         deleted: {
-            type: graphQl.GraphQLBoolean
+            type: GraphQLBoolean
         },
         reason: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         }
     }
 });

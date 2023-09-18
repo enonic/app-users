@@ -1,25 +1,32 @@
-var graphQl = require('/lib/graphql');
-var graphQlUtils = require('../../utils');
-var createAggregationsFiled = require('./aggregations').createAggregationsFiled;
-var schemaGenerator = require('../../schemaUtil').schemaGenerator;
+import {
+    GraphQLBoolean,
+    GraphQLInt,
+    list,
+    nonNull
+    // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
+} from '/lib/graphql';
+import { toInt } from '../../utils';
+import { createAggregationsField } from './aggregations';
+import { schemaGenerator } from '../../schemaUtil';
+
 
 var pageInfoType = schemaGenerator.createObjectType({
     name: 'PageInfo',
     fields: {
         startCursor: {
-            type: graphQl.nonNull(graphQl.GraphQLInt),
+            type: nonNull(GraphQLInt),
             resolve: function(env) {
-                return graphQlUtils.toInt(env.source.startCursor);
+                return toInt(env.source.startCursor);
             }
         },
         endCursor: {
-            type: graphQl.nonNull(graphQl.GraphQLInt),
+            type: nonNull(GraphQLInt),
             resolve: function(env) {
-                return graphQlUtils.toInt(env.source.endCursor);
+                return toInt(env.source.endCursor);
             }
         },
         hasNext: {
-            type: graphQl.nonNull(graphQl.GraphQLBoolean)
+            type: nonNull(GraphQLBoolean)
         }
     }
 });
@@ -29,30 +36,30 @@ function createEdgeType(name, type) {
         name: name + 'Edge',
         fields: {
             node: {
-                type: graphQl.nonNull(type)
+                type: nonNull(type)
             },
             cursor: {
-                type: graphQl.nonNull(graphQl.GraphQLInt),
+                type: nonNull(GraphQLInt),
                 resolve: function(env) {
-                    return graphQlUtils.toInt(env.source.cursor);
+                    return toInt(env.source.cursor);
                 }
             }
         }
     });
 }
 
-exports.createConnectionType = function(name, type) {
+export function createConnectionType(name, type) {
     return schemaGenerator.createObjectType({
         name: name + 'Connection',
         fields: {
             totalCount: {
-                type: graphQl.nonNull(graphQl.GraphQLInt),
+                type: nonNull(GraphQLInt),
                 resolve: function(env) {
                     return env.source.total;
                 }
             },
             edges: {
-                type: graphQl.list(createEdgeType(name, type)),
+                type: list(createEdgeType(name, type)),
                 resolve: function(env) {
                     var hits = env.source.hits;
                     var edges = [];
@@ -65,7 +72,7 @@ exports.createConnectionType = function(name, type) {
                     return edges;
                 }
             },
-            aggregations: createAggregationsFiled(),
+            aggregations: createAggregationsField(),
             pageInfo: {
                 type: pageInfoType,
                 resolve: function(env) {
@@ -82,4 +89,4 @@ exports.createConnectionType = function(name, type) {
             }
         }
     });
-};
+}

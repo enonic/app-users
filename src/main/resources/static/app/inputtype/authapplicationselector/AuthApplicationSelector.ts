@@ -15,9 +15,6 @@ import {FormContext} from '@enonic/lib-admin-ui/form/FormContext';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 import {AuthApplicationComboBox} from './AuthApplicationComboBox';
 import {BaseInputTypeManagingAdd} from '@enonic/lib-admin-ui/form/inputtype/support/BaseInputTypeManagingAdd';
-import {InputValidationRecording} from '@enonic/lib-admin-ui/form/inputtype/InputValidationRecording';
-import {Class} from '@enonic/lib-admin-ui/Class';
-import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
 import {Input} from '@enonic/lib-admin-ui/form/Input';
 import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
 
@@ -202,5 +199,3 @@ export class AuthApplicationSelector
         return this.comboBox.giveFocus();
     }
 }
-
-InputTypeManager.register(new Class('AuthApplicationSelector', AuthApplicationSelector));

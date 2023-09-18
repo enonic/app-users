@@ -1,6 +1,6 @@
-var authLib = require('/lib/xp/auth');
+import { hasRole } from '/lib/xp/auth';
 
-var Roles = {
+const Roles = {
     ADMIN: 'system.admin',
     EVERYONE: 'system.everyone',
     AUTHENTICATED: 'system.authenticated',
@@ -31,7 +31,7 @@ function nullOrValue(value) {
  * @param {string} params.key IdProvider key.
  * @returns {object} the id provider specified, or null if it doesn't exist.
  */
-exports.getIdProvider = function (params) {
+export function getIdProvider(params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProviderHandler');
     bean.setIdProviderKey(required(params, 'key'));
     return __.toNativeObject(bean.getIdProvider());
@@ -42,7 +42,7 @@ exports.getIdProvider = function (params) {
  *
  * @returns {object[]} Array of id providers.
  */
-exports.getIdProviders = function () {
+export function getIdProviders() {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProvidersHandler');
     return __.toNativeObject(bean.getIdProviders());
 };
@@ -54,7 +54,7 @@ exports.getIdProviders = function () {
  * @param {string} params.key Application key of the ID Provider application.
  * @returns {string} The ID provider mode.
  */
-exports.getIdProviderMode = function (params) {
+export function getIdProviderMode(params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetIdProviderModeHandler');
     bean.setApplicationKey(required(params, 'key'));
     return bean.getIdProviderMode();
@@ -67,7 +67,7 @@ exports.getIdProviderMode = function (params) {
  * @param {string} params.key Key of the id provider to fetch permissions for.
  * @returns {object[]} Returns the list of principals with access level.
  */
-exports.getPermissions = function (params) {
+export function getPermissions(params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.GetPermissionsHandler');
     bean.setIdProviderKey(required(params, 'key'));
     return __.toNativeObject(bean.getPermissions());
@@ -78,7 +78,7 @@ exports.getPermissions = function (params) {
  *
  * @returns {object[]} Returns the list of principals with access level.
  */
-exports.defaultPermissions = function () {
+export function defaultPermissions() {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DefaultPermissionsHandler');
     return __.toNativeObject(bean.defaultPermissions());
 };
@@ -92,7 +92,7 @@ exports.defaultPermissions = function () {
  * @param {object} [params.idProviderConfig] ID Provider configuration.
  * @param {object} [params.permissions] Id provider permissions.
  */
-exports.createIdProvider = function (params) {
+export function createIdProvider(params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.CreateIdProviderHandler');
 
     bean.setName(required(params, 'name'));
@@ -113,7 +113,7 @@ exports.createIdProvider = function (params) {
  * @param {object} [params.permissions] Id provider permissions.
  * @returns {object} The updated id provider.
  */
-exports.modifyIdProvider = function (params) {
+export function modifyIdProvider(params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.ModifyIdProviderHandler');
 
     bean.setIdProviderKey(required(params, 'key'));
@@ -130,12 +130,12 @@ exports.modifyIdProvider = function (params) {
  * @param {string} params.keys Array of id provider keys to delete.
  * @returns {object} the id providers specified, or null if it doesn't exist.
  */
-exports.deleteIdProviders = function (params) {
+export function deleteIdProviders(params) {
     var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DeleteIdProvidersHandler');
     bean.setIdProviderKeys(__.toScriptValue(required(params, 'keys')));
     return __.toNativeObject(bean.deleteIdProviders());
 };
 
-exports.isAdmin = function() {
-    return authLib.hasRole(Roles.ADMIN);
+export function isAdmin() {
+    return hasRole(Roles.ADMIN);
 };

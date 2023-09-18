@@ -14,17 +14,16 @@ import {TabbedAppBar} from '@enonic/lib-admin-ui/app/bar/TabbedAppBar';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
 import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
 import {Class} from '@enonic/lib-admin-ui/Class';
+import {
+    AuthApplicationSelector,
+    PrincipalSelector
+} from './app/inputtype/';
 
 const body = Body.get();
 
-// Dynamically import and execute all input types, since they are used
-// on-demand, when parsing XML schemas and has not real usage in app
-declare let require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
-const importAll = r => r.keys().forEach(r);
-importAll(require.context('./app/inputtype', true, /^(?!\.[\/\\]ui).*/));
+InputTypeManager.register(new Class('AuthApplicationSelector', AuthApplicationSelector));
 
 function getApplication(): Application {
     const assetsUri: string = CONFIG.getString('assetsUri');

@@ -1,15 +1,33 @@
-var graphQl = require('/lib/graphql');
-var authLib = require('/lib/auth');
+import {
+    GraphQLInt,
+    GraphQLString,
+    list,
+    nonNull
+    // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
+} from '/lib/graphql';
+import { isAdmin } from '/lib/auth';
 
-var idproviders = require('/lib/idproviders');
-var principals = require('/lib/principals');
+import {
+    getByKey,
+    getDefault,
+    list as listIdProviders
+} from '/lib/idproviders';
+import {
+    getByKeys as getPrincipalsByKeys,
+    list as listPrincipals,
+    Type
+} from '/lib/principals';
 var useritems = require('/lib/useritems');
-var repositories = require('/lib/repositories');
+import {
+    getById as getRepositoryById,
+    list as listRepositories
+} from '/lib/repositories';
+import { schemaGenerator } from '../schemaUtil';
+import TypesType from '../types';
 
-var schemaGenerator = require('../schemaUtil').schemaGenerator;
 
-var graphQlObjectTypes = require('../types').objects;
-var graphQlEnums = require('../types').enums;
+var graphQlObjectTypes = TypesType.objects;
+var graphQlEnums = TypesType.enums;
 
 
 function getUserItems(args, types) {
@@ -20,49 +38,49 @@ function getUserItems(args, types) {
     return useritems.list(types, query, itemIds, start, count);
 }
 
-module.exports = schemaGenerator.createObjectType({
+export = schemaGenerator.createObjectType({
     name: 'Query',
     fields: {
         idProviders: {
-            type: graphQl.list(graphQlObjectTypes.IdProviderType),
+            type: list(graphQlObjectTypes.IdProviderType),
             resolve: function () {
-                return idproviders.list();
+                return listIdProviders();
             }
         },
         idProvider: {
             type: graphQlObjectTypes.IdProviderType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString)
+                key: nonNull(GraphQLString)
             },
             resolve: function (env) {
                 var key = env.args.key;
-                return idproviders.getByKey(key);
+                return getByKey(key);
             }
         },
         defaultIdProvider: {
             type: graphQlObjectTypes.IdProviderType,
             resolve: function () {
-                return idproviders.getDefault();
+                return getDefault();
             }
         },
         principalsConnection: {
             type: graphQlObjectTypes.PrincipalConnectionType,
             args: {
-                idprovider: graphQl.GraphQLString,
-                types: graphQl.list(graphQlEnums.PrincipalTypeEnum),
-                query: graphQl.GraphQLString,
-                start: graphQl.GraphQLInt,
-                count: graphQl.GraphQLInt,
-                sort: graphQl.GraphQLString
+                idprovider: GraphQLString,
+                types: list(graphQlEnums.PrincipalTypeEnum),
+                query: GraphQLString,
+                start: GraphQLInt,
+                count: GraphQLInt,
+                sort: GraphQLString
             },
             resolve: function (env) {
                 var idprovider = env.args.idprovider || 'system';
-                var types = env.args.types || principals.Type.all();
+                var types = env.args.types || Type.all();
                 var query = env.args.query;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return principals.list(
+                return listPrincipals(
                     idprovider,
                     types,
                     query,
@@ -75,31 +93,31 @@ module.exports = schemaGenerator.createObjectType({
         principal: {
             type: graphQlObjectTypes.PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
+                key: nonNull(GraphQLString),
             },
             resolve: function (env) {
                 var key = env.args.key;
-                return principals.getByKeys(key);
+                return getPrincipalsByKeys(key);
             }
         },
         principals: {
-            type: graphQl.list(graphQlObjectTypes.PrincipalType),
+            type: list(graphQlObjectTypes.PrincipalType),
             args: {
-                keys: graphQl.nonNull(graphQl.list(graphQl.GraphQLString))
+                keys: nonNull(list(GraphQLString))
             },
             resolve: function (env) {
                 var keys = env.args.keys;
-                return principals.getByKeys(keys);
+                return getPrincipalsByKeys(keys);
             }
         },
         userItemsConnection: {
             type: graphQlObjectTypes.UserItemConnectionType,
             args: {
-                types: graphQl.list(graphQlEnums.UserItemTypeEnum),
-                query: graphQl.GraphQLString,
-                itemIds: graphQl.list(graphQl.GraphQLString),
-                start: graphQl.GraphQLInt,
-                count: graphQl.GraphQLInt
+                types: list(graphQlEnums.UserItemTypeEnum),
+                query: GraphQLString,
+                itemIds: list(GraphQLString),
+                start: GraphQLInt,
+                count: GraphQLInt
             },
             resolve: function (env) {
                 return getUserItems(env.args, env.args.types);
@@ -108,10 +126,10 @@ module.exports = schemaGenerator.createObjectType({
         types: {
             type: graphQlObjectTypes.TypesType,
             args: {
-                query: graphQl.GraphQLString,
-                itemIds: graphQl.list(graphQl.GraphQLString),
-                start: graphQl.GraphQLInt,
-                count: graphQl.GraphQLInt
+                query: GraphQLString,
+                itemIds: list(GraphQLString),
+                start: GraphQLInt,
+                count: GraphQLInt
             },
             resolve: function (env) {
                 return getUserItems(env.args, null);
@@ -120,33 +138,33 @@ module.exports = schemaGenerator.createObjectType({
         repository: {
             type: graphQlObjectTypes.RepositoryType,
             args: {
-                id: graphQl.nonNull(graphQl.GraphQLString)
+                id: nonNull(GraphQLString)
             },
             resolve: function (env) {
-                if (!authLib.isAdmin()) {
+                if (!isAdmin()) {
                     throw new Error('You don\'t have permission to access this resource');
                 }
                 var id = env.args.id;
-                return repositories.getById(id);
+                return getRepositoryById(id);
             }
         },
         repositories: {
-            type: graphQl.list(graphQlObjectTypes.RepositoryType),
+            type: list(graphQlObjectTypes.RepositoryType),
             args: {
-                query: graphQl.GraphQLString,
-                start: graphQl.GraphQLInt,
-                count: graphQl.GraphQLInt,
+                query: GraphQLString,
+                start: GraphQLInt,
+                count: GraphQLInt,
                 sort: graphQlEnums.SortModeEnum
             },
             resolve: function (env) {
-                if (!authLib.isAdmin()) {
+                if (!isAdmin()) {
                     throw new Error('You don\'t have permission to access this resource');
                 }
                 var query = env.args.query;
                 var start = env.args.start;
                 var count = env.args.count;
                 var sort = env.args.sort;
-                return repositories.list(query, start, count, sort);
+                return listRepositories(query, start, count, sort);
             }
         }
     }
