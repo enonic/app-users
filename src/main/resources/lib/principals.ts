@@ -4,7 +4,10 @@ import {
     queryAll,
     singleOrArray
 } from './common';
-import { deletePrincipal } from '/lib/xp/auth';
+import {
+    deletePrincipal,
+    getMemberships as _getMemberships
+} from '/lib/xp/auth';
 
 
 export function getByKeys(keys) {
@@ -21,8 +24,8 @@ export function getByKeys(keys) {
     return keys instanceof Array ? principals : singleOrArray(principals);
 }
 
-export function getMemberships(key, transitive) {
-    return authLib.getMemberships(key, transitive);
+export function getMemberships(key, transitive?: boolean) {
+    return _getMemberships(key, transitive);
 }
 
 export function addMemberships(key, memberships) {
@@ -33,7 +36,7 @@ export function addMemberships(key, memberships) {
     return addMms;
 }
 
-export function removeMemberships(key, memberships) {
+export function removeMemberships(key, memberships: string|string[]) {
     var removeMms = [].concat(memberships).map(function(current) {
         removeMembers(current, key);
         return current;
@@ -41,7 +44,7 @@ export function removeMemberships(key, memberships) {
     return removeMms;
 }
 
-export function updateMemberships(key, addMms, removeMms) {
+export function updateMemberships(key, addMms, removeMms?: string|string[]) {
     if (addMms && addMms.length > 0) {
         addMemberships(key, addMms);
     }

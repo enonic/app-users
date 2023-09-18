@@ -1,26 +1,30 @@
-var common = require('./common');
+import {
+    queryAll,
+    UserItemType
+} from './common';
 
-module.exports = {
-    list: function (types, query, itemIds, start, count) {
-        var result = common.queryAll({
-            query: createUserItemsQuery(query, types, itemIds),
-            start: start,
-            count: count,
-            aggregations: {
-                principalType: {
-                    terms: {
-                        field: 'principalType'
-                    }
+
+export function list(types, query, itemIds, start, count) {
+    const result = queryAll({
+        query: createUserItemsQuery(query, types, itemIds),
+        start: start,
+        count: count,
+        aggregations: {
+            principalType: {
+                terms: {
+                    field: 'principalType'
                 }
             }
-        });
+        }
+    });
 
-        processIdProviderAggregation(result);
+    processIdProviderAggregation(result);
 
-        return result;
-    },
-    Type: common.UserItemType
-};
+    return result;
+}
+
+export const Type = UserItemType;
+
 
 function processIdProviderAggregation(result) {
     if (!result || !result.aggregations || !result.aggregations.principalType || !result.aggregations.principalType.buckets) {
@@ -66,15 +70,15 @@ function createTextQuery(query) {
 }
 
 function createTypesQuery(types) {
-    var newTypes = types || common.UserItemType.all();
+    var newTypes = types || UserItemType.all();
     var query = newTypes
         .map(function(type) {
             switch (type) {
-                case common.UserItemType.ROLE:
-                case common.UserItemType.GROUP:
-                case common.UserItemType.USER:
+                case UserItemType.ROLE:
+                case UserItemType.GROUP:
+                case UserItemType.USER:
                     return 'principalType = "' + type + '"';
-            case common.UserItemType.ID_PROVIDER:
+            case UserItemType.ID_PROVIDER:
                     return '(_parentPath = "/identity" AND _path != "/identity/roles")';
                 default:
                     return null;

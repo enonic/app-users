@@ -17,17 +17,25 @@ import {
     list as listPrincipals,
     Type
 } from '/lib/principals';
-var useritems = require('/lib/useritems');
+import {list as listUserItems} from '/lib/useritems';
 import {
     getById as getRepositoryById,
     list as listRepositories
 } from '/lib/repositories';
 import { schemaGenerator } from '../schemaUtil';
-import TypesType from '../types';
-
-
-var graphQlObjectTypes = TypesType.objects;
-var graphQlEnums = TypesType.enums;
+import * as TypesType from '../types';
+import {
+    PrincipalTypeEnum,
+    SortModeEnum,
+    UserItemTypeEnum
+} from '../types/enums';
+import {
+    IdProviderType,
+    PrincipalConnectionType,
+    PrincipalType,
+    RepositoryType,
+    UserItemConnectionType
+} from '../types/objects'
 
 
 function getUserItems(args, types) {
@@ -35,20 +43,20 @@ function getUserItems(args, types) {
     var itemIds = args.itemIds;
     var count = args.count || 0;
     var start = args.start || 0;
-    return useritems.list(types, query, itemIds, start, count);
+    return listUserItems(types, query, itemIds, start, count);
 }
 
-export = schemaGenerator.createObjectType({
+const query = schemaGenerator.createObjectType({
     name: 'Query',
     fields: {
         idProviders: {
-            type: list(graphQlObjectTypes.IdProviderType),
+            type: list(IdProviderType),
             resolve: function () {
                 return listIdProviders();
             }
         },
         idProvider: {
-            type: graphQlObjectTypes.IdProviderType,
+            type: IdProviderType,
             args: {
                 key: nonNull(GraphQLString)
             },
@@ -58,16 +66,16 @@ export = schemaGenerator.createObjectType({
             }
         },
         defaultIdProvider: {
-            type: graphQlObjectTypes.IdProviderType,
+            type: IdProviderType,
             resolve: function () {
                 return getDefault();
             }
         },
         principalsConnection: {
-            type: graphQlObjectTypes.PrincipalConnectionType,
+            type: PrincipalConnectionType,
             args: {
                 idprovider: GraphQLString,
-                types: list(graphQlEnums.PrincipalTypeEnum),
+                types: list(PrincipalTypeEnum),
                 query: GraphQLString,
                 start: GraphQLInt,
                 count: GraphQLInt,
@@ -91,7 +99,7 @@ export = schemaGenerator.createObjectType({
             }
         },
         principal: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: PrincipalType,
             args: {
                 key: nonNull(GraphQLString),
             },
@@ -101,7 +109,7 @@ export = schemaGenerator.createObjectType({
             }
         },
         principals: {
-            type: list(graphQlObjectTypes.PrincipalType),
+            type: list(PrincipalType),
             args: {
                 keys: nonNull(list(GraphQLString))
             },
@@ -111,9 +119,9 @@ export = schemaGenerator.createObjectType({
             }
         },
         userItemsConnection: {
-            type: graphQlObjectTypes.UserItemConnectionType,
+            type: UserItemConnectionType,
             args: {
-                types: list(graphQlEnums.UserItemTypeEnum),
+                types: list(UserItemTypeEnum),
                 query: GraphQLString,
                 itemIds: list(GraphQLString),
                 start: GraphQLInt,
@@ -124,7 +132,7 @@ export = schemaGenerator.createObjectType({
             }
         },
         types: {
-            type: graphQlObjectTypes.TypesType,
+            type: TypesType,
             args: {
                 query: GraphQLString,
                 itemIds: list(GraphQLString),
@@ -136,7 +144,7 @@ export = schemaGenerator.createObjectType({
             }
         },
         repository: {
-            type: graphQlObjectTypes.RepositoryType,
+            type: RepositoryType,
             args: {
                 id: nonNull(GraphQLString)
             },
@@ -149,12 +157,12 @@ export = schemaGenerator.createObjectType({
             }
         },
         repositories: {
-            type: list(graphQlObjectTypes.RepositoryType),
+            type: list(RepositoryType),
             args: {
                 query: GraphQLString,
                 start: GraphQLInt,
                 count: GraphQLInt,
-                sort: graphQlEnums.SortModeEnum
+                sort: SortModeEnum
             },
             resolve: function (env) {
                 if (!isAdmin()) {
@@ -169,3 +177,4 @@ export = schemaGenerator.createObjectType({
         }
     }
 });
+export default query;

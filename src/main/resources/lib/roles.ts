@@ -1,13 +1,24 @@
-var common = require('./common');
-var principals = require('./principals');
-var authLib = require('/lib/xp/auth');
+import {
+    nameFromKey,
+    required
+} from './common';
+import {
+    addMembers,
+    getMembers,
+    updateMembers
+} from './principals';
+import {
+    createRole,
+    modifyRole
+} from '/lib/xp/auth';
 
-exports.create = function createRole(params) {
-    var key = common.required(params, 'key');
-    var name = common.nameFromKey(key);
-    var displayName = common.required(params, 'displayName');
 
-    var createdRole = authLib.createRole({
+export function create(params) {
+    var key = required(params, 'key');
+    var name = nameFromKey(key);
+    var displayName = required(params, 'displayName');
+
+    var createdRole = createRole({
         name: name,
         displayName: displayName,
         description: params.description
@@ -15,7 +26,7 @@ exports.create = function createRole(params) {
 
     var members = params.members;
     if (members && members.length > 0) {
-        principals.addMembers(key, members);
+        addMembers(key, members);
     }
 
     populateMembers(createdRole);
@@ -23,15 +34,15 @@ exports.create = function createRole(params) {
     return createdRole;
 };
 
-exports.update = function updateRole(params) {
-    var key = common.required(params, 'key');
-    var displayName = common.required(params, 'displayName');
+export function update(params) {
+    var key = required(params, 'key');
+    var displayName = required(params, 'displayName');
 
     if (isSuperUserToBeRemovedFromAdmins(key, params.removeMembers)) {
         throw new Error('Can\'t remove Super User from Administrators');
     }
 
-    var modifiedRole = authLib.modifyRole({
+    var modifiedRole = modifyRole({
         key: key,
         editor: function(role) {
             var newRole = role;
@@ -41,7 +52,7 @@ exports.update = function updateRole(params) {
         }
     });
 
-    principals.updateMembers(key, params.addMembers, params.removeMembers);
+    updateMembers(key, params.addMembers, params.removeMembers);
 
     populateMembers(modifiedRole);
 
@@ -54,8 +65,7 @@ function isSuperUserToBeRemovedFromAdmins(key, removeMembers) {
 
 function populateMembers(role) {
     // eslint-disable-next-line no-param-reassign
-    role.member = principals
-        .getMembers(role.key || role._id)
+    role.member = getMembers(role.key || role._id)
         .map(function(member) {
             return member.key;
         });

@@ -1,30 +1,44 @@
-var graphQl = require('/lib/graphql');
+import {
+    GraphQLBoolean,
+    GraphQLString,
+    list,
+    reference
+    // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
+} from '/lib/graphql';
 
-var principals = require('/lib/principals');
+import {
+    getByKeys,
+    getMemberships
+} from '/lib/principals';
 
-var schemaGenerator = require('../../schemaUtil').schemaGenerator;
+import { schemaGenerator } from '../../schemaUtil';
 
-var graphQlEnums = require('../enums');
-var graphQlUtils = require('../../utils');
+import {
+    PermissionEnum,
+    PrincipalTypeEnum
+} from '../enums';
+import {toArray} from  '../../utils';
 
-var graphQlUserItem = require('./userItem');
-var utilLib = require('/lib/util');
+// import { UserItemType } from './userItem';
+// @ts-expect-error Cannot find module '/lib/util' or its corresponding type declarations.ts(2307)
+import { forceArray } from '/lib/util';
 
-exports.PublicKeyType = schemaGenerator.createObjectType({
+
+export const PublicKeyType = schemaGenerator.createObjectType({
     name: 'PublicKey',
     description: 'Public key for a user',
     fields: {
         kid: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
         },
         publicKey: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
         },
         label: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
         },
         creationTime: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
         }
     }
 });
@@ -34,115 +48,118 @@ var PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
     description: 'Domain representation of access control entry',
     fields: {
         principal: {
-            type: graphQl.reference('Principal'),
+            type: reference('Principal'),
             resolve: function (env) {
-                return principals.getByKeys(env.source.principal);
+                return getByKeys(env.source.principal);
             }
         },
         allow: {
-            type: graphQl.list(graphQlEnums.PermissionEnum)
+            type: list(PermissionEnum)
         },
         deny: {
-            type: graphQl.list(graphQlEnums.PermissionEnum)
+            type: list(PermissionEnum)
         }
     }
 });
 
-exports.PrincipalType = schemaGenerator.createObjectType({
+export const PrincipalType = schemaGenerator.createObjectType({
     name: 'Principal',
     description: 'Domain representation of a principal',
-    interfaces: [graphQlUserItem.UserItemType],
+    // interfaces: [UserItemType],
+    // interfaces: [reference('UserItem')], // TODO constant
     fields: {
         key: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function (env) {
                 return env.source.key || env.source._id;
             }
         },
         name: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function (env) {
                 return env.source._name;
             }
         },
         path: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function (env) {
                 return env.source._path;
             }
         },
         displayName: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         description: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         principalType: {
-            type: graphQlEnums.PrincipalTypeEnum
+            type: PrincipalTypeEnum
         },
         idProviderKey: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         permissions: {
-            type: graphQl.list(PrincipalAccessControlEntryType),
+            type: list(PrincipalAccessControlEntryType),
             resolve: function (env) {
                 return env.source._permissions || [];
             }
         },
         login: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         email: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         },
         memberships: {
-            type: graphQl.list(graphQl.reference('Principal')),
+            type: list(reference('Principal')),
             args: {
-                transitive: graphQl.GraphQLBoolean
+                transitive: GraphQLBoolean
             },
             resolve: function (env) {
                 var key = env.source.key || env.source._id;
                 var transitive = env.args.transitive;
-                return graphQlUtils.toArray(principals.getMemberships(key, transitive));
+                return toArray(getMemberships(key, transitive));
             }
         },
         members: {
-            type: graphQl.list(graphQl.GraphQLString),
+            type: list(GraphQLString),
             resolve: function (env) {
-                return graphQlUtils.toArray(env.source.member);
+                return toArray(env.source.member);
             }
         },
         modifiedTime: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function (env) {
                 return env.source._timestamp;
             }
         },
         publicKeys: {
-            type: graphQl.list(exports.PublicKeyType),
+            type: list(PublicKeyType),
             resolve: function (env) {
-                return env.source.profile ? utilLib.forceArray(env.source.profile.publicKeys) : [];
+                return env.source.profile ? forceArray(env.source.profile.publicKeys) : [];
             }
         }
     }
 });
-graphQlUserItem.typeResolverMap.principalType = exports.PrincipalType;
 
-exports.PrincipalDeleteType = schemaGenerator.createObjectType({
+// NOTE: This populates the typeResolverMap which is used inside the UserItem typeResolver
+// graphQlUserItem.typeResolverMap.principalType = exports.PrincipalType;
+
+export const PrincipalDeleteType = schemaGenerator.createObjectType({
     name: 'PrincipalDelete',
     description: 'Result of a principal delete operation',
     fields: {
         key: {
-            type: graphQl.GraphQLString,
+            type: GraphQLString,
             resolve: function (env) {
                 return env.source.key;
             }
         },
         deleted: {
-            type: graphQl.GraphQLBoolean
+            type: GraphQLBoolean
         },
         reason: {
-            type: graphQl.GraphQLString
+            type: GraphQLString
         }
     }
 });

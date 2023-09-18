@@ -1,43 +1,74 @@
-var graphQl = require('/lib/graphql');
+import {
+    GraphQLBoolean,
+    GraphQLString,
+    list,
+    nonNull
+    // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
+} from '/lib/graphql';
 
-var idproviders = require('/lib/idproviders');
-var principals = require('/lib/principals');
-var users = require('/lib/users');
-var groups = require('/lib/groups');
-var roles = require('/lib/roles');
+import {
+    create as createIdProvider,
+    delete as deleteIdProvider,
+    update as updateIdProvider
+} from '/lib/idproviders';
+import { delete as deletePrincipals } from '/lib/principals';
+import {
+    addPublicKey,
+    create as createUser,
+    removePublicKey,
+    update as updateUser,
+    updatePwd
+} from '/lib/users';
+import {
+    create as createGroup,
+    update as updateGroup,
+} from '/lib/groups';
+import {
+    create as createRole,
+    update as updateRole
+} from '/lib/roles';
 
-var schemaGenerator = require('../schemaUtil').schemaGenerator;
+import { schemaGenerator } from '../schemaUtil';
+import {
+    IdProviderDeleteType,
+    IdProviderType,
+    PrincipalDeleteType,
+    PrincipalType,
+    PublicKeyType
+} from '../types/objects'
+import {
+    IdProviderAccessControlInput,
+    IdProviderConfigInput
+} from '../types/inputs';
 
-var graphQlObjectTypes = require('../types').objects;
-var graphQlInputTypes = require('../types').inputs;
 
-module.exports = schemaGenerator.createObjectType({
+const mutation = schemaGenerator.createObjectType({
     name: 'Mutation',
     fields: {
         // Principal
         deletePrincipals: {
-            type: graphQl.list(graphQlObjectTypes.PrincipalDeleteType),
+            type: list(PrincipalDeleteType),
             args: {
-                keys: graphQl.list(graphQl.GraphQLString)
+                keys: list(GraphQLString)
             },
             resolve: function(env) {
-                return principals.delete(env.args.keys);
+                return deletePrincipals(env.args.keys);
             }
         },
 
         // User
         createUser: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                email: graphQl.nonNull(graphQl.GraphQLString),
-                login: graphQl.nonNull(graphQl.GraphQLString),
-                password: graphQl.nonNull(graphQl.GraphQLString),
-                memberships: graphQl.list(graphQl.GraphQLString)
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                email: nonNull(GraphQLString),
+                login: nonNull(GraphQLString),
+                password: nonNull(GraphQLString),
+                memberships: list(GraphQLString)
             },
             resolve: function(env) {
-                return users.create({
+                return createUser({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     email: env.args.email,
@@ -48,17 +79,17 @@ module.exports = schemaGenerator.createObjectType({
             }
         },
         updateUser: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                email: graphQl.nonNull(graphQl.GraphQLString),
-                login: graphQl.nonNull(graphQl.GraphQLString),
-                addMemberships: graphQl.list(graphQl.GraphQLString),
-                removeMemberships: graphQl.list(graphQl.GraphQLString)
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                email: nonNull(GraphQLString),
+                login: nonNull(GraphQLString),
+                addMemberships: list(GraphQLString),
+                removeMemberships: list(GraphQLString)
             },
             resolve: function(env) {
-                return users.update({
+                return updateUser({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     email: env.args.email,
@@ -69,37 +100,37 @@ module.exports = schemaGenerator.createObjectType({
             }
         },
         updatePwd: {
-            type: graphQl.GraphQLBoolean,
+            type: GraphQLBoolean,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                password: graphQl.nonNull(graphQl.GraphQLString)
+                key: nonNull(GraphQLString),
+                password: nonNull(GraphQLString)
             },
             resolve: function(env) {
-                return users.updatePwd(env.args.key, env.args.password);
+                return updatePwd(env.args.key, env.args.password);
             }
         },
         removePublicKey: {
-            type: graphQl.GraphQLBoolean,
+            type: GraphQLBoolean,
             args: {
-                userKey: graphQl.nonNull(graphQl.GraphQLString),
-                kid: graphQl.nonNull(graphQl.GraphQLString),
+                userKey: nonNull(GraphQLString),
+                kid: nonNull(GraphQLString),
             },
             resolve: function (env) {
-                return users.removePublicKey({
+                return removePublicKey({
                     userKey: env.args.userKey,
                     kid: env.args.kid,
                 });
             }
         },
         addPublicKey: {
-            type: graphQlObjectTypes.PublicKeyType,
+            type: PublicKeyType,
             args: {
-                userKey: graphQl.nonNull(graphQl.GraphQLString),
-                publicKey: graphQl.nonNull(graphQl.GraphQLString),
-                label: graphQl.nonNull(graphQl.GraphQLString),
+                userKey: nonNull(GraphQLString),
+                publicKey: nonNull(GraphQLString),
+                label: nonNull(GraphQLString),
             },
             resolve: function (env) {
-                return users.addPublicKey({
+                return addPublicKey({
                     userKey: env.args.userKey,
                     publicKey: env.args.publicKey,
                     label: env.args.label,
@@ -109,16 +140,16 @@ module.exports = schemaGenerator.createObjectType({
 
         // Group
         createGroup: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                description: graphQl.GraphQLString,
-                members: graphQl.list(graphQl.GraphQLString),
-                memberships: graphQl.list(graphQl.GraphQLString)
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                description: GraphQLString,
+                members: list(GraphQLString),
+                memberships: list(GraphQLString)
             },
             resolve: function(env) {
-                return groups.create({
+                return createGroup({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -128,18 +159,18 @@ module.exports = schemaGenerator.createObjectType({
             }
         },
         updateGroup: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                description: graphQl.GraphQLString,
-                addMembers: graphQl.list(graphQl.GraphQLString),
-                removeMembers: graphQl.list(graphQl.GraphQLString),
-                addMemberships: graphQl.list(graphQl.GraphQLString),
-                removeMemberships: graphQl.list(graphQl.GraphQLString)
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                description: GraphQLString,
+                addMembers: list(GraphQLString),
+                removeMembers: list(GraphQLString),
+                addMemberships: list(GraphQLString),
+                removeMemberships: list(GraphQLString)
             },
             resolve: function(env) {
-                return groups.update({
+                return updateGroup({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -153,15 +184,15 @@ module.exports = schemaGenerator.createObjectType({
 
         // Role
         createRole: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                description: graphQl.GraphQLString,
-                members: graphQl.list(graphQl.GraphQLString)
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                description: GraphQLString,
+                members: list(GraphQLString)
             },
             resolve: function(env) {
-                return roles.create({
+                return createRole({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -170,16 +201,16 @@ module.exports = schemaGenerator.createObjectType({
             }
         },
         updateRole: {
-            type: graphQlObjectTypes.PrincipalType,
+            type: PrincipalType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                description: graphQl.GraphQLString,
-                addMembers: graphQl.list(graphQl.GraphQLString),
-                removeMembers: graphQl.list(graphQl.GraphQLString)
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                description: GraphQLString,
+                addMembers: list(GraphQLString),
+                removeMembers: list(GraphQLString)
             },
             resolve: function(env) {
-                return roles.update({
+                return updateRole({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -191,14 +222,14 @@ module.exports = schemaGenerator.createObjectType({
 
         // IdProvider
         createIdProvider: {
-            type: graphQlObjectTypes.IdProviderType,
+            type: IdProviderType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                description: graphQl.GraphQLString,
-                idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
-                permissions: graphQl.list(
-                    graphQlInputTypes.IdProviderAccessControlInput
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                description: GraphQLString,
+                idProviderConfig: IdProviderConfigInput,
+                permissions: list(
+                    IdProviderAccessControlInput
                 )
             },
             resolve: function(env) {
@@ -208,7 +239,7 @@ module.exports = schemaGenerator.createObjectType({
                     idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
-                return idproviders.create({
+                return createIdProvider({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -218,14 +249,14 @@ module.exports = schemaGenerator.createObjectType({
             }
         },
         updateIdProvider: {
-            type: graphQlObjectTypes.IdProviderType,
+            type: IdProviderType,
             args: {
-                key: graphQl.nonNull(graphQl.GraphQLString),
-                displayName: graphQl.nonNull(graphQl.GraphQLString),
-                description: graphQl.GraphQLString,
-                idProviderConfig: graphQlInputTypes.IdProviderConfigInput,
-                permissions: graphQl.list(
-                    graphQlInputTypes.IdProviderAccessControlInput
+                key: nonNull(GraphQLString),
+                displayName: nonNull(GraphQLString),
+                description: GraphQLString,
+                idProviderConfig: IdProviderConfigInput,
+                permissions: list(
+                    IdProviderAccessControlInput
                 )
             },
             resolve: function(env) {
@@ -235,7 +266,7 @@ module.exports = schemaGenerator.createObjectType({
                     idProviderConfig.config = JSON.parse(idProviderConfig.config);
                 }
 
-                return idproviders.update({
+                return updateIdProvider({
                     key: env.args.key,
                     displayName: env.args.displayName,
                     description: env.args.description,
@@ -245,13 +276,14 @@ module.exports = schemaGenerator.createObjectType({
             }
         },
         deleteIdProviders: {
-            type: graphQl.list(graphQlObjectTypes.IdProviderDeleteType),
+            type: list(IdProviderDeleteType),
             args: {
-                keys: graphQl.list(graphQl.GraphQLString)
+                keys: list(GraphQLString)
             },
             resolve: function(env) {
-                return idproviders.delete(env.args.keys);
+                return deleteIdProvider(env.args.keys);
             }
         }
     }
 });
+export default mutation;

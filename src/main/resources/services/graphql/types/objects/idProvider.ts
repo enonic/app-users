@@ -9,7 +9,7 @@ import {
     IdProviderAccessEnum,
     IdProviderModeEnum
 } from '../enums';
-import { UserItemType } from './userItem';
+// import { UserItemType } from './userItem';
 import {
     getIdProviderMode,
     getPermissions
@@ -50,7 +50,8 @@ export const IdProviderConfig = schemaGenerator.createObjectType({
 export const IdProviderType = schemaGenerator.createObjectType({
     name: 'IdProvider',
     description: 'Domain representation of an id provider',
-    interfaces: [UserItemType],
+    // interfaces: [UserItemType],
+    // interfaces: [reference('UserItem')],
     fields: {
         key: {
             type: GraphQLString,
@@ -105,9 +106,8 @@ export const IdProviderType = schemaGenerator.createObjectType({
     }
 });
 
-// This seems like very bad code, trying to overwrite the state inside another module?
-// Perhaps this worked when things are bundled into one file?
-graphQlUserItem.typeResolverMap.idProviderType = exports.IdProviderType;
+// NOTE: This populates the typeResolverMap which is used inside the UserItem typeResolver
+// graphQlUserItem.typeResolverMap.idProviderType = IdProviderType;
 
 export const IdProviderDeleteType = schemaGenerator.createObjectType({
     name: 'IdProviderDelete',

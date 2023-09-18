@@ -8,7 +8,7 @@ import { AggregationType } from './aggregations';
 import { schemaGenerator } from '../../schemaUtil';
 
 
-export = schemaGenerator.createObjectType({
+export const TypesType = schemaGenerator.createObjectType({
     name: 'Types',
     fields: {
         totalCount: {
