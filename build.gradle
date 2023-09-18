@@ -111,7 +111,7 @@ tasks.register('npmBuild', NpmTask) {
 }
 
 processResources {
-    exclude 'assets/**/*.ts'
+    exclude '**/*.ts'
     exclude 'assets/**/*.less' // lessc and postcss will handle this
     exclude 'assets/**/*.woff' // postcss-url will copy
     exclude 'assets/**/*.woff2' // postcss-url will copy

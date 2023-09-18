@@ -15,6 +15,7 @@ import {
     getPermissions
 } from '/lib/idproviders';
 import { schemaGenerator } from '../../schemaUtil';
+import { ObjectTypeNames } from '../../constants';
 
 
 var IdProviderAccessControlEntryType = schemaGenerator.createObjectType({
@@ -22,7 +23,7 @@ var IdProviderAccessControlEntryType = schemaGenerator.createObjectType({
     description: 'Domain representation of id provider access control entry',
     fields: {
         principal: {
-            type: reference('Principal')
+            type: reference(ObjectTypeNames.PRINCIPAL)
         },
         access: {
             type: IdProviderAccessEnum
