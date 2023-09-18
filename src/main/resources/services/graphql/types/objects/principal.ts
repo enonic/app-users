@@ -18,7 +18,7 @@ import {
     PrincipalTypeEnum
 } from '../enums';
 import {toArray} from  '../../utils';
-
+import { ObjectTypeNames } from '../../constants';
 // import { UserItemType } from './userItem';
 // @ts-expect-error Cannot find module '/lib/util' or its corresponding type declarations.ts(2307)
 import { forceArray } from '/lib/util';
@@ -48,7 +48,7 @@ var PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
     description: 'Domain representation of access control entry',
     fields: {
         principal: {
-            type: reference('Principal'),
+            type: reference(ObjectTypeNames.PRINCIPAL),
             resolve: function (env) {
                 return getByKeys(env.source.principal);
             }
@@ -63,7 +63,7 @@ var PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
 });
 
 export const PrincipalType = schemaGenerator.createObjectType({
-    name: 'Principal',
+    name: ObjectTypeNames.PRINCIPAL,
     description: 'Domain representation of a principal',
     // interfaces: [UserItemType],
     // interfaces: [reference('UserItem')], // TODO constant
@@ -111,7 +111,7 @@ export const PrincipalType = schemaGenerator.createObjectType({
             type: GraphQLString
         },
         memberships: {
-            type: list(reference('Principal')),
+            type: list(reference(ObjectTypeNames.PRINCIPAL)),
             args: {
                 transitive: GraphQLBoolean
             },
