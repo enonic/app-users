@@ -1,9 +1,14 @@
-var principals = require('./principals');
-var common = require('./common');
+import {getMemberships} from './principals';
+import {
+    isRole,
+    isSystemAdmin,
+    isUser,
+    newConnection
+} from './common';
 
-var PERMISSIONS = ['READ', 'CREATE', 'MODIFY', 'DELETE', 'PUBLISH', 'READ_PERMISSIONS', 'WRITE_PERMISSIONS'];
+const PERMISSIONS = ['READ', 'CREATE', 'MODIFY', 'DELETE', 'PUBLISH', 'READ_PERMISSIONS', 'WRITE_PERMISSIONS'];
 
-function generateReport(principalKey, repositoryId, branch) {
+export function generateReport(principalKey, repositoryId, branch) {
     var principalKeys = getPrincipalKeys(principalKey);
     var isSystemAdmin = hasSystemAdminRole(principalKeys);
     var filters = isSystemAdmin ? null : makeRepoNodesQueryFilters(principalKeys);
@@ -29,14 +34,14 @@ function generateReport(principalKey, repositoryId, branch) {
 function getPrincipalKeys(principalKey) {
     var principalKeys = [principalKey];
 
-    if (!common.isRole(principalKey)) {
-        var membershipKeys = principals.getMemberships(principalKey, true).map(function (m) {
+    if (!isRole(principalKey)) {
+        var membershipKeys = getMemberships(principalKey, true).map(function (m) {
             return m.key;
         });
         principalKeys = principalKeys.concat(membershipKeys);
     }
 
-    if (common.isUser(principalKey)) {
+    if (isUser(principalKey)) {
         principalKeys.push('role:system.everyone');
         if (principalKey != 'user:system:anonymous') {
             principalKeys.push('role:system.authenticated');
@@ -47,7 +52,7 @@ function getPrincipalKeys(principalKey) {
 }
 
 var queryRepositoryNodes = function (repositoryId, branch, filters) {
-    var repoConn = common.newConnection(repositoryId, branch);
+    var repoConn = newConnection(repositoryId, branch);
 
     return repoConn.query({
         count: -1, // TODO Batch
@@ -74,7 +79,7 @@ function makeRepoNodesQueryFilters(principalKeys) {
 
 function hasSystemAdminRole(principalKeys) {
     return principalKeys.some(function (principalKey) {
-        return common.isSystemAdmin(principalKey);
+        return isSystemAdmin(principalKey);
     })
 }
 
@@ -110,8 +115,4 @@ var generateSystemAdminReportLine = function (node) {
     });
 
     return line.join(',');
-};
-
-module.exports = {
-    generateReport: generateReport
 };

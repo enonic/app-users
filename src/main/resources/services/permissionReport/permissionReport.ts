@@ -1,6 +1,6 @@
 var permissionReports = require('/lib/permissionReports');
 
-exports.get = function (req) {
+export function get(req) {
     var principalKey = req.params.principalKey;
     var repositoryId = req.params.repositoryId;
     var branch = req.params.branch;
