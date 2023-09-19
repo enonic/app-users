@@ -10,24 +10,24 @@ import {
     create as createIdProvider,
     delete as deleteIdProvider,
     update as updateIdProvider
-} from '/lib/idproviders';
-import {delete as deletePrincipals} from '/lib/principals';
+} from '/lib/users/idproviders';
+import {delete as deletePrincipals} from '/lib/users/principals';
 import {
     addPublicKey,
     create as createUser,
     removePublicKey,
     update as updateUser,
     updatePwd
-} from '/lib/users';
+} from '/lib/users/users';
 import {
     create as createGroup,
     update as updateGroup,
-} from '/lib/groups';
+} from '/lib/users/groups';
 import {
     create as createRole,
     update as updateRole
-} from '/lib/roles';
-import {ObjectTypeNames} from '../constants';
+} from '/lib/users/roles';
+import {ObjectTypeNames} from '/services/graphql/constants';
 import {schemaGenerator} from '../schemaUtil';
 import {
     IdProviderDeleteType,

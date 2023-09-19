@@ -1,7 +1,7 @@
 // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 import {GraphQLString} from '/lib/graphql';
 import {schemaGenerator} from '../../schemaUtil';
-import {InterfaceTypeNames} from '../../constants';
+import {InterfaceTypeNames} from '/services/graphql/constants';
 
 
 // When creating an ObjectType, it references which interfaces it's in.

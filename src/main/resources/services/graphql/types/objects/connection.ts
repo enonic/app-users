@@ -1,7 +1,7 @@
 import {
     InterfaceTypeNames,
     ObjectTypeNames
-} from '../../constants';
+} from '/services/graphql/constants';
 
 import {
     GraphQLBoolean,

@@ -9,7 +9,7 @@ import {
 import {
     getByKeys,
     getMemberships
-} from '/lib/principals';
+} from '/lib/users/principals';
 
 import {schemaGenerator} from '../../schemaUtil';
 
@@ -18,13 +18,12 @@ import {
     PrincipalTypeEnum
 } from '../enums';
 import {toArray} from  '../../utils';
-import {ObjectTypeNames} from '../../constants';
+import {ObjectTypeNames} from '/services/graphql/constants';
 import {
     UserItemType,
     typeResolverMap
 } from './userItem';
-// @ts-expect-error Cannot find module '/lib/util' or its corresponding type declarations.ts(2307)
-import {forceArray} from '/lib/util';
+import {forceArray} from '/lib/users/util';
 
 
 export const PublicKeyType = schemaGenerator.createObjectType({

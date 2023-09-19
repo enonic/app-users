@@ -1,8 +1,7 @@
 import {
     InterfaceTypeNames,
     ObjectTypeNames
-} from '../../constants';
-
+} from '/services/graphql/constants';
 import {createConnectionType} from './connection';
 import {PrincipalType} from './principal';
 import {UserItemType} from './userItem';

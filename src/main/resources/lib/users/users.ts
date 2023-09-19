@@ -13,8 +13,7 @@ import {
     modifyProfile,
     modifyUser
 } from '/lib/xp/auth';
-// @ts-expect-error Cannot find module '/lib/util' or its corresponding type declarations.ts(2307)
-import {forceArray} from '/lib/util';
+import {forceArray} from '/lib/users/util';
 
 export function create(params) {
     let key = required(params, 'key');

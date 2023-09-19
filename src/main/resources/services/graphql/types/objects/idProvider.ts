@@ -16,8 +16,8 @@ import {
 import {
     getIdProviderMode,
     getPermissions
-} from '/lib/idproviders';
-import {ObjectTypeNames} from '../../constants';
+} from '/lib/users/idproviders';
+import {ObjectTypeNames} from '/services/graphql/constants';
 import {schemaGenerator} from '../../schemaUtil';
 
 

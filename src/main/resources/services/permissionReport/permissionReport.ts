@@ -1,4 +1,4 @@
-import {generateReport} from '/lib/permissionReports';
+import {generateReport} from '/lib/users/permissionReports';
 
 export function get(req) {
     let principalKey = req.params.principalKey;

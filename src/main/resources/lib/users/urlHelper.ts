@@ -7,7 +7,7 @@ import {
     FILEPATH_MANIFEST_CJS,
     FILEPATH_MANIFEST_NODE_MODULES,
     GETTER_ROOT
-} from '../constants';
+} from '/constants';
 import ioResource from './ioResource';
 import {IS_DEV_MODE} from './runMode';
 
