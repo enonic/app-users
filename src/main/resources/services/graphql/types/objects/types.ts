@@ -5,7 +5,7 @@ import {
     // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 } from '/lib/graphql';
 import {AggregationType} from './aggregations';
-import {ObjectTypeNames} from '../../constants';
+import {ObjectTypeNames} from '/services/graphql/constants';
 import {schemaGenerator} from '../../schemaUtil';
 
 

@@ -1,33 +1,52 @@
 import type { Options } from '.';
 
-
+import { readdirSync } from 'fs';
+import { resolve } from 'path/posix';
 import { globSync } from 'glob';
 // import { polyfillNode } from 'esbuild-plugin-polyfill-node';
 // import { print } from 'q-i';
 import {
 	DIR_SRC,
-	DIR_SRC_ASSETS,
-	DIR_SRC_STATIC
+	// DIR_SRC_ASSETS,
+	// DIR_SRC_STATIC
 } from './constants';
 
+function addControllersInFolder(path: string, entry: string[]) {
+	readdirSync(resolve(`${DIR_SRC}/${path}`), {
+		withFileTypes: true
+	})
+	.filter(dirent => dirent.isDirectory())
+	.forEach(dirent => {
+		entry.push(`${DIR_SRC}/${path}/${dirent.name}/${dirent.name}.ts`);
+	});
+}
+
+function addRecursive(path: string, entry: string[]) {
+	globSync(`${DIR_SRC}/${path}/**/*.ts`).forEach(f => entry.push(f));
+}
 
 export default function buildServerConfig(): Options {
-	const GLOB_EXTENSIONS_SERVER = '{ts,js}';
-	const FILES_SERVER = globSync(
-		`${DIR_SRC}/**/*.${GLOB_EXTENSIONS_SERVER}`,
-		{
-			absolute: false,
-			ignore: globSync(`${DIR_SRC_ASSETS}/**/*.${GLOB_EXTENSIONS_SERVER}`).concat(
-				globSync(`${DIR_SRC_STATIC}/**/*.${GLOB_EXTENSIONS_SERVER}`)
-			)
-		}
-	);
+	// const GLOB_EXTENSIONS_SERVER = '{ts,js}';
+	// const FILES_SERVER = globSync(
+	// 	`${DIR_SRC}/**/*.${GLOB_EXTENSIONS_SERVER}`,
+	// 	{
+	// 		absolute: false,
+	// 		ignore: globSync(`${DIR_SRC_ASSETS}/**/*.${GLOB_EXTENSIONS_SERVER}`).concat(
+	// 			globSync(`${DIR_SRC_STATIC}/**/*.${GLOB_EXTENSIONS_SERVER}`)
+	// 		)
+	// 	}
+	// );
 	// print(FILES_SERVER, { maxItems: Infinity });
+	const entry: string[] = [];
+	addControllersInFolder('admin/tools', entry);
+	// addRecursive('lib', entry);
+	addControllersInFolder('services', entry);
+	// print(entry);
 
 	return {
 		bundle: process.env.NODE_ENV === 'production',
 		dts: false, // d.ts files are use useless at runtime
-		entry: FILES_SERVER,
+		entry,
 		// env: {
 		// 	BROWSER_SYNC_PORT: '3000',
 		// },

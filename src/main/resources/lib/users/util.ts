@@ -1,4 +1,4 @@
-exports.forceArray = function (data) {
+export function forceArray<T>(data: T|T[]): T[] {
     if (data) {
         if (Array.isArray(data)) {
             return data;
@@ -6,4 +6,4 @@ exports.forceArray = function (data) {
         return [data];
     }
     return [];
-};
+}

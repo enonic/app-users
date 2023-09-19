@@ -9,24 +9,24 @@ import {
     nonNull
     // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 } from '/lib/graphql';
-import {isAdmin} from '/lib/auth';
-import {UserItemType} from '/lib/common';
+import {isAdmin} from '/lib/users/auth';
+import {UserItemType} from '/lib/users/common';
 import {
     getByKey,
     getDefault,
     list as listIdProviders
-} from '/lib/idproviders';
+} from '/lib/users/idproviders';
 import {
     getByKeys as getPrincipalsByKeys,
     list as listPrincipals,
     Type
-} from '/lib/principals';
-import {list as listUserItems} from '/lib/useritems';
+} from '/lib/users/principals';
+import {list as listUserItems} from '/lib/users/useritems';
 import {
     getById as getRepositoryById,
     list as listRepositories
-} from '/lib/repositories';
-import {ObjectTypeNames} from '../constants';
+} from '/lib/users/repositories';
+import {ObjectTypeNames} from '/services/graphql/constants';
 import {schemaGenerator} from '../schemaUtil';
 import {TypesType} from '../types/objects/types';
 import {

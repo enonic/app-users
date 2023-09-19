@@ -3,7 +3,7 @@ import {
     nonNull
     // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 } from '/lib/graphql';
-import {InputTypeNames} from '../constants';
+import {InputTypeNames} from '/services/graphql/constants';
 import {schemaGenerator} from '../schemaUtil';
 import {IdProviderAccessEnum} from './enums';
 

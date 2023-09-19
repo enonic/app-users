@@ -1,4 +1,4 @@
-import {EnumTypeNames} from '../constants';
+import {EnumTypeNames} from '/services/graphql/constants';
 import {schemaGenerator} from '../schemaUtil';
 
 export const IdProviderModeEnum = schemaGenerator.createEnumType({
