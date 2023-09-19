@@ -11,7 +11,7 @@ import {
     delete as deleteIdProvider,
     update as updateIdProvider
 } from '/lib/idproviders';
-import { delete as deletePrincipals } from '/lib/principals';
+import {delete as deletePrincipals} from '/lib/principals';
 import {
     addPublicKey,
     create as createUser,
@@ -27,15 +27,15 @@ import {
     create as createRole,
     update as updateRole
 } from '/lib/roles';
-
-import { schemaGenerator } from '../schemaUtil';
+import {ObjectTypeNames} from '../constants';
+import {schemaGenerator} from '../schemaUtil';
 import {
     IdProviderDeleteType,
     IdProviderType,
     PrincipalDeleteType,
     PrincipalType,
     PublicKeyType
-} from '../types/objects'
+} from '../types/objects';
 import {
     IdProviderAccessControlInput,
     IdProviderConfigInput
@@ -43,7 +43,7 @@ import {
 
 
 const mutation = schemaGenerator.createObjectType({
-    name: 'Mutation',
+    name: ObjectTypeNames.Mutation,
     fields: {
         // Principal
         deletePrincipals: {
@@ -51,7 +51,7 @@ const mutation = schemaGenerator.createObjectType({
             args: {
                 keys: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return deletePrincipals(env.args.keys);
             }
         },
@@ -67,7 +67,7 @@ const mutation = schemaGenerator.createObjectType({
                 password: nonNull(GraphQLString),
                 memberships: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return createUser({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -88,7 +88,7 @@ const mutation = schemaGenerator.createObjectType({
                 addMemberships: list(GraphQLString),
                 removeMemberships: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return updateUser({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -105,7 +105,7 @@ const mutation = schemaGenerator.createObjectType({
                 key: nonNull(GraphQLString),
                 password: nonNull(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return updatePwd(env.args.key, env.args.password);
             }
         },
@@ -148,7 +148,7 @@ const mutation = schemaGenerator.createObjectType({
                 members: list(GraphQLString),
                 memberships: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return createGroup({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -169,7 +169,7 @@ const mutation = schemaGenerator.createObjectType({
                 addMemberships: list(GraphQLString),
                 removeMemberships: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return updateGroup({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -191,7 +191,7 @@ const mutation = schemaGenerator.createObjectType({
                 description: GraphQLString,
                 members: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return createRole({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -209,7 +209,7 @@ const mutation = schemaGenerator.createObjectType({
                 addMembers: list(GraphQLString),
                 removeMembers: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return updateRole({
                     key: env.args.key,
                     displayName: env.args.displayName,
@@ -232,8 +232,8 @@ const mutation = schemaGenerator.createObjectType({
                     IdProviderAccessControlInput
                 )
             },
-            resolve: function(env) {
-                var idProviderConfig = env.args.idProviderConfig;
+            resolve: function (env) {
+                let idProviderConfig = env.args.idProviderConfig;
                 if (idProviderConfig) {
                     // parse config as there's no graphql type for it
                     idProviderConfig.config = JSON.parse(idProviderConfig.config);
@@ -259,8 +259,8 @@ const mutation = schemaGenerator.createObjectType({
                     IdProviderAccessControlInput
                 )
             },
-            resolve: function(env) {
-                var idProviderConfig = env.args.idProviderConfig;
+            resolve: function (env) {
+                let idProviderConfig = env.args.idProviderConfig;
                 if (idProviderConfig) {
                     // parse config as there's no graphql type for it
                     idProviderConfig.config = JSON.parse(idProviderConfig.config);
@@ -280,7 +280,7 @@ const mutation = schemaGenerator.createObjectType({
             args: {
                 keys: list(GraphQLString)
             },
-            resolve: function(env) {
+            resolve: function (env) {
                 return deleteIdProvider(env.args.keys);
             }
         }

@@ -81,11 +81,11 @@ tasks.withType(Copy) {
   includeEmptyDirs = false
 }
 
-task bunInstall( type: NpxTask ) {
-  // Running this should not create a package-lock.json file
-  command  = 'bun'
-  args = ['install']
-}
+// task bunInstall( type: NpxTask ) {
+//   // Running this should not create a package-lock.json file
+//   command  = 'bun'
+//   args = ['install']
+// }
 
 tasks.register('lint', NpmTask) {
     dependsOn ( 'npmInstall' )

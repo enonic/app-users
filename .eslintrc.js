@@ -1,8 +1,8 @@
 module.exports = {
     extends: '@enonic/eslint-config',
     parserOptions: {
-        project: './tsconfig.json',
-        tsconfigRootDir: __dirname,
+        project: './src/main/resources/tsconfig.json',
+        // tsconfigRootDir: __dirname,
     },
     'rules': {
         'new-cap': ['warn', {'capIsNewExceptions': ['Q']}],

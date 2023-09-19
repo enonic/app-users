@@ -3,12 +3,13 @@ import {
     list
     // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 } from '/lib/graphql';
-import { toArray } from '../../utils';
-import { schemaGenerator } from '../../schemaUtil';
+import {toArray} from '../../utils';
+import {ObjectTypeNames} from '../../constants';
+import {schemaGenerator} from '../../schemaUtil';
 
 
 export const RepositoryType = schemaGenerator.createObjectType({
-    name: 'Repository',
+    name: ObjectTypeNames.Repository,
     description: 'Domain representation of a repository',
     fields: {
         id: {

@@ -11,21 +11,24 @@ import {
     getMemberships
 } from '/lib/principals';
 
-import { schemaGenerator } from '../../schemaUtil';
+import {schemaGenerator} from '../../schemaUtil';
 
 import {
     PermissionEnum,
     PrincipalTypeEnum
 } from '../enums';
 import {toArray} from  '../../utils';
-import { ObjectTypeNames } from '../../constants';
-// import { UserItemType } from './userItem';
+import {ObjectTypeNames} from '../../constants';
+import {
+    UserItemType,
+    typeResolverMap
+} from './userItem';
 // @ts-expect-error Cannot find module '/lib/util' or its corresponding type declarations.ts(2307)
-import { forceArray } from '/lib/util';
+import {forceArray} from '/lib/util';
 
 
 export const PublicKeyType = schemaGenerator.createObjectType({
-    name: 'PublicKey',
+    name: ObjectTypeNames.PublicKey,
     description: 'Public key for a user',
     fields: {
         kid: {
@@ -43,12 +46,12 @@ export const PublicKeyType = schemaGenerator.createObjectType({
     }
 });
 
-var PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
-    name: 'PrincipalAccessControlEntry',
+let PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
+    name: ObjectTypeNames.PrincipalAccessControlEntry,
     description: 'Domain representation of access control entry',
     fields: {
         principal: {
-            type: reference(ObjectTypeNames.PRINCIPAL),
+            type: reference(ObjectTypeNames.Principal),
             resolve: function (env) {
                 return getByKeys(env.source.principal);
             }
@@ -63,9 +66,9 @@ var PrincipalAccessControlEntryType = schemaGenerator.createObjectType({
 });
 
 export const PrincipalType = schemaGenerator.createObjectType({
-    name: ObjectTypeNames.PRINCIPAL,
+    name: ObjectTypeNames.Principal,
     description: 'Domain representation of a principal',
-    // interfaces: [UserItemType],
+    interfaces: [UserItemType],
     // interfaces: [reference('UserItem')], // TODO constant
     fields: {
         key: {
@@ -111,13 +114,13 @@ export const PrincipalType = schemaGenerator.createObjectType({
             type: GraphQLString
         },
         memberships: {
-            type: list(reference(ObjectTypeNames.PRINCIPAL)),
+            type: list(reference(ObjectTypeNames.Principal)),
             args: {
                 transitive: GraphQLBoolean
             },
             resolve: function (env) {
-                var key = env.source.key || env.source._id;
-                var transitive = env.args.transitive;
+                let key = env.source.key || env.source._id;
+                let transitive = env.args.transitive;
                 return toArray(getMemberships(key, transitive));
             }
         },
@@ -143,15 +146,15 @@ export const PrincipalType = schemaGenerator.createObjectType({
 });
 
 // NOTE: This populates the typeResolverMap which is used inside the UserItem typeResolver
-// graphQlUserItem.typeResolverMap.principalType = exports.PrincipalType;
+typeResolverMap.principalType = PrincipalType;
 
 export const PrincipalDeleteType = schemaGenerator.createObjectType({
-    name: 'PrincipalDelete',
+    name: ObjectTypeNames.PrincipalDelete,
     description: 'Result of a principal delete operation',
     fields: {
         key: {
             type: GraphQLString,
-            resolve: function (env) {
+            resolve(env) {
                 return env.source.key;
             }
         },

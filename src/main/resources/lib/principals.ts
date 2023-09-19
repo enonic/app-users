@@ -11,10 +11,10 @@ import {
 
 
 export function getByKeys(keys) {
-    var noKeys = keys == null || (keys instanceof Array && keys.length === 0);
+    let noKeys = keys == null || (keys instanceof Array && keys.length === 0);
 
     // users and groups have their keys as _id, but roles have them stored as key
-    var principals = noKeys ? [] : queryAll({
+    let principals = noKeys ? [] : queryAll({
         query:
             createQueryByField('_id', keys) +
             ' OR ' +
@@ -29,7 +29,7 @@ export function getMemberships(key, transitive?: boolean) {
 }
 
 export function addMemberships(key, memberships) {
-    var addMms = [].concat(memberships).map(function(current) {
+    let addMms = [].concat(memberships).map(function (current) {
         addMembers(current, key);
         return current;
     });
@@ -37,7 +37,7 @@ export function addMemberships(key, memberships) {
 }
 
 export function removeMemberships(key, memberships: string|string[]) {
-    var removeMms = [].concat(memberships).map(function(current) {
+    let removeMms = [].concat(memberships).map(function (current) {
         removeMembers(current, key);
         return current;
     });
@@ -108,9 +108,9 @@ export function list(idProviderKey, types, query, start, count, sort) {
 }
 
 function _delete(keys) {
-    return keys.map(function(key) {
+    return keys.map(function (key) {
         try {
-            var deleted = deletePrincipal(key);
+            let deleted = deletePrincipal(key);
             return {
                 key: key,
                 deleted: deleted,
@@ -125,19 +125,19 @@ function _delete(keys) {
         }
     });
 }
-export { _delete as delete };
+export {_delete as delete};
 
 export const Type = PrincipalType;
 
 
 function createPrincipalQuery(idProviderKey, types, query) {
-    var q = query ? textQuery(query) : '';
+    let q = query ? textQuery(query) : '';
     if (!types) {
         q += (q ? ' AND ' : '') + idProviderQuery(idProviderKey);
     } else {
-        var tq = '';
-        types.forEach(function(type, index) {
-            var add;
+        let tq = '';
+        types.forEach(function (type, index) {
+            let add;
             switch (type) {
                 case PrincipalType.ROLE:
                     add = rolesQuery();
@@ -156,7 +156,7 @@ function createPrincipalQuery(idProviderKey, types, query) {
 }
 
 function textQuery(query) {
-    var q = '"_allText,displayName","' + query + '","AND"';
+    let q = '"_allText,displayName","' + query + '","AND"';
     return '(fulltext(' + q + ') OR ngram(' + q + '))';
 }
 

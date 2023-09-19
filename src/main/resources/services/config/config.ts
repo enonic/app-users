@@ -15,15 +15,15 @@ export function get() {
         body: {
             adminUrl: getBaseUri(),
             appId: app.name,
-            assetsUri: assetUrl({ path: '' }),
+            assetsUri: assetUrl({path: ''}),
             toolUri: getToolUrl(
                 app.name,
                 'main'
             ),
             services: {
-                graphQlUrl: serviceUrl({ service: 'graphql' }),
-                reportServiceUrl: serviceUrl({ service: 'permissionReport' }),
-                i18nUrl: serviceUrl({ service: 'i18n' }),
+                graphQlUrl: serviceUrl({service: 'graphql'}),
+                reportServiceUrl: serviceUrl({service: 'permissionReport'}),
+                i18nUrl: serviceUrl({service: 'i18n'}),
             }
         }
     };

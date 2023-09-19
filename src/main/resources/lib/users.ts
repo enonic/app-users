@@ -7,45 +7,50 @@ import {
     getMemberships,
     updateMemberships
 } from './principals';
-var authLib = require('/lib/xp/auth');
+import {
+    changePassword,
+    createUser,
+    modifyProfile,
+    modifyUser
+} from '/lib/xp/auth';
 // @ts-expect-error Cannot find module '/lib/util' or its corresponding type declarations.ts(2307)
-import { forceArray } from '/lib/util';
+import {forceArray} from '/lib/util';
 
 export function create(params) {
-    var key = required(params, 'key');
-    var idProviderKey = idProviderFromKey(key);
-    var name = required(params, 'login');
-    var displayName = required(params, 'displayName');
-    var email = required(params, 'email');
+    let key = required(params, 'key');
+    let idProviderKey = idProviderFromKey(key);
+    let name = required(params, 'login');
+    let displayName = required(params, 'displayName');
+    let email = required(params, 'email');
 
-    var createdUser = authLib.createUser({
+    let createdUser = createUser({
         idProvider: idProviderKey,
         name: name,
         displayName: displayName,
         email: email,
     });
 
-    var mms = params.memberships;
+    let mms = params.memberships;
     if (mms && mms.length > 0) {
         addMemberships(key, mms);
     }
 
-    var password = required(params, 'password');
+    let password = required(params, 'password');
     updatePwd(key, password);
 
     populateMemberships(createdUser);
 
     return createdUser;
-};
+}
 
 export function update(params) {
-    var key = required(params, 'key');
-    var displayName = required(params, 'displayName');
+    let key = required(params, 'key');
+    let displayName = required(params, 'displayName');
 
-    var updatedUser = authLib.modifyUser({
+    let updatedUser = modifyUser({
         key: key,
         editor: function (user) {
-            var newUser = user;
+            let newUser = user;
             newUser.displayName = displayName;
             newUser.email = params.email;
             newUser.login = params.login;
@@ -62,12 +67,12 @@ export function update(params) {
     populateMemberships(updatedUser);
 
     return updatedUser;
-};
+}
 
 export function updatePwd(key, pwd) {
-    var password = pwd.replace(/\s/g, '');
+    let password = pwd.replace(/\s/g, '');
     try {
-        authLib.changePassword({
+        changePassword({
             userKey: key,
             password: password
         });
@@ -76,13 +81,13 @@ export function updatePwd(key, pwd) {
         log.error('Could not update password for [' + key + ']');
         return false;
     }
-};
+}
 
 export function removePublicKey(params) {
     const userKey = required(params, 'userKey');
     const kid = required(params, 'kid');
 
-    const updatedProfile = authLib.modifyProfile({
+    const updatedProfile = modifyProfile({
         key: userKey,
         editor: function (profile) {
             const publicKeys = forceArray(profile.publicKeys);
@@ -92,19 +97,19 @@ export function removePublicKey(params) {
     });
 
     return forceArray(updatedProfile.publicKeys).filter(key => key.kid === kid).length === 0;
-};
+}
 
 export function addPublicKey(params) {
     const userKey = required(params, 'userKey');
     const publicKey = required(params, 'publicKey');
     const label = params.label;
 
-    const kidGenerator = __.newBean('com.enonic.xp.app.users.handler.KidGeneratorHandler') as {
+    const kidGenerator = __.newBean<{
         generateKid: (publicKey: string) => string
-    };
+    }>('com.enonic.xp.app.users.handler.KidGeneratorHandler');
     const kid = kidGenerator.generateKid(publicKey);
 
-    const updatedProfile = authLib.modifyProfile({
+    const updatedProfile = modifyProfile({
         key: userKey,
         editor: function (profile) {
             const publicKeys = forceArray(profile.publicKeys);
@@ -128,7 +133,7 @@ export function addPublicKey(params) {
     });
 
     return forceArray(updatedProfile.publicKeys).filter(key => key.kid === kid)[0];
-};
+}
 
 function populateMemberships(user) {
     // eslint-disable-next-line no-param-reassign

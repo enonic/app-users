@@ -1,14 +1,24 @@
+import type {QueryNodeParams} from '/lib/xp/node';
+
+
 import {
+    ALL_USER_ITEM_TYPES,
     queryAll,
-    UserItemType
+    UserItemType,
 } from './common';
 
 
-export function list(types, query, itemIds, start, count) {
+export function list(
+    types: UserItemType[],
+    query: string,
+    itemIds?: string[],
+    start?: QueryNodeParams['start'],
+    count?: QueryNodeParams['count']
+) {
     const result = queryAll({
         query: createUserItemsQuery(query, types, itemIds),
-        start: start,
-        count: count,
+        start,
+        count,
         aggregations: {
             principalType: {
                 terms: {
@@ -23,7 +33,7 @@ export function list(types, query, itemIds, start, count) {
     return result;
 }
 
-export const Type = UserItemType;
+// export const Type = UserItemType;
 
 
 function processIdProviderAggregation(result) {
@@ -31,28 +41,32 @@ function processIdProviderAggregation(result) {
         return;
     }
 
-    var aggregationBuckets = result.aggregations.principalType.buckets;
+    let aggregationBuckets = result.aggregations.principalType.buckets;
 
-    var principalsCount = 0;
+    let principalsCount = 0;
     aggregationBuckets.forEach(function (bucket) {
         principalsCount += bucket.docCount;
     });
 
-    var idProvidersCount = result.total - principalsCount;
+    let idProvidersCount = result.total - principalsCount;
 
     if (idProvidersCount > 0) {
         aggregationBuckets.push({key: 'id_provider', docCount: '' + idProvidersCount});
     }
 }
 
-function createUserItemsQuery(query, types, itemIds) {
-    var q = createTypesQuery(types);
+function createUserItemsQuery(
+    query: string,
+    types?: UserItemType[],
+    itemIds?: string[]
+) {
+    let q = createTypesQuery(types);
     if (query) {
         q = createTextQuery(query) + ' AND ' + q;
     }
 
     if (itemIds && itemIds.length > 0) {
-        var itemsIdsQuery = '';
+        let itemsIdsQuery = '';
 
         itemIds.forEach(function (id, index) {
             itemsIdsQuery += (index > 0 ? ' OR ' : '') + '_id="' + id + '" OR _name="' + id + '"';
@@ -64,27 +78,27 @@ function createUserItemsQuery(query, types, itemIds) {
     return q;
 }
 
-function createTextQuery(query) {
-    var q = '"_allText,displayName","' + query + '","AND"';
+function createTextQuery(query: string) {
+    const q = '"_allText,displayName","' + query + '","AND"';
     return '(fulltext(' + q + ') OR ngram(' + q + '))';
 }
 
-function createTypesQuery(types) {
-    var newTypes = types || UserItemType.all();
-    var query = newTypes
-        .map(function(type) {
+function createTypesQuery(types?: UserItemType[]) {
+    const newTypes = types || ALL_USER_ITEM_TYPES;
+    let query = newTypes
+        .map(function (type) {
             switch (type) {
                 case UserItemType.ROLE:
                 case UserItemType.GROUP:
                 case UserItemType.USER:
                     return 'principalType = "' + type + '"';
-            case UserItemType.ID_PROVIDER:
+                case UserItemType.ID_PROVIDER:
                     return '(_parentPath = "/identity" AND _path != "/identity/roles")';
                 default:
                     return null;
             }
         })
-        .filter(function(typeQuery) {
+        .filter(function (typeQuery) {
             return typeQuery != null;
         });
     return '(' + query.join(' OR ') + ')';

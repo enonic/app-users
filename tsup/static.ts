@@ -83,8 +83,8 @@ export default function buildStaticConfig(): Options {
         silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
         splitting: false,
 
-        sourcemap: false,
-        // sourcemap: process.env.NODE_ENV === 'development',
+        // sourcemap: false,
+        sourcemap: process.env.NODE_ENV === 'development',
         // sourcemap: true,
 
         tsconfig: 'src/main/resources/static/tsconfig.json',

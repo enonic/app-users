@@ -14,17 +14,17 @@ import {
 
 
 export function create(params) {
-    var key = required(params, 'key');
-    var name = nameFromKey(key);
-    var displayName = required(params, 'displayName');
+    let key = required(params, 'key');
+    let name = nameFromKey(key);
+    let displayName = required(params, 'displayName');
 
-    var createdRole = createRole({
+    let createdRole = createRole({
         name: name,
         displayName: displayName,
         description: params.description
     });
 
-    var members = params.members;
+    let members = params.members;
     if (members && members.length > 0) {
         addMembers(key, members);
     }
@@ -32,20 +32,20 @@ export function create(params) {
     populateMembers(createdRole);
 
     return createdRole;
-};
+}
 
 export function update(params) {
-    var key = required(params, 'key');
-    var displayName = required(params, 'displayName');
+    let key = required(params, 'key');
+    let displayName = required(params, 'displayName');
 
     if (isSuperUserToBeRemovedFromAdmins(key, params.removeMembers)) {
         throw new Error('Can\'t remove Super User from Administrators');
     }
 
-    var modifiedRole = modifyRole({
+    let modifiedRole = modifyRole({
         key: key,
-        editor: function(role) {
-            var newRole = role;
+        editor: function (role) {
+            let newRole = role;
             newRole.displayName = displayName;
             newRole.description = params.description;
             return newRole;
@@ -57,7 +57,7 @@ export function update(params) {
     populateMembers(modifiedRole);
 
     return modifiedRole;
-};
+}
 
 function isSuperUserToBeRemovedFromAdmins(key, removeMembers) {
     return key === 'role:system.admin' && !!removeMembers && removeMembers.some((member) => member === 'user:system:su');
@@ -66,7 +66,7 @@ function isSuperUserToBeRemovedFromAdmins(key, removeMembers) {
 function populateMembers(role) {
     // eslint-disable-next-line no-param-reassign
     role.member = getMembers(role.key || role._id)
-        .map(function(member) {
+        .map(function (member) {
             return member.key;
         });
 }

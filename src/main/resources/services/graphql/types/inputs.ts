@@ -3,26 +3,27 @@ import {
     nonNull
     // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 } from '/lib/graphql';
-import { schemaGenerator } from '../schemaUtil';
-import { IdProviderAccessEnum } from './enums';
+import {InputTypeNames} from '../constants';
+import {schemaGenerator} from '../schemaUtil';
+import {IdProviderAccessEnum} from './enums';
 
 
-// eslint-disable-next-line no-unused-vars
-var PrincipalInput = schemaGenerator.createInputObjectType({
-    name: 'PrincipalInput',
-    description: 'Input definition for principal',
-    fields: {
-        key: {
-            type: nonNull(GraphQLString)
-        },
-        displayName: {
-            type: nonNull(GraphQLString)
-        }
-    }
-});
+// TODO: ASFAIK, not used anywhere?
+// schemaGenerator.createInputObjectType({
+//     name: InputTypeNames.PrincipalInput,
+//     description: 'Input definition for principal',
+//     fields: {
+//         key: {
+//             type: nonNull(GraphQLString)
+//         },
+//         displayName: {
+//             type: nonNull(GraphQLString)
+//         }
+//     }
+// });
 
 export const IdProviderAccessControlInput = schemaGenerator.createInputObjectType({
-    name: 'IdProviderAccessControlInput',
+    name: InputTypeNames.IdProviderAccessControlInput,
     description: 'Input definition for id provider access control entry',
     fields: {
         principal: {
@@ -35,7 +36,7 @@ export const IdProviderAccessControlInput = schemaGenerator.createInputObjectTyp
 });
 
 export const IdProviderConfigInput = schemaGenerator.createInputObjectType({
-    name: 'IdProviderConfigInput',
+    name: InputTypeNames.IdProviderConfigInput,
     description: 'Input definition for id provider auth config',
     fields: {
         applicationKey: {

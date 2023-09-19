@@ -4,25 +4,26 @@ import {
     nonNull
     // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 } from '/lib/graphql';
-import { AggregationType } from './aggregations';
-import { schemaGenerator } from '../../schemaUtil';
+import {AggregationType} from './aggregations';
+import {ObjectTypeNames} from '../../constants';
+import {schemaGenerator} from '../../schemaUtil';
 
 
 export const TypesType = schemaGenerator.createObjectType({
-    name: 'Types',
+    name: ObjectTypeNames.Types,
     fields: {
         totalCount: {
             type: nonNull(GraphQLInt),
-            resolve: function(env) {
-                return env.source.total;
+            resolve({source}) {
+                return source.total;
             }
         },
         aggregations: {
             type: list(AggregationType),
-            resolve: function(env) {
-                var aggregations = env.source.aggregations;
-                var aggs = [];
-                Object.keys(aggregations).forEach(function(key) {
+            resolve(env) {
+                let aggregations = env.source.aggregations;
+                let aggs = [];
+                Object.keys(aggregations).forEach(function (key) {
                     aggs.push({
                         name: key,
                         aggregation: aggregations[key].buckets
