@@ -26,25 +26,13 @@ function addRecursive(path: string, entry: string[]) {
 }
 
 export default function buildServerConfig(): Options {
-	// const GLOB_EXTENSIONS_SERVER = '{ts,js}';
-	// const FILES_SERVER = globSync(
-	// 	`${DIR_SRC}/**/*.${GLOB_EXTENSIONS_SERVER}`,
-	// 	{
-	// 		absolute: false,
-	// 		ignore: globSync(`${DIR_SRC_ASSETS}/**/*.${GLOB_EXTENSIONS_SERVER}`).concat(
-	// 			globSync(`${DIR_SRC_STATIC}/**/*.${GLOB_EXTENSIONS_SERVER}`)
-	// 		)
-	// 	}
-	// );
-	// print(FILES_SERVER, { maxItems: Infinity });
 	const entry: string[] = [];
 	addControllersInFolder('admin/tools', entry);
-	// addRecursive('lib', entry);
 	addControllersInFolder('services', entry);
 	// print(entry);
 
 	return {
-		bundle: process.env.NODE_ENV === 'production',
+		bundle: true,
 		dts: false, // d.ts files are use useless at runtime
 		entry,
 		// env: {
@@ -171,7 +159,7 @@ export default function buildServerConfig(): Options {
 		platform: 'neutral',
 		silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
 		shims: false, // https://tsup.egoist.dev/#inject-cjs-and-esm-shims
-		splitting: process.env.NODE_ENV === 'production',
+		splitting: true,
 		sourcemap: false,
 		target: 'es5',
 		tsconfig: 'src/main/resources/tsconfig.json',
