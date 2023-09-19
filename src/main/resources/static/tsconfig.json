@@ -1,8 +1,17 @@
-{
+{ // https://www.typescriptlang.org/tsconfig
     "compilerOptions": {
         "baseUrl": ".",
+        "declaration": false,
         "esModuleInterop": true, // Needed for the 'q' npm module
-        "module": "commonjs",
+        "forceConsistentCasingInFileNames": true,
+
+        // Set in tsup/static.ts instead
+        // "inlineSourceMap": true,
+        // "inlineSources": true,
+
+        // TODO: Is this the line that caused wrong line numbers?
+        // "module": "commonjs",
+
         "lib": [
             "DOM",
             "ES2020",
@@ -12,7 +21,13 @@
         "paths": {},
         "rootDir": ".",
         "skipLibCheck": true,
-        "target": "es5", // Modern browsers
+
+        // Set in tsup/static.ts instead
+        // "sourceMap": true, // Important to get correct line numbers?
+
+        // TODO: Is this the line that caused wrong line numbers?
+        // "target": "ES2020", // Modern browsers
+
         "types": [
             "hasher",
             "q",
@@ -20,6 +35,9 @@
             "owasp-password-strength-test"
           ],
     },
+    "exclude": [
+        "./**/*.d.ts"
+    ],
     "include": [
         "./**/*.ts"
     ],
