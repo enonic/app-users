@@ -26,7 +26,7 @@ export function getDefault() {
 }
 
 export function create(params) {
-    var name = required(params, 'key');
+    let name = required(params, 'key');
 
     return createIdProvider({
         name: prettifyName(name),
@@ -38,12 +38,12 @@ export function create(params) {
 }
 
 export function update(params) {
-    var key = required(params, 'key');
+    let key = required(params, 'key');
 
     return modifyIdProvider({
         key: key,
         editor: function (idProvider) {
-            var newIdProvider = idProvider;
+            let newIdProvider = idProvider;
             newIdProvider.displayName = params.displayName;
             newIdProvider.description = params.description;
             newIdProvider.idProviderConfig = params.idProviderConfig;
@@ -56,7 +56,7 @@ export function update(params) {
 function _delete(keys) {
     return deleteIdProviders({keys: keys});
 }
-export { _delete as delete };
+export {_delete as delete};
 
 export function getIdProviderMode(applicationKey) {
     return _getIdProviderMode({key:applicationKey});

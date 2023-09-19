@@ -9,21 +9,24 @@ import {
     IdProviderAccessEnum,
     IdProviderModeEnum
 } from '../enums';
-// import { UserItemType } from './userItem';
+import {
+    UserItemType,
+    typeResolverMap
+} from './userItem';
 import {
     getIdProviderMode,
     getPermissions
 } from '/lib/idproviders';
-import { schemaGenerator } from '../../schemaUtil';
-import { ObjectTypeNames } from '../../constants';
+import {ObjectTypeNames} from '../../constants';
+import {schemaGenerator} from '../../schemaUtil';
 
 
-var IdProviderAccessControlEntryType = schemaGenerator.createObjectType({
-    name: 'IdProviderAccessControlEntry',
+const IdProviderAccessControlEntryType = schemaGenerator.createObjectType({
+    name: ObjectTypeNames.IdProviderAccessControlEntry,
     description: 'Domain representation of id provider access control entry',
     fields: {
         principal: {
-            type: reference(ObjectTypeNames.PRINCIPAL)
+            type: reference(ObjectTypeNames.Principal)
         },
         access: {
             type: IdProviderAccessEnum
@@ -32,7 +35,7 @@ var IdProviderAccessControlEntryType = schemaGenerator.createObjectType({
 });
 
 export const IdProviderConfig = schemaGenerator.createObjectType({
-    name: 'IdProviderConfig',
+    name: ObjectTypeNames.IdProviderConfig,
     description: 'Domain representation of auth config for id provider',
     fields: {
         applicationKey: {
@@ -40,7 +43,7 @@ export const IdProviderConfig = schemaGenerator.createObjectType({
         },
         config: {
             type: GraphQLString,
-            resolve: function(env) {
+            resolve: function (env) {
                 return JSON.stringify(env.source.config);
                 // TODO Create object type for property array
             }
@@ -49,27 +52,27 @@ export const IdProviderConfig = schemaGenerator.createObjectType({
 });
 
 export const IdProviderType = schemaGenerator.createObjectType({
-    name: 'IdProvider',
+    name: ObjectTypeNames.IdProvider,
     description: 'Domain representation of an id provider',
-    // interfaces: [UserItemType],
+    interfaces: [UserItemType],
     // interfaces: [reference('UserItem')],
     fields: {
         key: {
             type: GraphQLString,
-            resolve: function(env) {
-                return env.source.key || env.source._name;
+            resolve({source}) {
+                return source.key || source._name;
             }
         },
         name: {
             type: GraphQLString,
-            resolve: function(env) {
-                return env.source.key || env.source._name;
+            resolve({source}) {
+                return source.key || source._name;
             }
         },
         path: {
             type: GraphQLString,
-            resolve: function(env) {
-                return '/identity/' + (env.source.key || env.source._name);
+            resolve({source}) {
+                return '/identity/' + (source.key || source._name);
             }
         },
         displayName: {
@@ -83,10 +86,10 @@ export const IdProviderType = schemaGenerator.createObjectType({
         },
         idProviderMode: {
             type: IdProviderModeEnum,
-            resolve: function(env) {
-                var idProviderKey =
-                    env.source.idProviderConfig &&
-                    env.source.idProviderConfig.applicationKey;
+            resolve({source}) {
+                let idProviderKey =
+                    source.idProviderConfig &&
+                    source.idProviderConfig.applicationKey;
                 return idProviderKey
                        ? getIdProviderMode(idProviderKey)
                        : null;
@@ -94,30 +97,30 @@ export const IdProviderType = schemaGenerator.createObjectType({
         },
         permissions: {
             type: list(IdProviderAccessControlEntryType),
-            resolve: function(env) {
-                return getPermissions(env.source.key);
+            resolve({source}) {
+                return getPermissions(source.key);
             }
         },
         modifiedTime: {
             type: GraphQLString,
-            resolve: function(env) {
-                return env.source._timestamp;
+            resolve({source}) {
+                return source._timestamp;
             }
         }
     }
 });
 
 // NOTE: This populates the typeResolverMap which is used inside the UserItem typeResolver
-// graphQlUserItem.typeResolverMap.idProviderType = IdProviderType;
+typeResolverMap.idProviderType = IdProviderType;
 
 export const IdProviderDeleteType = schemaGenerator.createObjectType({
-    name: 'IdProviderDelete',
+    name: ObjectTypeNames.IdProviderDelete,
     description: 'Result of an idProvider delete operation',
     fields: {
         key: {
             type: GraphQLString,
-            resolve: function (env) {
-                return env.source.idProviderKey;
+            resolve({source}) {
+                return source.idProviderKey;
             }
         },
         deleted: {

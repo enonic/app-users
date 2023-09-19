@@ -16,8 +16,8 @@ import {
     assetUrl,
     serviceUrl
 } from '/lib/xp/portal';
-import { localize } from '/lib/xp/i18n';
-import { immutableGetter, getAdminUrl } from '/lib/urlHelper';
+import {localize} from '/lib/xp/i18n';
+import {immutableGetter, getAdminUrl} from '/lib/urlHelper';
 import {
 	FILEPATH_MANIFEST_CJS,
 	FILEPATH_MANIFEST_NODE_MODULES,

@@ -1,19 +1,30 @@
 // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
-import { GraphQLString } from '/lib/graphql';
-import { schemaGenerator } from '../../schemaUtil';
+import {GraphQLString} from '/lib/graphql';
+import {schemaGenerator} from '../../schemaUtil';
+import {InterfaceTypeNames} from '../../constants';
 
-import {IdProviderType} from './idProvider';
-import {PrincipalType} from './principal';
 
+// When creating an ObjectType, it references which interfaces it's in.
+// Either
+// 1. The interface type must already be created
+//    (which means it's already in the schema)
+//    and it's javascript pointer can be used directly.
+// Or
+// 2. A graphql reference to a "future" type can be used,
+//    but then one must remember to actually add the interfacetype later on.
+//
+// TypeResolvers must return actual ObjectTypes, not references.
+// This object is populated after the ObjectTypes are created,
+// so it's ready when the typeResolver is called.
 export const typeResolverMap = {
-    principalType: PrincipalType,
-    idProviderType: IdProviderType
+    principalType: null,
+    idProviderType: null
 };
 
 export const UserItemType = schemaGenerator.createInterfaceType({
-    name: 'UserItem',
+    name: InterfaceTypeNames.UserItem,
     description: 'User item is a base entity for every principal or id provider',
-    typeResolver: function(source) {
+    typeResolver: function (source) {
         return source.principalType
                ? typeResolverMap.principalType
                : typeResolverMap.idProviderType;

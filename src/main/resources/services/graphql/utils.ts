@@ -7,7 +7,3 @@ export function toArray(object) {
     }
     return [object];
 }
-
-export function toInt(number, defaultValue) {
-    return number == null ? defaultValue.intValue() : number.intValue();
-}

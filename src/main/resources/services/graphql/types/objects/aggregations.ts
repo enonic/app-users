@@ -4,11 +4,12 @@ import {
     list
     // @ts-expect-error Cannot find module '/lib/graphql' or its corresponding type declarations.ts(2307)
 } from '/lib/graphql';
-import { schemaGenerator } from '../../schemaUtil';
+import {ObjectTypeNames} from '../../constants';
+import {schemaGenerator} from '../../schemaUtil';
 
 
-var BucketType = schemaGenerator.createObjectType({
-    name: 'Bucket',
+const BucketType = schemaGenerator.createObjectType({
+    name: ObjectTypeNames.Bucket,
     description: 'Aggregated result for specific key',
     fields: {
         key: {
@@ -21,7 +22,7 @@ var BucketType = schemaGenerator.createObjectType({
 });
 
 export const AggregationType = schemaGenerator.createObjectType({
-    name: 'Aggregation',
+    name: ObjectTypeNames.Aggregation,
     description: 'List of buckets',
     fields: {
         name: {
@@ -29,7 +30,7 @@ export const AggregationType = schemaGenerator.createObjectType({
         },
         buckets: {
             type: list(BucketType),
-            resolve: function(env) {
+            resolve: function (env) {
                 return env.source.aggregation;
             }
         }
@@ -39,10 +40,10 @@ export const AggregationType = schemaGenerator.createObjectType({
 export function createAggregationsField() {
     return {
         type: list(AggregationType),
-        resolve: function(env) {
-            var aggregations = env.source.aggregations;
-            var aggs = [];
-            Object.keys(aggregations).forEach(function(key) {
+        resolve: function (env) {
+            let aggregations = env.source.aggregations;
+            let aggs = [];
+            Object.keys(aggregations).forEach(function (key) {
                 aggs.push({
                     name: key,
                     aggregation: aggregations[key].buckets

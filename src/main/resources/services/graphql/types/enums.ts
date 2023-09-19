@@ -1,7 +1,8 @@
-import { schemaGenerator } from '../schemaUtil';
+import {EnumTypeNames} from '../constants';
+import {schemaGenerator} from '../schemaUtil';
 
 export const IdProviderModeEnum = schemaGenerator.createEnumType({
-    name: 'IdProviderMode',
+    name: EnumTypeNames.IdProviderMode,
     description: 'Enumeration of Id provider modes',
     values: {
         LOCAL: 'LOCAL',
@@ -11,7 +12,7 @@ export const IdProviderModeEnum = schemaGenerator.createEnumType({
 });
 
 export const SortModeEnum = schemaGenerator.createEnumType({
-    name: 'SortMode',
+    name: EnumTypeNames.SortMode,
     description: 'Enumeration of sort modes',
     values: {
         ASC: 'ASC',
@@ -20,7 +21,7 @@ export const SortModeEnum = schemaGenerator.createEnumType({
 });
 
 export const UserItemTypeEnum = schemaGenerator.createEnumType({
-    name: 'UserItemType',
+    name: EnumTypeNames.UserItemType,
     description: 'Enumeration of user item types',
     values: {
         ID_PROVIDER: 'ID_PROVIDER',
@@ -31,7 +32,7 @@ export const UserItemTypeEnum = schemaGenerator.createEnumType({
 });
 
 export const PrincipalTypeEnum = schemaGenerator.createEnumType({
-    name: 'PrincipalType',
+    name: EnumTypeNames.PrincipalType,
     description: 'Enumeration of principal types',
     values: {
         USER: 'USER',
@@ -41,7 +42,7 @@ export const PrincipalTypeEnum = schemaGenerator.createEnumType({
 });
 
 export const PermissionEnum = schemaGenerator.createEnumType({
-    name: 'Permission',
+    name: EnumTypeNames.Permission,
     description: 'Enumeration of permissions',
     values: {
         READ: 'READ',
@@ -55,7 +56,7 @@ export const PermissionEnum = schemaGenerator.createEnumType({
 });
 
 export const IdProviderAccessEnum = schemaGenerator.createEnumType({
-    name: 'IdProviderAccess',
+    name: EnumTypeNames.IdProviderAccess,
     description: 'Enumeration of id provider access permissions',
     values: {
         READ: 'READ',

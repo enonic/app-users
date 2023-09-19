@@ -25,8 +25,7 @@ export default function buildServerConfig(): Options {
 	// print(FILES_SERVER, { maxItems: Infinity });
 
 	return {
-		// bundle: true, // Needed to bundle @enonic/js-utils
-        bundle: false,
+		bundle: process.env.NODE_ENV === 'production',
 		dts: false, // d.ts files are use useless at runtime
 		entry: FILES_SERVER,
 		// env: {
@@ -153,11 +152,10 @@ export default function buildServerConfig(): Options {
 		platform: 'neutral',
 		silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
 		shims: false, // https://tsup.egoist.dev/#inject-cjs-and-esm-shims
-		// splitting: true,
-        splitting: false,
+		splitting: process.env.NODE_ENV === 'production',
 		sourcemap: false,
 		target: 'es5',
-        tsconfig: 'src/main/resources/tsconfig.json',
+		tsconfig: 'src/main/resources/tsconfig.json',
 	};
 }
 

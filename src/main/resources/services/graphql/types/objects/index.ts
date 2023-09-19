@@ -1,5 +1,10 @@
-import { createConnectionType } from './connection';
-import { PrincipalType } from './principal';
+import {
+    InterfaceTypeNames,
+    ObjectTypeNames
+} from '../../constants';
+
+import {createConnectionType} from './connection';
+import {PrincipalType} from './principal';
 import {UserItemType} from './userItem';
 
 export {
@@ -10,17 +15,17 @@ export {
     PrincipalDeleteType,
     PublicKeyType
 } from './principal';
-export { TypesType } from './types';
-export { RepositoryType } from './repository';
+export {TypesType} from './types';
+export {RepositoryType} from './repository';
 
-export { PrincipalType };
+export {PrincipalType};
 
 export const PrincipalConnectionType = createConnectionType(
-    'Principal',
+    ObjectTypeNames.Principal,
     PrincipalType
 );
 
 export const UserItemConnectionType = createConnectionType(
-    'UserItem',
+    InterfaceTypeNames.UserItem,
     UserItemType
 );
