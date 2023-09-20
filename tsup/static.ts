@@ -3,26 +3,16 @@ import type { Options } from '.';
 
 import CopyWithHashPlugin from '@enonic/esbuild-plugin-copy-with-hash';
 import TsupPluginManifest from '@enonic/tsup-plugin-manifest';
-// import { globSync } from 'glob';
 import {
 	DIR_DST,
 	DIR_SRC_STATIC
 } from './constants';
 
 
-export default function buildStaticConfig(): Options {
-	const DIR_DST_STATIC = `${DIR_DST}/static`;
-	// const GLOB_EXTENSIONS_STATIC = '{tsx,ts,jsx,js}';
-	// const FILES_STATIC = globSync(`${DIR_SRC_STATIC}/**/*.${GLOB_EXTENSIONS_STATIC}`);
+const DIR_DST_STATIC = `${DIR_DST}/static`;
 
-	// const entry = {};
-	// for (let i = 0; i < FILES_STATIC.length; i++) {
-	//     const element = FILES_STATIC[i];
-	//     entry[element
-	//         .replace(`${DIR_SRC_STATIC}/`, '') // Remove path
-	//         .replace(/\.[^.]+$/, '') // Remove extension
-	//     ] = element;
-	// }
+
+export default function buildStaticConfig(): Options {
 	return {
 		bundle: true,
 		dts: false,
@@ -71,7 +61,7 @@ export default function buildStaticConfig(): Options {
 
 		minify: false,
 		// minify: process.env.NODE_ENV !== 'development',
-		// minify: true, // Causes app-users-bundle-L6FTUX7O.js:1 Uncaught TypeError: Cannot read properties of undefined (reading 'insertChild')
+		// minify: true, // ERROR: Causes app-users-bundle-L6FTUX7O.js:1 Uncaught TypeError: Cannot read properties of undefined (reading 'insertChild')
 
 		noExternal: [ // Same as dependencies in package.json
 			/@enonic\/lib-admin-ui.*/,
@@ -85,16 +75,9 @@ export default function buildStaticConfig(): Options {
 		platform: 'browser',
 		silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
 		splitting: false,
+		sourcemap: process.env.NODE_ENV === 'development',
 
-		// Let tsconfig handle sourcemap?
-		// sourcemap: false,
-		// sourcemap: process.env.NODE_ENV === 'development'
-		// 	? 'inline' // Shows the line in the transpiled code, not the source
-		// 	? true // Shows the source typescript, but currently the wrong line number :(
-		// 	: false,
-		sourcemap: true,
-
-		// TODO: Is this the line that fixed wrong line numbers?
+		// INFO: Sourcemaps works when target is set here, rather than in tsconfig.json
 		target: 'es2020',
 
 		tsconfig: 'src/main/resources/static/tsconfig.json',

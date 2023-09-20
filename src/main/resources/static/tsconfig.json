@@ -4,28 +4,24 @@
         "declaration": false,
         "esModuleInterop": true, // Needed for the 'q' npm module
         "forceConsistentCasingInFileNames": true,
-
-        // Set in tsup/static.ts instead
-        // "inlineSourceMap": true,
-        // "inlineSources": true,
-
-        // TODO: Is this the line that caused wrong line numbers?
-        // "module": "commonjs",
-
+        "module": "commonjs",
+        "moduleResolution": "node",
         "lib": [
             "DOM",
             "ES2020",
             "ES2015.Promise"
         ],
-        "moduleResolution": "node",
         "paths": {},
         "rootDir": ".",
         "skipLibCheck": true,
 
-        // Set in tsup/static.ts instead
-        // "sourceMap": true, // Important to get correct line numbers?
+        // WARNING: Whether or not we want sourcemaps depends upon process.env.NODE_ENV,
+        // so this is set in tsup/static.ts
+        // "inlineSourceMap": false,
+        // "inlineSources": false,
+        // "sourceMap": true,
 
-        // TODO: Is this the line that caused wrong line numbers?
+        // WARNING: This causes sourcemaps to fail! Must be set in tsup/static.ts instead
         // "target": "ES2020", // Modern browsers
 
         "types": [
