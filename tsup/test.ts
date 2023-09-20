@@ -32,6 +32,8 @@ export default function buildServerConfig(): Options {
 			options.chunkNames = '_chunks/[name]-[hash]';
 
 			options.mainFields = ['module', 'main'];
+
+			options.outbase = DIR_SRC_TEST;
 		},
 		esbuildPlugins: [
 			// Some node modules might need parts of Node polyfilled:

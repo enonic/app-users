@@ -137,6 +137,10 @@ processResources {
     }
 }
 
+processTestResources {
+    exclude '**/*.ts'
+}
+
 jar {
     outputs.dir "$buildDir/resources/main"
     dependsOn( 'npmBuild', 'javadoc', 'test' )
