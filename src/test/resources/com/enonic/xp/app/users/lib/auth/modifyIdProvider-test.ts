@@ -1,8 +1,14 @@
-var t = require('/lib/xp/testing');
-var auth = require('/lib/auth');
+import {
+    assertJsonEquals
+    // @ts-expect-error Cannot find module '/lib/xp/testing' or its corresponding type declarations.ts(2307)
+} from '/lib/xp/testing';
+import {
+    modifyIdProvider as _modifyIdProvider
+} from '/lib/users/auth';
 
-exports.modifyIdProvider = function () {
-    var expectedJson = {
+
+export function modifyIdProvider() {
+    const expectedJson = {
         key: 'myIdProvider',
         displayName: 'Id provider test',
         description: 'Id provider used for testing',
@@ -74,7 +80,7 @@ exports.modifyIdProvider = function () {
         }
     };
 
-    var result = auth.modifyIdProvider({
+    const result = _modifyIdProvider({
         key: 'myIdProvider',
         editor: function (idProvider) {
             var newIdProvider = idProvider;
@@ -164,16 +170,16 @@ exports.modifyIdProvider = function () {
         ]
     });
 
-    t.assertJsonEquals(expectedJson, result);
-};
+    assertJsonEquals(expectedJson, result);
+}
 
-exports.modifyIdProviderWithNullValues = function () {
-    var expectedJson = {
+export function modifyIdProviderWithNullValues() {
+    const expectedJson = {
         key: 'myIdProvider',
         displayName: 'Id provider test'
     };
 
-    var result = auth.modifyIdProvider({
+    const result = _modifyIdProvider({
         key: 'myIdProvider',
         editor: function (idProvider) {
             idProvider.description = null;
@@ -182,5 +188,5 @@ exports.modifyIdProviderWithNullValues = function () {
         }
     });
 
-    t.assertJsonEquals(expectedJson, result);
-};
+    assertJsonEquals(expectedJson, result);
+}

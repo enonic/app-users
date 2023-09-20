@@ -1,32 +1,18 @@
 import type { Options } from '.';
 
 // import { polyfillNode } from 'esbuild-plugin-polyfill-node';
-import { globSync } from 'glob';
 // import { print } from 'q-i';
-import {
-	DIR_SRC,
-	DIR_SRC_ASSETS,
-	DIR_SRC_STATIC
-} from './constants';
-// import {addControllersInFolder} from './addControllersInFolder';
-// import {addRecursive} from './addRecursive';
+import { DIR_SRC_TEST } from './constants';
+import {addRecursive} from './addRecursive';
 
 
 export default function buildServerConfig(): Options {
-	const entry = globSync(`${DIR_SRC}/**/*.ts`, {
-		absolute: false,
-		ignore: globSync(`${DIR_SRC_ASSETS}/**/*.ts`).concat(
-			globSync(`${DIR_SRC_STATIC}/**/*.ts`)
-		)
-	});
-	// const entry: string[] = [];
-	// addRecursive(`${DIR_SRC}/lib`, entry)
-	// addControllersInFolder(`${DIR_SRC}/admin/tools`, entry);
-	// addControllersInFolder(`${DIR_SRC}/services`, entry);
+	const entry: string[] = [];
+	addRecursive(DIR_SRC_TEST, entry);
 	// print(entry);
 
 	return {
-		bundle: true, // Needed for @enonic/lib-admin-ui
+		bundle: true,
 		dts: false, // d.ts files are use useless at runtime
 		entry,
 		// env: {
@@ -107,20 +93,7 @@ export default function buildServerConfig(): Options {
 			// }) // ReferenceError: "navigator" is not defined
 		],
 		external: [
-			'/lib/cache',
-			'/lib/enonic/static',
-			/^\/lib\/guillotine/,
-			'/lib/graphql',
-			'/lib/graphql-connection',
-			'/lib/http-client',
-			'/lib/license',
-			'/lib/mustache',
-			'/lib/router',
-			'/lib/util',
-			'/lib/vanilla',
-			'/lib/text-encoding',
-			'/lib/thymeleaf',
-			/^\/lib\/xp\//,
+			/^\//,
 		],
 		format: 'cjs',
 		inject: [
@@ -153,13 +126,10 @@ export default function buildServerConfig(): Options {
 		platform: 'neutral',
 		silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
 		shims: false, // https://tsup.egoist.dev/#inject-cjs-and-esm-shims
-
-		splitting: false, // In order for tests to work
-		// splitting: true,
-
+		splitting: true,
 		sourcemap: false,
 		target: 'es5',
-		tsconfig: `${DIR_SRC}/tsconfig.json`,
+		tsconfig: `${DIR_SRC_TEST}/tsconfig.json`,
 	};
 }
 

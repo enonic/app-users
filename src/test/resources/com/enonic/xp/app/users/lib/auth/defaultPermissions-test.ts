@@ -1,11 +1,15 @@
-var t = require('/lib/xp/testing');
-var auth = require('/lib/auth');
+import {
+    assertJsonEquals
+    // @ts-expect-error Cannot find module '/lib/xp/testing' or its corresponding type declarations.ts(2307)
+} from '/lib/xp/testing';
+import {
+    defaultPermissions as _defaultPermissions
+} from '/lib/users/auth';
 
-exports.defaultPermissions = function () {
 
-    var result = auth.defaultPermissions();
-
-    var expectedJson = [
+export function defaultPermissions() {
+    const result = _defaultPermissions();
+    const expectedJson = [
         {
             principal: {
                 'type': 'user',
@@ -20,7 +24,5 @@ exports.defaultPermissions = function () {
             access: 'ADMINISTRATOR'
         }
     ];
-
-    t.assertJsonEquals(expectedJson, result);
-
-};
+    assertJsonEquals(expectedJson, result);
+}

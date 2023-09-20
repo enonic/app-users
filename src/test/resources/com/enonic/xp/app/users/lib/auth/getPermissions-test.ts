@@ -1,11 +1,16 @@
-var t = require('/lib/xp/testing');
-var auth = require('/lib/auth');
+import {
+    assertEquals,
+    assertJsonEquals
+    // @ts-expect-error Cannot find module '/lib/xp/testing' or its corresponding type declarations.ts(2307)
+} from '/lib/xp/testing';
+import {
+    getPermissions as _getPermissions
+} from '/lib/users/auth';
 
-exports.getPermissions = function () {
 
-    var result = auth.getPermissions({key: 'myIdProvider'});
-
-    var expectedJson = [
+export function getPermissions() {
+    const result = _getPermissions({key: 'myIdProvider'});
+    const expectedJson = [
         {
             principal: {
                 'type': 'user',
@@ -30,17 +35,11 @@ exports.getPermissions = function () {
             access: 'CREATE_USERS'
         }
     ];
+    assertJsonEquals(expectedJson, result);
+}
 
-    t.assertJsonEquals(expectedJson, result);
-
-};
-
-exports.getNonExistingPermissions = function () {
-
-    var result = auth.getPermissions({key: 'myIdProvider'});
-
-    var length = result.length;
-
-    t.assertEquals(0, length);
-
-};
+export function getNonExistingPermissions() {
+    const result = _getPermissions({key: 'myIdProvider'});
+    const length = result.length;
+    assertEquals(0, length);
+}

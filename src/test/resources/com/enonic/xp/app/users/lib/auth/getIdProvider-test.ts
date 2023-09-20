@@ -1,11 +1,16 @@
-var t = require('/lib/xp/testing');
-var auth = require('/lib/auth');
+import {
+    assertEquals,
+    assertJsonEquals
+    // @ts-expect-error Cannot find module '/lib/xp/testing' or its corresponding type declarations.ts(2307)
+} from '/lib/xp/testing';
+import {
+    getIdProvider as _getIdProvider
+} from '/lib/users/auth';
 
-exports.getIdProvider = function () {
 
-    var result = auth.getIdProvider({key: 'myIdProvider'});
-
-    var expectedJson = {
+export function getIdProvider() {
+    const result = _getIdProvider({key: 'myIdProvider'});
+    const expectedJson = {
         key: 'myIdProvider',
         displayName: 'Id provider test',
         description: 'Id provider used for testing',
@@ -78,15 +83,10 @@ exports.getIdProvider = function () {
             ]
         }
     };
+    assertJsonEquals(expectedJson, result);
+}
 
-    t.assertJsonEquals(expectedJson, result);
-
-};
-
-exports.getNonExistingIdProvider = function () {
-
-    var result = auth.getIdProvider({key: 'myIdProvider'});
-
-    t.assertEquals(null, result);
-
-};
+export function getNonExistingIdProvider() {
+    const result = _getIdProvider({key: 'myIdProvider'});
+    assertEquals(null, result);
+}
