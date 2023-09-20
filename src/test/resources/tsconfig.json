@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        // "rootDir": "../../main/resources"
+        "paths": {
+            "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
+            "/*": ["../../main/resources/*"]
+        },
+        "skipLibCheck": true,
+        "types": [
+            "@enonic-types/global"
+            // "global" // When typeRoots is set the prefix @enonic-types/ must be removed.
+        ],
+    },
+    "include": [
+        "./**/*.ts"
+    ]
+}

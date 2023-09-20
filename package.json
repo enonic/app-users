@@ -8,16 +8,17 @@
     "url": "https://github.com/enonic/app-users"
   },
   "scripts": {
-    "build": "concurrently -c auto -g --timings npm:build:*",
-    "build:css": "postcss -o build/resources/main/assets/styles/main.css build/less/main.css",
-    "build:server": "tsup -d build/resources/main",
-    "build:static": "tsup -d build/resources/main/static",
+    "build": "concurrently -c auto -g --timings npm:build:main:*",
+    "build:main:css": "postcss -o build/resources/main/assets/styles/main.css build/less/main.css",
+    "build:main:server": "tsup -d build/resources/main",
+    "build:main:static": "tsup -d build/resources/main/static",
+    "build:tests": "tsup -d build/resources/test",
     "check:types": "tsc --pretty --skipLibCheck --noEmit",
     "clean": "del build",
     "fix": "eslint --fix src/**/*.ts --cache",
     "less": "lessc --source-map src/main/resources/assets/styles/main.less build/less/main.css",
     "lint": "eslint src/**/*.ts --quiet --cache",
-    "prebuild:css": "npm run less"
+    "prebuild:main:css": "npm run less"
   },
   "dependencies": {
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
