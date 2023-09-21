@@ -27,6 +27,7 @@ import {
 const TOOL_NAME = 'main';
 const VIEW = resolve('./main.html');
 
+// @ts-expect-error A function with a name starting with an uppercase letter should only be used as a constructor
 const router = Router();
 
 router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
