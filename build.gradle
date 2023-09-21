@@ -25,6 +25,10 @@ configurations {
     }
 }
 
+compileJava {
+    options.release = 11
+}
+
 apply from: "$projectDir/gradle/env.gradle"
 apply from: "$projectDir/gradle/node.gradle"
 apply from: "$projectDir/gradle/lib-admin.gradle"
