@@ -66,7 +66,7 @@ repositories {
 }
 
 tasks.register('npmCheck', NpmTask) {
-	dependsOn npmInstall
+	dependsOn( 'npmInstall' )
 	args = [
 		'run',
 		'check:types'
@@ -75,17 +75,10 @@ tasks.register('npmCheck', NpmTask) {
 		'FORCE_COLOR': 'true',
 	]
 }
-check.dependsOn npmCheck
 
-tasks.withType(Copy) {
-  includeEmptyDirs = false
+tasks.withType(Copy).configureEach {
+    includeEmptyDirs = false
 }
-
-// task bunInstall( type: NpxTask ) {
-//   // Running this should not create a package-lock.json file
-//   command  = 'bun'
-//   args = ['install']
-// }
 
 tasks.register('lint', NpmTask) {
     dependsOn ( 'npmInstall' )
@@ -93,7 +86,8 @@ tasks.register('lint', NpmTask) {
     args = ['run', 'lint']
     outputs.upToDateWhen { false }
 }
-check.dependsOn lint
+
+check.dependsOn( 'lint', 'npmCheck' )
 
 tasks.register('npmBuild', NpmTask) {
     dependsOn( 'npmInstall' )
@@ -111,7 +105,7 @@ tasks.register('npmBuild', NpmTask) {
 }
 
 tasks.register('npmBuildTests', NpmTask) {
-    dependsOn( 'npmBuild' )
+    dependsOn( 'npmBuild', 'processTestResources' )
     environment = [
         'FORCE_COLOR': 'true',
         'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
@@ -123,7 +117,6 @@ tasks.register('npmBuildTests', NpmTask) {
     outputs.dir "$buildDir/build/resources/test"
     inputs.file 'tsup.config.ts'
 }
-test.dependsOn npmBuildTests
 
 processResources {
     exclude '**/*.ts'
@@ -147,6 +140,8 @@ jar {
 }
 
 test {
+    dependsOn( 'npmBuildTests' )
+
     useJUnitPlatform()
     systemProperty 'java.awt.headless', 'true'
     jvmArgs '-noverify', '-XX:TieredStopAtLevel=1'
