@@ -5,6 +5,7 @@
         "esModuleInterop": true, // Needed for the 'q' npm module
         "forceConsistentCasingInFileNames": true,
         "module": "commonjs",
+        "target": "es5",
         "moduleResolution": "node",
         "lib": [
             "DOM",
