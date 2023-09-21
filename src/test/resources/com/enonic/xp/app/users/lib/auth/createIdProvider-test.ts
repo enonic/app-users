@@ -35,8 +35,8 @@ function createAndAssert(params) {
                     ]
                 },
                 {
-                    name: "sessionTimeout",
-                    type: "Long",
+                    name: 'sessionTimeout',
+                    type: 'Long',
                     values: [{}]
                 },
                 {
@@ -111,8 +111,8 @@ export function createIdProvider() {
                     ]
                 },
                 {
-                    name: "sessionTimeout",
-                    type: "Long",
+                    name: 'sessionTimeout',
+                    type: 'Long',
                     values: [
                         {
                             v: null

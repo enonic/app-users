@@ -34,8 +34,8 @@ export function modifyIdProvider() {
                     ]
                 },
                 {
-                    name: "sessionTimeout",
-                    type: "Long",
+                    name: 'sessionTimeout',
+                    type: 'Long',
                     values: [{}]
                 },
                 {
@@ -83,7 +83,7 @@ export function modifyIdProvider() {
     const result = _modifyIdProvider({
         key: 'myIdProvider',
         editor: function (idProvider) {
-            var newIdProvider = idProvider;
+            let newIdProvider = idProvider;
             newIdProvider.displayName = 'Id provider test';
             newIdProvider.description = 'Id provider used for testing';
             newIdProvider.idProviderConfig = {
@@ -108,8 +108,8 @@ export function modifyIdProvider() {
                         ]
                     },
                     {
-                        name: "sessionTimeout",
-                        type: "Long",
+                        name: 'sessionTimeout',
+                        type: 'Long',
                         values: [
                             {
                                 v: null
@@ -156,7 +156,7 @@ export function modifyIdProvider() {
                     }
                 ]
             };
-            return newIdProvider
+            return newIdProvider;
         },
         permissions: [
             {

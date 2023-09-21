@@ -36,9 +36,9 @@ export function getIdProvider() {
                     ]
                 },
                 {
-                    "name": "sessionTimeout",
-                    "type": "Long",
-                    "values": [
+                    'name': 'sessionTimeout',
+                    'type': 'Long',
+                    'values': [
                         {}
                     ]
                 },
@@ -71,14 +71,14 @@ export function getIdProvider() {
                     ]
                 },
                 {
-                    "name": "emptySet",
-                    "type": "PropertySet",
-                    "values": []
+                    'name': 'emptySet',
+                    'type': 'PropertySet',
+                    'values': []
                 },
                 {
-                    "name": "defaultGroups",
-                    "type": "Reference",
-                    "values": []
+                    'name': 'defaultGroups',
+                    'type': 'Reference',
+                    'values': []
                 }
             ]
         }
