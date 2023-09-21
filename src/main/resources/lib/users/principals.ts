@@ -6,7 +6,10 @@ import {
 } from './common';
 import {
     deletePrincipal,
-    getMemberships as _getMemberships
+    getMemberships as _getMemberships,
+    getMembers as _getMembers,
+    removeMembers as _removeMembers,
+    addMembers as _addMembers
 } from '/lib/xp/auth';
 
 
@@ -54,12 +57,12 @@ export function updateMemberships(key, addMms, removeMms?: string|string[]) {
 }
 
 export function getMembers(key) {
-    return authLib.getMembers(key);
+    return _getMembers(key);
 }
 
 export function addMembers(key, members) {
     try {
-        authLib.addMembers(key, members);
+        _addMembers(key, members);
     } catch (e) {
         log.error(
             'Could not add members ' +
@@ -75,7 +78,7 @@ export function addMembers(key, members) {
 
 export function removeMembers(key, members) {
     try {
-        authLib.removeMembers(key, members);
+        _removeMembers(key, members);
     } catch (e) {
         log.error(
             'Could not remove members ' +
