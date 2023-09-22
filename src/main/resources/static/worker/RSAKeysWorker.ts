@@ -40,5 +40,3 @@ async function exportPublicKey(key) {
 self.onmessage = (e: MessageEvent<string>) => {
     generateRSAKeys();
 };
-
-export {};
