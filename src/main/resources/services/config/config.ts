@@ -6,7 +6,9 @@ import {
     assetUrl,
     serviceUrl
 } from '/lib/xp/portal';
+import {getAdminUrl} from '/lib/users/urlHelper';
 
+const TOOL_NAME = 'main';
 
 export function get() {
     return {
@@ -18,8 +20,11 @@ export function get() {
             assetsUri: assetUrl({path: ''}),
             toolUri: getToolUrl(
                 app.name,
-                'main'
+                TOOL_NAME
             ),
+            cryptoWorkerUrl: getAdminUrl({
+                path: 'worker/RSAKeysWorker.js'
+            }, TOOL_NAME),
             services: {
                 graphQlUrl: serviceUrl({service: 'graphql'}),
                 reportServiceUrl: serviceUrl({service: 'permissionReport'}),
