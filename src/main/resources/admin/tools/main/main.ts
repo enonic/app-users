@@ -39,6 +39,9 @@ function get(_request: Request): Response {
         appUsersBundleUrl: getAdminUrl({
             path: 'main.js'
         }, TOOL_NAME),
+        cryptoWorkerUrl: getAdminUrl({
+            path: 'worker/RSAKeysWorker.js'
+        }, TOOL_NAME),
         assetsUri: assetUrl({path: ''}),
         appName: localize({
             key: 'admin.tool.displayName',
