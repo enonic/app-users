@@ -1,6 +1,7 @@
 const path = require('path');
 let PropertiesReader = require('properties-reader');
 const {TimelineService} = require('wdio-timeline-reporter/timeline-service');
+const file = path.join(__dirname, '/browser.properties');
 const properties = PropertiesReader(file);
 const browser_version = properties.get('browser.version');
 exports.config = {
