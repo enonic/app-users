@@ -24,6 +24,7 @@ import {
 const body = Body.get();
 
 InputTypeManager.register(new Class('AuthApplicationSelector', AuthApplicationSelector));
+InputTypeManager.register(new Class('PrincipalSelector', PrincipalSelector));
 
 function getApplication(): Application {
     const assetsUri: string = CONFIG.getString('assetsUri');
@@ -87,5 +88,3 @@ function startApplication() {
     await i18nInit(CONFIG.getString('services.i18nUrl'));
     startApplication();
 })();
-
-InputTypeManager.register(new Class('PrincipalSelector', PrincipalSelector), true);
