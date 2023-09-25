@@ -18,7 +18,7 @@ class GridContextMenu extends Page {
     async waitForContextMenuVisible() {
         try {
             await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
-            return await this.pause(400);
+            return await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_grid_context_menu');
             throw new Error(`tree grid context menu is not loaded, screenshot: ` + screenshot + '  ' + err);
@@ -42,26 +42,30 @@ class GridContextMenu extends Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Grid context menu - Edit menu item is not enabled after 3 seconds'});
     }
 
-
-    isEditMenuItemDisabled() {
-        return this.getAttribute(XPATH.container + XPATH.editMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
+    async waitForMenuItemEnabled(menuItem) {
+        try {
+            let locator = XPATH.container + lib.menuItemByName(menuItem);
+            await this.getBrowser().waitUntil(async () => {
+                let text = await this.getAttribute(locator, 'class');
+                return !text.includes('disabled');
+            }, {timeout: appConst.shortTimeout, timeoutMsg: "Context menu item should be enabled"});
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_context_menu');
+            throw new Error("The grid-context menu item should be enabled, screenshot: " + screenshot + ' ' + err);
+        }
     }
 
-    async isNewRoleMenuItemDisabled() {
-        let result = await this.getAttribute(XPATH.container + XPATH.newRoleMenuItem, 'class');
-        return result.includes('disabled');
-    }
-
-    async isDeleteMenuItemDisabled() {
-        let result = await this.getAttribute(XPATH.deleteMenuItem, 'class');
-        return result.includes('disabled');
-    }
-
-    async isNewMenuItemDisabled() {
-        let result = await this.getAttribute(XPATH.container + XPATH.newMenuItem, 'class');
-        return result.includes('disabled');
+    async waitForMenuItemDisabled(menuItem) {
+        try {
+            let locator = XPATH.container + lib.menuItemByName(menuItem);
+            await this.getBrowser().waitUntil(async () => {
+                let text = await this.getAttribute(locator, 'class');
+                return text.includes('disabled');
+            }, {timeout: appConst.shortTimeout, timeoutMsg: "Context menu item should be enabled"});
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_context_menu');
+            throw new Error("The grid-context menu item should be disabled, screenshot: " + screenshot + ' ' + err);
+        }
     }
 
     // returns array with menu-items
