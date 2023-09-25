@@ -66,7 +66,7 @@ describe('User Browse Panel specification', function () {
             assert.equal(result, '1', '1 should be displayed in the selection-toggler button');
         });
 
-    //Verifies - https://github.com/enonic/app-users/issues/340  Empty TreeGrid when toggling Selection
+    // Verifies - https://github.com/enonic/app-users/issues/340  Empty TreeGrid when toggling Selection
     it("GIVEN 'System Id Provider' checkbox is checked WHEN SelectionPanelToggler has been clicked THEN grid gets filtered - one item should be in the grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
@@ -82,8 +82,8 @@ describe('User Browse Panel specification', function () {
             assert.equal(names[0], 'System Id Provider', 'The name of the folder should be System Id Provider');
         });
 
-    //Verifies https://github.com/enonic/lib-admin-ui/issues/1790
-    //Case 2: Grid gets empty after openein/closing Details Panel (or resizing the browser window)
+    // Verifies https://github.com/enonic/lib-admin-ui/issues/1790
+    // Case 2: Grid gets empty after openein/closing Details Panel (or resizing the browser window)
     it("GIVEN 'Selection Controller' checkbox has been clicked WHEN 'Selection Toggler' has been clicked THEN grid gets filtered - only provider-folders should be present in grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
