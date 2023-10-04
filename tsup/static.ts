@@ -21,16 +21,9 @@ export default function buildStaticConfig(): Options {
 			'app-users-bundle': 'src/main/resources/static/main.ts',
 			'crypto-worker': 'src/main/resources/static/worker/RSAKeysWorker.ts',
 		},
-		// esbuildOptions(options, context) {
-		// 	// options.banner = {
-		// 	//     js: `const jQuery = window.$;` // jQuery UI Tabbable requires this
-		// 	// };
-		// 	// options.external = [
-		// 	//     'jquery'
-		// 	// ]
-		// 	// options.sourcemap = 'external'; // Shows the line in the transpiled code, not the source
-		// 	// options.sourcemap = 'both'; // // Shows the line in the transpiled code, not the source
-		// },
+		esbuildOptions(options, context) {
+			options.keepNames = true;
+		},
 		esbuildPlugins: [
 			CopyWithHashPlugin({
 				context: 'node_modules',
@@ -60,13 +53,10 @@ export default function buildStaticConfig(): Options {
 		],
 
 		minify: false,
-		// minify: process.env.NODE_ENV !== 'development',
-		// minify: true, // ERROR: Causes app-users-bundle-L6FTUX7O.js:1 Uncaught TypeError: Cannot read properties of undefined (reading 'insertChild')
 
 		noExternal: [ // Same as dependencies in package.json
 			/@enonic\/lib-admin-ui.*/,
 			'hasher',
-			// 'jquery', // This will bundle jQuery into the bundle
 			'nanoid',
 			'owasp-password-strength-test',
 			'q'
