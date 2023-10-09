@@ -30,7 +30,7 @@ export default function buildStaticConfig(): Options {
 				manifest: `node_modules-manifest.json`,
 				patterns: [
 					'jquery/dist/*.*',
-					'jquery-ui/dist/*.*',
+					'jquery-ui-dist/*.*',
 				]
 			}),
 			TsupPluginManifest({
