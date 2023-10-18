@@ -1,30 +1,32 @@
-{
+{ // https://www.typescriptlang.org/tsconfig
   "compilerOptions": {
+    "declaration": false,
+    "esModuleInterop": true, // Needed for the 'q' npm module
+    "lib": [
+        "es2015",
+        "es2015.promise",
+        "dom"
+    ],
     "module": "commonjs",
-    "target": "es5",
-    "sourceMap": true,
+    "sourceMap": true, // Important to get correct line numbers?
+
+    // We set target in tsup.config.ts instead
+    // "target": "es5",
+
     "types": [
       "hasher",
       "q",
       "nanoid",
       "owasp-password-strength-test"
-    ],
-    "lib": [
-      "es2015",
-      "es2015.promise",
-      "dom"
     ]
   },
-  "files": [
-    "./src/main/resources/assets/js/main.ts"
-  ],
   "exclude": [
     "build/**/*",
     "out/**/*",
-    "node_modules/*"
+    "node_modules/*",
+    "src/main/resources/**/*"
   ],
   "include": [
-    "src/**/*",
     "../lib-admin-ui/src/main/resources/assets/admin/common/js/_**/*.ts",
     ".xp/dev/lib-admin-ui/**/*.ts"
   ]

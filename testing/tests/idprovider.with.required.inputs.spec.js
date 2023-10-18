@@ -59,6 +59,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await confirmationDialog.waitForDialogLoaded();
             // 4. Click on 'Yes' button:
             await confirmationDialog.clickOnYesButton();
+            await userBrowsePanel.pause(1000);
             // 5. Expected notification message should appear:
             await testUtils.saveScreenshot('provider_save_before_close_yes');
             let message = await idProviderWizard.waitForNotificationMessage();

@@ -4,7 +4,6 @@
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const itemBuilders = require('../../libs/userItems.builder');
 const XPATH = {
     displayNameInput: `//input[contains(@name,'displayName')]`,
     saveButton: "//button[contains(@id,'ActionButton') and child::span[text()='Save']]",
@@ -25,19 +24,26 @@ class WizardPanel extends Page {
         return XPATH.deleteButton;
     }
 
-    waitForSaveButtonEnabled() {
-        return this.waitForElementEnabled(this.saveButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot("err_save_button");
-            throw new Error("Save button is not enabled: " + err);
-        })
+    async waitForSaveButtonEnabled() {
+        try {
+            return await this.waitForElementEnabled(this.saveButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_wizard_save_btn');
+            throw new Error('Save button should be enabled, screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     isSaveButtonEnabled() {
         return this.isElementEnabled(this.saveButton);
     }
 
-    waitForSaveButtonDisabled() {
-        return this.waitForElementDisabled(this.saveButton, appConst.mediumTimeout);
+    async waitForSaveButtonDisabled() {
+        try {
+            return await this.waitForElementDisabled(this.saveButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_wizard_save_btn');
+            throw new Error('Save button should be disabled, screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     waitForDeleteButtonDisabled() {
@@ -58,20 +64,22 @@ class WizardPanel extends Page {
 
     async waitAndClickOnSave() {
         try {
-            await this.waitForSaveButtonEnabled();
+            await this.waitForElementEnabled(this.saveButton, appConst.mediumTimeout);
             await this.clickOnElement(this.saveButton);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot(lib.generateRandomName("err_save_button"));
-            throw new Error("Error when Save button has been clicked!" + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_wizard_save_btn');
+            throw new Error('Error during clicking on Save, screenshot: ' + screenshot + ' ' + err);
         }
     }
 
-    clickOnDeleteButton() {
-        return this.clickOnElement(this.deleteButton).catch(err => {
-            this.saveScreenshot('err_delete_wizard');
-            throw new Error('Error when Delete button has been clicked ' + err);
-        });
+    async clickOnDeleteButton() {
+        try {
+            await this.clickOnElement(this.deleteButton)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_delete_wizard');
+            throw new Error('Error during clicking on Delete button, screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     async isItemInvalid(displayName) {
