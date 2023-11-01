@@ -17,7 +17,7 @@ import {
     serviceUrl
 } from '/lib/xp/portal';
 import {localize} from '/lib/xp/i18n';
-import {immutableGetter, getAdminUrl} from '/lib/users/urlHelper';
+import {immutableGetter, getAdminUrl, getAdminNodeModuleUrl} from '/lib/users/urlHelper';
 import {
 	// FILEPATH_MANIFEST_CJS,
 	FILEPATH_MANIFEST_NODE_MODULES,
@@ -46,14 +46,15 @@ function get(_request: Request): Response {
             locale: getLocales()
         }),
         configServiceUrl: serviceUrl({service: 'config'}),
-        jqueryUrl: getAdminUrl({
-            manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-            path: 'jquery/dist/jquery.min.js',
-        }, TOOL_NAME),
-        jqueryUiUrl: getAdminUrl({
-            manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-            path: 'jquery-ui-dist/jquery-ui.min.js',
-        }, TOOL_NAME),
+        dompurifyUrl: getAdminNodeModuleUrl('dompurify/dist/purify.min.js', TOOL_NAME),
+        signalsUrl: getAdminNodeModuleUrl('signals/dist/signals.min.js', TOOL_NAME),
+        hasherUrl: getAdminNodeModuleUrl('hasher/dist/js/hasher.min.js', TOOL_NAME),
+        jqueryUrl: getAdminNodeModuleUrl('jquery/dist/jquery.min.js', TOOL_NAME),
+        jqueryUiUrl: getAdminNodeModuleUrl('jquery-ui-dist/jquery-ui.min.js', TOOL_NAME),
+        mousetrapUrl: getAdminNodeModuleUrl('mousetrap/mousetrap.min.js', TOOL_NAME),
+        owaspUrl: getAdminNodeModuleUrl('owasp-password-strength-test/owasp-password-strength-test.js', TOOL_NAME),
+        // qUrl: getAdminNodeModuleUrl('q/q.js', TOOL_NAME),
+        legacySlickgridUrl: getAdminNodeModuleUrl('@enonic/legacy-slickgrid/index.js', TOOL_NAME),
         launcherPath: getLauncherPath(),
     };
 
@@ -66,7 +67,6 @@ function get(_request: Request): Response {
     };
 }
 
-router.get('', (r: Request) => get(r)); // Default admin tool path
-router.get('/', (r: Request) => get(r)); // Just in case someone adds a slash on the end
+router.get('/?', (r: Request) => get(r));
 
 export const all = (r: Request) => router.dispatch(r);

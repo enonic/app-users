@@ -30,7 +30,7 @@
     },
     "exclude": [
         "./assets/**/*",
-        "./static/**/*",
+        "./_static/**/*",
     ],
     "include": [
         "./**/*.ts"

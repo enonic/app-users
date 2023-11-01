@@ -1,15 +1,18 @@
 import type { Options } from '.';
 
 import esbuildPluginExternalGlobal from 'esbuild-plugin-external-global';
-
+import {
+	DIR_DST_ASSETS,
+	DIR_SRC_ASSETS
+} from './constants';
 
 export default function buildAssetConfig(): Options {
     return {
         bundle: true,
         dts: false, // d.ts files are use useless at runtime
         entry: {
-            'js/app-users-bundle': 'src/main/resources/assets/js/main.ts',
-            'js/crypto-worker': 'src/main/resources/assets/js/worker/RSAKeysWorker.ts',
+            'js/app-users-bundle': `${DIR_SRC_ASSETS}/js/main.ts`,
+            'js/crypto-worker': `${DIR_SRC_ASSETS}/js/worker/RSAKeysWorker.ts`,
         },
         esbuildOptions(options, context) {
             options.banner = {
@@ -33,10 +36,10 @@ export default function buildAssetConfig(): Options {
             'owasp-password-strength-test',
             'q'
         ],
-        outDir: 'build/resources/main/assets',
+        outDir: DIR_DST_ASSETS,
         platform: 'browser',
         silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
         sourcemap: process.env.NODE_ENV === 'development',
-        tsconfig: 'src/main/resources/assets/tsconfig.json',
+        tsconfig: `${DIR_SRC_ASSETS}/tsconfig.json`,
     };
 }

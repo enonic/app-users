@@ -1,3 +1,21 @@
+import {Store} from '@enonic/lib-admin-ui/store/Store';
+import {StyleHelper} from '@enonic/lib-admin-ui/StyleHelper';
+
+import '@enonic/lib-admin-ui/form/inputtype/support/NoInputTypeFoundView';
+import '@enonic/lib-admin-ui/form/inputtype/checkbox/Checkbox';
+import '@enonic/lib-admin-ui/form/inputtype/combobox/ComboBox';
+import '@enonic/lib-admin-ui/form/inputtype/time/Date';
+import '@enonic/lib-admin-ui/form/inputtype/time/DateTime';
+import '@enonic/lib-admin-ui/form/inputtype/time/DateTimeRange';
+import '@enonic/lib-admin-ui/form/inputtype/time/Time';
+import '@enonic/lib-admin-ui/form/inputtype/number/Double';
+import '@enonic/lib-admin-ui/form/inputtype/number/Long';
+import '@enonic/lib-admin-ui/form/inputtype/geo/GeoPoint';
+import '@enonic/lib-admin-ui/form/inputtype/principal/PrincipalSelector';
+import '@enonic/lib-admin-ui/form/inputtype/radiobutton/RadioButton';
+import '@enonic/lib-admin-ui/form/inputtype/text/TextArea';
+import '@enonic/lib-admin-ui/form/inputtype/text/TextLine';
+
 import {UserAppPanel} from './app/UserAppPanel';
 import {ChangeUserPasswordDialog} from './app/wizard/ChangeUserPasswordDialog';
 import {Router} from './app/Router';
@@ -5,6 +23,7 @@ import {ShowNewPrincipalDialogEvent} from './app/browse/ShowNewPrincipalDialogEv
 import {NewPrincipalDialog} from './app/create/NewPrincipalDialog';
 import {PrincipalServerEventsHandler} from './app/event/PrincipalServerEventsHandler';
 import {UsersServerEventsListener} from './app/event/UsersServerEventsListener';
+
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Application} from '@enonic/lib-admin-ui/app/Application';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
@@ -20,6 +39,13 @@ import {
     AuthApplicationSelector,
     PrincipalSelector
 } from './app/inputtype/';
+
+const hasJQuery = Store.instance().has('$');
+if (!hasJQuery) {
+    Store.instance().set('$', $);
+}
+
+StyleHelper.setCurrentPrefix(StyleHelper.ADMIN_PREFIX);
 
 const body = Body.get();
 

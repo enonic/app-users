@@ -3,34 +3,51 @@ import type { Options } from '.';
 
 import CopyWithHashPlugin from '@enonic/esbuild-plugin-copy-with-hash';
 import TsupPluginManifest from '@enonic/tsup-plugin-manifest';
+import GlobalsPlugin from 'esbuild-plugin-globals';
+
 import {
-	DIR_DST,
+	DIR_DST_STATIC,
 	DIR_SRC_STATIC
 } from './constants';
-
-
-const DIR_DST_STATIC = `${DIR_DST}/static`;
 
 
 export default function buildStaticConfig(): Options {
 	return {
 		bundle: true,
 		dts: false,
-		// entry,
 		entry: {
-			'app-users-bundle': 'src/main/resources/static/main.ts',
-			'crypto-worker': 'src/main/resources/static/worker/RSAKeysWorker.ts',
+			'app-users-bundle': `${DIR_SRC_STATIC}/main.ts`,
+			'crypto-worker': `${DIR_SRC_STATIC}/worker/RSAKeysWorker.ts`,
 		},
 		esbuildOptions(options, context) {
 			options.keepNames = true;
 		},
 		esbuildPlugins: [
+			GlobalsPlugin({
+				'@enonic/legacy-slickgrid.*'(modulename) {
+					return 'Slick';
+				},
+				'dompurify': 'DOMPurify',
+				'hasher': 'hasher',
+				'jquery': '$',
+				'mousetrap': 'Mousetrap',
+				'owasp-password-strength-test': 'owaspPasswordStrengthTest',
+				// 'q': 'Q',
+				'signals': 'signals',
+			}),
 			CopyWithHashPlugin({
 				context: 'node_modules',
 				manifest: `node_modules-manifest.json`,
 				patterns: [
+					'@enonic/legacy-slickgrid/index.js',
+					'dompurify/dist/*.js',
+					'hasher/dist/js/*.js',
 					'jquery/dist/*.*',
 					'jquery-ui-dist/*.*',
+					'mousetrap/mousetrap*.js',
+					'owasp-password-strength-test/owasp-password-strength-test.js',
+					// 'q/*.js',
+					'signals/dist/*.js',
 				]
 			}),
 			TsupPluginManifest({
@@ -54,14 +71,21 @@ export default function buildStaticConfig(): Options {
 
 		minify: false,
 
-		noExternal: [ // Same as dependencies in package.json
+		// NOTE: By default tsup bundles all import-ed modules except dependencies and peerDependencies.
+		noExternal: [
 			/@enonic\/lib-admin-ui.*/,
+			'nanoid', // nanoid@5 can't be CJS globalized
+			'q', // There are errors when trying to use Q as a global
+			// These need to be listed here for esbuildPluginExternalGlobal to work
+			/@enonic\/legacy-slickgrid.*/,
+			'dompurify',
+			'jquery',
 			'hasher',
-			'nanoid',
+			'mousetrap',
 			'owasp-password-strength-test',
-			'q'
+			'signals'
 		],
-		outDir: 'build/resources/main/static',
+		outDir: DIR_DST_STATIC,
 		platform: 'browser',
 		silent: ['QUIET', 'WARN'].includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
 		splitting: false,
@@ -70,6 +94,6 @@ export default function buildStaticConfig(): Options {
 		// INFO: Sourcemaps works when target is set here, rather than in tsconfig.json
 		target: 'es2020',
 
-		tsconfig: 'src/main/resources/static/tsconfig.json',
-	};
+		tsconfig: `${DIR_SRC_STATIC}/tsconfig.json`,
+	} as Options;
 }
