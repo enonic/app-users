@@ -15,14 +15,13 @@ const FilterPanel = require("../page_objects/browsepanel/principal.filter.panel"
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 const appConst = require("./app_const");
 const webDriverHelper = require("./WebDriverHelper");
-const addContext = require('mochawesome/addContext');
 const fs = require('fs');
 const path = require('path');
 
 module.exports = {
 
     getBrowser() {
-        if (typeof browser !== "undefined") {
+        if (typeof browser !== 'undefined') {
             return browser;
         } else {
             return webDriverHelper.browser;
@@ -44,23 +43,18 @@ module.exports = {
         await browsePanel.clickOnSearchButton();
         return await filterPanel.waitForOpened();
     },
-    typeNameInFilterPanel(name) {
+    async typeNameInFilterPanel(name) {
         let browsePanel = new UserBrowsePanel();
         let filterPanel = new FilterPanel();
-        return filterPanel.isPanelVisible().then(result => {
-            if (!result) {
-                return browsePanel.clickOnSearchButton().then(() => {
-                    return filterPanel.waitForOpened();
-                });
-            }
-        }).then(() => {
-            console.log('filter panel is opened, typing the text: ' + name);
-            return filterPanel.typeSearchText(name);
-        }).then(() => {
-            return browsePanel.pause(300);
-        }).then(() => {
-            return browsePanel.waitForSpinnerNotVisible();
-        });
+        let isVisible = await filterPanel.isPanelVisible();
+        if (!isVisible) {
+            await browsePanel.clickOnSearchButton();
+            await filterPanel.waitForOpened();
+        }
+        console.log('filter panel is opened, insert the text: ' + name);
+        await filterPanel.typeSearchText(name);
+        await filterPanel.pause(200);
+        return await browsePanel.waitForSpinnerNotVisible();
     },
     async selectAndDeleteItem(name) {
         let browsePanel = new UserBrowsePanel();
@@ -80,8 +74,8 @@ module.exports = {
             await confirmationDialog.clickOnYesButton();
             return await browsePanel.waitForSpinnerNotVisible();
         } catch (err) {
-            this.saveScreenshot('err_confirm_dialog');
-            throw new Error('Error in Confirm Delete: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_confirm_dialog');
+            throw new Error('Error in Confirm Delete, screenshot: ' + screenshot + ' ' + err);
         }
     },
     async navigateToUsersApp(userName, password) {
@@ -97,9 +91,8 @@ module.exports = {
             }
             await this.doSwitchToUsersApp();
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_navigation");
-            await this.saveScreenshot(screenshot);
-            throw new Error('error during navigation to Users app, screenshot ' + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_navigation');
+            throw new Error('error during navigation to Users app, screenshot: ' + screenshot + "  " + err);
         }
     },
     async doLoginAndClickOnUsersLink(userName, password) {
@@ -122,7 +115,7 @@ module.exports = {
         }
     },
 
-    doSwitchToHome: function () {
+    doSwitchToHome() {
         return this.getBrowser().switchWindow("Enonic XP Home").then(() => {
             console.log("switched to Home...");
         }).then(() => {
@@ -130,14 +123,14 @@ module.exports = {
             return homePage.waitForLoaded(appConst.mediumTimeout);
         });
     },
-    switchAndCheckTitle: function (handle, reqTitle) {
+    switchAndCheckTitle(handle, reqTitle) {
         return this.getBrowser().switchWindow(handle).then(() => {
             return this.getBrowser().getTitle().then(title => {
                 return title === reqTitle;
             })
         });
     },
-    doCloseUsersApp: function () {
+    doCloseUsersApp() {
         return this.getBrowser().getTitle().then(title => {
             if (title === 'Users - Enonic XP Admin') {
                 return this.getBrowser().closeWindow();
@@ -146,6 +139,7 @@ module.exports = {
             return this.doSwitchToHome();
         });
     },
+    // Select a user by its display name that is present in the path
     async selectUserAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
         let userWizard = new UserWizard();
@@ -198,13 +192,13 @@ module.exports = {
         //3. Click on Group item in the modal dialog:
         await newPrincipalDialog.clickOnItem(menuItem);
     },
-    //Click on Save button and close the wizard:
+    // Click on Save button and close the wizard:
     async saveAndCloseWizard(displayName) {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
         await wizardPanel.waitAndClickOnSave();
         await wizardPanel.pause(700);
-        //Click on Close icon and close the wizard:
+        // Click on 'Close' icon and close the wizard:
         return await browsePanel.closeTabAndWaitForGrid(displayName);
     },
     async openWizardAndSaveRole(role) {
@@ -219,7 +213,7 @@ module.exports = {
     async clickOnRolesFolderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
         let roleWizard = new RoleWizard();
-        //Select Roles folder:
+        // Select 'Roles' folder:
         await browsePanel.clickOnRowByName('roles');
         await browsePanel.clickOnNewButton();
         return await roleWizard.waitForLoaded();
@@ -234,7 +228,7 @@ module.exports = {
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },
-    //Opens System ID Provider folder:
+    // Opens System ID Provider folder:
     async selectSystemIdProviderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
         let idProviderWizard = new IdProviderWizard();
@@ -277,11 +271,11 @@ module.exports = {
     },
     async openWizardAndSaveIdProvider(idProviderData) {
         let idProviderWizard = new IdProviderWizard();
-        //1. Open new ID Provider Wizard:
+        // 1. Open new ID Provider Wizard:
         await this.openIdProviderWizard();
         await idProviderWizard.typeData(idProviderData);
         await idProviderWizard.pause(500);
-        //2. Save the data:
+        // 2. Save the data:
         await idProviderWizard.waitAndClickOnSave();
         await idProviderWizard.pause(2000);
         return await idProviderWizard.waitForSpinnerNotVisible();
@@ -298,11 +292,11 @@ module.exports = {
 
     async addSystemUser(userData) {
         let userWizard = new UserWizard();
-        //1. Select System ID Provider folder:
+        // 1. Select System ID Provider folder:
         await this.clickOnSystemOpenUserWizard();
-        //2. Type the data:
+        // 2. Type the data:
         await userWizard.typeData(userData);
-        //3. Save the data and close the wizard:
+        // 3. Save the data and close the wizard:
         return await this.saveAndCloseWizard(userData.displayName);
     },
     async clickOnIdProviderAndOpenUserWizard(storeName) {
@@ -315,15 +309,12 @@ module.exports = {
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },
-    saveScreenshot: function (name, that) {
-        let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
+    saveScreenshot(name, that) {
+        let screenshotsDir = path.join(__dirname, '/../build/reports/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, {recursive: true});
         }
         return this.getBrowser().saveScreenshot(screenshotsDir + name + '.png').then(() => {
-            if (that) {
-                addContext(that, 'screenshots/' + name + '.png');
-            }
 
             return console.log('screenshot saved ' + name);
         }).catch(err => {

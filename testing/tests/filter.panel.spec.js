@@ -10,8 +10,8 @@ const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.
 describe('filter.panel.spec Principal Filter Panel specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    const NON_EXISTENT_ITEM = appConst.generateRandomName("test");
-    if (typeof browser === "undefined") {
+    const NON_EXISTENT_ITEM = appConst.generateRandomName('test');
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -19,10 +19,10 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let filterPanel = new BrowseFilterPanel();
-            //1. Open Filter Panel:
+            // 1. Open Filter Panel:
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
-            //2. Click on Hide-icon:
+            // 2. Click on Hide-icon:
             await userBrowsePanel.clickOnHideFilterButton();
             await filterPanel.waitForClosed();
         });
@@ -33,29 +33,29 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let filterPanel = new BrowseFilterPanel();
-            //1. Open Filter Panel:
+            // 1. Open Filter Panel:
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
-            //2. Type a non existent name:
+            // 2. Type a non existent name:
             await filterPanel.typeSearchText(NON_EXISTENT_ITEM);
-            //3. Verify that 'Clear' button should appear:
+            // 3. Verify that 'Clear' button should appear:
             await filterPanel.waitForClearLinkVisible();
-            //4. Verify that grid in  Browse panel is empty:
+            // 4. Verify that grid in  Browse panel is empty:
             let result = await userBrowsePanel.getGridItemDisplayNames();
-            assert.isTrue(result.length === 0, "Grid should be empty")
+            assert.isTrue(result.length === 0, 'Grid should be empty')
         });
 
     it('GIVEN `Principal Filter Panel` is opened  and search text typed WHEN `Clear` has been clicked THEN the link should not be displayed',
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let filterPanel = new BrowseFilterPanel();
-            //1. Open Filter Panel:
+            // 1. Open Filter Panel:
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
-            //2. Type a text:
+            // 2. Type a text:
             await filterPanel.typeSearchText('test');
             await filterPanel.waitForClearLinkVisible();
-            //3. Click on Clear button:
+            // 3. Click on Clear button:
             await filterPanel.clickOnClearLink();
             await filterPanel.waitForClearLinkNotVisible();
         });
@@ -66,13 +66,13 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             let filterPanel = new BrowseFilterPanel();
             let name = testUtils.generateRandomName('group');
             let testGroup = itemBuilder.buildGroup(name, 'simple group');
-            //1. Save new group:
+            // 1. Save new group:
             await testUtils.openWizardAndSaveGroup(testGroup);
-            //2. Open Filter Panel:
+            // 2. Open Filter Panel:
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
-            //3. Verify aggregation items:
-            testUtils.saveScreenshot('aggregation_group_added');
+            // 3. Verify aggregation items:
+            await testUtils.saveScreenshot('aggregation_group_added');
             let result = await filterPanel.getAggregationItems();
             assert.equal(result.length, 4, 'three aggregation-checkboxes should be present on the page');
             assert.isTrue(result[0].includes('Group'), 'User aggregation-item should be present');

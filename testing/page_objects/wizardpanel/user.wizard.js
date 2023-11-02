@@ -90,11 +90,15 @@ class UserWizard extends wizards.WizardPanel {
         return this.clickOnElement(this.generateLink);
     }
 
-    clickOnShowLink() {
-        return this.clickOnElement(this.showPasswordLink).catch(err => {
+    async clickOnShowPasswordLink() {
+        try {
+            await this.waitForElementDisplayed(this.showPasswordLink, appConst.mediumTimeout);
+            await this.clickOnElement(this.showPasswordLink);
+        } catch (err) {
             throw new Error("Error after clicking on Show Pass link:  " + err);
-        })
+        }
     }
+
 
     isEmailInputDisplayed() {
         return this.isElementDisplayed(this.emailInput);

@@ -32,7 +32,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
             await testUtils.findAndSelectItem('/system');
             await userBrowsePanel.hotKeyEdit();
             await testUtils.saveScreenshot('hot_key_edit_system');
-            //'Id Provider wizard should be loaded'
+            // 'Id Provider' wizard should be loaded'
             await idProviderWizard.waitForOpened();
         });
 
