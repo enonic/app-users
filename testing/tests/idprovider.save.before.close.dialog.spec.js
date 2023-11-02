@@ -14,7 +14,7 @@ const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 describe("Id Provider - checks unsaved changes", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -26,7 +26,7 @@ describe("Id Provider - checks unsaved changes", function () {
             await testUtils.openIdProviderWizard();
             await userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
             await userBrowsePanel.pause(500);
-            testUtils.saveScreenshot("provider_save_before1");
+            await testUtils.saveScreenshot("provider_save_before1");
             let result = await confirmationDialog.isDialogLoaded();
             //there are no unsaved changes, so dialog should not be present.
             assert.isFalse(result, "Confirmation dialog must not be loaded");
@@ -40,7 +40,7 @@ describe("Id Provider - checks unsaved changes", function () {
             await testUtils.openIdProviderWizard();
             await idProviderWizard.typeDescription('description');
             await userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
-            testUtils.saveScreenshot("provider_save_before2");
+            await testUtils.saveScreenshot("provider_save_before2");
             //description has been typed, so save before close dialog should appear!
             await confirmationDialog.waitForDialogLoaded();
         });

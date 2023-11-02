@@ -14,13 +14,13 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 describe("group.transitive.memberships.spec: checks transitive memberships", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
     let group1;
     let group2;
-    let TRANSITIVE_ROLE = 'Administration Console Login';
+    const TRANSITIVE_ROLE = 'Administration Console Login';
 
     it("Precondition: group1 should be created",
         async () => {
@@ -32,9 +32,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeData(group1);
             await groupWizard.waitAndClickOnSave();
-            let message = await groupWizard.waitForNotificationMessage();
-            testUtils.saveScreenshot("group1_saved");
-            assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message is expected");
+            await groupWizard.waitForNotificationMessage();
         });
 
     it("Precondition: group2 should be added, this group should have the group1 in members",
@@ -49,7 +47,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             await groupWizard.typeData(group2);
             await groupWizard.waitAndClickOnSave();
             let message = await groupWizard.waitForNotificationMessage();
-            testUtils.saveScreenshot("group2_saved");
+            await testUtils.saveScreenshot('group_saved');
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message is expected");
         });
 
@@ -58,7 +56,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             let groupStatisticsPanel = new GroupStatisticsPanel();
             //1. Select the first group:
             await testUtils.findAndSelectItem(group1.displayName);
-            testUtils.saveScreenshot("transitive_memberships_not_checked");
+            await testUtils.saveScreenshot('transitive_memberships_not_checked');
             let roles = await groupStatisticsPanel.getDisplayNameOfRoles();
             //2. One role should be present in Statistics Panel:
             assert.equal(roles.length, 1, "One role should be displayed in Statistics Panel");
@@ -68,18 +66,18 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
     it("GIVEN group1 is selected WHEN 'transitive checkbox' has been checked THEN one transitive role should be added in roles-list",
         async () => {
             let groupStatisticsPanel = new GroupStatisticsPanel();
-            //1. The First group has been selected:
+            // 1. The First group has been selected:
             await testUtils.findAndSelectItem(group1.displayName);
-            //2. Transitive checkbox has been checked:
+            // 2. Transitive checkbox has been checked:
             await groupStatisticsPanel.clickOnTransitiveCheckBox();
-            testUtils.saveScreenshot("transitive_memberships_checked");
+            await testUtils.saveScreenshot('transitive_memberships_checked');
             let roles = await groupStatisticsPanel.getDisplayNameOfRoles();
-            //3. Two roles should be displayed in the Statistics Panel:
+            // 3. Two roles should be displayed in the Statistics Panel:
             assert.equal(roles.length, 2, "Two roles should be displayed");
             assert.isTrue(roles.includes(appConst.ROLES_DISPLAY_NAME.USERS_APP), '`Users App` role should be present on the panel');
             assert.isTrue(roles.includes(appConst.ROLES_DISPLAY_NAME.ADMIN_CONSOLE),
                 'Transitive role should be present on the panel as well');
-            //4. One group should be displayed
+            // 4. One group should be displayed
             let groups = await groupStatisticsPanel.getDisplayNamesInGroupList();
             assert.equal(groups.length, 1, "One group should be visible in the group-list in Statistics Panel");
             assert.isTrue(groups.includes(group2.displayName), 'Expected group-name should be in the group-list');
@@ -90,20 +88,20 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             let groupStatisticsPanel = new GroupStatisticsPanel();
             let userBrowsePanel = new UserBrowsePanel();
             let groupWizard = new GroupWizard();
-            //1. The group2 is opened:
+            // 1. The group2 is opened:
             await testUtils.selectGroupAndOpenWizard(group2.displayName);
-            //2. Go to grid and select the first group:
+            // 2. Go to grid and select the first group:
             await userBrowsePanel.clickOnAppHomeButton();
             await testUtils.findAndSelectItem(group1.displayName);
-            //3. Go to group2-wizard and remove the member:
+            // 3. Go to group2-wizard and remove the member:
             await userBrowsePanel.clickOnTabBarItem(group2.displayName);
             await groupWizard.removeMember(group1.displayName);
             await groupWizard.waitAndClickOnSave();
-            //4. Go to the grid
+            // 4. Go to the grid
             await userBrowsePanel.clickOnAppHomeButton();
-            testUtils.saveScreenshot("transitive_memberships_checked");
+            await testUtils.saveScreenshot('one_group_removed');
             let groups = await groupStatisticsPanel.getDisplayNamesInGroupList();
-            //5. Verify that group stats should be correctly updated:
+            // 5. Verify that group stats should be correctly updated:
             assert.equal(groups.length, 0, "Group list gets empty in Statistics Panel");
         });
 

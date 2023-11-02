@@ -14,7 +14,7 @@ const appConst = require('../libs/app_const');
 describe('user.trim.inputs.spec Save user, trim the password and display name', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let PASSWORD = appConst.PASSWORD.MEDIUM;
@@ -26,17 +26,19 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
             let userName = userItemsBuilder.generateRandomName('user');
             let nameWithSpaces = '   ' + userName + '   ';
             let testUser = userItemsBuilder.buildUser(nameWithSpaces, PASSWORD, userItemsBuilder.generateEmail(userName), null);
-            //1. Open new user-wizard:
+            // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
-            //2. Type the user-data:
+            // 2. Type the user-data:
             await userWizard.typeData(testUser);
-            //3. Click on Save button and close the wizard:
+            // 3. Click on Save button and close the wizard:
             await testUtils.saveAndCloseWizard(testUser.displayName.trim());
-            //4. Type displayName with spaces:
+            // 4. Type displayName with spaces:
             await testUtils.typeNameInFilterPanel(testUser.displayName);
-            testUtils.saveScreenshot("user_trimmed_name");
+            await testUtils.saveScreenshot("user_trimmed_name");
+            // 5. Verify that spaces are trimmed in the display name:
             let result = await userBrowsePanel.isItemDisplayed(nameWithSpaces);
             assert.isFalse(result, "name with spaces should not be displayed in the grid");
+            // 6.  User-name without spaces is displayed in the path:
             result = await userBrowsePanel.isItemDisplayed(userName);
             assert.isTrue(result, "trimmed name should be displayed");
         });
@@ -53,7 +55,7 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
             //Type a password with white space:
             await userWizard.typePassword(passwordWithSpaces);
             //Save button gets enabled:
-            testUtils.saveScreenshot("user_password_spaces");
+            await testUtils.saveScreenshot('user_password_spaces');
             await userWizard.waitForSaveButtonEnabled();
         });
 

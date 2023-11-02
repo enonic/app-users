@@ -3,10 +3,10 @@
  */
 const Page = require('../page');
 const appConst = require('../../libs/app_const');
+const lib = require('../../libs/elements');
 
 const XPATH = {
     container: `//ul[contains(@id,'TreeGridContextMenu')]`,
-    contextMenuItems: `//li[contains(@id,'MenuItem')]`,
     deleteMenuItem: `//li[contains(@id,'MenuItem') and text()='Delete']`,
     editMenuItem: `//li[contains(@id,'MenuItem') and text()='Edit']`,
     newMenuItem: `//li[contains(@id,'MenuItem') and text()='New...']`,
@@ -18,10 +18,10 @@ class GridContextMenu extends Page {
     async waitForContextMenuVisible() {
         try {
             await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
-            return await this.pause(400);
+            return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot('err_grid_context_menu');
-            throw new Error(`tree grid context menu is not loaded ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_grid_context_menu');
+            throw new Error(`tree grid context menu is not loaded, screenshot: ` + screenshot + '  ' + err);
         }
     }
 
@@ -42,48 +42,48 @@ class GridContextMenu extends Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Grid context menu - Edit menu item is not enabled after 3 seconds'});
     }
 
-
-    isEditMenuItemDisabled() {
-        return this.getAttribute(XPATH.container + XPATH.editMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
+    async waitForMenuItemEnabled(menuItem) {
+        try {
+            let locator = XPATH.container + lib.menuItemByName(menuItem);
+            await this.getBrowser().waitUntil(async () => {
+                let text = await this.getAttribute(locator, 'class');
+                return !text.includes('disabled');
+            }, {timeout: appConst.shortTimeout, timeoutMsg: "Context menu item should be enabled"});
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_context_menu');
+            throw new Error("The grid-context menu item should be enabled, screenshot: " + screenshot + ' ' + err);
+        }
     }
 
-    isNewRoleMenuItemDisabled() {
-        return this.getAttribute(XPATH.container + XPATH.newRoleMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
+    async waitForMenuItemDisabled(menuItem) {
+        try {
+            let locator = XPATH.container + lib.menuItemByName(menuItem);
+            await this.getBrowser().waitUntil(async () => {
+                let text = await this.getAttribute(locator, 'class');
+                return text.includes('disabled');
+            }, {timeout: appConst.shortTimeout, timeoutMsg: "Context menu item should be enabled"});
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_context_menu');
+            throw new Error("The grid-context menu item should be disabled, screenshot: " + screenshot + ' ' + err);
+        }
     }
 
-    isDeleteMenuItemDisabled() {
-        return this.getAttribute(XPATH.deleteMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
-    }
-
-    isNewMenuItemDisabled() {
-        return this.getAttribute(XPATH.container + XPATH.newMenuItem, 'class').then(result => {
-            return result.includes('disabled');
-        });
-    }
-
-    //returns array with menu-items
+    // returns array with menu-items
     getGridContextMenuItems() {
-        let selector = XPATH.container + XPATH.contextMenuItems;
+        let selector = XPATH.container + lib.LI_MENU_ITEM;
         return this.getTextInElements(selector);
     }
 
-    clickOnMenuItem(menuItem) {
-        //TODO finish it
-        let nameXpath = XPATH.itemByName(menuItem);
-        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).then(() => {
-            return this.clickOnElement(nameXpath);
-        }).then(() => {
-            return this.pause(500);
-        }).catch(err => {
-            this.saveScreenshot('err_find_' + menuItem);
-            throw Error('Item  ' + menuItem + ' was not found. ' + err);
-        })
+    async clickOnMenuItem(menuItem) {
+        try {
+            let menuItemLocator = XPATH.container + lib.menuItemByName(menuItem);
+            await this.waitForElementDisplayed(menuItemLocator, appConst.mediumTimeout);
+            await this.clickOnElement(menuItemLocator);
+            await this.pause(500);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_menu_item');
+            throw Error('Menu Item, screenshot  ' + screenshot + ' ' + err);
+        }
     }
 }
 

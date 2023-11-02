@@ -16,7 +16,7 @@ const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 describe('Id Provider, provider-dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     const APP_PROVIDER_WITH_CONFIG = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
@@ -30,16 +30,16 @@ describe('Id Provider, provider-dialog specification', function () {
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
-            //1. Open new ID Provider wizard and type the data:
+            // 1. Open new ID Provider wizard and type the data:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
-            //2. Save button should be disabled, because  Provider-configuration has required inputs:
+            // 2. Save button should be disabled, because  Provider-configuration has required inputs:
             await idProviderWizard.waitForSaveButtonDisabled();
-            //3. Click on close-icon:
+            // 3. Click on close-icon:
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
-            testUtils.saveScreenshot('application_save_before_close_present1');
+            await testUtils.saveScreenshot('application_save_before_close_present1');
             let confirmationDialog = new ConfirmationDialog();
-            //Confirmation dialog should appear:
+            // Verify - Confirmation dialog should appear:
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -49,17 +49,18 @@ describe('Id Provider, provider-dialog specification', function () {
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
-            //1. Open new ID Provider wizard and select the provider with invalid configuration:
+            // 1. Open new ID Provider wizard and select the provider with invalid configuration:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
-            //2. Click on close-icon:
+            // 2. Click on close-icon:
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
             let confirmationDialog = new ConfirmationDialog();
-            //3. "Confirmation" dialog should appear:
+            // 3. "Confirmation" dialog should appear:
             await confirmationDialog.waitForDialogLoaded();
-            //4. Click on 'Yes' button:
+            // 4. Click on 'Yes' button:
             await confirmationDialog.clickOnYesButton();
-            testUtils.saveScreenshot('provider_save_before_close_yes');
+            // 5. Expected notification message should appear:
+            await testUtils.saveScreenshot('provider_save_before_close_yes');
             let message = await idProviderWizard.waitForNotificationMessage();
             assert.equal(message, "Invalid configuration of the ID Provider.", "Expected notification message should appear");
         });
@@ -70,15 +71,15 @@ describe('Id Provider, provider-dialog specification', function () {
             let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfigDialog = new ProviderConfigDialog();
-            //1. Open new id provider wizard, type the data:
+            // 1. Open new id provider wizard, type the data:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
             await idProviderWizard.pause(700);
-            //2. Open app-configuration dialog and fill required inputs:
+            // 2. Open app-configuration dialog and fill required inputs:
             await providerConfigDialog.openDialogFillRequiredInputsAndApply('domain', 'id', 'secret');
-            //3. ID Provider gets valid in the wizard:
+            // 3. ID Provider gets valid in the wizard:
             let result = await idProviderWizard.isItemInvalid(testIdProvider.displayName);
-            testUtils.saveScreenshot('id_provider_is_getting_valid');
+            await testUtils.saveScreenshot('id_provider_is_getting_valid');
             assert.isFalse(result, 'Red icon should not be present at the wizard');
         });
 

@@ -15,12 +15,13 @@ const LauncherPanel = require('../page_objects/launcher.panel');
 describe("Create an user with generated password and log in the user", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let testUser;
     let userName;
     let PASSWORD;
+
     it("WHEN new 'user' with roles has been added THEN the user should be searchable",
         async () => {
             let permissions = ['Administration Console Login', 'Content Manager App'];
@@ -29,16 +30,16 @@ describe("Create an user with generated password and log in the user", function 
             userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, null, userItemsBuilder.generateEmail(userName), permissions);
             await testUtils.navigateToUsersApp();
-            //1. Open new wizard:
+            // 1. Open new wizard:
             await testUtils.clickOnSystemOpenUserWizard();
-            //2. Type the data and click on Generate button:
+            // 2. Type the data and click on Generate button:
             await userWizard.typeDataAndGeneratePassword(testUser);
-            //3. Get the generated password:
+            // 3. Get the generated password:
             PASSWORD = await userWizard.getTextInPasswordInput();
-            //4. Save the user:
+            // 4. Save the user:
             await userWizard.waitAndClickOnSave();
             await userBrowsePanel.closeTabAndWaitForGrid(userName);
-
+            // 5. Verify that user is created:
             await testUtils.typeNameInFilterPanel(userName);
             let result = await userBrowsePanel.isItemDisplayed(userName);
             assert.isTrue(result, 'new user should be present in the grid');
@@ -49,11 +50,11 @@ describe("Create an user with generated password and log in the user", function 
             let launcherPanel = new LauncherPanel();
             let loginPage = new LoginPage();
             await testUtils.doCloseUsersApp();
-            //1. Do log out:
+            // 1. Do log out:
             await launcherPanel.clickOnLogoutLink();
-            //2. Log in with the generated password
+            // 2. Log in with the generated password
             await loginPage.doLogin(userName, PASSWORD);
-            //3. Check that user is logged in:
+            // 3. Check that user is logged in:
             await launcherPanel.waitForPanelDisplayed();
         });
 
