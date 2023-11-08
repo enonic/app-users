@@ -53,7 +53,7 @@ function get(_request: Request): Response {
         jqueryUiUrl: getAdminNodeModuleUrl('jquery-ui-dist/jquery-ui.min.js', TOOL_NAME),
         mousetrapUrl: getAdminNodeModuleUrl('mousetrap/mousetrap.min.js', TOOL_NAME),
         owaspUrl: getAdminNodeModuleUrl('owasp-password-strength-test/owasp-password-strength-test.js', TOOL_NAME),
-        // qUrl: getAdminNodeModuleUrl('q/q.js', TOOL_NAME),
+        qUrl: getAdminNodeModuleUrl('q/q.js', TOOL_NAME),
         legacySlickgridUrl: getAdminNodeModuleUrl('@enonic/legacy-slickgrid/index.js', TOOL_NAME),
         launcherPath: getLauncherPath(),
     };

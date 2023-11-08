@@ -32,7 +32,7 @@ export default function buildStaticConfig(): Options {
 				'jquery': '$',
 				'mousetrap': 'Mousetrap',
 				'owasp-password-strength-test': 'owaspPasswordStrengthTest',
-				// 'q': 'Q',
+				'q': 'Q',
 				'signals': 'signals',
 			}),
 			CopyWithHashPlugin({
@@ -46,7 +46,7 @@ export default function buildStaticConfig(): Options {
 					'jquery-ui-dist/*.*',
 					'mousetrap/mousetrap*.js',
 					'owasp-password-strength-test/owasp-password-strength-test.js',
-					// 'q/*.js',
+					'q/*.js',
 					'signals/dist/*.js',
 				]
 			}),
@@ -75,7 +75,6 @@ export default function buildStaticConfig(): Options {
 		noExternal: [
 			/@enonic\/lib-admin-ui.*/,
 			'nanoid', // nanoid@5 can't be CJS globalized
-			'q', // There are errors when trying to use Q as a global
 			// These need to be listed here for esbuildPluginExternalGlobal to work
 			/@enonic\/legacy-slickgrid.*/,
 			'dompurify',
@@ -83,6 +82,7 @@ export default function buildStaticConfig(): Options {
 			'hasher',
 			'mousetrap',
 			'owasp-password-strength-test',
+			'q',
 			'signals'
 		],
 		outDir: DIR_DST_STATIC,
