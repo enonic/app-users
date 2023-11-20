@@ -36,6 +36,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. User's data has been typed:
             await userWizard.typeDisplayName(TEST_USER.displayName);
             await userWizard.typeEmail(TEST_USER.email);
+            await userWizard.pause(1000);
             await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
             // 3. keyboard shortcut to Save button has been pressed:
@@ -70,7 +71,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Group's data has been typed:
             await groupWizard.typeDisplayName(TEST_GROUP.displayName);
             await groupWizard.waitForSaveButtonEnabled();
-            await groupWizard.pause(1000);
+            await groupWizard.pause(500);
             // 3. keyboard shortcut to save button has been pressed:
             await groupWizard.hotKeySave();
             await testUtils.saveScreenshot('group_shortcut_save');
