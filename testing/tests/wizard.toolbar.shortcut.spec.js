@@ -70,9 +70,10 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Group's data has been typed:
             await groupWizard.typeDisplayName(TEST_GROUP.displayName);
             await groupWizard.waitForSaveButtonEnabled();
+            await groupWizard.pause(1000);
             // 3. keyboard shortcut to save button has been pressed:
             await groupWizard.hotKeySave();
-            await testUtils.saveScreenshot("group_shortcut_save");
+            await testUtils.saveScreenshot('group_shortcut_save');
             // 4. Verify the notification message
             let message = await groupWizard.waitForNotificationMessage();
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message should appear");
@@ -86,7 +87,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await testUtils.selectGroupAndOpenWizard(TEST_GROUP.displayName);
             // 2. keyboard shortcut to Delete button has been pressed:
             await groupWizard.hotKeyDelete();
-            await testUtils.saveScreenshot("group_shortcut_delete");
+            await testUtils.saveScreenshot('group_shortcut_delete');
             // 3. Confirmation dialog should be loaded:
             await confirmationDialog.waitForDialogLoaded();
         });
@@ -117,7 +118,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await testUtils.selectRoleAndOpenWizard(TEST_ROLE.displayName);
             // 2. keyboard shortcut to Delete button has been pressed:
             await roleWizard.hotKeyDelete();
-            await testUtils.saveScreenshot("group_shortcut_delete");
+            await testUtils.saveScreenshot('group_shortcut_delete');
             // 3. Confirmation dialog should be loaded:
             await confirmationDialog.waitForDialogLoaded();
         });
