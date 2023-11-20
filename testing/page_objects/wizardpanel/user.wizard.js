@@ -80,8 +80,9 @@ class UserWizard extends wizards.WizardPanel {
         await this.waitForAddPublicKeyButtonDisplayed();
         await this.clickOnElement(this.addPublicKeyButton);
     }
-    async getNumberOfKeyRows(){
-        let locator = XPATH.container + "//div[contains(@class,'public-keys-grid-body')]"+  XPATH.publicKeysGridRow;
+
+    async getNumberOfKeyRows() {
+        let locator = XPATH.container + "//div[contains(@class,'public-keys-grid-body')]" + XPATH.publicKeysGridRow;
         let result = await this.findElements(locator);
         return result.length;
     }
@@ -90,12 +91,12 @@ class UserWizard extends wizards.WizardPanel {
         let locator = XPATH.container + XPATH.publicKeysGridRow + XPATH.removePublicKeyIcon;
         await this.waitForElementDisplayed(locator);
         let elements = await this.findElements(locator);
-        let res = await elements[0].getAttribute('class');
         return await elements[index].click();
     }
-    async clickOnShowKeyDetailsLink(label){
+
+    async clickOnShowKeyDetailsLink(label) {
         let locator = XPATH.showKeyDetailsLinkByLabel(label);
-        await this.waitForElementDisplayed(locator,appConst.mediumTimeout);
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         await this.clickOnElement(locator);
     }
 
@@ -132,7 +133,8 @@ class UserWizard extends wizards.WizardPanel {
             await this.waitForElementDisplayed(this.showPasswordLink, appConst.mediumTimeout);
             await this.clickOnElement(this.showPasswordLink);
         } catch (err) {
-            throw new Error("Error after clicking on Show Pass link:  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_show_password');
+            throw new Error("Error after clicking on Show Pass link, screenshot: " + screenshot + '  ' + err);
         }
     }
 
@@ -167,7 +169,7 @@ class UserWizard extends wizards.WizardPanel {
             await this.waitForDeleteButtonEnabled();
             await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_delete_btn');
+            let screenshot = await this.saveScreenshotUniqueName('err_delete_btn');
             throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + '  ' + err);
         }
     }
@@ -184,12 +186,11 @@ class UserWizard extends wizards.WizardPanel {
         return await this.getBrowser().keys('\uE003');
     }
 
-    clearEmailInput() {
-        return this.clearInputText(this.emailInput).then(() => {
-            return this.typeTextInInput(this.emailInput, 'a');
-        }).then(() => {
-            return this.getBrowser().keys('\uE003');
-        });
+    async clearEmailInput() {
+        await this.clearInputText(this.emailInput);
+        await this.typeTextInInput(this.emailInput, 'a');
+        return await this.getBrowser().keys('\uE003');
+
     }
 
     getTextInPasswordInput() {
@@ -251,8 +252,13 @@ class UserWizard extends wizards.WizardPanel {
         return await this.pause(500);
     }
 
-    typeEmail(email) {
-        return this.typeTextInInput(this.emailInput, email);
+    async typeEmail(email) {
+        try {
+            return await this.typeTextInInput(this.emailInput, email);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_email_input');
+            throw new Error("Error during inserting the text in email input, screenshot: " + screenshot + ' ' + err);
+        }
     }
 
     typePassword(password) {
