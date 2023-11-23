@@ -86,6 +86,12 @@ task startServer( dependsOn: unpackDistro ) {
     }
 }
 
+task stopServer {
+    doLast {
+        xpServer.stop()
+    }
+}
+
 task cleanup(type: Delete) {
     delete './build/reports/allure'
 }
@@ -94,12 +100,6 @@ task generateReportAndStopServer( type: NpmTask ) {
     args = ['run-script', 'allure-report']
     finalizedBy cleanup
     finalizedBy stopServer
-}
-
-task stopServer {
-    doLast {
-        xpServer.stop()
-    }
 }
 
 // wdio_chrome is a script defined in package.json
@@ -111,13 +111,5 @@ task w_testUsersApp( type: NpmTask, dependsOn: [npmInstall, unpackDistro, copyCo
 task w_testUsersAppLocal( type: NpmTask, dependsOn: [npmInstall] ) {
     args = ['run-script', 'test_users:wdio_chrome']
 }
-/////////////////////////
-task testUsersAppFirefox( type: NpmTask, dependsOn: [npmInstall,installGeckoService, installGeckoDriver, unpackDistro, copyConfig, copyApps, deployApp, startServer] ) {
-    args = ['run-script', 'test:firefox']
-    finalizedBy stopServer
-}
 
-task testUsersAppFirefoxLocally( type: NpmTask, dependsOn: [npmInstall] ) {
-    args = ['run-script', 'test:firefox']
-}
 
