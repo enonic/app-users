@@ -228,7 +228,7 @@ class UserWizard extends wizards.WizardPanel {
     async getSelectedRoles() {
         let selectedOptions = "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + lib.PRINCIPAL_SELECTED_OPTION +
                               lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selectedOptions);
+        return await this.getTextInElements(selectedOptions);
     }
 
     async filterOptionsAndAddRole(roleDisplayName) {
