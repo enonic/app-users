@@ -24,6 +24,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await filterPanel.waitForOpened();
             // 2. Click on Hide-icon:
             await userBrowsePanel.clickOnHideFilterButton();
+            // Verify that the panel is closed:
             await filterPanel.waitForClosed();
         });
 
