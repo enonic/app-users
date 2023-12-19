@@ -31,7 +31,7 @@ class Page {
         if (elements.length === 0) {
             return [];
         }
-        let pr = elements.map(el => el.isDisplayed());
+        let pr = await elements.map(el => el.isDisplayed());
         return Promise.all(pr).then(result => {
             return elements.filter((el, i) => result[i]);
         });

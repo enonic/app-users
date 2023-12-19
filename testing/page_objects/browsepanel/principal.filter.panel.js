@@ -83,11 +83,13 @@ class BrowseFilterPanel extends Page {
         return this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.mediumTimeout);
     }
 
-    waitForClosed() {
-        return this.waitUntilElementNotVisible(xpath.userAggregationCheckbox, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot('err_filter_panel_not_closed');
+    async waitForClosed() {
+        try {
+            await this.waitForElementNotDisplayed(xpath.userAggregationCheckbox, appConst.shortTimeout)
+        } catch (err) {
+            await this.saveScreenshot('err_filter_panel_not_closed');
             throw new Error('Filter Panel was not closed. ' + err);
-        })
+        }
     }
 
     async typeSearchText(text) {
@@ -111,7 +113,7 @@ class BrowseFilterPanel extends Page {
     }
 
     waitForClearLinkNotVisible() {
-        return this.waitUntilElementNotVisible(this.clearFilterLink, appConst.shortTimeout);
+        return this.waitForElementNotDisplayed(this.clearFilterLink, appConst.shortTimeout);
     }
 
     clickOnClearLink() {
