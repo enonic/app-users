@@ -95,6 +95,11 @@ module.exports = {
             throw new Error('error during navigation to Users app, screenshot: ' + screenshot + "  " + err);
         }
     },
+    async saveScreenshotUniqueName(namePart) {
+        let screenshotName = appConst.generateRandomName(namePart);
+        await this.saveScreenshot(screenshotName);
+        return screenshotName;
+    },
     async doLoginAndClickOnUsersLink(userName, password) {
         let loginPage = new LoginPage();
         await loginPage.doLogin(userName, password);
