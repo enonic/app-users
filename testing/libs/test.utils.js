@@ -113,11 +113,10 @@ module.exports = {
             let browsePanel = new UserBrowsePanel();
             await this.getBrowser().switchWindow("Users - Enonic XP Admin");
             console.log("switched to Users app...");
-            //await browsePanel.waitForSpinnerNotVisible();
-            await browsePanel.pause(1000);
-            //return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
+            await browsePanel.waitForSpinnerNotVisible();
+            return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
         } catch (err) {
-            throw new Error("doSwitchToUsersApp - Error during switching to Users App " + err);
+            throw new Error("Error when switching to Users App " + err);
         }
     },
 
