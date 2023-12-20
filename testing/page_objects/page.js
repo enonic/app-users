@@ -28,7 +28,10 @@ class Page {
 
     async getDisplayedElements(selector) {
         let elements = await this.findElements(selector);
-        let pr = elements.map(el => el.isDisplayed());
+        if (elements.length === 0) {
+            return [];
+        }
+        let pr = await elements.map(el => el.isDisplayed());
         return Promise.all(pr).then(result => {
             return elements.filter((el, i) => result[i]);
         });
@@ -57,7 +60,10 @@ class Page {
     async getTextInElements(selector) {
         let strings = [];
         let elements = await this.findElements(selector);
-        elements.forEach(el => {
+        if (elements.length === 0) {
+            return [];
+        }
+        await elements.forEach(el => {
             strings.push(el.getText());
         });
         return Promise.all(strings);
@@ -157,10 +163,9 @@ class Page {
         }, {timeout: timeout, timeoutMsg: message});
     }
 
-    isElementNotDisplayed(selector) {
-        return this.getDisplayedElements(selector).then(result => {
-            return result.length === 0;
-        })
+    async isElementNotDisplayed(selector) {
+        let result = await this.getDisplayedElements(selector);
+        return result.length === 0;
     }
 
     async getAttribute(selector, attributeName) {
