@@ -21,14 +21,16 @@ class UserStatisticsPanel extends UserItemStatisticsPanel {
         return this.getTextInElements(this.email);
     }
 
-    getDisplayNameOfRoles() {
-        let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
-        return this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_user_statistic');
+    async getDisplayNameOfRoles() {
+        try {
+            let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
+            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, appConst.mediumTimeout)
+            return await this.getTextInElements(items);
+        } catch (err) {
+            await this.saveScreenshot('err_user_statistic');
             throw new Error("Roles & Groups was not loaded!" + err);
-        }).then(() => {
-            return this.getTextInElements(items);
-        })
+
+        }
     }
 }
 module.exports = UserStatisticsPanel;

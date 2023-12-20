@@ -11,7 +11,7 @@ const UserStatisticsPanel = require('../page_objects/browsepanel/user.statistics
 describe('statistics.panel.permissions.report.spec: Generate Report specification ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
@@ -38,14 +38,14 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
         async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
             await testUtils.findAndSelectItem('su');
-            //1. Select a repository and a branch:
+            // 1. Select a repository and a branch:
             await userStatisticsPanel.selectRepository('com.enonic.cms.default');
             await userStatisticsPanel.clickOnDropDownHandleAndSelectBranch('draft');
 
-            //default repository and draft-branch should be selected:
+            // default repository and draft-branch should be selected:
             await userStatisticsPanel.isOptionSelected('com.enonic.cms.default');
             let branchName = await userStatisticsPanel.getBranchName('com.enonic.cms.default');
-            assert.equal(branchName, "draft", "Expected branch should be displayed")
+            assert.equal(branchName, 'draft', "Expected branch should be displayed")
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

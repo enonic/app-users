@@ -92,7 +92,7 @@ module.exports = {
             await this.doSwitchToUsersApp();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigation');
-            throw new Error('error during navigation to Users app, screenshot: ' + screenshot + "  " + err);
+            throw new Error('navigateToUsersApp  - error during navigation to Users app, screenshot: ' + screenshot + "  " + err);
         }
     },
     async saveScreenshotUniqueName(namePart) {
