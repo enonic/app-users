@@ -1,10 +1,7 @@
 /**
  * Created on 06.11.2017.
- * verifies the lib-admin-ui#147
- * https://github.com/enonic/lib-admin-ui/issues/147
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
@@ -21,16 +18,16 @@ describe('Id Provider Permissions spec', function () {
     it(`GIVEN 'Id Provider' wizard is opened AND Acl-entry has been added WHEN filter input has been cleared AND drop-down handle clicked THEN number of options should be more than 1`,
         async () => {
             let idProviderWizard = new IdProviderWizard();
-            //1. Open new ID Provider wizard:
+            // 1. Open new ID Provider wizard:
             await testUtils.openIdProviderWizard();
-            //2. Add new Acl-entry:
+            // 2. Add new Acl-entry:
             await idProviderWizard.filterOptionsAndSelectPermission('Everyone');
-            //3. Clear the options filter input:
+            // 3. Clear the options filter input:
             await idProviderWizard.clearPrincipalOptionsFilterInput();
-            //4.Expand the combobox:
+            // 4.Expand the combobox:
             await idProviderWizard.clickOnPrincipalComboBoxDropDownHandle();
             let result = await idProviderWizard.getPrincipalOptionDisplayNames();
-            assert.isTrue(result.length > 1, 'number of options should be more than 1');
+            assert.ok(result.length > 1, 'number of options should be more than 1');
         });
 
     it(`GIVEN wizard for new 'Id Provider' is opened WHEN provider's drop-down handle has been clicked THEN 'Standard ID provider' item should be present in the list`,
@@ -39,7 +36,7 @@ describe('Id Provider Permissions spec', function () {
             await testUtils.openIdProviderWizard();
             await idProviderWizard.clickOnProviderComboBoxDropDownHandle();
             let displayNames = await idProviderWizard.getProviderOptionDisplayNames();
-            assert.isTrue(displayNames.includes(appConst.STANDARD_ID_PROVIDER),
+            assert.ok(displayNames.includes(appConst.STANDARD_ID_PROVIDER),
                 'Standard ID provider item should be present in the options list');
         });
 

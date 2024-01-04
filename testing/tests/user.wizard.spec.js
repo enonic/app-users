@@ -1,8 +1,7 @@
 /**
  * Created on 24.10.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
@@ -13,7 +12,7 @@ const appConst = require('../libs/app_const');
 describe('User Wizard and Change Password dialog spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let testUser;

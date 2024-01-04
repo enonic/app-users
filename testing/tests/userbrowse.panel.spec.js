@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
@@ -17,11 +16,11 @@ describe('User Browse Panel specification', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let result = await userBrowsePanel.isItemDisplayed('roles');
-            assert.isTrue(result, 'roles folder should be present in the root directory');
+            assert.ok(result, 'roles folder should be present in the root directory');
             result = await userBrowsePanel.isItemDisplayed('/system');
-            assert.isTrue(result, '`/system` folder should be present in the root directory');
+            assert.ok(result, '`/system` folder should be present in the root directory');
             result = await userBrowsePanel.isSelectionTogglerVisible();
-            assert.isFalse(result, "'Selection toggler' should not be displayed");
+            assert.ok(result === false, "'Selection toggler' should not be displayed");
         });
 
     it("GIVEN Browse panel is opened WHEN 'Roles' folder has been expanded THEN required system roles should be listed",
@@ -29,20 +28,20 @@ describe('User Browse Panel specification', function () {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnExpanderIcon('roles');
             let isDisplayed = await userBrowsePanel.isItemDisplayed('system.user.admin');
-            assert.isTrue(isDisplayed, "'User Administrator' role should be displayed");
+            assert.ok(isDisplayed, "'User Administrator' role should be displayed");
             isDisplayed = await userBrowsePanel.isItemDisplayed('system.admin');
-            assert.isTrue(isDisplayed, "'Administrator' role should be displayed");
+            assert.ok(isDisplayed, "'Administrator' role should be displayed");
             isDisplayed = await userBrowsePanel.isItemDisplayed('cms.admin');
-            assert.isTrue(isDisplayed, "'Content Manager Administrator' role should be displayed");
+            assert.ok(isDisplayed, "'Content Manager Administrator' role should be displayed");
 
             isDisplayed = await userBrowsePanel.isItemDisplayed('system.admin.login');
-            assert.isTrue(isDisplayed, "'Administration Console Login' role should be displayed");
+            assert.ok(isDisplayed, "'Administration Console Login' role should be displayed");
             isDisplayed = await userBrowsePanel.isItemDisplayed('system.everyone');
-            assert.isTrue(isDisplayed, "'Everyone' role should be displayed");
+            assert.ok(isDisplayed, "'Everyone' role should be displayed");
             isDisplayed = await userBrowsePanel.isItemDisplayed('cms.expert');
-            assert.isTrue(isDisplayed, "'Content Manager Expert' role should be displayed");
+            assert.ok(isDisplayed, "'Content Manager Expert' role should be displayed");
             isDisplayed = await userBrowsePanel.isItemDisplayed('system.authenticated');
-            assert.isTrue(isDisplayed, "'Authenticated' role should be displayed");
+            assert.ok(isDisplayed, "'Authenticated' role should be displayed");
         });
 
     it("GIVEN Browse panel is opened WHEN '/system' folder has been expanded THEN 'Groups' and 'Users' get visible",
@@ -50,9 +49,9 @@ describe('User Browse Panel specification', function () {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnExpanderIcon('/system');
             let isDisplayed = await userBrowsePanel.isItemDisplayed('groups');
-            assert.isTrue(isDisplayed, "'Groups' folder should be present beneath the 'system'");
+            assert.ok(isDisplayed, "'Groups' folder should be present beneath the 'system'");
             isDisplayed = await userBrowsePanel.isItemDisplayed('users');
-            assert.isTrue(isDisplayed, "'Users' folder should be present beneath the 'system'");
+            assert.ok(isDisplayed, "'Users' folder should be present beneath the 'system'");
         });
 
     it("WHEN checkbox 'System Id Provider' has been checked THEN SelectionPanelToggler gets visible",
@@ -96,12 +95,11 @@ describe('User Browse Panel specification', function () {
             await testUtils.openFilterPanel();
             let aggregationItems = await browseFilterPanel.getAggregationItems();
             assert.equal(aggregationItems.length, 1, "one aggregation item should be present in Filter Panel - 'Id provider'");
-            assert.isTrue(aggregationItems[0].includes('Id Provider'),
-                "one aggregation item should be present in Filter Panel - 'Id provider'");
+            assert.ok(aggregationItems[0].includes('Id Provider'), "ID Provider checkbox should be displayed in the Filter Panel");
             // 3. The grid should be filtered: one item remains in the grid
             let names = await userBrowsePanel.getGridItemDisplayNames();
             await testUtils.saveScreenshot('selection_toggler_clicked2');
-            assert.isTrue(names.includes('System Id Provider'), "Row with 'System Id Provider' should be present in the grid");
+            assert.ok(names.includes('System Id Provider'), "Row with 'System Id Provider' should be present in the grid");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

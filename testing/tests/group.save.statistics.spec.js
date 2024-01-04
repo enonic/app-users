@@ -1,8 +1,7 @@
 /**
  * Created on 09.10.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -70,7 +69,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             await testUtils.typeNameInFilterPanel(testGroup.displayName);
             // 4. Verify that new group is filtered:
             let isPresent = await userBrowsePanel.isItemDisplayed(testGroup.displayName);
-            assert.isTrue(isPresent, "new group should be filtered in the rid");
+            assert.ok(isPresent, "new group should be filtered in the rid");
         });
 
     it("GIVEN existing 'group'(has no roles) is opened WHEN 'Users App' role has been added THEN this role gets visible in roles-step",

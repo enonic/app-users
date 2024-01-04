@@ -1,8 +1,7 @@
 /**
  * Created on 06.09.2023
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const testUtils = require('../libs/test.utils');
@@ -66,7 +65,7 @@ describe('user.public.key.spec: ui-tests for public key modal dialog', function 
             await testUtils.saveScreenshot('public_key_generated');
             // 5. Verify the notification message:
             let message = await userWizard.waitForNotificationMessage();
-            assert.isTrue(message.includes("A file with the private key was stored on your computer"),
+            assert.ok(message.includes("A file with the private key was stored on your computer"),
                 'Expected notification message should appear');
         });
 
@@ -100,8 +99,8 @@ describe('user.public.key.spec: ui-tests for public key modal dialog', function 
             await testUtils.saveScreenshot('key_details_dialog');
             // 4. Verify the key-text in the text area:
             let text = await userKeyDetailsDialog.getTextInTextArea();
-            assert.isTrue(text.includes('BEGIN PUBLIC KEY'), "Expected text should be displayed in the modal dialog");
-            assert.isTrue(text.includes('END PUBLIC KEY'), "Expected text should be displayed in the modal dialog");
+            assert.ok(text.includes('BEGIN PUBLIC KEY'), "Expected text should be displayed in the modal dialog");
+            assert.ok(text.includes('END PUBLIC KEY'), "Expected text should be displayed in the modal dialog");
         });
 
     it("GIVEN existing user is opened WHEN public key has been removed THEN the row with key should not be present in the table",

@@ -1,8 +1,7 @@
 /**
  * Created on 25.09.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const testUtils = require('../libs/test.utils');
@@ -65,7 +64,7 @@ describe('User Wizard negative spec ', function () {
             await userWizard.typeDisplayName(testUser.displayName);
             // 3. Verify that red icon is not displayed in the tab:
             let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            assert.isTrue(isRedIconPresent, "red circle should be visible in the tab, because 'password' is empty");
+            assert.ok(isRedIconPresent, "red circle should be visible in the tab, because 'password' is empty");
         });
 
     it("GIVEN wizard for new User is opened WHEN all data has been typed THEN red circle gets not visible in the wizard page",
@@ -76,7 +75,7 @@ describe('User Wizard negative spec ', function () {
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             let isRedIconNotPresent = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
-            assert.isTrue(isRedIconNotPresent, "red circle gets not visible, because all required inputs are filled");
+            assert.ok(isRedIconNotPresent, "red circle gets not visible, because all required inputs are filled");
         });
 
     it("GIVEN wizard for new User is opened AND all required inputs has been filled in WHEN password has been cleared THEN red circle gets visible again",
@@ -92,7 +91,7 @@ describe('User Wizard negative spec ', function () {
             await userWizard.clearPasswordInput();
             // 4. Verify that red icon appears in the wizard page
             let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            assert.isTrue(isRedIconPresent, "red circle gets visible, because 'password' input has been cleared");
+            assert.ok(isRedIconPresent, "red circle gets visible, because 'password' input has been cleared");
         });
 
     it("GIVEN wizard for new User is opened AND all data has been typed WHEN e-mail has been cleared THEN red circle gets visible",
@@ -106,7 +105,7 @@ describe('User Wizard negative spec ', function () {
             await userWizard.clearEmailInput();
             // Verify that red icon appears in the tab:
             let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            assert.isTrue(isRedIconPresent, "red circle gets visible, because 'email' input has been cleared");
+            assert.ok(isRedIconPresent, "red circle gets visible, because 'email' input has been cleared");
         });
 
     it("GIVEN all data has been typed in new wizard WHEN e-mail is invalid THEN red circle should be visible",
@@ -119,7 +118,7 @@ describe('User Wizard negative spec ', function () {
             await userWizard.typeData(testUser);
             // Verify that red icon is displayed in the tab:
             let result = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            assert.isTrue(result, "red circle should be visible, because 'e-mail' is not valid");
+            assert.ok(result, "red circle should be visible, because 'e-mail' is not valid");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

@@ -1,8 +1,7 @@
 /**
  * Created on 04.10.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -107,7 +106,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             await testUtils.typeNameInFilterPanel(NEW_DISPLAY_NAME);
             // 5. Verify that the user's path is not updated (the initial display name is displayed):
             let isDisplayed = await userBrowsePanel.isItemDisplayed(TEST_USER.displayName);
-            assert.isTrue(isDisplayed, "User with new display name should be searchable in the grid");
+            assert.ok(isDisplayed, "User with new display name should be searchable in the grid");
         });
 
     it("GIVEN existing user is opened WHEN one role has been removed THEN this role should not be present in the statistics panel",

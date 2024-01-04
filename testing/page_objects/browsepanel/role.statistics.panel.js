@@ -16,14 +16,15 @@ const XPATH = {
 
 class RoleStatisticsPanel extends ItemStatistic {
 
-    getDisplayNameOfMembers() {
-        let items = XPATH.div + XPATH.memberList + lib.H6_DISPLAY_NAME;
-        return this.waitForElementDisplayed(XPATH.membersDataGroup, 1000).catch(err => {
-            this.saveScreenshot(appConst.generateRandomName('err_role_stat_members'));
-            throw new Error('Members data-group was not in Role Statistic panel!' + err);
-        }).then(() => {
-            return this.getTextInElements(items);
-        })
+    async getDisplayNameOfMembers() {
+        try {
+            let items = XPATH.div + XPATH.memberList + lib.H6_DISPLAY_NAME;
+            await this.waitForElementDisplayed(XPATH.membersDataGroup, appConst.mediumTimeout);
+            return await this.getTextInElements(items);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_role_stat_members');
+            throw new Error('Members data-group was not in Role Statistic panel! screenshot: ' + screenshot + ' ' + err);
+        }
     }
 }
 

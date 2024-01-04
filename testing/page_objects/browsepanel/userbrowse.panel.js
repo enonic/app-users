@@ -141,8 +141,8 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            let screeenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw Error('Item was not found. screenshot: ' + screeenshot + ' ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_find_item');
+            throw Error('Item was not found. screenshot: ' + screenshot + ' ' + err);
         }
     }
 

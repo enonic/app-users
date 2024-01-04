@@ -1,8 +1,7 @@
 /**
  * Created on 26/02/2021.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
