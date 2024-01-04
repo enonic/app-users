@@ -41,13 +41,12 @@ class BrowseFilterPanel extends Page {
         return text.substring(startIndex + 1, endIndex);
     }
 
-    getNumberInRoleAggregationCheckbox() {
+    async getNumberInRoleAggregationCheckbox() {
         let roleAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + `/label`;
-        return this.getText(roleAggregationLocator).then(result => {
-            let startIndex = result.indexOf('(');
-            let endIndex = result.indexOf(')');
-            return result.substring(startIndex + 1, endIndex);
-        });
+        let result = await this.getText(roleAggregationLocator);
+        let startIndex = result.indexOf('(');
+        let endIndex = result.indexOf(')');
+        return result.substring(startIndex + 1, endIndex);
     }
 
     getAggregationItems() {
@@ -98,7 +97,7 @@ class BrowseFilterPanel extends Page {
             await this.typeTextInInput(this.searchTextInput, text);
             return await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_search_input");
+            let screenshot = await this.saveScreenshotUniqueName('err_search_input');
             throw new Error("Filter Panel, search input - screenshot:" + screenshot + ' ' + err);
         }
     }
@@ -107,8 +106,8 @@ class BrowseFilterPanel extends Page {
         try {
             await this.waitForElementDisplayed(this.clearFilterLink, appConst.mediumTimeout)
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_clear_link'));
-            throw new Error('Clear link should be visible: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_clear_link');
+            throw new Error('Clear link should be visible, screenshot: ' + screenshot + ' ' + err);
         }
     }
 

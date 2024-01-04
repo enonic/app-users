@@ -48,11 +48,14 @@ class RoleWizard extends WizardPanel {
         return await this.typeTextInInput(this.descriptionInput, data.description);
     }
 
-    clickOnDelete() {
-        return this.clickOnElement(this.deleteButton).catch(err => {
-            this.saveScreenshot('err_delete_button_in_role_wizard', err);
-            throw new Error("Role wizard - " + err);
-        });
+    async clickOnDelete() {
+        try {
+            await this.waitForDeleteButtonEnabled();
+            return await this.clickOnElement(this.deleteButton);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_delete_button_in_role_wizard');
+            throw new Error("Role wizard - delete button, screenshot:" + screenshot + ' ' + err);
+        }
     }
 
     waitForDeleteButtonEnabled() {
@@ -98,7 +101,7 @@ class RoleWizard extends WizardPanel {
             let locator = xpath.container + lib.selectedPrincipalByDisplayName(roleDisplayName) + lib.REMOVE_ICON;
             return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_remove_icon');
             throw new Error('Error - remove-icon should not be displayed for the role, screenshot: ' + screenshot + ' ' + err);
         }
     }

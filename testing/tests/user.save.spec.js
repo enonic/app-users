@@ -1,8 +1,7 @@
 /**
  * Created on 28.09.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -45,7 +44,7 @@ describe('Save User specification - save an user', function () {
             await userWizard.pause(400);
             //Verify that confirmation dialog is not loaded:
             let isLoaded = await confirmationDialog.isDialogLoaded();
-            assert.isFalse(isLoaded, 'Confirmation dialog should not be loaded, because all changes were saved');
+            assert.ok(isLoaded === false, 'Confirmation dialog should not be loaded, because all changes were saved');
         });
 
     it('GIVEN wizard for new User is opened AND valid data is typed WHEN the user has been saved THEN expected notification message should appear AND the user should be searchable',
@@ -66,7 +65,7 @@ describe('Save User specification - save an user', function () {
             await testUtils.typeNameInFilterPanel(userName);
             // 4. Verify that user is filtered
             let isPresent = await userBrowsePanel.isItemDisplayed(userName);
-            assert.isTrue(isPresent, 'New user should be added in the grid')
+            assert.ok(isPresent, 'New user should be added in the grid')
         });
 
     it('WHEN user has been saved in the wizard AND the wizard closed AND Users folder has been expanded THEN grid should be updated AND the user should be listed',
@@ -87,7 +86,7 @@ describe('Save User specification - save an user', function () {
             await userBrowsePanel.clickOnExpanderIcon('users');
             // 3. Verify that user is added:
             let isPresent = await userBrowsePanel.isItemDisplayed(userName);
-            assert.isTrue(isPresent, "New user should be added beneath the Users folder");
+            assert.ok(isPresent, "New user should be added beneath the Users folder");
         });
 
     it('WHEN try to save user with name that already in use THEN correct notification message should appear',

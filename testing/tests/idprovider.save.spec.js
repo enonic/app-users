@@ -1,8 +1,7 @@
 /**
  * Created on 29/06/2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -43,21 +42,21 @@ describe('Id Provider specification - save and edit a provider', function () {
             await newPrincipalDialog.waitForDialogLoaded();
             //2. Verify expander-icons on the dialog:
             let result = await newPrincipalDialog.waitForExpanderIconDisplayed("User Group");
-            assert.isTrue(result, "Expander in User Group menu-item should be displayed");
-            result = await newPrincipalDialog.waitForExpanderIconDisplayed("User");
-            assert.isTrue(result, "Expander in User menu-item should be displayed");
+            assert.ok(result, "Expander in User Group menu-item should be displayed");
+            result = await newPrincipalDialog.waitForExpanderIconDisplayed('User');
+            assert.ok(result, "Expander in User menu-item should be displayed");
         });
 
     it(`GIVEN existing 2 id-providers AND New button has been pressed WHEN expander has been clicked THEN expected provider's name should be present in expanded menu`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let newPrincipalDialog = new NewPrincipalDialog();
-            //1. Open New content dialog:
+            // 1. Open New content dialog:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
-            //2. Click on the expander-icon in Users Group menu item:
-            await newPrincipalDialog.clickOnExpanderIcon("User Group");
-            //3. 2 id-providers should be present in the expanded menu:
+            // 2. Click on the expander-icon in Users Group menu item:
+            await newPrincipalDialog.clickOnExpanderIcon('User Group');
+            // 3. 2 id-providers should be present in the expanded menu:
             await testUtils.saveScreenshot('User_Group_row_expanded');
             await newPrincipalDialog.waitForProviderNameDisplayed(ID_PROVIDER.displayName);
         });
@@ -65,16 +64,16 @@ describe('Id Provider specification - save and edit a provider', function () {
     it(`GIVEN 'Id provider' wizard is opened WHEN the name that already in use has been typed THEN Expected notification message should appear`,
         async () => {
             let idProviderWizard = new IdProviderWizard();
-            //1. Open new wizard:
+            // 1. Open new wizard:
             await testUtils.openIdProviderWizard();
-            //2. Type the name and save:
+            // 2. Type the name and save:
             await idProviderWizard.typeDisplayName(ID_PROVIDER.displayName);
             await idProviderWizard.waitAndClickOnSave();
-            //3. Expected notification message should appear:
+            // 3. Expected notification message should appear:
             let actualMessage = await idProviderWizard.waitForErrorNotificationMessage();
             let msg = `Id Provider [` + ID_PROVIDER.displayName + `] could not be created. A Id Provider with that name already exists`;
             assert.strictEqual(actualMessage, msg, 'expected notification message should be displayed');
-            //verifies issue#189 - (Endless spinner when saving the Id Provider)
+            // verifies issue#189 - (Endless spinner when saving the Id Provider)
             await idProviderWizard.waitForSpinnerNotVisible();
         });
 
@@ -82,13 +81,13 @@ describe('Id Provider specification - save and edit a provider', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             ID_PROVIDER_2 = userItemsBuilder.buildIdProvider(userItemsBuilder.generateRandomName('provider'), 'test Id provider');
-            //1. Save new ID Provider:
+            // 1. Save new ID Provider:
             await testUtils.openWizardAndSaveIdProvider(ID_PROVIDER_2);
             await userBrowsePanel.closeTabAndWaitForGrid(ID_PROVIDER_2.displayName);
             await userBrowsePanel.pause(1000);
-            //2. new Id Provider should be present in browse panel:
+            // 2. new Id Provider should be present in browse panel:
             let isDisplayed = await userBrowsePanel.isItemDisplayed(ID_PROVIDER_2.displayName);
-            assert.isTrue(isDisplayed, 'new Id provider should be present in the grid');
+            assert.ok(isDisplayed, 'new Id provider should be present in the grid');
         });
 
     it(`WHEN new ID Provider with permissions has been saved AND the wizard has been closed THEN 'Save Before Close' dialog should not appear`,
@@ -98,17 +97,17 @@ describe('Id Provider specification - save and edit a provider', function () {
             let userBrowsePanel = new UserBrowsePanel();
             let name = userItemsBuilder.generateRandomName('provider');
             let testProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', null, permissions);
-            //1. Open new wizard and type the data with permissions:
+            // 1. Open new wizard and type the data with permissions:
             await testUtils.openIdProviderWizard(testProvider);
             await idProviderWizard.typeData(testProvider);
-            //2. click on Save button:
+            // 2. click on Save button:
             await idProviderWizard.waitAndClickOnSave();
             await idProviderWizard.waitForSpinnerNotVisible();
             await idProviderWizard.pause(1500);
-            //3. Close the wizard-tab:
+            // 3. Close the wizard-tab:
             await userBrowsePanel.closeTabAndWaitForGrid(testProvider.displayName);
             let result = await userBrowsePanel.isItemDisplayed(testProvider.displayName);
-            assert.isTrue(result, 'new Id provider should be present in browse panel');
+            assert.ok(result, 'new Id provider should be present in browse panel');
         });
 
     it(`WHEN existing 'Id Provider' has been opened THEN expected description should be present`,
@@ -126,11 +125,11 @@ describe('Id Provider specification - save and edit a provider', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnRowByName(ID_PROVIDER_2.displayName);
-            //'Delete' button should be enabled, because of the provider does not contain users:
+            // 'Delete' button should be enabled, because of the provider does not contain users:
             await userBrowsePanel.waitForDeleteButtonEnabled();
-            //'New' button should be enabled
+            // 'New' button should be enabled
             await userBrowsePanel.waitForNewButtonEnabled();
-            //'Edit' button should be enabled
+            // 'Edit' button should be enabled
             await userBrowsePanel.isEditButtonEnabled();
         });
 

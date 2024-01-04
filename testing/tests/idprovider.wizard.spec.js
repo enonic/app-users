@@ -1,10 +1,7 @@
 /**
  * Created on 5/30/2017.
- * verifies the xp-apps#201 (options not filtered, when the name of ID provider has been typed)
- * https://github.com/enonic/xp-apps/issues/201
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
@@ -22,7 +19,7 @@ describe('Id Provider wizard - validation and inputs', function () {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
             let isRedIconPresent = await idProviderWizard.waitUntilInvalidIconAppears('<Unnamed Id Provider>');
-            assert.isTrue(isRedIconPresent, 'red circle should be present in the tab, because required input(name) is empty');
+            assert.ok(isRedIconPresent, 'red circle should be present in the tab, because required input(name) is empty');
         });
 
     it("WHEN 'New' button has been pressed AND 'Id Provider' menu-item has been clicked THEN required inputs should be loaded in the wizard",
@@ -30,15 +27,15 @@ describe('Id Provider wizard - validation and inputs', function () {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
             let result = await idProviderWizard.isDisplayNameInputVisible();
-            assert.isTrue(result, 'display name input should be present');
+            assert.ok(result, 'display name input should be present');
             result = await idProviderWizard.isDescriptionInputDisplayed();
-            assert.isTrue(result, 'description input should be present');
+            assert.ok(result, 'description input should be present');
             result = await idProviderWizard.waitForSaveButtonDisabled();
-            assert.isTrue(result, "'Save' button should be disabled");
+            assert.ok(result, "'Save' button should be disabled");
             result = await idProviderWizard.isAuthApplicationsOptionsFilterInputDisplayed();
-            assert.isTrue(result, "'Auth Applications Options Filter' input should be present");
+            assert.ok(result, "'Auth Applications Options Filter' input should be present");
             result = await idProviderWizard.isPermissionsOptionsFilterInputDisplayed();
-            assert.isTrue(result, "'Permissions Options Filter' input should be present");
+            assert.ok(result, "'Permissions Options Filter' input should be present");
         });
 
     it("GIVEN 'Id Provider' wizard is opened WHEN 'Standard ID Provider' has been selected THEN 'Provider Options Filter' gets not visible",
@@ -47,7 +44,7 @@ describe('Id Provider wizard - validation and inputs', function () {
             await testUtils.openIdProviderWizard();
             await idProviderWizard.filterOptionsAndSelectApplication(appConst.ID_PROVIDERS.STANDARD_ID_PROVIDER);
             let result = await idProviderWizard.isAuthApplicationsOptionsFilterInputDisplayed();
-            assert.isFalse(result, "'Provider Options Filter' input gets not visible");
+            assert.ok(result === false, "'Provider Options Filter' input gets not visible");
         });
 
     it("GIVEN wizard for new provider is opened and `Standard ID Provider` is selected WHEN the application has been removed THEN 'Provider Options Filter' input gets visible",
@@ -59,7 +56,7 @@ describe('Id Provider wizard - validation and inputs', function () {
             // 2. remove the selected application:
             await idProviderWizard.removeAuthApplication();
             let result = await idProviderWizard.isAuthApplicationsOptionsFilterInputDisplayed();
-            assert.isTrue(result, "'Provider Options Filter' input gets displayed");
+            assert.ok(result, "'Provider Options Filter' input gets displayed");
         });
 
     it("WHEN new 'Id Provider Wizard' is opened THEN three default three roles should be present",
@@ -70,9 +67,9 @@ describe('Id Provider wizard - validation and inputs', function () {
             // three default ACL entry should be displayed:
             let result = await idProviderWizard.getPermissions();
             assert.equal(result.length, 3, 'Three entries should be displayed in the form');
-            assert.isTrue(result.includes(appConst.ROLES_DISPLAY_NAME.AUTHENTICATED), 'Authenticated principal should be present');
-            assert.isTrue(result.includes(appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR), 'Administrator principal should be present');
-            assert.isTrue(result.includes(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR),
+            assert.ok(result.includes(appConst.ROLES_DISPLAY_NAME.AUTHENTICATED), 'Authenticated principal should be present');
+            assert.ok(result.includes(appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR), 'Administrator principal should be present');
+            assert.ok(result.includes(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR),
                 'Users Administrator principal should be present');
         });
 
@@ -82,12 +79,12 @@ describe('Id Provider wizard - validation and inputs', function () {
             await testUtils.openIdProviderWizard();
             await idProviderWizard.filterOptionsAndSelectPermission('Everyone');
             let result = await idProviderWizard.isPermissionsOptionsFilterInputDisplayed();
-            assert.isTrue(result, "'Permissions Options Filter' input should be displayed");
+            assert.ok(result, "'Permissions Options Filter' input should be displayed");
             let perm = await idProviderWizard.getPermissions();
-            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.AUTHENTICATED));
-            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR));
-            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR));
-            assert.isTrue(perm.includes(appConst.ROLES_DISPLAY_NAME.EVERYONE));
+            assert.ok(perm.includes(appConst.ROLES_DISPLAY_NAME.AUTHENTICATED));
+            assert.ok(perm.includes(appConst.ROLES_DISPLAY_NAME.ADMINISTRATOR));
+            assert.ok(perm.includes(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR));
+            assert.ok(perm.includes(appConst.ROLES_DISPLAY_NAME.EVERYONE));
         });
 
     it("GIVEN new wizard for 'Id Provider Wizard' is opened WHEN name has been typed THEN red icon gets not visible",
@@ -96,7 +93,7 @@ describe('Id Provider wizard - validation and inputs', function () {
             await testUtils.openIdProviderWizard();
             await idProviderWizard.typeDisplayName('test');
             let isRedIconNotPresent = await idProviderWizard.waitUntilInvalidIconDisappears('test');
-            assert.isTrue(isRedIconNotPresent, 'red circle gets not visible in the tab, because  required input(name) is filled');
+            assert.ok(isRedIconNotPresent, 'red circle gets not visible in the tab, because  required input(name) is filled');
             // 'Save' button gets enabled:
             await idProviderWizard.waitForSaveButtonEnabled();
             // 'Delete' button should be disabled:

@@ -1,8 +1,7 @@
 /**
  * Created on 21.11.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const RoleWizard = require('../page_objects/wizardpanel/role.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -52,7 +51,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             // 2. Expand Roles-folder:
             await userBrowsePanel.clickOnExpanderIcon('roles');
             let result = await userBrowsePanel.isItemDisplayed(roleName);
-            assert.isTrue(result, 'new role should be present in the grid')
+            assert.ok(result, 'new role should be present in the grid')
         });
 
     it("GIVEN new 'Role' is saved WHEN 'Delete' button in wizard-toolbar has been pressed THEN Confirmation dialog should appear",

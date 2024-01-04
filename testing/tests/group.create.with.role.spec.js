@@ -1,9 +1,7 @@
 /**
  * Created on 22.01.2018.
- * verifies: xp-apps#371 GroupWizard - SaveBeforeClose dialog appears in saved group
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
@@ -29,8 +27,8 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             await testUtils.openWizardAndSaveRole(testRole);
             //2. Type the name in the filter panel:
             await testUtils.typeNameInFilterPanel(testRole.displayName);
-            let result = await userBrowsePanel.isItemDisplayed(testRole.displayName);
-            assert.isTrue(result, "New role should be present in the grid");
+            let isDisplayed = await userBrowsePanel.isItemDisplayed(testRole.displayName);
+            assert.ok(isDisplayed, "New role should be present in the grid");
         });
 
     //verifies: xp-apps#371 GroupWizard - SaveBeforeClose dialog appears in saved group
@@ -50,7 +48,7 @@ describe('group.create.with.role Create a Group with a just created new Role', f
             let confirmationDialog = new ConfirmationDialog();
             //Confirmation dialog should not be displayed:
             let result = await confirmationDialog.isDialogLoaded();
-            assert.isFalse(result, "Confirmation dialog should not be loaded");
+            assert.ok(result === false, "Confirmation dialog should not be loaded");
         });
 
     it("GIVEN new group is saved AND System ID Provider is selected WHEN New button has been clicked THEN 'New principal' dialog should be loaded",

@@ -1,8 +1,7 @@
 /**
  * Created on 28.05.2020.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
@@ -13,7 +12,7 @@ const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.
 describe("Check 'Selection Controller' and 'Show Selection' elements in filtered grid", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let GROUP_1;
@@ -46,37 +45,37 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             await testUtils.saveScreenshot("selection_toggle_checkbox_partial");
             //5. Verify that 'Selection Controller' checkBox shows that the selection is partial:
             let result = await userBrowsePanel.waitForSelectionControllerPartial();
-            assert.isTrue(result, "'Selection Controller' shows that selection is partial");
+            assert.ok(result, "'Selection Controller' shows that selection is partial");
         });
 
     //Verifies  issue#334 Incorrect behaviour of Show Selection button and Selection Controller gets irresponsive
-    it("WHEN 'Show Selection', 'Hide Selection',Show Selection sequentially clicked in filtered grid THEN expected group should be present and Selection Controller should be selected",
+    it("WHEN 'Show Selection', 'Hide Selection', Show Selection sequentially clicked in filtered grid THEN expected group should be present and Selection Controller should be selected",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let browseFilterPanel = new BrowseFilterPanel();
             await testUtils.openFilterPanel();
-            //1. Click ib Group aggregation checkbox:
+            // 1. Click ib Group aggregation checkbox:
             await browseFilterPanel.clickOnGroupAggregation();
-            //2. Select 2 groups:
+            // 2. Select 2 groups:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_1.displayName);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_2.displayName);
-            //3. Click on 'Show Selection'
+            // 3. Click on 'Show Selection'
             await userBrowsePanel.clickOnSelectionToggler();
             await userBrowsePanel.pause(1000);
-            //4. Click on 'Hide Selection', initial state of thr grid is restored:
+            // 4. Click on 'Hide Selection', initial state of thr grid is restored:
             await userBrowsePanel.clickOnSelectionToggler();
             await userBrowsePanel.pause(500);
-            //5. Click on 'Show Selection'
+            // 5. Click on 'Show Selection'
             await userBrowsePanel.clickOnSelectionToggler();
-            testUtils.saveScreenshot("selection_toggle_checkbox_selected");
-            //6. Verify that 'Selection Controller' checkBox should be selected:
+            await testUtils.saveScreenshot("selection_toggle_checkbox_selected");
+            // 6. Verify that 'Selection Controller' checkBox should be selected:
             let isSelected = await userBrowsePanel.isSelectionControllerSelected();
-            assert.isTrue(isSelected, "'Selection Controller' shows that selection is partial");
-            //7. Verify that only 2 items(groups) are displayed:
+            assert.ok(isSelected, "'Selection Controller' shows that selection is partial");
+            // 7. Verify that only 2 items(groups) are displayed:
             let gridItems = await userBrowsePanel.getGridItemDisplayNames();
             assert.equal(gridItems.length, 2, "Two groups should be present in User Browse Panel");
-            assert.isTrue(gridItems.includes(GROUP_1.displayName), "The first group should be present in User Browse Panel");
-            assert.isTrue(gridItems.includes(GROUP_1.displayName), "The second group should be present in User Browse Panel");
+            assert.ok(gridItems.includes(GROUP_1.displayName), "The first group should be present in User Browse Panel");
+            assert.ok(gridItems.includes(GROUP_1.displayName), "The second group should be present in User Browse Panel");
         });
 
     before(async () => {

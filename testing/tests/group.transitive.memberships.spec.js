@@ -1,8 +1,7 @@
 /**
  * Created on 01.11.2018.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const testUtils = require('../libs/test.utils');
@@ -74,13 +73,13 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             let roles = await groupStatisticsPanel.getDisplayNameOfRoles();
             // 3. Two roles should be displayed in the Statistics Panel:
             assert.equal(roles.length, 2, "Two roles should be displayed");
-            assert.isTrue(roles.includes(appConst.ROLES_DISPLAY_NAME.USERS_APP), '`Users App` role should be present on the panel');
-            assert.isTrue(roles.includes(appConst.ROLES_DISPLAY_NAME.ADMIN_CONSOLE),
+            assert.ok(roles.includes(appConst.ROLES_DISPLAY_NAME.USERS_APP), '`Users App` role should be present on the panel');
+            assert.ok(roles.includes(appConst.ROLES_DISPLAY_NAME.ADMIN_CONSOLE),
                 'Transitive role should be present on the panel as well');
             // 4. One group should be displayed
             let groups = await groupStatisticsPanel.getDisplayNamesInGroupList();
             assert.equal(groups.length, 1, "One group should be visible in the group-list in Statistics Panel");
-            assert.isTrue(groups.includes(group2.displayName), 'Expected group-name should be in the group-list');
+            assert.ok(groups.includes(group2.displayName), 'Expected group-name should be in the group-list');
         });
 
     it("GIVEN group1 is selected AND group2 is opened WHEN group1 is removed in members of group2 THEN group1 stats should be updated in Inspect Panel",

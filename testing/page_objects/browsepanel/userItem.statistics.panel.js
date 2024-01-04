@@ -63,11 +63,13 @@ class UserItemStatisticsPanel extends Page {
         return this.isElementDisplayed(XPATH.reportDataGroup);
     }
 
-    waitForGenerateButtonEnabled() {
-        return this.waitForElementEnabled(this.generateReportButton, appConst.mediumTimeout).catch(err => {
-            console.log('Generate Report Button : ' + err);
-            return false;
-        })
+    async waitForGenerateButtonEnabled() {
+        try {
+            return await this.waitForElementEnabled(this.generateReportButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_generate_btn');
+            throw new Error("Generate button is not enabled, screenshot " + screenshot + ' ' + err);
+        }
     }
 
     async clickOnGenerateReportButton() {

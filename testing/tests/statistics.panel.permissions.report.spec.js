@@ -1,8 +1,7 @@
 /**
  * Created on 13.09.2018.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
@@ -21,7 +20,7 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
             await testUtils.findAndSelectItem('su');
             await testUtils.saveScreenshot('generate_report_button_is_disabled');
             let isDisabled = await userStatisticsPanel.waitForGenerateButtonDisabled();
-            assert.isTrue(isDisabled, '`Generate Report` button should be disabled');
+            assert.ok(isDisabled, '`Generate Report` button should be disabled');
         });
 
     it("GIVEN 'su' is selected WHEN a repository has been selected in the statistic panel THEN 'Generate Report' button gets enabled",
@@ -30,8 +29,8 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
             await testUtils.findAndSelectItem('su');
             await userStatisticsPanel.selectRepository('com.enonic.cms.default');
             await testUtils.saveScreenshot('generate_report_button_getting_enabled');
-            let result = await userStatisticsPanel.waitForGenerateButtonEnabled();
-            assert.isTrue(result, '`Generate Report` button gets enabled');
+            // Verify that 'Generate' button is enabled:
+            await userStatisticsPanel.waitForGenerateButtonEnabled();
         });
 
     it("GIVEN 'su' is selected WHEN 'default' repository and 'draft' branch have been selected THEN draft branch should be displayed AND 'remove' icon should appear",
