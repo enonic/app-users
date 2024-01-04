@@ -104,8 +104,9 @@ describe('Id Provider, provider-dialog specification', function () {
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
             await idProviderWizard.pause(500);
             await testUtils.saveScreenshot('idprovider_wizard_modal_dialog_should_be_closed');
+            // 5. Verify that confirmation modal dialog should not be loaded:
             let result = await confirmationDialog.isDialogLoaded();
-            assert.ok(result, 'Confirmation dialog should not appear');
+            assert.ok(result === false, 'Confirmation dialog should not appear, all changes were saved');
         });
 
     it(`GIVEN id provider with a configuration is selected WHEN Create New User menu item has been clicked THEN expected notification message should appear`,
@@ -115,7 +116,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, "User");
             // 2. Verify the actual notification message - The application does not allow to create users
             let actualMessage = await userBrowsePanel.waitForNotificationMessage();
-            await testUtils.saveScreenshot("app_does_not_allow_users");
+            await testUtils.saveScreenshot('app_does_not_allow_users');
             assert.equal(actualMessage, NOTIFICATION_MESSAGE, "The application does not allow to create users");
         });
 
