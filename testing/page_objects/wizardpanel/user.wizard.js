@@ -138,6 +138,7 @@ class UserWizard extends wizards.WizardPanel {
         }
     }
 
+
     isEmailInputDisplayed() {
         return this.isElementDisplayed(this.emailInput);
     }

@@ -55,7 +55,7 @@ Start ui-tests on your local environment:
 ```
 Start ui-tests on GitHub environment,  go to `app-users`:
 All these commands downloads XP distro, unpacks and starts the server(test apps will be copied to the `deploy` folder before the starting)
-```gradlew w_testUsersApp```       
+```gradlew w_testUsersApp```
 
 
 Test reports and screenshot you can find in the folder: ```app-users\testing\build\reports\```
