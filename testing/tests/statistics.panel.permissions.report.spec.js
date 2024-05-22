@@ -14,6 +14,8 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
         webDriverHelper.setupBrowser();
     }
 
+    const TEST_REPOSITORY = 'com.enonic.cms.selenium';
+
     it("GIVEN 'su' is selected WHEN repository is not selected in the statistic panel THEN 'Generate Report' button should be disabled",
         async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
@@ -27,23 +29,23 @@ describe('statistics.panel.permissions.report.spec: Generate Report specificatio
         async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
             await testUtils.findAndSelectItem('su');
-            await userStatisticsPanel.selectRepository('com.enonic.cms.default');
+            await userStatisticsPanel.selectRepository('system-repo');
             await testUtils.saveScreenshot('generate_report_button_getting_enabled');
             // Verify that 'Generate' button is enabled:
             await userStatisticsPanel.waitForGenerateButtonEnabled();
         });
 
-    it("GIVEN 'su' is selected WHEN 'default' repository and 'draft' branch have been selected THEN draft branch should be displayed AND 'remove' icon should appear",
+    it("GIVEN 'su' is selected WHEN 'selenium' repository and 'draft' branch have been selected THEN draft branch should be displayed AND 'remove' icon should appear",
         async () => {
             let userStatisticsPanel = new UserStatisticsPanel();
             await testUtils.findAndSelectItem('su');
             // 1. Select a repository and a branch:
-            await userStatisticsPanel.selectRepository('com.enonic.cms.default');
+            await userStatisticsPanel.selectRepository(TEST_REPOSITORY);
             await userStatisticsPanel.clickOnDropDownHandleAndSelectBranch('draft');
 
             // default repository and draft-branch should be selected:
-            await userStatisticsPanel.isOptionSelected('com.enonic.cms.default');
-            let branchName = await userStatisticsPanel.getBranchName('com.enonic.cms.default');
+            await userStatisticsPanel.isOptionSelected(TEST_REPOSITORY);
+            let branchName = await userStatisticsPanel.getBranchName(TEST_REPOSITORY);
             assert.equal(branchName, 'draft', "Expected branch should be displayed")
         });
 
