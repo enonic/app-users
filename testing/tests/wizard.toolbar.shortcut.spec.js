@@ -45,6 +45,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let message = await userWizard.waitForNotificationMessage();
             assert.equal(message, appConst.USER_WAS_CREATED_MESSAGE, 'User was created - message should appear');
         });
+
     it(`GIVEN existing user is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
         async () => {
             let userWizard = new UserWizard();
