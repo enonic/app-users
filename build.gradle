@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'maven-publish'
     id 'com.enonic.defaults' version '2.1.5'
     id 'com.enonic.xp.app' version '3.4.0'
@@ -23,6 +24,15 @@ configurations {
             attribute( LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named( LibraryElements, 'dev-resources' ) )
         }
     }
+    all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    xp.enonicRepo( 'dev' )
 }
 
 apply from: "$projectDir/gradle/env.gradle"
@@ -40,27 +50,16 @@ dependencies {
     include "com.enonic.xp:lib-i18n:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    include "com.enonic.lib:lib-graphql:2.0.1"
-    include "com.enonic.lib:lib-mustache:2.1.0"
+    include "com.enonic.lib:lib-graphql:2.1.0"
+    include "com.enonic.lib:lib-mustache:2.1.1"
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter:5.9.1'
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:4.8.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation( testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" ) )
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    xp.enonicRepo( 'dev' )
-}
 
 tasks.register('lint', NpmTask) {
     dependsOn ( 'npmInstall' )
@@ -100,5 +99,15 @@ jar {
 test {
     useJUnitPlatform()
     systemProperty 'java.awt.headless', 'true'
-    jvmArgs '-noverify', '-XX:TieredStopAtLevel=1'
+    jvmArgs '-XX:TieredStopAtLevel=1'
 }
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    mustRunAfter jar
+}
+
+check.dependsOn jacocoTestReport
