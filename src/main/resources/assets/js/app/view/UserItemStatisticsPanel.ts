@@ -251,7 +251,7 @@ export class UserItemStatisticsPanel
 
     private getReportServicePath(): string {
         if (!this.reportServicePath) {
-            this.reportServicePath = Path.fromString(CONFIG.getString('services.reportServiceUrl')).toString();
+            this.reportServicePath = Path.fromString(CONFIG.getString('apis.reportServiceUrl')).toString();
         }
 
         return this.reportServicePath;
