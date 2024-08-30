@@ -3,7 +3,7 @@ import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 import {
     PrincipalComboBox,
-    PrincipalComboBoxBuilder,
+    PrincipalComboBoxWrapper,
     PrincipalSelectedOptionsView
 } from '@enonic/lib-admin-ui/ui/security/PrincipalComboBox';
 import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
@@ -22,6 +22,8 @@ export class MembersWizardStepForm
 
     private principalCombobox: MembersPrincipalCombobox;
 
+    private comboboxWrapper: PrincipalComboBoxWrapper;
+
     constructor() {
         super('membership-wizard-step-form');
     }
@@ -29,19 +31,18 @@ export class MembersWizardStepForm
     protected initElements(): void {
         super.initElements();
 
-        const loader: PrincipalLoader = <PrincipalLoader>new PrincipalLoader()
-            .setAllowedTypes([PrincipalType.GROUP, PrincipalType.USER])
-            .skipPrincipals([PrincipalKey.ofAnonymous()])
-            .setUseDataPreLoad(true);
+        this.principalCombobox = new MembersPrincipalCombobox({
+            maxSelected: 0,
+            allowedTypes: [PrincipalType.GROUP, PrincipalType.USER],
+            skipPrincipals: [PrincipalKey.ofAnonymous()],
+            selectedOptionsView: new MembersPrincipalSelectedOptionsView(),
+        });
 
-        const builder: PrincipalComboBoxBuilder = <PrincipalComboBoxBuilder>PrincipalComboBox.create()
-            .setLoader(loader)
-            .setSelectedOptionsView(new MembersPrincipalSelectedOptionsView());
-        this.principalCombobox = new MembersPrincipalCombobox(builder);
+        this.comboboxWrapper = new PrincipalComboBoxWrapper(this.principalCombobox);
     }
 
     protected createFormItems(): FormItem[] {
-        const principalsFormItem: FormItem = new FormItemBuilder(this.principalCombobox).setLabel(i18n('field.members')).build();
+        const principalsFormItem: FormItem = new FormItemBuilder(this.comboboxWrapper).setLabel(i18n('field.members')).build();
         return [principalsFormItem];
     }
 
@@ -50,19 +51,19 @@ export class MembersWizardStepForm
             this.principalCombobox.setReadOnlyItems([PrincipalKey.ofSU()]);
         }
 
-        if (this.principalCombobox.isDirty()) {
+        if (this.comboboxWrapper.isDirty()) {
             if (ObjectHelper.arrayEquals(this.getMembersKeys(), principal.getMembers())) {
-                this.principalCombobox.resetBaseValues();
+                this.comboboxWrapper.resetBaseValues();
             }
         } else {
             this.getLoader().skipPrincipal(principal.getKey());
             const value: string = principal.getMembers().map((key: PrincipalKey) => key.toString()).join(';');
-            this.principalCombobox.setValue(value);
+            this.comboboxWrapper.setValue(value);
         }
     }
 
     getMembers(): Principal[] {
-        return this.principalCombobox.getSelectedDisplayValues();
+        return this.principalCombobox.getSelectedOptions().map((option) => option.getOption().getDisplayValue());
     }
 
     getMembersKeys(): PrincipalKey[] {
@@ -91,14 +92,10 @@ class MembersPrincipalCombobox
 
     private readOnlyItems: PrincipalKey[] = [];
 
-    protected createOption(p: Principal, readOnly?: boolean): Option<Principal> {
-        return super.createOption(p, readOnly || this.isReadOnlyItem(p.getKey()));
-    }
-
     setReadOnlyItems(items: PrincipalKey[]): void {
         this.readOnlyItems = items || [];
 
-        (<MembersPrincipalSelectedOptionsView>this.getSelectedOptionView()).setReadOnlyItems(items);
+        (<MembersPrincipalSelectedOptionsView>this.selectedOptionsView).setReadOnlyItems(items);
     }
 
     private isReadOnlyItem(key: PrincipalKey): boolean {
