@@ -66,7 +66,7 @@ describe('User Browse Panel specification', function () {
         });
 
     // Verifies - https://github.com/enonic/app-users/issues/340  Empty TreeGrid when toggling Selection
-    it("GIVEN 'System Id Provider' checkbox is checked WHEN SelectionPanelToggler has been clicked THEN grid gets filtered - one item should be in the grid",
+    it("GIVEN 'System Id Provider' checkbox is checked WHEN 'Show Selection' has been clicked THEN grid gets filtered - one item should be in the grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             // 1. Click on the checkbox:
@@ -83,7 +83,7 @@ describe('User Browse Panel specification', function () {
 
     // Verifies https://github.com/enonic/lib-admin-ui/issues/1790
     // Case 2: Grid gets empty after openein/closing Details Panel (or resizing the browser window)
-    it("GIVEN 'Selection Controller' checkbox has been clicked WHEN 'Selection Toggler' has been clicked THEN grid gets filtered - only provider-folders should be present in grid",
+    it("GIVEN 'Selection Controller' checkbox has been clicked WHEN 'Show selections' button has been clicked THEN only provider-folders should be present in grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let browseFilterPanel = new BrowseFilterPanel();
@@ -93,12 +93,13 @@ describe('User Browse Panel specification', function () {
             // 2. Click on 'Show Selection':
             await userBrowsePanel.clickOnSelectionToggler();
             await testUtils.openFilterPanel();
+            await testUtils.saveScreenshot('selection_toggler_clicked2');
+            // 3. Verify that the only one checkbox should be displayed in  Filter Panel
             let aggregationItems = await browseFilterPanel.getAggregationItems();
             assert.equal(aggregationItems.length, 1, "one aggregation item should be present in Filter Panel - 'Id provider'");
             assert.ok(aggregationItems[0].includes('Id Provider'), "ID Provider checkbox should be displayed in the Filter Panel");
-            // 3. The grid should be filtered: one item remains in the grid
+            // 4. The grid should be filtered: one item should remain in the grid
             let names = await userBrowsePanel.getGridItemDisplayNames();
-            await testUtils.saveScreenshot('selection_toggler_clicked2');
             assert.ok(names.includes('System Id Provider'), "Row with 'System Id Provider' should be present in the grid");
         });
 

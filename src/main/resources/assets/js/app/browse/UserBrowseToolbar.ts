@@ -4,8 +4,7 @@ export class UserBrowseToolbar
     extends Toolbar<ToolbarConfig> {
 
     constructor() {
-        super({
-            className: 'user-browse-toolbar'
-        });
+        super();
+        this.addClass('user-browse-toolbar');
     }
 }

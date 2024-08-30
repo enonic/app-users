@@ -15,7 +15,7 @@ describe('User Wizard and Change Password dialog spec', function () {
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let testUser;
+    let TEST_USER;
     const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
     const BAD_PASSWORD = '123';
 
@@ -51,10 +51,10 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let displayName = userItemsBuilder.generateRandomName('user');
             let email = userItemsBuilder.generateEmail(displayName);
-            testUser = userItemsBuilder.buildUser(displayName, MEDIUM_PASSWORD, email, null, null);
+            TEST_USER = userItemsBuilder.buildUser(displayName, MEDIUM_PASSWORD, email, null, null);
             await testUtils.clickOnSystemOpenUserWizard();
-            await userWizard.typeData(testUser);
-            let result = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
+            await userWizard.typeData(TEST_USER);
+            let result = await userWizard.waitUntilInvalidIconDisappears(TEST_USER.displayName);
             assert.ok(result, 'red circle should not be present in the tab, because all required inputs are filled');
             // 'Save' button gets enabled, otherwise exception will be thrown:
             await userWizard.waitForSaveButtonEnabled();
@@ -65,11 +65,11 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let displayName = userItemsBuilder.generateRandomName('user');
             let email = userItemsBuilder.generateEmail(displayName);
-            testUser = userItemsBuilder.buildUser(displayName, MEDIUM_PASSWORD, email, null, null);
+            TEST_USER = userItemsBuilder.buildUser(displayName, MEDIUM_PASSWORD, email, null, null);
             // 1. Open the wizard for new user;
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Type the data:
-            await userWizard.typeData(testUser);
+            await userWizard.typeData(TEST_USER);
             // 3. Click on Save button:
             await userWizard.waitAndClickOnSave();
             await testUtils.saveScreenshot('user_change_password_button_displayed');
@@ -81,7 +81,7 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             // 1. Open the existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Clear the name-input:
             await userWizard.clearDisplayNameInput();
             // 3. Verify that red icon appears in the wizard:
@@ -96,19 +96,19 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
             // 1. Open the existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Open Change Password dialog:
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             let result = await changePasswordDialog.getUserPath();
-            assert.ok(result[0].includes(testUser.displayName), 'Display name of the user should be present in the path');
+            assert.ok(result[0].includes(TEST_USER.displayName), 'Display name of the user should be present in the path');
         });
 
     it("WHEN 'Change Password Dialog' is opened THEN required elements should be present",
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
@@ -127,7 +127,7 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
@@ -145,7 +145,7 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
@@ -165,7 +165,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
             // Existing user is opened:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // Click on 'Show Password':
@@ -179,7 +179,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             let userWizard = new UserWizard();
             // 1. Open the existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Click on Change password button:
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
@@ -196,7 +196,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
             // 1. Open an existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Click on 'Change password' button
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
@@ -209,7 +209,7 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
             await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();

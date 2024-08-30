@@ -1,4 +1,7 @@
-import {IdProviderAccessControlComboBox, IdProviderAccessControlComboBoxBuilder} from './IdProviderAccessControlComboBox';
+import {
+    IdProviderAccessControlComboBox,
+    IdProviderAccessControlComboBoxWrapper
+} from './IdProviderAccessControlComboBox';
 import {IdProvider} from '../principal/IdProvider';
 import {IdProviderAccessControlList} from '../access/IdProviderAccessControlList';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
@@ -16,6 +19,8 @@ export class SecurityWizardStepForm
 
     private comboBox: IdProviderAccessControlComboBox;
 
+    private comboboxWrapper: IdProviderAccessControlComboBoxWrapper;
+
     constructor() {
         super('security-wizard-step-form');
     }
@@ -24,11 +29,12 @@ export class SecurityWizardStepForm
         super.initElements();
 
         this.inheritance = new DivEl(/*'inheritance'*/);
-        this.comboBox = new IdProviderAccessControlComboBoxBuilder().build();
+        this.comboBox = new IdProviderAccessControlComboBox();
+        this.comboboxWrapper = new IdProviderAccessControlComboBoxWrapper(this.comboBox);
     }
 
     protected createFormItems(): FormItem[] {
-        const accessComboBoxFormItem: FormItem = new FormItemBuilder(this.comboBox)
+        const accessComboBoxFormItem: FormItem = new FormItemBuilder(this.comboboxWrapper)
             .setValidator(Validators.required)
             .setLabel(i18n('field.permissions')).build();
 
@@ -36,9 +42,9 @@ export class SecurityWizardStepForm
     }
 
     layout(idProvider: IdProvider, defaultIdProvider: IdProvider): void {
-        if (this.comboBox.isDirty()) {
+        if (this.comboboxWrapper.isDirty()) {
             if (this.isNewPermissionsListEqualToCurrent(idProvider, defaultIdProvider)) {
-                this.comboBox.resetBaseValues();
+                this.comboboxWrapper.resetBaseValues();
             }
         } else {
             this.doLayout(idProvider, defaultIdProvider);
@@ -49,7 +55,8 @@ export class SecurityWizardStepForm
         const defaultEntries: IdProviderAccessControlEntry[] = defaultIdProvider?.getPermissions().getEntries() || [];
         const entries: IdProviderAccessControlEntry[] = idProvider.getPermissions().getEntries();
 
-        const currentPermissions: IdProviderAccessControlEntry[]  = this.comboBox.getSelectedDisplayValues();
+        const currentPermissions: IdProviderAccessControlEntry[] = this.comboBox.getSelectedOptions().map(
+            (option) => option.getOption().getDisplayValue());
         const newPermissions: IdProviderAccessControlEntry[] = ArrayHelper.removeDuplicates([...defaultEntries, ...entries],
             (item: IdProviderAccessControlEntry) => item.toString());
 
@@ -62,27 +69,26 @@ export class SecurityWizardStepForm
         const defaultEntries: IdProviderAccessControlEntry[] = defaultIdProvider?.getPermissions().getEntries() || [];
         const entries: IdProviderAccessControlEntry[] = idProvider.getPermissions().getEntries();
 
-        this.comboBox.clearSelection(true);
+        this.comboBox.deselectAll();
 
         if (defaultIdProvider) {
             defaultEntries.forEach((item: IdProviderAccessControlEntry) => {
-                this.comboBox.select(item, true, true);
-                this.comboBox.resetBaseValues();
+                this.comboBox.select(item);
             });
         }
 
         entries.forEach((item: IdProviderAccessControlEntry) => {
-            if (!this.comboBox.isSelected(item)) {
-                this.comboBox.select(item, false, true);
-                this.comboBox.resetBaseValues();
+            if (!this.comboBox.isSelected(item.getPrincipal().getKey().toString())) {
+                this.comboBox.select(item);
             }
         });
     }
 
     layoutReadOnly(idProvider: IdProvider): void {
-        this.comboBox.clearSelection();
+        this.comboBox.deselectAll();
+
         idProvider.getPermissions().getEntries().forEach((item) => {
-            if (!this.comboBox.isSelected(item)) {
+            if (!this.comboBox.isSelected(item.getPrincipal().getKey().toString())) {
                 this.comboBox.select(item, true);
             }
         });
@@ -94,7 +100,8 @@ export class SecurityWizardStepForm
     }
 
     getPermissions(): IdProviderAccessControlList {
-        return new IdProviderAccessControlList(this.comboBox.getSelectedDisplayValues());
+        return new IdProviderAccessControlList(this.comboBox.getSelectedOptions().map(
+            (option) => option.getOption().getDisplayValue()));
     }
 
     doRender(): Q.Promise<boolean> {
