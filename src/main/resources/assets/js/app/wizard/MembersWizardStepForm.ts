@@ -2,7 +2,7 @@ import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 import {
-    PrincipalComboBox,
+    PrincipalComboBox, PrincipalComboBoxParams,
     PrincipalComboBoxWrapper,
     PrincipalSelectedOptionsView
 } from '@enonic/lib-admin-ui/ui/security/PrincipalComboBox';
@@ -16,6 +16,7 @@ import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
 import * as Q from 'q';
 import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {RoleKeys} from '@enonic/lib-admin-ui/security/RoleKeys';
+import {UrlHelper} from '../../util/UrlHelper';
 
 export class MembersWizardStepForm
     extends UserItemWizardStepForm {
@@ -89,6 +90,11 @@ export class MembersWizardStepForm
 
 class MembersPrincipalCombobox
     extends PrincipalComboBox {
+
+    constructor(options?: PrincipalComboBoxParams) {
+        options.postfixUri = options.postfixUri ?? UrlHelper.getRestUri(''); // override the default postfixUri
+        super(options);
+    }
 
     private readOnlyItems: PrincipalKey[] = [];
 

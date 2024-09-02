@@ -8,6 +8,7 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {UsersPrincipalCombobox} from './UsersPrincipalComboBox';
 
 export class UserMembershipsWizardStepForm
     extends UserItemWizardStepForm {
@@ -27,7 +28,7 @@ export class UserMembershipsWizardStepForm
     protected initElements(): void {
         super.initElements();
 
-        this.groups = new PrincipalComboBox({
+        this.groups = new UsersPrincipalCombobox({
             maxSelected: 0,
             allowedTypes: [PrincipalType.GROUP],
             skipPrincipals: [RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED],
@@ -35,7 +36,7 @@ export class UserMembershipsWizardStepForm
 
         this.groupsWrapper = new PrincipalComboBoxWrapper(this.groups);
 
-        this.roles = new PrincipalComboBox({
+        this.roles = new UsersPrincipalCombobox({
             maxSelected: 0,
             allowedTypes: [PrincipalType.ROLE],
             skipPrincipals: [RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED],
