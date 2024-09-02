@@ -9,6 +9,7 @@ import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {PrincipalComboBox, PrincipalComboBoxWrapper} from '@enonic/lib-admin-ui/ui/security/PrincipalComboBox';
+import {UsersPrincipalCombobox} from './UsersPrincipalComboBox';
 
 export class RolesWizardStepForm
     extends UserItemWizardStepForm {
@@ -24,7 +25,7 @@ export class RolesWizardStepForm
     protected initElements(): void {
         super.initElements();
 
-        this.roles = new PrincipalComboBox({
+        this.roles = new UsersPrincipalCombobox({
             maxSelected: 0,
             allowedTypes: [PrincipalType.ROLE],
             skipPrincipals: [RoleKeys.EVERYONE, RoleKeys.AUTHENTICATED],
