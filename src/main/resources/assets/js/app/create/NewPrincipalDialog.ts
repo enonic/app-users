@@ -1,7 +1,6 @@
 import {UserItemTypesTreeGrid} from './UserItemTypesTreeGrid';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItem, UserTreeGridItemType} from '../browse/UserTreeGridItem';
-import {ResponsiveManager} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveManager';
 import {PEl} from '@enonic/lib-admin-ui/dom/PEl';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
@@ -30,11 +29,6 @@ export class NewPrincipalDialog
 
     protected initListeners(): void {
         super.initListeners();
-
-        this.grid.onDataChanged(() => ResponsiveManager.fireResizeEvent());
-        this.grid.onSelectionChanged(() => {
-            !!this.grid.hasSelectedItems() ? this.getCancelButton().giveBlur() : this.getCancelButton().giveFocus();
-        });
 
         NewPrincipalEvent.on(() => this.isVisible() && this.close());
     }
@@ -70,8 +64,7 @@ export class NewPrincipalDialog
     }
 
     open(): void {
-        this.grid.reload();
-        this.grid.getGrid().resizeCanvas();
+        this.grid.load();
         Body.get().appendChild(this);
         super.open();
     }

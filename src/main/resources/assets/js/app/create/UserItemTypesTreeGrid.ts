@@ -1,6 +1,5 @@
 import * as Q from 'q';
 import {UserTypeTreeGridItem, UserTypeTreeGridItemBuilder} from './UserTypeTreeGridItem';
-import {UserItemTypesRowFormatter} from './UserItemTypesRowFormatter';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from '../browse/UserTreeGridItem';
 import {ListIdProvidersRequest} from '../../graphql/idprovider/ListIdProvidersRequest';
@@ -8,65 +7,75 @@ import {IdProvider, IdProviderBuilder} from '../principal/IdProvider';
 import {User, UserBuilder} from '../principal/User';
 import {Group, GroupBuilder} from '../principal/Group';
 import {Role, RoleBuilder} from '../principal/Role';
-import {TreeGrid} from '@enonic/lib-admin-ui/ui/treegrid/TreeGrid';
-import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
-import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
-import {ResponsiveManager} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveManager';
 import {IsAuthenticatedRequest} from '@enonic/lib-admin-ui/security/auth/IsAuthenticatedRequest';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {LoginResult} from '@enonic/lib-admin-ui/security/auth/LoginResult';
-import {KeyBinding} from '@enonic/lib-admin-ui/ui/KeyBinding';
 import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
-import {KeyHelper} from '@enonic/lib-admin-ui/ui/KeyHelper';
+import {TreeListBox, TreeListBoxParams, TreeListElement, TreeListElementParams} from '@enonic/lib-admin-ui/ui/selector/list/TreeListBox';
+import {UserTypesTreeGridItemViewer} from './UserTypesTreeGridItemViewer';
 
-export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
+export class UserItemTypesTreeGrid
+    extends TreeListBox<UserTypeTreeGridItem> {
 
-    private idProviders: IdProvider[];
+    private static allIDProviders: IdProvider[];
 
-    private manualIdProvider: boolean;
+    private presetIdProvider: IdProvider;
 
-    constructor() {
-        const builder = new TreeGridBuilder<UserTypeTreeGridItem>().setColumnConfig([{
-            name: i18n('field.name'),
-            id: 'name',
-            field: 'displayName',
-            formatter: UserItemTypesRowFormatter.nameFormatter,
-            style: {}
-        }]).setPartialLoadEnabled(false)
-            .setShowToolbar(false)
-            .disableMultipleSelection(true)
-            .setCheckableRows(false)
-            .setToggleClickEnabled(false)
-            .prependClasses('user-types-tree-grid');
-
-        super(builder);
-
-        this.manualIdProvider = false;
-
-        this.initEventHandlers();
+    constructor(params?: TreeListBoxParams<UserTypeTreeGridItem>) {
+        super(params);
     }
 
-    private isFlat(): boolean {
-        return this.idProviders.length <= 1;
+    protected createItemView(item: UserTypeTreeGridItem, readOnly: boolean): UserItemTypesTreeGridListElement {
+        return new UserItemTypesTreeGridListElement(item,
+            {presetIdProvider: this.presetIdProvider, scrollParent: this.scrollParent, level: this.level, parentList: this});
+    }
+
+    protected getItemId(item: UserTypeTreeGridItem): string {
+        return item.getId();
     }
 
     private fetchIdProviders(): Q.Promise<IdProvider[]> {
-        if (this.idProviders) {
-            return Q.resolve(this.idProviders);
+        if (this.presetIdProvider) {
+            return Q.resolve([this.presetIdProvider]);
+        }
+
+        if (UserItemTypesTreeGrid.allIDProviders) {
+            return Q.resolve(UserItemTypesTreeGrid.allIDProviders);
         }
 
         return new ListIdProvidersRequest().sendAndParse().then((idProviders: IdProvider[]) => {
-            this.idProviders = idProviders;
-            this.toggleClass('flat', this.isFlat());
+            UserItemTypesTreeGrid.allIDProviders = idProviders;
             return idProviders;
         });
     }
 
-    fetchRoot(): Q.Promise<UserTypeTreeGridItem[]> {
+    protected handleLazyLoad(): void {
+        if (this.getItemCount() === 0) {
+            this.load();
+        }
+    }
+
+    load(): void {
+        this.fetchItems().then((items: UserTypeTreeGridItem[]) => {
+            if (items.length > 0) {
+                this.setItems(items);
+            }
+        }).catch(DefaultErrorHandler.handle);
+    }
+
+    private fetchItems(): Q.Promise<UserTypeTreeGridItem[]> {
+        return this.isRoot() ? this.fetchRoot() : this.fetchChildren();
+    }
+
+    private isRoot(): boolean {
+        return !this.options.parentListElement;
+    }
+
+    private fetchRoot(): Q.Promise<UserTypeTreeGridItem[]> {
         return Q.spread<any, any>(
             [new IsAuthenticatedRequest().sendAndParse(), this.fetchIdProviders()],
             (result: LoginResult) => result.isUserAdmin(),
@@ -85,7 +94,7 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
                     .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.GROUP, 'user-group'))
                     .setDisplayName(i18n('field.userGroup'))
                     .build()).build(),
-            ...((this.manualIdProvider || !userIsAdmin) ? [] : [
+            ...((this.presetIdProvider || !userIsAdmin) ? [] : [
                 new UserTypeTreeGridItemBuilder()
                     .setUserItem(new IdProviderBuilder()
                         .setKey(IdProviderKey.SYSTEM.toString())
@@ -100,163 +109,103 @@ export class UserItemTypesTreeGrid extends TreeGrid<UserTypeTreeGridItem> {
         ]);
     }
 
-    hasChildren(item: UserTypeTreeGridItem): boolean {
-        return item.hasChildren();
-    }
-
-    fetchChildren(parentNode: TreeNode<UserTypeTreeGridItem>): Q.Promise<UserTypeTreeGridItem[]> {
-        return this.fetchIdProviders().then((idProviders: IdProvider[]) => {
-            if (idProviders.length > 1) {
-                return idProviders.map((idProvider: IdProvider) => new UserTypeTreeGridItemBuilder()
-                    .setUserItem(new IdProviderBuilder()
-                        .setKey(idProvider.getKey().toString())
-                        .setDisplayName(idProvider.getDisplayName())
-                        .build()).build());
-            }
-            return [];
-        });
+    private fetchChildren(): Q.Promise<UserTypeTreeGridItem[]> {
+        return Q.resolve(UserItemTypesTreeGrid.allIDProviders.map((idProvider: IdProvider) => new UserTypeTreeGridItemBuilder()
+            .setUserItem(new IdProviderBuilder()
+                .setKey(idProvider.getKey().toString())
+                .setDisplayName(idProvider.getDisplayName())
+                .build()).build()));
     }
 
     setIdProvider(idProvider: IdProvider): void {
-        this.idProviders = [idProvider];
-        this.manualIdProvider = true;
-        this.addClass('flat');
+        this.presetIdProvider = idProvider;
     }
 
     reset(): void {
-        this.idProviders = null;
-        this.manualIdProvider = false;
-        this.removeClass('flat');
-        this.deselectAll(true);
+        this.presetIdProvider = null;
+        UserItemTypesTreeGrid.allIDProviders = null;
     }
 
-    protected createKeyBindings(): KeyBinding[] {
-        const result: KeyBinding[] = super.createKeyBindings();
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.addClass('user-types-tree-grid');
 
-        result.push(new KeyBinding('tab', (event: KeyboardEvent) => {
-            this.focusNextOnTab(event);
-        }));
-
-        result.push(new KeyBinding('shift+tab', (event: KeyboardEvent) => {
-            this.focusPreviousOnShiftTab(event);
-        }));
-
-        return result;
-    }
-
-    private focusNextOnTab(event: KeyboardEvent): void {
-        if (this.isLastItemSelected()) {
-            this.focusElementOutOfGrid(event);
-        } else {
-            this.selectNextItemInGrid(event);
-        }
-    }
-
-    private isLastItemSelected(): boolean {
-        return this.getCurrentData().pop().getUserItem() === this.getFirstSelectedItem()?.getUserItem();
-    }
-
-    private focusElementOutOfGrid(event: KeyboardEvent): void {
-        event.preventDefault();
-        event.stopPropagation();
-        this.deselectAll(true);
-    }
-
-    private selectNextItemInGrid(event: KeyboardEvent): void {
-        if (this.getEl().contains(<HTMLElement>event.target)) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-
-        this.navigateDown();
-    }
-
-    private focusPreviousOnShiftTab(event: KeyboardEvent): void {
-        if (this.isFirstItemSelected()) {
-            this.focusElementOutOfGrid(event);
-        } else {
-            this.selectPreviousItemInGrid(event);
-        }
-    }
-
-    private isFirstItemSelected(): boolean {
-        return this.getCurrentData()[0].getUserItem() === this.getFirstSelectedItem()?.getUserItem();
-    }
-
-    private selectPreviousItemInGrid(event: KeyboardEvent): void {
-        if (this.getEl().contains(<HTMLElement>event.target)) {
-            // not letting focus go to the unwanted grid elements
-            event.preventDefault();
-            event.stopPropagation();
-            this.navigateUp();
-        } else {
-            const lastRow: number = this.getCurrentTotal() - 1;
-            this.selectRow(lastRow);
-            this.scrollToRow(lastRow);
-        }
-    }
-
-    protected editItem(node: TreeNode<UserTypeTreeGridItem>): void {
-        this.handleEditItem(node);
-    }
-
-    private initEventHandlers(): void {
-        this.getGrid().subscribeOnClick((event, data) => {
-            // not letting focus go to the unwanted grid elements
-            event.preventDefault();
-            event.stopPropagation();
-
-            const node: TreeNode<UserTypeTreeGridItem> = this.getGrid().getDataView().getItem(data.row);
-            this.handleEditItem(node);
+            return rendered;
         });
+    }
+}
 
-        this.onKeyUp((event: KeyboardEvent) => {
-            if (KeyHelper.isEnterKey(event)) {
-                if (this.hasSelectedItems()) {
-                    this.handleEditItem(this.getLastSelectedOrHighlightedNode());
-                }
+export interface UserItemTypesTreeGridListElementParams extends TreeListElementParams<UserTypeTreeGridItem> {
+    presetIdProvider?: IdProvider;
+}
+
+export class UserItemTypesTreeGridListElement
+    extends TreeListElement<UserTypeTreeGridItem> {
+
+    protected options: UserItemTypesTreeGridListElementParams;
+
+    constructor(item: UserTypeTreeGridItem, params: UserItemTypesTreeGridListElementParams) {
+        super(item, params);
+    }
+
+    protected initListeners(): void {
+        super.initListeners();
+
+        this.getDataView().onClicked((event: MouseEvent) => {
+            if (event.target === this.toggleElement.getHTMLElement()) {
+                return;
+            }
+
+            if (this.hasChildren()) {
+                this.setExpanded(!this.isExpanded());
+            } else {
+                this.fireNewPrincipalEvent();
             }
         });
     }
 
-    private handleEditItem(node: TreeNode<UserTypeTreeGridItem>): void {
-        if (this.isExpandableNode(node)) {
-            this.toggleNode(node);
-            ResponsiveManager.fireResizeEvent();
-        } else {
-            this.fireNewPrincipalEvent(node);
-        }
+    protected createChildrenList(params?: TreeListBoxParams<UserTypeTreeGridItem>): TreeListBox<UserTypeTreeGridItem> {
+        return new UserItemTypesTreeGrid(params);
     }
 
-    private isExpandableNode(node: TreeNode<UserTypeTreeGridItem>): boolean {
-        return !this.isFlat() && this.hasChildren(node.getData());
+    hasChildren(): boolean {
+        return this.item.hasChildren() && !this.options.presetIdProvider;
     }
 
-    private fireNewPrincipalEvent(node: TreeNode<UserTypeTreeGridItem>): void {
-        const params: { idProvider?: IdProvider, type: UserTreeGridItemType } = this.getPrincipalProps(node);
+    protected createItemViewer(item: UserTypeTreeGridItem): UserTypesTreeGridItemViewer {
+        const isRootNode = this.options.level === 0;
+        const viewer = new UserTypesTreeGridItemViewer(isRootNode);
+        viewer.setObject(item);
+
+        return viewer;
+    }
+
+    private fireNewPrincipalEvent(): void {
+        const params: { idProvider?: IdProvider, type: UserTreeGridItemType } = this.getPrincipalProps();
         const item: UserTreeGridItem = new UserTreeGridItemBuilder().setType(params.type).setIdProvider(params.idProvider).build();
         new NewPrincipalEvent([item]).fire();
     }
 
-    private getPrincipalProps(node: TreeNode<UserTypeTreeGridItem>): { idProvider?: IdProvider, type: UserTreeGridItemType } {
-        const userItem: UserItem = node.getData().getUserItem();
+    private getPrincipalProps(): { idProvider?: IdProvider, type: UserTreeGridItemType } {
+        const userItem: UserItem = this.item.getUserItem();
 
         if (userItem instanceof IdProvider) {
-            const isRootNode: boolean = node.calcLevel() === 1;
+            const isRootNode: boolean = this.options.level === 0;
 
             if (isRootNode) {
                 return {type: UserTreeGridItemType.ID_PROVIDER};
-            } else if (node.getParent().getData().getUserItem() instanceof User) {
+            } else if (this.getParentList().getParentItem()?.getUserItem() instanceof User) {
                 return {type: UserTreeGridItemType.USERS, idProvider: userItem};
-            } else if (node.getParent().getData().getUserItem() instanceof Group) {
+            } else if (this.getParentList().getParentItem()?.getUserItem() instanceof Group) {
                 return {type: UserTreeGridItemType.GROUPS, idProvider: userItem};
             }
         } else if (userItem instanceof Role) {
             return {type: UserTreeGridItemType.ROLES};
         } else if (userItem instanceof User) {
-            return {type: UserTreeGridItemType.USERS, idProvider: this.idProviders[0]};
+            return {type: UserTreeGridItemType.USERS, idProvider: this.options.presetIdProvider};
         } else if (userItem instanceof Group) {
-            return {type: UserTreeGridItemType.GROUPS, idProvider: this.idProviders[0]};
+            return {type: UserTreeGridItemType.GROUPS, idProvider: this.options.presetIdProvider};
         }
     }
+
 }
