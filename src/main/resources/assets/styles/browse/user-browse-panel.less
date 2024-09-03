@@ -1,0 +1,26 @@
+.user-browse-panel {
+  .tree-grid-toolbar {
+    margin-top: 0;
+
+    .selection-controller {
+      padding-left: 11px;
+    }
+  }
+
+  .user-list-box-wrapper {
+    overflow: auto;
+    height: calc(100% - 40px); // minus toolbar height
+
+    .item-view-wrapper {
+      height: 42px;
+
+      &.selected {
+        .viewer {
+          .xp-admin-common-names-view * {
+            color: @admin-white;
+          }
+        }
+      }
+    }
+  }
+}

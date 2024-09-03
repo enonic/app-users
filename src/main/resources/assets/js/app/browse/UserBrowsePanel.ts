@@ -1,6 +1,6 @@
 import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {UserBrowseToolbar} from './UserBrowseToolbar';
-import {UserTreeGridItem, UserTreeGridItemType} from './UserTreeGridItem';
+import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {UserBrowseItemPanel} from './UserBrowseItemPanel';
 import {PrincipalBrowseFilterPanel} from './filter/PrincipalBrowseFilterPanel';
 import {Router} from '../Router';
@@ -11,20 +11,225 @@ import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {BrowsePanel} from '@enonic/lib-admin-ui/app/browse/BrowsePanel';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {SelectableListBoxPanel} from '@enonic/lib-admin-ui/ui/panel/SelectableListBoxPanel';
+import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridContextMenu';
+import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolbar';
+import {UserTreeGridActions} from './UserTreeGridActions';
+import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
+import {SelectableTreeListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableTreeListBoxKeyNavigator';
+import {BrowseFilterSearchEvent} from '@enonic/lib-admin-ui/app/browse/filter/BrowseFilterSearchEvent';
+import {PrincipalBrowseSearchData} from './filter/PrincipalBrowseSearchData';
+import {BrowseFilterResetEvent} from '@enonic/lib-admin-ui/app/browse/filter/BrowseFilterResetEvent';
+import {UserItemsTreeRootList} from './UserItemsTreeRootList';
+import {UserItemsTreeList, UserItemsTreeListElement} from './UserItemsTreeList';
+import {EditPrincipalEvent} from './EditPrincipalEvent';
+import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {ViewItem} from '@enonic/lib-admin-ui/app/view/ViewItem';
 
 export class UserBrowsePanel
     extends BrowsePanel {
 
-    protected treeGrid: UserItemsTreeGrid;
+    protected treeListBox: UserItemsTreeRootList;
+
+    protected selectionWrapper: SelectableListBoxWrapper<UserTreeGridItem>;
+
+    protected toolbar: ListBoxToolbar<UserTreeGridItem>;
+
+    protected treeActions: UserTreeGridActions;
+
+    protected contextMenu: TreeGridContextMenu;
 
     constructor() {
         super();
 
+        this.addClass('user-browse-panel');
         this.bindServerEventListeners();
 
+        this.onShown(() => {
+            Router.setHash('browse');
+        });
+    }
+
+    private bindServerEventListeners() {
+        const serverHandler = PrincipalServerEventsHandler.getInstance();
+
+        serverHandler.onUserItemCreated((principal: Principal, idProvider: IdProvider) => {
+            this.appendUserItemNode(principal, idProvider);
+            this.setRefreshOfFilterRequired();
+
+            /*
+                In case you switch to UserBrowsePanel before this event occured you need to trigger refresh manually
+                Otherwise 'shown' event won't update filter
+             */
+            if (this.isVisible()) {
+                this.refreshFilter();
+            }
+
+            if (this.selectionWrapper.getSelectedItems().length > 0) {
+                this.updateBrowseActions();
+            }
+        });
+
+        serverHandler.onUserItemUpdated((principal: Principal, idProvider: IdProvider) => {
+            let userTreeGridItem: UserTreeGridItem;
+            const builder: UserTreeGridItemBuilder = new UserTreeGridItemBuilder();
+
+            if (!principal) { // IdProvider type
+                userTreeGridItem = builder.setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
+            } else {         // Principal type
+                userTreeGridItem = builder.setPrincipal(principal).setIdProvider(idProvider).setType(UserTreeGridItemType.PRINCIPAL).build();
+            }
+
+            this.findParentList(userTreeGridItem)?.replaceItems(userTreeGridItem);
+        });
+
+        serverHandler.onUserItemDeleted((ids: string[]) => {
+            this.setRefreshOfFilterRequired();
+
+            ids.forEach((id: string) => {
+                const item = this.treeListBox.getItem(id);
+
+                if (item) {
+                    this.findParentList(item)?.removeItems(item);
+                }
+            });
+
+            this.refreshFilter();
+        });
+    }
+
+    private appendUserItemNode(principal: Principal, idProvider: IdProvider): void {
+        if (!principal) {
+            this.appendIdProvider(idProvider);
+        } else {
+            this.appendPrincipal(principal, idProvider);
+        }
+    }
+
+    private appendIdProvider(idProvider: IdProvider) {
+        const idProviderItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(
+            UserTreeGridItemType.ID_PROVIDER).build();
+
+        this.treeListBox.addItems(idProviderItem);
+    }
+
+    private appendPrincipal(principal: Principal, idProvider: IdProvider) {
+        const userTreeGridItem: UserTreeGridItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setPrincipal(principal).setType(
+            UserTreeGridItemType.PRINCIPAL).build();
+        const parentList = this.findParentList(userTreeGridItem);
+
+        if (parentList.wasAlreadyShownAndLoaded()) {
+            parentList.addItems(userTreeGridItem, false, 0);
+        } else {
+            const p = parentList.getParentItem();
+
+            if (!p.hasChildrenItems()) {
+                p.setChildren(true);
+                parentList.getParentList().replaceItems(p);
+            }
+        }
+    }
+
+    private findParentList(item: UserTreeGridItem): UserItemsTreeList {
+        if (item.isIdProvider()) {
+            return this.treeListBox;
+        }
+
+        if (item.isPrincipal()) {
+            if (item.getPrincipal().isRole()) {
+                const listElement = this.treeListBox.getItemViews().find(
+                    (view: UserItemsTreeListElement) => view.getItem().isRole()) as UserItemsTreeListElement;
+                return listElement.getList() as UserItemsTreeList;
+            }
+
+            if (item.getPrincipal().isGroup() || item.getPrincipal().isUser()) {
+                const idProviderKey = item.getIdProvider().getKey().toString();
+                const idProviderListElement = this.treeListBox.getItemViews().find(
+                    (view: UserItemsTreeListElement) => view.getItem().getId() === idProviderKey) as UserItemsTreeListElement;
+                const idProviderList = idProviderListElement?.getList() as UserItemsTreeList;
+
+                const typeToLook = item.getPrincipal().isUser() ? UserTreeGridItemType.USERS : UserTreeGridItemType.GROUPS;
+                const usersOrGroupsListElement = idProviderList?.getItemViews().find(
+                    (view: UserItemsTreeListElement) => view.getItem().getType() === typeToLook) as UserItemsTreeListElement;
+
+                return usersOrGroupsListElement?.getList() as UserItemsTreeList;
+            }
+        }
+
+        return null;
+    }
+
+    protected initListeners(): void {
+        super.initListeners();
+
+        this.treeListBox.onItemsAdded((items: UserTreeGridItem[]) => {
+            items.forEach((item: UserTreeGridItem) => {
+                const listElement = this.treeListBox.getDataView(item) as UserItemsTreeListElement;
+
+                listElement?.onDblClicked(() => {
+                    if (item.isIdProvider() || item.isPrincipal()) {
+                        new EditPrincipalEvent([item]).fire();
+                    }
+                });
+
+                listElement?.onContextMenu((event: MouseEvent) => {
+                    event.preventDefault();
+                    this.contextMenu.showAt(event.clientX, event.clientY);
+                });
+            });
+        });
+
+        BrowseFilterSearchEvent.on((event: BrowseFilterSearchEvent<PrincipalBrowseSearchData>) => {
+            const data = event.getData();
+            this.treeListBox.setSearchString(data.getSearchString()).setSearchTypes(data.getTypes()).load();
+        });
+
+        BrowseFilterResetEvent.on(() => {
+            this.treeListBox.resetFilter();
+        });
+
+        this.initSelectionListeners();
+    }
+
+    protected createToolbar(): UserBrowseToolbar {
+        return new UserBrowseToolbar(this.treeActions);
+    }
+
+    protected getBrowseActions(): TreeGridActions<ViewItem> {
+        return this.treeActions;
+    }
+
+    protected createTreeGrid(): UserItemsTreeGrid {
+        return new UserItemsTreeGrid();
+    }
+
+    protected createListBoxPanel(): SelectableListBoxPanel<UserTreeGridItem> {
+        this.treeListBox = new UserItemsTreeRootList({scrollParent: this});
+
+        this.selectionWrapper = new SelectableListBoxWrapper<UserTreeGridItem>(this.treeListBox, {
+            className: 'user-list-box-wrapper',
+            maxSelected: 0,
+            checkboxPosition: 'left',
+            highlightMode: true,
+        });
+
+        this.treeActions = new UserTreeGridActions(this.selectionWrapper);
+        this.contextMenu = new TreeGridContextMenu(this.treeActions);
+        this.toolbar = new ListBoxToolbar<UserTreeGridItem>(this.selectionWrapper, {
+            refreshAction: () => void this.treeListBox.load(),
+        });
+
+        new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
+
+        this.toolbar.getSelectionPanelToggler().hide();
+
+        return new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
+    }
+
+    private initSelectionListeners(): void {
         const changeSelectionStatus = AppHelper.debounce((selection: UserTreeGridItem[]) => {
             const singleSelection = selection.length === 1;
-            const newAction = this.treeGrid.getTreeGridActions().NEW;
+            const newAction = this.treeActions.NEW;
 
             let label;
 
@@ -53,69 +258,7 @@ export class UserBrowsePanel
             newAction.setLabel(label);
         }, 10);
 
-        this.treeGrid.onSelectionChanged(() => changeSelectionStatus(this.treeGrid.getCurrentSelection()));
-
-        this.treeGrid.onHighlightingChanged(() => {
-            const selectedItem: UserTreeGridItem = this.treeGrid.getFirstSelectedOrHighlightedItem();
-            changeSelectionStatus(!!selectedItem ? [selectedItem] : []);
-        });
-
-        this.onShown(() => {
-            Router.setHash('browse');
-        });
-    }
-
-    protected initElements() {
-        super.initElements();
-
-        this.browseToolbar.addActions(this.treeGrid.getTreeGridActions().getAllActions());
-    }
-
-    private bindServerEventListeners() {
-        const serverHandler = PrincipalServerEventsHandler.getInstance();
-
-        serverHandler.onUserItemCreated((principal: Principal, idProvider: IdProvider) => {
-            this.treeGrid.appendUserItemNode(principal, idProvider);
-            this.setRefreshOfFilterRequired();
-
-            /*
-                In case you switch to UserBrowsePanel before this event occured you need to trigger refresh manually
-                Otherwise 'shown' event won't update filter
-             */
-            if (this.isVisible()) {
-                this.refreshFilter();
-            }
-
-            if (this.treeGrid.hasSelectedOrHighlightedNode()) {
-                this.updateBrowseActions();
-            }
-        });
-
-        serverHandler.onUserItemUpdated((principal: Principal, idProvider: IdProvider) => {
-            this.treeGrid.updateUserNode(principal, idProvider);
-        });
-
-        serverHandler.onUserItemDeleted((ids: string[]) => {
-            this.setRefreshOfFilterRequired();
-            /*
-             Deleting content won't trigger browsePanel.onShow event,
-             because we are left on the same panel. We need to refresh manually.
-             */
-
-            ids.forEach((id: string) => {
-                this.treeGrid.deleteNodeByDataId(id);
-            });
-
-            this.refreshFilter();
-        });
-    }
-
-    protected createToolbar(): UserBrowseToolbar {
-        return new UserBrowseToolbar();
-    }
-
-    protected createTreeGrid(): UserItemsTreeGrid {
-        return new UserItemsTreeGrid();
+        this.selectionWrapper.onSelectionChanged(() => changeSelectionStatus(this.selectionWrapper.getSelectedItems()));
     }
 
     protected createBrowseItemPanel(): UserBrowseItemPanel {
@@ -127,44 +270,13 @@ export class UserBrowsePanel
     }
 
     protected enableSelectionMode(): void {
-        this.filterPanel.setSelectedItems(this.treeGrid.getSelectedItems());
+        this.filterPanel.setSelectedItems(this.selectionWrapper.getSelectedItems().map(item => item.getId()));
     }
 
     protected disableSelectionMode(): void {
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
         super.disableSelectionMode();
-    }
-
-    private selectIconClass(item: UserTreeGridItem): string {
-
-        let type: UserTreeGridItemType = item.getType();
-
-        switch (type) {
-        case UserTreeGridItemType.ID_PROVIDER:
-            return 'icon-address-book icon-large';
-
-        case UserTreeGridItemType.PRINCIPAL:
-            if (item.getPrincipal().isRole()) {
-                return 'icon-masks icon-large';
-
-            } else if (item.getPrincipal().isUser()) {
-                return 'icon-user icon-large';
-
-            } else if (item.getPrincipal().isGroup()) {
-                return 'icon-users icon-large';
-            }
-            break;
-
-        case UserTreeGridItemType.GROUPS:
-            return 'icon-folder icon-large';
-
-        case UserTreeGridItemType.ROLES:
-            return 'icon-folder icon-large';
-
-        case UserTreeGridItemType.USERS:
-            return 'icon-folder icon-large';
-        }
-
+        this.treeListBox.resetFilter();
     }
 }

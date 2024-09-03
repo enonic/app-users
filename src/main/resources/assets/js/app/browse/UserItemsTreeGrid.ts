@@ -69,7 +69,7 @@ export class UserItemsTreeGrid
 
         super(builder);
 
-        this.treeGridActions = new UserTreeGridActions(this);
+        this.treeGridActions = new UserTreeGridActions(null);
 
         this.setContextMenu(new TreeGridContextMenu(this.treeGridActions));
 
