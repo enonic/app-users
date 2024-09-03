@@ -32,7 +32,7 @@ export class UserTreeGridItem
         this.idProvider = builder.idProvider;
         this.principal = builder.principal;
         this.type = builder.type;
-        this.children = builder.children;
+        this.children = builder.children || false;
 
         if (this.type === UserTreeGridItemType.PRINCIPAL) {
             this.modifiedTime = this.principal.getModifiedTime();
@@ -126,8 +126,16 @@ export class UserTreeGridItem
         return this.type === UserTreeGridItemType.PRINCIPAL;
     }
 
+    setChildren(children: boolean): void {
+        this.children = children;
+    }
+
     hasChildren(): boolean {
         return this.isIdProvider() || this.isRole() || this.children;
+    }
+
+    hasChildrenItems(): boolean {
+        return this.children;
     }
 
     equals(o: Equitable): boolean {
