@@ -1,31 +1,68 @@
 import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
 import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
-import {Dropdown, DropdownConfig} from '@enonic/lib-admin-ui/ui/selector/dropdown/Dropdown';
 import {RepositoryViewer} from './RepositoryViewer';
 import {Repository} from './Repository';
-import {RepositoryLoader} from './RepositoryLoader';
-import {RichComboBox, RichComboBoxBuilder} from '@enonic/lib-admin-ui/ui/selector/combobox/RichComboBox';
 import {SelectedOptionView} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOptionView';
 import {BaseSelectedOptionsView} from '@enonic/lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
-import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
-import {SelectedOptionsView} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOptionsView';
+import {FilterableListBoxWrapperWithSelectedView} from '@enonic/lib-admin-ui/ui/selector/list/FilterableListBoxWrapperWithSelectedView';
+import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import {FormInputEl} from '@enonic/lib-admin-ui/dom/FormInputEl';
+import {ListRepositoriesRequest} from '../../graphql/repository/ListRepositoriesRequest';
+import * as Q from 'q';
+import {Dropdown} from '@enonic/lib-admin-ui/ui/Dropdown';
 
 export class RepositoryComboBox
-    extends RichComboBox<Repository> {
+    extends FilterableListBoxWrapperWithSelectedView<Repository> {
 
-    constructor(builder: RepositoryComboBoxBuilder = new RepositoryComboBoxBuilder()) {
-        super(builder);
+    private static loadPromise: Q.Promise<Repository[]>;
+
+    constructor() {
+        super(new RepositoryList(), {
+            maxSelected: 0,
+            className: 'repository-combobox',
+            filter: (item, searchString) => item.getName().toString().toLowerCase().indexOf(searchString.toLowerCase()) !== -1,
+            selectedOptionsView: new ReportSelectedOptionsView(),
+            checkboxPosition: 'right',
+        });
+
+        this.load();
     }
 
-    clearSelection(forceClear: boolean = false): void {
-        this.getLoader().search('');
-        super.clearSelection(forceClear);
-        (this.getSelectedOptions()[0].getOptionView() as ReportSelectedOptionView).getBranch();
+    private load(): void {
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+       RepositoryComboBox.loadPromise = RepositoryComboBox.loadPromise || new ListRepositoriesRequest().sendAndParse();
+
+       RepositoryComboBox.loadPromise.then((repositories: Repository[]) => {
+           this.listBox.setItems(repositories);
+       });
+    }
+
+    createSelectedOption(item: Repository): Option<Repository> {
+        return Option.create<Repository>()
+            .setValue(item.getName())
+            .setDisplayValue(item)
+            .build();
     }
 
     getSelectedBranches(): string[] {
         return this.getSelectedOptions().map(selectedOption => (selectedOption.getOptionView() as ReportSelectedOptionView).getBranch());
     }
+}
+
+export class RepositoryList
+    extends ListBox<Repository> {
+
+    protected createItemView(item: Repository, readOnly: boolean): Element {
+        const viewer = new RepositoryViewer();
+        viewer.setObject(item);
+        return viewer;
+    }
+
+    protected getItemId(item: Repository): string {
+        return item.getName();
+    }
+
 }
 
 class ReportSelectedOptionView
@@ -34,7 +71,7 @@ class ReportSelectedOptionView
 
     private option: Option<Repository>;
 
-    private branchDropDown: Dropdown<string>;
+    private branchDropDown: Dropdown;
 
     constructor(option: Option<Repository>) {
         super('selected-option report-selected-option-view');
@@ -56,15 +93,13 @@ class ReportSelectedOptionView
         return this.branchDropDown.getValue();
     }
 
-    private createBranchesDropdown(repo: Repository): Dropdown<string> {
-        const branchDropDown = new Dropdown<string>('branch', {} as DropdownConfig<string>);
+    private createBranchesDropdown(repo: Repository): Dropdown {
+        const branchDropDown = new Dropdown('branch');
+        branchDropDown.addClass('branch-dropdown');
         const masterBranch: string = 'master';
 
         repo.getBranches().forEach((branch: string) => {
-            branchDropDown.addOption(Option.create<string>()
-                .setValue(branch)
-                .setDisplayValue(branch)
-                .build());
+            branchDropDown.addOption(branch, branch);
 
             if (branch === masterBranch) {
                 branchDropDown.setValue(masterBranch);
@@ -90,19 +125,24 @@ class ReportSelectedOptionsView
         let optionView = new ReportSelectedOptionView(option);
         return new SelectedOption<Repository>(optionView, this.count());
     }
-
 }
 
-export class RepositoryComboBoxBuilder
-    extends RichComboBoxBuilder<Repository> {
+export class RepositoryComboBoxWrapper extends FormInputEl {
 
-    comboBoxName: string = 'ReportSelector';
+    private readonly selector: RepositoryComboBox;
 
-    loader: RepositoryLoader = new RepositoryLoader();
+    constructor(selector: RepositoryComboBox) {
+        super('div', 'locale-selector-wrapper');
 
-    optionDisplayValueViewer: Viewer<Repository> = new RepositoryViewer();
+        this.selector = selector;
+        this.appendChild(this.selector);
+    }
 
-    delayedInputValueChangedHandling: number = 500;
+    getComboBox(): RepositoryComboBox {
+        return this.selector;
+    }
 
-    selectedOptionsView: SelectedOptionsView<Repository> = new ReportSelectedOptionsView();
+    getValue(): string {
+        return this.selector.getSelectedOptions().map((item: SelectedOption<Repository>) => item.getOption().getValue()).join(';') || null;
+    }
 }
