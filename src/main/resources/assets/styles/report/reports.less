@@ -1,56 +1,61 @@
 .reports {
   flex-direction: column;
 
-  .rich-combobox {
-    display: inline-block;
-    margin-right: 20px;
-    margin-bottom: 10px;
+  .reports-combo-and-button {
+    display: grid;
+    grid-template-columns: 300px 160px;
+    grid-column-gap: 20px;
 
-    .loader-combobox {
-      width: 300px;
+    .repository-combobox {
+      .item-view-wrapper {
+        &.selected {
+          .viewer {
+            .@{_COMMON_PREFIX}names-view {
+              .@{_COMMON_PREFIX}main-name {
+                color: @admin-white;
+              }
 
-      .options-container {
-        .slick-row {
-          height: 40px;
-
-          .slick-cell {
-            height: 40px;
-            padding: 12px 0 12px 12px;
-
-            &.slick-cell-checkboxsel {
-              padding: 12px 12px 12px 0;
-
-              label {
-                background-position: right center;
+              .@{_COMMON_PREFIX}sub-name {
+                color: @admin-white;
               }
             }
+          }
+        }
+
+        .repository-viewer {
+          height: 40px;
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .selected-options {
+        .report-selected-option-view {
+          height: auto;
+          margin: 10px 0;
+          padding-left: 0;
+          padding-right: 0;
+          width: 300px;
+
+          .selected-option {
+            height: auto;
+
+            .option-value {
+              margin: 0 0 3px 10px;
+            }
+          }
+
+          .branch-dropdown {
+            width: 60px;
+            height: 20px;
+            text-align: center;
           }
         }
       }
     }
 
-    .selected-options {
-      .report-selected-option-view {
-        height: auto;
-        margin: 10px 0;
-        padding-left: 0;
-        padding-right: 0;
-        width: 300px;
-
-        .selected-option {
-          height: auto;
-
-          .option-value {
-            margin: 0 0 3px 10px;
-          }
-        }
-
-        .@{_COMMON_PREFIX}dropdown {
-          margin: 0 5px;
-          width: 100px;
-          flex-shrink: 0;
-        }
-      }
+    button {
+      text-align: center;
     }
   }
 
