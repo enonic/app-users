@@ -5,24 +5,46 @@ import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
-import {RichComboBox, RichComboBoxBuilder} from '@enonic/lib-admin-ui/ui/selector/combobox/RichComboBox';
-import {BaseLoader} from '@enonic/lib-admin-ui/util/loader/BaseLoader';
-import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
-import {AuthApplicationLoader} from './AuthApplicationLoader';
+import {FilterableListBoxWrapperWithSelectedView} from '@enonic/lib-admin-ui/ui/selector/list/FilterableListBoxWrapperWithSelectedView';
+import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
+import {ApplicationConfigProvider} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
+import {FormInputEl} from '@enonic/lib-admin-ui/dom/FormInputEl';
+import {ListIdProviderApplicationsRequest} from '../../resource/ListIdProviderApplicationsRequest';
+import * as Q from 'q';
+import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 
 export class AuthApplicationComboBox
-    extends RichComboBox<Application> {
+    extends FilterableListBoxWrapperWithSelectedView<Application> {
 
-    private authApplicationSelectedOptionsView: AuthApplicationSelectedOptionsView;
+    protected selectedOptionsView: AuthApplicationSelectedOptionsView;
 
-    constructor(builder: AuthApplicationComboBoxBuilder) {
-        super(builder);
+    private loadedPromise: Q.Promise<Application[]>;
 
-        this.authApplicationSelectedOptionsView = builder.selectedOptionsView;
+    constructor(applicationConfigProvider: ApplicationConfigProvider, readOnly?: boolean) {
+        super(new AuthApplicationList(), {
+            maxSelected: 1,
+            className: 'auth-application-combobox',
+            filter: (item, searchString) => item.getDisplayName().toString().toLowerCase().indexOf(searchString.toLowerCase()) !== -1,
+            selectedOptionsView: new AuthApplicationSelectedOptionsView(applicationConfigProvider, readOnly),
+        });
+
+        this.load();
     }
 
-    public static create(): AuthApplicationComboBoxBuilder {
-        return new AuthApplicationComboBoxBuilder();
+    private load(): void {
+        this.loadedPromise = new ListIdProviderApplicationsRequest().sendAndParse();
+
+        this.loadedPromise.then((applications: Application[]) => {
+            this.listBox.setItems(applications);
+        }).catch(DefaultErrorHandler.handle);
+    }
+
+    createSelectedOption(item: Application): Option<Application> {
+        return Option.create<Application>()
+            .setValue(item.getApplicationKey().toString())
+            .setDisplayValue(item)
+            .build();
     }
 
     getSelectedOptionViews(): AuthApplicationSelectedOptionView[] {
@@ -33,48 +55,75 @@ export class AuthApplicationComboBox
         return views;
     }
 
+    preSelectApplication(applicationKey: ApplicationKey): void {
+        if (!applicationKey) {
+            return;
+        }
+
+        this.loadedPromise.then(() => {
+            const item = this.getItemById(applicationKey.getName());
+
+            if (item) {
+                this.select(item);
+            }
+        });
+    }
+
     onSiteConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView) }): void {
-        this.authApplicationSelectedOptionsView.onApplicationConfigFormDisplayed(listener);
+        this.selectedOptionsView.onApplicationConfigFormDisplayed(listener);
     }
 
     unSiteConfigFormDisplayed(listener: { (applicationKey: ApplicationKey, formView: FormView) }): void {
-        this.authApplicationSelectedOptionsView.unApplicationConfigFormDisplayed(listener);
+        this.selectedOptionsView.unApplicationConfigFormDisplayed(listener);
     }
 
     onBeforeOptionCreated(listener: () => void): void {
-        this.authApplicationSelectedOptionsView.onBeforeOptionCreated(listener);
+        this.selectedOptionsView.onBeforeOptionCreated(listener);
     }
 
     unBeforeOptionCreated(listener: () => void): void {
-        this.authApplicationSelectedOptionsView.unBeforeOptionCreated(listener);
+        this.selectedOptionsView.unBeforeOptionCreated(listener);
     }
 
     onAfterOptionCreated(listener: () => void): void {
-        this.authApplicationSelectedOptionsView.onAfterOptionCreated(listener);
+        this.selectedOptionsView.onAfterOptionCreated(listener);
     }
 
     unAfterOptionCreated(listener: () => void): void {
-        this.authApplicationSelectedOptionsView.unAfterOptionCreated(listener);
+        this.selectedOptionsView.unAfterOptionCreated(listener);
     }
 }
 
-export class AuthApplicationComboBoxBuilder extends RichComboBoxBuilder<Application> {
+class AuthApplicationList
+    extends ListBox<Application> {
 
-    identifierMethod: string = 'getApplicationKey';
+    protected createItemView(item: Application, readOnly: boolean): ApplicationViewer {
+        const viewer = new ApplicationViewer();
+        viewer.setObject(item);
+        return viewer;
+    }
 
-    comboBoxName: string = 'applicationSelector';
+    protected getItemId(item: Application): string {
+        return item.getId();
+    }
+}
 
-    delayedInputValueChangedHandling: number = 500;
+export class AuthApplicationComboBoxWrapper extends FormInputEl {
 
-    loader: BaseLoader<Application> = new AuthApplicationLoader();
+    private readonly selector: AuthApplicationComboBox;
 
-    optionDisplayValueViewer: Viewer<Application> = new ApplicationViewer();
+    constructor(selector: AuthApplicationComboBox) {
+        super('div', 'locale-selector-wrapper');
 
-    maximumOccurrences: number = 1;
+        this.selector = selector;
+        this.appendChild(this.selector);
+    }
 
-    selectedOptionsView: AuthApplicationSelectedOptionsView;
+    getComboBox(): AuthApplicationComboBox {
+        return this.selector;
+    }
 
-    build(): AuthApplicationComboBox {
-        return new AuthApplicationComboBox(this);
+    getValue(): string {
+        return this.selector.getSelectedOptions().map((item: SelectedOption<Application>) => item.getOption().getValue()).join(';') || null;
     }
 }

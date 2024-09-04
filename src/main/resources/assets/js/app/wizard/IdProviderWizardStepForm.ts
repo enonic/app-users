@@ -5,7 +5,7 @@ import {PropertyTree} from '@enonic/lib-admin-ui/data/PropertyTree';
 import {IdProvider} from '../principal/IdProvider';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {TextInput} from '@enonic/lib-admin-ui/ui/text/TextInput';
-import {AuthApplicationComboBox, AuthApplicationComboBoxBuilder} from '../inputtype/authapplicationselector/AuthApplicationComboBox';
+import {AuthApplicationComboBox, AuthApplicationComboBoxWrapper} from '../inputtype/authapplicationselector/AuthApplicationComboBox';
 import {ApplicationConfigProvider} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
 import {PropertyArray} from '@enonic/lib-admin-ui/data/PropertyArray';
 import {ValueTypePropertySet} from '@enonic/lib-admin-ui/data/ValueTypePropertySet';
@@ -17,6 +17,8 @@ import {WizardStepValidityChangedEvent} from '@enonic/lib-admin-ui/app/wizard/Wi
 import {FormValidityChangedEvent} from '@enonic/lib-admin-ui/form/FormValidityChangedEvent';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
 
 export class IdProviderWizardStepForm
     extends UserItemWizardStepForm {
@@ -25,7 +27,7 @@ export class IdProviderWizardStepForm
 
     private applicationComboBox: AuthApplicationComboBox;
 
-    private selectedOptionsView: AuthApplicationSelectedOptionsView;
+    private wrapper: AuthApplicationComboBoxWrapper;
 
     constructor() {
         super('idprovider-wizard-step-form');
@@ -36,36 +38,34 @@ export class IdProviderWizardStepForm
 
         this.description = new TextInput('middle');
 
-        this.selectedOptionsView =
-            new AuthApplicationSelectedOptionsView(this.createApplicationConfigProvider(), false);
-
-        this.applicationComboBox = new AuthApplicationComboBoxBuilder()
-            .setSelectedOptionsView(this.selectedOptionsView)
-            .build() as AuthApplicationComboBox;
+        this.applicationComboBox = new AuthApplicationComboBox(this.createApplicationConfigProvider(), false);
+        this.wrapper = new AuthApplicationComboBoxWrapper(this.applicationComboBox);
     }
 
     protected initListeners(): void {
         super.initListeners();
 
-        this.applicationComboBox.onOptionSelected(() => {
-            const selectedIdProviderOptionView: AuthApplicationSelectedOptionView =
-                this.selectedOptionsView.getSelectedOptions()[0].getOptionView() as AuthApplicationSelectedOptionView;
+        this.applicationComboBox.onSelectionChanged((selectionChange: SelectionChange<Application>) => {
+            if (selectionChange.selected?.length > 0) {
+                const selectedIdProviderOptionView: AuthApplicationSelectedOptionView =
+                    this.applicationComboBox.getSelectedOptions()[0].getOptionView() as AuthApplicationSelectedOptionView;
 
-            selectedIdProviderOptionView.getFormView().onValidityChanged((event: FormValidityChangedEvent) => {
-                this.previousValidation = event.getRecording();
-                this.notifyValidityChanged(new WizardStepValidityChangedEvent(event.isValid()));
-            });
-        });
+                selectedIdProviderOptionView.getFormView().onValidityChanged((event: FormValidityChangedEvent) => {
+                    this.previousValidation = event.getRecording();
+                    this.notifyValidityChanged(new WizardStepValidityChangedEvent(event.isValid()));
+                });
+            }
 
-        this.applicationComboBox.onOptionDeselected(() => {
-            this.previousValidation = new ValidationRecording();
-            this.notifyValidityChanged(new WizardStepValidityChangedEvent(true));
+            if (selectionChange.deselected?.length > 0) {
+                this.previousValidation = new ValidationRecording();
+                this.notifyValidityChanged(new WizardStepValidityChangedEvent(true));
+            }
         });
     }
 
     protected createFormItems(): FormItem[] {
         const descriptionFormItem: FormItem = new FormItemBuilder(this.description).setLabel(i18n('field.description')).build();
-        const appComboBox: FormItem = new FormItemBuilder(this.applicationComboBox).setLabel(i18n('field.application')).build();
+        const appComboBox: FormItem = new FormItemBuilder(this.wrapper).setLabel(i18n('field.application')).build();
         return [descriptionFormItem, appComboBox];
     }
 
@@ -94,10 +94,10 @@ export class IdProviderWizardStepForm
             this.description.setValue(description);
         }
 
-        if (this.applicationComboBox.isDirty()) {
-            if (ObjectHelper.stringEquals(this.applicationComboBox.getValue(),
+        if (this.wrapper.isDirty()) {
+            if (ObjectHelper.stringEquals(this.wrapper.getValue(),
                 idProvider.getIdProviderConfig()?.getApplicationKey().toString())) {
-                this.applicationComboBox.resetBaseValues();
+                this.wrapper.resetBaseValues();
             }
         } else {
             this.layoutApplicationCombobox(idProvider);
@@ -106,11 +106,12 @@ export class IdProviderWizardStepForm
 
     private layoutApplicationCombobox(idProvider: IdProvider) {
         const config: IdProviderConfig = idProvider.getIdProviderConfig();
-        this.applicationComboBox.setValue(!!config ? config.getApplicationKey().toString() : '');
-        this.applicationComboBox.getSelectedOptionView().setReadonly(idProvider.getKey().isSystem());
+        this.applicationComboBox.preSelectApplication(config?.getApplicationKey());
+        this.applicationComboBox.getSelectedOptionsView().setReadonly(idProvider.getKey().isSystem());
 
         if (!config) {
-            this.selectedOptionsView.setApplicationConfigProvider(this.createApplicationConfigProvider());
+            (this.applicationComboBox.getSelectedOptionsView() as AuthApplicationSelectedOptionsView).setApplicationConfigProvider(
+                this.createApplicationConfigProvider());
             return;
         }
 
@@ -121,7 +122,7 @@ export class IdProviderWizardStepForm
         }
 
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
-            (this.applicationComboBox.getSelectedOptionView() as AuthApplicationSelectedOptionsView);
+            (<AuthApplicationSelectedOptionsView>this.applicationComboBox.getSelectedOptionsView());
 
         const optionViewAddedListener = (optionView: AuthApplicationSelectedOptionView) => {
             optionView.setSiteConfig(this.createApplicationConfig(config));
