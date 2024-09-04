@@ -8,18 +8,17 @@ import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/Selected
 import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
 import {ApplicationConfig} from '@enonic/lib-admin-ui/application/ApplicationConfig';
-import {SelectedOptionEvent} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOptionEvent';
 import {ApplicationConfigProvider} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
 import {InputTypeViewContext} from '@enonic/lib-admin-ui/form/inputtype/InputTypeViewContext';
 import {FormContext} from '@enonic/lib-admin-ui/form/FormContext';
 import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
-import {AuthApplicationComboBox} from './AuthApplicationComboBox';
+import {AuthApplicationComboBox, AuthApplicationComboBoxWrapper} from './AuthApplicationComboBox';
 import {BaseInputTypeManagingAdd} from '@enonic/lib-admin-ui/form/inputtype/support/BaseInputTypeManagingAdd';
-import {InputValidationRecording} from '@enonic/lib-admin-ui/form/inputtype/InputValidationRecording';
 import {Class} from '@enonic/lib-admin-ui/Class';
 import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
 import {Input} from '@enonic/lib-admin-ui/form/Input';
 import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
+import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
 
 export interface AuthApplicationSelectorConfig
     extends InputTypeViewContext {
@@ -32,6 +31,8 @@ export class AuthApplicationSelector
     extends BaseInputTypeManagingAdd {
 
     private comboBox: AuthApplicationComboBox;
+
+    private wrapper: AuthApplicationComboBoxWrapper;
 
     private applicationConfigProvider: ApplicationConfigProvider;
 
@@ -65,6 +66,7 @@ export class AuthApplicationSelector
 
         this.applicationConfigProvider = new ApplicationConfigProvider(propertyArray);
         this.comboBox = this.createComboBox(input, this.applicationConfigProvider);
+        this.wrapper = new AuthApplicationComboBoxWrapper(this.comboBox);
 
         this.appendChild(this.comboBox);
 
@@ -79,9 +81,13 @@ export class AuthApplicationSelector
 
         this.applicationConfigProvider.setPropertyArray(propertyArray);
 
-        if (!unchangedOnly || !this.comboBox.isDirty()) {
+        if (!unchangedOnly || !this.wrapper.isDirty()) {
             return superPromise.then(() => {
-                this.comboBox.setValue(this.getValueFromPropertyArray(propertyArray));
+                const provValue = this.getValueFromPropertyArray(propertyArray);
+
+                if (provValue) {
+                    this.comboBox.preSelectApplication(ApplicationKey.fromString(provValue));
+                }
             });
         } else {
             return superPromise;
@@ -89,7 +95,7 @@ export class AuthApplicationSelector
     }
 
     reset(): void {
-        this.comboBox.resetBaseValues();
+        this.wrapper.resetBaseValues();
     }
 
     private saveToSet(applicationConfig: ApplicationConfig, index: number) {
@@ -124,10 +130,7 @@ export class AuthApplicationSelector
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
             new AuthApplicationSelectedOptionsView(applicationConfigProvider, this.readOnly);
 
-        const comboBox: AuthApplicationComboBox = <AuthApplicationComboBox>AuthApplicationComboBox.create()
-            .setMaximumOccurrences(input.getOccurrences().getMaximum() || 0)
-            .setSelectedOptionsView(selectedOptionsView)
-            .build();
+        const comboBox: AuthApplicationComboBox = new AuthApplicationComboBox(applicationConfigProvider, this.readOnly);
 
         // creating selected option might involve property changes
         comboBox.onBeforeOptionCreated(() => this.ignorePropertyChange(true));
@@ -143,29 +146,24 @@ export class AuthApplicationSelector
             forcedValidate();
         };
 
-        comboBox.onOptionDeselected((event: SelectedOptionEvent<Application>) => {
-            this.ignorePropertyChange(true);
+        comboBox.onSelectionChanged((selectionChange: SelectionChange<Application>) => {
+            if (selectionChange.selected?.length > 0) {
+                this.ignorePropertyChange(true);
 
-            this.getPropertyArray().remove(event.getSelectedOption().getIndex());
-
-            forcedValidate();
-        });
-
-        comboBox.onOptionSelected((event: SelectedOptionEvent<Application>) => {
-            this.fireFocusSwitchEvent(event);
-
-            this.ignorePropertyChange(true);
-
-            const selectedOption = event.getSelectedOption();
-            const key = selectedOption.getOption().getDisplayValue().getApplicationKey();
-            if (key) {
-                saveAndForceValidate(selectedOption);
+                const selectedOption = this.comboBox.getSelectedOptions()[0];
+                const key = selectedOption.getOption().getDisplayValue().getApplicationKey();
+                if (key) {
+                    saveAndForceValidate(selectedOption);
+                }
             }
-        });
 
-        comboBox.onOptionMoved((selectedOption: SelectedOption<Application>, fromIndex: number) => {
-            this.getPropertyArray().move(fromIndex, selectedOption.getIndex());
-            forcedValidate();
+            if (selectionChange.deselected?.length > 0) {
+                this.ignorePropertyChange(true);
+
+                this.getPropertyArray().remove(0);
+
+                forcedValidate();
+            }
         });
 
         comboBox.onSiteConfigFormDisplayed((applicationKey: ApplicationKey, formView: FormView) => {
