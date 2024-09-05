@@ -4,7 +4,6 @@ import {FindPrincipalsRequest} from './FindPrincipalsRequest';
 import {GetPrincipalsByKeysRequest} from './GetPrincipalsByKeysRequest';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
-import {ComboBox} from '@enonic/lib-admin-ui/ui/selector/combobox/ComboBox';
 import {BaseSelectedOptionsView} from '@enonic/lib-admin-ui/ui/selector/combobox/BaseSelectedOptionsView';
 
 export class PrincipalLoader
@@ -24,7 +23,7 @@ export class PrincipalLoader
     the data is a mix of the first {MAX_TO_APPEND} ones from the request and the remaining ones built directly
     from the keys in the searchString. */
     preLoadData(searchString: string): Q.Promise<Principal[]> {
-        const separator = ComboBox.VALUE_SEPARATOR;
+        const separator = ';';
         const max_to_append = BaseSelectedOptionsView.MAX_TO_APPEND;
 
         if (searchString.split(separator).length <= max_to_append) {
