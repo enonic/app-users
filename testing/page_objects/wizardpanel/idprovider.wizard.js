@@ -5,18 +5,19 @@ const WizardPanel = require('./wizard.panel').WizardPanel;
 const wpXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const AuthApplicationComboBox = require('../selectors/auth.application.combobox');
+const IdProviderAccessControlComboBox = require('../selectors/id.provider.access.control.combobox');
 
 const XPATH = {
     container: "//div[contains(@id,'IdProviderWizardPanel')]",
-    permissionsFilterInput: "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
+    permissionsFilterInput: "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.DROPDOWN_SELECTOR.OPTION_FILTER_INPUT,
     permissionsLink: "//li[child::a[text()='Permissions']]",
     aclList: "//div[contains(@id,'IdProviderACESelectedOptionsView') and contains(@class,'selected-options')]",
     aceAccessSelector: "//div[contains(@id,'IdProviderAccessSelector')]",
     selectedAcEntryByDisplayName: function (displayName) {
         return `//div[contains(@id,'IdProviderAccessControlEntryView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
     },
-    aceOperationByName: function (displayName) {
+    aceOperationByName(displayName) {
         return `//ul[@class='menu']//li[child::a[text()='${displayName}']]`
     },
     providerComboBox: "//div[contains(@id,'AuthApplicationComboBox')]",
@@ -39,11 +40,11 @@ class IdProviderWizard extends WizardPanel {
     }
 
     get permissionsDropDownHandle() {
-        return XPATH.container + "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.DROP_DOWN_HANDLE;
+        return XPATH.container + "//div[contains(@id,'IdProviderAccessControlComboBox')]" + lib.BUTTONS.DROP_DOWN_HANDLE;
     }
 
     get providerDropDownHandle() {
-        return XPATH.container + XPATH.providerComboBox + lib.DROP_DOWN_HANDLE;
+        return XPATH.container + XPATH.providerComboBox + lib.BUTTONS.DROP_DOWN_HANDLE;
     }
 
     get deleteButton() {
@@ -75,7 +76,7 @@ class IdProviderWizard extends WizardPanel {
             await this.waitForDeleteButtonEnabled();
             return await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            this.saveScreenshot('err_delete_in_idprovider_wizard');
+            await this.saveScreenshot('err_delete_in_idprovider_wizard');
             throw new Error('Error when Delete button has been clicked ' + err);
         }
     }
@@ -93,11 +94,9 @@ class IdProviderWizard extends WizardPanel {
     }
 
     async filterOptionsAndSelectPermission(permissionDisplayName) {
-        let loaderComboBox = new LoaderComboBox();
+        let idProviderAccessControlComboBox = new IdProviderAccessControlComboBox();
         try {
-            await this.typeTextInInput(XPATH.permissionsFilterInput, permissionDisplayName);
-            await loaderComboBox.waitForOptionVisible(XPATH.container, permissionDisplayName);
-            await loaderComboBox.clickOnOption(XPATH.container, permissionDisplayName);
+            await idProviderAccessControlComboBox.selectFilteredOptionAndClickOnOk(permissionDisplayName, XPATH.container);
             return await this.pause(300);
         } catch (err) {
             throw new Error('Error when selecting the ACL-entry: ' + permissionDisplayName + ' ' + err);
@@ -109,24 +108,30 @@ class IdProviderWizard extends WizardPanel {
         return await this.pause(400);
     }
 
+    // Permissions selector:
     async clickOnPrincipalComboBoxDropDownHandle() {
-        await this.clickOnElement(this.permissionsDropDownHandle);
-        return await this.pause(800);
+        let idProviderAccessControlComboBox = new IdProviderAccessControlComboBox();
+        await idProviderAccessControlComboBox.clickOnDropdownHandle();
+        return await this.pause(400);
     }
 
+    // Applications(Provider) selector
     async clickOnProviderComboBoxDropDownHandle() {
-        await this.clickOnElement(this.providerDropDownHandle);
-        return await this.pause(800);
+        let authApplicationComboBox = new AuthApplicationComboBox();
+        await authApplicationComboBox.clickOnDropdownHandle();
     }
 
-    getPrincipalOptionDisplayNames() {
-        let loaderComboBox = new LoaderComboBox();
-        return loaderComboBox.getOptionDisplayNames(XPATH.container + "//div[contains(@id,'IdProviderAccessControlComboBox')]");
+    // Permissions selector:
+    async getPrincipalOptionDisplayNames() {
+        let idProviderAccessControlComboBox = new IdProviderAccessControlComboBox();
+        return await idProviderAccessControlComboBox.getOptionsDisplayName(XPATH.container);
+
     }
 
-    getProviderOptionDisplayNames() {
-        let loaderComboBox = new LoaderComboBox();
-        return loaderComboBox.getOptionDisplayNames(XPATH.container + XPATH.providerComboBox);
+    // Applications(Provider) selector
+    async getProviderOptionDisplayNames() {
+        let authApplicationComboBox = new AuthApplicationComboBox();
+        return await authApplicationComboBox.getOptionsDisplayName(XPATH.container);
     }
 
     async removeAuthApplication() {
@@ -135,11 +140,9 @@ class IdProviderWizard extends WizardPanel {
     }
 
     async filterOptionsAndSelectApplication(authAppName) {
+        let authApplicationComboBox = new AuthApplicationComboBox();
         try {
-            let loaderComboBox = new LoaderComboBox();
-            await this.typeTextInInput(this.authApplicationSelectorFilterInput, authAppName);
-            await loaderComboBox.waitForOptionVisible(XPATH.container, authAppName);
-            await loaderComboBox.clickOnOption(XPATH.container, authAppName);
+            await authApplicationComboBox.selectFilteredOptionAndClickOnOk(authAppName, XPATH.container);
             return await this.pause(300);
         } catch (err) {
             await this.saveScreenshot('err_select_application');

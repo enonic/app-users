@@ -83,7 +83,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
     }
 
     cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+        return XPATH.container + lib.BUTTONS.CANCEL_BUTTON_TOP;
     }
 
     isDomainInputDisplayed() {

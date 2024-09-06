@@ -26,17 +26,6 @@ class Page {
         return this.browser.$$(selector);
     }
 
-    async getDisplayedElements(selector) {
-        let elements = await this.findElements(selector);
-        if (elements.length === 0) {
-            return [];
-        }
-        let pr = await elements.map(el => el.isDisplayed());
-        return Promise.all(pr).then(result => {
-            return elements.filter((el, i) => result[i]);
-        });
-    }
-
     // value: string | string[]
     keys(value) {
         return this.browser.keys(value);
@@ -57,6 +46,20 @@ class Page {
         return await element.getText();
     }
 
+    async getDisplayedElements(selector) {
+        let elements = await this.findElements(selector);
+        if (elements.length === 0) {
+            return [];
+        }
+        return await this.doFilterDisplayedElements(elements);
+    }
+
+    async doFilterDisplayedElements(elements) {
+        let pr = await elements.map(async (el) => await el.isDisplayed());
+        let result = await Promise.all(pr);
+        return elements.filter((el, i) => result[i]);
+    }
+
     async getTextInElements(selector) {
         let strings = [];
         let elements = await this.findElements(selector);
@@ -67,6 +70,18 @@ class Page {
             strings.push(el.getText());
         });
         return Promise.all(strings);
+    }
+
+    async getTextInDisplayedElements(selector) {
+        let results = [];
+        let elements = await this.getDisplayedElements(selector);
+        if (elements.length === 0) {
+            return [];
+        }
+        for (const item of elements) {
+            results.push(await item.getText());
+        }
+        return results;
     }
 
     async typeTextInInput(selector, text) {
@@ -113,6 +128,14 @@ class Page {
     async isElementDisplayed(selector) {
         let element = await this.findElement(selector);
         return await element.isDisplayed();
+    }
+
+    waitUntilDisplayed(selector, ms) {
+        return this.getBrowser().waitUntil(() => {
+            return this.getDisplayedElements(selector).then(result => {
+                return result.length > 0;
+            })
+        }, {timeout: ms, timeoutMsg: 'Timeout exception. Element ' + selector + ' still not visible in: ' + ms});
     }
 
     async isElementEnabled(selector) {
