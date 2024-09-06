@@ -17,8 +17,8 @@ class GridContextMenu extends Page {
 
     async waitForContextMenuVisible() {
         try {
-            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
-            return await this.pause(500);
+            await this.waitUntilDisplayed(XPATH.container, appConst.mediumTimeout);
+            return await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_grid_context_menu');
             throw new Error(`tree grid context menu is not loaded, screenshot: ` + screenshot + '  ' + err);
@@ -77,8 +77,9 @@ class GridContextMenu extends Page {
     async clickOnMenuItem(menuItem) {
         try {
             let menuItemLocator = XPATH.container + lib.menuItemByName(menuItem);
-            await this.waitForElementDisplayed(menuItemLocator, appConst.mediumTimeout);
-            await this.clickOnElement(menuItemLocator);
+            await this.waitUntilDisplayed(menuItemLocator, appConst.mediumTimeout);
+            let elements = await this.getDisplayedElements(menuItemLocator);
+            await elements[0].click();
             await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_menu_item');

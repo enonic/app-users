@@ -5,7 +5,7 @@ const WizardPanel = require('./wizard.panel').WizardPanel;
 const baseXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const MembersPrincipalCombobox = require('../selectors/members.principal.combobox');
 
 const xpath = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
@@ -108,13 +108,11 @@ class RoleWizard extends WizardPanel {
 
     async filterOptionsAndAddMember(displayName) {
         try {
-            let loaderComboBox = new LoaderComboBox();
-            await this.typeTextInInput(xpath.container + xpath.memberOptionsFilterInput, displayName);
-            await loaderComboBox.waitForOptionVisible(xpath.container, displayName);
-            await loaderComboBox.clickOnOption(xpath.container, displayName);
+            let membersPrincipalCombobox = new MembersPrincipalCombobox();
+            await membersPrincipalCombobox.selectFilteredOptionAndClickOnOk(xpath.container, displayName);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_member');
-            throw new Error('Error selecting the option, screenshot:  ' + screenshot + ' ' + err);
+            throw new Error(`Error occurred in Role wizard screenshot: ${screenshot} ` + err);
         }
     }
 }

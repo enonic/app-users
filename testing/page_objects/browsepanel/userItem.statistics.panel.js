@@ -97,7 +97,7 @@ class UserItemStatisticsPanel extends Page {
 
     //clicks on dropDown handle and selects draft/master
     async clickOnDropDownHandleAndSelectBranch(optionName) {
-        let dropDownHandle = XPATH.reportSelectedOptionsView + lib.DROP_DOWN_HANDLE;
+        let dropDownHandle = XPATH.reportSelectedOptionsView + lib.BUTTONS.DROP_DOWN_HANDLE;
         await this.waitForElementDisplayed(dropDownHandle, appConst.mediumTimeout);
         await this.clickOnElement(dropDownHandle);
         let optionSelector = XPATH.reportSelectedOptionsView + XPATH.repositoryBranchOption(optionName);

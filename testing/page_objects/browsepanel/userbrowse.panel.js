@@ -9,10 +9,13 @@ const appConst = require('../../libs/app_const');
 const xpath = {
     container: "//div[contains(@id,'UserBrowsePanel')]",
     selectionToggler: "//button[contains(@id,'SelectionPanelToggler')]",
+    userItemsTreeGridRootUL: "//ul[contains(@id,'UserItemsTreeRootList')]",
     selectionControllerCheckBox: "//div[contains(@id,'SelectionController')]",
     toolbar: "//div[contains(@id,'UserBrowseToolbar')]",
-    grid: "//div[contains(@class,'grid-canvas')]",
-    treeGridToolbar: `//div[contains(@id,'TreeGridToolbar')]`,
+    highlightedRow: `//li[contains(@class,'checkbox-left selected') and not(contains(@class,'checked')) ]`,
+    checkedRowLi: `//li[contains(@class,'checkbox-left selected checked')]`,
+    userItemsTreeRootList: "//ul[contains(@id,'UserItemsTreeRootList')]",
+    listBoxToolbarDiv: `//div[contains(@id,'ListBoxToolbar')]`,
     searchButton: "//button[contains(@class, 'icon-search')]",
     hideFilterPanelButton: "//span[contains(@class, 'hide-filter-panel-button')]",
     appHomeButton: "//div[contains(@id,'TabbedAppBar')]/div[contains(@class,'home-button')]",
@@ -29,10 +32,6 @@ const xpath = {
         return `${lib.itemByDisplayName(displayName)}` +
                `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
     },
-    expanderIconByName(name) {
-        return this.rowByName(name) +
-               `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
-    },
     closeItemTabButton(name) {
         return `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${name}']]/button`;
     },
@@ -41,6 +40,10 @@ const xpath = {
 };
 
 class UserBrowsePanel extends Page {
+
+    get treeGrid() {
+        return xpath.container + xpath.userItemsTreeRootList;
+    }
     get newButton() {
         return xpath.toolbar + "/*[contains(@id, 'ActionButton') and child::span[contains(.,'New')]]";
     }
@@ -70,7 +73,7 @@ class UserBrowsePanel extends Page {
     }
 
     get selectionControllerCheckBox() {
-        return xpath.treeGridToolbar + xpath.selectionControllerCheckBox;
+        return xpath.listBoxToolbarDiv + xpath.selectionControllerCheckBox;
     }
 
     waitForPanelVisible(ms) {
@@ -91,7 +94,7 @@ class UserBrowsePanel extends Page {
 
     async waitForUsersGridLoaded(ms) {
         try {
-            await this.waitForElementDisplayed(xpath.grid, ms);
+            await this.waitForElementDisplayed(this.treeGrid, ms);
             await this.waitForSpinnerNotVisible();
             console.log('user browse panel is loaded');
         } catch (err) {
@@ -230,10 +233,10 @@ class UserBrowsePanel extends Page {
 
     async clickCheckboxAndSelectRowByDisplayName(displayName) {
         try {
-            let displayNameXpath = xpath.checkboxByDisplayName(displayName);
-            await this.waitForElementDisplayed(displayNameXpath, appConst.mediumTimeout);
-            await this.clickOnElement(displayNameXpath);
-            return await this.pause(300);
+            let checkboxElement = lib.TREE_GRID.itemTreeGridListElementByDisplayName(displayName) + lib.DIV.CHECKBOX_DIV + '/label';
+            await this.waitForElementDisplayed(checkboxElement, appConst.mediumTimeout);
+            await this.clickOnElement(checkboxElement);
+            return await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
             throw Error('Row checkbox, screenshot: ' + screenshot + ' ' + err);
@@ -293,13 +296,13 @@ class UserBrowsePanel extends Page {
     }
 
     clickOnExpanderIcon(name) {
-        let expanderIcon = xpath.expanderIconByName(name);
+        let expanderIcon = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(name) + lib.TREE_GRID.EXPANDER_ICON_DIV;
         return this.clickOnElement(expanderIcon);
     }
 
     getGridItemDisplayNames() {
-        let selector = xpath.container + lib.SLICK_ROW + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selector);
+        let locator = xpath.userItemsTreeGridRootUL + lib.H6_DISPLAY_NAME;
+        return this.getTextInElements(locator);
     }
 
     waitForSelectionTogglerVisible() {
@@ -367,12 +370,11 @@ class UserBrowsePanel extends Page {
         }
     }
 
-    async isRowHighlighted(name) {
-        let locator = `${lib.itemByDisplayName(name)}` +
-                      `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]`;
+    async isRowHighlighted(displayName) {
+        let locator = lib.TREE_GRID.listItemByDisplayName(displayName);
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         let attribute = await this.getAttribute(locator, 'class');
-        return attribute.includes('highlight');
+        return attribute.includes('selected') && !attribute.includes('checked');
     }
 }
 

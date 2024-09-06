@@ -4,7 +4,7 @@
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const PrincipalComboBox = require('../inputs/principal.compobox');
+const PrincipalComboBox = require('../selectors/principal.combobox');
 const XPATH = {
     container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
     domainInput: "//input[contains(@id,'TextInput') and contains(@name,'appDomain')]",
@@ -65,7 +65,7 @@ class IdProviderConfiguratorDialog extends Page {
     }
 
     cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+        return XPATH.container + lib.BUTTONS.CANCEL_BUTTON_TOP;
     }
 
     isDomainInputDisplayed() {
@@ -126,9 +126,7 @@ class IdProviderConfiguratorDialog extends Page {
 
     async selectGroup(groupName) {
         let principalComboBox = new PrincipalComboBox();
-        //await this.typeTextInInput(XPATH.container + lib.COMBO_BOX_OPTION_FILTER_INPUT, groupName)
-        await principalComboBox.typeTextAndSelectOption(groupName, XPATH.container);
-        return await this.pause(500);
+        await principalComboBox.selectFilteredOptionAndClickOnOk(groupName, XPATH.container);
     }
 
     async getSelectedGroups() {
