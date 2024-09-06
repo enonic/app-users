@@ -17,7 +17,7 @@ const makeChromeOptions = (headless, width, height) => ({
         ...(headless ? ["--headless", "--disable-gpu", "--no-sandbox"] : []),
         "--lang=en",
         '--disable-extensions',
-        `window-size=${width},1200`
+        `--window-size=${width},${height}`
     ]
 });
 
@@ -48,6 +48,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
             logLevel: "error",
             automationProtocol: "webdriver",
             capabilities: {
+                "wdio:enforceWebDriverClassic": true,
                 browserName: browser_name,
                 browserVersion: browser_version,
                 'goog:chromeOptions': makeChromeOptions(isHeadless, width, height)

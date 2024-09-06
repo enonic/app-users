@@ -1,8 +1,7 @@
 /**
  * Created on 12.04.2018.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const testUtils = require('../libs/test.utils');
@@ -20,11 +19,11 @@ describe("User Wizard generate password spec", function () {
             let userWizard = new UserWizard();
             // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
-            let result = await userWizard.isGenerateDisplayed();
+            let isDisplayed = await userWizard.isGenerateDisplayed();
             await testUtils.saveScreenshot('generate_password_link');
-            assert.isTrue(result, "generate password link should be displayed");
-            result = await userWizard.isShowLinkDisplayed();
-            assert.isTrue(result, "show-link should be displayed");
+            assert.ok(isDisplayed, "generate password link should be displayed");
+            isDisplayed = await userWizard.isShowLinkDisplayed();
+            assert.ok(isDisplayed, "show-link should be displayed");
         });
 
     it("GIVEN user-wizard is opened WHEN 'Generate' link has been pressed THEN new password should be generated",
@@ -36,7 +35,7 @@ describe("User Wizard generate password spec", function () {
             await userWizard.clickOnGenerateLink();
             await testUtils.saveScreenshot('generate_password_link_clicked');
             let result = await userWizard.getTextInPasswordInput();
-            assert.isTrue(result.length > 0, "new password should be generated");
+            assert.ok(result.length > 0, "new password should be generated");
         });
 
     it("GIVEN user-wizard is opened WHEN 'Show' password link has been clicked THEN 'Hide' link should appear",
@@ -48,7 +47,7 @@ describe("User Wizard generate password spec", function () {
             await userWizard.clickOnShowPasswordLink();
             await testUtils.saveScreenshot('show_password_link_clicked');
             let result = await userWizard.isHidePasswordLinkDisplayed();
-            assert.isTrue(result, "'Hide' link gets displayed");
+            assert.ok(result, "'Hide' link gets displayed");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

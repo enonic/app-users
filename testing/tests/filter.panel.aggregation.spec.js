@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
@@ -48,7 +47,7 @@ describe('filter.panel.aggregation.spec - tests for Principal Aggregation', func
             await testUtils.saveScreenshot('aggregation_in_users');
             // 5. Verify that SU is present in the filtered grid
             let isDisplayed = await userBrowsePanel.isItemDisplayed('/system/users/su');
-            assert.isTrue(isDisplayed, "'SU' should be displayed in the filtered panel");
+            assert.ok(isDisplayed, "'SU' should be displayed in the filtered panel");
         });
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `Role` aggregation has been clicked THEN Id Provider should not be displayed',
@@ -63,7 +62,7 @@ describe('filter.panel.aggregation.spec - tests for Principal Aggregation', func
             await userBrowsePanel.waitForItemByDisplayNameNotDisplayed('System Id Provider');
             // Verify that 'Users Administrator' role is displayed:
             let isDisplayed = await userBrowsePanel.isItemDisplayed('/roles/system.user.admin');
-            assert.isTrue(isDisplayed, 'expected role should be displayed in the filtered panel');
+            assert.ok(isDisplayed, 'expected role should be displayed in the filtered panel');
         });
 
     it('GIVEN `Principal Filter Panel` is opened WHEN `Id Provider` aggregation has been clicked THEN Roles-folder should not be displayed',

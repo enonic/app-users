@@ -1,8 +1,7 @@
 /**
  * Created on 13.04.2018.*
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -32,7 +31,7 @@ describe("Create an user with generated password and log in the user", function 
             await testUtils.navigateToUsersApp();
             // 1. Open new wizard:
             await testUtils.clickOnSystemOpenUserWizard();
-            // 2. Type the data and click on Generate button:
+            // 2. Type the data and click on 'Generate' button:
             await userWizard.typeDataAndGeneratePassword(testUser);
             // 3. Get the generated password:
             PASSWORD = await userWizard.getTextInPasswordInput();
@@ -41,8 +40,8 @@ describe("Create an user with generated password and log in the user", function 
             await userBrowsePanel.closeTabAndWaitForGrid(userName);
             // 5. Verify that user is created:
             await testUtils.typeNameInFilterPanel(userName);
-            let result = await userBrowsePanel.isItemDisplayed(userName);
-            assert.isTrue(result, 'new user should be present in the grid');
+            let isDisplayed = await userBrowsePanel.isItemDisplayed(userName);
+            assert.ok(isDisplayed, 'new user should be present in the grid');
         });
 
     it("WHEN user name and 'generated' password have been typed AND 'login-button' pressed THEN user should be 'logged in'",

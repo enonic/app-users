@@ -1,8 +1,7 @@
 /**
  * Created on 16.03.2018.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -29,7 +28,7 @@ describe("Id Provider - checks unsaved changes", function () {
             await testUtils.saveScreenshot("provider_save_before1");
             let result = await confirmationDialog.isDialogLoaded();
             //there are no unsaved changes, so dialog should not be present.
-            assert.isFalse(result, "Confirmation dialog must not be loaded");
+            assert.ok(result === false, "Confirmation dialog must not be loaded");
         });
 
     it("GIVEN 'IdProvider' wizard is opened WHEN description has been typed AND `close` icon pressed THEN Confirmation dialog should appear",
@@ -41,7 +40,7 @@ describe("Id Provider - checks unsaved changes", function () {
             await idProviderWizard.typeDescription('description');
             await userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
             await testUtils.saveScreenshot("provider_save_before2");
-            //description has been typed, so save before close dialog should appear!
+            // description has been typed, so save before close dialog should appear!
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -52,15 +51,15 @@ describe("Id Provider - checks unsaved changes", function () {
             let name = userItemsBuilder.generateRandomName('provider');
             let userBrowsePanel = new UserBrowsePanel();
             let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', providerName, null);
-            //1. Wizard for new provider has been opened:
+            // 1. Wizard for new provider has been opened:
             await testUtils.openIdProviderWizard(idProvider);
-            //2. type a data:
+            // 2. type a data:
             await idProviderWizard.typeData(idProvider);
             await testUtils.saveScreenshot("application_should_be_selected");
-            //3. Click on close wizard icon:
+            // 3. Click on close wizard icon:
             await userBrowsePanel.doClickOnCloseTabButton(idProvider.displayName);
             let confirmationDialog = new ConfirmationDialog();
-            //4. Verify that 'Confirmation' dialog should appear, otherwise exception will be thrown:
+            // 4. Verify that 'Confirmation' dialog should appear, otherwise exception will be thrown:
             await confirmationDialog.waitForDialogLoaded();
         });
 

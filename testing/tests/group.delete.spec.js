@@ -1,8 +1,7 @@
 /**
  * Created on 17.11.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -25,23 +24,23 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             let groupWizard = new GroupWizard();
             let confirmationDialog = new ConfirmationDialog();
             let testGroup = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 0');
-            //1. Group wizard has been opened:
+            // 1. Group wizard has been opened:
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeData(testGroup);
-            //2. The Group has been saved:
+            // 2. The Group has been saved:
             await groupWizard.waitAndClickOnSave();
-            //3. Delete button in toolbar has been clicked:
+            // 3. Delete button in toolbar has been clicked:
             await groupWizard.clickOnDelete();
             await testUtils.saveScreenshot("group_wizard_confirm_delete1");
-            //4.`Verify that Confirmation Dialog` is loaded
+            // 4.`Verify that Confirmation Dialog` is loaded
             await confirmationDialog.waitForDialogLoaded();
             await confirmationDialog.pause(200);
-            //5. Press 'Esc' key
+            // 5. Press 'Esc' key
             await groupWizard.pressEscKey();
             await testUtils.saveScreenshot("group_wizard_confirm_dialog_closed");
-            //6. Verify that confirmation dialog is closed:
+            // 6. Verify that confirmation dialog is closed:
             await confirmationDialog.waitForDialogClosed();
-            //7. Verify that Group wizard remains opened after canceling the deleting
+            // 7. Verify that Group wizard remains opened after canceling the deleting
             await groupWizard.waitForOpened();
         });
 
@@ -52,15 +51,15 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             let groupToDelete = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 1');
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeData(groupToDelete);
-            //1. Save new group:
+            // 1. Save new group:
             await groupWizard.waitAndClickOnSave();
-            //2. Click on delete:
+            // 2. Click on delete:
             await groupWizard.clickOnDelete();
-            //3. Confirm:
+            // 3. Confirm:
             await testUtils.confirmDelete();
             await testUtils.saveScreenshot("group_deleted_confirmation_mess1");
             let expectedMessage = appConst.groupDeletedMessage(groupToDelete.displayName);
-            //Message : Principal "group:system:${displayName}" is deleted - should appear
+            // Message : Principal "group:system:${displayName}" is deleted - should appear
             await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
         });
 
@@ -70,13 +69,13 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             let confirmationDialog = new ConfirmationDialog();
             TEST_GROUP = userItemsBuilder.buildGroup(userItemsBuilder.generateRandomName('group'), 'test group 2');
             await testUtils.openWizardAndSaveGroup(TEST_GROUP);
-            //1. Select existing group in the grid:
+            // 1. Select existing group in the grid:
             await testUtils.findAndSelectItem(TEST_GROUP.displayName);
-            //2. Click on Delete button:
+            // 2. Click on Delete button:
             await userBrowsePanel.waitForDeleteButtonEnabled();
             await userBrowsePanel.clickOnDeleteButton();
-            await testUtils.saveScreenshot("group_confirm_dialog_appears");
-            //Verify that Confirmation Dialog appears:
+            await testUtils.saveScreenshot('group_confirm_dialog_appears');
+            // Verify that Confirmation Dialog appears:
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -86,7 +85,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             //Select and delete existing group:
             await testUtils.selectAndDeleteItem(TEST_GROUP.displayName);
             let message = await userBrowsePanel.waitForNotificationMessage();
-            await testUtils.saveScreenshot("group_deleted_notification_mes2");
+            await testUtils.saveScreenshot('group_deleted_notification_mes2');
             let expected = appConst.groupDeletedMessage(TEST_GROUP.displayName);
             assert.strictEqual(message, expected, 'Expected message should appear: Principal "group:system:${displayName}" is deleted');
         });
@@ -113,7 +112,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await testUtils.saveScreenshot("group_number_after_recreating");
             // 5. Verify that the number of groups is increased
             let newNumberOfGroup = await filterPanel.getNumberInGroupAggregationCheckbox();
-            assert.isTrue(newNumberOfGroup - initialNumber === 1,
+            assert.ok(newNumberOfGroup - initialNumber === 1,
                 "Number of group in Filter panel should be increased after recreating the group");
         });
 

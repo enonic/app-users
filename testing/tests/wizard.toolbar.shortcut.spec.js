@@ -1,8 +1,7 @@
 /**
  * Created on 12/08/2019.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const userItemsBuilder = require('../libs/userItems.builder.js');
@@ -36,6 +35,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. User's data has been typed:
             await userWizard.typeDisplayName(TEST_USER.displayName);
             await userWizard.typeEmail(TEST_USER.email);
+            await userWizard.pause(500);
             await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
             // 3. keyboard shortcut to Save button has been pressed:
@@ -45,6 +45,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             let message = await userWizard.waitForNotificationMessage();
             assert.equal(message, appConst.USER_WAS_CREATED_MESSAGE, 'User was created - message should appear');
         });
+
     it(`GIVEN existing user is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
         async () => {
             let userWizard = new UserWizard();
@@ -70,9 +71,10 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Group's data has been typed:
             await groupWizard.typeDisplayName(TEST_GROUP.displayName);
             await groupWizard.waitForSaveButtonEnabled();
+            await groupWizard.pause(500);
             // 3. keyboard shortcut to save button has been pressed:
             await groupWizard.hotKeySave();
-            await testUtils.saveScreenshot("group_shortcut_save");
+            await testUtils.saveScreenshot('group_shortcut_save');
             // 4. Verify the notification message
             let message = await groupWizard.waitForNotificationMessage();
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message should appear");
@@ -86,7 +88,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await testUtils.selectGroupAndOpenWizard(TEST_GROUP.displayName);
             // 2. keyboard shortcut to Delete button has been pressed:
             await groupWizard.hotKeyDelete();
-            await testUtils.saveScreenshot("group_shortcut_delete");
+            await testUtils.saveScreenshot('group_shortcut_delete');
             // 3. Confirmation dialog should be loaded:
             await confirmationDialog.waitForDialogLoaded();
         });
@@ -117,7 +119,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await testUtils.selectRoleAndOpenWizard(TEST_ROLE.displayName);
             // 2. keyboard shortcut to Delete button has been pressed:
             await roleWizard.hotKeyDelete();
-            await testUtils.saveScreenshot("group_shortcut_delete");
+            await testUtils.saveScreenshot('group_shortcut_delete');
             // 3. Confirmation dialog should be loaded:
             await confirmationDialog.waitForDialogLoaded();
         });

@@ -1,8 +1,7 @@
 /**
  * Created on 21.11.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');

@@ -5,7 +5,7 @@ const WizardPanel = require('./wizard.panel').WizardPanel;
 const baseXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const MembersPrincipalCombobox = require('../selectors/members.principal.combobox');
 
 const xpath = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
@@ -48,11 +48,14 @@ class RoleWizard extends WizardPanel {
         return await this.typeTextInInput(this.descriptionInput, data.description);
     }
 
-    clickOnDelete() {
-        return this.clickOnElement(this.deleteButton).catch(err => {
-            this.saveScreenshot('err_delete_button_in_role_wizard', err);
-            throw new Error("Role wizard - " + err);
-        });
+    async clickOnDelete() {
+        try {
+            await this.waitForDeleteButtonEnabled();
+            return await this.clickOnElement(this.deleteButton);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_delete_button_in_role_wizard');
+            throw new Error("Role wizard - delete button, screenshot:" + screenshot + ' ' + err);
+        }
     }
 
     waitForDeleteButtonEnabled() {
@@ -98,20 +101,18 @@ class RoleWizard extends WizardPanel {
             let locator = xpath.container + lib.selectedPrincipalByDisplayName(roleDisplayName) + lib.REMOVE_ICON;
             return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_remove_icon');
             throw new Error('Error - remove-icon should not be displayed for the role, screenshot: ' + screenshot + ' ' + err);
         }
     }
 
     async filterOptionsAndAddMember(displayName) {
         try {
-            let loaderComboBox = new LoaderComboBox();
-            await this.typeTextInInput(xpath.container + xpath.memberOptionsFilterInput, displayName);
-            await loaderComboBox.waitForOptionVisible(xpath.container, displayName);
-            await loaderComboBox.clickOnOption(xpath.container, displayName);
+            let membersPrincipalCombobox = new MembersPrincipalCombobox();
+            await membersPrincipalCombobox.selectFilteredOptionAndClickOnOk(xpath.container, displayName);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_member');
-            throw new Error('Error selecting the option, screenshot:  ' + screenshot + ' ' + err);
+            throw new Error(`Error occurred in Role wizard screenshot: ${screenshot} ` + err);
         }
     }
 }

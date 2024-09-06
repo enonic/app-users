@@ -1,9 +1,7 @@
 /**
  * Created on 14/02/2018
- * verifies the enonic/lib-admin-ui#254 (Users App - trim spaces in displayName input (Wizards))
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -19,6 +17,7 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
     }
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
+    // verifies the enonic/lib-admin-ui#254 (Users App - trim spaces in displayName input (Wizards))
     it("GIVEN user wizard is opened WHEN user-name with white spaces has been typed and the user saved THEN name without spaces should be displayed in the grid",
         async () => {
             let userWizard = new UserWizard();
@@ -36,11 +35,11 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
             await testUtils.typeNameInFilterPanel(testUser.displayName);
             await testUtils.saveScreenshot("user_trimmed_name");
             // 5. Verify that spaces are trimmed in the display name:
-            let result = await userBrowsePanel.isItemDisplayed(nameWithSpaces);
-            assert.isFalse(result, "name with spaces should not be displayed in the grid");
+            let isDisplayed = await userBrowsePanel.isItemDisplayed(nameWithSpaces);
+            assert.ok(isDisplayed === false, "name with spaces should not be displayed in the grid");
             // 6.  User-name without spaces is displayed in the path:
-            result = await userBrowsePanel.isItemDisplayed(userName);
-            assert.isTrue(result, "trimmed name should be displayed");
+            isDisplayed = await userBrowsePanel.isItemDisplayed(userName);
+            assert.ok(isDisplayed, "trimmed name should be displayed");
         });
 
     it("GIVEN user wizard is opened WHEN password starting and ending with a space has been typed THEN Save button gets enabled",
@@ -52,9 +51,9 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeDisplayName(testUser.displayName);
             await userWizard.typeEmail(testUser.email);
-            //Type a password with white space:
+            // Type a password with white space:
             await userWizard.typePassword(passwordWithSpaces);
-            //Save button gets enabled:
+            // Save button gets enabled:
             await testUtils.saveScreenshot('user_password_spaces');
             await userWizard.waitForSaveButtonEnabled();
         });

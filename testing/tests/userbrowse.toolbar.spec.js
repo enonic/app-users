@@ -1,8 +1,6 @@
 /**
  * Created on 27/06/2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
@@ -18,10 +16,10 @@ describe("User Browse panel, toolbar spec", function () {
     it("WHEN 'su' user has been selected THEN Delete button should be disabled",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            await testUtils.findAndSelectItem("su");
-            //`Delete button gets disabled`
+            await testUtils.findAndSelectItem('su');
+            //'`Delete' button gets disabled`
             await userBrowsePanel.waitForDeleteButtonDisabled();
-            //'Edit button should be enabled'
+            // 'Edit' button should be enabled'
             await userBrowsePanel.waitForEditButtonEnabled();
         });
 
@@ -30,7 +28,7 @@ describe("User Browse panel, toolbar spec", function () {
             let userBrowsePanel = new UserBrowsePanel();
             await testUtils.findAndSelectItem('anonymous');
             await userBrowsePanel.waitForDeleteButtonDisabled();
-            //'Edit button should be enabled'
+            // 'Edit button should be enabled'
             await userBrowsePanel.waitForEditButtonEnabled();
         });
 

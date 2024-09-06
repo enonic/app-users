@@ -33,7 +33,7 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     get cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+        return XPATH.container + lib.BUTTONS.CANCEL_BUTTON_TOP;
     }
 
     get userPath() {
@@ -52,10 +52,13 @@ class ChangeUserPasswordDialog extends Page {
         return this.isElementDisplayed(this.showPasswordLink);
     }
 
-    waitForClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(error => {
-            throw new Error('Change Password Dialog is not closed ' + error);
-        });
+    async waitForClosed() {
+        try {
+            return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+        } catch (error) {
+            let screenshot = await this.saveScreenshotUniqueName('err_ch_password_dlg');
+            throw new Error('Change Password Dialog is not closed, screenshot ' + screenshot + ' ' + error);
+        }
     }
 
     async isHideLinkDisplayed() {

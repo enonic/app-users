@@ -63,11 +63,13 @@ class UserItemStatisticsPanel extends Page {
         return this.isElementDisplayed(XPATH.reportDataGroup);
     }
 
-    waitForGenerateButtonEnabled() {
-        return this.waitForElementEnabled(this.generateReportButton, appConst.mediumTimeout).catch(err => {
-            console.log('Generate Report Button : ' + err);
-            return false;
-        })
+    async waitForGenerateButtonEnabled() {
+        try {
+            return await this.waitForElementEnabled(this.generateReportButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_generate_btn');
+            throw new Error("Generate button is not enabled, screenshot " + screenshot + ' ' + err);
+        }
     }
 
     async clickOnGenerateReportButton() {
@@ -95,7 +97,7 @@ class UserItemStatisticsPanel extends Page {
 
     //clicks on dropDown handle and selects draft/master
     async clickOnDropDownHandleAndSelectBranch(optionName) {
-        let dropDownHandle = XPATH.reportSelectedOptionsView + lib.DROP_DOWN_HANDLE;
+        let dropDownHandle = XPATH.reportSelectedOptionsView + lib.BUTTONS.DROP_DOWN_HANDLE;
         await this.waitForElementDisplayed(dropDownHandle, appConst.mediumTimeout);
         await this.clickOnElement(dropDownHandle);
         let optionSelector = XPATH.reportSelectedOptionsView + XPATH.repositoryBranchOption(optionName);
