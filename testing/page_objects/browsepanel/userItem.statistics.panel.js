@@ -4,7 +4,7 @@
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const RepositoryComboBox = require('../selectors/repository.comboBox');
 
 const XPATH = {
     container: "//div[contains(@id,'UserItemStatisticsPanel')]",
@@ -16,13 +16,13 @@ const XPATH = {
     reportSelectedOptionView: "//div[contains(@id,'ReportSelectedOptionView')]",
     generateButton: "//button[contains(@id,'Button') and child::span[text()='Generate report']]",
     reportItem: "//ul[contains(@class,'data-list') and descendant::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]",
-    reportByTitle: function (title) {
+    reportByTitle(title) {
         return `//li[contains(@id,'ReportProgressItem') and descendant::span[contains(.,'${title}')]]`
     },
-    repositoryBranchOption: function (name) {
+    repositoryBranchOption(name) {
         return `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell') and child::div[contains(@id,'DefaultOptionDisplayValueViewer') and contains(.,'${name}')]]`
     },
-    selectedOptionByRepoName: function (name) {
+    selectedOptionByRepoName(name) {
         return `//div[contains(@id,'ReportSelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${name}')]]`
     }
 };
@@ -90,8 +90,8 @@ class UserItemStatisticsPanel extends Page {
 
 //clicks on required option in the comboBox and selects a repository for generating Permissions Report
     selectRepository(name) {
-        let loaderComboBox = new LoaderComboBox();
-        return loaderComboBox.typeTextAndSelectOption(name, XPATH.reportDataGroup);
+        let repositoryComboBox = new RepositoryComboBox();
+        return repositoryComboBox.selectFilteredOptionAndClickOnOk(name, XPATH.reportDataGroup);
     }
 
 
