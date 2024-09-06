@@ -13,13 +13,13 @@ const FilterPanel = require('../page_objects/browsepanel/principal.filter.panel'
 describe('Role - save a role and check the number in aggregations', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
     //verifies https://github.com/enonic/app-users/issues/214
     //Filter panel is not updated when the grid is filtered by role  and a new role is added
-    it('GIVEN Filter Panel Is opened AND Roles checkbox is checked WHEN new role has been created THEN number of roles on the Filter panel should be increased',
+    it(`GIVEN Filter Panel Is opened AND 'Roles' checkbox is checked WHEN new role has been created THEN number of roles on the Filter panel should be increased`,
         async () => {
             let roleName = userItemsBuilder.generateRandomName('role');
             let initialNumber;
@@ -27,16 +27,16 @@ describe('Role - save a role and check the number in aggregations', function () 
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();
             await testUtils.openFilterPanel();
-            //1. Click on Role-checkbox:
+            // 1. Click on Role-checkbox:
             await filterPanel.clickOnRoleAggregation();
-            //2. Get the initial number of roles:
+            // 2. Get the initial number of roles:
             initialNumber = await filterPanel.getNumberInRoleAggregationCheckbox();
-            //3. Open new wizard and save new role:
+            // 3. Open new wizard and save new role:
             await testUtils.clickOnRolesFolderAndOpenWizard();
             await roleWizard.typeDisplayName(roleName);
             await roleWizard.waitAndClickOnSave();
             await roleWizard.pause(1000);
-            //4. Go to browse panel:
+            // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
             let result = await filterPanel.getNumberInRoleAggregationCheckbox();
             assert.ok(result - initialNumber === 1, "Number of roles in Filter panel should be increased ");
