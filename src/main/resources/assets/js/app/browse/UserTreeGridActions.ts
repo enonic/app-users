@@ -4,7 +4,6 @@ import {SyncPrincipalAction} from './action/SyncPrincipalAction';
 import {DeletePrincipalAction} from './action/DeletePrincipalAction';
 import {EditPrincipalAction} from './action/EditPrincipalAction';
 import {NewPrincipalAction} from './action/NewPrincipalAction';
-import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {User} from '../principal/User';
 import {IdProvider} from '../principal/IdProvider';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';

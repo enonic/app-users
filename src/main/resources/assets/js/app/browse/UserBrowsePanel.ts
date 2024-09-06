@@ -1,4 +1,3 @@
-import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {UserBrowseToolbar} from './UserBrowseToolbar';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {UserBrowseItemPanel} from './UserBrowseItemPanel';
@@ -197,10 +196,6 @@ export class UserBrowsePanel
 
     protected getBrowseActions(): TreeGridActions<ViewItem> {
         return this.treeActions;
-    }
-
-    protected createTreeGrid(): UserItemsTreeGrid {
-        return new UserItemsTreeGrid();
     }
 
     protected createListBoxPanel(): SelectableListBoxPanel<UserTreeGridItem> {
