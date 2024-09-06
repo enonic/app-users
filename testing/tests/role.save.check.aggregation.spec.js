@@ -1,9 +1,7 @@
 /**
  * Created on 15.03.2019.
  */
-
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const RoleWizard = require('../page_objects/wizardpanel/role.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -41,7 +39,7 @@ describe('Role - save a role and check the number in aggregations', function () 
             //4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
             let result = await filterPanel.getNumberInRoleAggregationCheckbox();
-            assert.isTrue(result - initialNumber === 1, "Number of roles in Filter panel should be increased ");
+            assert.ok(result - initialNumber === 1, "Number of roles in Filter panel should be increased ");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

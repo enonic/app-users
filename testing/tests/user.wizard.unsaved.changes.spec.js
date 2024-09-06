@@ -1,8 +1,7 @@
 /**
  * Created on 06.11.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
@@ -17,7 +16,7 @@ describe("User Wizard and 'Confirmation dialog'", function () {
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let testUser;
+    let TEST_USER;
     const PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("GIVEN user-wizard is opened AND display name has been typed WHEN close button pressed THEN Confirmation dialog should appear",
@@ -38,12 +37,12 @@ describe("User Wizard and 'Confirmation dialog'", function () {
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
             let roles = [appConst.ROLES_DISPLAY_NAME.CM_ADMIN, appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR];
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
-            await testUtils.addSystemUser(testUser);
+            TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), roles);
+            await testUtils.addSystemUser(TEST_USER);
             await testUtils.typeNameInFilterPanel(userName);
 
             let result = await userBrowsePanel.isItemDisplayed(userName);
-            assert.isTrue(result, "New user should be present in browse panel");
+            assert.ok(result, "New user should be present in browse panel");
         });
 
     it("GIVEN existing user is opened WHEN display name has been changed AND 'Close' button pressed THEN Confirmation dialog should appear",
@@ -52,7 +51,7 @@ describe("User Wizard and 'Confirmation dialog'", function () {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
             // 1. Select and open existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Change the name:
             await userWizard.typeDisplayName("new-name");
             // 3. Click on close-icon
@@ -66,10 +65,10 @@ describe("User Wizard and 'Confirmation dialog'", function () {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
             // 1. Select and open existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
-            await userWizard.typeEmail("new@gmail.com");
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
+            await userWizard.typeEmail('new@gmail.com');
             // 2. Click on close-icon abd verify Confirmation dialog
-            await userBrowsePanel.doClickOnCloseTabButton(testUser.displayName);
+            await userBrowsePanel.doClickOnCloseTabButton(TEST_USER.displayName);
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -79,10 +78,10 @@ describe("User Wizard and 'Confirmation dialog'", function () {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
             // 1. Select and open existing user:
-            await testUtils.selectUserAndOpenWizard(testUser.displayName);
+            await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             await userWizard.removeRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
             // 2. Click on close-icon
-            await userBrowsePanel.doClickOnCloseTabButton(testUser.displayName);
+            await userBrowsePanel.doClickOnCloseTabButton(TEST_USER.displayName);
             // Verify the Confirmation dialog:
             await confirmationDialog.waitForDialogLoaded();
         });

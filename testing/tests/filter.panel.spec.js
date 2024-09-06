@@ -1,5 +1,4 @@
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const itemBuilder = require('../libs/userItems.builder');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -42,7 +41,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await filterPanel.waitForClearLinkVisible();
             // 4. Verify that grid in  Browse panel is empty:
             let result = await userBrowsePanel.getGridItemDisplayNames();
-            assert.isTrue(result.length === 0, 'Grid should be empty')
+            assert.equal(result.length, 0, 'Grid should be empty')
         });
 
     it('GIVEN `Principal Filter Panel` is opened  and search text typed WHEN `Clear` has been clicked THEN the link should not be displayed',
@@ -75,10 +74,10 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await testUtils.saveScreenshot('aggregation_group_added');
             let result = await filterPanel.getAggregationItems();
             assert.equal(result.length, 4, 'three aggregation-checkboxes should be present on the page');
-            assert.isTrue(result[0].includes('Group'), 'User aggregation-item should be present');
-            assert.isTrue(result[1].includes(appConst.ID_PROVIDER), 'Id Provider aggregation-item should be present');
-            assert.isTrue(result[2].includes('Role'), 'Role aggregation-item should be present');
-            assert.isTrue(result[3].includes('User'), 'User aggregation-item should be present');
+            assert.ok(result[0].includes('Group'), 'User aggregation-item should be present');
+            assert.ok(result[1].includes(appConst.ID_PROVIDER), 'Id Provider aggregation-item should be present');
+            assert.ok(result[2].includes('Role'), 'Role aggregation-item should be present');
+            assert.ok(result[3].includes('User'), 'User aggregation-item should be present');
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

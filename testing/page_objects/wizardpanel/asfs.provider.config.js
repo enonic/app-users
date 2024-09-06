@@ -83,7 +83,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
     }
 
     cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+        return XPATH.container + lib.BUTTONS.CANCEL_BUTTON_TOP;
     }
 
     isDomainInputDisplayed() {
@@ -100,17 +100,18 @@ class AdfsIdProviderConfiguratorDialog extends Page {
         try {
             await this.typeTextInInput(this.domainInput, domain);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_domain_input');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_domain_input');
             throw new Error("Error in domain input screenshot: " + screenshot + " " + err);
         }
     }
 
-    typeInClientSecretInput(text) {
-        return this.typeTextInInput(this.clientSecretInput, text).catch(err => {
-            this.saveScreenshot('err_type_secretInput');
-            throw new Error(err);
-        })
+    async typeInClientSecretInput(text) {
+        try {
+            return this.typeTextInInput(this.clientSecretInput, text)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_type_secretInput');
+            throw new Error("ID provider, client secret input, screenshot: " + screenshot + ' ' + err);
+        }
     }
 
     typeInClientIdInput(clientId) {

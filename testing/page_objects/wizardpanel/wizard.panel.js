@@ -44,8 +44,14 @@ class WizardPanel extends Page {
         return this.waitForElementDisabled(this.deleteButton, appConst.mediumTimeout);
     }
 
-    typeDisplayName(displayName) {
-        return this.typeTextInInput(this.displayNameInput, displayName);
+    async typeDisplayName(displayName) {
+        try {
+            await this.typeTextInInput(this.displayNameInput, displayName);
+            await this.pause(500);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_displayName_input');
+            throw new Error("Error during inserting the display name, screenshot: " + screenshot + '  ' + err);
+        }
     }
 
     clearDisplayNameInput() {

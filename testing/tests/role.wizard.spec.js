@@ -1,8 +1,7 @@
 /**
  * Created on 12.09.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const RoleWizard = require('../page_objects/wizardpanel/role.wizard');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
@@ -14,7 +13,7 @@ const RoleStatisticsPanel = require('../page_objects/browsepanel/role.statistics
 describe('Role Wizard and Statistics Panel spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let TEST_ROLE;
@@ -28,7 +27,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await testUtils.selectRoleAndOpenWizard(appConst.ROLES_NAME.ADMINISTRATOR);
             //2. Super User should be displayed in the members form:
             let members = await roleWizard.getMembers();
-            assert.isTrue(members.includes("Super User"), 'Super User should be present in members form');
+            assert.ok(members.includes("Super User"), 'Super User should be present in members form');
             //3. Remove icon should not be displayed for Super User in members form:
             await roleWizard.waitForRemoveMemberIconNotDisplayed("Super User");
         });
@@ -132,7 +131,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await testUtils.saveAndCloseWizard(TEST_ROLE.displayName);
             //3. Members should be updated in the Statistics Panel
             let members = await roleStatisticsPanel.getDisplayNameOfMembers();
-            assert.isTrue(members.length === 0);
+            assert.ok(members.length === 0);
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

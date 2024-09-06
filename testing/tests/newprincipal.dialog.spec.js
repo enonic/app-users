@@ -1,8 +1,7 @@
 /**
  * Created on 05.09.2017.
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const appConst = require('../libs/app_const');
@@ -43,7 +42,7 @@ describe('New Principal dialog specification', function () {
             assert.equal(header, 'Create New', 'Expected header should be displayed');
 
             let result = await newPrincipalDialog.isCancelButtonDisplayed();
-            assert.isTrue(result, '`Cancel` button should be present');
+            assert.ok(result, '`Cancel` button should be present');
             // 2. Expected items should be present in the dialog:
             let items = await newPrincipalDialog.getItemNames();
             assert.equal(items[0], appConst.USER, '`User` item should be present on the dialog');
@@ -62,7 +61,7 @@ describe('New Principal dialog specification', function () {
             // 2. Click on New button:
             await userBrowsePanel.clickOnNewButton();
             await newPrincipalDialog.waitForDialogLoaded();
-            await testUtils.saveScreenshot("new_principal_dialog_2_items");
+            await testUtils.saveScreenshot('new_principal_dialog_2_items');
             // 3. Two items should be present in the modal dialog:
             let items = await newPrincipalDialog.getItemNames();
             assert.equal(items.length, 2, "Two items should be present");
