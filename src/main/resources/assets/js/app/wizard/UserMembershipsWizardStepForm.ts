@@ -60,7 +60,7 @@ export class UserMembershipsWizardStepForm
                 this.rolesWrapper.resetBaseValues();
             }
         } else {
-            this.rolesWrapper.setValue(rolesKeys.join(';'));
+            this.rolesWrapper.getComboBox().setSelectedItems(rolesKeys);
         }
 
         const groupKeys: PrincipalKey[] = this.getGroupsKeysFromUser(principal as User);
@@ -70,7 +70,7 @@ export class UserMembershipsWizardStepForm
                 this.groupsWrapper.resetBaseValues();
             }
         } else {
-            this.groupsWrapper.setValue(groupKeys.join(';'));
+            this.groupsWrapper.getComboBox().setSelectedItems(groupKeys);
         }
     }
 
