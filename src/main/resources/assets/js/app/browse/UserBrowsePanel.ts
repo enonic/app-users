@@ -65,6 +65,12 @@ export class UserBrowsePanel
         });
     }
 
+    protected initElements() {
+        super.initElements();
+
+        this.browseToolbar.addActions(this.treeGrid.getTreeGridActions().getAllActions());
+    }
+
     private bindServerEventListeners() {
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
@@ -105,9 +111,7 @@ export class UserBrowsePanel
     }
 
     protected createToolbar(): UserBrowseToolbar {
-        let browseActions = this.treeGrid.getTreeGridActions();
-
-        return new UserBrowseToolbar(browseActions);
+        return new UserBrowseToolbar();
     }
 
     protected createTreeGrid(): UserItemsTreeGrid {
