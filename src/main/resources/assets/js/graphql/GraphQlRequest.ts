@@ -34,16 +34,16 @@ export class GraphQlRequest<PARSED_TYPE>
         return params;
     }
 
-    getVariables(): {} {
+    getVariables(): object {
         return {};
     }
 
     getQuery(): string {
-        throw 'getQuery() should be overridden to use query()';
+        throw Error('getQuery() should be overridden to use query()');
     }
 
     getMutation(): string {
-        throw 'getMutation() should be overridden to use mutate()';
+        throw Error('getMutation() should be overridden to use mutate()');
     }
 
     validate(): boolean {

@@ -4,7 +4,6 @@ import {Group} from '../../app/principal/Group';
 import {Role} from '../../app/principal/Role';
 import {UserJson} from '../../app/principal/UserJson';
 import {GroupJson} from '../../app/principal/GroupJson';
-import {RoleJson} from '../../app/principal/RoleJson';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
@@ -112,14 +111,14 @@ export class GetPrincipalByKeyRequest
 
     fromJsonToPrincipal(json: PrincipalJson): Principal {
         if (!json) {
-            throw `Principal[${this.key.toString()}] not found`;
+            throw Error(`Principal[${this.key.toString()}] not found`);
         }
         if (!json.key) {
             return null;
         }
         let pKey: PrincipalKey = PrincipalKey.fromString(json.key);
         if (pKey.isRole()) {
-            return Role.fromJson(json as RoleJson);
+            return Role.fromJson(json);
 
         } else if (pKey.isGroup()) {
             return Group.fromJson(json as GroupJson);

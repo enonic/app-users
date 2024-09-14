@@ -1,10 +1,10 @@
 import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {Role} from '../../../app/principal/Role';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
-import {RoleJson} from '../../../app/principal/RoleJson';
+import {MembersJson} from '../../../app/principal/MembersJson';
 
 type UpdateRoleMutationResponse = GraphQlMutationResponse & {
-    updateRole: RoleJson;
+    updateRole: MembersJson;
 };
 
 export class UpdateRoleRequest
@@ -41,7 +41,7 @@ export class UpdateRoleRequest
         return this;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;
@@ -69,9 +69,9 @@ export class UpdateRoleRequest
         return this.mutate().then((json: UpdateRoleMutationResponse) => this.fromJson(json.updateRole, json.error));
     }
 
-    fromJson(role: RoleJson, error: string): Role {
+    fromJson(role: MembersJson, error: string): Role {
         if (!role || error) {
-            throw error;
+            throw Error(error);
         }
 
         return Role.fromJson(role);

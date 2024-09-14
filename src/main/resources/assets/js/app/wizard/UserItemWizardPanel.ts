@@ -222,12 +222,12 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
             this.getWizardHeader().normalizeNames();
             if (!this.getWizardHeader().getName()) {
                 return Q.fcall(() => {
-                    throw i18n('notify.empty.name');
+                    throw Error(i18n('notify.empty.name'));
                 });
             }
             if (!this.getWizardHeader().getDisplayName()) {
                 return Q.fcall(() => {
-                    throw i18n('notify.empty.displayName');
+                    throw Error(i18n('notify.empty.displayName'));
                 });
             }
         }

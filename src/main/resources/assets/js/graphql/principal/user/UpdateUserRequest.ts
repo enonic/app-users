@@ -47,7 +47,7 @@ export class UpdateUserRequest
         return this;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;
@@ -91,7 +91,7 @@ export class UpdateUserRequest
 
     fromJson(user: UserJson, error: string): User {
         if (!user || error) {
-            throw error;
+            throw Error(error);
         }
         return User.fromJson(user);
     }

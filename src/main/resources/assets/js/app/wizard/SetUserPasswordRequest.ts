@@ -28,7 +28,7 @@ export class SetUserPasswordRequest
         return this;
     }
 
-    getParams(): Object {
+    getParams(): object {
         return {
             key: this.key.toString(),
             password: this.password

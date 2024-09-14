@@ -32,7 +32,7 @@ export class AddPublicKeyRequest
         return this;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         let vars = super.getVariables();
         vars['userKey'] = this.key.toString();
         vars['publicKey'] = this.publicKey;
@@ -60,7 +60,7 @@ export class AddPublicKeyRequest
 
     fromJson(user: PublicKeyJson, error: string): PublicKey {
         if (!user || error) {
-            throw error;
+            throw Error(error);
         }
         return PublicKey.fromJson(user);
     }

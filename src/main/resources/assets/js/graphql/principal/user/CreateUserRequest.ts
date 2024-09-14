@@ -56,7 +56,7 @@ export class CreateUserRequest
         return this;
     }
 
-    getVariables(): Record<string, CreateUserRequestData> {
+    getVariables(): object {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;
@@ -92,7 +92,7 @@ export class CreateUserRequest
 
     fromJson(user: UserJson, error: string): User {
         if (!user || error) {
-            throw error;
+            throw Error(error);
         }
         return User.fromJson(user);
     }

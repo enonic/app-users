@@ -1,7 +1,7 @@
 import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {Role} from '../../../app/principal/Role';
-import {RoleJson} from '../../../app/principal/RoleJson';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {MembersJson} from '../../../app/principal/MembersJson';
 
 // Key and members should be PrincipalsKeys?
 interface CreateRoleProperties {
@@ -12,7 +12,7 @@ interface CreateRoleProperties {
 }
 
 type CreateRoleMutationResponse = GraphQlMutationResponse & {
-    createRole: RoleJson;
+    createRole: MembersJson;
 };
 
 export class CreateRoleRequest
@@ -67,9 +67,9 @@ export class CreateRoleRequest
         return this.mutate().then((json: CreateRoleMutationResponse) => this.fromJson(json.createRole, json.error));
     }
 
-    fromJson(role: RoleJson, error: string): Role {
+    fromJson(role: MembersJson, error: string): Role {
         if (!role || error) {
-            throw error;
+            throw Error(error);
         }
         return Role.fromJson(role);
     }

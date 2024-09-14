@@ -41,7 +41,7 @@ export class CreateGroupRequest
         return this;
     }
 
-    getVariables(): Record<string, string | PrincipalKey | PrincipalKey[]> {
+    getVariables(): object {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['displayName'] = this.displayName;
@@ -73,7 +73,7 @@ export class CreateGroupRequest
 
     fromJson(group: GroupJson, error: string): Group {
         if (!group || error) {
-            throw error;
+            throw Error(error);
         }
         return Group.fromJson(group);
     }

@@ -195,9 +195,9 @@ export class UserWizardPanel
         const formEmail: string = this.userEmailWizardStepForm.getEmail();
 
         if (StringHelper.isEmpty(formEmail)) {
-            throw i18n('notify.empty.email');
+            throw Error(i18n('notify.empty.email'));
         } else if (!this.userEmailWizardStepForm.isValid()) {
-            throw `${i18n('field.email.invalid') || 'invalid'}.`;
+            throw Error(`${i18n('field.email.invalid') || 'invalid'}.`);
         }
     }
 
@@ -205,9 +205,9 @@ export class UserWizardPanel
         const password: string = this.userPasswordWizardStepForm.getPassword();
 
         if (StringHelper.isEmpty(password)) {
-            throw i18n('notify.empty.password');
+            throw Error(i18n('notify.empty.password'));
         } else if (!this.userPasswordWizardStepForm.isValid()) {
-            throw `${i18n('field.password.invalid') || 'invalid'}.`;
+            throw Error(`${i18n('field.password.invalid') || 'invalid'}.`);
         }
     }
 

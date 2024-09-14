@@ -1,8 +1,8 @@
-import {RoleJson} from './RoleJson';
 import {assert} from '@enonic/lib-admin-ui/util/Assert';
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {Members, MembersBuilder} from './Members';
+import {MembersJson} from './MembersJson';
 
 export class Role
     extends Members {
@@ -32,7 +32,7 @@ export class Role
         return new RoleBuilder();
     }
 
-    static fromJson(json: RoleJson): Role {
+    static fromJson(json: MembersJson): Role {
         return new RoleBuilder().fromJson(json).build() as Role;
     }
 }
