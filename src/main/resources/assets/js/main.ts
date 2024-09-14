@@ -17,7 +17,6 @@ import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
 import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
 import {Class} from '@enonic/lib-admin-ui/Class';
-import {JSONObject} from '@enonic/lib-admin-ui/types';
 
 const body = Body.get();
 
@@ -81,16 +80,12 @@ function startApplication() {
     if (!document.currentScript) {
         throw Error('Legacy browsers are not supported');
     }
-
-    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
-    if (!configScriptId) {
-        throw Error('Missing \'data-config-script-id\' attribute');
+    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
+    if (!configServiceUrl) {
+        throw Error('Unable to fetch app config');
     }
-
-    const configScriptEl: HTMLElement = document.getElementById(configScriptId);
-    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as JSONObject);
-
-    await i18nInit(CONFIG.getString('apis.i18nUrl'));
+    await CONFIG.init(configServiceUrl);
+    await i18nInit(CONFIG.getString('services.i18nUrl'));
     startApplication();
 })();
 

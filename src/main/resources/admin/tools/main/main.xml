@@ -7,11 +7,4 @@
     <principal>role:system.user.admin</principal>
     <principal>role:system.user.app</principal>
   </allow>
-  <apis>
-    <api>graphql</api>
-    <api>i18n</api>
-    <api>permissionReport</api>
-    <api>com.enonic.xp.app.main:launcher</api>
-    <api>com.enonic.xp.app.main:i18n</api>
-  </apis>
 </tool>

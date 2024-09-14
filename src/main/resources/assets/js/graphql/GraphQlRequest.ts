@@ -16,7 +16,7 @@ export class GraphQlRequest<PARSED_TYPE>
     private readonly path: Path;
 
     constructor() {
-        this.path = Path.fromString(CONFIG.getString('apis.graphQlUrl'));
+        this.path = Path.fromString(CONFIG.getString('services.graphQlUrl'));
     }
 
     private getParams(query: string, mutation: string): object {
