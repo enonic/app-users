@@ -39,22 +39,6 @@ export class UserTreeGridItem
         }
     }
 
-    static fromIdProvider(idProvider: IdProvider): UserTreeGridItem {
-        return new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
-    }
-
-    setIdProvider(idProvider: IdProvider): void {
-        this.idProvider = idProvider;
-    }
-
-    setPrincipal(principal: Principal): void {
-        this.principal = principal;
-    }
-
-    setType(type: UserTreeGridItemType): void {
-        this.type = type;
-    }
-
     getType(): UserTreeGridItemType {
         return this.type;
     }
