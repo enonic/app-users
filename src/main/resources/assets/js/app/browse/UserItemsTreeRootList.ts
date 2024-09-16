@@ -1,13 +1,18 @@
 import {UserItemsTreeList} from './UserItemsTreeList';
 import {UserItemType} from './UserItemType';
 import * as Q from 'q';
-import {UserTreeGridItem, UserTreeGridItemBuilder} from './UserTreeGridItem';
+import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {ListUserItemsRequest} from '../../graphql/principal/ListUserItemsRequest';
+import {IdProvider} from '../principal/IdProvider';
+import {ListIdProvidersRequest} from '../../graphql/idprovider/ListIdProvidersRequest';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 
 export class UserItemsTreeRootList extends UserItemsTreeList {
 
     private searchString: string;
     private searchTypes: UserItemType[];
+    private latestIdProviders: IdProvider[];
 
     setSearchString(searchString: string): this {
         this.searchString = searchString;
@@ -26,6 +31,7 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
     resetFilter(): void {
         this.searchString = null;
         this.searchTypes = null;
+        this.latestIdProviders = null;
         this.load();
     }
 
@@ -38,11 +44,36 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
     }
 
     private fetchFilteredItems(): Q.Promise<UserTreeGridItem[]> {
-        return new ListUserItemsRequest().setCount(20).setTypes(this.searchTypes).setQuery(this.searchString).setStart(
-            this.getItemCount()).sendAndParse()
-            .then((result) => {
-                return result.userItems.map(item => new UserTreeGridItemBuilder().setAny(item).build());
-            });
+        // load list of idproviders to set for filtered users/groups
+        const idProvidersPromise = this.latestIdProviders ? Q.resolve() : new ListIdProvidersRequest().sendAndParse().then((idProviders) => {
+            this.latestIdProviders = idProviders;
+            return Q.resolve();
+        }).catch(DefaultErrorHandler.handle);
+
+
+        return idProvidersPromise.then(() => {
+            return new ListUserItemsRequest()
+                .setCount(20)
+                .setTypes(this.searchTypes)
+                .setQuery(this.searchString)
+                .setStart(this.getItemCount())
+                .sendAndParse()
+                .then((result) => {
+                    return result.userItems.map(userItem => {
+                        const builder = new UserTreeGridItemBuilder();
+
+                        if (userItem instanceof Principal) {
+                            const idProv = this.latestIdProviders.find(idProv => idProv.getKey().equals(userItem.getKey().getIdProvider()));
+                           builder.setPrincipal(userItem).setIdProvider(idProv).setType(UserTreeGridItemType.PRINCIPAL);
+                        } else if (userItem instanceof IdProvider) {
+                            builder.setIdProvider(userItem).setType(UserTreeGridItemType.ID_PROVIDER);
+                        }
+
+                        return builder.build();
+                    });
+                });
+        });
+
     }
 
 
