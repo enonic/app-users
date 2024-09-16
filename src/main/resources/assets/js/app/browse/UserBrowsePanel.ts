@@ -79,7 +79,7 @@ export class UserBrowsePanel
                 userTreeGridItem = builder.setPrincipal(principal).setIdProvider(idProvider).setType(UserTreeGridItemType.PRINCIPAL).build();
             }
 
-            this.findParentList(userTreeGridItem)?.replaceItems(userTreeGridItem);
+            this.findParentList(userTreeGridItem).forEach((list) => list.replaceItems(userTreeGridItem));
         });
 
         serverHandler.onUserItemDeleted((ids: string[]) => {
@@ -89,7 +89,8 @@ export class UserBrowsePanel
                 const item = this.treeListBox.getItem(id);
 
                 if (item) {
-                    this.findParentList(item)?.removeItems(item);
+                    this.selectionWrapper.deselect(item);
+                    this.findParentList(item).forEach((list) => list.replaceItems(item));
                 }
             });
 
@@ -115,7 +116,7 @@ export class UserBrowsePanel
     private appendPrincipal(principal: Principal, idProvider: IdProvider) {
         const userTreeGridItem: UserTreeGridItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setPrincipal(principal).setType(
             UserTreeGridItemType.PRINCIPAL).build();
-        const parentList = this.findParentList(userTreeGridItem);
+        const parentList = this.findParentList(userTreeGridItem)[0];
 
         if (parentList.wasAlreadyShownAndLoaded()) {
             parentList.addItems(userTreeGridItem, false, 0);
@@ -129,16 +130,32 @@ export class UserBrowsePanel
         }
     }
 
-    private findParentList(item: UserTreeGridItem): UserItemsTreeList {
+    private findParentList(item: UserTreeGridItem): UserItemsTreeList[] {
         if (item.isIdProvider()) {
-            return this.treeListBox;
+            return [this.treeListBox];
+        }
+
+        let result = [];
+
+        if (this.treeListBox.isFiltered()) {
+            // if the tree is filtered, then item can be in the root filtered list and also in item's regular place under the id provider or roles
+            const rootItem = this.treeListBox.getItemViews().find((view: UserItemsTreeListElement) => {
+                return view.getItem().getId() === item.getId();
+            });
+
+            if (rootItem) {
+                result.push(this.treeListBox);
+            }
         }
 
         if (item.isPrincipal()) {
             if (item.getPrincipal().isRole()) {
                 const listElement = this.treeListBox.getItemViews().find(
                     (view: UserItemsTreeListElement) => view.getItem().isRole()) as UserItemsTreeListElement;
-                return listElement.getList() as UserItemsTreeList;
+
+                if (listElement) {
+                    result.push(listElement.getList());
+                }
             }
 
             if (item.getPrincipal().isGroup() || item.getPrincipal().isUser()) {
@@ -151,11 +168,13 @@ export class UserBrowsePanel
                 const usersOrGroupsListElement = idProviderList?.getItemViews().find(
                     (view: UserItemsTreeListElement) => view.getItem().getType() === typeToLook) as UserItemsTreeListElement;
 
-                return usersOrGroupsListElement?.getList() as UserItemsTreeList;
+                if (usersOrGroupsListElement) {
+                    result.push(usersOrGroupsListElement.getList());
+                }
             }
         }
 
-        return null;
+        return result;
     }
 
     protected initListeners(): void {
@@ -216,8 +235,6 @@ export class UserBrowsePanel
 
         new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
 
-        this.toolbar.getSelectionPanelToggler().hide();
-
         return new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
     }
 
@@ -265,7 +282,9 @@ export class UserBrowsePanel
     }
 
     protected enableSelectionMode(): void {
-        this.filterPanel.setSelectedItems(this.selectionWrapper.getSelectedItems().map(item => item.getId()));
+        this.treeListBox.clearItems(true);
+        this.treeListBox.setItems(this.selectionWrapper.getSelectedItems());
+        //this.filterPanel.setSelectedItems(this.selectionWrapper.getSelectedItems().map(item => item.getId()));
     }
 
     protected disableSelectionMode(): void {
