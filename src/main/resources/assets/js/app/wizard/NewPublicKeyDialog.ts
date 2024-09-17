@@ -11,7 +11,7 @@ import {User} from '../principal/User';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {showSuccess} from '@enonic/lib-admin-ui/notify/MessageBus';
-import {MenuButton} from '@enonic/lib-admin-ui/ui/button/MenuButton';
+import {MenuButton, MenuButtonConfig} from '@enonic/lib-admin-ui/ui/button/MenuButton';
 import {DropdownButtonRow} from '@enonic/lib-admin-ui/ui/dialog/DropdownButtonRow';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
@@ -59,8 +59,10 @@ export class NewPublicKeyDialog
         this.generateKeyAction = new Action(i18n('field.generate'));
         this.uploadKeyAction = new Action(i18n('dialog.addUserKey.uploadBtn'));
 
-
-        this.menuButton = this.getButtonRow().makeActionMenu(this.generateKeyAction, [this.uploadKeyAction], true);
+        this.menuButton = this.getButtonRow().makeActionMenu({
+            defaultAction: this.generateKeyAction,
+            menuActions: [this.uploadKeyAction]
+        }, true);
         this.menuButton.setEnabled(false);
 
         this.menuButton.getEl().appendChild(this.keyUploaderTextInput.getHTMLElement());
@@ -199,8 +201,9 @@ export class NewPublicKeyDialog
 
 export class NewPublicKeyDialogButtonRow
     extends DropdownButtonRow {
-    makeActionMenu(mainAction: Action, menuActions: Action[], useDefault: boolean = true): MenuButton {
-        super.makeActionMenu(mainAction, menuActions, useDefault);
+
+    makeActionMenu(menuButtonConfig: Action | MenuButtonConfig, useDefault: boolean = true): MenuButton {
+        super.makeActionMenu(menuButtonConfig, useDefault);
         return this.actionMenu.addClass(`${NewPublicKeyDialog.DIALOG_CSS_STYLE}-menu`) as MenuButton;
     }
 }

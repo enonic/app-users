@@ -29,7 +29,7 @@ export class SaveIdProviderRequest
         this.mutationType = mutationType;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         const idProviderConfig = this.idProviderConfig ? {
             applicationKey: this.idProviderConfig.getApplicationKey().toString(),
             config: this.idProviderConfig.getConfig() ? JSON.stringify(this.idProviderConfig.getConfig().toJson()) : null
@@ -104,7 +104,7 @@ export class SaveIdProviderRequest
 
     idProviderfromJson(us: IdProviderJson, error: string): IdProvider {
         if (error) {
-            throw new Exception(error);
+            throw new Error(error);
         } else if (!us) {
             throw new Error(`IdProvider [${this.idProviderKey.toString()}] not found`);
         }

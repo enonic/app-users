@@ -12,7 +12,7 @@ export abstract class DeleteUserItemRequest extends GraphQlRequest<DeleteUserIte
         return this;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         return {
             keys: this.keys.map((memberKey) => memberKey.toString())
         };

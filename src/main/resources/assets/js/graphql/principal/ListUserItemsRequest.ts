@@ -8,7 +8,6 @@ import {Group} from '../../app/principal/Group';
 import {Role} from '../../app/principal/Role';
 import {UserJson} from '../../app/principal/UserJson';
 import {GroupJson} from '../../app/principal/GroupJson';
-import {RoleJson} from '../../app/principal/RoleJson';
 import {UserItemBucketAggregationJson} from '../aggregation/UserItemBucketAggregationJson';
 import {UserItemAggregationHelper} from '../aggregation/UserItemAggregationHelper';
 import {UserItemType} from '../../app/browse/UserItemType';
@@ -123,7 +122,7 @@ export class ListUserItemsRequest
         try {
             const pKey: PrincipalKey = PrincipalKey.fromString(json.key);
             if (pKey.isRole()) {
-                return Role.fromJson(json as RoleJson);
+                return Role.fromJson(json);
             } else if (pKey.isGroup()) {
                 return Group.fromJson(json as GroupJson);
             } else /*if (pKey.isUser())*/ {

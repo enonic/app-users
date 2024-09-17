@@ -22,7 +22,7 @@ export class DeletePublicKeyRequest
         return this;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         let vars = super.getVariables();
         vars['userKey'] = this.key.toString();
         vars['kid'] = this.kid;
@@ -44,7 +44,7 @@ export class DeletePublicKeyRequest
 
     fromJson(removed: boolean, error: string): boolean {
         if (error) {
-            throw error;
+            throw Error(error);
         }
         return removed;
     }

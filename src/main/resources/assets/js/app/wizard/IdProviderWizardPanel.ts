@@ -132,7 +132,7 @@ export class IdProviderWizardPanel
         if (this.isRendered()) {
             if (!this.idProviderWizardStepForm.isValid()) {
                 return Q.fcall(() => {
-                    throw i18n('notify.invalid.idProviderConfig');
+                    throw Error(i18n('notify.invalid.idProviderConfig'));
                 });
             }
         }

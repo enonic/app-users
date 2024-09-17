@@ -132,7 +132,11 @@ export class UserAppPanel
         });
 
         wizardPanel.onLockChanged(value => {
-            value ? tabMenuItem.lock() : tabMenuItem.unlock();
+            if (value) {
+                tabMenuItem.lock();
+            } else {
+                tabMenuItem.unlock();
+            }
         });
     }
 

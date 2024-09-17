@@ -4,7 +4,6 @@ import {Group} from '../../app/principal/Group';
 import {Role} from '../../app/principal/Role';
 import {UserJson} from '../../app/principal/UserJson';
 import {GroupJson} from '../../app/principal/GroupJson';
-import {RoleJson} from '../../app/principal/RoleJson';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
@@ -35,7 +34,7 @@ export class GetPrincipalsByKeysRequest
         return this;
     }
 
-    getVariables(): Record<string, object> {
+    getVariables(): object {
         const vars = super.getVariables();
         if (this.keys) {
             vars['keys'] = this.keys.map(principalKey => principalKey.toString());
@@ -90,7 +89,7 @@ export class GetPrincipalsByKeysRequest
         return principalsJson.map(principalJson => {
             let pKey: PrincipalKey = PrincipalKey.fromString(principalJson.key);
             if (pKey.isRole()) {
-                return Role.fromJson(principalJson as RoleJson);
+                return Role.fromJson(principalJson);
 
             } else if (pKey.isGroup()) {
                 return Group.fromJson(principalJson as GroupJson);

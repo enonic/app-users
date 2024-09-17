@@ -1,4 +1,3 @@
-import Q = require('q');
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {H2El} from '@enonic/lib-admin-ui/dom/H2El';
@@ -10,6 +9,7 @@ import {PrincipalViewer} from '@enonic/lib-admin-ui/ui/security/PrincipalViewer'
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {GetPrincipalsByKeysRequest} from '../../graphql/principal/GetPrincipalsByKeysRequest';
 import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
+import * as Q from 'q';
 
 export class MembersListing extends DivEl {
 

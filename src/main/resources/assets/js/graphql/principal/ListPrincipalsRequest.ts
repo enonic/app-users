@@ -4,7 +4,6 @@ import {Group} from '../../app/principal/Group';
 import {Role} from '../../app/principal/Role';
 import {UserJson} from '../../app/principal/UserJson';
 import {GroupJson} from '../../app/principal/GroupJson';
-import {RoleJson} from '../../app/principal/RoleJson';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
@@ -92,7 +91,7 @@ export class ListPrincipalsRequest
     private fromJsonToPrincipal(json: PrincipalJson): Principal {
         let pKey: PrincipalKey = PrincipalKey.fromString(json.key);
         if (pKey.isRole()) {
-            return Role.fromJson(json as RoleJson);
+            return Role.fromJson(json);
 
         } else if (pKey.isGroup()) {
             return Group.fromJson(json as GroupJson);

@@ -2,11 +2,11 @@ import {GraphQlRequest, GraphQlMutationResponse} from '../../GraphQlRequest';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 
 type UpdatePwdMutationResponse = GraphQlMutationResponse & {
-    updatePwd: Boolean;
+    updatePwd: boolean;
 };
 
 export class UpdatePasswordRequest
-    extends GraphQlRequest<Boolean> {
+    extends GraphQlRequest<boolean> {
 
     private key: PrincipalKey;
     private password: string;
@@ -21,7 +21,7 @@ export class UpdatePasswordRequest
         return this;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
         vars['password'] = this.password;
@@ -34,7 +34,7 @@ export class UpdatePasswordRequest
         }`;
     }
 
-    sendAndParse(): Q.Promise<Boolean> {
+    sendAndParse(): Q.Promise<boolean> {
         return this.mutate().then((json: UpdatePwdMutationResponse) => json.updatePwd);
     }
 

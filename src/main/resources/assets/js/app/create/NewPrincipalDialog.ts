@@ -33,7 +33,11 @@ export class NewPrincipalDialog
 
         this.grid.onDataChanged(() => ResponsiveManager.fireResizeEvent());
         this.grid.onSelectionChanged(() => {
-            !!this.grid.hasSelectedItems() ? this.getCancelButton().giveBlur() : this.getCancelButton().giveFocus();
+            if (this.grid.hasSelectedItems()) {
+                this.getCancelButton().giveBlur()
+            } else {
+                this.getCancelButton().giveFocus();
+            }
         });
 
         NewPrincipalEvent.on(() => this.isVisible() && this.close());

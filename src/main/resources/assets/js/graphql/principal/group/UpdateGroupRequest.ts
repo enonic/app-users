@@ -53,7 +53,7 @@ export class UpdateGroupRequest
         return this;
     }
 
-    getVariables(): Object {
+    getVariables(): object {
         let vars = super.getVariables();
 
         vars['key'] = this.key.toString();
@@ -92,7 +92,7 @@ export class UpdateGroupRequest
 
     fromJson(group: GroupJson, error: string): Group {
         if (!group || error) {
-            throw error;
+            throw Error(error);
         }
 
         return Group.fromJson(group);

@@ -7,7 +7,7 @@ import {ResponsiveItem} from '@enonic/lib-admin-ui/ui/responsive/ResponsiveItem'
 import {FormIcon} from '@enonic/lib-admin-ui/app/wizard/FormIcon';
 import {WizardHeaderWithDisplayNameAndName} from '@enonic/lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
 import {WizardStep} from '@enonic/lib-admin-ui/app/wizard/WizardStep';
-import {Toolbar} from '@enonic/lib-admin-ui/ui/toolbar/Toolbar';
+import {Toolbar, ToolbarConfig} from '@enonic/lib-admin-ui/ui/toolbar/Toolbar';
 import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
 import {WizardPanel} from '@enonic/lib-admin-ui/app/wizard/WizardPanel';
 import {ImgEl} from '@enonic/lib-admin-ui/dom/ImgEl';
@@ -74,17 +74,16 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         return new UserItemWizardActions(this);
     }
 
-    protected createMainToolbar(): Toolbar {
-        const toolbar: Toolbar = new Toolbar();
+    protected createMainToolbar(): Toolbar<ToolbarConfig> {
+        const toolbar: Toolbar<ToolbarConfig> = new Toolbar<ToolbarConfig>();
 
-        toolbar.addAction(this.wizardActions.getSaveAction());
-        toolbar.addAction(this.wizardActions.getDeleteAction());
+        toolbar.addActions([this.wizardActions.getSaveAction(), this.wizardActions.getDeleteAction()]);
 
         return toolbar;
     }
 
     protected getWizardNameValue(): string {
-        return this.getPersistedItem() ? this.getPersistedItem().getKey().getId() : '';
+        return this.getPersistedItem()?.getKey()?.getId() ?? '';
     }
 
     protected createWizardHeader(): WizardHeaderWithDisplayNameAndName {
@@ -223,12 +222,12 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
             this.getWizardHeader().normalizeNames();
             if (!this.getWizardHeader().getName()) {
                 return Q.fcall(() => {
-                    throw i18n('notify.empty.name');
+                    throw Error(i18n('notify.empty.name'));
                 });
             }
             if (!this.getWizardHeader().getDisplayName()) {
                 return Q.fcall(() => {
-                    throw i18n('notify.empty.displayName');
+                    throw Error(i18n('notify.empty.displayName'));
                 });
             }
         }
