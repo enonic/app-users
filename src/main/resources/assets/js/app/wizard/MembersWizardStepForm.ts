@@ -101,7 +101,7 @@ class MembersPrincipalCombobox
     setReadOnlyItems(items: PrincipalKey[]): void {
         this.readOnlyItems = items || [];
 
-        (<MembersPrincipalSelectedOptionsView>this.selectedOptionsView).setReadOnlyItems(items);
+        (this.selectedOptionsView as MembersPrincipalSelectedOptionsView).setReadOnlyItems(items);
     }
 
     private isReadOnlyItem(key: PrincipalKey): boolean {
