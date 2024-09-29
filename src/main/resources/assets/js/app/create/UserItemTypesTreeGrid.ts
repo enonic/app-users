@@ -76,9 +76,8 @@ export class UserItemTypesTreeGrid
     }
 
     private fetchRoot(): Q.Promise<UserTypeTreeGridItem[]> {
-        return Q.spread<any, any>(
-            [new IsAuthenticatedRequest().sendAndParse(), this.fetchIdProviders()],
-            (result: LoginResult) => result.isUserAdmin(),
+        return Q.all([new IsAuthenticatedRequest().sendAndParse(), this.fetchIdProviders()]).then(
+            (result: [LoginResult, IdProvider[]]) => result[0].isUserAdmin(),
             reason => {
                 DefaultErrorHandler.handle(reason);
                 return false;

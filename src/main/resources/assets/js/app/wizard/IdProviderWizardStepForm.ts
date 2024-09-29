@@ -122,7 +122,7 @@ export class IdProviderWizardStepForm
         }
 
         const selectedOptionsView: AuthApplicationSelectedOptionsView =
-            (<AuthApplicationSelectedOptionsView>this.applicationComboBox.getSelectedOptionsView());
+            this.applicationComboBox.getSelectedOptionsView() as AuthApplicationSelectedOptionsView;
 
         const optionViewAddedListener = (optionView: AuthApplicationSelectedOptionView) => {
             optionView.setSiteConfig(this.createApplicationConfig(config));
