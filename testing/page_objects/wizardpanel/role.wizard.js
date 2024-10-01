@@ -9,7 +9,6 @@ const MembersPrincipalCombobox = require('../selectors/members.principal.combobo
 
 const xpath = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
-    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
 };
 
 class RoleWizard extends WizardPanel {
@@ -31,7 +30,7 @@ class RoleWizard extends WizardPanel {
             await this.waitForElementDisplayed(xpath.container + this.displayNameInput, appConst.mediumTimeout);
         } catch (e) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_wizard');
-            throw new Error("Role wizard was not loaded! Screenshot " + screenshot + " " + e);
+            throw new Error(`Role wizard was not loaded! Screenshot:${screenshot} ` + e);
         }
     }
 
@@ -54,7 +53,7 @@ class RoleWizard extends WizardPanel {
             return await this.clickOnElement(this.deleteButton);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_delete_button_in_role_wizard');
-            throw new Error("Role wizard - delete button, screenshot:" + screenshot + ' ' + err);
+            throw new Error(`Role wizard - delete button, screenshot: ${screenshot}` + err);
         }
     }
 
@@ -71,7 +70,7 @@ class RoleWizard extends WizardPanel {
             return await this.getTextInElements(selectedOptions);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_members');
-            throw new Error('Error when getting text from elements, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error when getting text from elements, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -82,7 +81,7 @@ class RoleWizard extends WizardPanel {
             return await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_member');
-            throw new Error('Error - remove-icon for the role, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error - remove-icon for the role, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -92,7 +91,7 @@ class RoleWizard extends WizardPanel {
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_member');
-            throw new Error('Error - remove-icon should be displayed for the role, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error - remove-icon should be displayed for the role, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -102,7 +101,7 @@ class RoleWizard extends WizardPanel {
             return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_icon');
-            throw new Error('Error - remove-icon should not be displayed for the role, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error - remove-icon should not be displayed for the role, screenshot: ${screenshot} ` + err);
         }
     }
 

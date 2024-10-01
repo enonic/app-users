@@ -53,9 +53,9 @@ describe("User Wizard and 'Confirmation dialog'", function () {
             // 1. Select and open existing user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Change the name:
-            await userWizard.typeDisplayName("new-name");
+            await userWizard.typeDisplayName('new-name');
             // 3. Click on close-icon
-            await userBrowsePanel.doClickOnCloseTabButton("new-name");
+            await userBrowsePanel.doClickOnCloseTabButton('new-name');
             await confirmationDialog.waitForDialogLoaded();
         });
 

@@ -24,8 +24,6 @@ module.exports = Object.freeze({
         return `//div[contains(@id,'FormItem') and child::label[contains(.,'${label}')]]`
     },
 
-    COMBO_BOX_OPTION_FILTER_INPUT: "//input[contains(@id,'ComboBoxOptionFilterInput')]",
-
     PRINCIPAL_SELECTED_OPTION: `//div[contains(@id,'PrincipalSelectedOptionView')]`,
 
     selectedPrincipalByDisplayName(displayName) {

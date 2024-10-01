@@ -45,9 +45,9 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
 
     async getDisplayNameOfRoles() {
         try {
-            let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
+            let itemsLocator = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
             await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, 2000);
-            return await this.getTextInElements(items);
+            return await this.getTextInElements(itemsLocator);
         } catch (err) {
             await this.saveScreenshot(appConst.generateRandomName('err_role_list'));
             throw new Error('Members data-group is not present on the page! ' + err);

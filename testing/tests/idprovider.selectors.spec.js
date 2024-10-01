@@ -33,7 +33,9 @@ describe('Id Provider Permissions spec', function () {
     it(`GIVEN wizard for new 'Id Provider' is opened WHEN provider's drop-down handle has been clicked THEN 'Standard ID provider' item should be present in the list`,
         async () => {
             let idProviderWizard = new IdProviderWizard();
+            // 1. Open new ID Provider wizard:
             await testUtils.openIdProviderWizard();
+            // 2. Provider dropdown has been expanded
             await idProviderWizard.clickOnProviderComboBoxDropDownHandle();
             let displayNames = await idProviderWizard.getProviderOptionDisplayNames();
             assert.ok(displayNames.includes(appConst.STANDARD_ID_PROVIDER),

@@ -37,6 +37,7 @@ class UserBrowsePanel extends Page {
     get treeGrid() {
         return xpath.container + xpath.userItemsTreeRootList;
     }
+
     get newButton() {
         return xpath.toolbar + "/*[contains(@id, 'ActionButton') and child::span[contains(.,'New')]]";
     }
@@ -80,8 +81,8 @@ class UserBrowsePanel extends Page {
             await this.waitForElementEnabled(this.newButton, appConst.mediumTimeout)
             return await this.clickOnElement(this.newButton);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_new_btn'));
-            throw new Error("Error during clicking on New button!" + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_new_btn');
+            throw new Error(`Error occurred during clicking on New button! ${screenshot} ` + err);
         }
     }
 
@@ -108,7 +109,7 @@ class UserBrowsePanel extends Page {
             await this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_item');
-            throw new Error('The item should not be displayed, screenshot:' + screenshot + '  ' + err);
+            throw new Error(`The item should not be displayed, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -117,7 +118,7 @@ class UserBrowsePanel extends Page {
             await this.waitForElementNotDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_item');
-            throw new Error("The item should not be displayed, screenshot:" + screenshot + "  " + err);
+            throw new Error(`The item should not be displayed, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -126,7 +127,7 @@ class UserBrowsePanel extends Page {
             await this.waitForElementDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_item');
-            throw new Error('The item should be displayed, screenshot:' + screenshot + "  " + err);
+            throw new Error(`The item should be displayed, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -138,7 +139,7 @@ class UserBrowsePanel extends Page {
             return await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw Error('Item was not found. screenshot: ' + screenshot + ' ' + err);
+            throw Error(`Item was not found. screenshot:${screenshot} ` + err);
         }
     }
 
@@ -147,7 +148,7 @@ class UserBrowsePanel extends Page {
             return this.waitForElementDisplayed(xpath.rowByName('users'), appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_users_folder');
-            throw new Error(`Users folder was not found! screenshot: ` + screenshot + ' ' + err);
+            throw new Error(`Users folder was not found! screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -160,7 +161,7 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(this.hideFilterPanelButton)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_hide_filter_button');
-            throw new Error('Error,screenshot: ' + screenshot + '  ' + err);
+            throw new Error(`Error, hide filter button, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -195,15 +196,22 @@ class UserBrowsePanel extends Page {
         });
     }
 
-    waitForDeleteButtonEnabled() {
-        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_delete_button_not_enabled');
-            throw new Error('Delete button is not enabled ! ' + err);
-        });
+    async waitForDeleteButtonEnabled() {
+        try {
+            await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_delete_button_not_enabled');
+            throw new Error(`Delete button is not enabled ! Screenshot: ${screenshot} ` + err);
+        }
     }
 
-    waitForDeleteButtonDisabled() {
-        return this.waitForElementDisabled(this.deleteButton, appConst.mediumTimeout);
+    async waitForDeleteButtonDisabled() {
+        try {
+            return await this.waitForElementDisabled(this.deleteButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_delete_btn');
+            throw new Error(`Delete button should be disabled! screenshot: ${screenshot}` + err);
+        }
     }
 
     isEditButtonEnabled() {
@@ -232,7 +240,7 @@ class UserBrowsePanel extends Page {
             return await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw Error('Row checkbox, screenshot: ' + screenshot + ' ' + err);
+            throw Error(`Row checkbox, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -244,7 +252,7 @@ class UserBrowsePanel extends Page {
             return await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_close');
-            throw new Error('itemTabButton was not found! screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`itemTabButton was not found! screenshot:${screenshot} ` + err);
         }
     }
 
@@ -333,7 +341,7 @@ class UserBrowsePanel extends Page {
             return await this.doRightClick(selector);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_right_click');
-            throw Error(`Error during right click on the row, screenshot:  ` + screenshot + '  ' + err);
+            throw Error(`Error occurred during right click on the row, screenshot: ${screenshot} ` + err);
         }
     }
 
