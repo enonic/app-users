@@ -131,14 +131,14 @@ class GroupWizard extends WizardPanel {
         return await this.clickOnElement(this.deleteButton);
     }
 
-    getMembers() {
+    async getSelectedMembers() {
         let selectedOptions = XPATH.container + XPATH.membersStepForm + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selectedOptions);
+        return await this.getTextInElements(selectedOptions);
     }
 
-    getRoles() {
+    async getSelectedRoles() {
         let selectedOptions = XPATH.container + XPATH.rolesStepForm + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selectedOptions);
+        return await this.getTextInElements(selectedOptions);
     }
 
     async removeMember(displayName) {

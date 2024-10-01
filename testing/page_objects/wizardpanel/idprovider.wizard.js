@@ -32,7 +32,7 @@ class IdProviderWizard extends WizardPanel {
     }
 
     get authApplicationSelectorFilterInput() {
-        return XPATH.container + lib.formItemByLabel("Application") + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+        return XPATH.container + lib.formItemByLabel("Application") + lib.DROPDOWN_SELECTOR.OPTION_FILTER_INPUT;
     }
 
     get permissionsOptionsFilterInput() {
@@ -145,8 +145,8 @@ class IdProviderWizard extends WizardPanel {
             await authApplicationComboBox.selectFilteredOptionAndClickOnOk(authAppName, XPATH.container);
             return await this.pause(300);
         } catch (err) {
-            await this.saveScreenshot('err_select_application');
-            throw new Error('ID Provider - Error when selecting the auth-application: ' + authAppName + ' ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_id_provider_select_application');
+            throw new Error(`ID Provider - Error when selecting the auth-application:${screenshot} ` + err);
         }
     }
 
@@ -156,11 +156,10 @@ class IdProviderWizard extends WizardPanel {
         return await this.pause(400);
     }
 
-    isAceMenuOptionsExpanded(entryDisplayName) {
+    async isAceMenuOptionsExpanded(entryDisplayName) {
         let selector = XPATH.selectedAcEntryByDisplayName(entryDisplayName) + XPATH.aceAccessSelector;
-        return this.getAttribute(selector, 'class').then(result => {
-            return result.includes('expanded');
-        })
+        let attr = await this.getAttribute(selector, 'class');
+        return attr.includes('expanded');
     }
 
     async clickOnAceMenuOperation(operation) {
@@ -208,13 +207,15 @@ class IdProviderWizard extends WizardPanel {
     }
 
     //gets selected options in Permissions step
-    getPermissions() {
-        let items = XPATH.container + XPATH.aclList + lib.H6_DISPLAY_NAME;
-        return this.waitForElementDisplayed(XPATH.aclList, 1000).catch(err => {
-            throw new Error('ID Provider wizard, ACL entries are not displayed in Permissions wizard-step. ' + err);
-        }).then(() => {
-            return this.getTextInElements(items)
-        });
+    async getPermissions() {
+        try {
+            let items = XPATH.container + XPATH.aclList + lib.H6_DISPLAY_NAME;
+            await this.waitForElementDisplayed(XPATH.aclList);
+            return await this.getTextInElements(items);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_id_provider_wizard_perm');
+            throw new Error(`ID Provider, error occurred during getting permissions in the wizard-step. screenshot:${screenshot}  ` + err);
+        }
     }
 
     isDescriptionInputDisplayed() {
@@ -230,8 +231,9 @@ class IdProviderWizard extends WizardPanel {
         return this.isElementDisplayed(this.permissionsOptionsFilterInput);
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout);
+    async waitForOpened() {
+        await this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout);
+        await this.pause(300);
     }
 }
 

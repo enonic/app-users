@@ -20,7 +20,7 @@ describe('Id Provider specification - save and edit a provider', function () {
     let ID_PROVIDER;
     let ID_PROVIDER_2;
     let TEST_USER;
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it(`GIVEN wizard for new 'Id Provider' is opened WHEN name has been typed AND 'Save' button pressed THEN expected notification message should appear`,
         async () => {
@@ -133,20 +133,20 @@ describe('Id Provider specification - save and edit a provider', function () {
             await userBrowsePanel.isEditButtonEnabled();
         });
 
-    //Verifies https://github.com/enonic/app-users/issues/461
-    //Delete button remains enabled after adding a user in ID provider #461
+    // Verifies https://github.com/enonic/app-users/issues/461
+    // Delete button remains enabled after adding a user in ID provider #461
     it(`GIVEN existing 'Id Provider'(with an user) is selected WHEN new user has been added THEN 'Delete' button(in browse panel) gets disabled`,
         async () => {
             let userName = userItemsBuilder.generateRandomName('user');
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName));
-            //1. Select existing ID Provider and add new user:
+            // 1. Select existing ID Provider and add new user:
             await testUtils.clickOnIdProviderAndOpenUserWizard(ID_PROVIDER_2.displayName);
             await userWizard.typeData(TEST_USER);
-            //2. Close the user-wizard:
+            // 2. Close the user-wizard:
             await testUtils.saveAndCloseWizard(TEST_USER.displayName);
-            //3. Delete gets disabled, because of the ID Provider contains an user
+            // 3. Delete gets disabled, because of the ID Provider contains an user
             await userBrowsePanel.waitForDeleteButtonDisabled();
             await userBrowsePanel.waitForEditButtonEnabled();
         });
