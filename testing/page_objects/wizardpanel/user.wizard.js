@@ -5,13 +5,15 @@ const wizards = require('./wizard.panel');
 const wpXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const UsersPrincipalCombobox = require('../selectors/users.principal.combobox');
 
 const XPATH = {
     container: "//div[contains(@id,'UserWizardPanel')]",
     emailInput: "//input[@type = 'email']",
-    groupOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
-    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
+    groupsForm: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]",
+    rolesForm: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]",
+    groupOptionsFilterInput: this.groupsForm + lib.COMBO_BOX_OPTION_FILTER_INPUT,
+    roleOptionsFilterInput: this.rolesForm + lib.COMBO_BOX_OPTION_FILTER_INPUT,
     publicKeyFormItem: "//div[contains(@id,'FormItem') and child::label[contains(.,'Public Keys')]]",
     rolesGroupLink: "//li[child::a[text()='Roles & Groups']]",
     passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
@@ -138,7 +140,6 @@ class UserWizard extends wizards.WizardPanel {
         }
     }
 
-
     isEmailInputDisplayed() {
         return this.isElementDisplayed(this.emailInput);
     }
@@ -171,7 +172,7 @@ class UserWizard extends wizards.WizardPanel {
             await this.clickOnElement(this.deleteButton);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_delete_btn');
-            throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + '  ' + err);
+            throw new Error(`Error occurred after clicking on Delete button, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -191,7 +192,6 @@ class UserWizard extends wizards.WizardPanel {
         await this.clearInputText(this.emailInput);
         await this.typeTextInInput(this.emailInput, 'a');
         return await this.getBrowser().keys('\uE003');
-
     }
 
     getTextInPasswordInput() {
@@ -234,22 +234,18 @@ class UserWizard extends wizards.WizardPanel {
 
     async filterOptionsAndAddRole(roleDisplayName) {
         try {
-            let loaderComboBox = new LoaderComboBox();
-            await this.typeTextInInput(XPATH.roleOptionsFilterInput, roleDisplayName);
-            await loaderComboBox.waitForOptionVisible(XPATH.container, roleDisplayName);
-            await loaderComboBox.clickOnOption(XPATH.container, roleDisplayName);
+            let usersPrincipalCombobox = new UsersPrincipalCombobox();
+            await usersPrincipalCombobox.selectFilteredOptionAndClickOnOk(roleDisplayName, XPATH.container + XPATH.rolesForm);
             await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_selector');
-            throw new Error('Error when selecting the role-option, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error when selecting the role-option, screenshot:${screenshot} ` + err);
         }
     }
 
     async filterOptionsAndAddGroup(groupDisplayName) {
-        let loaderComboBox = new LoaderComboBox();
-        await this.typeTextInInput(XPATH.groupOptionsFilterInput, groupDisplayName);
-        await loaderComboBox.waitForOptionVisible(XPATH.container, groupDisplayName);
-        await loaderComboBox.clickOnOption(XPATH.container, groupDisplayName);
+        let usersPrincipalCombobox = new UsersPrincipalCombobox();
+        await usersPrincipalCombobox.selectFilteredOptionAndClickOnOk(groupDisplayName, XPATH.container + XPATH.groupsForm);
         return await this.pause(500);
     }
 

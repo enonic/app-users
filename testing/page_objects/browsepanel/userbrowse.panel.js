@@ -24,14 +24,7 @@ const xpath = {
     },
     rowByDisplayName:
         displayName => `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
-    checkboxByName(name) {
-        return `${lib.itemByName(name)}` +
-               `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
-    },
-    checkboxByDisplayName(displayName) {
-        return `${lib.itemByDisplayName(displayName)}` +
-               `/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
-    },
+
     closeItemTabButton(name) {
         return `//div[contains(@id,'AppBar')]//li[contains(@id,'AppBarTabMenuItem') and child::a[@class='label' and text() ='${name}']]/button`;
     },
