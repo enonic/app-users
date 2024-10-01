@@ -14,7 +14,7 @@ const FilterPanel = require('../page_objects/browsepanel/principal.filter.panel'
 describe('group.delete.spec: confirm and delete a group in wizard and in Browse Panel', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let TEST_GROUP;
@@ -31,13 +31,13 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await groupWizard.waitAndClickOnSave();
             // 3. Delete button in toolbar has been clicked:
             await groupWizard.clickOnDelete();
-            await testUtils.saveScreenshot("group_wizard_confirm_delete1");
+            await testUtils.saveScreenshot('group_wizard_confirm_delete1');
             // 4.`Verify that Confirmation Dialog` is loaded
             await confirmationDialog.waitForDialogLoaded();
             await confirmationDialog.pause(200);
             // 5. Press 'Esc' key
             await groupWizard.pressEscKey();
-            await testUtils.saveScreenshot("group_wizard_confirm_dialog_closed");
+            await testUtils.saveScreenshot('group_wizard_confirm_dialog_closed');
             // 6. Verify that confirmation dialog is closed:
             await confirmationDialog.waitForDialogClosed();
             // 7. Verify that Group wizard remains opened after canceling the deleting
@@ -57,7 +57,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await groupWizard.clickOnDelete();
             // 3. Confirm:
             await testUtils.confirmDelete();
-            await testUtils.saveScreenshot("group_deleted_confirmation_mess1");
+            await testUtils.saveScreenshot('group_deleted_confirmation_mess1');
             let expectedMessage = appConst.groupDeletedMessage(groupToDelete.displayName);
             // Message : Principal "group:system:${displayName}" is deleted - should appear
             await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
@@ -109,7 +109,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await groupWizard.pause(1000);
             // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
-            await testUtils.saveScreenshot("group_number_after_recreating");
+            await testUtils.saveScreenshot('group_number_after_recreating');
             // 5. Verify that the number of groups is increased
             let newNumberOfGroup = await filterPanel.getNumberInGroupAggregationCheckbox();
             assert.ok(newNumberOfGroup - initialNumber === 1,

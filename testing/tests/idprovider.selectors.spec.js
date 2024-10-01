@@ -10,11 +10,12 @@ const appConst = require('../libs/app_const');
 describe('Id Provider Permissions spec', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
-    //verifies the lib-admin-ui#147
+    // verifies the lib-admin-ui#147  Contents of a dropdown will not reset to original list after being filtered #147
+    // https://github.com/enonic/lib-admin-ui/issues/147
     it(`GIVEN 'Id Provider' wizard is opened AND Acl-entry has been added WHEN filter input has been cleared AND drop-down handle clicked THEN number of options should be more than 1`,
         async () => {
             let idProviderWizard = new IdProviderWizard();
@@ -22,10 +23,9 @@ describe('Id Provider Permissions spec', function () {
             await testUtils.openIdProviderWizard();
             // 2. Add new Acl-entry:
             await idProviderWizard.filterOptionsAndSelectPermission('Everyone');
-            // 3. Clear the options filter input:
+            // 3. Clear the Permissions options filter input:
             await idProviderWizard.clearPrincipalOptionsFilterInput();
-            // 4.Expand the combobox:
-            await idProviderWizard.clickOnPrincipalComboBoxDropDownHandle();
+            // 4. The dropdown should be expanded after clearing  the options filter input
             let result = await idProviderWizard.getPrincipalOptionDisplayNames();
             assert.ok(result.length > 1, 'number of options should be more than 1');
         });
