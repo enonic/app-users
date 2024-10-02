@@ -76,5 +76,7 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
 
     }
 
-
+    isLoadAllowed(): boolean {
+        return this.isFiltered() ? true : super.isLoadAllowed();
+    }
 }
