@@ -71,11 +71,11 @@ module.exports = Object.freeze({
         listItemByDisplayName: (displayName) => {
             return `//li[contains(@class,'item-view-wrapper') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`;
         },
-        itemTreeGridListElementByDisplayName: displayName => {//ContentTreeGridListViewer
+        itemTreeGridListElementByDisplayName: displayName => {
             return `(//li[contains(@id,'UserItemsTreeListElement') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]])[last()]`
         },
-        itemTreeGridListElementByName: name => {
-            return `//li[contains(@id,'UserItemsTreeListElement') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
+        UserTreeGridItemViewerByName: name => {
+            return `//div[contains(@id,'UserTreeGridItemViewer') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
         },
         itemTypesTreeGridListElement: displayName => {
             return `//li[contains(@id,'UserItemTypesTreeGridListElement') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`

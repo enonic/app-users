@@ -297,7 +297,7 @@ class UserBrowsePanel extends Page {
     }
 
     clickOnExpanderIcon(name) {
-        let expanderIcon = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(name) + lib.TREE_GRID.EXPANDER_ICON_DIV;
+        let expanderIcon = this.treeGrid + lib.TREE_GRID.UserTreeGridItemViewerByName(name) + "/.." + lib.TREE_GRID.EXPANDER_ICON_DIV;
         return this.clickOnElement(expanderIcon);
     }
 

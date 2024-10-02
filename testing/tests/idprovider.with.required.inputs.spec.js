@@ -164,7 +164,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await providerConfigDialog.openDialogFillRequiredInputs('domain', 'id', 'secret');
             // 5. Select a group:
             await providerConfigDialog.selectGroup(groupName);
-            await testUtils.saveScreenshot("idprovider_config_group_selected");
+            await testUtils.saveScreenshot('idprovider_config_group_selected');
             // 6. Verify the selected option:
             let actualGroups = await providerConfigDialog.getSelectedGroups();
             assert.equal(actualGroups[0], groupName, "Expected group should be present in selected options");
