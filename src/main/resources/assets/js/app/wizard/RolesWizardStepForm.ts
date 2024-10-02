@@ -40,14 +40,16 @@ export class RolesWizardStepForm
     }
 
     layout(principal: Principal): void {
-        const rolesKeys: PrincipalKey[] = this.getRolesKeysFromPrincipal(principal);
+        const roles: Principal[] = this.getRolesKeysFromPrincipal(principal);
+        const rolesKeys: PrincipalKey[] = roles.map((role: Principal) => role.getKey());
 
         if (this.rolesWrapper.isDirty()) {
             if (ObjectHelper.arrayEquals(this.getRolesKeys(), rolesKeys)) {
                 this.rolesWrapper.resetBaseValues();
             }
         } else {
-            this.rolesWrapper.setValue(rolesKeys.join(';'));
+            this.roles.deselectAll(true);
+            this.roles.select(roles);
         }
     }
 
@@ -59,15 +61,14 @@ export class RolesWizardStepForm
         return this.getRoles().map((role: Principal) => role.getKey());
     }
 
-    private getRolesKeysFromPrincipal(principal: Principal): PrincipalKey[] {
+    private getRolesKeysFromPrincipal(principal: Principal): Principal[] {
         if (principal && principal.isUser()) {
             return (principal as User).getMemberships()
-                .filter((membership: Principal) => membership.isRole())
-                .map((p: Principal) => p.getKey());
+                .filter((membership: Principal) => membership.isRole());
         }
 
         if (principal && principal.isGroup()) {
-            return (principal as Group).getMemberships().filter((m: Principal) => m.isRole()).map((p: Principal) => p.getKey());
+            return (principal as Group).getMemberships().filter((m: Principal) => m.isRole());
         }
 
         return [];

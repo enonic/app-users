@@ -90,11 +90,15 @@ export class UserBrowsePanel
 
                 if (item) {
                     this.selectionWrapper.deselect(item);
-                    this.findParentList(item).forEach((list) => list.replaceItems(item));
+                    this.findParentList(item).forEach((list) => list.removeItems(item));
                 }
             });
 
-            this.refreshFilter();
+            if (this.treeListBox.isFiltered() && this.treeListBox.getItems().length === 0) {
+                this.filterPanel.reset();
+            } else {
+                this.refreshFilter();
+            }
         });
     }
 
@@ -117,6 +121,10 @@ export class UserBrowsePanel
         const userTreeGridItem: UserTreeGridItem = new UserTreeGridItemBuilder().setIdProvider(idProvider).setPrincipal(principal).setType(
             UserTreeGridItemType.PRINCIPAL).build();
         const parentList = this.findParentList(userTreeGridItem)[0];
+
+        if (!parentList) {
+            return;
+        }
 
         if (parentList.wasAlreadyShownAndLoaded()) {
             parentList.addItems(userTreeGridItem, false, 0);
@@ -177,6 +185,12 @@ export class UserBrowsePanel
         return result;
     }
 
+    protected initElements(): void {
+        super.initElements();
+
+        this.browseToolbar.addActions(this.getBrowseActions().getAllActions());
+    }
+
     protected initListeners(): void {
         super.initListeners();
 
@@ -210,7 +224,7 @@ export class UserBrowsePanel
     }
 
     protected createToolbar(): UserBrowseToolbar {
-        return new UserBrowseToolbar(this.treeActions);
+        return new UserBrowseToolbar();
     }
 
     protected getBrowseActions(): TreeGridActions<ViewItem> {

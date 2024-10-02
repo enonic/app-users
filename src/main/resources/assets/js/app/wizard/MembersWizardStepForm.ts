@@ -21,7 +21,7 @@ import {UrlHelper} from '../../util/UrlHelper';
 export class MembersWizardStepForm
     extends UserItemWizardStepForm {
 
-    private principalCombobox: MembersPrincipalCombobox;
+    private membersCombobox: MembersPrincipalCombobox;
 
     private comboboxWrapper: PrincipalComboBoxWrapper;
 
@@ -32,14 +32,14 @@ export class MembersWizardStepForm
     protected initElements(): void {
         super.initElements();
 
-        this.principalCombobox = new MembersPrincipalCombobox({
+        this.membersCombobox = new MembersPrincipalCombobox({
             maxSelected: 0,
             allowedTypes: [PrincipalType.GROUP, PrincipalType.USER],
             skipPrincipals: [PrincipalKey.ofAnonymous()],
             selectedOptionsView: new MembersPrincipalSelectedOptionsView(),
         });
 
-        this.comboboxWrapper = new PrincipalComboBoxWrapper(this.principalCombobox);
+        this.comboboxWrapper = new PrincipalComboBoxWrapper(this.membersCombobox);
     }
 
     protected createFormItems(): FormItem[] {
@@ -49,7 +49,7 @@ export class MembersWizardStepForm
 
     layout(principal: Members): void {
         if (RoleKeys.isAdmin(principal.getKey())) {
-            this.principalCombobox.setReadOnlyItems([PrincipalKey.ofSU()]);
+            this.membersCombobox.setReadOnlyItems([PrincipalKey.ofSU()]);
         }
 
         if (this.comboboxWrapper.isDirty()) {
@@ -58,13 +58,12 @@ export class MembersWizardStepForm
             }
         } else {
             this.getLoader().skipPrincipal(principal.getKey());
-            const value: string = principal.getMembers().map((key: PrincipalKey) => key.toString()).join(';');
-            this.comboboxWrapper.setValue(value);
+            this.membersCombobox.setSelectedItems(principal.getMembers());
         }
     }
 
     getMembers(): Principal[] {
-        return this.principalCombobox.getSelectedOptions().map((option) => option.getOption().getDisplayValue());
+        return this.membersCombobox.getSelectedOptions().map((option) => option.getOption().getDisplayValue());
     }
 
     getMembersKeys(): PrincipalKey[] {
@@ -72,11 +71,11 @@ export class MembersWizardStepForm
     }
 
     giveFocus(): boolean {
-        return this.principalCombobox.giveFocus();
+        return this.membersCombobox.giveFocus();
     }
 
     getLoader(): PrincipalLoader {
-        return this.principalCombobox.getLoader() as PrincipalLoader;
+        return this.membersCombobox.getLoader() as PrincipalLoader;
     }
 
     doRender(): Q.Promise<boolean> {
