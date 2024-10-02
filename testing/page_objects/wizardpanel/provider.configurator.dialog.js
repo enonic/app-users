@@ -20,6 +20,9 @@ const XPATH = {
 
 class IdProviderConfiguratorDialog extends Page {
 
+    get container() {
+        return XPATH.container;
+    }
     get applyButton() {
         return `${XPATH.container}` + `${XPATH.applyButton}`;
     }

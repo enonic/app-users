@@ -6,13 +6,13 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
 const XPATH = {
-    principalComboboxDiv: "//div[contains(@id,'PrincipalCombobox')]",
+    principalComboboxDiv: "//div[contains(@id,'PrincipalComboBox')]",
 };
 
 class PrincipalCombobox extends BaseDropdown {
 
     get container() {
-        return XPATH.usersPrincipalComboboxDiv;
+        return XPATH.principalComboboxDiv;
     }
 
     async selectFilteredOptionAndClickOnOk(optionName, parentElement) {
