@@ -213,7 +213,12 @@ export class UserBrowsePanel
 
         BrowseFilterSearchEvent.on((event: BrowseFilterSearchEvent<PrincipalBrowseSearchData>) => {
             const data = event.getData();
-            this.treeListBox.setSearchString(data.getSearchString()).setSearchTypes(data.getTypes()).load();
+
+            this.treeListBox
+                .setSearchString(data.getSearchString())
+                .setSearchTypes(data.getTypes())
+                .setConstraintItems(data.getItemIds())
+                .load();
         });
 
         BrowseFilterResetEvent.on(() => {
@@ -297,8 +302,8 @@ export class UserBrowsePanel
 
     protected enableSelectionMode(): void {
         this.treeListBox.clearItems(true);
-        this.treeListBox.setItems(this.selectionWrapper.getSelectedItems());
-        //this.filterPanel.setSelectedItems(this.selectionWrapper.getSelectedItems().map(item => item.getId()));
+        //this.treeListBox.setItems(this.selectionWrapper.getSelectedItems());
+        this.filterPanel.setSelectedItems(this.selectionWrapper.getSelectedItems().map(item => item.getId()));
     }
 
     protected disableSelectionMode(): void {

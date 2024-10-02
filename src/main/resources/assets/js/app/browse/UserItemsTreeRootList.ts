@@ -13,6 +13,7 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
     private searchString: string;
     private searchTypes: UserItemType[];
     private latestIdProviders: IdProvider[];
+    private constraintItems: string[];
 
     setSearchString(searchString: string): this {
         this.searchString = searchString;
@@ -28,10 +29,16 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
         return !!this.searchString || !!this.searchTypes;
     }
 
+    setConstraintItems(items: string[]): this {
+        this.constraintItems = items;
+        return this;
+    }
+
     resetFilter(): void {
         this.searchString = null;
         this.searchTypes = null;
         this.latestIdProviders = null;
+        this.constraintItems = null;
         this.load();
     }
 
@@ -55,6 +62,7 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
             return new ListUserItemsRequest()
                 .setCount(20)
                 .setTypes(this.searchTypes)
+                .setItems(this.constraintItems)
                 .setQuery(this.searchString)
                 .setStart(this.getItemCount())
                 .sendAndParse()
