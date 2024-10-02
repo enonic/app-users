@@ -93,13 +93,13 @@ describe('User Browse Panel specification', function () {
             // 2. Click on 'Show Selection':
             await userBrowsePanel.clickOnSelectionToggler();
             await testUtils.openFilterPanel();
+            await testUtils.saveScreenshot('selection_toggler_clicked2');
             // 3. Verify that the only one checkbox should be displayed in  Filter Panel
             let aggregationItems = await browseFilterPanel.getAggregationItems();
             assert.equal(aggregationItems.length, 1, "one aggregation item should be present in Filter Panel - 'Id provider'");
             assert.ok(aggregationItems[0].includes('Id Provider'), "ID Provider checkbox should be displayed in the Filter Panel");
             // 4. The grid should be filtered: one item should remain in the grid
             let names = await userBrowsePanel.getGridItemDisplayNames();
-            await testUtils.saveScreenshot('selection_toggler_clicked2');
             assert.ok(names.includes('System Id Provider'), "Row with 'System Id Provider' should be present in the grid");
         });
 
