@@ -36,9 +36,7 @@ export class PrincipalBrowseFilterPanel
     }
 
     private initEventHandlers() {
-        UserFilteredDataScrollEvent.on((event) => {
-            this.searchDataAndHandleResponse(event.getPrevCount(), event.getCount());
-        });
+    //
     }
 
     private initHitsCounter() {
@@ -100,22 +98,18 @@ export class PrincipalBrowseFilterPanel
     }
 
     // setCount(100): Initially get only 100 users. The UserFilteredDataScrollEvent will request more if necessary.
-    private searchDataAndHandleResponse(prevCount: number = 0, count: number = 100): Q.Promise<void> {
+    private searchDataAndHandleResponse(): Q.Promise<void> {
         const types: UserItemType[] = this.getCheckedTypes();
         const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
         const itemIds: string[] = this.getSelectedItemIds();
 
         return new ListUserItemsRequest()
-            .setCount(count)
+            .setCount(0)
             .setTypes(types)
             .setQuery(searchString)
             .setItems(itemIds)
             .sendAndParse()
             .then((result: ListUserItemsRequestResult) => {
-                if(result.total === prevCount) {
-                    new UserItemsStopScrollEvent().fire();
-                }
-
                 this.handleDataSearchResult(result, types, searchString);
             }).catch((reason) => {
                 DefaultErrorHandler.handle(reason);
@@ -127,10 +121,9 @@ export class PrincipalBrowseFilterPanel
         const searchString: string = this.getSearchInputValues().getTextSearchFieldValue();
         const itemIds: string[] = this.getSelectedItemIds();
 
-        // setCount(100): After refreshing get only 100 users.
-        return new ListUserItemsRequest().setCount(100).setTypes(types).setQuery(searchString).setItems(itemIds).sendAndParse()
+        return new ListUserItemsRequest().setCount(0).setTypes(types).setQuery(searchString).setItems(itemIds).sendAndParse()
             .then((result: ListUserItemsRequestResult) => {
-                if (result.userItems.length > 0) {
+                if (result.total > 0) {
                     this.handleDataSearchResult(result, types, searchString);
                 } else {
                     this.handleNoSearchResultOnRefresh();
@@ -150,9 +143,9 @@ export class PrincipalBrowseFilterPanel
 
     private handleDataSearchResult(result: ListUserItemsRequestResult, types: UserItemType[], searchString: string) {
         this.fetchAndUpdateAggregations().then(() => {
-            const userItems: UserItem[] = result.userItems;
+            const itemIds: string[] = this.getSelectedItemIds();
 
-            new BrowseFilterSearchEvent(new PrincipalBrowseSearchData(searchString, types, userItems)).fire();
+            new BrowseFilterSearchEvent(new PrincipalBrowseSearchData(searchString, types, itemIds)).fire();
 
             this.updateHitsCounter(result.total, StringHelper.isBlank(searchString));
             this.toggleAggregationsVisibility(result.aggregations);
