@@ -18,7 +18,7 @@ describe('Id Provider Permissions spec', function () {
     // https://github.com/enonic/lib-admin-ui/issues/147
     // https://github.com/enonic/app-contentstudio/issues/7919
     // Duplicated items in ListBox #7919
-    it(`GIVEN 'Id Provider' wizard is opened AND Acl-entry has been added WHEN filter input has been cleared AND drop-down handle clicked THEN number of options should be more than 1`,
+    it(`GIVEN 'Id Provider' wizard is opened AND Acl-entry has been added WHEN filter input has been cleared AND drop-down handle clicked THEN number of options should be more than 10`,
         async () => {
             let idProviderWizard = new IdProviderWizard();
             // 1. Open new ID Provider wizard:
@@ -29,9 +29,10 @@ describe('Id Provider Permissions spec', function () {
             await idProviderWizard.clearPrincipalOptionsFilterInput();
             await testUtils.saveScreenshot('id_privider_options');
             // 4. The dropdown should be expanded after clearing  the options filter input
-            let result = await idProviderWizard.getPrincipalOptionDisplayNames();
-            assert.ok(result.length > 10, 'More than 10 options should be in the list');
-            let countItem = duplicates(result, 'Administrator');
+            let options = await idProviderWizard.getPrincipalOptionDisplayNames();
+            console.log("ID PROVIDER PERMISSIONS OPTIONS  #####################:   " + options);
+            assert.ok(options.length > 10, 'More than 10 options should be in the list');
+            let countItem = duplicates(options, 'Administrator');
             assert.ok(countItem === 1, 'Options should not be duplicated in the ListBox');
         });
 

@@ -42,7 +42,7 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             //4. Click on Selection Toggle (circle, Hide Selection), initial state of thr grid is restored:
             await userBrowsePanel.clickOnSelectionToggler();
             await userBrowsePanel.pause(500);
-            await testUtils.saveScreenshot("selection_toggle_checkbox_partial");
+            await testUtils.saveScreenshot('groups_selection_toggle_checkbox_partial');
             //5. Verify that 'Selection Controller' checkBox shows that the selection is partial:
             let result = await userBrowsePanel.waitForSelectionControllerPartial();
             assert.ok(result, "'Selection Controller' shows that selection is partial");
