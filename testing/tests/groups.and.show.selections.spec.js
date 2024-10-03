@@ -59,15 +59,16 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             // 2. Select 2 groups:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_1.displayName);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_2.displayName);
+            await testUtils.saveScreenshot('issue_show_selection');
             // 3. Click on 'Show Selection'
             await userBrowsePanel.clickOnSelectionToggler();
             await userBrowsePanel.pause(1000);
             // 4. Click on 'Hide Selection', initial state of thr grid is restored:
             await userBrowsePanel.clickOnSelectionToggler();
-            await userBrowsePanel.pause(500);
+            await userBrowsePanel.pause(1000);
             // 5. Click on 'Show Selection'
             await userBrowsePanel.clickOnSelectionToggler();
-            await testUtils.saveScreenshot("selection_toggle_checkbox_selected");
+            await testUtils.saveScreenshot('issue_selection_toggle_checkbox_selected');
             // 6. Verify that 'Selection Controller' checkBox should be selected:
             let isSelected = await userBrowsePanel.isSelectionControllerSelected();
             assert.ok(isSelected, "'Selection Controller' shows that selection is partial");
@@ -75,7 +76,7 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             let gridItems = await userBrowsePanel.getGridItemDisplayNames();
             assert.equal(gridItems.length, 2, "Two groups should be present in User Browse Panel");
             assert.ok(gridItems.includes(GROUP_1.displayName), "The first group should be present in User Browse Panel");
-            assert.ok(gridItems.includes(GROUP_1.displayName), "The second group should be present in User Browse Panel");
+            assert.ok(gridItems.includes(GROUP_2.displayName), "The second group should be present in User Browse Panel");
         });
 
     before(async () => {
