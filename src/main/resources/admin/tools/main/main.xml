@@ -8,7 +8,6 @@
     <principal>role:system.user.app</principal>
   </allow>
   <apis>
-    <api>config</api>
     <api>graphql</api>
     <api>i18n</api>
     <api>permissionReport</api>
