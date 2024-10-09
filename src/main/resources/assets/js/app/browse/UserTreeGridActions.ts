@@ -4,7 +4,6 @@ import {SyncPrincipalAction} from './action/SyncPrincipalAction';
 import {DeletePrincipalAction} from './action/DeletePrincipalAction';
 import {EditPrincipalAction} from './action/EditPrincipalAction';
 import {NewPrincipalAction} from './action/NewPrincipalAction';
-import {UserItemsTreeGrid} from './UserItemsTreeGrid';
 import {User} from '../principal/User';
 import {IdProvider} from '../principal/IdProvider';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
@@ -12,6 +11,7 @@ import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGrid
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
 
 export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
 
@@ -22,11 +22,11 @@ export class UserTreeGridActions implements TreeGridActions<UserTreeGridItem> {
 
     private actions: Action[] = [];
 
-    constructor(grid: UserItemsTreeGrid) {
-        this.NEW = new NewPrincipalAction(grid);
-        this.EDIT = new EditPrincipalAction(grid);
-        this.DELETE = new DeletePrincipalAction(grid);
-        this.SYNC = new SyncPrincipalAction(grid);
+    constructor(selectionWrapper: SelectableListBoxWrapper<UserTreeGridItem>) {
+        this.NEW = new NewPrincipalAction(selectionWrapper);
+        this.EDIT = new EditPrincipalAction(selectionWrapper);
+        this.DELETE = new DeletePrincipalAction(selectionWrapper);
+        this.SYNC = new SyncPrincipalAction(selectionWrapper);
 
         this.NEW.setEnabled(true);
         this.actions.push(this.NEW, this.EDIT, this.DELETE/*, this.SYNC*/);

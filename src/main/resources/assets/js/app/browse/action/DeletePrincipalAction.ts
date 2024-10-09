@@ -1,4 +1,3 @@
-import {UserItemsTreeGrid} from '../UserItemsTreeGrid';
 import {UserTreeGridItem, UserTreeGridItemType} from '../UserTreeGridItem';
 import {DeletePrincipalRequest} from '../../../graphql/principal/DeletePrincipalRequest';
 import {DeleteIdProviderRequest} from '../../../graphql/idprovider/DeleteIdProviderRequest';
@@ -11,11 +10,12 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {DeleteUserItemResult} from '../../../graphql/useritem/DeleteUserItemResult';
+import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
 
 export class DeletePrincipalAction
     extends Action {
 
-    constructor(grid: UserItemsTreeGrid) {
+    constructor(selectionWrapper: SelectableListBoxWrapper<UserTreeGridItem>) {
         super(i18n('action.delete'), 'mod+del');
         this.setEnabled(false);
         const confirmation = new ConfirmationDialog()
@@ -23,12 +23,12 @@ export class DeletePrincipalAction
             .setNoCallback(null)
             .setYesCallback(() => {
 
-                let principalItems = grid.getSelectedDataList().filter(
+                let principalItems = selectionWrapper.getSelectedItems().filter(
                     userItem => UserTreeGridItemType.PRINCIPAL === userItem.getType()).map((userItem: UserTreeGridItem) => {
                     return userItem.getPrincipal();
                 });
 
-                let idProviderItems = grid.getSelectedDataList().filter(
+                let idProviderItems = selectionWrapper.getSelectedItems().filter(
                     userItem => UserTreeGridItemType.ID_PROVIDER === userItem.getType()).map((userItem: UserTreeGridItem) => {
                     return userItem.getIdProvider();
                 });
@@ -78,7 +78,7 @@ export class DeletePrincipalAction
             });
 
         this.onExecuted(() => {
-            const multiple = grid.getSelectedDataList().length > 1;
+            const multiple = selectionWrapper.getSelectedItems().length > 1;
             const question = multiple ? i18n('dialog.delete.multiple.question') : i18n('dialog.delete.question');
             confirmation.setQuestion(question).open();
         });

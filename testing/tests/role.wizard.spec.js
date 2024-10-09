@@ -18,17 +18,18 @@ describe('Role Wizard and Statistics Panel spec', function () {
     }
     let TEST_ROLE;
 
-    //Verifies It shouldn't be possible to unassign system.administrator role from su user
-    //https://github.com/enonic/app-users/issues/1227
+    // Verifies It shouldn't be possible to unassign system.administrator role from su user
+    // https://github.com/enonic/app-users/issues/1227
     it(`WHEN Administrator role is opened THEN remove icon should not be displayed for SU in Members form`,
         async () => {
             let roleWizard = new RoleWizard();
-            //1. Open Administrator role:
+            // 1. Open Administrator role:
             await testUtils.selectRoleAndOpenWizard(appConst.ROLES_NAME.ADMINISTRATOR);
-            //2. Super User should be displayed in the members form:
+            // 2. ADMINISTRATOR role  should be with members:
             let members = await roleWizard.getMembers();
+            assert.ok(members.length > 0, "Admin role should have members");
             assert.ok(members.includes("Super User"), 'Super User should be present in members form');
-            //3. Remove icon should not be displayed for Super User in members form:
+            // 3. Remove icon should not be displayed for Super User in members form:
             await roleWizard.waitForRemoveMemberIconNotDisplayed("Super User");
         });
 
@@ -36,29 +37,29 @@ describe('Role Wizard and Statistics Panel spec', function () {
         async () => {
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            TEST_ROLE = userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'test role', null);
-            //1.Select Roles folder and save new role:
+            TEST_ROLE = userItemsBuilder.buildRole(userItemsBuilder.generateRandomName('role'), 'description', null);
+            // 1. Select Roles folder and save new role:
             await userBrowsePanel.clickOnRowByName('roles');
             await userBrowsePanel.clickOnNewButton();
             await roleWizard.waitForLoaded();
             await roleWizard.typeData(TEST_ROLE);
             await roleWizard.waitAndClickOnSave();
-            //Verify the notification message:
+            // Verify the notification message:
             let actualMessage = await roleWizard.waitForNotificationMessage();
             assert.equal(actualMessage, 'Role was created', "Expected and actual messages are equal");
         });
 
-    //verifies: xp-apps#93 Incorrect message appears when try to create a role with name that already in use #93
+    // verifies: xp-apps#93 Incorrect message appears when try to create a role with name that already in use #93
     it(`GIVEN new 'role' wizard is opened WHEN the name that already in use has been typed THEN expected notification message should appear`,
         async () => {
             let roleWizard = new RoleWizard();
-            //1. Select Roles and open new wizard:
+            // 1. Select Roles and open new wizard:
             await testUtils.clickOnRolesFolderAndOpenWizard();
-            //2. Type existing name:
+            // 2. Type existing name:
             await roleWizard.typeDisplayName(TEST_ROLE.displayName);
             await roleWizard.waitAndClickOnSave();
             let errorMessage = await roleWizard.waitForErrorNotificationMessage();
-            //3. Error message should appear:
+            // 3. Error message should appear:
             let expectedMsg = `Principal [role:` + TEST_ROLE.displayName +
                               `] could not be created. A principal with that name already exists`;
             assert.strictEqual(errorMessage, expectedMsg, 'expected notification message should appear');
@@ -68,15 +69,15 @@ describe('Role Wizard and Statistics Panel spec', function () {
         async () => {
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Open the existing role:
+            // 1. Open the existing role:
             await testUtils.findAndSelectItem(TEST_ROLE.displayName);
             await userBrowsePanel.clickOnEditButton();
             await roleWizard.waitForLoaded();
-            //2. Add SU in members:
+            // 2. Add SU in members:
             await roleWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
-            //3.click on Save:
+            // 3.click on Save:
             await roleWizard.waitAndClickOnSave();
-            //4. Get selected options in members:
+            // 4. Get selected options in members:
             let selectedOptions = await roleWizard.getMembers();
             assert.equal(selectedOptions[0], appConst.SUPER_USER_DISPLAY_NAME, "SU should be in selected options");
         });
@@ -85,9 +86,9 @@ describe('Role Wizard and Statistics Panel spec', function () {
         async () => {
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Type the name in the filter panel:
+            // 1. Type the name in the filter panel:
             await testUtils.findAndSelectItem(TEST_ROLE.displayName);
-            //2. Click on Edit button:
+            // 2. Click on 'Edit' button:
             await userBrowsePanel.clickOnEditButton();
             await roleWizard.waitForLoaded();
             let actualDescription = await roleWizard.getDescription();
@@ -98,22 +99,22 @@ describe('Role Wizard and Statistics Panel spec', function () {
         async () => {
             let roleWizard = new RoleWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            //1. Type 'system.auditlog' in the filter panel:
-            await testUtils.findAndSelectItem("system.auditlog");
-            //2. Click on 'Edit' button:
+            // 1. Type 'system.auditlog' in the filter panel:
+            await testUtils.findAndSelectItem('system.auditlog');
+            // 2. Click on 'Edit' button:
             await userBrowsePanel.clickOnEditButton();
             await roleWizard.waitForLoaded();
-            //3. Verify that 'Delete' button is disabled:
+            // 3. Verify that 'Delete' button is disabled:
             await roleWizard.waitForDeleteButtonDisabled();
         });
 
     it(`GIVEN existing 'Role' with a member WHEN it has been selected THEN expected info should be present in the 'statistics panel'`,
         async () => {
             let roleStatisticsPanel = new RoleStatisticsPanel();
-            //1.Type the name and select the role in browse panel:
+            // 1.Type the name and select the role in browse panel:
             await testUtils.findAndSelectItem(TEST_ROLE.displayName);
             await roleStatisticsPanel.waitForPanelLoaded();
-            //2. Verify the data in Statistics Panel
+            // 2. Verify the data in Statistics Panel
             let actualName = await roleStatisticsPanel.getItemName();
             assert.equal(actualName, TEST_ROLE.displayName, "Expected and actual names should be equal");
             let actualItemPath = await roleStatisticsPanel.getItemPath();
@@ -124,12 +125,12 @@ describe('Role Wizard and Statistics Panel spec', function () {
         async () => {
             let roleWizard = new RoleWizard();
             let roleStatisticsPanel = new RoleStatisticsPanel();
-            //1. Open existing role and remove the member:
+            // 1. Open existing role and remove the member:
             await testUtils.selectRoleAndOpenWizard(TEST_ROLE.displayName);
             await roleWizard.removeMember(appConst.SUPER_USER_DISPLAY_NAME);
-            //2. role has been saved and the wizard closed
+            // 2. role has been saved and the wizard closed
             await testUtils.saveAndCloseWizard(TEST_ROLE.displayName);
-            //3. Members should be updated in the Statistics Panel
+            // 3. Members should be updated in the Statistics Panel
             let members = await roleStatisticsPanel.getDisplayNameOfMembers();
             assert.ok(members.length === 0);
         });

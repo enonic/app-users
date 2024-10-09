@@ -32,27 +32,11 @@ export class UserTreeGridItem
         this.idProvider = builder.idProvider;
         this.principal = builder.principal;
         this.type = builder.type;
-        this.children = builder.children;
+        this.children = builder.children || false;
 
         if (this.type === UserTreeGridItemType.PRINCIPAL) {
             this.modifiedTime = this.principal.getModifiedTime();
         }
-    }
-
-    static fromIdProvider(idProvider: IdProvider): UserTreeGridItem {
-        return new UserTreeGridItemBuilder().setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
-    }
-
-    setIdProvider(idProvider: IdProvider): void {
-        this.idProvider = idProvider;
-    }
-
-    setPrincipal(principal: Principal): void {
-        this.principal = principal;
-    }
-
-    setType(type: UserTreeGridItemType): void {
-        this.type = type;
     }
 
     getType(): UserTreeGridItemType {
@@ -126,8 +110,16 @@ export class UserTreeGridItem
         return this.type === UserTreeGridItemType.PRINCIPAL;
     }
 
+    setChildren(children: boolean): void {
+        this.children = children;
+    }
+
     hasChildren(): boolean {
         return this.isIdProvider() || this.isRole() || this.children;
+    }
+
+    hasChildrenItems(): boolean {
+        return this.children;
     }
 
     equals(o: Equitable): boolean {

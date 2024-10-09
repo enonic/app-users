@@ -22,7 +22,7 @@ class NewPrincipalDialog extends Page {
     }
 
     get cancelButton() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+        return XPATH.container + lib.BUTTONS.CANCEL_BUTTON_TOP;
     }
 
     clickOnCancelButtonTop() {
@@ -64,7 +64,7 @@ class NewPrincipalDialog extends Page {
     }
 
     waitForExpanderIconDisplayed(name) {
-        let selector = XPATH.container + XPATH.expanderIconByName(name);
+        let selector = XPATH.container + lib.TREE_GRID.itemTypesTreeGridListElement(name) + lib.TREE_GRID.EXPANDER_ICON_DIV;
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout).catch(err => {
             console.log("Expander is not visible " + err);
             return false;
@@ -81,7 +81,7 @@ class NewPrincipalDialog extends Page {
     }
 
     async clickOnExpanderIcon(name) {
-        let selector = XPATH.container + XPATH.expanderIconByName(name);
+        let selector = XPATH.container + lib.TREE_GRID.itemTypesTreeGridListElement(name) + lib.TREE_GRID.EXPANDER_ICON_DIV;
         await this.clickOnElement(selector);
         return await this.pause(300);
     }

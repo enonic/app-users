@@ -28,6 +28,7 @@ import {UserItemStatisticsHeader} from './UserItemStatisticsHeader';
 import {LoginResult} from '@enonic/lib-admin-ui/security/auth/LoginResult';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {MembersListing} from './MembersListing';
+import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -204,17 +205,18 @@ export class UserItemStatisticsPanel
         if(!isAdmin) { return Q(null); }
 
         const reportsGroup = new ItemDataGroup(i18n('field.report'), 'reports');
-
         const reportsCombo = new RepositoryComboBox();
-        reportsCombo.onOptionSelected(() => {
-            if (!genButton.isEnabled()) {
-                genButton.setEnabled(true);
-            }
-        });
-        reportsCombo.onOptionDeselected(() => {
-            if (reportsCombo.getSelectedValues().length === 0) {
-                genButton.setEnabled(false);
-            }
+
+        reportsCombo.onSelectionChanged((selectionChange: SelectionChange<Repository>) => {
+           if (selectionChange.selected?.length > 0) {
+               genButton.setEnabled(true);
+           }
+
+           if (selectionChange.deselected?.length > 0) {
+               if (reportsCombo.getSelectedOptions().length === 0) {
+                   genButton.setEnabled(false);
+               }
+           }
         });
 
         const genButton = new Button(i18n('action.report.generate'));
@@ -222,14 +224,14 @@ export class UserItemStatisticsPanel
             .addClass('principal-button large')
             .onClicked(() => {
                 const branches = reportsCombo.getSelectedBranches();
-                const repos = reportsCombo.getSelectedDisplayValues();
+                const repos = reportsCombo.getSelectedOptions().map(option => option.getOption().getDisplayValue());
                 repos.forEach((repo: Repository, index: number) => {
                     reportsCombo.deselect(repo);
                     this.downloadReport(principal, repo, branches[index]);
                 });
             });
 
-        const comboAndButton = new DivEl();
+        const comboAndButton = new DivEl('reports-combo-and-button');
         comboAndButton.appendChildren<Element>(reportsCombo, genButton);
 
         reportsGroup.addDataElements(i18n('field.repository.select'), [comboAndButton]);
