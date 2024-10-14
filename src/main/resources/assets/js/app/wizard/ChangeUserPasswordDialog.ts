@@ -2,7 +2,6 @@ import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
 import {SetUserPasswordRequest} from './SetUserPasswordRequest';
 import {PasswordGenerator} from './PasswordGenerator';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
-import {DialogButton} from '@enonic/lib-admin-ui/ui/dialog/DialogButton';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
@@ -21,7 +20,7 @@ export class ChangeUserPasswordDialog
 
     private principal: Principal;
 
-    private changePasswordButton: DialogButton;
+    private changePasswordAction: Action;
 
     constructor() {
         super({
@@ -64,22 +63,28 @@ export class ChangeUserPasswordDialog
     }
 
     private initializeActions() {
+        this.changePasswordAction = new Action(i18n('action.changePassword'), '')
+            .setEnabled(false)
+            .onExecuted(() => {
+                if (!this.password.isValid()) {
+                    return;
+                }
+                new SetUserPasswordRequest()
+                    .setKey(this.principal.getKey())
+                    .setPassword(this.password.getValue())
+                    .sendAndParse()
+                    .then(() => {
+                        showFeedback(i18n('notify.change.password'));
+                        this.close();
+                    })
+                    .catch(DefaultErrorHandler.handle);
+            });
 
-        this.changePasswordButton = this.addAction(new Action(i18n('action.changePassword'), '').onExecuted(() => {
-            if (!this.password.isValid()) {
-                return;
-            }
-            new SetUserPasswordRequest().setKey(this.principal.getKey()).setPassword(
-                this.password.getValue()).sendAndParse().then(() => {
-                showFeedback(i18n('notify.change.password'));
-                this.close();
-            }).catch(DefaultErrorHandler.handle);
-        }));
-        this.changePasswordButton.setEnabled(false);
+        this.addAction(this.changePasswordAction);
     }
 
     private toggleChangePasswordButton() {
-        this.changePasswordButton.setEnabled(this.password.isValid());
+        this.changePasswordAction.setEnabled(this.password.isValid());
     }
 
     open(): void {
