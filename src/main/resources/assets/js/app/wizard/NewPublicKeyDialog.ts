@@ -16,7 +16,6 @@ import {DropdownButtonRow} from '@enonic/lib-admin-ui/ui/dialog/DropdownButtonRo
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
 
-
 export class NewPublicKeyDialog
     extends ModalDialog {
 
@@ -29,8 +28,6 @@ export class NewPublicKeyDialog
     private keyUploaderTextInput: TextInput;
 
     private labelFormItem: FormItem;
-
-    private menuButton: MenuButton;
 
     private generateKeyAction: Action;
 
@@ -56,16 +53,15 @@ export class NewPublicKeyDialog
         this.keyUploaderTextInput.getHTMLElement().setAttribute('accept', '.pem');
         this.keyUploaderTextInput.hide();
 
-        this.generateKeyAction = new Action(i18n('field.generate'));
+        this.generateKeyAction = new Action(i18n('field.generate')).setEnabled(false);
         this.uploadKeyAction = new Action(i18n('dialog.addUserKey.uploadBtn'));
 
-        this.menuButton = this.getButtonRow().makeActionMenu({
+        const menuButton = this.getButtonRow().makeActionMenu({
             defaultAction: this.generateKeyAction,
             menuActions: [this.uploadKeyAction]
         }, true);
-        this.menuButton.setEnabled(false);
 
-        this.menuButton.getEl().appendChild(this.keyUploaderTextInput.getHTMLElement());
+        menuButton.getEl().appendChild(this.keyUploaderTextInput.getHTMLElement());
 
         this.appendChildToContentPanel(this.createForm());
 
@@ -85,9 +81,9 @@ export class NewPublicKeyDialog
 
         this.labelTextInput.onValidityChanged((event) => {
             if (event.isValid()) {
-                this.menuButton.setEnabled(true);
+                this.generateKeyAction.setEnabled(true);
             } else {
-                this.menuButton.setEnabled(false);
+                this.generateKeyAction.setEnabled(false);
             }
         });
 
