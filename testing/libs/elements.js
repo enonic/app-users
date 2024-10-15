@@ -69,7 +69,7 @@ module.exports = Object.freeze({
             return `//div[contains(@id,'NamesView') and child::p[contains(@class,'xp-admin-common-sub-name') and contains(.,'${name}')]]`
         },
         listItemByDisplayName: (displayName) => {
-            return `//li[contains(@class,'item-view-wrapper') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`;
+            return `//*[contains(@class,'item-view-wrapper') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`;
         },
         itemTreeGridListElementByDisplayName: displayName => {
             return `(//li[contains(@id,'UserItemsTreeListElement') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]])[last()]`

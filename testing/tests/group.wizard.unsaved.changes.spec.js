@@ -16,7 +16,7 @@ describe('Group Wizard - checks unsaved changes ', function () {
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let testGroup;
+    let TEST_GROUP;
 
     it('GIVEN group-wizard is opened AND display name has been typed WHEN close button pressed THEN Confirmation dialog should appear',
         async () => {
@@ -36,8 +36,8 @@ describe('Group Wizard - checks unsaved changes ', function () {
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let groupName = userItemsBuilder.generateRandomName('group');
-            testGroup = userItemsBuilder.buildGroup(groupName, 'description', null);
-            await testUtils.openWizardAndSaveGroup(testGroup);
+            TEST_GROUP = userItemsBuilder.buildGroup(groupName, 'description', null);
+            await testUtils.openWizardAndSaveGroup(TEST_GROUP);
             await testUtils.typeNameInFilterPanel(groupName);
             let result = await userBrowsePanel.isItemDisplayed(groupName);
             assert.ok(result, "New group should be present in grid");
@@ -49,7 +49,7 @@ describe('Group Wizard - checks unsaved changes ', function () {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
             // 1. Open existing group and change the display name:
-            await testUtils.selectGroupAndOpenWizard(testGroup.displayName);
+            await testUtils.selectGroupAndOpenWizard(TEST_GROUP.displayName);
             await groupWizard.typeDisplayName('new-name');
             // 2. Click on Close-icon:
             await userBrowsePanel.doClickOnCloseTabButton('new-name');
@@ -61,9 +61,9 @@ describe('Group Wizard - checks unsaved changes ', function () {
             let groupWizard = new GroupWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
-            await testUtils.selectGroupAndOpenWizard(testGroup.displayName);
+            await testUtils.selectGroupAndOpenWizard(TEST_GROUP.displayName);
             await groupWizard.typeDescription('new-description');
-            await userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
+            await userBrowsePanel.doClickOnCloseTabButton(TEST_GROUP.displayName);
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -73,11 +73,11 @@ describe('Group Wizard - checks unsaved changes ', function () {
             let confirmationDialog = new ConfirmationDialog();
             let userBrowsePanel = new UserBrowsePanel();
             // 1. Open existing group:
-            await testUtils.selectGroupAndOpenWizard(testGroup.displayName);
+            await testUtils.selectGroupAndOpenWizard(TEST_GROUP.displayName);
             // 2. Add the member:
             await groupWizard.filterOptionsAndAddMember('Super User');
             // 3. Click on Close icon:
-            await userBrowsePanel.doClickOnCloseTabButton(testGroup.displayName);
+            await userBrowsePanel.doClickOnCloseTabButton(TEST_GROUP.displayName);
             await confirmationDialog.waitForDialogLoaded();
         });
 

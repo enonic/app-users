@@ -15,11 +15,11 @@ class MembersPrincipalCombobox extends BaseDropdown {
         return XPATH.membersPrincipalComboboxDiv;
     }
 
-    async selectFilteredOptionAndClickOnOk(optionName, parentElement) {
+    async selectFilteredOptionAndClickOnApply(optionName, parentElement) {
         try {
-            await this.clickOnFilteredItemAndClickOnOk(optionName, parentElement);
+            await this.clickOnFilteredByDisplayNameItemAndClickOnApply(optionName, parentElement);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_dropdown');
+            let screenshot = await this.saveScreenshotUniqueName('err_memebers_dropdown');
             throw new Error(`MembersPrincipalCombobox - Error during selecting the option, screenshot: ${screenshot}` + err);
         }
     }

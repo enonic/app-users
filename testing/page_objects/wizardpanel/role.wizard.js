@@ -108,7 +108,7 @@ class RoleWizard extends WizardPanel {
     async filterOptionsAndAddMember(displayName) {
         try {
             let membersPrincipalCombobox = new MembersPrincipalCombobox();
-            await membersPrincipalCombobox.selectFilteredOptionAndClickOnOk(displayName, xpath.container);
+            await membersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, xpath.container);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_member');
             throw new Error(`Error occurred in Role wizard screenshot: ${screenshot} ` + err);

@@ -97,16 +97,22 @@ class BaseDropdown extends Page {
         }
     }
 
-    // 1. Insert a text in Filter input
-    // 2. Click on the filtered by displayName item (h6[contains(@class,'main-name'))
-    // 3. Click on OK button and apply the selection.
-    async clickOnFilteredItemAndClickOnOk(optionDisplayName, parentLocator) {
+    // Do filter by a display name then Click on the item
+    async clickOnFilteredByDisplayNameItem(optionDisplayName, parentLocator) {
         // parentLocator - modal dialog or wizard panel
         // 1. Insert the text in Options Filter Input:
         await this.filterItem(optionDisplayName, parentLocator);
         // 2. Wait for the required option is displayed then click on it:
         await this.clickOnOptionByDisplayName(optionDisplayName, parentLocator);
-        // 3. Click on 'OK' button:
+    }
+
+    // 1. Insert a text in Filter input
+    // 2. Click on the filtered by displayName item (h6[contains(@class,'main-name'))
+    // 3. Click on Apply button and apply the selection.
+    async clickOnFilteredByDisplayNameItemAndClickOnApply(optionDisplayName, parentLocator) {
+        // 1. Click on the filtered item:
+        await this.clickOnFilteredByDisplayNameItem(optionDisplayName, parentLocator);
+        // 3. Click on 'Apply' button:
         return await this.clickOnApplySelectionButton(parentLocator);
     }
 

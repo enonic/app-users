@@ -234,7 +234,7 @@ class UserWizard extends wizards.WizardPanel {
     async filterOptionsAndAddRole(roleDisplayName) {
         try {
             let usersPrincipalCombobox = new UsersPrincipalCombobox();
-            await usersPrincipalCombobox.selectFilteredOptionAndClickOnOk(roleDisplayName, XPATH.container + XPATH.rolesForm);
+            await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(roleDisplayName, XPATH.container + XPATH.rolesForm);
             await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_selector');
@@ -244,7 +244,7 @@ class UserWizard extends wizards.WizardPanel {
 
     async filterOptionsAndAddGroup(groupDisplayName) {
         let usersPrincipalCombobox = new UsersPrincipalCombobox();
-        await usersPrincipalCombobox.selectFilteredOptionAndClickOnOk(groupDisplayName, XPATH.container + XPATH.groupsForm);
+        await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(groupDisplayName, XPATH.container + XPATH.groupsForm);
         return await this.pause(500);
     }
 

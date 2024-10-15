@@ -96,7 +96,7 @@ class UserItemStatisticsPanel extends Page {
     // clicks on required option in the comboBox and selects a repository for generating Permissions Report
     selectRepository(name) {
         let repositoryComboBox = new RepositoryComboBox();
-        return repositoryComboBox.selectFilteredOptionAndClickOnOk(name, XPATH.reportDataGroup);
+        return repositoryComboBox.selectFilteredOptionAndClickOnApply(name, XPATH.reportDataGroup);
     }
 
 

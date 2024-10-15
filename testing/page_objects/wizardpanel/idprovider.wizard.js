@@ -96,7 +96,7 @@ class IdProviderWizard extends WizardPanel {
     async filterOptionsAndSelectPermission(permissionDisplayName) {
         let idProviderAccessControlComboBox = new IdProviderAccessControlComboBox();
         try {
-            await idProviderAccessControlComboBox.selectFilteredOptionAndClickOnOk(permissionDisplayName, XPATH.container);
+            await idProviderAccessControlComboBox.selectFilteredByDisplayNamePermission(permissionDisplayName, XPATH.container);
             return await this.pause(300);
         } catch (err) {
             throw new Error('Error when selecting the ACL-entry: ' + permissionDisplayName + ' ' + err);
@@ -142,7 +142,7 @@ class IdProviderWizard extends WizardPanel {
     async filterOptionsAndSelectApplication(authAppName) {
         let authApplicationComboBox = new AuthApplicationComboBox();
         try {
-            await authApplicationComboBox.selectFilteredOptionAndClickOnOk(authAppName, XPATH.container);
+            await authApplicationComboBox.selectFilteredByDisplayNameProviderApp(authAppName, XPATH.container);
             return await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_id_provider_select_application');

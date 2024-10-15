@@ -100,7 +100,7 @@ class GroupWizard extends WizardPanel {
     async filterOptionsAndAddRole(displayName) {
         try {
             let usersPrincipalCombobox = new UsersPrincipalCombobox();
-            await usersPrincipalCombobox.selectFilteredOptionAndClickOnOk(displayName, XPATH.container);
+            await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, XPATH.container);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_group_wizard_role_selector');
             throw new Error(`Error occurred in Roles selector , screenshot: ${screenshot} ` + err);
@@ -118,7 +118,7 @@ class GroupWizard extends WizardPanel {
     async filterOptionsAndAddMember(displayName) {
         try {
             let membersPrincipalCombobox = new MembersPrincipalCombobox();
-            await membersPrincipalCombobox.selectFilteredOptionAndClickOnOk(displayName, XPATH.container);
+            await membersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, XPATH.container);
             return await this.pause(400);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_members_selector');

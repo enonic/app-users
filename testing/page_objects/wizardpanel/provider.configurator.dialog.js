@@ -129,7 +129,7 @@ class IdProviderConfiguratorDialog extends Page {
 
     async selectGroup(groupName) {
         let principalComboBox = new PrincipalComboBox();
-        await principalComboBox.selectFilteredOptionAndClickOnOk(groupName, XPATH.container);
+        await principalComboBox.selectFilteredOptionAndClickOnApply(groupName, XPATH.container);
     }
 
     async getSelectedGroups() {

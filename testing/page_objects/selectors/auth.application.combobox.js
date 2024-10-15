@@ -15,11 +15,11 @@ class AuthApplicationComboBox extends BaseDropdown {
         return XPATH.authApplicationComboBoxDiv;
     }
 
-    async selectFilteredOptionAndClickOnOk(optionName, parentElement) {
+    async selectFilteredByDisplayNameProviderApp(providerApp, parentElement) {
         try {
-            await this.clickOnFilteredItemAndClickOnOk(optionName, parentElement);
+            await this.clickOnFilteredByDisplayNameItem(providerApp, parentElement);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_dropdown');
+            let screenshot = await this.saveScreenshotUniqueName('err_provider_dropdown');
             throw new Error(`IdProviderAccessControlComboBox - Error during selecting the option, screenshot: ${screenshot}` + err);
         }
     }
