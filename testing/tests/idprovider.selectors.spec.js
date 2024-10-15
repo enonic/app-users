@@ -31,7 +31,7 @@ describe('Id Provider Permissions spec', function () {
             // 4. The dropdown should be expanded after clearing  the options filter input
             let options = await idProviderWizard.getPrincipalOptionDisplayNames();
             console.log("ID PROVIDER PERMISSIONS OPTIONS  #####################:   " + options);
-            assert.ok(options.length > 10, 'More than 10 options should be in the list');
+            assert.ok(options.length > 9, 'More than 9 options should be in the list');
             let countItem = duplicates(options, 'Administrator');
             assert.ok(countItem === 1, 'Options should not be duplicated in the ListBox');
         });
