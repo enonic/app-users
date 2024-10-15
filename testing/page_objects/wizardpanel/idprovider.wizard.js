@@ -121,6 +121,12 @@ class IdProviderWizard extends WizardPanel {
         await authApplicationComboBox.clickOnDropdownHandle();
     }
 
+    async clickOnEditAuthAppConfig() {
+        let locator = XPATH.container + "//div[contains(@id,'AuthApplicationSelectedOptionsView')]" + lib.EDIT_ICON;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        await this.clickOnElement(locator);
+    }
+
     // Permissions selector:
     async getPrincipalOptionDisplayNames() {
         let idProviderAccessControlComboBox = new IdProviderAccessControlComboBox();

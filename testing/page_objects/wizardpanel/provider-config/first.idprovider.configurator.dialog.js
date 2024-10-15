@@ -1,10 +1,11 @@
 /**
- * Created on 20.03.2018.
+ * Created on 15.10.2024
  */
-const Page = require('../page');
-const lib = require('../../libs/elements');
-const appConst = require('../../libs/app_const');
-const PrincipalComboBox = require('../selectors/principal.combobox');
+const Page = require('../../page');
+const lib = require('../../../libs/elements');
+const appConst = require("../../../libs/app_const");
+const PrincipalComboBox = require('../../selectors/principal.combobox');
+
 const XPATH = {
     container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
     domainInput: "//input[contains(@id,'TextInput') and contains(@name,'appDomain')]",
@@ -18,11 +19,12 @@ const XPATH = {
     occurrenceMoreButton: label => `//div[contains(@id,'FormItemSetView') and descendant::h5[text()='${label}']]//button[contains(@id,'MoreButton')]`
 };
 
-class IdProviderConfiguratorDialog extends Page {
+class FirstIdProviderConfiguratorDialog extends Page {
 
     get container() {
         return XPATH.container;
     }
+
     get applyButton() {
         return `${XPATH.container}` + `${XPATH.applyButton}`;
     }
@@ -166,4 +168,4 @@ class IdProviderConfiguratorDialog extends Page {
     }
 }
 
-module.exports = IdProviderConfiguratorDialog;
+module.exports = FirstIdProviderConfiguratorDialog;

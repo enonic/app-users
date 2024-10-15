@@ -54,10 +54,9 @@ describe("Id Provider - checks unsaved changes", function () {
     it("GIVEN name and idProvider inputs have been filled in WHEN 'close' icon has been pressed THEN 'Confirmation' dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
-            let providerName = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
             let name = userItemsBuilder.generateRandomName('provider');
             let userBrowsePanel = new UserBrowsePanel();
-            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', providerName, null);
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_NAME, null);
             // 1. Wizard for new provider has been opened:
             await testUtils.openIdProviderWizard(idProvider);
             // 2. type the data:
@@ -69,6 +68,7 @@ describe("Id Provider - checks unsaved changes", function () {
             // 4. Verify that 'Confirmation' dialog should appear, otherwise exception will be thrown:
             await confirmationDialog.waitForDialogLoaded();
         });
+
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

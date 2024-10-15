@@ -9,7 +9,7 @@ const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard'
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
-const ProviderConfigDialog = require('../page_objects/wizardpanel/provider.configurator.dialog');
+const ProviderConfigDialog = require('../page_objects/wizardpanel/provider-config/first.idprovider.configurator.dialog');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 
 describe('Id Provider, provider-dialog specification', function () {
@@ -22,6 +22,50 @@ describe('Id Provider, provider-dialog specification', function () {
     let TEST_ID_PROVIDER_NAME;
     const NOTIFICATION_MESSAGE = "The application selected for this id provider does not allow to create users.";
     const GROUP_NAME = userItemsBuilder.generateRandomName('group');
+
+    const APP_PROVIDER_NAME = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
+
+    it("WHEN app-provider with required inputs has been selected in the wizard THEN 'Save' button gets disabled",
+        async () => {
+            let idProviderWizard = new IdProviderWizard();
+            let name = userItemsBuilder.generateRandomName('provider');
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_NAME, null);
+            // 1. Wizard for a new id-provider has been opened:
+            await testUtils.openIdProviderWizard(idProvider);
+            // 2. type a name:
+            await idProviderWizard.typeDisplayName(name);
+            // 3. Select an application with required inputs in provider-config:
+            await idProviderWizard.filterOptionsAndSelectApplication(APP_PROVIDER_NAME);
+            // 4. Verify that Save button gets disabled:
+            await idProviderWizard.waitForSaveButtonDisabled();
+        });
+
+
+    it("GIVEN providerConfigDialog is opened WHEN  all required inputs has been filled in AND Apply button pressed in the dialog THEN 'Save' button gets enabled",
+        async () => {
+            let idProviderWizard = new IdProviderWizard();
+            let name = userItemsBuilder.generateRandomName('provider');
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_NAME, null);
+            // 1. Wizard for a new id-provider has been opened:
+            await testUtils.openIdProviderWizard(idProvider);
+            // 2. type a name:
+            await idProviderWizard.typeDisplayName(name);
+            // 3. Select an application with required inputs in provider-config:
+            await idProviderWizard.filterOptionsAndSelectApplication(APP_PROVIDER_NAME);
+            // 4. Open the configurator
+            await idProviderWizard.clickOnEditAuthAppConfig();
+            let providerConfigDialog = new ProviderConfigDialog();
+            // 5. Fill in the required inputs:
+            await providerConfigDialog.typeInDomainInput('test');
+            await providerConfigDialog.typeInClientIdInput('id');
+            await providerConfigDialog.typeInClientSecretInput('secret');
+            // 6. Click on Apply button
+            await providerConfigDialog.clickOnApplyButton();
+            await providerConfigDialog.waitForClosed();
+            // 7. Verify that Save button gets enabled:
+            await idProviderWizard.waitForSaveButtonEnabled();
+        });
+
 
     it(`GIVEN provider's data is filled WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Confirmation' dialog should appear after 'Close' has been clicked`,
         async () => {
@@ -136,8 +180,8 @@ describe('Id Provider, provider-dialog specification', function () {
             assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message should be displayed");
         });
 
-    //Verify Error in group selector inside ID providers config form #940
-    //https://github.com/enonic/app-users/issues/940
+    // Verify Error in group selector inside ID providers config form #940
+    // https://github.com/enonic/app-users/issues/940
     it(`GIVEN Provider Config Dialog is opened WHEN existing group has been selected in the dialog THEN expected group should be present in selected options`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
@@ -153,7 +197,6 @@ describe('Id Provider, provider-dialog specification', function () {
             await groupWizard.waitAndClickOnSave();
             await userBrowsePanel.doClickOnCloseTabButton(groupName);
             await userBrowsePanel.waitForUsersGridLoaded(appConst.shortTimeout);
-
             // 2. Unselect the system id provider:
             await userBrowsePanel.clickOnRowByName('system');
             // 3. Open new id provider wizard, fill in the display name input, select the application :
