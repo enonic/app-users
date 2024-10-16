@@ -17,6 +17,8 @@ describe("Id Provider - checks unsaved changes", function () {
         webDriverHelper.setupBrowser();
     }
 
+    const APP_PROVIDER_NAME = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
+
     // Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
     it("GIVEN wizard for new Id Provider is opened WHEN no changes in the wizard AND 'close' icon has been pressed THEN Confirmation dialog must not be loaded",
         async () => {
@@ -35,7 +37,7 @@ describe("Id Provider - checks unsaved changes", function () {
             assert.ok(result === false, "Confirmation dialog must not be loaded");
         });
 
-    it("GIVEN description input has been filled in  WHEN `close` tab icon has been pressed THEN Confirmation dialog should appear",
+    it("GIVEN description input has been filled in WHEN `close` tab icon has been pressed THEN Confirmation dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
