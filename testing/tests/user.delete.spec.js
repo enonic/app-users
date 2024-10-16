@@ -33,7 +33,7 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             await userWizard.clickOnDelete();
             //"Confirmation Dialog" should be loaded:
             await confirmationDialog.waitForDialogLoaded();
-            await testUtils.saveScreenshot("user_wizard_confirm_delete1");
+            await testUtils.saveScreenshot('user_wizard_confirm_delete1');
         });
 
     it("GIVEN new User is saved  WHEN the User has been deleted in Wizard panel THEN expected notification message should appear",

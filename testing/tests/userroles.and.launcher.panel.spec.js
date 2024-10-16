@@ -19,7 +19,7 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
     }
     let TEST_USER;
     let userName;
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("WHEN new user with required roles has been added THEN the user should be searchable",
         async () => {
@@ -33,6 +33,7 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(TEST_USER);
             await userWizard.waitAndClickOnSave();
+            await userWizard.pause(1000);
             await userBrowsePanel.closeTabAndWaitForGrid(userName);
             // 2. Type the user-name in Filter Panel:
             await testUtils.typeNameInFilterPanel(userName);

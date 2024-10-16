@@ -7,7 +7,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
-const AdfsIdProviderConfiguratorDialog = require('../page_objects/wizardpanel/asfs.provider.config');
+const AdfsIdProviderConfiguratorDialog = require('../page_objects/wizardpanel/provider-config/asfs.provider.config');
 
 describe('ADFS Id Provider, tests for provider configuration dialog with item set', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -16,12 +16,13 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
         webDriverHelper.setupBrowser();
     }
 
+    const AUTH_APP_NAME = 'Second Selenium App'
     // Verifies:https://github.com/enonic/app-users/issues/533
     // Empty form in the ID Provider config #533
     it("GIVEN provider's data is filled WHEN Provider-configuration has been opened THEN required inputs should be loaded",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', AUTH_APP_NAME, null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfig = new AdfsIdProviderConfiguratorDialog();
             // 1. Open new ID Provider wizard and type the data:

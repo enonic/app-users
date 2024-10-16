@@ -15,7 +15,7 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const PASSWORD = appConst.PASSWORD.MEDIUM;
 
     // verifies the enonic/lib-admin-ui#254 (Users App - trim spaces in displayName input (Wizards))
     it("GIVEN user wizard is opened WHEN user-name with white spaces has been typed and the user saved THEN name without spaces should be displayed in the grid",

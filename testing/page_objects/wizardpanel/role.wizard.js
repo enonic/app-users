@@ -5,11 +5,10 @@ const WizardPanel = require('./wizard.panel').WizardPanel;
 const baseXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const MembersPrincipalCombobox = require('../selectors/members.principal.combobox');
 
 const xpath = {
     container: `//div[contains(@id,'RoleWizardPanel')]`,
-    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
 };
 
 class RoleWizard extends WizardPanel {
@@ -31,7 +30,7 @@ class RoleWizard extends WizardPanel {
             await this.waitForElementDisplayed(xpath.container + this.displayNameInput, appConst.mediumTimeout);
         } catch (e) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_wizard');
-            throw new Error("Role wizard was not loaded! Screenshot " + screenshot + " " + e);
+            throw new Error(`Role wizard was not loaded! Screenshot:${screenshot} ` + e);
         }
     }
 
@@ -54,7 +53,7 @@ class RoleWizard extends WizardPanel {
             return await this.clickOnElement(this.deleteButton);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_delete_button_in_role_wizard');
-            throw new Error("Role wizard - delete button, screenshot:" + screenshot + ' ' + err);
+            throw new Error(`Role wizard - delete button, screenshot: ${screenshot}` + err);
         }
     }
 
@@ -71,7 +70,7 @@ class RoleWizard extends WizardPanel {
             return await this.getTextInElements(selectedOptions);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_members');
-            throw new Error('Error when getting text from elements, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error when getting text from elements, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -82,7 +81,7 @@ class RoleWizard extends WizardPanel {
             return await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_member');
-            throw new Error('Error - remove-icon for the role, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error - remove-icon for the role, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -92,7 +91,7 @@ class RoleWizard extends WizardPanel {
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_member');
-            throw new Error('Error - remove-icon should be displayed for the role, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error - remove-icon should be displayed for the role, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -102,19 +101,17 @@ class RoleWizard extends WizardPanel {
             return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_icon');
-            throw new Error('Error - remove-icon should not be displayed for the role, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error - remove-icon should not be displayed for the role, screenshot: ${screenshot} ` + err);
         }
     }
 
     async filterOptionsAndAddMember(displayName) {
         try {
-            let loaderComboBox = new LoaderComboBox();
-            await this.typeTextInInput(xpath.container + xpath.memberOptionsFilterInput, displayName);
-            await loaderComboBox.waitForOptionVisible(xpath.container, displayName);
-            await loaderComboBox.clickOnOption(xpath.container, displayName);
+            let membersPrincipalCombobox = new MembersPrincipalCombobox();
+            await membersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, xpath.container);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_member');
-            throw new Error('Error selecting the option, screenshot:  ' + screenshot + ' ' + err);
+            throw new Error(`Error occurred in Role wizard screenshot: ${screenshot} ` + err);
         }
     }
 }

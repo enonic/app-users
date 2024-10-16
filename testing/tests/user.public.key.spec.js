@@ -19,7 +19,7 @@ describe('user.public.key.spec: ui-tests for public key modal dialog', function 
     }
 
     let TEST_USER;
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const PASSWORD = appConst.PASSWORD.MEDIUM;
     const KEY_LABEL_1 = appConst.generateRandomName('label');
 
     it("Preconditions: user should be created",

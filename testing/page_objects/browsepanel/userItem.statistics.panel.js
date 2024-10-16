@@ -4,7 +4,7 @@
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const RepositoryComboBox = require('../selectors/repository.comboBox');
 
 const XPATH = {
     container: "//div[contains(@id,'UserItemStatisticsPanel')]",
@@ -16,18 +16,23 @@ const XPATH = {
     reportSelectedOptionView: "//div[contains(@id,'ReportSelectedOptionView')]",
     generateButton: "//button[contains(@id,'Button') and child::span[text()='Generate report']]",
     reportItem: "//ul[contains(@class,'data-list') and descendant::li[text()='Generated report(s)']]//li[contains(@id,'ReportProgressItem')]",
-    reportByTitle: function (title) {
+    branchDropdownSelect: "//select[contains(@class,'branch-dropdown')]",
+    reportByTitle(title) {
         return `//li[contains(@id,'ReportProgressItem') and descendant::span[contains(.,'${title}')]]`
     },
-    repositoryBranchOption: function (name) {
+    repositoryBranchOption(name) {
         return `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell') and child::div[contains(@id,'DefaultOptionDisplayValueViewer') and contains(.,'${name}')]]`
     },
-    selectedOptionByRepoName: function (name) {
+    selectedOptionByRepoName(name) {
         return `//div[contains(@id,'ReportSelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${name}')]]`
     }
 };
 
 class UserItemStatisticsPanel extends Page {
+
+    get branchDropdown() {
+        return XPATH.branchDropdownSelect;
+    }
 
     get generateReportButton() {
         return XPATH.container + XPATH.reportDataGroup + XPATH.generateButton;
@@ -88,16 +93,16 @@ class UserItemStatisticsPanel extends Page {
         })
     }
 
-//clicks on required option in the comboBox and selects a repository for generating Permissions Report
+    // clicks on required option in the comboBox and selects a repository for generating Permissions Report
     selectRepository(name) {
-        let loaderComboBox = new LoaderComboBox();
-        return loaderComboBox.typeTextAndSelectOption(name, XPATH.reportDataGroup);
+        let repositoryComboBox = new RepositoryComboBox();
+        return repositoryComboBox.selectFilteredOptionAndClickOnApply(name, XPATH.reportDataGroup);
     }
 
 
     //clicks on dropDown handle and selects draft/master
     async clickOnDropDownHandleAndSelectBranch(optionName) {
-        let dropDownHandle = XPATH.reportSelectedOptionsView + lib.DROP_DOWN_HANDLE;
+        let dropDownHandle = XPATH.reportSelectedOptionsView + lib.BUTTONS.DROP_DOWN_HANDLE;
         await this.waitForElementDisplayed(dropDownHandle, appConst.mediumTimeout);
         await this.clickOnElement(dropDownHandle);
         let optionSelector = XPATH.reportSelectedOptionsView + XPATH.repositoryBranchOption(optionName);
@@ -106,14 +111,40 @@ class UserItemStatisticsPanel extends Page {
         return await this.pause(400);
     }
 
+    // Generate Report form, select a branch for selected repo:
+    async selectBranch(repoName, branchName) {
+        try {
+            let locator = XPATH.selectedOptionByRepoName(repoName) + this.branchDropdown;
+            let elements = await this.findElements(locator);
+            if (elements.length === 0) {
+                throw new Error("Branch selector was not found for the repo in Generate Report form!");
+            }
+            await elements[0].selectByVisibleText(branchName);
+            return await this.pause(200);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_select_branch');
+            throw new Error(`Error occurred in Report,  Select repository form, screenshot: ${screenshot} ` + err);
+        }
+    }
+
     isOptionSelected(repoName) {
         let selector = XPATH.selectedOptionByRepoName(repoName);
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
     }
 
-    getBranchName(repoName) {
-        let selector = XPATH.selectedOptionByRepoName(repoName) + "//div[@name='branch']//div[@class='viewer']";
-        return this.getText(selector);
+    // returns branch name for the selected repo:
+    async getBranchName(repoName) {
+        let locator = XPATH.selectedOptionByRepoName(repoName) + this.branchDropdown;
+        let elements = await this.findElements(locator);
+        if (elements.length === 0) {
+            throw new Error("Branch selector was not found for the repo in Generate Report form!");
+        }
+        return await elements[0].getValue();
+    }
+
+    async waitForRemoveRepoButtonDisplayed(repoName) {
+        let locator = XPATH.selectedOptionByRepoName(repoName) + lib.REMOVE_ICON;
+        return await this.waitForElementDisplayed(locator);
     }
 }
 

@@ -15,8 +15,8 @@ describe('User Wizard negative spec ', function () {
         webDriverHelper.setupBrowser();
     }
     let testUser;
-    let MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
-    let WEAK_PASSWORD = appConst.PASSWORD.WEAK;
+    const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
+    const WEAK_PASSWORD = appConst.PASSWORD.WEAK;
 
     it("GIVEN wizard for new User is opened WHEN data with weak password has been typed THEN 'Save' button should be disabled",
         async () => {
