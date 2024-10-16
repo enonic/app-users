@@ -20,8 +20,8 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
 
     it('Preconditions - two groups should be saved',
         async () => {
-            let groupName1 = userItemsBuilder.generateRandomName('group');
-            let groupName2 = userItemsBuilder.generateRandomName('group');
+            const groupName1 = userItemsBuilder.generateRandomName('group');
+            const groupName2 = userItemsBuilder.generateRandomName('group');
             GROUP_1 = userItemsBuilder.buildGroup(groupName1, 'description', null);
             GROUP_2 = userItemsBuilder.buildGroup(groupName2, 'description', null);
             await testUtils.openWizardAndSaveGroup(GROUP_1);
@@ -36,13 +36,14 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             await browseFilterPanel.clickOnGroupAggregation();
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_1.displayName);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_2.displayName);
-            // Click on Show Selection
+            // Click on 'Show Selection'
             await userBrowsePanel.clickOnSelectionToggler();
+            await testUtils.saveScreenshot('groups_selection_toggle_checkbox_partial_issue_1');
             await userBrowsePanel.pause(1000);
-            //4. Click on Selection Toggle (circle, Hide Selection), initial state of thr grid is restored:
+            //4. Click on Selection Toggle (circle, Hide Selection), initial state of the grid is restored:
             await userBrowsePanel.clickOnSelectionToggler();
             await userBrowsePanel.pause(500);
-            await testUtils.saveScreenshot('groups_selection_toggle_checkbox_partial');
+            await testUtils.saveScreenshot('groups_selection_toggle_checkbox_partial_issue_2');
             //5. Verify that 'Selection Controller' checkBox shows that the selection is partial:
             let result = await userBrowsePanel.waitForSelectionControllerPartial();
             assert.ok(result, "'Selection Controller' shows that selection is partial");

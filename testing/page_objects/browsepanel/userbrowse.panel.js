@@ -8,7 +8,7 @@ const appConst = require('../../libs/app_const');
 
 const xpath = {
     container: "//div[contains(@id,'UserBrowsePanel')]",
-    selectionToggler: "//button[contains(@id,'SelectionPanelToggler')]",
+    selectionToggler: "//button[contains(@id,'ListSelectionPanelToggler')]",
     userItemsTreeGridRootUL: "//ul[contains(@id,'UserItemsTreeRootList')]",
     selectionControllerCheckBox: "//div[contains(@id,'SelectionController')]",
     toolbar: "//div[contains(@id,'UserBrowseToolbar')]",

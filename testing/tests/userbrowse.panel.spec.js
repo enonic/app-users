@@ -69,11 +69,11 @@ describe('User Browse Panel specification', function () {
     it("GIVEN 'System Id Provider' checkbox is checked WHEN 'Show Selection' has been clicked THEN grid gets filtered - one item should be in the grid",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            // 1. Click on the checkbox:
+            // 1. Click on the 'System Id Provider' checkbox:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
             await userBrowsePanel.waitForSelectionTogglerVisible();
             await userBrowsePanel.pause(1000);
-            // 2. Click on Show Selection:
+            // 2. Click on 'Show Selection' button:
             await userBrowsePanel.clickOnSelectionToggler();
             // 3. The grid should be filtered:
             let names = await userBrowsePanel.getGridItemDisplayNames();
