@@ -36,6 +36,7 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             await browseFilterPanel.clickOnGroupAggregation();
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_1.displayName);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_2.displayName);
+            await userBrowsePanel.pause(1000);
             // Click on 'Show Selection'
             await userBrowsePanel.clickOnSelectionToggler();
             await testUtils.saveScreenshot('groups_selection_toggle_checkbox_partial_issue_1');
