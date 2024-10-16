@@ -17,43 +17,51 @@ describe("Id Provider - checks unsaved changes", function () {
         webDriverHelper.setupBrowser();
     }
 
-    //Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
-    it("GIVEN wizard for new Id Provider is opened WHEN no changes in the wizard AND 'close' icon pressed THEN Confirmation dialog must not be loaded",
+    const APP_PROVIDER_NAME = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
+
+    // Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
+    it("GIVEN wizard for new Id Provider is opened WHEN no changes in the wizard AND 'close' icon has been pressed THEN Confirmation dialog must not be loaded",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
+            // 1. Click on New, select  'Id Provider' in the modal dialog:
             await testUtils.openIdProviderWizard();
+            await userBrowsePanel.pause(700);
+            // 2. Close the tab (no any data were typed):
             await userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
             await userBrowsePanel.pause(500);
-            await testUtils.saveScreenshot("provider_save_before1");
+            await testUtils.saveScreenshot('provider_save_before1');
+            // 3. Verify that Confirmation modal dialog does not load:
             let result = await confirmationDialog.isDialogLoaded();
             //there are no unsaved changes, so dialog should not be present.
             assert.ok(result === false, "Confirmation dialog must not be loaded");
         });
 
-    it("GIVEN 'IdProvider' wizard is opened WHEN description has been typed AND `close` icon pressed THEN Confirmation dialog should appear",
+    it("GIVEN description input has been filled in WHEN `close` tab icon has been pressed THEN Confirmation dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
+            // 1. Click on New, select  'Id Provider' in the modal dialog:
             await testUtils.openIdProviderWizard();
+            // 2. Fill in the description input:
             await idProviderWizard.typeDescription('description');
+            // 3. Click on 'close tab' icon:
             await userBrowsePanel.doClickOnCloseTabButton("<Unnamed Id Provider>");
-            await testUtils.saveScreenshot("provider_save_before2");
-            // description has been typed, so save before close dialog should appear!
+            await testUtils.saveScreenshot('provider_save_before2');
+            // 4. Verify - save before close dialog should appear!
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it("GIVEN Id Provider wizard is opened AND name and idProvider have been typed WHEN 'close' icon has been pressed THEN 'Confirmation' dialog should appear",
+    it("GIVEN name and idProvider inputs have been filled in WHEN 'close' icon has been pressed THEN 'Confirmation' dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
-            let providerName = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
             let name = userItemsBuilder.generateRandomName('provider');
             let userBrowsePanel = new UserBrowsePanel();
-            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', providerName, null);
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_NAME, null);
             // 1. Wizard for new provider has been opened:
             await testUtils.openIdProviderWizard(idProvider);
-            // 2. type a data:
+            // 2. type the data:
             await idProviderWizard.typeData(idProvider);
             await testUtils.saveScreenshot("application_should_be_selected");
             // 3. Click on close wizard icon:
@@ -62,6 +70,7 @@ describe("Id Provider - checks unsaved changes", function () {
             // 4. Verify that 'Confirmation' dialog should appear, otherwise exception will be thrown:
             await confirmationDialog.waitForDialogLoaded();
         });
+
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

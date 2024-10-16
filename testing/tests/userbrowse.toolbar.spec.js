@@ -67,7 +67,7 @@ describe("User Browse panel, toolbar spec", function () {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnExpanderIcon("/system");
             await userBrowsePanel.waitForFolderUsersVisible();
-            await userBrowsePanel.clickOnRowByName("users");
+            await userBrowsePanel.clickOnRowByName('users');
             await userBrowsePanel.waitForNewButtonEnabled();
             // Delete button should be disabled
             await userBrowsePanel.waitForDeleteButtonDisabled();
@@ -80,7 +80,7 @@ describe("User Browse panel, toolbar spec", function () {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnExpanderIcon("/system");
             await userBrowsePanel.waitForFolderUsersVisible();
-            await userBrowsePanel.clickOnRowByName("groups");
+            await userBrowsePanel.clickOnRowByName('groups');
             await userBrowsePanel.waitForNewButtonEnabled();
             // Delete button should be disabled
             await userBrowsePanel.waitForDeleteButtonDisabled();

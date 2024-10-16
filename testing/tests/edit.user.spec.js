@@ -21,7 +21,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
     }
 
     let TEST_USER;
-    let PASSWORD = appConst.PASSWORD.MEDIUM;
+    const PASSWORD = appConst.PASSWORD.MEDIUM;
     const NEW_DISPLAY_NAME = appConst.generateRandomName('user');
 
     it("GIVEN 'User' with a role has been saved WHEN the user has been clicked THEN expected role should be displayed in the statistic panel",

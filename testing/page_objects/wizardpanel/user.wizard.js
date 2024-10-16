@@ -5,13 +5,13 @@ const wizards = require('./wizard.panel');
 const wpXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../inputs/loaderComboBox');
+const UsersPrincipalCombobox = require('../selectors/users.principal.combobox');
 
 const XPATH = {
     container: "//div[contains(@id,'UserWizardPanel')]",
     emailInput: "//input[@type = 'email']",
-    groupOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
-    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + lib.COMBO_BOX_OPTION_FILTER_INPUT,
+    groupsForm: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]",
+    rolesForm: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]",
     publicKeyFormItem: "//div[contains(@id,'FormItem') and child::label[contains(.,'Public Keys')]]",
     rolesGroupLink: "//li[child::a[text()='Roles & Groups']]",
     passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
@@ -41,11 +41,11 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     get groupOptionsFilterInput() {
-        return XPATH.container + XPATH.groupOptionsFilterInput;
+        return XPATH.container + XPATH.groupsForm + lib.DROPDOWN_SELECTOR.OPTION_FILTER_INPUT;
     }
 
     get roleOptionsFilterInput() {
-        return XPATH.container + XPATH.roleOptionsFilterInput;
+        return XPATH.container + XPATH.rolesForm + lib.DROPDOWN_SELECTOR.OPTION_FILTER_INPUT;
     }
 
     get rolesGroupsLink() {
@@ -138,7 +138,6 @@ class UserWizard extends wizards.WizardPanel {
         }
     }
 
-
     isEmailInputDisplayed() {
         return this.isElementDisplayed(this.emailInput);
     }
@@ -171,7 +170,7 @@ class UserWizard extends wizards.WizardPanel {
             await this.clickOnElement(this.deleteButton);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_delete_btn');
-            throw new Error("Error when clicking on Delete button, screenshot: " + screenshot + '  ' + err);
+            throw new Error(`Error occurred after clicking on Delete button, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -191,14 +190,15 @@ class UserWizard extends wizards.WizardPanel {
         await this.clearInputText(this.emailInput);
         await this.typeTextInInput(this.emailInput, 'a');
         return await this.getBrowser().keys('\uE003');
-
     }
 
-    getTextInPasswordInput() {
-        return this.getTextInInput(this.passwordInput).catch(err => {
-            this.saveScreenshot("err_get_text_password");
-            throw new Error('Error when getting text in password input ' + err);
-        });
+    async getTextInPasswordInput() {
+        try {
+            return await this.getTextInInput(this.passwordInput);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_get_text_password');
+            throw new Error(`Error when getting text in password input , ${screenshot} ` + err);
+        }
     }
 
     //clicks on Remove icon and removes the role
@@ -214,7 +214,7 @@ class UserWizard extends wizards.WizardPanel {
             return await this.waitForElementNotDisplayed(removeIconLocator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_icon');
-            throw new Error('Remove role icon should not be displayed, screenshot:' + screenshot + '  ' + err);
+            throw new Error(`Remove role icon should not be displayed, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -227,29 +227,24 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     async getSelectedRoles() {
-        let selectedOptions = "//div[contains(@id,'FormItem') and child::label[text()='Roles']]" + lib.PRINCIPAL_SELECTED_OPTION +
-                              lib.H6_DISPLAY_NAME;
+        let selectedOptions = XPATH.rolesForm + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
         return await this.getTextInElements(selectedOptions);
     }
 
     async filterOptionsAndAddRole(roleDisplayName) {
         try {
-            let loaderComboBox = new LoaderComboBox();
-            await this.typeTextInInput(XPATH.roleOptionsFilterInput, roleDisplayName);
-            await loaderComboBox.waitForOptionVisible(XPATH.container, roleDisplayName);
-            await loaderComboBox.clickOnOption(XPATH.container, roleDisplayName);
+            let usersPrincipalCombobox = new UsersPrincipalCombobox();
+            await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(roleDisplayName, XPATH.container + XPATH.rolesForm);
             await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_role_selector');
-            throw new Error('Error when selecting the role-option, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Error when selecting the role-option, screenshot:${screenshot} ` + err);
         }
     }
 
     async filterOptionsAndAddGroup(groupDisplayName) {
-        let loaderComboBox = new LoaderComboBox();
-        await this.typeTextInInput(XPATH.groupOptionsFilterInput, groupDisplayName);
-        await loaderComboBox.waitForOptionVisible(XPATH.container, groupDisplayName);
-        await loaderComboBox.clickOnOption(XPATH.container, groupDisplayName);
+        let usersPrincipalCombobox = new UsersPrincipalCombobox();
+        await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(groupDisplayName, XPATH.container + XPATH.groupsForm);
         return await this.pause(500);
     }
 
@@ -258,7 +253,7 @@ class UserWizard extends wizards.WizardPanel {
             return await this.typeTextInInput(this.emailInput, email);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_email_input');
-            throw new Error("Error during inserting the text in email input, screenshot: " + screenshot + ' ' + err);
+            throw new Error(`Error during inserting the text in email input, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -291,7 +286,7 @@ class UserWizard extends wizards.WizardPanel {
             return await this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_user_wizard');
-            throw new Error('User Wizard is not loaded! screenshot:' + screenshot + ' ' + err);
+            throw new Error(`User Wizard is not loaded! screenshot: ${screenshot} ` + err);
         }
     }
 

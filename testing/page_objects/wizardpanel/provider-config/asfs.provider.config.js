@@ -1,9 +1,9 @@
 /**
  * Created on 26.02.2021.
  */
-const Page = require('../page');
-const lib = require('../../libs/elements');
-const appConst = require('../../libs/app_const');
+const Page = require('../../page');
+const lib = require('../../../libs/elements');
+const appConst = require('../../../libs/app_const');
 const XPATH = {
     container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
     authorizationUrl: "//input[contains(@id,'TextInput') and contains(@name,'authorizationUrl')]",
@@ -83,7 +83,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
     }
 
     cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+        return XPATH.container + lib.BUTTONS.CANCEL_BUTTON_TOP;
     }
 
     isDomainInputDisplayed() {

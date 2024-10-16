@@ -13,7 +13,7 @@ const appConst = require('../libs/app_const');
 describe("Role Wizard - 'Confirmation' dialog specification", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
-    if (typeof browser === "undefined") {
+    if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
     let TEST_ROLE;

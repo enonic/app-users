@@ -25,11 +25,13 @@ class WizardPanel extends Page {
         return XPATH.deleteButton;
     }
 
-    waitForSaveButtonEnabled() {
-        return this.waitForElementEnabled(this.saveButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot("err_save_button");
-            throw new Error("Save button is not enabled: " + err);
-        })
+    async waitForSaveButtonEnabled() {
+        try {
+            return await this.waitForElementEnabled(this.saveButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_save_button');
+            throw new Error(`Save button is not enabled:${screenshot} ` + err);
+        }
     }
 
     isSaveButtonEnabled() {
@@ -66,10 +68,10 @@ class WizardPanel extends Page {
         try {
             await this.waitForSaveButtonEnabled();
             await this.clickOnElement(this.saveButton);
-            return await this.pause(500);
+            return await this.pause(900);
         } catch (err) {
-            this.saveScreenshot(lib.generateRandomName("err_save_button"));
-            throw new Error("Error when Save button has been clicked!" + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_save_button');
+            throw new Error(`Error occurred during clicking on Save button ! ${screenshot} ` + err);
         }
     }
 
