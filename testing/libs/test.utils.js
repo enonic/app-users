@@ -78,6 +78,17 @@ module.exports = {
             throw new Error('Error in Confirm Delete, screenshot: ' + screenshot + ' ' + err);
         }
     },
+    async switchToTab(title) {
+        let handles = await this.getBrowser().getWindowHandles();
+        for (const handle of handles) {
+            await this.getBrowser().switchToWindow(handle);
+            let currentTitle = await this.getBrowser().getTitle();
+            if (currentTitle === title) {
+                return handle;
+            }
+        }
+        throw new Error('Browser tab with title ' + title + ' was not found');
+    },
     async navigateToUsersApp(userName, password) {
         try {
             let launcherPanel = new LauncherPanel();
@@ -111,7 +122,7 @@ module.exports = {
         try {
             console.log('testUtils:switching to users app...');
             let browsePanel = new UserBrowsePanel();
-            await this.getBrowser().switchWindow("Users - Enonic XP Admin");
+            await this.switchToTab(appConst.BROWSER_TITLES.USERS_APP);
             console.log("switched to Users app...");
             await browsePanel.waitForSpinnerNotVisible();
             return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
@@ -120,13 +131,11 @@ module.exports = {
         }
     },
 
-    doSwitchToHome() {
-        return this.getBrowser().switchWindow("Enonic XP Home").then(() => {
-            console.log("switched to Home...");
-        }).then(() => {
-            let homePage = new HomePage();
-            return homePage.waitForLoaded(appConst.mediumTimeout);
-        });
+    async doSwitchToHome() {
+        console.log('testUtils:switching to Home page...');
+        let homePage = new HomePage();
+        await this.switchToTab(appConst.BROWSER_TITLES.XP_HOME);
+        return await homePage.waitForLoaded(appConst.mediumTimeout);
     },
     switchAndCheckTitle(handle, reqTitle) {
         return this.getBrowser().switchWindow(handle).then(() => {
@@ -135,14 +144,12 @@ module.exports = {
             })
         });
     },
-    doCloseUsersApp() {
-        return this.getBrowser().getTitle().then(title => {
-            if (title === 'Users - Enonic XP Admin') {
-                return this.getBrowser().closeWindow();
+    async doCloseUsersApp() {
+        let title = await this.getBrowser().getTitle();
+        if (title === appConst.BROWSER_TITLES.USERS_APP) {
+            await this.getBrowser().closeWindow();
             }
-        }).then(() => {
-            return this.doSwitchToHome();
-        });
+        await this.doSwitchToHome();
     },
     // Select a user by its display name that is present in the path
     async selectUserAndOpenWizard(displayName) {
