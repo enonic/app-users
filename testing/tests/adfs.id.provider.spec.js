@@ -16,13 +16,30 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
         webDriverHelper.setupBrowser();
     }
 
-    const AUTH_APP_NAME = 'Second Selenium App'
+    const AUTH_APP_NAME_ADFS = 'Second Selenium App'
+
+    it("GIVEN name and app-provider has been selected WHEN there are required inputs in app-config THEN 'Save' button should be disabled",
+        async () => {
+            let idProviderWizard = new IdProviderWizard();
+            let name = userItemsBuilder.generateRandomName('provider');
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', AUTH_APP_NAME_ADFS, null);
+            // 1. Wizard for a new id-provider has been opened:
+            await testUtils.openIdProviderWizard(idProvider);
+            // 2. type the name:
+            await idProviderWizard.typeDisplayName(name);
+            // 3. Select an application(ADFS provider wit required inputs)
+            await idProviderWizard.filterOptionsAndSelectApplication(AUTH_APP_NAME_ADFS);
+            // 4. Verify that Save button is disabled when required inputs are not filled:
+            await testUtils.saveScreenshot('id_prov_wizard_save_disabled');
+            await idProviderWizard.waitForSaveButtonDisabled();
+        });
+
     // Verifies:https://github.com/enonic/app-users/issues/533
     // Empty form in the ID Provider config #533
     it("GIVEN provider's data is filled WHEN Provider-configuration has been opened THEN required inputs should be loaded",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', AUTH_APP_NAME, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', AUTH_APP_NAME_ADFS, null);
             let idProviderWizard = new IdProviderWizard();
             let providerConfig = new AdfsIdProviderConfiguratorDialog();
             // 1. Open new ID Provider wizard and type the data:
