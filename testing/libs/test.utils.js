@@ -199,6 +199,7 @@ module.exports = {
         }
         //2. Open New Principal dialog:
         await browsePanel.waitForNewButtonEnabled();
+        await browsePanel.pause(400);
         await browsePanel.clickOnNewButton();
         await newPrincipalDialog.waitForDialogLoaded();
         //3. Click on Group item in the modal dialog:

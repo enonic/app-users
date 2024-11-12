@@ -156,8 +156,9 @@ describe('Id Provider, provider-dialog specification', function () {
     it(`GIVEN id provider with a configuration is selected WHEN Create New User menu item has been clicked THEN expected notification message should appear`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
+            await userBrowsePanel.pause(2000);
             // 1. Select an existing provider with configurator then click on Create User menu item in the modal dialog:
-            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, "User");
+            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, 'User');
             // 2. Verify the actual notification message - The application does not allow to create users
             let actualMessage = await userBrowsePanel.waitForNotificationMessage();
             await testUtils.saveScreenshot('app_does_not_allow_users');
