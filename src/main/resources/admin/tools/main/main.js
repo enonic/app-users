@@ -24,7 +24,15 @@ function getConfigAsJson() {
                 application: app.name,
                 api: 'i18n',
             }),
-        }
+        },
+        eventApiUrl: portal.apiUrl({
+            application: 'admin',
+            api: 'event',
+        }),
+        statusApiUrl: portal.apiUrl({
+            application: 'admin',
+            api: 'status',
+        }),
     }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
 }
 
