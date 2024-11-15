@@ -44,6 +44,7 @@ function getApplication(): Application {
 function startLostConnectionDetector() {
     ConnectionDetector.get()
         .setAuthenticated(true)
+        .setStatusUrl(CONFIG.getString('statusApiUrl'))
         .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
         .setNotificationMessage(i18n('notify.connection.loss'))
         .startPolling(true);
@@ -65,7 +66,7 @@ function startApplication() {
     new ChangeUserPasswordDialog();
     application.setLoaded(true);
 
-    const serverEventsListener = new UsersServerEventsListener([application]);
+    const serverEventsListener = new UsersServerEventsListener([application], CONFIG.getString('eventApiUrl'));
     serverEventsListener.start();
 
     startLostConnectionDetector();
