@@ -8,8 +8,8 @@ import {UsersServerEventsTranslator} from './UsersServerEventsTranslator';
 export class UsersServerEventsListener
     extends ServerEventsListener {
 
-    constructor(applications: Application[]) {
-        super(applications);
+    constructor(applications: Application[], eventApiUrl: string) {
+        super(applications, eventApiUrl);
 
         this.setServerEventsTranslator(new UsersServerEventsTranslator());
     }

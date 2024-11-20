@@ -17,6 +17,9 @@ app {
     devSourcePaths += file( "$rootDir/../lib-admin-ui/src/main/resources" )
 }
 
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = sourceCompatibility
+
 configurations {
     devResources {
         attributes {
@@ -42,6 +45,7 @@ dependencies {
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-graphql:2.0.1"
     include "com.enonic.lib:lib-mustache:2.1.0"
+    include "com.enonic.lib:lib-asset:1.0.0"
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
@@ -83,18 +87,11 @@ tasks.register('webpack', NpmTask) {
 }
 
 jar {
-    exclude 'assets/**/*.ts'
-    exclude 'assets/**/*.less'
-    exclude 'assets/styles/*.js'
+    dependsOn += webpack
+}
 
-    if ( isProd() )
-    {
-        exclude 'assets/**/*.map'
-    }
-
-    outputs.dir "$buildDir/resources/main"
-
-    dependsOn( 'webpack', 'javadoc', 'test' )
+processResources {
+    exclude 'assets/**'  // Excluded because webpack does it
 }
 
 test {
