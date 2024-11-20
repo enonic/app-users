@@ -18,6 +18,7 @@ import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
 import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
 import {Class} from '@enonic/lib-admin-ui/Class';
 import {JSONObject} from '@enonic/lib-admin-ui/types';
+import {LauncherHelper} from '@enonic/lib-admin-ui/util/LauncherHelper';
 
 const body = Body.get();
 
@@ -75,6 +76,8 @@ function startApplication() {
     ShowNewPrincipalDialogEvent.on((event) => {
         newPrincipalDialog.setSelection(event.getSelection()).open();
     });
+
+    LauncherHelper.appendLauncherPanel();
 }
 
 (async () => {

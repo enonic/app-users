@@ -11,8 +11,7 @@
     <api>graphql</api>
     <api>i18n</api>
     <api>permissionReport</api>
-    <api>com.enonic.xp.app.main:launcher</api>
-    <api>com.enonic.xp.app.main:i18n</api>
+    <api>admin:widget</api>
     <api>admin:status</api>
     <api>admin:event</api>
   </apis>
