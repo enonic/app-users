@@ -1,8 +1,8 @@
 const path = require('path');
 let PropertiesReader = require('properties-reader');
 const file = path.join(__dirname, '/browser.properties');
-const baseURL = properties.get('base.url');
 const properties = PropertiesReader(file);
+const baseURL = properties.get('base.url');
 const browser_version = properties.get('browser.version');
 
 exports.config = {
