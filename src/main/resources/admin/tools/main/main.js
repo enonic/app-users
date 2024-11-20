@@ -34,6 +34,14 @@ function getConfigAsJson() {
             application: 'admin',
             api: 'status',
         }),
+        launcherUrl: admin.widgetUrl({
+            application: 'com.enonic.xp.app.main',
+            widget: 'launcher',
+            params: {
+                appName: app.name,
+                theme: 'dark',
+            }
+        }),
     }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
 }
 
