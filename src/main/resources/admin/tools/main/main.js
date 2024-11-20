@@ -55,9 +55,6 @@ function handleGet() {
             bundles: ['i18n/phrases'],
             locale: admin.getLocales()
         }),
-        launcherPath: admin.getLauncherPath(),
-        toolBaseUrl: admin.getToolUrl(app.name, 'main'),
-        toolAppName: app.name,
         configScriptId: 'app-users-config-as-json',
         configAsJson: getConfigAsJson(),
     };
