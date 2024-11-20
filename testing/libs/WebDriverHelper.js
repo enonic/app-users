@@ -29,7 +29,8 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
     let _this = this;
     let ww = w;
     let hh = h;
-    before(async function () {
+
+     before( async function () {
         let PropertiesReader = require('properties-reader');
         let path = require('path');
         let webdriverio = require('webdriverio');
@@ -47,7 +48,9 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
         let options = {
             logLevel: "error",
             automationProtocol: "webdriver",
+            "wdio:enforceWebDriverClassic": true,
             capabilities: {
+                "wdio:enforceWebDriverClassic": true,
                 browserName: browser_name,
                 browserVersion: browser_version,
                 'goog:chromeOptions': makeChromeOptions(isHeadless, width, height)
@@ -56,7 +59,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
         _this.browser = await webdriverio.remote(options);
         await _this.browser.url(baseUrl);
         console.log('webdriverio #####################  ' + 'is  initialized!');
-        return _this.browser;
+        //return _this.browser;
     });
     after(async function () {
         await _this.browser.deleteSession();

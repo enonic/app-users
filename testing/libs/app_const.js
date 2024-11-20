@@ -66,6 +66,11 @@ module.exports = Object.freeze({
         ADMINISTRATOR: 'system.admin',
         USERS_APP: 'system.user.admin',
     },
+    BROWSER_TITLES: {
+        CONTENT_STUDIO: 'Content Studio - Enonic XP Admin',
+        XP_HOME: 'Enonic XP Home',
+        USERS_APP: "Users - Enonic XP Admin",
+    },
     principalExistsMessage(displayName) {
         return `Principal [${displayName}] could not be created. A principal with that name already exists`
     },
