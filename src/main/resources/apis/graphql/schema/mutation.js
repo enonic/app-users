@@ -33,7 +33,7 @@ module.exports = schemaGenerator.createObjectType({
                 displayName: graphQl.nonNull(graphQl.GraphQLString),
                 email: graphQl.nonNull(graphQl.GraphQLString),
                 login: graphQl.nonNull(graphQl.GraphQLString),
-                password: graphQl.nonNull(graphQl.GraphQLString),
+                password: graphQl.GraphQLString,
                 memberships: graphQl.list(graphQl.GraphQLString)
             },
             resolve: function(env) {
