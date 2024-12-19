@@ -69,7 +69,7 @@ export class CreateUserRequest
 
     /* eslint-disable max-len */
     getMutation(): string {
-        return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String!, $memberships: [String]) {
+        return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String, $memberships: [String]) {
             createUser(key: $key, displayName: $displayName, email: $email, login: $login, password: $password, memberships: $memberships) {
                 key
                 login
