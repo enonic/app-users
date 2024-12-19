@@ -13,7 +13,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import com.enonic.xp.app.users.rest.resource.AdminResourceTestSupport;
-import com.enonic.xp.app.users.rest.resource.security.json.UpdatePasswordJson;
 import com.enonic.xp.jaxrs.impl.MockRestResponse;
 import com.enonic.xp.security.Group;
 import com.enonic.xp.security.IdProviderKey;
@@ -174,57 +173,6 @@ public class UsersSecurityResourceTest
         } );
         assertEquals( "Expected email parameter", ex.getMessage() );
     }
-
-    @Test
-    public void setPasswordNullThrowsException()
-        throws Exception
-    {
-        final UsersSecurityResource resource = getResourceInstance();
-        final UpdatePasswordJson params = new UpdatePasswordJson( "user:system:user1", null );
-
-        final WebApplicationException ex = assertThrows( WebApplicationException.class, () -> {
-            resource.setPassword( params );
-        } );
-
-        assertEquals( "Password has not been set.", ex.getMessage() );
-    }
-
-    @Test
-    public void setPasswordEmptyThrowsException()
-        throws Exception
-    {
-        final UsersSecurityResource resource = getResourceInstance();
-        final UpdatePasswordJson params = new UpdatePasswordJson( "user:system:user1", "" );
-
-        final WebApplicationException ex = assertThrows( WebApplicationException.class, () -> {
-            resource.setPassword( params );
-        } );
-
-        assertEquals( "Password has not been set.", ex.getMessage() );
-    }
-
-    @Test
-    public void setPassword()
-        throws Exception
-    {
-        final User user = User.create().
-            key( PrincipalKey.ofUser( ID_PROVIDER_1, "user1" ) ).
-            displayName( "User 1" ).
-            modifiedTime( Instant.now( clock ) ).
-            email( "user1@enonic.com" ).
-            login( "user1" ).
-            build();
-
-        Mockito.doReturn( user ).when( this.securityService ).setPassword( Mockito.any(), ArgumentMatchers.eq( "myPassword" ) );
-
-        request().
-            path( "security/principals/setPassword" ).
-            entity( readFromFile( "setPasswordParams.json" ), MediaType.APPLICATION_JSON_TYPE ).
-            post().getAsString();
-
-        Mockito.verify( this.securityService, Mockito.times( 1 ) ).setPassword( Mockito.any(), ArgumentMatchers.eq( "myPassword" ) );
-    }
-
 
     private Principals createPrincipalsFromUsers()
     {

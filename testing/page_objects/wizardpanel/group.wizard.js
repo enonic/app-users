@@ -128,7 +128,8 @@ class GroupWizard extends WizardPanel {
 
     async clickOnDelete() {
         await this.waitForDeleteButtonEnabled();
-        return await this.clickOnElement(this.deleteButton);
+        await this.clickOnElement(this.deleteButton);
+        await this.pause(500);
     }
 
     async getSelectedMembers() {

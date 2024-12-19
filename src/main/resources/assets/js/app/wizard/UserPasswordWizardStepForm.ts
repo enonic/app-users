@@ -1,7 +1,5 @@
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
-import {PasswordGenerator} from './PasswordGenerator';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
-import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
@@ -10,17 +8,17 @@ import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {NewPublicKeyDialog} from './NewPublicKeyDialog';
 import {User} from '../principal/User';
 import {PublicKeysGrid} from '../view/PublicKeysGrid';
+import {SetUserPasswordEvent} from './SetUserPasswordEvent';
+import {PasswordGenerator} from './PasswordGenerator';
 
 export class UserPasswordWizardStepForm
     extends UserItemWizardStepForm {
 
-    private password: PasswordGenerator;
+    private password: string;
 
     private changePasswordButton: Button;
 
     private addPublicKeyButton: Button;
-
-    private createPasswordFormItem: FormItem;
 
     private updatePasswordFormItem: FormItem;
 
@@ -30,15 +28,16 @@ export class UserPasswordWizardStepForm
 
     private publicKeysGrid: PublicKeysGrid;
 
-    constructor() {
+    constructor(principal?: Principal) {
         super('user-password-wizard-step-form');
+
+        this.principal = principal;
     }
 
     protected initElements(): void {
         super.initElements();
 
-        this.password = new PasswordGenerator();
-        this.changePasswordButton = new Button(i18n('action.changePassword'));
+        this.changePasswordButton = new Button(i18n(!this.principal ? 'action.setPassword' : 'action.changePassword'));
         this.addPublicKeyButton = new Button(i18n('action.add'));
         this.publicKeysGrid = new PublicKeysGrid();
     }
@@ -46,26 +45,21 @@ export class UserPasswordWizardStepForm
     protected postInitElements(): void {
         super.postInitElements();
 
-        this.updatePasswordFormItem.setVisible(false);
         this.addPublicKeyFormItem.setVisible(false);
     }
 
     protected createFormItems(): FormItem[] {
-        this.createPasswordFormItem = new FormItemBuilder(this.password)
-            .setLabel(i18n('field.password')).setValidator(Validators.required).build();
-
         this.updatePasswordFormItem = new FormItemBuilder(this.changePasswordButton).build();
 
         this.addPublicKeyFormItem = new FormItemBuilder(this.addPublicKeyButton).setLabel(i18n('field.userKeys.grid.title')).build();
 
-        return [this.createPasswordFormItem, this.updatePasswordFormItem, this.addPublicKeyFormItem];
+        return [this.updatePasswordFormItem, this.addPublicKeyFormItem];
     }
 
     protected initListeners(): void {
         super.initListeners();
 
         this.form.onValidityChanged((event: ValidityChangedEvent) => {
-            this.createPasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
             this.updatePasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
             this.addPublicKeyFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
         });
@@ -79,6 +73,10 @@ export class UserPasswordWizardStepForm
             const publicKeysDialog = new NewPublicKeyDialog(user);
             publicKeysDialog.open();
         });
+
+        SetUserPasswordEvent.on((event) => {
+           this.password = event.getPassword();
+        });
     }
 
     layout(principal: Principal): void {
@@ -88,26 +86,14 @@ export class UserPasswordWizardStepForm
     updatePrincipal(principal: Principal): void {
         this.principal = principal;
 
-        if (principal) {
-            this.fieldSet.removeItem(this.createPasswordFormItem);
-            this.updatePasswordFormItem.setVisible(true);
-            if (principal.getKey().getIdProvider().isSystem()) {
-                this.addPublicKeyFormItem.setVisible(true);
-                this.publicKeysGrid.setUser(principal as User);
-            }
+        if (principal && principal.getKey().getIdProvider().isSystem()) {
+            this.addPublicKeyFormItem.setVisible(true);
+            this.publicKeysGrid.setUser(principal as User);
         }
     }
 
-    isValid(): boolean {
-        return !!this.principal || this.password.isValid();
-    }
-
     getPassword(): string {
-        return this.password.getValue();
-    }
-
-    giveFocus(): boolean {
-        return this.password.giveFocus();
+        return this.password;
     }
 
     doRender(): Q.Promise<boolean> {

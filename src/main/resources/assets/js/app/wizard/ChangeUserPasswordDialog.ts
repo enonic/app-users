@@ -1,5 +1,4 @@
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
-import {SetUserPasswordRequest} from './SetUserPasswordRequest';
 import {PasswordGenerator} from './PasswordGenerator';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
@@ -12,6 +11,8 @@ import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {SetUserPasswordEvent} from './SetUserPasswordEvent';
+import {UpdatePasswordRequest} from '../../graphql/principal/user/UpdatePasswordRequest';
 
 export class ChangeUserPasswordDialog
     extends ModalDialog {
@@ -55,7 +56,19 @@ export class ChangeUserPasswordDialog
 
         OpenChangePasswordDialogEvent.on((event) => {
             this.principal = event.getPrincipal();
-            userPath.setHtml(this.principal.getKey().toPath());
+
+            if (!event.getPrincipal()) {
+                this.setHeading(i18n('dialog.setPassword.title'));
+                this.changePasswordAction.setLabel(i18n('action.setPassword'));
+                descMessage.setVisible(false);
+                userPath.setHtml('');
+            } else {
+                this.setHeading(i18n('dialog.changePassword.title'));
+                this.changePasswordAction.setLabel(i18n('action.changePassword'));
+                descMessage.setVisible(true);
+                userPath.setHtml(this.principal.getKey().toPath());
+            }
+
             this.open();
         });
 
@@ -69,15 +82,21 @@ export class ChangeUserPasswordDialog
                 if (!this.password.isValid()) {
                     return;
                 }
-                new SetUserPasswordRequest()
-                    .setKey(this.principal.getKey())
-                    .setPassword(this.password.getValue())
-                    .sendAndParse()
-                    .then(() => {
-                        showFeedback(i18n('notify.change.password'));
-                        this.close();
-                    })
-                    .catch(DefaultErrorHandler.handle);
+                if (this.principal) {
+                    new UpdatePasswordRequest()
+                        .setPassword(this.password.getValue())
+                        .setKey(this.principal.getKey())
+                        .sendAndParse()
+                        .then(() => {
+                            showFeedback(i18n('notify.change.password'));
+                            this.close();
+                        })
+                        .catch(DefaultErrorHandler.handle);
+                } else {
+                    new SetUserPasswordEvent(this.password.getValue()).fire();
+                    showFeedback(i18n('notify.set.password'));
+                    this.close();
+                }
             });
 
         this.addAction(this.changePasswordAction);

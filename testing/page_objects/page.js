@@ -233,6 +233,18 @@ class Page {
         }
     }
 
+    //returns array of messages
+    async waitForNotificationMessages() {
+        try {
+            await this.waitForElementDisplayed(lib.NOTIFICATION_TEXT, appConst.mediumTimeout);
+            await this.pause(300);
+            return await this.getTextInDisplayedElements(lib.NOTIFICATION_TEXT);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_notification');
+            throw new Error('Error when wait for notification message, screenshot: ' + screenshot + "  " + err);
+        }
+    }
+
     async doRightClick(selector) {
         let el = await this.findElement(selector);
         await el.moveTo();

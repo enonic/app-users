@@ -8,6 +8,7 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
+const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
 
 describe('user.trim.inputs.spec Save user, trim the password and display name', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -33,7 +34,7 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
             await testUtils.saveAndCloseWizard(testUser.displayName.trim());
             // 4. Type displayName with spaces:
             await testUtils.typeNameInFilterPanel(testUser.displayName);
-            await testUtils.saveScreenshot("user_trimmed_name");
+            await testUtils.saveScreenshot('user_trimmed_name');
             // 5. Verify that spaces are trimmed in the display name:
             let isDisplayed = await userBrowsePanel.isItemDisplayed(nameWithSpaces);
             assert.ok(isDisplayed === false, "name with spaces should not be displayed in the grid");
@@ -45,14 +46,21 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
     it("GIVEN user wizard is opened WHEN password starting and ending with a space has been typed THEN Save button gets enabled",
         async () => {
             let userWizard = new UserWizard();
+            let changePasswordDialog = new ChangePasswordDialog();
             let passwordWithSpaces = appConst.PASSWORD.WITH_SPACES;
             let userName = userItemsBuilder.generateRandomName('user');
             let testUser = userItemsBuilder.buildUser(userName, passwordWithSpaces, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeDisplayName(testUser.displayName);
             await userWizard.typeEmail(testUser.email);
+            await userWizard.clickOnSetPasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
             // Type a password with white space:
-            await userWizard.typePassword(passwordWithSpaces);
+            await changePasswordDialog.typePassword(passwordWithSpaces);
+            await changePasswordDialog.clickOnSetPasswordButton();
+            await changePasswordDialog.waitForClosed();
+            let message = await userWizard.waitForNotificationMessage();
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.PASSWORD_IS_SET, 'Expected notification should appear');
             // Save button gets enabled:
             await testUtils.saveScreenshot('user_password_spaces');
             await userWizard.waitForSaveButtonEnabled();

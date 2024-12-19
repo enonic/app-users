@@ -136,7 +136,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             // 2. Add new role:
             await userWizard.filterOptionsAndAddRole(appConst.ROLES_DISPLAY_NAME.USERS_ADMINISTRATOR);
             // 3. Change the password:
-            await userWizard.clickOnChangePasswordButton();
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             await changePasswordDialog.clickOnGeneratePasswordLink();
             await changePasswordDialog.waitForChangePasswordButtonEnabled();
