@@ -27,12 +27,15 @@ module.exports = Object.freeze({
     USER_WIZARD_PASS_MESSAGE: 'Password can not be empty.',
     USER_WIZARD_EMAIL_MESSAGE: 'Email can not be empty.',
     USER_WIZARD_EMAIL_IS_INVALID: 'Email is invalid.',
-    USER_WAS_CREATED_MESSAGE: 'User was created',
-    ROLE_WAS_CREATED_MESSAGE: 'Role was created',
-    GROUP_WAS_CREATED: 'Group was created',
-    PROVIDER_CREATED_NOTIFICATION: 'Id provider was created',
-    STANDARD_ID_PROVIDER: 'Standard ID Provider',
 
+    STANDARD_ID_PROVIDER: 'Standard ID Provider',
+    NOTIFICATION_MESSAGE: {
+        PASSWORD_IS_SET: 'Password is set.',
+        GROUP_WAS_CREATED: 'Group was created',
+        PROVIDER_CREATED: 'Id provider was created',
+        USER_WAS_CREATED: 'User was created',
+        ROLE_WAS_CREATED: 'Role was created',
+    },
     ID_PROVIDERS: {
         STANDARD_ID_PROVIDER: 'Standard ID Provider',
         FIRST_SELENIUM_APP: 'First Selenium App',

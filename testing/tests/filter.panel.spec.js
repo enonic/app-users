@@ -35,7 +35,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             // 1. Open Filter Panel:
             await userBrowsePanel.clickOnSearchButton();
             await filterPanel.waitForOpened();
-            // 2. Type a non existent name:
+            // 2. Type a non-existent name:
             await filterPanel.typeSearchText(NON_EXISTENT_ITEM);
             // 3. Verify that 'Clear' button should appear:
             await filterPanel.waitForClearLinkVisible();
