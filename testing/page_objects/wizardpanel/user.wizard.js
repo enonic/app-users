@@ -6,6 +6,7 @@ const wpXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const UsersPrincipalCombobox = require('../selectors/users.principal.combobox');
+const ChangePasswordDialog = require('../../page_objects/wizardpanel/change.password.dialog');
 
 const XPATH = {
     container: "//div[contains(@id,'UserWizardPanel')]",
@@ -15,10 +16,8 @@ const XPATH = {
     publicKeyFormItem: "//div[contains(@id,'FormItem') and child::label[contains(.,'Public Keys')]]",
     rolesGroupLink: "//li[child::a[text()='Roles & Groups']]",
     passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
-    showPasswordLink: "//a[@data-i18n='Show']",
-    hidePasswordLink: "//a[@data-i18n='Hide']",
     generatePasswordLink: "//a[text()='Generate']",
-    changePasswordButton: "//button[contains(@class,'change-password-button')]",
+    setPasswordButton: "//button[contains(@class,'password-button')]/span[text()='Set Password']",
     publicKeysGrid: "//div[contains(@id,'PublicKeysGrid')]",
     publicKeysGridRow: "//div[contains(@class,'public-keys-grid-row')]",
     removePublicKeyIcon: "//a[contains(@class,'remove-public-key icon-close')]",
@@ -36,10 +35,6 @@ class UserWizard extends wizards.WizardPanel {
         return XPATH.container + XPATH.emailInput;
     }
 
-    get passwordInput() {
-        return XPATH.container + "//input[@type = 'text' and contains(@class,'password-input')]";
-    }
-
     get groupOptionsFilterInput() {
         return XPATH.container + XPATH.groupsForm + lib.DROPDOWN_SELECTOR.OPTION_FILTER_INPUT;
     }
@@ -52,20 +47,8 @@ class UserWizard extends wizards.WizardPanel {
         return XPATH.container + XPATH.rolesGroupLink;
     }
 
-    get showPasswordLink() {
-        return XPATH.container + XPATH.showPasswordLink;
-    }
-
-    get hidePasswordLink() {
-        return XPATH.container + XPATH.hidePasswordLink;
-    }
-
-    get generateLink() {
-        return XPATH.container + XPATH.generatePasswordLink;
-    }
-
-    get changePasswordButton() {
-        return XPATH.container + XPATH.changePasswordButton;
+    get setPasswordButton() {
+        return XPATH.container + XPATH.setPasswordButton;
     }
 
     get addPublicKeyButton() {
@@ -100,50 +83,27 @@ class UserWizard extends wizards.WizardPanel {
         await this.clickOnElement(locator);
     }
 
-    isShowLinkDisplayed() {
-        return this.isElementDisplayed(this.showPasswordLink);
-    }
-
-    isHidePasswordLinkDisplayed() {
-        return this.isElementDisplayed(this.hidePasswordLink);
-    }
-
-    clickOnChangePasswordButton() {
-        return this.clickOnElement(this.changePasswordButton);
-    }
-
-    isChangePasswordButtonDisplayed() {
-        return this.isElementDisplayed(this.changePasswordButton);
-    }
-
-    waitForChangePasswordButtonDisplayed() {
-        return this.waitForElementDisplayed(this.changePasswordButton, appConst.mediumTimeout);
-    }
-
-    isGenerateDisplayed() {
-        return this.isElementDisplayed(this.generateLink);
-    }
-
-    clickOnGenerateLink() {
-        return this.clickOnElement(this.generateLink);
-    }
-
-    async clickOnShowPasswordLink() {
+    async clickOnSetPasswordButton() {
         try {
-            await this.waitForElementDisplayed(this.showPasswordLink, appConst.mediumTimeout);
-            await this.clickOnElement(this.showPasswordLink);
+            await this.waitForSetPasswordButtonDisplayed();
+            await await this.clickOnElement(this.setPasswordButton);
+            await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_show_password');
-            throw new Error("Error after clicking on Show Pass link, screenshot: " + screenshot + '  ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_set_password_btn');
+            throw new Error(`Error occurred after clicking on Set Password button, screenshot: ${screenshot} ` + err);
         }
+    }
+
+    isSetPasswordButtonDisplayed() {
+        return this.isElementDisplayed(this.setPasswordButton);
+    }
+
+    waitForSetPasswordButtonDisplayed() {
+        return this.waitForElementDisplayed(this.setPasswordButton, appConst.mediumTimeout);
     }
 
     isEmailInputDisplayed() {
         return this.isElementDisplayed(this.emailInput);
-    }
-
-    isPasswordInputDisplayed() {
-        return this.isElementDisplayed(this.passwordInput);
     }
 
     isGroupOptionsFilterInputDisplayed() {
@@ -178,27 +138,10 @@ class UserWizard extends wizards.WizardPanel {
         await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout);
     }
 
-    async clearPasswordInput() {
-        await this.clearInputText(this.passwordInput);
-        //insert a letter:
-        await this.typeTextInInput(this.passwordInput, 'a');
-        //press on BACKSPACE, remove the letter:
-        return await this.getBrowser().keys('\uE003');
-    }
-
     async clearEmailInput() {
         await this.clearInputText(this.emailInput);
         await this.typeTextInInput(this.emailInput, 'a');
         return await this.getBrowser().keys('\uE003');
-    }
-
-    async getTextInPasswordInput() {
-        try {
-            return await this.getTextInInput(this.passwordInput);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_get_text_password');
-            throw new Error(`Error when getting text in password input , ${screenshot} ` + err);
-        }
     }
 
     //clicks on Remove icon and removes the role
@@ -257,24 +200,34 @@ class UserWizard extends wizards.WizardPanel {
         }
     }
 
-    typePassword(password) {
-        return this.typeTextInInput(this.passwordInput, password);
-    }
-
     async typeDataAndGeneratePassword(user) {
+        let changePasswordDialog = new ChangePasswordDialog();
         await this.typeDisplayName(user.displayName);
         await this.typeEmail(user.email);
-        await this.clickOnGenerateLink();
+        await this.clickOnSetPasswordButton();
+        await changePasswordDialog.clickOnGeneratePasswordLink();
+        await changePasswordDialog.clickOnShowPasswordLink();
+        let password = await changePasswordDialog.getPasswordText();
+        await changePasswordDialog.clickOnSetPasswordButton();
+        await changePasswordDialog.waitForClosed();
         await this.pause(500);
         if (user.roles != null) {
             await this.addRoles(user.roles);
         }
+        return password;
     }
 
     async typeData(user) {
+        let changePasswordDialog = new ChangePasswordDialog();
         await this.typeDisplayName(user.displayName);
         await this.typeEmail(user.email);
-        await this.typePassword(user.password);
+        if (user.password) {
+            await this.clickOnSetPasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            await changePasswordDialog.typePassword(user.password);
+            await changePasswordDialog.clickOnSetPasswordButton();
+            await changePasswordDialog.waitForClosed();
+        }
         await this.pause(500);
         if (user.roles != null) {
             await this.addRoles(user.roles);

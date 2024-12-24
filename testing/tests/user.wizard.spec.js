@@ -36,14 +36,12 @@ describe('User Wizard and Change Password dialog spec', function () {
             isDisplayed = await userWizard.isEmailInputDisplayed();
             assert.ok(isDisplayed, "E-mail name input should be displayed");
             await testUtils.saveScreenshot('change_pass_button_should_not_be_displayed');
-            isDisplayed = await userWizard.isPasswordInputDisplayed();
-            assert.ok(isDisplayed, "Password-input should be displayed");
+            // 'Set Password' button should be displayed:
+            await userWizard.waitForSetPasswordButtonDisplayed();
             isDisplayed = await userWizard.isGroupOptionsFilterInputDisplayed();
             assert.ok(isDisplayed, "'Groups' selector should be displayed");
             isDisplayed = await userWizard.isRoleOptionsFilterInputDisplayed();
             assert.ok(isDisplayed, "'Roles' selector should be displayed");
-            isDisplayed = await userWizard.isChangePasswordButtonDisplayed();
-            assert.ok(isDisplayed === false, "'Change Password' button should not be displayed");
         });
 
     it('GIVEN `User` wizard is opened WHEN name, e-mail, password have been typed THEN red circle should not be present on the tab',
@@ -73,8 +71,8 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 3. Click on Save button:
             await userWizard.waitAndClickOnSave();
             await testUtils.saveScreenshot('user_change_password_button_displayed');
-            // 4. Verify 'Change Password' button is visible
-            await userWizard.waitForChangePasswordButtonDisplayed();
+            // 4. Verify 'Set Password' button is displayed
+            await userWizard.waitForSetPasswordButtonDisplayed();
         });
 
     it('GIVEN existing user is opened WHEN name input has been cleared THEN red circle should appears in the tab',
@@ -97,8 +95,8 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             // 1. Open the existing user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
-            // 2. Open Change Password dialog:
-            await userWizard.clickOnChangePasswordButton();
+            // 2. Open 'Change Password' dialog:
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             let result = await changePasswordDialog.getUserPath();
             assert.ok(result[0].includes(TEST_USER.displayName), 'Display name of the user should be present in the path');
@@ -108,17 +106,18 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
+            // 1. Open the user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
-            // Open 'Change Password Dialog'
-            await userWizard.clickOnChangePasswordButton();
+            // 2. Open 'Change Password Dialog'
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
-            await testUtils.saveScreenshot("change_password_dialog");
+            await testUtils.saveScreenshot('change_password_dialog');
             let isDisplayed = await changePasswordDialog.isPasswordInputDisplayed();
             assert.ok(isDisplayed, 'Password Input should be displayed');
-            isDisplayed = await changePasswordDialog.isGenerateLinkDisplayed();
-            assert.ok(isDisplayed, 'Generate Link should be displayed');
-            isDisplayed = await changePasswordDialog.isShowLinkDisplayed();
-            assert.ok(isDisplayed, 'Show Password Link should be displayed');
+            // 'Generate' Link should be displayed
+            isDisplayed = await changePasswordDialog.waitForGenerateLinkDisplayed();
+            // 'Show Password' link should be displayed
+            await changePasswordDialog.waitForShowPasswordLinkDisplayed()
             // Verify that 'Change Password' button is disabled:
             await changePasswordDialog.waitForChangePasswordButtonDisabled();
         });
@@ -129,7 +128,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
-            await userWizard.clickOnChangePasswordButton();
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             await testUtils.saveScreenshot('change_password_dialog_2');
             // 2. Insert an easy password:
@@ -137,7 +136,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let status = await changePasswordDialog.getPasswordStatus();
             await testUtils.saveScreenshot('change_password_bad_status');
             assert.equal(status, appConst.PASSWORD_STATE.BAD, "bad password's status should be displayed");
-            // Verify than 'Change Password' button is disabled:
+            // Verify than 'Change Password' button is disabled if the state is BAD :
             await changePasswordDialog.waitForChangePasswordButtonDisabled();
         });
 
@@ -147,7 +146,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
-            await userWizard.clickOnChangePasswordButton();
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 2. Generate new password:
             await changePasswordDialog.clickOnGeneratePasswordLink();
@@ -164,14 +163,15 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             let changePasswordDialog = new ChangePasswordDialog();
-            // Existing user is opened:
+            // 1. Existing user is opened:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
-            await userWizard.clickOnChangePasswordButton();
+            // 2. Click on Set Password button:
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
-            // Click on 'Show Password':
+            // 3. Click on 'Show Password':
             await changePasswordDialog.clickOnShowPasswordLink();
-            let result = await changePasswordDialog.isHideLinkDisplayed();
-            await assert.ok(result, "'Hide' button should appear");
+            // Verify that 'Hide' button should appear
+            await changePasswordDialog.waitForHideLinkDisplayed();
         });
 
     it("WHEN 'Change Password Dialog' is opened THEN 'Generate password' link has been clicked THEN generated 'password' should appear",
@@ -181,13 +181,13 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 1. Open the existing user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Click on Change password button:
-            await userWizard.clickOnChangePasswordButton();
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 3. Click on 'Generate' button:
             await changePasswordDialog.clickOnGeneratePasswordLink();
             await testUtils.saveScreenshot('change_password_generated');
             // 4. Verify that password is generated:
-            let password = await changePasswordDialog.getPasswordString();
+            let password = await changePasswordDialog.getPasswordText();
             assert.ok(password.length > 4, 'password should be generated');
         });
 
@@ -198,7 +198,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 1. Open an existing user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Click on 'Change password' button
-            await userWizard.clickOnChangePasswordButton();
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 3. Click on Cancel button in the modal dialog:
             await changePasswordDialog.clickOnCancelButton();
@@ -211,7 +211,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
-            await userWizard.clickOnChangePasswordButton();
+            await userWizard.clickOnSetPasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 2. Click on Cancel-top button:
             await changePasswordDialog.clickOnCancelButtonTop();

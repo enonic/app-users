@@ -47,7 +47,7 @@ export class UserWizardPanel
         const steps: WizardStep[] = [];
 
         this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams().idProvider.getKey(), this.isSystemUserItem());
-        this.userPasswordWizardStepForm = new UserPasswordWizardStepForm();
+        this.userPasswordWizardStepForm = new UserPasswordWizardStepForm(principal);
         this.userMembershipsWizardStepForm = new UserMembershipsWizardStepForm();
 
         if (!this.isSystemUserItem()) {

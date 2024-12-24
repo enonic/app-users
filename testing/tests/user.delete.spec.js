@@ -16,22 +16,22 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let testUser;
+    let TEST_USER;
     let PASSWORD = appConst.PASSWORD.MEDIUM;
 
     it("GIVEN new user is saved WHEN Delete button in toolbar has been pressed THEN Confirmation dialog should appear",
         async () => {
             let userWizard = new UserWizard();
-            let userName = userItemsBuilder.generateRandomName("user");
+            let userName = userItemsBuilder.generateRandomName('user');
             let confirmationDialog = new ConfirmationDialog();
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
-            //1. Open new user-wizard, save the data:
+            TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            // 1. Open new user-wizard, save the data:
             await testUtils.clickOnSystemOpenUserWizard();
-            await userWizard.typeData(testUser);
+            await userWizard.typeData(TEST_USER);
             await userWizard.waitAndClickOnSave();
-            //2. Click on Delete button:
+            // 2. Click on Delete button:
             await userWizard.clickOnDelete();
-            //"Confirmation Dialog" should be loaded:
+            // "Confirmation Dialog" should be loaded:
             await confirmationDialog.waitForDialogLoaded();
             await testUtils.saveScreenshot('user_wizard_confirm_delete1');
         });
@@ -41,17 +41,17 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             // 1. Save the user:
             await testUtils.clickOnSystemOpenUserWizard();
-            await userWizard.typeData(testUser);
+            await userWizard.typeData(TEST_USER);
             await userWizard.waitAndClickOnSave();
             // 2. click on Delete and confirm:
             await userWizard.clickOnDelete();
             await testUtils.confirmDelete();
             await testUtils.saveScreenshot('user_deleted_confirmation_mess1');
             // 3. Verify the notification message:
-            let expectedMessage = appConst.userDeletedMessage(testUser.displayName);
+            let expectedMessage = appConst.userDeletedMessage(TEST_USER.displayName);
             // `Principal "user:system:userName" is deleted - notification message should appear`
             await userBrowsePanel.waitForExpectedNotificationMessage(expectedMessage);
         });
@@ -61,10 +61,10 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             let userBrowsePanel = new UserBrowsePanel();
             let userName = userItemsBuilder.generateRandomName('user');
             let confirmationDialog = new ConfirmationDialog();
-            testUser = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
+            TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             // 1. Add and select new user:
-            await testUtils.addSystemUser(testUser);
-            await testUtils.findAndSelectItem(testUser.displayName);
+            await testUtils.addSystemUser(TEST_USER);
+            await testUtils.findAndSelectItem(TEST_USER.displayName);
             await userBrowsePanel.waitForDeleteButtonEnabled();
             // 2. Click on Delete button:
             await userBrowsePanel.clickOnDeleteButton();
@@ -73,14 +73,14 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             await confirmationDialog.waitForDialogLoaded();
         });
 
-    it("GIVEN existing User WHEN the User has been deleted in the browse panel THEN correct notification should appear",
+    it("GIVEN existing User WHEN the User has been deleted in the browse panel THEN expected notification should appear",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             // Select and Delete existing user in browse panel:
-            await testUtils.selectAndDeleteItem(testUser.displayName);
+            await testUtils.selectAndDeleteItem(TEST_USER.displayName);
             let result = await userBrowsePanel.waitForNotificationMessage();
             await testUtils.saveScreenshot('user_deleted_notification_mes2');
-            let expectedMsg = appConst.userDeletedMessage(testUser.displayName);
+            let expectedMsg = appConst.userDeletedMessage(TEST_USER.displayName);
             assert.strictEqual(result, expectedMsg, "'Principal 'user:system:userName' is deleted' the  message should appear");
         });
 
