@@ -63,7 +63,8 @@ class ChangeUserPasswordDialog extends Page {
 
     async waitForClosed() {
         try {
-            return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(300);
         } catch (error) {
             let screenshot = await this.saveScreenshotUniqueName('err_ch_password_dlg');
             throw new Error(`Change Password Dialog is not closed, screenshot ${screenshot} ` + error);

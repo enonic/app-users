@@ -7,6 +7,7 @@ const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
+const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
 
 describe('User Wizard negative spec ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -18,41 +19,53 @@ describe('User Wizard negative spec ', function () {
     const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
     const WEAK_PASSWORD = appConst.PASSWORD.WEAK;
 
-    it("GIVEN wizard for new User is opened WHEN data with weak password has been typed THEN 'Save' button should be disabled",
+    it("GIVEN wizard for new User is opened WHEN weak password has been typed THEN 'Set password' button should be disabled",
         async () => {
+            let changePasswordDialog = new ChangePasswordDialog();
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, WEAK_PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             // 1. Type a data with weak password:
-            await userWizard.typeData(testUser);
+            await userWizard.typeDisplayName(userName);
+            await userWizard.typeEmail(testUser.email);
+
+            await userWizard.clickOnSetPasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            await changePasswordDialog.typePassword(WEAK_PASSWORD);
             // 2. Verify that Weak state of the password is displayed
-            let status = await userWizard.getPasswordStatus();
-            assert.equal(status, appConst.PASSWORD_STATE.WEAK, "Weak state of password should be displayed");
-            // 3. Verify that 'Save' button is disabled:
-            await userWizard.waitForSaveButtonDisabled();
-            // 4. Verify that user is not valid:
-            await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
+            await changePasswordDialog.waitForSetPasswordButtonDisabled();
+            let actualStatus = await changePasswordDialog.getPasswordStatus();
+            assert.equal(actualStatus, appConst.PASSWORD_STATE.WEAK);
+
         });
 
-    it("GIVEN wizard for new User is opened WHEN data with medium password has been typed THEN 'Save' button should be enabled",
+    it("GIVEN wizard for new User is opened WHEN medium password has been typed THEN 'Save' button should be enabled",
         async () => {
             let userWizard = new UserWizard();
+            let changePasswordDialog = new ChangePasswordDialog();
             let userName = userItemsBuilder.generateRandomName('user');
             testUser = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             // 1. Type a data with medium password:
-            await userWizard.typeData(testUser);
-            // 2. Verify that 'Save' button is enabled:
-            await userWizard.waitForSaveButtonEnabled();
+            await userWizard.typeDisplayName(userName);
+            await userWizard.typeEmail(testUser.email);
+
+            await userWizard.clickOnSetPasswordButton();
+            await changePasswordDialog.waitForDialogLoaded();
+            await changePasswordDialog.typePassword(MEDIUM_PASSWORD);
             // 3. Verify that Medium state of the password is displayed
-            let status = await userWizard.getPasswordStatus();
-            assert.equal(status, appConst.PASSWORD_STATE.MEDIUM, "Medium state of password should be displayed");
+            await changePasswordDialog.waitForSetPasswordButtonEnabled();
+            let actualStatus = await changePasswordDialog.getPasswordStatus();
+            assert.equal(actualStatus, appConst.PASSWORD_STATE.MEDIUM, "Medium state of the password should be displayed");
+            await changePasswordDialog.clickOnSetPasswordButton();
+            await changePasswordDialog.waitForClosed();
             // 4. Verify that red icon is not visible and the user is valid
             await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
         });
 
-    it("GIVEN wizard for new User is opened WHEN name and e-mail have been typed THEN red circle should be displayed in the wizard page",
+    // Password must be optional for Service Account 1808
+    it("GIVEN wizard for new User is opened WHEN only the name and e-mail have been typed THEN red circle should not be displayed in the wizard page",
         async () => {
             let userWizard = new UserWizard();
             let userName = userItemsBuilder.generateRandomName('user');
@@ -62,9 +75,9 @@ describe('User Wizard negative spec ', function () {
             // 2. Type an email and displayName:
             await userWizard.typeEmail(testUser.email);
             await userWizard.typeDisplayName(testUser.displayName);
-            // 3. Verify that red icon is not displayed in the tab:
-            let isRedIconPresent = await userWizard.waitUntilInvalidIconAppears(testUser.displayName);
-            assert.ok(isRedIconPresent, "red circle should be visible in the tab, because 'password' is empty");
+            // 3. Verify that red icon should not be displayed in the tab, because Password must be optional for Service Account
+            let isRedIconPresent = await userWizard.waitUntilInvalidIconDisappears(testUser.displayName);
+            assert.ok(isRedIconPresent, "red circle should not be displayed in the tab, because 'password' is empty");
         });
 
     it("GIVEN wizard for new User is opened WHEN all data has been typed THEN red circle gets not visible in the wizard page",
