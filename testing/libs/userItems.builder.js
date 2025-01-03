@@ -11,7 +11,7 @@ module.exports = {
     generateEmail: function (userName) {
         return userName + '@gmail.com'
     },
-    buildIdProvider: function (displayName, description, authAppName, permissions) {
+    buildIdProvider(displayName, description, authAppName, permissions) {
         return {
             displayName: displayName,
             description: description,
@@ -19,7 +19,7 @@ module.exports = {
             permissions: permissions,
         };
     },
-    buildUser: function (displayName, password, email, roles) {
+    buildUser(displayName, password, email, roles) {
         return {
             displayName: displayName,
             password: password,
@@ -27,14 +27,14 @@ module.exports = {
             roles: roles,
         };
     },
-    buildRole: function (displayName, description, members) {
+    buildRole(displayName, description, members) {
         return {
             displayName: displayName,
             description: description,
             members: members,
         };
     },
-    buildGroup: function (displayName, description, members, roles) {
+    buildGroup(displayName, description, members, roles) {
         return {
             displayName: displayName,
             description: description,
