@@ -92,14 +92,12 @@ class WizardPanel extends Page {
         }
     }
 
-    waitUntilInvalidIconAppears(displayName) {
+    async waitUntilInvalidIconDisplayed(displayName) {
         let selector = lib.tabItemByDisplayName(displayName);
-        return this.getBrowser().waitUntil(() => {
-            return this.getAttribute(selector, 'class').then(result => {
-                return result.includes('invalid');
-            });
-        }, {timeout: 10000, timeoutMsg: "Group-wizard:invalid-icon should be displayed"});
-
+        return await this.browser.waitUntil(async () => {
+            let result = await this.getAttribute(selector, 'class');
+            return result.includes('invalid');
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'invalid-icon should be displayed in the wizard'});
     }
 
     waitUntilInvalidIconDisappears(displayName) {

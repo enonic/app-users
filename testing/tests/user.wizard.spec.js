@@ -23,7 +23,7 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             await testUtils.clickOnSystemOpenUserWizard();
-            let result = await userWizard.waitUntilInvalidIconAppears('<Unnamed User>');
+            let result = await userWizard.waitUntilInvalidIconDisplayed('<Unnamed User>');
             assert.ok(result, 'red circle should be present on the tab, because required inputs are empty');
         });
 
@@ -31,6 +31,7 @@ describe('User Wizard and Change Password dialog spec', function () {
         async () => {
             let userWizard = new UserWizard();
             await testUtils.clickOnSystemOpenUserWizard();
+            // display name and e-mail inputs should be displayed:
             let isDisplayed = await userWizard.isDisplayNameInputVisible();
             assert.ok(isDisplayed, "Display name input should be displayed");
             isDisplayed = await userWizard.isEmailInputDisplayed();
@@ -38,6 +39,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             await testUtils.saveScreenshot('change_pass_button_should_not_be_displayed');
             // 'Set Password' button should be displayed:
             await userWizard.waitForSetPasswordButtonDisplayed();
+            // Group and Role selectors should be displayed:
             isDisplayed = await userWizard.isGroupOptionsFilterInputDisplayed();
             assert.ok(isDisplayed, "'Groups' selector should be displayed");
             isDisplayed = await userWizard.isRoleOptionsFilterInputDisplayed();
@@ -82,8 +84,8 @@ describe('User Wizard and Change Password dialog spec', function () {
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Clear the name-input:
             await userWizard.clearDisplayNameInput();
-            // 3. Verify that red icon appears in the wizard:
-            let result = await userWizard.waitUntilInvalidIconAppears('<Unnamed User>');
+            // 3. Verify that red icon appears in the wizard for unnamed user:
+            let result = await userWizard.waitUntilInvalidIconDisplayed('<Unnamed User>');
             assert.ok(result, 'red circle should appears in the tab, because display-name input has been cleared');
             // 4. Verify that 'Save' button gets disabled now:
             await userWizard.waitForSaveButtonDisabled();

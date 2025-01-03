@@ -20,7 +20,7 @@ describe("group.wizard.spec - validation and check inputs", function () {
         async () => {
             let groupWizard = new GroupWizard();
             await testUtils.clickOnSystemAndOpenGroupWizard();
-            let isRedIconPresent = await groupWizard.waitUntilInvalidIconAppears('<Unnamed Group>');
+            let isRedIconPresent = await groupWizard.waitUntilInvalidIconDisplayed('<Unnamed Group>');
             assert.ok(isRedIconPresent, "red circle should be present in the tab, because required input(name) is empty");
         });
 
@@ -73,7 +73,7 @@ describe("group.wizard.spec - validation and check inputs", function () {
             await groupWizard.typeData(TEST_GROUP);
             // 2. Clear the displayName input:
             await groupWizard.clearDisplayNameInput();
-            let isRedIconPresent = await groupWizard.waitUntilInvalidIconAppears("<Unnamed Group>");
+            let isRedIconPresent = await groupWizard.waitUntilInvalidIconDisplayed("<Unnamed Group>");
             assert.ok(isRedIconPresent, "red circle gets visible, because the name input has been cleared");
             // 3. Save button gets disabled:
             await groupWizard.waitForSaveButtonDisabled();
