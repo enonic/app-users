@@ -57,7 +57,7 @@ exports.update = function updateUser(params) {
 };
 
 exports.updatePwd = function (key, pwd) {
-    var password = pwd.replace(/\s/g, '');
+    const password = pwd ? pwd.replace(/\s/g, '') : null;
     try {
         authLib.changePassword({
             userKey: key,
