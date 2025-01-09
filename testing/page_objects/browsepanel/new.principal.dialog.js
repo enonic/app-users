@@ -41,10 +41,11 @@ class NewPrincipalDialog extends Page {
 
     async waitForDialogLoaded() {
         try {
-            return await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot('err_principal_dialog_load');
-            throw new Error("New Principal dialog is not loaded in: " + appConst.mediumTimeout + " ms  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_principal_dialog_load');
+            throw new Error(`New Principal dialog is not loaded screenshot${screenshot}: ` + err);
         }
     }
 
