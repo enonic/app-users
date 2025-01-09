@@ -123,6 +123,12 @@ exports.PrincipalType = schemaGenerator.createObjectType({
             resolve: function (env) {
                 return env.source.profile ? utilLib.forceArray(env.source.profile.publicKeys) : [];
             }
+        },
+        hasPassword: {
+            type: graphQl.GraphQLBoolean,
+            resolve: function (env) {
+                return env.source.authenticationHash != null;
+            }
         }
     }
 });
