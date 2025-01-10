@@ -16,4 +16,6 @@ export interface UserJson
 
     publicKeys?: PublicKeyJson[];
 
+    hasPassword: boolean;
+
 }
