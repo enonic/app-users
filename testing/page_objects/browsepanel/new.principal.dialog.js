@@ -30,9 +30,9 @@ class NewPrincipalDialog extends Page {
     }
 
     //clicks on User, User Group, Id Provider....
-    clickOnItem(itemName) {
+    async clickOnItem(itemName) {
         let selector = XPATH.itemViewer + lib.itemByDisplayName(itemName);
-        return this.clickOnElement(selector)
+        return await this.clickOnElement(selector)
     }
 
     isCancelButtonDisplayed() {

@@ -61,12 +61,7 @@ export class GetPrincipalByKeyRequest
                             allow
                             deny
                         }
-                        publicKeys {
-                            kid
-                            publicKey
-                            creationTime
-                            label
-                        }
+                        ${this.addFieldsIfUser(this.key)}
                     }
                 }`;
     }
@@ -94,6 +89,20 @@ export class GetPrincipalByKeyRequest
             break;
         }
         return fields;
+    }
+
+    private addFieldsIfUser(key: PrincipalKey): string {
+        if (key.isUser()) {
+            return `publicKeys {
+                         kid
+                         publicKey
+                         creationTime
+                         label
+                    }
+                    hasPassword`;
+        } else {
+            return '';
+        }
     }
 
     private getMembershipsField(includeMemberships: boolean) {

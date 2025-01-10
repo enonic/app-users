@@ -19,6 +19,8 @@ export class User
 
     private readonly publicKeys: PublicKey[];
 
+    private readonly userHasPassword : boolean;
+
     constructor(builder: UserBuilder) {
         super(builder);
         assert(this.getKey().isUser(), 'Expected PrincipalKey of type User');
@@ -27,6 +29,7 @@ export class User
         this.loginDisabled = builder.loginDisabled || false;
         this.memberships = builder.memberships || [];
         this.publicKeys = builder.publicKeys || [];
+        this.userHasPassword = builder.hasPassword || false;
     }
 
     getEmail(): string {
@@ -49,6 +52,10 @@ export class User
         return this.publicKeys.slice(0);
     }
 
+    hasPassword(): boolean {
+        return this.userHasPassword;
+    }
+
     equals(o: Equitable): boolean {
         if (!ObjectHelper.iFrameSafeInstanceOf(o, User)) {
             return false;
@@ -61,7 +68,8 @@ export class User
                this.email === other.getEmail() &&
                this.login === other.getLogin() &&
                ObjectHelper.arrayEquals(this.memberships, other.getMemberships()) &&
-               ObjectHelper.arrayEquals(this.publicKeys, other.getPublicKeys());
+               ObjectHelper.arrayEquals(this.publicKeys, other.getPublicKeys()) &&
+               this.userHasPassword === other.hasPassword();
     }
 
     clone(): User {
@@ -95,6 +103,8 @@ export class UserBuilder
 
     publicKeys: PublicKey[] = [];
 
+    hasPassword: boolean;
+
     constructor(source?: User) {
         super(source);
         if (source) {
@@ -106,6 +116,7 @@ export class UserBuilder
             this.modifiedTime = source.getModifiedTime();
             this.memberships = source.getMemberships().slice(0);
             this.publicKeys = source.getPublicKeys().slice(0);
+            this.hasPassword = source.hasPassword();
         }
     }
 
@@ -122,6 +133,8 @@ export class UserBuilder
         if (json.publicKeys) {
             this.publicKeys = json.publicKeys.map((publicKeyJson) => PublicKey.fromJson(publicKeyJson));
         }
+        this.hasPassword = json.hasPassword;
+
         return this;
     }
 
