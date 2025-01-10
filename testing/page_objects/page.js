@@ -205,7 +205,8 @@ class Page {
             await this.pause(400);
             return await this.getText(notificationXpath);
         } catch (err) {
-            throw new Error('Error when wait for the notification message: ' + err);
+            let screenshot = appConst.generateRandomName('err_notification');
+            throw new Error(`Error occurred - notification message:screenshot:${screenshot} ` + err);
         }
     }
 
