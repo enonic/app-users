@@ -5,21 +5,31 @@ import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
 import {WizardStepValidityChangedEvent} from '@enonic/lib-admin-ui/app/wizard/WizardStepValidityChangedEvent';
+import {UserItemWizardPanelParams} from './UserItemWizardPanelParams';
+import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
 
-export abstract class UserItemWizardStepForm
+export abstract class UserItemWizardStepForm<T extends UserItem>
     extends WizardStepForm {
 
     protected form: Form;
 
     protected fieldSet: Fieldset;
 
-    protected constructor(className?: string) {
+    protected params: UserItemWizardPanelParams<T>;
+
+    protected constructor(params: UserItemWizardPanelParams<T>, className?: string) {
         super(className);
         this.addClass('user-item-wizard-step-form');
+
+        this.params = params;
 
         this.initElements();
         this.postInitElements();
         this.initListeners();
+    }
+
+    protected getParams(): UserItemWizardPanelParams<T> {
+        return this.params;
     }
 
     protected initElements(): void {

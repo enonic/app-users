@@ -10,9 +10,10 @@ import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {UrlHelper} from '../../util/UrlHelper';
 import {CheckEmailAvailabilityRequest} from '@enonic/lib-admin-ui/security/CheckEmailAvailabilityRequest';
+import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 
 export class UserEmailWizardStepForm
-    extends UserItemWizardStepForm {
+    extends UserItemWizardStepForm<Principal> {
 
     private emailInput: EmailInput;
 
@@ -22,12 +23,14 @@ export class UserEmailWizardStepForm
 
     private readonly isSystemUser: boolean;
 
-    constructor(idProviderKey: IdProviderKey, isSystemUser: boolean) {
-        super('user-email-wizard-step-form');
+    constructor(params: PrincipalWizardPanelParams) {
+        super(params, 'user-email-wizard-step-form');
 
-        this.idProviderKey = idProviderKey;
-        this.isSystemUser = isSystemUser;
+        this.idProviderKey = params.idProviderKey;
+        this.isSystemUser = params.idProvider.getKey().isSystem();
     }
+
+
 
     protected initElements(): void {
         super.initElements();

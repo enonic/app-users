@@ -11,7 +11,6 @@ import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
-import {SetUserPasswordEvent} from './SetUserPasswordEvent';
 import {UpdatePasswordRequest} from '../../graphql/principal/user/UpdatePasswordRequest';
 
 export class ChangeUserPasswordDialog
@@ -92,10 +91,6 @@ export class ChangeUserPasswordDialog
                             this.close();
                         })
                         .catch(DefaultErrorHandler.handle);
-                } else {
-                    new SetUserPasswordEvent(this.password.getValue()).fire();
-                    showFeedback(i18n('notify.set.password'));
-                    this.close();
                 }
             });
 

@@ -17,6 +17,7 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 import {WizardHeaderWithDisplayNameAndName} from '@enonic/lib-admin-ui/app/wizard/WizardHeaderWithDisplayNameAndName';
+import {UserPasswordWizardStepFormParams} from './UserPasswordWizardStepFormParams';
 
 export class UserWizardPanel
     extends PrincipalWizardPanel {
@@ -46,9 +47,12 @@ export class UserWizardPanel
     createSteps(principal?: Principal): WizardStep[] {
         const steps: WizardStep[] = [];
 
-        this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams().idProvider.getKey(), this.isSystemUserItem());
-        this.userPasswordWizardStepForm = new UserPasswordWizardStepForm(principal);
-        this.userMembershipsWizardStepForm = new UserMembershipsWizardStepForm();
+        this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams());
+
+        this.userPasswordWizardStepForm =
+            new UserPasswordWizardStepForm(new UserPasswordWizardStepFormParams(this.getParams()).setUser(principal as User));
+
+        this.userMembershipsWizardStepForm = new UserMembershipsWizardStepForm(this.getParams());
 
         if (!this.isSystemUserItem()) {
             steps.push(new WizardStep(i18n('field.user'), this.userEmailWizardStepForm));
@@ -90,7 +94,7 @@ export class UserWizardPanel
             if (principal) {
                 this.decorateDeletedAction(principal.getKey());
                 this.userEmailWizardStepForm.layout(principal);
-                this.userPasswordWizardStepForm.layout(principal);
+                this.userPasswordWizardStepForm.layout(principal as User);
                 this.userMembershipsWizardStepForm.layout(principal);
             }
 
@@ -99,19 +103,19 @@ export class UserWizardPanel
     }
 
     persistNewItem(): Q.Promise<Principal> {
-        return this.produceCreateUserRequest().sendAndParse().then((principal: Principal) => {
-            this.decorateDeletedAction(principal.getKey());
+        return this.produceCreateUserRequest().sendAndParse().then((user: User) => {
+            this.decorateDeletedAction(user.getKey());
 
-            new UserItemCreatedEvent(principal, this.getIdProvider(), this.isParentOfSameType()).fire();
+            new UserItemCreatedEvent(user, this.getIdProvider(), this.isParentOfSameType()).fire();
 
             showFeedback(i18n('notify.create.user'));
-            this.notifyUserItemNamed(principal);
+            this.notifyUserItemNamed(user);
 
-            this.userMembershipsWizardStepForm.layout(principal);
-            this.userEmailWizardStepForm.layout(principal);
-            this.userPasswordWizardStepForm.layout(principal);
+            this.userMembershipsWizardStepForm.layout(user);
+            this.userEmailWizardStepForm.layout(user);
+            this.userPasswordWizardStepForm.layout(user);
 
-            return principal;
+            return user;
         });
     }
 
@@ -142,7 +146,7 @@ export class UserWizardPanel
             //remove after users event handling is configured and layout is updated on receiving upd from server
             this.userMembershipsWizardStepForm.layout(principal);
             this.userEmailWizardStepForm.layout(principal);
-            this.userPasswordWizardStepForm.layout(principal);
+            this.userPasswordWizardStepForm.layout(principal as User);
             return principal;
         });
     }

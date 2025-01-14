@@ -11,9 +11,10 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {IdProviderAccessControlEntry} from '../access/IdProviderAccessControlEntry';
 import {ArrayHelper} from '@enonic/lib-admin-ui/util/ArrayHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
 
 export class SecurityWizardStepForm
-    extends UserItemWizardStepForm {
+    extends UserItemWizardStepForm<IdProvider> {
 
     private inheritance: DivEl;
 
@@ -21,8 +22,8 @@ export class SecurityWizardStepForm
 
     private comboboxWrapper: IdProviderAccessControlComboBoxWrapper;
 
-    constructor() {
-        super('security-wizard-step-form');
+    constructor(params: IdProviderWizardPanelParams) {
+        super(params, 'security-wizard-step-form');
     }
 
     protected initElements(): void {

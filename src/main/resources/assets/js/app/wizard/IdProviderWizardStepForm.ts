@@ -19,9 +19,10 @@ import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {IdProviderWizardPanelParams} from './IdProviderWizardPanelParams';
 
 export class IdProviderWizardStepForm
-    extends UserItemWizardStepForm {
+    extends UserItemWizardStepForm<IdProvider> {
 
     private description: TextInput;
 
@@ -29,8 +30,8 @@ export class IdProviderWizardStepForm
 
     private wrapper: AuthApplicationComboBoxWrapper;
 
-    constructor() {
-        super('idprovider-wizard-step-form');
+    constructor(params: IdProviderWizardPanelParams) {
+        super(params, 'idprovider-wizard-step-form');
     }
 
     protected initElements(): void {

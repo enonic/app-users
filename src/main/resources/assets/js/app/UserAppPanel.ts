@@ -352,7 +352,12 @@ export class UserAppPanel
                     this.handleIdProviderEdit(userItem.getIdProvider(), tabId, tabMenuItem);
                 } else if (userItem.getType() === UserTreeGridItemType.PRINCIPAL) {
                     this.loadIdProviderIfNeeded(userItem).then((idProvider) => {
-                        this.handlePrincipalEdit(userItem.getPrincipal(), idProvider, tabId, tabMenuItem);
+                        try {
+                            this.handlePrincipalEdit(userItem.getPrincipal(), idProvider, tabId, tabMenuItem);
+                        } catch (e) {
+                            DefaultErrorHandler.handle(e);
+                        }
+
                     });
                 }
             }

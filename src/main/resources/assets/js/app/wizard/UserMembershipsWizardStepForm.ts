@@ -9,9 +9,10 @@ import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {UsersPrincipalCombobox} from './UsersPrincipalComboBox';
+import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 
 export class UserMembershipsWizardStepForm
-    extends UserItemWizardStepForm {
+    extends UserItemWizardStepForm<Principal> {
 
     private groups: PrincipalComboBox;
 
@@ -21,8 +22,8 @@ export class UserMembershipsWizardStepForm
 
     private rolesWrapper: PrincipalComboBoxWrapper;
 
-    constructor() {
-        super('user-memberships-wizard-step-form');
+    constructor(params: PrincipalWizardPanelParams) {
+        super(params, 'user-memberships-wizard-step-form');
     }
 
     protected initElements(): void {

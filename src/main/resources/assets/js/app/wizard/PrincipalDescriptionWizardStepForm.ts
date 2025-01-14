@@ -5,14 +5,15 @@ import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
+import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 
 export class PrincipalDescriptionWizardStepForm
-    extends UserItemWizardStepForm {
+    extends UserItemWizardStepForm<Principal> {
 
     private description: TextInput;
 
-    constructor() {
-        super('principal-description-wizard-step-form');
+    constructor(params: PrincipalWizardPanelParams) {
+        super(params, 'principal-description-wizard-step-form');
     }
 
     protected initElements(): void {

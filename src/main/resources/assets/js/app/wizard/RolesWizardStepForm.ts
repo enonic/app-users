@@ -10,16 +10,17 @@ import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {PrincipalComboBox, PrincipalComboBoxWrapper} from '@enonic/lib-admin-ui/ui/security/PrincipalComboBox';
 import {UsersPrincipalCombobox} from './UsersPrincipalComboBox';
+import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 
 export class RolesWizardStepForm
-    extends UserItemWizardStepForm {
+    extends UserItemWizardStepForm<Principal> {
 
     private roles: PrincipalComboBox;
 
     private rolesWrapper: PrincipalComboBoxWrapper;
 
-    constructor() {
-        super('roles-wizard-step-form');
+    constructor(params: PrincipalWizardPanelParams) {
+        super(params, 'roles-wizard-step-form');
     }
 
     protected initElements(): void {

@@ -17,16 +17,17 @@ import * as Q from 'q';
 import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {RoleKeys} from '@enonic/lib-admin-ui/security/RoleKeys';
 import {UrlHelper} from '../../util/UrlHelper';
+import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 
 export class MembersWizardStepForm
-    extends UserItemWizardStepForm {
+    extends UserItemWizardStepForm<Principal> {
 
     private membersCombobox: MembersPrincipalCombobox;
 
     private comboboxWrapper: PrincipalComboBoxWrapper;
 
-    constructor() {
-        super('membership-wizard-step-form');
+    constructor(params: PrincipalWizardPanelParams) {
+        super(params, 'membership-wizard-step-form');
     }
 
     protected initElements(): void {
