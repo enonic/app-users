@@ -28,7 +28,7 @@ exports.create = function createUser(params) {
 
     populateMemberships(createdUser);
 
-    return createdUser;
+    return authLib.getPrincipal(key);
 };
 
 exports.update = function updateUser(params) {
@@ -54,7 +54,11 @@ exports.update = function updateUser(params) {
 
     populateMemberships(updatedUser);
 
-    return updatedUser;
+    if (params.password) {
+        exports.updatePwd(key, params.password);
+    }
+
+    return authLib.getPrincipal(key);
 };
 
 exports.updatePwd = function (key, pwd) {

@@ -55,7 +55,8 @@ module.exports = schemaGenerator.createObjectType({
                 email: graphQl.nonNull(graphQl.GraphQLString),
                 login: graphQl.nonNull(graphQl.GraphQLString),
                 addMemberships: graphQl.list(graphQl.GraphQLString),
-                removeMemberships: graphQl.list(graphQl.GraphQLString)
+                removeMemberships: graphQl.list(graphQl.GraphQLString),
+                password: graphQl.GraphQLString,
             },
             resolve: function(env) {
                 return users.update({
@@ -64,7 +65,8 @@ module.exports = schemaGenerator.createObjectType({
                     email: env.args.email,
                     login: env.args.login,
                     addMemberships: env.args.addMemberships,
-                    removeMemberships: env.args.removeMemberships
+                    removeMemberships: env.args.removeMemberships,
+                    password: env.args.password,
                 });
             }
         },

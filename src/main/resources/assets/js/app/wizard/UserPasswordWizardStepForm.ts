@@ -1,113 +1,94 @@
-import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
-import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
-import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
-import {NewPublicKeyDialog} from './NewPublicKeyDialog';
 import {User} from '../principal/User';
-import {PublicKeysGrid} from '../view/PublicKeysGrid';
-import {SetUserPasswordEvent} from './SetUserPasswordEvent';
-import {PasswordGenerator} from './PasswordGenerator';
+import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
+import {PasswordSection} from './PasswordSection';
+import {PublicKeysSection} from './PublicKeysSection';
+import {SetPasswordButtonClickedEvent} from './SetPasswordButtonClickedEvent';
 
 export class UserPasswordWizardStepForm
     extends UserItemWizardStepForm {
 
-    private password: string;
+    private passwordSection: PasswordSection;
 
-    private changePasswordButton: Button;
+    private passwordFormItem: FormItem;
 
-    private addPublicKeyButton: Button;
+    private publicKeysSection?: PublicKeysSection;
 
-    private updatePasswordFormItem: FormItem;
+    private publicKeyFormItem?: FormItem;
 
-    private addPublicKeyFormItem: FormItem;
+    private user?: User;
 
-    private principal: Principal;
+    private idProviderKey: IdProviderKey;
 
-    private publicKeysGrid: PublicKeysGrid;
-
-    constructor(principal?: Principal) {
+    constructor(idProviderKey: IdProviderKey, user?: User) {
         super('user-password-wizard-step-form');
 
-        this.principal = principal;
+        this.idProviderKey = idProviderKey;
+        this.user = user;
+    }
+
+    private isSystemUser(): boolean {
+        return this.idProviderKey.isSystem();
     }
 
     protected initElements(): void {
         super.initElements();
 
-        this.changePasswordButton = new Button(i18n(!this.principal ? 'action.setPassword' : 'action.changePassword'));
-        this.addPublicKeyButton = new Button(i18n('action.add'));
-        this.publicKeysGrid = new PublicKeysGrid();
+        this.passwordSection = new PasswordSection(this.user);
+        this.passwordSection.initialize();
+
+        if (this.isSystemUser()) {
+            this.publicKeysSection = new PublicKeysSection(this.user);
+            this.publicKeysSection.initialize();
+        }
     }
 
-    protected postInitElements(): void {
-        super.postInitElements();
+    protected initListeners() {
+        super.initListeners();
 
-        this.addPublicKeyFormItem.setVisible(false);
+        SetPasswordButtonClickedEvent.on((event) => {
+            this.passwordFormItem.getLabel().setVisible(event.isShowLabel());
+        });
     }
 
     protected createFormItems(): FormItem[] {
-        this.updatePasswordFormItem = new FormItemBuilder(this.changePasswordButton).build();
+        const formItems: FormItem[] = [];
 
-        this.addPublicKeyFormItem = new FormItemBuilder(this.addPublicKeyButton).setLabel(i18n('field.userKeys.grid.title')).build();
+        this.passwordFormItem = new FormItemBuilder(this.passwordSection).setLabel(i18n('field.password')).build();
+        this.passwordFormItem.getLabel().setVisible(false);
 
-        return [this.updatePasswordFormItem, this.addPublicKeyFormItem];
+        formItems.push(this.passwordFormItem);
+
+
+        if (this.isSystemUser()) {
+            this.publicKeyFormItem = new FormItemBuilder(this.publicKeysSection).setLabel(i18n('field.userKeys.grid.title')).build();
+            formItems.push(this.publicKeyFormItem);
+        }
+
+        return formItems;
     }
 
-    protected initListeners(): void {
-        super.initListeners();
-
-        this.form.onValidityChanged((event: ValidityChangedEvent) => {
-            this.updatePasswordFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
-            this.addPublicKeyFormItem.toggleClass(FormItem.INVALID_CLASS, !event.isValid());
-        });
-
-        this.changePasswordButton.onClicked(() => {
-            new OpenChangePasswordDialogEvent(this.principal).fire();
-        });
-
-        this.addPublicKeyButton.onClicked(() => {
-            const user = this.principal as User;
-            const publicKeysDialog = new NewPublicKeyDialog(user);
-            publicKeysDialog.open();
-        });
-
-        SetUserPasswordEvent.on((event) => {
-           this.password = event.getPassword();
-        });
+    layout(user: User): void {
+        this.updatePrincipal(user);
     }
 
-    layout(principal: Principal): void {
-        this.updatePrincipal(principal);
-    }
+    updatePrincipal(user: User): void {
+        this.user = user;
 
-    updatePrincipal(principal: Principal): void {
-        this.principal = principal;
+        new SetPasswordButtonClickedEvent(false).fire();
 
-        if (principal && principal.getKey().getIdProvider().isSystem()) {
-            this.addPublicKeyFormItem.setVisible(true);
-            this.publicKeysGrid.setUser(principal as User);
+        if (!!this.user) {
+            this.passwordSection.updateView(this.user);
+
+            if (this.isSystemUser()) {
+                this.publicKeysSection.updateView(this.user);
+            }
         }
     }
 
     getPassword(): string {
-        return this.password;
-    }
-
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.changePasswordButton.addClass('change-password-button');
-
-            this.publicKeysGrid.insertBeforeEl(this.addPublicKeyButton);
-
-            const principal = this.principal as User;
-            if (principal?.getKey().getIdProvider().isSystem()) {
-                this.publicKeysGrid.setUser(principal);
-            }
-
-            return rendered;
-        });
+        return this.passwordSection.getPassword();
     }
 }
