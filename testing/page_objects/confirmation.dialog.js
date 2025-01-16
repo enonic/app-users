@@ -20,7 +20,7 @@ class ConfirmationDialog extends Page {
     }
 
     get noButton() {
-        return XPATH.container + XPATH.yesButton;
+        return XPATH.container + XPATH.noButton;
     }
 
     async clickOnYesButton() {
@@ -54,6 +54,12 @@ class ConfirmationDialog extends Page {
 
     isWarningMessageDisplayed() {
         return this.waitForElementDisplayed(this.warningMessage, appConst.mediumTimeout);
+    }
+
+    async getQuestionText() {
+        let locator = "//h6[@class='question']";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return this.getText(locator);
     }
 }
 

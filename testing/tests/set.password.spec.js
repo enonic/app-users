@@ -5,7 +5,8 @@ const webDriverHelper = require('../libs/WebDriverHelper');
 const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
-const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
+const userItemsBuilder = require('../libs/userItems.builder');
+const assert = require('node:assert');
 
 describe('Tests for set password modal dialog', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -16,62 +17,56 @@ describe('Tests for set password modal dialog', function () {
 
     const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
 
-    it("GIVEN wizard for new User is opened WHEN the only a valid password has been set THEN 'Save' button should be disabled in the wizard",
+    it("GIVEN the password input is empty WHEN name, email has been filled in AND Save button clicked THEN 'Set password' button should appears but the user is valid",
         async () => {
-            let changePasswordDialog = new ChangePasswordDialog();
             let userWizard = new UserWizard();
+            let userName = appConst.generateRandomName('user');
+            let email = userItemsBuilder.generateEmail(userName);
             // 1. Open wizard for new user:
             await testUtils.clickOnSystemOpenUserWizard();
+            // 1. Type a user data with a weak password:
+            await userWizard.typeDisplayName(userName);
+            await userWizard.typeEmail(email);
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            // 3. Fill in the password input with a medium password:
-            await changePasswordDialog.typePassword(MEDIUM_PASSWORD);
-            // 4. Verify that 'Set password' button gets enabled, click on it and close the dialog:
-            await changePasswordDialog.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForClosed();
+            // 3. Do not type a password but save the user:
+            await userWizard.waitAndClickOnSave();
+            // 4. Verify that 'Set password' button is displayed:
+            await userWizard.waitForSetPasswordButtonDisplayed();
             await testUtils.saveScreenshot('user_wizard_with_the_only_password');
-            // 5. Verify that Weak state of the password is displayed
-            await userWizard.waitUntilInvalidIconDisplayed('<Unnamed User>');
-            // 6. Verify that 'Save' button is disabled in the wizard:
-            await userWizard.waitForSaveButtonDisabled();
+            // 5. Verify that user is valid:
+            await userWizard.waitUntilInvalidIconDisappears(userName);
         });
 
-    it("GIVEN 'Set password' modal dialog has been opened WHEN 'Cancel' button has been clicked THEN the dialog closes and 'Save' button should be disabled in the wizard",
+    it("GIVEN user-wizard is opened WHEN 'Generate' link has been pressed THEN new password should be generated",
         async () => {
-            let changePasswordDialog = new ChangePasswordDialog();
             let userWizard = new UserWizard();
-            // 1. Open wizard for new user:
+            // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            // 3. Click on Cancel button and close the dialog:
-            await changePasswordDialog.clickOnCancelButton();
-            // 4. Verify that 'Save' button is disabled in the wizard and the modal dialog is closed:
-            await changePasswordDialog.waitForClosed();
-            await userWizard.waitForSaveButtonDisabled();
-            // 5. Verify that Weak state of the password is displayed
-            await userWizard.waitUntilInvalidIconDisplayed('<Unnamed User>');
+            // 3. Click on 'generate':
+            await userWizard.clickOnGenerateLink();
+            await userWizard.clickOnShowPasswordLink();
+            await testUtils.saveScreenshot('generate_password_link_clicked');
+            let result = await userWizard.getTextInPasswordInput();
+            assert.ok(result.length > 0, "new password should be generated");
         });
 
-    it("GIVEN 'Set password' modal dialog has been opened AND 'Generate' button has been clicked WHEN 'Cancel' button has been clicked THEN the dialog closes and 'Save' button should be disabled in the wizard",
+    it("GIVEN user-wizard is opened WHEN 'Show' password link has been clicked THEN 'Hide' link should appear",
         async () => {
-            let changePasswordDialog = new ChangePasswordDialog();
             let userWizard = new UserWizard();
-            // 1. Open wizard for new user:
+            // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            // 3. Click on 'Generate' button in the modal dialog:
-            await changePasswordDialog.clickOnGeneratePasswordLink();
-            // 4. Click on Cancel button and close the dialog:
-            await changePasswordDialog.clickOnCancelButton();
-            // 4. Verify that 'Save' button is disabled in the wizard and the modal dialog is closed:
-            await changePasswordDialog.waitForClosed();
-            await userWizard.waitForSaveButtonDisabled();
+            // 3. Click on 'Show Password' button:
+            await userWizard.clickOnShowPasswordLink();
+            await testUtils.saveScreenshot('show_password_link_clicked');
+            // Verify that 'Hide' link gets displayed
+            await userWizard.waitForHidePasswordLinkDisplayed();
         });
+
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());

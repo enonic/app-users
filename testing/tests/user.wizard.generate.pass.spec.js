@@ -18,56 +18,52 @@ describe("User Wizard generate password spec", function () {
     it("GIVEN 'User' wizard is opened WHEN 'Set password' modal dialog has been opened THEN 'Show' 'Generate' links should be displayed",
         async () => {
             let userWizard = new UserWizard();
-            let changePasswordDialog = new ChangePasswordDialog();
             // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.waitForSetPasswordButtonDisplayed();
+            // 2. Verify that password input is not displayed:
+            await userWizard.waitForPasswordInputNotDisplayed();
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
-            await testUtils.saveScreenshot('generate_password_link');
-            await changePasswordDialog.waitForDialogLoaded();
+            await testUtils.saveScreenshot('set_password_btn_clicked');
             // 3. Verify that 'Show' and 'Generate' links are displayed:
-            await changePasswordDialog.waitForGenerateLinkDisplayed();
-            await changePasswordDialog.waitForShowPasswordLinkDisplayed();
-            // 4. Verify that 'Set password' button is disabled:
-            await changePasswordDialog.waitForSetPasswordButtonDisabled();
+            await userWizard.waitForPasswordInputDisplayed();
+            await userWizard.waitForGenerateLinkDisplayed();
+            await userWizard.waitForShowPasswordLinkDisplayed();
+            await userWizard.waitForAddPublicKeyButtonNotDisplayed();
         });
 
-    it("GIVEN 'Set password' modal dialog has been opened WHEN 'Generate' link has been pressed THEN new password should be generated",
+    it("GIVEN 'Set password' button has been clicked WHEN 'Generate' link has been pressed THEN new password should be generated",
         async () => {
             let userWizard = new UserWizard();
-            let changePasswordDialog = new ChangePasswordDialog();
             // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
-            // 3. Click on 'generate' link in the dialog:
-            await changePasswordDialog.clickOnGeneratePasswordLink();
+            // 3. Click on 'generate' link in the wizard:
+            await userWizard.clickOnGeneratePasswordLink();
             await testUtils.saveScreenshot('generate_password_link_clicked');
-            let result = await changePasswordDialog.getPasswordText();
+            let result = await userWizard.getTextInPasswordInput();
             assert.ok(result.length > 0, "new password should be generated");
-            let passwordState = await changePasswordDialog.getPasswordStatus();
+            let passwordState = await userWizard.getPasswordStatus();
             assert.ok(passwordState === appConst.PASSWORD_STATE.STRONG || passwordState === appConst.PASSWORD_STATE.EXCELLENT,
                 "Strong or Excellent password's status should be displayed");
             // 4. Verify that 'Set password' button is enabled now :
-            await changePasswordDialog.waitForSetPasswordButtonEnabled();
+            //await changePasswordDialog.waitForSetPasswordButtonEnabled();
         });
 
-    it("GIVEN 'Set password' modal dialog has been opened WHEN 'Show' password link has been clicked THEN 'Hide' link should appear",
+    it("GIVEN 'Set password' button has been clicked WHEN 'Show' password link has been clicked THEN 'Hide' link should appear",
         async () => {
             let userWizard = new UserWizard();
-            let changePasswordDialog = new ChangePasswordDialog();
             // 1. Open new user-wizard:
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
             // 3. Click on 'Show' Password button:
-            await changePasswordDialog.clickOnShowPasswordLink();
+            await userWizard.clickOnShowPasswordLink();
             await testUtils.saveScreenshot('show_password_link_clicked');
             // 4. Verify that 'Hide' link should appear:
-            await changePasswordDialog.waitForHidePasswordLinkDisplayed();
-            await changePasswordDialog.waitForSetPasswordButtonDisabled();
+            await userWizard.waitForHidePasswordLinkDisplayed();
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

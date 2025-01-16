@@ -7,7 +7,6 @@ const UserWizard = require('../page_objects/wizardpanel/user.wizard');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
 
 describe('Negative ui-tests for user wizard ', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -20,9 +19,8 @@ describe('Negative ui-tests for user wizard ', function () {
     const WEAK_PASSWORD = appConst.PASSWORD.WEAK;
     const INVALID_EMAIL = 'invalid@@@mail.com';
 
-    it("GIVEN wizard for new User is opened WHEN weak password has been typed THEN 'Set password' button should be disabled",
+    it("GIVEN wizard for new User is opened WHEN weak password has been typed THEN 'Save' button should be disabled",
         async () => {
-            let changePasswordDialog = new ChangePasswordDialog();
             let userWizard = new UserWizard();
             let userName = appConst.generateRandomName('user');
             let email = userItemsBuilder.generateEmail(userName);
@@ -31,38 +29,33 @@ describe('Negative ui-tests for user wizard ', function () {
             await userWizard.typeDisplayName(userName);
             await userWizard.typeEmail(email);
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            await changePasswordDialog.typePassword(WEAK_PASSWORD);
-            // 2. Verify that 'Set password' button is disabled:
-            await changePasswordDialog.waitForSetPasswordButtonDisabled();
+            await userWizard.typePassword(WEAK_PASSWORD);
             // 3. Verify that 'Weak' state of the password is displayed
-            let actualStatus = await changePasswordDialog.getPasswordStatus();
+            let actualStatus = await userWizard.getPasswordStatus();
             assert.equal(actualStatus, appConst.PASSWORD_STATE.WEAK, "'Weak' state of the password should be displayed");
+            // 4. Verify that user is invalid:
+            await userWizard.waitUntilInvalidIconAppears(TEST_USER.displayName);
+            await userWizard.waitForSaveButtonDisabled();
         });
 
     it("GIVEN a user's name and email has been filled in WHEN a medium password has been set THEN the red icon disappears in the wizard 'Save' button should be enabled",
         async () => {
             let userWizard = new UserWizard();
-            let changePasswordDialog = new ChangePasswordDialog();
             let userName = userItemsBuilder.generateRandomName('user');
             TEST_USER = userItemsBuilder.buildUser(userName, MEDIUM_PASSWORD, userItemsBuilder.generateEmail(userName), null);
             await testUtils.clickOnSystemOpenUserWizard();
             // 1. Type a user-name and email:
             await userWizard.typeDisplayName(userName);
             await userWizard.typeEmail(TEST_USER.email);
-            // 2. Open the modal dialog and set a medium password:
+            // 2. Insert a medium password:
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            await changePasswordDialog.typePassword(MEDIUM_PASSWORD);
+            await userWizard.typePassword(MEDIUM_PASSWORD);
             // 3. Verify that 'Medium' state of the password is displayed:
-            await changePasswordDialog.waitForSetPasswordButtonEnabled();
-            let actualStatus = await changePasswordDialog.getPasswordStatus();
+            let actualStatus = await userWizard.getPasswordStatus();
             assert.equal(actualStatus, appConst.PASSWORD_STATE.MEDIUM, "'Medium' state of the password should be displayed");
-            // 4. Click on Set password button and close the modal dialog:
-            await changePasswordDialog.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForClosed();
             // 4. Verify that red icon is not visible and the user is valid
             await userWizard.waitUntilInvalidIconDisappears(TEST_USER.displayName);
+            await userWizard.waitForSaveButtonEnabled();
         });
 
     // Password must be optional for Service Account 1808

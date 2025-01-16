@@ -16,6 +16,8 @@ const XPATH = {
     publicKeyFormItem: "//div[contains(@id,'FormItem') and child::label[contains(.,'Public Keys')]]",
     rolesGroupLink: "//li[child::a[text()='Roles & Groups']]",
     passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
+    showPasswordLink: "//a[@data-i18n='Show']",
+    hidePasswordLink: "//a[@data-i18n='Hide']",
     generatePasswordLink: "//a[text()='Generate']",
     setPasswordButton: "//button[contains(@class,'password-button')]/span[text()='Set Password']",
     publicKeysGrid: "//div[contains(@id,'PublicKeysGrid')]",
@@ -29,6 +31,10 @@ class UserWizard extends wizards.WizardPanel {
 
     get deleteButton() {
         return XPATH.container + wpXpath.deleteButton;
+    }
+
+    get passwordInput() {
+        return XPATH.container + "//input[@type = 'text' and contains(@class,'password-input')]";
     }
 
     get emailInput() {
@@ -51,8 +57,54 @@ class UserWizard extends wizards.WizardPanel {
         return XPATH.container + XPATH.setPasswordButton;
     }
 
+    get clearPasswordButton() {
+        return XPATH.container + "//button[contains(.,'Clear Password')]";
+    }
+
     get addPublicKeyButton() {
         return XPATH.container + XPATH.publicKeyFormItem + '//button';
+    }
+
+    get hidePasswordLink() {
+        return XPATH.container + XPATH.hidePasswordLink;
+    }
+
+    get generateLink() {
+        return XPATH.container + XPATH.generatePasswordLink;
+    }
+
+    get showPasswordLink() {
+        return XPATH.container + XPATH.showPasswordLink;
+    }
+
+    get changePasswordButton() {
+        return XPATH.container + "//button[contains(@class,'change-password-button') and child::span[contains(.,'Change Password')]]";
+    }
+
+    async clickOnChangePasswordButton() {
+        try {
+            await this.waitForChangePasswordButtonDisplayed();
+            return await this.clickOnElement(this.changePasswordButton);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_change_password_btn');
+            throw new Error(`Error occurred during clicking on 'Change Password' button, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async waitForChangePasswordButtonDisplayed() {
+        return await this.waitForElementDisplayed(this.changePasswordButton, appConst.mediumTimeout);
+    }
+
+    async waitForChangePasswordButtonNotDisplayed() {
+        return await this.waitForElementNotDisplayed(this.changePasswordButton, appConst.mediumTimeout);
+    }
+
+    async clickOnGenerateLink() {
+        return await this.clickOnElement(this.generateLink);
+    }
+
+    waitForHidePasswordLinkDisplayed() {
+        return this.waitForElementDisplayed(this.hidePasswordLink, appConst.mediumTimeout);
     }
 
     async waitForAddPublicKeyButtonDisplayed() {
@@ -86,11 +138,11 @@ class UserWizard extends wizards.WizardPanel {
     async clickOnSetPasswordButton() {
         try {
             await this.waitForSetPasswordButtonDisplayed();
-            await await this.clickOnElement(this.setPasswordButton);
+            await this.clickOnElement(this.setPasswordButton);
             await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_set_password_btn');
-            throw new Error(`Error occurred after clicking on Set Password button, screenshot: ${screenshot} ` + err);
+            throw new Error(`Error occurred when tried to click on 'Set Password' button, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -201,16 +253,13 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     async typeDataAndGeneratePassword(user) {
-        let changePasswordDialog = new ChangePasswordDialog();
         await this.typeDisplayName(user.displayName);
         await this.typeEmail(user.email);
         await this.clickOnSetPasswordButton();
-        await changePasswordDialog.clickOnGeneratePasswordLink();
-        await changePasswordDialog.clickOnShowPasswordLink();
-        let password = await changePasswordDialog.getPasswordText();
-        await changePasswordDialog.clickOnSetPasswordButton();
-        await changePasswordDialog.waitForClosed();
-        await this.pause(500);
+        await this.clickOnGeneratePasswordLink();
+        await this.clickOnShowPasswordLink();
+        let password = await this.getTextInPasswordInput();
+        await this.pause(200);
         if (user.roles != null) {
             await this.addRoles(user.roles);
         }
@@ -218,17 +267,13 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     async typeData(user) {
-        let changePasswordDialog = new ChangePasswordDialog();
         await this.typeDisplayName(user.displayName);
         await this.typeEmail(user.email);
         if (user.password) {
             await this.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            await changePasswordDialog.typePassword(user.password);
-            await changePasswordDialog.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForClosed();
+            await this.typePassword(user.password);
         }
-        await this.pause(500);
+        await this.pause(200);
         if (user.roles != null) {
             await this.addRoles(user.roles);
         }
@@ -249,6 +294,95 @@ class UserWizard extends wizards.WizardPanel {
             throw new Error("Password status was not found!");
         }
         return status;
+    }
+
+    async clearPasswordInput() {
+        await this.clearInputText(this.passwordInput);
+        //insert a letter:
+        await this.typeTextInInput(this.passwordInput, 'a');
+        //press on BACKSPACE, remove the letter:
+        return await this.getBrowser().keys('\uE003');
+    }
+
+    async getTextInPasswordInput() {
+        try {
+            return await this.getTextInInput(this.passwordInput);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_get_text_password');
+            throw new Error(`Error when getting text in password input , ${screenshot} ` + err);
+        }
+    }
+
+    async waitForPasswordInputDisplayed() {
+        return await this.waitForElementDisplayed(this.passwordInput, appConst.mediumTimeout);
+
+    }
+
+    async waitForPasswordInputNotDisplayed() {
+        try {
+            return await this.waitForElementNotDisplayed(this.passwordInput, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_password_input');
+            throw new Error(`Password input should not be displayed, screenshot: ${screenshot} ` + err);
+        }
+
+    }
+
+    async typePassword(password) {
+        await this.waitForPasswordInputDisplayed();
+        return await this.typeTextInInput(this.passwordInput, password);
+    }
+
+    async clickOnShowPasswordLink() {
+        try {
+            await this.waitForElementDisplayed(this.showPasswordLink, appConst.mediumTimeout);
+            await this.clickOnElement(this.showPasswordLink);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_show_password');
+            throw new Error("Error after clicking on Show Pass link, screenshot: " + screenshot + '  ' + err);
+        }
+    }
+
+    async waitForGenerateLinkDisplayed() {
+        return await this.waitForElementDisplayed(this.generateLink, appConst.mediumTimeout);
+    }
+
+    // Clicks on Generate password link(button)
+    async clickOnGeneratePasswordLink() {
+        await this.waitForGenerateLinkDisplayed();
+        return await this.clickOnElement(this.generateLink);
+    }
+
+
+    async waitForShowPasswordLinkDisplayed() {
+        return await this.waitForElementDisplayed(this.showPasswordLink, appConst.mediumTimeout);
+    }
+
+    async waitForAddPublicKeyButtonNotDisplayed() {
+        try {
+            return await this.waitForElementNotDisplayed(this.addPublicKeyButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_add_public_key');
+            throw new Error(`Add public key button should not be displayed, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async waitForClearPasswordButtonDisplayed() {
+        return await this.waitForElementDisplayed(this.clearPasswordButton, appConst.mediumTimeout);
+    }
+
+    async waitForClearPasswordButtonNotDisplayed() {
+        try {
+            return await this.waitForElementNotDisplayed(this.clearPasswordButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_clear_password');
+            throw new Error(`Clear password button should not be displayed, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async clickOnClearPasswordButton() {
+        await this.waitForClearPasswordButtonDisplayed();
+        return await this.clickOnElement(this.clearPasswordButton);
     }
 }
 
