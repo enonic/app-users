@@ -8,7 +8,8 @@ const appConst = require('../../libs/app_const');
 const XPATH = {
     container: "//div[contains(@id,'ChangeUserPasswordDialog')]",
     passwordInput: "//input[contains(@class,'password-input')]",
-    showPasswordLink: "//a[contains(@class,'show-link')]",
+    showPasswordLink: "//a[contains(@class,'show-link') and @data-i18n='Show']",
+    hidePasswordLink: "//a[contains(@class,'show-link') and @data-i18n='Hide']",
     generatePasswordLink: "//a[text()='Generate']",
     userPath: "//h6[@class='user-path']",
     passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
@@ -28,6 +29,10 @@ class ChangeUserPasswordDialog extends Page {
         return XPATH.container + XPATH.showPasswordLink;
     }
 
+    get hidePasswordLink() {
+        return XPATH.container + XPATH.hidePasswordLink;
+    }
+
     get cancelButton() {
         return XPATH.container + lib.BUTTONS.dialogButton('Cancel');
     }
@@ -44,30 +49,40 @@ class ChangeUserPasswordDialog extends Page {
         return XPATH.container + lib.BUTTONS.dialogButton('Change Password');
     }
 
+    get setPasswordButton() {
+        return XPATH.container + lib.BUTTONS.dialogButton('Set Password');
+    }
+
     isPasswordInputDisplayed() {
         return this.isElementDisplayed(this.passwordInput);
     }
 
-    isShowLinkDisplayed() {
-        return this.isElementDisplayed(this.showPasswordLink);
+    async waitForShowPasswordLinkDisplayed() {
+        return await this.isElementDisplayed(this.showPasswordLink);
     }
 
     async waitForClosed() {
         try {
-            return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(300);
         } catch (error) {
             let screenshot = await this.saveScreenshotUniqueName('err_ch_password_dlg');
-            throw new Error('Change Password Dialog is not closed, screenshot ' + screenshot + ' ' + error);
+            throw new Error(`Change Password Dialog is not closed, screenshot ${screenshot} ` + error);
         }
     }
 
-    async isHideLinkDisplayed() {
-        let attr = await this.getAttribute(this.showPasswordLink, 'data-i18n');
-        return attr.includes('Hide');
+    async waitForHideLinkDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(this.hidePasswordLink, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_hide_link');
+            throw new Error(`Hide link is not displayed! screenshot: ${screenshot} ` + err);
+        }
+
     }
 
-    isGenerateLinkDisplayed() {
-        return this.isElementDisplayed(this.generatePasswordLink);
+    async waitForGenerateLinkDisplayed() {
+        return await this.waitForElementDisplayed(this.generatePasswordLink, appConst.mediumTimeout);
     }
 
     async clickOnChangePasswordButton() {
@@ -89,6 +104,15 @@ class ChangeUserPasswordDialog extends Page {
         return await this.pause(300);
     }
 
+    async waitForHidePasswordLinkDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(this.hidePasswordLink, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_hide_pswd_link');
+            throw new Error(`Hide password link is not displayed! screenshot: ${screenshot} ` + err);
+        }
+    }
+
     clickOnCancelButton() {
         return this.clickOnElement(this.cancelButton);
     }
@@ -97,7 +121,7 @@ class ChangeUserPasswordDialog extends Page {
         return this.clickOnElement(this.cancelButtonTop);
     }
 
-    getPasswordString() {
+    getPasswordText() {
         return this.getTextInInput(this.passwordInput)
     }
 
@@ -132,6 +156,42 @@ class ChangeUserPasswordDialog extends Page {
             let screenshot = await this.saveScreenshotUniqueName('err_pswd_dlg');
             throw new Error("Password status was not found! screenshot:" + screenshot + '  ' + err);
         }
+    }
+
+    waitForSetPasswordButtonDisplayed() {
+        return this.waitForElementDisplayed(this.setPasswordButton, appConst.mediumTimeout);
+    }
+
+    async clickOnSetPasswordButton() {
+        await this.waitForSetPasswordButtonEnabled();
+        await this.clickOnElement(this.setPasswordButton);
+        return await this.waitForClosed();
+    }
+
+    async waitForSetPasswordButtonEnabled() {
+        try {
+            return await this.waitForElementEnabled(this.setPasswordButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_set_pswd_btn');
+            throw new Error(`Set Password button is not enabled! screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async waitForSetPasswordButtonDisabled() {
+        try {
+            return await this.waitForElementDisabled(this.setPasswordButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_set_pswd_btn_disabled');
+            throw new Error(`Set Password button is not disabled! screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async clearPasswordInput() {
+        await this.clearInputText(this.passwordInput);
+        //insert a letter:
+        await this.typeTextInInput(this.passwordInput, 'a');
+        //press on BACKSPACE, remove the letter:
+        return await this.getBrowser().keys('\uE003');
     }
 }
 

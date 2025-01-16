@@ -19,7 +19,10 @@ export class MembersWizardPanel extends PrincipalWizardPanel {
         super(params);
 
         this.descriptionWizardStepForm = new PrincipalDescriptionWizardStepForm();
+        this.descriptionWizardStepForm.initialize();
+
         this.membersWizardStepForm = new MembersWizardStepForm();
+        this.membersWizardStepForm.initialize();
 
         this.addClass('membership-wizard-panel');
     }

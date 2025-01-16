@@ -29,7 +29,7 @@ export class UpdatePasswordRequest
     }
 
     getMutation(): string {
-        return `mutation ($key: String!, $password: String!) {
+        return `mutation ($key: String!, $password: String) {
             updatePwd(key: $key, password: $password)
         }`;
     }

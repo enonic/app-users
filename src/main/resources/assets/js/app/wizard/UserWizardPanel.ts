@@ -47,8 +47,13 @@ export class UserWizardPanel
         const steps: WizardStep[] = [];
 
         this.userEmailWizardStepForm = new UserEmailWizardStepForm(this.getParams().idProvider.getKey(), this.isSystemUserItem());
-        this.userPasswordWizardStepForm = new UserPasswordWizardStepForm();
+        this.userEmailWizardStepForm.initialize();
+
+        this.userPasswordWizardStepForm = new UserPasswordWizardStepForm(this.getParams().idProvider.getKey(), principal as User);
+        this.userPasswordWizardStepForm.initialize();
+
         this.userMembershipsWizardStepForm = new UserMembershipsWizardStepForm();
+        this.userMembershipsWizardStepForm.initialize();
 
         if (!this.isSystemUserItem()) {
             steps.push(new WizardStep(i18n('field.user'), this.userEmailWizardStepForm));
@@ -90,7 +95,7 @@ export class UserWizardPanel
             if (principal) {
                 this.decorateDeletedAction(principal.getKey());
                 this.userEmailWizardStepForm.layout(principal);
-                this.userPasswordWizardStepForm.layout(principal);
+                this.userPasswordWizardStepForm.layout(principal as User);
                 this.userMembershipsWizardStepForm.layout(principal);
             }
 
@@ -109,7 +114,7 @@ export class UserWizardPanel
 
             this.userMembershipsWizardStepForm.layout(principal);
             this.userEmailWizardStepForm.layout(principal);
-            this.userPasswordWizardStepForm.layout(principal);
+            this.userPasswordWizardStepForm.layout(principal as User);
 
             return principal;
         });
@@ -142,7 +147,7 @@ export class UserWizardPanel
             //remove after users event handling is configured and layout is updated on receiving upd from server
             this.userMembershipsWizardStepForm.layout(principal);
             this.userEmailWizardStepForm.layout(principal);
-            this.userPasswordWizardStepForm.layout(principal);
+            this.userPasswordWizardStepForm.layout(principal as User);
             return principal;
         });
     }
@@ -167,7 +172,8 @@ export class UserWizardPanel
             .setEmail(email)
             .setLogin(login)
             .addMemberships(addMemberships)
-            .removeMemberships(removeMemberships);
+            .removeMemberships(removeMemberships)
+            .setPassword(this.userPasswordWizardStepForm.getPassword());
     }
 
     assembleViewedItem(): Principal {

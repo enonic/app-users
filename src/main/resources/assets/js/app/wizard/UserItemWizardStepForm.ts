@@ -16,7 +16,9 @@ export abstract class UserItemWizardStepForm
     protected constructor(className?: string) {
         super(className);
         this.addClass('user-item-wizard-step-form');
+    }
 
+    initialize(): void {
         this.initElements();
         this.postInitElements();
         this.initListeners();

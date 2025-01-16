@@ -22,12 +22,13 @@ exports.create = function createUser(params) {
         principals.addMemberships(key, mms);
     }
 
-    var password = common.required(params, 'password');
-    exports.updatePwd(key, password);
+    if (params.password) {
+        exports.updatePwd(key, params.password);
+    }
 
     populateMemberships(createdUser);
 
-    return createdUser;
+    return authLib.getPrincipal(key);
 };
 
 exports.update = function updateUser(params) {
@@ -53,7 +54,11 @@ exports.update = function updateUser(params) {
 
     populateMemberships(updatedUser);
 
-    return updatedUser;
+    if (params.password) {
+        exports.updatePwd(key, params.password);
+    }
+
+    return authLib.getPrincipal(key);
 };
 
 exports.updatePwd = function (key, pwd) {

@@ -16,6 +16,7 @@ export class UpdateUserRequest
     private login: string;
     private membershipsToAdd: PrincipalKey[] = [];
     private membershipsToRemove: PrincipalKey[] = [];
+    private password: string;
 
     setKey(key: PrincipalKey): UpdateUserRequest {
         this.key = key;
@@ -47,6 +48,11 @@ export class UpdateUserRequest
         return this;
     }
 
+    setPassword(password: string): UpdateUserRequest {
+        this.password = password;
+        return this;
+    }
+
     getVariables(): object {
         let vars = super.getVariables();
         vars['key'] = this.key.toString();
@@ -55,19 +61,21 @@ export class UpdateUserRequest
         vars['login'] = this.login;
         vars['addMemberships'] = this.membershipsToAdd.map((memberKey) => memberKey.toString());
         vars['removeMemberships'] = this.membershipsToRemove.map((memberKey) => memberKey.toString());
+        vars['password'] = this.password;
         return vars;
     }
 
     /* eslint-disable max-len */
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $addMemberships: [String],
-                          $removeMemberships: [String]) {
+                          $removeMemberships: [String], $password: String) {
             updateUser(key: $key, displayName: $displayName, email: $email, login: $login, addMemberships: $addMemberships,
-                       removeMemberships: $removeMemberships) {
+                       removeMemberships: $removeMemberships, password: $password) {
                 key
                 login
                 displayName
                 email
+                hasPassword
                 memberships {
                     key
                     displayName

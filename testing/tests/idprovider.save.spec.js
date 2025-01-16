@@ -30,7 +30,8 @@ describe('Id Provider specification - save and edit a provider', function () {
             await idProviderWizard.typeDisplayName(ID_PROVIDER.displayName);
             await idProviderWizard.waitAndClickOnSave();
             let actualMessage = await idProviderWizard.waitForNotificationMessage();
-            assert.strictEqual(actualMessage, appConst.PROVIDER_CREATED_NOTIFICATION, 'expected notification message should be displayed');
+            assert.strictEqual(actualMessage, appConst.NOTIFICATION_MESSAGE.PROVIDER_CREATED,
+                'expected notification message should appear');
         });
 
     it(`GIVEN existing two providers WHEN New button has been pressed THEN 2 row-expander should be present in the dialog`,

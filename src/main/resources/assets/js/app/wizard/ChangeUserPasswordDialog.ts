@@ -1,7 +1,5 @@
 import {OpenChangePasswordDialogEvent} from './OpenChangePasswordDialogEvent';
-import {SetUserPasswordRequest} from './SetUserPasswordRequest';
 import {PasswordGenerator} from './PasswordGenerator';
-import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
@@ -12,13 +10,15 @@ import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {UpdatePasswordRequest} from '../../graphql/principal/user/UpdatePasswordRequest';
+import {User} from '../principal/User';
 
 export class ChangeUserPasswordDialog
     extends ModalDialog {
 
     private password: PasswordGenerator;
 
-    private principal: Principal;
+    private principal: User;
 
     private changePasswordAction: Action;
 
@@ -55,7 +55,7 @@ export class ChangeUserPasswordDialog
 
         OpenChangePasswordDialogEvent.on((event) => {
             this.principal = event.getPrincipal();
-            userPath.setHtml(this.principal.getKey().toPath());
+            userPath.setHtml(this.principal?.getKey().toPath());
             this.open();
         });
 
@@ -69,9 +69,9 @@ export class ChangeUserPasswordDialog
                 if (!this.password.isValid()) {
                     return;
                 }
-                new SetUserPasswordRequest()
-                    .setKey(this.principal.getKey())
+                new UpdatePasswordRequest()
                     .setPassword(this.password.getValue())
+                    .setKey(this.principal.getKey())
                     .sendAndParse()
                     .then(() => {
                         showFeedback(i18n('notify.change.password'));
@@ -101,7 +101,7 @@ export class ChangeUserPasswordDialog
         this.remove();
     }
 
-    getPrincipal(): Principal {
+    getPrincipal(): User {
         return this.principal;
     }
 
