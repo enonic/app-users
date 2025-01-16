@@ -80,6 +80,7 @@ export class CreateUserRequest
                     displayName
                     description
                 }
+                hasPassword
             }
         }`;
     }

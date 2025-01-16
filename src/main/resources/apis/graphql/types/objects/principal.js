@@ -127,7 +127,9 @@ exports.PrincipalType = schemaGenerator.createObjectType({
         hasPassword: {
             type: graphQl.GraphQLBoolean,
             resolve: function (env) {
-                return env.source.authenticationHash != null;
+                // when source comes from Node API, it will have the 'authenticationHash'
+                // when source comes from Auth API, it will have the 'hasPassword' property
+                return env.source.authenticationHash != null || env.source.hasPassword === true;
             }
         }
     }
