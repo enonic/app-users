@@ -6,6 +6,7 @@ import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {PasswordSection} from './PasswordSection';
 import {PublicKeysSection} from './PublicKeysSection';
 import {SetPasswordButtonClickedEvent} from './SetPasswordButtonClickedEvent';
+import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 
 export class UserPasswordWizardStepForm
     extends UserItemWizardStepForm {
@@ -50,6 +51,7 @@ export class UserPasswordWizardStepForm
 
         SetPasswordButtonClickedEvent.on((event) => {
             this.passwordFormItem.getLabel().setVisible(event.isShowLabel());
+            this.passwordFormItem.setValidator(Validators.required);
         });
     }
 
@@ -90,5 +92,13 @@ export class UserPasswordWizardStepForm
 
     getPassword(): string {
         return this.passwordSection.getPassword();
+    }
+
+    isValid(): boolean {
+        if (!this.passwordSection.isPasswordVisible()) {
+            return true;
+        }
+
+        return this.passwordSection.isValidPassword();
     }
 }

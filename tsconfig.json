@@ -7,7 +7,6 @@
       "hasher",
       "q",
       "nanoid",
-      "owasp-password-strength-test"
     ],
     "lib": [
       "es2015",

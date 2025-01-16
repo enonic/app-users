@@ -10,6 +10,7 @@ import {showFeedback} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {FormItemEl} from '@enonic/lib-admin-ui/dom/FormItemEl';
 import {SetPasswordButtonClickedEvent} from './SetPasswordButtonClickedEvent';
+import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
 
 export class PasswordSection
     extends FormItemEl {
@@ -58,7 +59,13 @@ export class PasswordSection
             if (this.isNewUserOrUserWithoutPassword()) {
                 new SetPasswordButtonClickedEvent(true).fire();
                 this.password.setVisible(true);
+                this.password.setFocus();
                 this.setOrChangePasswordButton.setVisible(false);
+
+                this.notifyValidityChanged(false);
+                this.password.onValidityChanged((event: ValidityChangedEvent) => {
+                    this.notifyValidityChanged(event.isValid());
+                });
             } else {
                 new OpenChangePasswordDialogEvent(this.user).fire();
             }
@@ -83,8 +90,16 @@ export class PasswordSection
         });
     }
 
+    isPasswordVisible(): boolean {
+        return this.password.isVisible();
+    }
+
     getPassword(): string {
         return this.password.getValue();
+    }
+
+    isValidPassword(): boolean {
+        return this.password.isValid();
     }
 
     updateView(user: User): void {
