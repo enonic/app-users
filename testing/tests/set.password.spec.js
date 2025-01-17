@@ -17,7 +17,7 @@ describe('Tests for set password modal dialog', function () {
 
     const MEDIUM_PASSWORD = appConst.PASSWORD.MEDIUM;
 
-    it("GIVEN the password input is empty WHEN name, email has been filled in AND Save button clicked THEN 'Set password' button should appears but the user is valid",
+    it("GIVEN Set password button has been clicked WHEN the password input is empty but name, email has been filled in  THEN 'Save' button should be disabled and  the user is invalid",
         async () => {
             let userWizard = new UserWizard();
             let userName = appConst.generateRandomName('user');
@@ -29,13 +29,14 @@ describe('Tests for set password modal dialog', function () {
             await userWizard.typeEmail(email);
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
-            // 3. Do not type a password but save the user:
-            await userWizard.waitAndClickOnSave();
+            // 3. Save button should be disabled:
+            await userWizard.waitForSaveButtonDisabled();
+            // TODO add check for Clear password button
             // 4. Verify that 'Set password' button is displayed:
-            await userWizard.waitForSetPasswordButtonDisplayed();
-            await testUtils.saveScreenshot('user_wizard_with_the_only_password');
+            //await userWizard.waitForSetPasswordButtonDisplayed();
+            //await testUtils.saveScreenshot('user_wizard_with_the_only_password');
             // 5. Verify that user is valid:
-            await userWizard.waitUntilInvalidIconDisappears(userName);
+            await userWizard.waitUntilInvalidIconDisplayed(userName);
         });
 
     it("GIVEN user-wizard is opened WHEN 'Generate' link has been pressed THEN new password should be generated",

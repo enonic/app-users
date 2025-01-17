@@ -11,7 +11,6 @@ const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const RoleWizard = require('../page_objects/wizardpanel/role.wizard');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
-const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
 
 describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`, function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -29,20 +28,15 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
     it(`GIVEN new user-wizard is opened AND data has been typed WHEN 'Ctrl+s' has been pressed THEN the user should be saved`,
         async () => {
             let userWizard = new UserWizard();
-            let changePasswordDialog = new ChangePasswordDialog();
             let userName = userItemsBuilder.generateRandomName('user');
             TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             // 1.  User-wizard is opened:
             await testUtils.clickOnSystemOpenUserWizard();
-            // 2. User's data has been typed:
+            // 2. All User's data has been typed:
             await userWizard.typeDisplayName(TEST_USER.displayName);
             await userWizard.typeEmail(TEST_USER.email);
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            await changePasswordDialog.typePassword(PASSWORD);
-            await changePasswordDialog.waitForSetPasswordButtonEnabled();
-            await changePasswordDialog.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForClosed();
+            await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
             // 3. keyboard shortcut to Save button has been pressed:
             await userWizard.hotKeySave();
