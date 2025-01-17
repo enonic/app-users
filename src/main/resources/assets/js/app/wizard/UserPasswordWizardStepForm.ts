@@ -7,6 +7,7 @@ import {PasswordSection} from './PasswordSection';
 import {PublicKeysSection} from './PublicKeysSection';
 import {SetPasswordButtonClickedEvent} from './SetPasswordButtonClickedEvent';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
+import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
 
 export class UserPasswordWizardStepForm
     extends UserItemWizardStepForm {
@@ -22,6 +23,8 @@ export class UserPasswordWizardStepForm
     private user?: User;
 
     private idProviderKey: IdProviderKey;
+
+    private hidePasswordButton: AEl;
 
     constructor(idProviderKey: IdProviderKey, user?: User) {
         super('user-password-wizard-step-form');
@@ -46,10 +49,25 @@ export class UserPasswordWizardStepForm
         }
     }
 
+    createCloseButton(): AEl {
+        const closeButton = new AEl('remove');
+        closeButton.onClicked((event: MouseEvent) => {
+            this.passwordSection.resetPasswordView();
+            this.passwordFormItem.getLabel().hide();
+            this.passwordFormItem.removeValidator();
+            closeButton.remove();
+        });
+        return closeButton;
+    }
+
     protected initListeners() {
         super.initListeners();
 
         SetPasswordButtonClickedEvent.on((event) => {
+            if (!this.hidePasswordButton) {
+                this.hidePasswordButton = this.createCloseButton();
+            }
+            this.hidePasswordButton.insertAfterEl(this.passwordFormItem.getLabel());
             this.passwordFormItem.getLabel().setVisible(event.isShowLabel());
             this.passwordFormItem.setValidator(Validators.required);
         });
@@ -62,7 +80,6 @@ export class UserPasswordWizardStepForm
         this.passwordFormItem.getLabel().setVisible(false);
 
         formItems.push(this.passwordFormItem);
-
 
         if (this.isSystemUser()) {
             this.publicKeyFormItem = new FormItemBuilder(this.publicKeysSection).setLabel(i18n('field.userKeys.grid.title')).build();
@@ -79,7 +96,10 @@ export class UserPasswordWizardStepForm
     updatePrincipal(user: User): void {
         this.user = user;
 
-        new SetPasswordButtonClickedEvent(false).fire();
+        if (this.hidePasswordButton?.hasParent()) {
+            this.hidePasswordButton.remove();
+        }
+        this.passwordFormItem.getLabel().hide();
 
         if (!!this.user) {
             this.passwordSection.updateView(this.user);

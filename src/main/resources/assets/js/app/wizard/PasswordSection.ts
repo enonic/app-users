@@ -106,12 +106,17 @@ export class PasswordSection
         this.user = user;
 
         if (!!this.user) {
-            this.password.reset();
-            this.password.setVisible(false);
-            this.setOrChangePasswordButton.setVisible(true);
-            this.setOrChangePasswordButton.setLabel(i18n(this.isUserWithPassword() ? 'action.changePassword' : 'action.setPassword'));
+            this.resetPasswordView();
             this.clearPasswordButton.setVisible(this.isUserWithPassword());
         }
+    }
+
+    resetPasswordView() {
+        this.password.reset();
+        this.password.setVisible(false);
+        this.setOrChangePasswordButton.setVisible(true);
+        this.setOrChangePasswordButton.setLabel(i18n(this.isUserWithPassword() ? 'action.changePassword' : 'action.setPassword'));
+        this.notifyValidityChanged(true);
     }
 
     doRender(): Q.Promise<boolean> {
