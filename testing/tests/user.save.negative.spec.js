@@ -34,7 +34,7 @@ describe('Negative ui-tests for user wizard ', function () {
             let actualStatus = await userWizard.getPasswordStatus();
             assert.equal(actualStatus, appConst.PASSWORD_STATE.WEAK, "'Weak' state of the password should be displayed");
             // 4. Verify that user is invalid:
-            await userWizard.waitUntilInvalidIconAppears(TEST_USER.displayName);
+            await userWizard.waitUntilInvalidIconDisplayed(userName);
             await userWizard.waitForSaveButtonDisabled();
         });
 

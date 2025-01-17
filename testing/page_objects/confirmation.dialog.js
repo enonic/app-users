@@ -26,10 +26,11 @@ class ConfirmationDialog extends Page {
     async clickOnYesButton() {
         try {
             await this.clickOnElement(this.yesButton);
-            return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_close_confirmation_dialog');
-            throw new Error('Confirmation dialog must be closed! screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Confirmation dialog must be closed! screenshot: ${screenshot} ` + err);
         }
     }
 

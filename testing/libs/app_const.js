@@ -6,7 +6,7 @@ module.exports = Object.freeze({
         return part + Math.round(Math.random() * 1000000);
     },
     //waitForTimeout
-    mediumTimeout: 3500,
+    mediumTimeout: 4000,
     TIMEOUT_4: 4000,
     TIMEOUT_7: 7000,
     shortTimeout: 2000,
@@ -42,10 +42,10 @@ module.exports = Object.freeze({
     },
 
     PASSWORD: {
-        MEDIUM: "password123",
-        STRONG: "password123=",
+        MEDIUM: "userA567$",
+        STRONG: "userA567$=",
         WEAK: "1q2w3e",
-        WITH_SPACES: " password123 "
+        WITH_SPACES: " userA567$ "
     },
     PASSWORD_STATE: {
         MEDIUM: "Medium",
