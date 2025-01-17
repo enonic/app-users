@@ -73,8 +73,10 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 3. Click on Save button:
             await userWizard.waitAndClickOnSave();
             await testUtils.saveScreenshot('user_change_password_button_displayed');
-            // 4. Verify 'Set Password' button is displayed
-            await userWizard.waitForSetPasswordButtonDisplayed();
+            // 4. Verify 'Change Password' button is displayed
+            await userWizard.waitForChangePasswordButtonDisplayed();
+            await userWizard.waitForClearPasswordButtonDisplayed();
+            await userWizard.waitForAddPublicKeyButtonDisplayed();
         });
 
     it('GIVEN existing user is opened WHEN name input has been cleared THEN red circle should appears in the tab',
@@ -98,7 +100,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 1. Open the existing user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Open 'Change Password' dialog:
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             let result = await changePasswordDialog.getUserPath();
             assert.ok(result[0].includes(TEST_USER.displayName), 'Display name of the user should be present in the path');
@@ -111,7 +113,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 1. Open the user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Open 'Change Password Dialog'
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             await testUtils.saveScreenshot('change_password_dialog');
             let isDisplayed = await changePasswordDialog.isPasswordInputDisplayed();
@@ -130,7 +132,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             await testUtils.saveScreenshot('change_password_dialog_2');
             // 2. Insert an easy password:
@@ -148,7 +150,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 2. Generate new password:
             await changePasswordDialog.clickOnGeneratePasswordLink();
@@ -168,7 +170,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 1. Existing user is opened:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Click on Set Password button:
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 3. Click on 'Show Password':
             await changePasswordDialog.clickOnShowPasswordLink();
@@ -183,7 +185,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 1. Open the existing user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Click on Change password button:
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 3. Click on 'Generate' button:
             await changePasswordDialog.clickOnGeneratePasswordLink();
@@ -200,7 +202,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             // 1. Open an existing user:
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Click on 'Change password' button
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 3. Click on Cancel button in the modal dialog:
             await changePasswordDialog.clickOnCancelButton();
@@ -213,7 +215,7 @@ describe('User Wizard and Change Password dialog spec', function () {
             let changePasswordDialog = new ChangePasswordDialog();
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 1. Open 'Change Password Dialog'
-            await userWizard.clickOnSetPasswordButton();
+            await userWizard.clickOnChangePasswordButton();
             await changePasswordDialog.waitForDialogLoaded();
             // 2. Click on Cancel-top button:
             await changePasswordDialog.clickOnCancelButtonTop();

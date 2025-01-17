@@ -148,7 +148,7 @@ module.exports = {
         let title = await this.getBrowser().getTitle();
         if (title === appConst.BROWSER_TITLES.USERS_APP) {
             await this.getBrowser().closeWindow();
-            }
+        }
         await this.doSwitchToHome();
     },
     // Select a user by its display name that is present in the path

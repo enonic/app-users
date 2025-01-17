@@ -8,7 +8,8 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
+const LauncherPanel = require('../page_objects/launcher.panel');
+const LoginPage = require('../page_objects/login.page');
 
 describe('user.trim.inputs.spec Save user, trim the password and display name', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -17,6 +18,7 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
         webDriverHelper.setupBrowser();
     }
     const PASSWORD = appConst.PASSWORD.MEDIUM;
+    let TEST_USER;
 
     // verifies the enonic/lib-admin-ui#254 (Users App - trim spaces in displayName input (Wizards))
     it("GIVEN user wizard is opened WHEN user-name with white spaces has been typed and the user saved THEN name without spaces should be displayed in the grid",
@@ -43,27 +45,39 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
             assert.ok(isDisplayed, "trimmed name should be displayed");
         });
 
-    it("GIVEN user wizard is opened WHEN password starting and ending with a space has been typed THEN Save button gets enabled",
+    it("GIVEN a password starting and ending with spaces has been typed WHEN Save button pressed THEN the user should be saved",
         async () => {
             let userWizard = new UserWizard();
-            let changePasswordDialog = new ChangePasswordDialog();
             let passwordWithSpaces = appConst.PASSWORD.WITH_SPACES;
             let userName = userItemsBuilder.generateRandomName('user');
-            let testUser = userItemsBuilder.buildUser(userName, passwordWithSpaces, userItemsBuilder.generateEmail(userName), null);
+            let roles = [appConst.ROLES_DISPLAY_NAME.CM_ADMIN, appConst.ROLES_DISPLAY_NAME.ADMIN_CONSOLE];
+            TEST_USER = userItemsBuilder.buildUser(userName, passwordWithSpaces, userItemsBuilder.generateEmail(userName), roles);
             await testUtils.clickOnSystemOpenUserWizard();
-            await userWizard.typeDisplayName(testUser.displayName);
-            await userWizard.typeEmail(testUser.email);
+            await userWizard.typeDisplayName(TEST_USER.displayName);
+            await userWizard.typeEmail(TEST_USER.email);
+            await userWizard.addRoles(roles);
             await userWizard.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForDialogLoaded();
-            // Type a password with white space:
-            await changePasswordDialog.typePassword(passwordWithSpaces);
-            await changePasswordDialog.clickOnSetPasswordButton();
-            await changePasswordDialog.waitForClosed();
+            // Type a password with spaces:
+            await userWizard.typePassword(passwordWithSpaces);
+            await userWizard.waitAndClickOnSave();
             let message = await userWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.NOTIFICATION_MESSAGE.PASSWORD_IS_SET, 'Expected notification should appear');
-            // Save button gets enabled:
-            await testUtils.saveScreenshot('user_password_spaces');
-            await userWizard.waitForSaveButtonEnabled();
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.USER_WAS_CREATED, 'Expected notification should appear');
+            await userWizard.waitForChangePasswordButtonDisplayed();
+        });
+
+    it("WHEN trimmed password have been typed in the login page AND 'login-button' pressed THEN the user should be 'logged in'",
+        async () => {
+            let launcherPanel = new LauncherPanel();
+            let loginPage = new LoginPage();
+            let trimmedPassword = appConst.PASSWORD.WITH_SPACES.trim();
+            await testUtils.doCloseUsersApp();
+            // 1. Do log out:
+            await launcherPanel.clickOnLogoutLink();
+            // 2. Log in with the generated password
+            await loginPage.doLogin(TEST_USER.displayName, trimmedPassword);
+            await testUtils.saveScreenshot('trimmed_pass_logged_in')
+            // 3. Check that user is logged in:
+            await launcherPanel.waitForPanelDisplayed();
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

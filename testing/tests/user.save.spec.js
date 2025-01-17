@@ -58,8 +58,7 @@ describe('Save User specification - save an user', function () {
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
             await testUtils.saveScreenshot('user-saved-notification');
-            // 2. two notification messages should appear:
-            await userWizard.waitForExpectedNotificationMessage(appConst.NOTIFICATION_MESSAGE.PASSWORD_IS_SET);
+            // 2. User was created - notification messages should appear:
             await userWizard.waitForExpectedNotificationMessage(appConst.NOTIFICATION_MESSAGE.USER_WAS_CREATED);
             // 3. Click on App Home button and go to the browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
