@@ -20,6 +20,7 @@ const XPATH = {
     hidePasswordLink: "//a[@data-i18n='Hide']",
     generatePasswordLink: "//a[text()='Generate']",
     setPasswordButton: "//button[contains(@class,'password-button')]/span[text()='Set Password']",
+    passwordSectionRemoveIcon: "//fieldset[descendant::div[contains(@id,'PasswordSection')]]//a[contains(@class,'remove')]",
     publicKeysGrid: "//div[contains(@id,'PublicKeysGrid')]",
     publicKeysGridRow: "//div[contains(@class,'public-keys-grid-row')]",
     removePublicKeyIcon: "//a[contains(@class,'remove-public-key icon-close')]",
@@ -383,6 +384,16 @@ class UserWizard extends wizards.WizardPanel {
     async clickOnClearPasswordButton() {
         await this.waitForClearPasswordButtonDisplayed();
         return await this.clickOnElement(this.clearPasswordButton);
+    }
+
+    async clickOnRemovePasswordSection() {
+        try {
+            await this.waitForElementDisplayed(XPATH.container + XPATH.passwordSectionRemoveIcon);
+            return await this.clickOnElement(XPATH.container + XPATH.passwordSectionRemoveIcon);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_remove_password_section');
+            throw new Error(`Error occurred when tried to click on remove password section icon, screenshot: ${screenshot} ` + err);
+        }
     }
 }
 

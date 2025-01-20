@@ -238,6 +238,7 @@ module.exports = {
         await browsePanel.clickOnRowByName('system');
         await browsePanel.waitForNewButtonEnabled();
         await browsePanel.clickOnNewButton();
+        await browsePanel.pause(300);
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },
