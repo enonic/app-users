@@ -3,14 +3,12 @@ import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {AEl} from '@enonic/lib-admin-ui/dom/AEl';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {nanoid} from 'nanoid';
+import {customAlphabet} from 'nanoid';
 import {InputEl} from '@enonic/lib-admin-ui/dom/InputEl';
-import * as owasp from 'owasp-password-strength-test';
-import {PasswordStrengthBlock} from './PasswordStrengthBlock';
+import {passwordStrength} from 'check-password-strength';
 import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 
 export enum PasswordStrength {
-    EXCELLENT = 'excellent',
     STRONG = 'strong',
     MEDIUM = 'medium',
     WEAK = 'weak',
@@ -23,7 +21,6 @@ export class PasswordGenerator
     private input: InputEl;
     private showLink: AEl;
     private generateLink: AEl;
-    private passwordStrengthBlock: PasswordStrengthBlock;
     private passwordStrength: PasswordStrength;
     private helpTextBlock: DivEl;
 
@@ -39,7 +36,6 @@ export class PasswordGenerator
 
     private initElements() {
         this.input = new InputEl('password-input');
-        this.passwordStrengthBlock = new PasswordStrengthBlock();
         this.showLink = new AEl('show-link');
         this.toggleShowLink(true);
         this.generateLink = new AEl('generate-link');
@@ -127,46 +123,39 @@ export class PasswordGenerator
             return;
         }
 
-        const testResult: owasp.TestResult = owasp.test(value);
-        this.passwordStrengthBlock.setTestResult(testResult);
+        const testResult: string = passwordStrength(value).value;
 
         this.passwordStrength = this.getPasswordStrength(testResult);
+
         this.getEl().setAttribute('data-i18n', i18n(`field.pswGenerator.complexity.${this.passwordStrength}`));
         this.addClass(this.passwordStrength);
     }
 
-    private getPasswordStrength(testResult: owasp.TestResult): PasswordStrength {
-        if (testResult.errors.length === 0) {
-            return PasswordStrength.EXCELLENT;
-        }
-
-        if (testResult.errors.length === 1) {
-            return PasswordStrength.STRONG;
-        }
-
-        if (testResult.errors.length === 2) {
-            return PasswordStrength.MEDIUM;
-        }
-
-        if (testResult.errors.length === 3) {
-            return PasswordStrength.WEAK;
-        }
-
-        return PasswordStrength.BAD;
+    private getPasswordStrength(testResult: string): PasswordStrength {
+        return PasswordStrength[testResult.toUpperCase()] || PasswordStrength.BAD;
     }
 
     private generatePassword() {
-        this.input.setValue(nanoid());
+        let passStrength = PasswordStrength.BAD;
+        let password = ''
+        const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+,-.<=>?@[]^_{|}~', 15);
+        while (!this.isPasswordValid(passStrength)) {
+            password = nanoid();
+            passStrength = this.getPasswordStrength(passwordStrength(password).value);
+        }
+        this.input.setValue(password);
     }
 
     isValid(): boolean {
-        return !!this.getValue() && this.getValue().length > 0 && this.input.isValid() && this.isPasswordValid();
+        return !!this.getValue() && this.getValue().length > 0 && this.input.isValid() && this.isPasswordValid(this.passwordStrength);
     }
 
-    private isPasswordValid(): boolean {
-        return this.passwordStrength === PasswordStrength.EXCELLENT ||
-               this.passwordStrength === PasswordStrength.STRONG ||
-               this.passwordStrength === PasswordStrength.MEDIUM;
+    setFocus(): void {
+        this.input.getEl().focus();
+    }
+
+    private isPasswordValid(passwordStrength: PasswordStrength): boolean {
+        return passwordStrength === PasswordStrength.STRONG || passwordStrength === PasswordStrength.MEDIUM;
     }
 
     private initFocusEvents(el: Element) {
@@ -187,7 +176,6 @@ export class PasswordGenerator
 
             const toolbarWrapper = new DivEl('toolbar-wrapper');
             toolbarWrapper.appendChildren(this.showLink, this.generateLink);
-            toolbarWrapper.appendChild(this.passwordStrengthBlock);
             this.appendChild(toolbarWrapper);
             this.appendChild(this.helpTextBlock);
 

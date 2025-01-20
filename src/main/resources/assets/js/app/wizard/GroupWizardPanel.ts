@@ -32,6 +32,7 @@ export class GroupWizardPanel
         const descriptionStep = this.getDescriptionWizardStepForm();
         const membersStep = this.getMembersWizardStepForm();
         this.rolesWizardStepForm = new RolesWizardStepForm();
+        this.rolesWizardStepForm.initialize();
 
         steps.push(new WizardStep(i18n('field.groups'), descriptionStep));
         steps.push(new WizardStep(i18n('field.members'), membersStep));

@@ -103,11 +103,11 @@ module.exports = {
                     key: key,
                     deleted: false,
                     reason: e.message
-                }; 
-            }            
+                };
+            }
         });
     },
-    Type: common.PrincipalType    
+    Type: common.PrincipalType
 };
 
 function createPrincipalQuery(idProviderKey, types, query) {

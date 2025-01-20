@@ -20,16 +20,17 @@ class ConfirmationDialog extends Page {
     }
 
     get noButton() {
-        return XPATH.container + XPATH.yesButton;
+        return XPATH.container + XPATH.noButton;
     }
 
     async clickOnYesButton() {
         try {
             await this.clickOnElement(this.yesButton);
-            return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_close_confirmation_dialog');
-            throw new Error('Confirmation dialog must be closed! screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Confirmation dialog must be closed! screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -54,6 +55,12 @@ class ConfirmationDialog extends Page {
 
     isWarningMessageDisplayed() {
         return this.waitForElementDisplayed(this.warningMessage, appConst.mediumTimeout);
+    }
+
+    async getQuestionText() {
+        let locator = "//h6[@class='question']";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return this.getText(locator);
     }
 }
 

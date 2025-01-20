@@ -18,7 +18,7 @@ describe('Id Provider wizard - validation and inputs', function () {
         async () => {
             let idProviderWizard = new IdProviderWizard();
             await testUtils.openIdProviderWizard();
-            let isRedIconPresent = await idProviderWizard.waitUntilInvalidIconAppears('<Unnamed Id Provider>');
+            let isRedIconPresent = await idProviderWizard.waitUntilInvalidIconDisplayed('<Unnamed Id Provider>');
             assert.ok(isRedIconPresent, 'red circle should be present in the tab, because required input(name) is empty');
         });
 

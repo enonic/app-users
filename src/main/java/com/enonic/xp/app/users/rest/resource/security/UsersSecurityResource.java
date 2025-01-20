@@ -22,7 +22,6 @@ import com.enonic.xp.app.users.rest.resource.security.json.FindPrincipalsResultJ
 import com.enonic.xp.app.users.rest.resource.security.json.GroupJson;
 import com.enonic.xp.app.users.rest.resource.security.json.PrincipalJson;
 import com.enonic.xp.app.users.rest.resource.security.json.RoleJson;
-import com.enonic.xp.app.users.rest.resource.security.json.UpdatePasswordJson;
 import com.enonic.xp.app.users.rest.resource.security.json.UserJson;
 import com.enonic.xp.jaxrs.JaxRsComponent;
 import com.enonic.xp.security.Group;
@@ -136,21 +135,6 @@ public final class UsersSecurityResource
         final PrincipalQuery query = PrincipalQuery.create().email( email ).idProvider( idProviderKey ).build();
         final PrincipalQueryResult queryResult = securityService.query( query );
         return new EmailAvailabilityJson( queryResult.isEmpty() );
-    }
-
-    @POST
-    @Path("principals/setPassword")
-    public UserJson setPassword( final UpdatePasswordJson params )
-    {
-        final PrincipalKey userKey = params.getUserKey();
-
-        if ( isNullOrEmpty( params.getPassword() ) )
-        {
-            throw new WebApplicationException( "Password has not been set." );
-        }
-
-        final User user = securityService.setPassword( userKey, params.getPassword() );
-        return new UserJson( user );
     }
 
     private PrincipalJson principalToJson( final Principal principal, final Boolean resolveMemberships )

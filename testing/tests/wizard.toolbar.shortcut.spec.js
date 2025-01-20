@@ -32,18 +32,18 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             TEST_USER = userItemsBuilder.buildUser(userName, PASSWORD, userItemsBuilder.generateEmail(userName), null);
             // 1.  User-wizard is opened:
             await testUtils.clickOnSystemOpenUserWizard();
-            // 2. User's data has been typed:
+            // 2. All User's data has been typed:
             await userWizard.typeDisplayName(TEST_USER.displayName);
             await userWizard.typeEmail(TEST_USER.email);
-            await userWizard.pause(500);
+            await userWizard.clickOnSetPasswordButton();
             await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
             // 3. keyboard shortcut to Save button has been pressed:
             await userWizard.hotKeySave();
             await testUtils.saveScreenshot('user_shortcut_save');
             // 4. Verify the notification message:
-            let message = await userWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.USER_WAS_CREATED_MESSAGE, 'User was created - message should appear');
+            let messages = await userWizard.waitForNotificationMessages();
+            assert.ok(messages.includes(appConst.NOTIFICATION_MESSAGE.USER_WAS_CREATED), 'User was created - message should appear');
         });
     it(`GIVEN existing user is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
         async () => {
@@ -76,7 +76,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await testUtils.saveScreenshot('group_shortcut_save');
             // 4. Verify the notification message
             let message = await groupWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message should appear");
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED, "Group was created - message should appear");
         });
 
     it(`GIVEN existing group is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
@@ -107,7 +107,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await testUtils.saveScreenshot('role_shortcut_save');
             // 4. Verify the notification message:
             let message = await roleWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.ROLE_WAS_CREATED_MESSAGE, 'Role was created - message should appear');
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.ROLE_WAS_CREATED, 'Role was created - message should appear');
         });
 
     it(`GIVEN existing role is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
@@ -138,7 +138,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await testUtils.saveScreenshot('provider_shortcut_save');
             // 4. Verify the notification message:
             let message = await idProviderWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.PROVIDER_CREATED_NOTIFICATION, "Id provider was created - message should appear");
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.PROVIDER_CREATED, "Id provider was created - message should appear");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

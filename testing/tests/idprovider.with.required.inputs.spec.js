@@ -177,7 +177,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await testUtils.saveScreenshot('group_saved_in_provider');
             // 4. Verify that group is saved:
             let message = await groupWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message should be displayed");
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED, "Group was created - message should be displayed");
         });
 
     // Verify Error in group selector inside ID providers config form #940

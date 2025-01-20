@@ -47,7 +47,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             await groupWizard.waitAndClickOnSave();
             let message = await groupWizard.waitForNotificationMessage();
             await testUtils.saveScreenshot('group_saved');
-            assert.equal(message, appConst.GROUP_WAS_CREATED, "Group was created - message is expected");
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED, "Group was created - message is expected");
         });
 
     it("WHEN 'group 1' is selected and 'transitive checkbox' is not checked THEN 'transitive'-role should not be displayed",

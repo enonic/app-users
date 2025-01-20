@@ -1,5 +1,5 @@
 /**
- * Created on 13.04.2018.*
+ * Created on 13.04.2018
  */
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -10,37 +10,38 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const LoginPage = require('../page_objects/login.page');
 const LauncherPanel = require('../page_objects/launcher.panel');
+const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
 
-describe("Create an user with generated password and log in the user", function () {
+describe("Create an user with generated password and do login with the user", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    let testUser;
-    let userName;
+    let TEST_USER;
+    let USER_NAME;
     let PASSWORD;
 
-    it("WHEN new 'user' with roles has been added THEN the user should be searchable",
+    it("WHEN new 'user' with required roles has been added THEN the user should be searchable",
         async () => {
             let permissions = ['Administration Console Login', 'Content Manager App'];
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            userName = userItemsBuilder.generateRandomName('user');
-            testUser = userItemsBuilder.buildUser(userName, null, userItemsBuilder.generateEmail(userName), permissions);
+            let changePasswordDialog = new ChangePasswordDialog();
+            USER_NAME = userItemsBuilder.generateRandomName('user');
+            TEST_USER = userItemsBuilder.buildUser(USER_NAME, null, userItemsBuilder.generateEmail(USER_NAME), permissions);
             await testUtils.navigateToUsersApp();
             // 1. Open new wizard:
             await testUtils.clickOnSystemOpenUserWizard();
-            // 2. Type the data and click on 'Generate' button:
-            await userWizard.typeDataAndGeneratePassword(testUser);
-            // 3. Get the generated password:
-            PASSWORD = await userWizard.getTextInPasswordInput();
+            // 2. Type the data and click on 'Generate' button, save the generated password:
+            PASSWORD = await userWizard.typeDataAndGeneratePassword(TEST_USER);
             // 4. Save the user:
             await userWizard.waitAndClickOnSave();
-            await userBrowsePanel.closeTabAndWaitForGrid(userName);
+            await userWizard.pause(500);
+            await userBrowsePanel.closeTabAndWaitForGrid(USER_NAME);
             // 5. Verify that user is created:
-            await testUtils.typeNameInFilterPanel(userName);
-            let isDisplayed = await userBrowsePanel.isItemDisplayed(userName);
+            await testUtils.typeNameInFilterPanel(USER_NAME);
+            let isDisplayed = await userBrowsePanel.isItemDisplayed(USER_NAME);
             assert.ok(isDisplayed, 'new user should be present in the grid');
         });
 
@@ -52,7 +53,7 @@ describe("Create an user with generated password and log in the user", function 
             // 1. Do log out:
             await launcherPanel.clickOnLogoutLink();
             // 2. Log in with the generated password
-            await loginPage.doLogin(userName, PASSWORD);
+            await loginPage.doLogin(USER_NAME, PASSWORD);
             // 3. Check that user is logged in:
             await launcherPanel.waitForPanelDisplayed();
         });
