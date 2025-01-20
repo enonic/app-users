@@ -148,7 +148,7 @@ module.exports = {
         let title = await this.getBrowser().getTitle();
         if (title === appConst.BROWSER_TITLES.USERS_APP) {
             await this.getBrowser().closeWindow();
-            }
+        }
         await this.doSwitchToHome();
     },
     // Select a user by its display name that is present in the path
@@ -238,6 +238,7 @@ module.exports = {
         await browsePanel.clickOnRowByName('system');
         await browsePanel.waitForNewButtonEnabled();
         await browsePanel.clickOnNewButton();
+        await browsePanel.pause(300);
         await newPrincipalDialog.clickOnItem('User');
         return await userWizard.waitForOpened();
     },

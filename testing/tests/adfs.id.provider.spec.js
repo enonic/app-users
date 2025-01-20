@@ -90,7 +90,8 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
             // 6. Save the provider:
             await idProviderWizard.waitAndClickOnSave();
             let message = await idProviderWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.PROVIDER_CREATED_NOTIFICATION, "'Id provider was created' - this message should appear");
+            // 'Id provider was created'
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.PROVIDER_CREATED, "Expected message should appear");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

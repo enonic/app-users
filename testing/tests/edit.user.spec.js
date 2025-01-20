@@ -141,6 +141,8 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             await changePasswordDialog.clickOnGeneratePasswordLink();
             await changePasswordDialog.waitForChangePasswordButtonEnabled();
             await changePasswordDialog.clickOnChangePasswordButton();
+            await changePasswordDialog.waitForClosed();
+            await userWizard.waitForChangePasswordButtonDisplayed();
             // 4. Click on Save button:
             await userWizard.waitAndClickOnSave();
             await userWizard.waitForNotificationMessage();

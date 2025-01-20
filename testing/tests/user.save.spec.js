@@ -21,7 +21,7 @@ describe('Save User specification - save an user', function () {
 
     // verifies  https://github.com/enonic/lib-admin-ui/issues/614
     // User Wizard - confirmation about unsaved changes after changes were saved
-    it('GIVEN new user has been saved in wizard AND display name has been changed AND Save button pressed WHEN `close` icon clicked THEN `Confirmation dialog` should not appear',
+    it('GIVEN new user has been saved in wizard WHEN `close` icon has been clicked THEN `Confirmation dialog` should not appear',
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -47,7 +47,7 @@ describe('Save User specification - save an user', function () {
             assert.ok(isLoaded === false, 'Confirmation dialog should not be loaded, because all changes were saved');
         });
 
-    it('GIVEN wizard for new User is opened AND valid data is typed WHEN the user has been saved THEN expected notification message should appear AND the user should be searchable',
+    it('GIVEN an user has been saved WHEN App home button clicked THEN just created user should be searchable in browse panel',
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -57,18 +57,19 @@ describe('Save User specification - save an user', function () {
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
-            let actualMessage = await userWizard.waitForNotificationMessage();
-            assert.equal(actualMessage, appConst.USER_WAS_CREATED_MESSAGE, "'User was created' - this message should appear");
-            // 2. Click on App Home button and go to the browse panel:
+            await testUtils.saveScreenshot('user-saved-notification');
+            // 2. User was created - notification messages should appear:
+            await userWizard.waitForExpectedNotificationMessage(appConst.NOTIFICATION_MESSAGE.USER_WAS_CREATED);
+            // 3. Click on App Home button and go to the browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
-            // 3. Type the name in Filter Panel:
+            // 4. Type the name in Filter Panel:
             await testUtils.typeNameInFilterPanel(userName);
-            // 4. Verify that user is filtered
+            // 5. Verify that user is filtered
             let isPresent = await userBrowsePanel.isItemDisplayed(userName);
             assert.ok(isPresent, 'New user should be added in the grid')
         });
 
-    it('WHEN user has been saved in the wizard AND the wizard closed AND Users folder has been expanded THEN grid should be updated AND the user should be listed',
+    it('GIVEN user has been saved AND the wizard closed WHEN Users folder has been expanded THEN grid should be updated AND the user should be listed',
         async () => {
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -89,7 +90,7 @@ describe('Save User specification - save an user', function () {
             assert.ok(isPresent, "New user should be added beneath the Users folder");
         });
 
-    it('WHEN try to save user with name that already in use THEN correct notification message should appear',
+    it('WHEN try to save user with the name that already in use THEN expected notification message should appear',
         async () => {
             let userWizard = new UserWizard();
             testUser.email = userItemsBuilder.generateEmail('test');

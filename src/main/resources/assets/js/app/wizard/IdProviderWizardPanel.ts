@@ -72,7 +72,10 @@ export class IdProviderWizardPanel
         const steps: WizardStep[] = [];
 
         this.idProviderWizardStepForm = new IdProviderWizardStepForm();
+        this.idProviderWizardStepForm.initialize();
+
         this.permissionsWizardStepForm = new SecurityWizardStepForm();
+        this.permissionsWizardStepForm.initialize();
 
         steps.push(new WizardStep(i18n('field.idProvider'), this.idProviderWizardStepForm));
         steps.push(new WizardStep(i18n('field.permissions'), this.permissionsWizardStepForm));

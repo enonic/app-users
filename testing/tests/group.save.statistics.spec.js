@@ -34,7 +34,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             // 3. wait for the notification message:
             let message = await groupWizard.waitForNotificationMessage();
             await testUtils.saveScreenshot('group_is_saved');
-            assert.equal(message, appConst.GROUP_WAS_CREATED, "Expected notification message should appear");
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED, "Expected notification message should appear");
         });
 
     it("WHEN existing group is opened THEN expected description, role and members should be present",

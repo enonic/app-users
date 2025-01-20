@@ -1,18 +1,18 @@
-import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {ClassHelper} from '@enonic/lib-admin-ui/ClassHelper';
 import {Event} from '@enonic/lib-admin-ui/event/Event';
+import {User} from '../principal/User';
 
 export class OpenChangePasswordDialogEvent
     extends Event {
 
-    private principal: Principal;
+    private readonly principal: User;
 
-    constructor(principal: Principal) {
+    constructor(principal: User) {
         super();
         this.principal = principal;
     }
 
-    getPrincipal(): Principal {
+    getPrincipal(): User {
         return this.principal;
     }
 

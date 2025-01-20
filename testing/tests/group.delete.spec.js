@@ -82,7 +82,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
     it("WHEN existing group has been deleted in browse panel THEN expected notification should appear",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            //Select and delete existing group:
+            // Select and delete the existing group:
             await testUtils.selectAndDeleteItem(TEST_GROUP.displayName);
             let message = await userBrowsePanel.waitForNotificationMessage();
             await testUtils.saveScreenshot('group_deleted_notification_mes2');
