@@ -46,6 +46,7 @@ describe("user.delete.spec:User - confirm and delete it in the wizard and in the
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(TEST_USER);
             await userWizard.waitAndClickOnSave();
+            await userWizard.waitForNotificationMessage();
             // 2. click on Delete and confirm:
             await userWizard.clickOnDelete();
             await testUtils.confirmDelete();

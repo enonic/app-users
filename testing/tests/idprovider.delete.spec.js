@@ -109,7 +109,7 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             // Select the provider and click on Delete button:
             await testUtils.selectAndDeleteItem(ID_PROVIDER.displayName);
             let actualMessage = await userBrowsePanel.waitForNotificationMessage();
-            await testUtils.saveScreenshot('store_deleted_notification_mes2');
+            await testUtils.saveScreenshot('idprovider_deleted_notification_mes2');
             let expectedMessage = appConst.providerDeletedMessage(ID_PROVIDER.displayName);
             // Expected message: Id Provider "${displayName}" is deleted
             assert.strictEqual(actualMessage, expectedMessage, 'expected notification message should be displayed');

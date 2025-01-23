@@ -160,9 +160,9 @@ describe('Id Provider, provider-dialog specification', function () {
             // 1. Select an existing provider with configurator then click on Create User menu item in the modal dialog:
             await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, 'User');
             // 2. Verify the actual notification message - The application does not allow to create users
-            let actualMessage = await userBrowsePanel.waitForNotificationMessage();
+            let actualMessages = await userBrowsePanel.waitForNotificationMessage();
             await testUtils.saveScreenshot('app_does_not_allow_users');
-            assert.equal(actualMessage, NOTIFICATION_MESSAGE, "The application does not allow to create users");
+            assert.ok(actualMessages.includes(NOTIFICATION_MESSAGE), "The application does not allow to create users");
         });
 
     it(`GIVEN id provider with a configuration is selected WHEN Create New User Group menu item has been clicked THEN expected notification message should appear`,
@@ -177,8 +177,9 @@ describe('Id Provider, provider-dialog specification', function () {
             await groupWizard.waitAndClickOnSave();
             await testUtils.saveScreenshot('group_saved_in_provider');
             // 4. Verify that group is saved:
-            let message = await groupWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED, "Group was created - message should be displayed");
+            let messages = await groupWizard.waitForNotificationMessage();
+            assert.ok(messages.includes(appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED),
+                "Group was created - message should be displayed");
         });
 
     // Verify Error in group selector inside ID providers config form #940

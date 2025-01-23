@@ -99,7 +99,7 @@ class UserBrowsePanel extends Page {
 
     isItemDisplayed(itemName) {
         return this.waitForElementDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout).catch(err => {
-            console.log("item is not displayed:" + itemName + +" " + err);
+            console.log("item is not displayed: " + itemName);
             return false;
         });
     }
@@ -178,7 +178,8 @@ class UserBrowsePanel extends Page {
 
     async clickOnDeleteButton() {
         await this.waitForDeleteButtonEnabled();
-        return await this.clickOnElement(this.deleteButton);
+        await await this.clickOnElement(this.deleteButton);
+        await this.pause(500);
     }
 
     isSearchButtonDisplayed() {
@@ -198,7 +199,8 @@ class UserBrowsePanel extends Page {
 
     async waitForDeleteButtonEnabled() {
         try {
-            await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout)
+            await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout);
+            await this.pause(400);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_delete_button_not_enabled');
             throw new Error(`Delete button is not enabled ! Screenshot: ${screenshot} ` + err);

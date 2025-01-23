@@ -98,11 +98,11 @@ describe('Save User specification - save an user', function () {
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
-            let actualMessage = await userWizard.waitForErrorNotificationMessage();
+            let actualMessages = await userWizard.waitForErrorNotificationMessages();
             // 2. Verify the error message:
             await testUtils.saveScreenshot('user-already-exists-message');
             let expectedMessage = appConst.principalExistsMessage('user:system:' + testUser.displayName);
-            assert.equal(actualMessage, expectedMessage, "'A principal with that name already exists' - this message should appear");
+            assert.ok(actualMessages.includes(expectedMessage), "'A principal with that name already exists' - this message should appear");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

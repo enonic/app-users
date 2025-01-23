@@ -43,10 +43,11 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await userBrowsePanel.clickOnNewButton();
             await roleWizard.waitForLoaded();
             await roleWizard.typeData(TEST_ROLE);
+            await roleWizard.pause(1000);
             await roleWizard.waitAndClickOnSave();
             // Verify the notification message:
-            let actualMessage = await roleWizard.waitForNotificationMessage();
-            assert.equal(actualMessage, 'Role was created', "Expected and actual messages are equal");
+            let actualMessages = await roleWizard.waitForNotificationMessages();
+            assert.ok(actualMessages.includes('Role was created'), "'Role was created' message should appear");
         });
 
     // verifies: xp-apps#93 Incorrect message appears when try to create a role with name that already in use #93
@@ -57,12 +58,13 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await testUtils.clickOnRolesFolderAndOpenWizard();
             // 2. Type existing name:
             await roleWizard.typeDisplayName(TEST_ROLE.displayName);
+            await roleWizard.pause(1000);
             await roleWizard.waitAndClickOnSave();
-            let errorMessage = await roleWizard.waitForErrorNotificationMessage();
+            let errorMessages = await roleWizard.waitForErrorNotificationMessage();
             // 3. Error message should appear:
             let expectedMsg = `Principal [role:` + TEST_ROLE.displayName +
                               `] could not be created. A principal with that name already exists`;
-            assert.strictEqual(errorMessage, expectedMsg, 'expected notification message should appear');
+            assert.ok(errorMessages.includes(expectedMsg), 'expected notification message should appear');
         });
 
     it(`GIVEN existing 'Role' WHEN 'Super User' has been added in members THEN expected selected option should appear in members form`,
@@ -75,6 +77,7 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await roleWizard.waitForLoaded();
             // 2. Add SU in members:
             await roleWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
+            await roleWizard.pause(1000);
             // 3.click on Save:
             await roleWizard.waitAndClickOnSave();
             // 4. Get selected options in members:

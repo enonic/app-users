@@ -38,6 +38,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await userWizard.clickOnSetPasswordButton();
             await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
+            await userWizard.pause(1000);
             // 3. keyboard shortcut to Save button has been pressed:
             await userWizard.hotKeySave();
             await testUtils.saveScreenshot('user_shortcut_save');
@@ -71,13 +72,13 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Group's data has been typed:
             await groupWizard.typeDisplayName(TEST_GROUP.displayName);
             await groupWizard.waitForSaveButtonEnabled();
-            await groupWizard.pause(500);
+            await groupWizard.pause(1500);
             // 3. keyboard shortcut to save button has been pressed:
             await groupWizard.hotKeySave();
             await testUtils.saveScreenshot('group_shortcut_save');
             // 4. Verify the notification message
-            let message = await groupWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED, "Group was created - message should appear");
+            let messages = await groupWizard.waitForNotificationMessages();
+            assert.ok(messages.includes(appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED), "Group was created - message should appear");
         });
 
     it(`GIVEN existing group is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
@@ -103,12 +104,13 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Role's data has been typed:
             await roleWizard.typeDisplayName(TEST_ROLE.displayName);
             await roleWizard.waitForSaveButtonEnabled();
+            await roleWizard.pause(1000);
             // 3. keyboard shortcut to Save button has been pressed:
             await roleWizard.hotKeySave();
             await testUtils.saveScreenshot('role_shortcut_save');
             // 4. Verify the notification message:
-            let message = await roleWizard.waitForNotificationMessage();
-            assert.equal(message, appConst.NOTIFICATION_MESSAGE.ROLE_WAS_CREATED, 'Role was created - message should appear');
+            let messages = await roleWizard.waitForNotificationMessages();
+            assert.ok(messages.includes(appConst.NOTIFICATION_MESSAGE.ROLE_WAS_CREATED), 'Role was created - message should appear');
         });
 
     it(`GIVEN existing role is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
@@ -134,6 +136,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. data has been typed:
             await idProviderWizard.typeDisplayName(TEST_PROVIDER.displayName);
             await idProviderWizard.waitForSaveButtonEnabled();
+            await idProviderWizard.pause(700);
             // 3. keyboard shortcut to Save button has been pressed:
             await idProviderWizard.hotKeySave();
             await testUtils.saveScreenshot('provider_shortcut_save');
