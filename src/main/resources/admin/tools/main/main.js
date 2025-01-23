@@ -5,8 +5,11 @@ const mustache = require('/lib/mustache');
 const portal = require('/lib/xp/portal');
 const i18n = require('/lib/xp/i18n');
 const assetLib = require('/lib/enonic/asset');
+const authLib = require('/lib/xp/auth');
 
 function getConfigAsJson() {
+    const user = authLib.getUser();
+
     return JSON.stringify({
         adminUrl: admin.getBaseUri(),
         appId: app.name,
@@ -42,6 +45,8 @@ function getConfigAsJson() {
                 theme: 'dark',
             }
         }),
+        user,
+        principals: authLib.getMemberships(user.key, true)
     }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
 }
 

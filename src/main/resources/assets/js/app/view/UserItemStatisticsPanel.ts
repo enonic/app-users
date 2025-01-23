@@ -13,10 +13,8 @@ import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {PrincipalViewer} from '@enonic/lib-admin-ui/ui/security/PrincipalViewer';
-import {RoleKeys} from '@enonic/lib-admin-ui/security/RoleKeys';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
-import {IsAuthenticatedRequest} from '@enonic/lib-admin-ui/security/auth/IsAuthenticatedRequest';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
@@ -25,10 +23,10 @@ import {CheckboxBuilder} from '@enonic/lib-admin-ui/ui/Checkbox';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {UserItemStatisticsHeader} from './UserItemStatisticsHeader';
-import {LoginResult} from '@enonic/lib-admin-ui/security/auth/LoginResult';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {MembersListing} from './MembersListing';
 import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
+import {AuthHelper} from '@enonic/lib-admin-ui/auth/AuthHelper';
 
 export class UserItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -198,9 +196,7 @@ export class UserItemStatisticsPanel
     }
 
     private async createReportGroup(principal: Principal): Promise<ItemDataGroup | null> {
-        const isAdmin = await new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
-            return loginResult.getPrincipals().some(key => key.equals(RoleKeys.ADMIN));
-        });
+        const isAdmin = AuthHelper.isAdmin();
 
         if(!isAdmin) { return Q(null); }
 

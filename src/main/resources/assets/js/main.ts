@@ -19,6 +19,9 @@ import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeMan
 import {Class} from '@enonic/lib-admin-ui/Class';
 import {JSONObject} from '@enonic/lib-admin-ui/types';
 import {LauncherHelper} from '@enonic/lib-admin-ui/util/LauncherHelper';
+import {AuthContext} from '@enonic/lib-admin-ui/auth/AuthContext';
+import {Principal} from '@enonic/lib-admin-ui/security/Principal';
+import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 
 const body = Body.get();
 
@@ -92,6 +95,8 @@ function startApplication() {
 
     const configScriptEl: HTMLElement = document.getElementById(configScriptId);
     CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as JSONObject);
+    AuthContext.init(Principal.fromJson(CONFIG.get('user') as PrincipalJson),
+        (CONFIG.get('principals') as PrincipalJson[]).map(Principal.fromJson));
 
     await i18nInit(CONFIG.getString('apis.i18nUrl'));
     startApplication();

@@ -9,14 +9,13 @@ import {Group, GroupBuilder} from '../principal/Group';
 import {Role, RoleBuilder} from '../principal/Role';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
 import {PrincipalType} from '@enonic/lib-admin-ui/security/PrincipalType';
-import {IsAuthenticatedRequest} from '@enonic/lib-admin-ui/security/auth/IsAuthenticatedRequest';
 import {IdProviderKey} from '@enonic/lib-admin-ui/security/IdProviderKey';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {LoginResult} from '@enonic/lib-admin-ui/security/auth/LoginResult';
 import {UserItem} from '@enonic/lib-admin-ui/security/UserItem';
 import {TreeListBox, TreeListBoxParams, TreeListElement, TreeListElementParams} from '@enonic/lib-admin-ui/ui/selector/list/TreeListBox';
 import {UserTypesTreeGridItemViewer} from './UserTypesTreeGridItemViewer';
+import {AuthHelper} from '@enonic/lib-admin-ui/auth/AuthHelper';
 
 export class UserItemTypesTreeGrid
     extends TreeListBox<UserTypeTreeGridItem> {
@@ -76,13 +75,7 @@ export class UserItemTypesTreeGrid
     }
 
     private fetchRoot(): Q.Promise<UserTypeTreeGridItem[]> {
-        return Q.all([new IsAuthenticatedRequest().sendAndParse(), this.fetchIdProviders()]).then(
-            (result: [LoginResult, IdProvider[]]) => result[0].isUserAdmin(),
-            reason => {
-                DefaultErrorHandler.handle(reason);
-                return false;
-            }
-        ).then(userIsAdmin => [
+        return this.fetchIdProviders().then(() => [
             new UserTypeTreeGridItemBuilder()
                 .setUserItem(new UserBuilder()
                     .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.USER, 'user'))
@@ -93,7 +86,7 @@ export class UserItemTypesTreeGrid
                     .setKey(new PrincipalKey(IdProviderKey.SYSTEM, PrincipalType.GROUP, 'user-group'))
                     .setDisplayName(i18n('field.userGroup'))
                     .build()).build(),
-            ...((this.presetIdProvider || !userIsAdmin) ? [] : [
+            ...((this.presetIdProvider || !AuthHelper.isUserAdmin()) ? [] : [
                 new UserTypeTreeGridItemBuilder()
                     .setUserItem(new IdProviderBuilder()
                         .setKey(IdProviderKey.SYSTEM.toString())
