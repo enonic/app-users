@@ -56,6 +56,11 @@ export class UserBrowsePanel
             this.appendUserItemNode(principal, idProvider);
             this.setRefreshOfFilterRequired();
 
+            // IdProvider type
+            if (!principal) {
+                this.treeListBox.resetIdProviders();
+            }
+
             /*
                 In case you switch to UserBrowsePanel before this event occured you need to trigger refresh manually
                 Otherwise 'shown' event won't update filter
@@ -75,6 +80,7 @@ export class UserBrowsePanel
 
             if (!principal) { // IdProvider type
                 userTreeGridItem = builder.setIdProvider(idProvider).setType(UserTreeGridItemType.ID_PROVIDER).build();
+                this.treeListBox.resetIdProviders();
             } else {         // Principal type
                 userTreeGridItem = builder.setPrincipal(principal).setIdProvider(idProvider).setType(UserTreeGridItemType.PRINCIPAL).build();
             }
@@ -91,6 +97,10 @@ export class UserBrowsePanel
                 if (item) {
                     this.selectionWrapper.deselect(item);
                     this.findParentList(item).forEach((list) => list.removeItems(item));
+                }
+
+                if (!item || item.isIdProvider()) {
+                    this.treeListBox.resetIdProviders();
                 }
             });
 

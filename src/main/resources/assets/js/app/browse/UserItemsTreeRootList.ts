@@ -12,7 +12,7 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
 
     private searchString: string;
     private searchTypes: UserItemType[];
-    private latestIdProviders: IdProvider[];
+    private cachedIdProviders: IdProvider[];
     private constraintItems: string[];
 
     setSearchString(searchString: string): this {
@@ -37,9 +37,12 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
     resetFilter(): void {
         this.searchString = null;
         this.searchTypes = null;
-        this.latestIdProviders = null;
         this.constraintItems = null;
         this.load();
+    }
+
+    resetIdProviders(): void {
+        this.cachedIdProviders = null;
     }
 
     protected fetchRoot(): Q.Promise<UserTreeGridItem[]> {
@@ -51,28 +54,21 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
     }
 
     private fetchFilteredItems(): Q.Promise<UserTreeGridItem[]> {
-        // load list of idproviders to set for filtered users/groups
-        const idProvidersPromise = this.latestIdProviders ? Q.resolve() : new ListIdProvidersRequest().sendAndParse().then((idProviders) => {
-            this.latestIdProviders = idProviders;
-            return Q.resolve();
-        }).catch(DefaultErrorHandler.handle);
-
-
-        return idProvidersPromise.then(() => {
-            return new ListUserItemsRequest()
-                .setCount(20)
-                .setTypes(this.searchTypes)
-                .setItems(this.constraintItems)
-                .setQuery(this.searchString)
-                .setStart(this.getItemCount())
-                .sendAndParse()
-                .then((result) => {
-                    return result.userItems.map(userItem => {
+        return new ListUserItemsRequest()
+            .setCount(20)
+            .setTypes(this.searchTypes)
+            .setItems(this.constraintItems)
+            .setQuery(this.searchString)
+            .setStart(this.getItemCount())
+            .sendAndParse()
+            .then((userItemsResponse) => {
+                return this.getIdProviders().then((idProviders) => {
+                    return userItemsResponse.userItems.map(userItem => {
                         const builder = new UserTreeGridItemBuilder();
 
                         if (userItem instanceof Principal) {
-                            const idProv = this.latestIdProviders.find(idProv => idProv.getKey().equals(userItem.getKey().getIdProvider()));
-                           builder.setPrincipal(userItem).setIdProvider(idProv).setType(UserTreeGridItemType.PRINCIPAL);
+                            const idProv = idProviders.find(idProv => idProv.getKey().equals(userItem.getKey().getIdProvider()));
+                            builder.setPrincipal(userItem).setIdProvider(idProv).setType(UserTreeGridItemType.PRINCIPAL);
                         } else if (userItem instanceof IdProvider) {
                             builder.setIdProvider(userItem).setType(UserTreeGridItemType.ID_PROVIDER);
                         }
@@ -80,8 +76,21 @@ export class UserItemsTreeRootList extends UserItemsTreeList {
                         return builder.build();
                     });
                 });
-        });
+            });
+    }
 
+    private getIdProviders(): Q.Promise<IdProvider[]> {
+        if (this.cachedIdProviders) {
+            return Q.resolve(this.cachedIdProviders.slice());
+        }
+
+        return new ListIdProvidersRequest().sendAndParse().then((result) => {
+            this.cachedIdProviders = result;
+            return this.cachedIdProviders.slice();
+        }).catch(() => {
+            DefaultErrorHandler.handle('Failed to load id providers');
+            return [];
+        });
     }
 
     isLoadAllowed(): boolean {
