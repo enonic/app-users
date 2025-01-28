@@ -5,12 +5,16 @@ const portal = require('/lib/xp/portal');
 const assetLib = require('/lib/enonic/asset');
 
 function handleGet() {
-    const baseUri = admin.getBaseUri();
+    let baseUri = admin.getBaseUri();
+    if (baseUri.endsWith('/')) {
+        baseUri = baseUri.substring(0, baseUri.length - 1);
+    }
+
     return {
         status: 200,
         contentType: 'application/json',
         body: {
-            adminUrl: baseUri,
+            adminUrl: admin.getBaseUri(),
             appId: app.name,
             assetsUri: assetLib.assetUrl({path: ''}),
             toolUri: admin.getToolUrl(
