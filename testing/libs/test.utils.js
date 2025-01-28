@@ -61,6 +61,7 @@ module.exports = {
         let confirmationDialog = new ConfirmationDialog();
         await this.findAndSelectItem(name);
         await browsePanel.waitForDeleteButtonEnabled();
+        await browsePanel.pause(1000);
         await browsePanel.clickOnDeleteButton();
         await confirmationDialog.waitForDialogLoaded();
         await confirmationDialog.clickOnYesButton();
@@ -199,7 +200,7 @@ module.exports = {
         }
         //2. Open New Principal dialog:
         await browsePanel.waitForNewButtonEnabled();
-        await browsePanel.pause(400);
+        await browsePanel.pause(1000);
         await browsePanel.clickOnNewButton();
         await newPrincipalDialog.waitForDialogLoaded();
         //3. Click on Group item in the modal dialog:
@@ -266,7 +267,8 @@ module.exports = {
             await this.findAndSelectItem(displayName);
             await browsePanel.waitForEditButtonEnabled();
             await browsePanel.clickOnEditButton();
-            return await roleWizard.waitForLoaded();
+            await roleWizard.waitForLoaded();
+            await roleWizard.pause(500);
         } catch (err) {
             throw new Error("Error when open the role: " + err);
         }
