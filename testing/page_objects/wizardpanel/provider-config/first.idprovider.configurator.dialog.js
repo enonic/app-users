@@ -57,8 +57,9 @@ class FirstIdProviderConfiguratorDialog extends Page {
         return this.clickOnElement(this.applyButton);
     }
 
-    waitForApplyButtonEnabled() {
-        return this.waitForElementEnabled(this.applyButton, appConst.mediumTimeout);
+    async waitForApplyButtonEnabled() {
+        await this.waitForElementEnabled(this.applyButton, appConst.mediumTimeout);
+        await this.pause(200);
     }
 
     waitForApplyButtonDisabled() {
@@ -77,10 +78,13 @@ class FirstIdProviderConfiguratorDialog extends Page {
         return this.isElementEnabled(this.domainInput);
     }
 
-    waitForClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(error => {
-            throw new Error('ID Provider config Dialog was not closed');
-        });
+    async waitForClosed() {
+        try {
+            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_close_id_provider_config_dialog');
+            throw new Error(`ID Provider config Dialog was not closed, screenshot:${screenshot} ` + err);
+        }
     }
 
     typeInDomainInput(domain) {
