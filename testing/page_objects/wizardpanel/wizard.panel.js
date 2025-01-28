@@ -4,7 +4,7 @@
 const Page = require('../page');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const itemBuilders = require('../../libs/userItems.builder');
+const {Key} = require('webdriverio');
 const XPATH = {
     displayNameInput: `//input[contains(@name,'displayName')]`,
     saveButton: "//button[contains(@id,'ActionButton') and child::span[text()='Save']]",
@@ -109,16 +109,22 @@ class WizardPanel extends Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "Invalid icon should not be displayed", interval: 500});
     }
 
-    hotKeySave() {
-        return this.getBrowser().status().then(status => {
-            return this.getBrowser().keys(['Control', 's']);
-        })
+    async hotKeySave() {
+        let status = await this.getBrowserStatus();
+        if (status.os.name.includes('Mac')) {
+            return await this.getBrowser().keys([Key.Command, 's']);
+        } else {
+            return await this.getBrowser().keys([Key.Ctrl, 's']);
+        }
     }
 
-    hotKeyDelete() {
-        return this.getBrowser().status().then(status => {
-            return this.getBrowser().keys(['Control', 'Delete']);
-        })
+    async hotKeyDelete() {
+        let status = await this.getBrowserStatus();
+        if (status.os.name.includes('Mac')) {
+            return await this.getBrowser().keys([Key.Command, Key.Delete]);
+        } else {
+            return await this.getBrowser().keys([Key.Ctrl, Key.Delete]);
+        }
     }
 }
 

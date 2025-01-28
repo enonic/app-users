@@ -38,10 +38,14 @@ class ConfirmationDialog extends Page {
         return this.clickOnElement(this.noButton);
     }
 
-    waitForDialogLoaded() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
-            throw new Error("Confirmation dialog was not loaded! " + err);
-        })
+    async waitForDialogLoaded() {
+        try {
+            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(300);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_confirmation_dialog');
+            throw new Error(`Confirmation dialog was not loaded! screenshot${screenshot} ` + err);
+        }
     }
 
     isDialogLoaded() {

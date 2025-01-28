@@ -280,6 +280,10 @@ class Page {
         await this.keys('Escape');
         return await this.pause(300);
     }
+
+    async getBrowserStatus() {
+        return await this.getBrowser().status();
+    }
 }
 
 module.exports = Page;

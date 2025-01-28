@@ -7,6 +7,7 @@ const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
+const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe("group.wizard.spec - validation and check inputs", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -22,6 +23,22 @@ describe("group.wizard.spec - validation and check inputs", function () {
             await testUtils.clickOnSystemAndOpenGroupWizard();
             let isRedIconPresent = await groupWizard.waitUntilInvalidIconDisplayed('<Unnamed Group>');
             assert.ok(isRedIconPresent, "red circle should be present in the tab, because required input(name) is empty");
+        });
+
+    it("GIVEN 'Group' wizard is opened AND a name has been and saved WHEN 'Ctrl/Command+Delete' pressed THEN confirmation dialog should be loaded",
+        async () => {
+            let groupWizard = new GroupWizard();
+            // 1. Open group-wizard:
+            await testUtils.clickOnSystemAndOpenGroupWizard();
+            // 2. Type a name:
+            await groupWizard.typeDisplayName(appConst.generateRandomName('group'));
+            // 3. Save the group:
+            await groupWizard.waitAndClickOnSave();
+            // 4. Press Ctrl/Command+Delete:
+            await groupWizard.hotKeyDelete();
+            // 5.`Confirmation dialog` should appear:
+            let confirmationDialog = new ConfirmationDialog();
+            await confirmationDialog.waitForDialogLoaded();
         });
 
     it("GIVEN 'Group' wizard is opened WHEN name has been typed THEN red circle gets not visible",
