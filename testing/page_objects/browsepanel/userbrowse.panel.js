@@ -5,6 +5,7 @@ const Page = require('../page');
 const ConfirmationDialog = require('../confirmation.dialog');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
+const {Key} = require('webdriverio');
 
 const xpath = {
     container: "//div[contains(@id,'UserBrowsePanel')]",
@@ -139,7 +140,7 @@ class UserBrowsePanel extends Page {
             return await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw Error(`Item was not found. screenshot:${screenshot} ` + err);
+            throw new Error(`Item was not found. screenshot:${screenshot} ` + err);
         }
     }
 
@@ -230,7 +231,7 @@ class UserBrowsePanel extends Page {
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw Error('Row was not found: screenshot' + screenshot + '  ' + err);
+            throw new Error(`Row was not found: screenshot ${screenshot} ` + err);
         }
     }
 
@@ -242,7 +243,7 @@ class UserBrowsePanel extends Page {
             return await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw Error(`Row checkbox, screenshot:${screenshot} ` + err);
+            throw new Error(`Row checkbox, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -265,17 +266,25 @@ class UserBrowsePanel extends Page {
         })
     }
 
-    hotKeyEdit() {
-        return this.browser.keys(['Control', 'e']);
+    async hotKeyEdit() {
+        let status = await this.getBrowserStatus();
+        if (status.os.name.includes('Mac')) {
+            return await this.getBrowser().keys([Key.Command, 'e']);
+        } else {
+            return await this.getBrowser().keys([Key.Ctrl, 'e']);
+        }
     }
 
-    hotKeyDelete() {
-        return this.browser.status().then(status => {
-            return this.browser.keys(['Control', 'Delete']);
-        })
+    async hotKeyDelete() {
+        let status = await this.getBrowserStatus();
+        if (status.os.name.includes('Mac')) {
+            return await this.getBrowser().keys([Key.Command, Key.Delete]);
+        } else {
+            return await this.getBrowser().keys([Key.Ctrl, Key.Delete]);
+        }
     }
 
-    //Click on existing Tab-Item and navigates to the opened wizard:
+//Click on existing Tab-Item and navigates to the opened wizard:
     async clickOnTabBarItem(displayName) {
         let tabItem = xpath.itemTabByDisplayName(displayName);
         await this.waitForElementDisplayed(tabItem, appConst.mediumTimeout);
@@ -317,7 +326,7 @@ class UserBrowsePanel extends Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: 'expected style not present after 3s'});
     }
 
-    // Click on Show/Hide selections
+// Click on Show/Hide selections
     async clickOnSelectionToggler() {
         let selector = xpath.container + xpath.selectionToggler;
         await this.clickOnElement(selector);
@@ -343,11 +352,11 @@ class UserBrowsePanel extends Page {
             return await this.doRightClick(selector);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_right_click');
-            throw Error(`Error occurred during right click on the row, screenshot: ${screenshot} ` + err);
+            throw new Error(`Error occurred during right click on the row, screenshot: ${screenshot} ` + err);
         }
     }
 
-    // Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
+// Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
     async waitForSelectionControllerPartial() {
         let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         await this.getBrowser().waitUntil(async () => {
@@ -357,7 +366,7 @@ class UserBrowsePanel extends Page {
         return true;
     }
 
-    // returns true if 'Selection Controller' checkbox is selected:
+// returns true if 'Selection Controller' checkbox is selected:
     isSelectionControllerSelected() {
         let locator = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         return this.isSelected(locator);
