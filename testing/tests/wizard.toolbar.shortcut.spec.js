@@ -38,13 +38,13 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await userWizard.clickOnSetPasswordButton();
             await userWizard.typePassword(PASSWORD);
             await userWizard.waitForSaveButtonEnabled();
-            await userWizard.pause(1000);
+            await userWizard.pause(700);
             // 3. keyboard shortcut to Save button has been pressed:
             await userWizard.hotKeySave();
             await testUtils.saveScreenshot('user_shortcut_save');
             // 4. Verify the notification message:
-            let messages = await userWizard.waitForNotificationMessages();
-            assert.ok(messages.includes(appConst.NOTIFICATION_MESSAGE.USER_WAS_CREATED), 'User was created - message should appear');
+            let message = await userWizard.waitForNotificationMessage();
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.USER_WAS_CREATED, 'User was created - message should appear');
         });
 
     it(`GIVEN existing user is opened WHEN 'Ctrl+del' has been pressed THEN confirmation modal dialog should appear`,
@@ -72,7 +72,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Group's data has been typed:
             await groupWizard.typeDisplayName(TEST_GROUP.displayName);
             await groupWizard.waitForSaveButtonEnabled();
-            await groupWizard.pause(1500);
+            await groupWizard.pause(500);
             // 3. keyboard shortcut to save button has been pressed:
             await groupWizard.hotKeySave();
             await testUtils.saveScreenshot('group_shortcut_save');
@@ -137,7 +137,7 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             await idProviderWizard.typeDisplayName(TEST_PROVIDER.displayName);
             await idProviderWizard.waitForSaveButtonEnabled();
             await idProviderWizard.pause(700);
-            // 3. keyboard shortcut to Save button has been pressed:
+            // 3. keyboard shortcut to 'Save' button has been pressed:
             await idProviderWizard.hotKeySave();
             await testUtils.saveScreenshot('provider_shortcut_save');
             // 4. Verify the notification message:

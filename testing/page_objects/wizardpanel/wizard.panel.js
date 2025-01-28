@@ -68,7 +68,7 @@ class WizardPanel extends Page {
         try {
             await this.waitForSaveButtonEnabled();
             await this.clickOnElement(this.saveButton);
-            return await this.pause(900);
+            return await this.pause(700);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_save_button');
             throw new Error(`Error occurred during clicking on Save button ! ${screenshot} ` + err);
