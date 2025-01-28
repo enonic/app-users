@@ -44,7 +44,7 @@ class ConfirmationDialog extends Page {
             await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_confirmation_dialog');
-            throw new Error("Confirmation dialog was not loaded! " + err);
+            throw new Error(`Confirmation dialog was not loaded! screenshot${screenshot} ` + err);
         }
     }
 
