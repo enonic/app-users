@@ -19,8 +19,8 @@ describe('User Browse Panel specification', function () {
             assert.ok(result, 'roles folder should be present in the root directory');
             result = await userBrowsePanel.isItemDisplayed('/system');
             assert.ok(result, '`/system` folder should be present in the root directory');
-            result = await userBrowsePanel.isSelectionTogglerVisible();
-            assert.ok(result === false, "'Selection toggler' should not be displayed");
+            // 'Selection toggle' should not be displayed when no items are selected
+            await userBrowsePanel.waitForSelectionToggleNotDisplayed();
         });
 
     it("GIVEN Browse panel is opened WHEN 'Roles' folder has been expanded THEN required system roles should be listed",
@@ -59,7 +59,7 @@ describe('User Browse Panel specification', function () {
             let userBrowsePanel = new UserBrowsePanel();
             // 1. Click on the checkbox:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
-            await userBrowsePanel.waitForSelectionTogglerVisible();
+            await userBrowsePanel.waitForSelectionToggleDisplayed();
             let result = await userBrowsePanel.getNumberInSelectionToggler();
             await testUtils.saveScreenshot('number_in_selection');
             assert.equal(result, '1', '1 should be displayed in the selection-toggler button');
@@ -71,7 +71,7 @@ describe('User Browse Panel specification', function () {
             let userBrowsePanel = new UserBrowsePanel();
             // 1. Click on the 'System Id Provider' checkbox:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
-            await userBrowsePanel.waitForSelectionTogglerVisible();
+            await userBrowsePanel.waitForSelectionToggleDisplayed();
             await userBrowsePanel.pause(1000);
             // 2. Click on 'Show Selection' button:
             await userBrowsePanel.clickOnSelectionToggler();
@@ -90,7 +90,7 @@ describe('User Browse Panel specification', function () {
             let browseFilterPanel = new BrowseFilterPanel();
             // 1. Click on the Controller Checkbox(select all items):
             await userBrowsePanel.clickOnSelectionControllerCheckbox();
-            await userBrowsePanel.waitForSelectionTogglerVisible();
+            await userBrowsePanel.waitForSelectionToggleDisplayed();
             // 2. Click on 'Show Selection':
             await userBrowsePanel.clickOnSelectionToggler();
             await testUtils.openFilterPanel();

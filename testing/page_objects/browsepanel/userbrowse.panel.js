@@ -231,7 +231,7 @@ class UserBrowsePanel extends Page {
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw new Error(`Row was not found: screenshot ${screenshot} ` + err);
+            throw new Error(`Row with item by the name ${name} was not found: screenshot ${screenshot} ` + err);
         }
     }
 
@@ -243,7 +243,7 @@ class UserBrowsePanel extends Page {
             return await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw new Error(`Row checkbox, screenshot:${screenshot} ` + err);
+            throw new Error(`Error occurred after clickong on the row-checkbox, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -317,19 +317,21 @@ class UserBrowsePanel extends Page {
         return this.getTextInElements(locator);
     }
 
-    waitForSelectionTogglerVisible() {
-        let selector = xpath.container + xpath.selectionToggler;
+    waitForSelectionToggleDisplayed() {
         return this.getBrowser().waitUntil(() => {
-            return this.getAttribute(selector, 'class').then(result => {
+            return this.getAttribute(this.selectionToggler, 'class').then(result => {
                 return result.includes('any-selected');
             })
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'expected style not present after 3s'});
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'any-selected style should be present for selection toggle'});
+    }
+
+    waitForSelectionToggleNotDisplayed() {
+        return this.waitForElementNotDisplayed(this.selectionToggler, appConst.mediumTimeout);
     }
 
 // Click on Show/Hide selections
     async clickOnSelectionToggler() {
-        let selector = xpath.container + xpath.selectionToggler;
-        await this.clickOnElement(selector);
+        await this.clickOnElement(this.selectionToggler);
         return await this.pause(1000);
     }
 
