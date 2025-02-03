@@ -55,7 +55,7 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await filterPanel.typeSearchText('test');
             await filterPanel.waitForClearLinkVisible();
             // 3. Click on Clear button:
-            await filterPanel.clickOnClearLink();
+            await filterPanel.clickOnClearFilterLink();
             await filterPanel.waitForClearLinkNotVisible();
         });
 

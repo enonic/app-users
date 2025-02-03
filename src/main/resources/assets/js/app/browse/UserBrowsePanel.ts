@@ -88,8 +88,15 @@ export class UserBrowsePanel
             ids.forEach((id: string) => {
                 const item = this.treeListBox.getItem(id);
 
+                if (this.selectionWrapper.isSelected(id)) {
+                    const itemToDeselect = this.selectionWrapper.getSelectedItems().find((item) => item.getId() === id);
+
+                    if (itemToDeselect) {
+                        this.selectionWrapper.deselect(itemToDeselect);
+                    }
+                }
+
                 if (item) {
-                    this.selectionWrapper.deselect(item);
                     this.findParentList(item).forEach((list) => list.removeItems(item));
                 }
             });

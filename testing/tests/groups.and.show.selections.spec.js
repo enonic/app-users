@@ -8,6 +8,7 @@ const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const BrowseFilterPanel = require('../page_objects/browsepanel/principal.filter.panel');
+const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
 describe("Check 'Selection Controller' and 'Show Selection' elements in filtered grid", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -79,6 +80,38 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             assert.equal(gridItems.length, 2, "Two groups should be present in User Browse Panel");
             assert.ok(gridItems.includes(GROUP_1.displayName), "The first group should be present in User Browse Panel");
             assert.ok(gridItems.includes(GROUP_2.displayName), "The second group should be present in User Browse Panel");
+        });
+
+
+    // Verify the bug: Error notification message appears after deleting selection items #2228
+    // https://github.com/enonic/app-users/issues/2228
+    it("GIVEN existing group has been filtered then checked WHEN 'clear filter' button has been pressed and the group has been deleted THEN 'Show Selection' button should be hidden",
+        async () => {
+            let userBrowsePanel = new UserBrowsePanel();
+            let browseFilterPanel = new BrowseFilterPanel();
+            let confirmationDialog = new ConfirmationDialog();
+            // 1. Open Filter Panel and type the group's name:
+            await testUtils.openFilterPanel();
+            await browseFilterPanel.typeSearchText(GROUP_1.displayName);
+            // 2. Check the group:
+            await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_1.displayName);
+            // 3. Click on 'Clear Filter' button(link):
+            await browseFilterPanel.clickOnClearFilterLink();
+            // 4. Verify that 'Show Selection' button(link) remains visible yet:
+            await userBrowsePanel.waitForSelectionToggleDisplayed();
+            // 5. Delete the checked group
+            await userBrowsePanel.waitForDeleteButtonEnabled();
+            await userBrowsePanel.clickOnDeleteButton();
+            await confirmationDialog.waitForDialogLoaded();
+            await confirmationDialog.clickOnYesButton();
+            await confirmationDialog.waitForDialogClosed();
+            await testUtils.saveScreenshot('groups_deleted_show_selection');
+            // 5. Verify that only one expected notification message appears:
+            let messages = await userBrowsePanel.waitForNotificationMessages();
+            assert.equal(messages.length, 1, 'The only one notification message should appear');
+            assert.equal(messages[0], appConst.groupDeletedMessage(GROUP_1.displayName), 'Expected notification message should appear');
+
+            await userBrowsePanel.waitForSelectionToggleNotDisplayed();
         });
 
     before(async () => {
