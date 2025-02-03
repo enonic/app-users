@@ -115,7 +115,7 @@ class BrowseFilterPanel extends Page {
         return this.waitForElementNotDisplayed(this.clearFilterLink, appConst.shortTimeout);
     }
 
-    clickOnClearLink() {
+    clickOnClearFilterLink() {
         return this.clickOnElement(this.clearFilterLink);
     }
 
