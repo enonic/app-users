@@ -84,7 +84,6 @@ export class UserItemStatisticsPanel
         const serverHandler = PrincipalServerEventsHandler.getInstance();
 
         serverHandler.onUserItemCreated(handler);
-        serverHandler.onUserItemDeleted(handler);
         serverHandler.onUserItemUpdated(handler);
     }
 
