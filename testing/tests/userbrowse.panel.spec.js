@@ -19,28 +19,29 @@ describe('User Browse Panel specification', function () {
             assert.ok(result, 'roles folder should be present in the root directory');
             result = await userBrowsePanel.isItemDisplayed('/system');
             assert.ok(result, '`/system` folder should be present in the root directory');
-            // 'Selection toggle' should not be displayed when no items are selected
-            await userBrowsePanel.waitForSelectionToggleNotDisplayed();
+            result = await userBrowsePanel.isSelectionTogglerVisible();
+            assert.ok(result === false, "'Selection toggler' should not be displayed");
         });
 
     it("GIVEN Browse panel is opened WHEN 'Roles' folder has been expanded THEN required system roles should be listed",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.clickOnExpanderIcon('roles');
-            let isDisplayed = await userBrowsePanel.isItemDisplayed('system.user.admin');
+            let isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem('system.user.admin', 300, 10);
             assert.ok(isDisplayed, "'User Administrator' role should be displayed");
-            isDisplayed = await userBrowsePanel.isItemDisplayed('system.admin');
+            isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem('system.admin', 300, 10);
             assert.ok(isDisplayed, "'Administrator' role should be displayed");
-            isDisplayed = await userBrowsePanel.isItemDisplayed('cms.admin');
+            isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem('cms.admin', 300, 10);
             assert.ok(isDisplayed, "'Content Manager Administrator' role should be displayed");
 
-            isDisplayed = await userBrowsePanel.isItemDisplayed('system.admin.login');
+            isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem('system.admin.login', 300, 10);
             assert.ok(isDisplayed, "'Administration Console Login' role should be displayed");
-            isDisplayed = await userBrowsePanel.isItemDisplayed('system.everyone');
+
+            isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem('system.everyone', 300, 10);
             assert.ok(isDisplayed, "'Everyone' role should be displayed");
-            isDisplayed = await userBrowsePanel.isItemDisplayed('cms.expert');
+            isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem('cms.expert', 300, 10);
             assert.ok(isDisplayed, "'Content Manager Expert' role should be displayed");
-            isDisplayed = await userBrowsePanel.isItemDisplayed('system.authenticated');
+            isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem('system.authenticated', 300, 10);
             assert.ok(isDisplayed, "'Authenticated' role should be displayed");
         });
 
