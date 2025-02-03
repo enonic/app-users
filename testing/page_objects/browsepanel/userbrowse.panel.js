@@ -71,12 +71,6 @@ class UserBrowsePanel extends Page {
         return xpath.listBoxToolbarDiv + xpath.selectionControllerCheckBox;
     }
 
-    waitForPanelVisible(ms) {
-        return this.waitForElementDisplayed(xpath.toolbar, ms).catch(err => {
-            throw new Error('User browse panel was not loaded ' + err);
-        });
-    }
-
     async clickOnNewButton() {
         try {
             await this.waitForElementEnabled(this.newButton, appConst.mediumTimeout)
@@ -94,7 +88,7 @@ class UserBrowsePanel extends Page {
             console.log('user browse panel is loaded');
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_grid');
-            throw new Error('Users browse panel was not loaded screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Users browse panel was not loaded screenshot:${screenshot} ` + err);
         }
     }
 
@@ -104,6 +98,39 @@ class UserBrowsePanel extends Page {
             return false;
         });
     }
+
+    async scrollListBoxPanelAndFindItem(itemName, deltaY, maxScrolls) {
+        let locator = xpath.rowByName(itemName);
+        const elementForScroll = await this.findElement("//div[contains(@id,'SelectableListBoxWrapper')]");
+        let id = await elementForScroll.getAttribute('id');
+        let scriptScrollTop = 'return document.getElementById(arguments[0]).scrollTop';
+        let scriptTop = 'document.getElementById(arguments[0]).scrollTop=arguments[1]';
+        await this.getBrowser().execute(scriptTop, id, 0);
+        await this.pause(500);
+        // get the initial scroll position for List of user items in 'Browse Panel'
+        //let lastScrollY = await this.browser.execute(scriptScrollTop, id);
+        let lastScrollY = 0;
+        let newScrollY;
+        for (let i = 0; i < maxScrolls; i++) {
+            let isDisplayed = await this.isElementDisplayed(locator);
+            if (isDisplayed) {
+                return true;
+            } else {
+                // Scroll 'Browse Panel':
+                await this.performScrollWithWheelActions(elementForScroll, deltaY);
+                await this.pause(1000);
+                // check the new scroll position:
+                newScrollY = await this.browser.execute(scriptScrollTop, id);
+                // If the scroll did not change the position, then the item is not found:
+                if (newScrollY === lastScrollY) {
+                    return false;
+                }
+                lastScrollY = newScrollY;
+            }
+        }
+        throw new Error(`User item ${itemName} was not found after ${maxScrolls} scrolls`);
+    }
+
 
     async waitForItemNotDisplayed(itemName) {
         try {
@@ -153,8 +180,14 @@ class UserBrowsePanel extends Page {
         }
     }
 
-    clickOnSearchButton() {
-        return this.clickOnElement(this.searchButton);
+    async clickOnSearchButton() {
+        try {
+            await this.waitForElementDisplayed(this.searchButton, appConst.mediumTimeout);
+            return await this.clickOnElement(this.searchButton);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_search_button');
+            throw new Error(`Error, search button, screenshot: ${screenshot} ` + err);
+        }
     }
 
     async clickOnHideFilterButton() {
@@ -179,16 +212,17 @@ class UserBrowsePanel extends Page {
 
     async clickOnDeleteButton() {
         await this.waitForDeleteButtonEnabled();
-        await await this.clickOnElement(this.deleteButton);
+        await this.clickOnElement(this.deleteButton);
         await this.pause(500);
     }
 
-    isSearchButtonDisplayed() {
-        return this.isElementDisplayed(this.searchButton);
-    }
-
-    waitForNewButtonEnabled() {
-        return this.waitForElementEnabled(this.newButton, appConst.mediumTimeout);
+    async waitForNewButtonEnabled() {
+        try {
+            return await this.waitForElementEnabled(this.newButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_new_button');
+            throw new Error(`New button is not enabled! screenshot: ${screenshot} ` + err);
+        }
     }
 
     waitForEditButtonEnabled() {
@@ -243,7 +277,7 @@ class UserBrowsePanel extends Page {
             return await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw new Error(`Error occurred after clickong on the row-checkbox, screenshot:${screenshot} ` + err);
+            throw new Error(`Error occurred after clicking on the row-checkbox, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -255,15 +289,14 @@ class UserBrowsePanel extends Page {
             return await this.pause(500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_close');
-            throw new Error(`itemTabButton was not found! screenshot:${screenshot} ` + err);
+            throw new Error(`Close tab button was not found! itemName: ${displayName}, screenshot:${screenshot} ` + err);
         }
     }
 
-    hotKeyNew() {
-        return this.browser.status().then(status => {
-            console.log('browser status:' + status);
-            return this.browser.keys(['Alt', 'n']);
-        })
+    async hotKeyNew() {
+        let status = await this.getBrowserStatus();
+        console.log('browser status:' + status);
+        return await this.browser.keys([Key.Alt, 'n']);
     }
 
     async hotKeyEdit() {
@@ -284,7 +317,7 @@ class UserBrowsePanel extends Page {
         }
     }
 
-//Click on existing Tab-Item and navigates to the opened wizard:
+    // Clicks on existing Tab-Item and switches to the opened wizard:
     async clickOnTabBarItem(displayName) {
         let tabItem = xpath.itemTabByDisplayName(displayName);
         await this.waitForElementDisplayed(tabItem, appConst.mediumTimeout);
@@ -329,7 +362,7 @@ class UserBrowsePanel extends Page {
         return this.waitForElementNotDisplayed(this.selectionToggler, appConst.mediumTimeout);
     }
 
-// Click on Show/Hide selections
+    // Clicks on Show/Hide selections
     async clickOnSelectionToggler() {
         await this.clickOnElement(this.selectionToggler);
         return await this.pause(1000);
@@ -358,7 +391,7 @@ class UserBrowsePanel extends Page {
         }
     }
 
-// Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
+    // Waits for 'Selection Controller' checkBox gets 'partial', then returns true, otherwise exception will be thrown
     async waitForSelectionControllerPartial() {
         let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         await this.getBrowser().waitUntil(async () => {
@@ -368,7 +401,7 @@ class UserBrowsePanel extends Page {
         return true;
     }
 
-// returns true if 'Selection Controller' checkbox is selected:
+    // returns true if 'Selection Controller' checkbox is selected:
     isSelectionControllerSelected() {
         let locator = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         return this.isSelected(locator);
@@ -379,8 +412,8 @@ class UserBrowsePanel extends Page {
             await this.clickOnElement(this.selectionControllerCheckBox);
             return await this.pause(300);
         } catch (err) {
-            await this.saveScreenshot('err_click_on_selection_controller');
-            throw new Error('error when click on selection_controller ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_click_on_selection_controller');
+            throw new Error(`error when click on selection_controller screenshot: ${screenshot} ` + err);
         }
     }
 

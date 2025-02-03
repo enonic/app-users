@@ -10,7 +10,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
-describe("user.delete.spec:User - confirm and delete it in the wizard and in the browse panel", function () {
+describe("user.delete.spec:User - confirm and delete an user in wizard and in browse panel", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
     if (typeof browser === 'undefined') {

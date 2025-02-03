@@ -34,24 +34,27 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             let userBrowsePanel = new UserBrowsePanel();
             let browseFilterPanel = new BrowseFilterPanel();
             await testUtils.openFilterPanel();
+            // 1. Click on Group aggregation checkbox:
             await browseFilterPanel.clickOnGroupAggregation();
+            // 2. Scroll the panel and check 2 groups:
+            await userBrowsePanel.scrollListBoxPanelAndFindItem(GROUP_1.displayName, 300, 10);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_1.displayName);
+            await userBrowsePanel.scrollListBoxPanelAndFindItem(GROUP_2.displayName, 300, 10);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_2.displayName);
-            await userBrowsePanel.pause(1000);
-            // Click on 'Show Selection'
+            // 3. Click on 'Show Selection' button:
             await userBrowsePanel.clickOnSelectionToggler();
             await testUtils.saveScreenshot('groups_selection_toggle_checkbox_partial_issue_1');
             await userBrowsePanel.pause(1000);
-            //4. Click on Selection Toggle (circle, Hide Selection), initial state of the grid is restored:
+            // 4. Click on Selection Toggle (circle, Hide Selection), initial state of the grid should be restored:
             await userBrowsePanel.clickOnSelectionToggler();
             await userBrowsePanel.pause(500);
             await testUtils.saveScreenshot('groups_selection_toggle_checkbox_partial_issue_2');
-            //5. Verify that 'Selection Controller' checkBox shows that the selection is partial:
+            // 5. Verify that 'Selection Controller' checkBox shows that the selection is partial:
             let result = await userBrowsePanel.waitForSelectionControllerPartial();
             assert.ok(result, "'Selection Controller' shows that selection is partial");
         });
 
-    //Verifies  issue#334 Incorrect behaviour of Show Selection button and Selection Controller gets irresponsive
+    // Verifies  issue#334 Incorrect behaviour of Show Selection button and Selection Controller gets irresponsive
     it("WHEN 'Show Selection', 'Hide Selection', Show Selection sequentially clicked in filtered grid THEN expected group should be present and Selection Controller should be selected",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
@@ -60,7 +63,9 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             // 1. Click ib Group aggregation checkbox:
             await browseFilterPanel.clickOnGroupAggregation();
             // 2. Select 2 groups:
+            await userBrowsePanel.scrollListBoxPanelAndFindItem(GROUP_1.displayName, 300, 10);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_1.displayName);
+            await userBrowsePanel.scrollListBoxPanelAndFindItem(GROUP_2.displayName, 300, 10);
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName(GROUP_2.displayName);
             await testUtils.saveScreenshot('issue_show_selection');
             // 3. Click on 'Show Selection'
@@ -72,7 +77,7 @@ describe("Check 'Selection Controller' and 'Show Selection' elements in filtered
             // 5. Click on 'Show Selection'
             await userBrowsePanel.clickOnSelectionToggler();
             await testUtils.saveScreenshot('issue_selection_toggle_checkbox_selected');
-            // 6. Verify that 'Selection Controller' checkBox should be selected:
+            // 6. Verify - 'Selection Controller' checkBox should be selected:
             let isSelected = await userBrowsePanel.isSelectionControllerSelected();
             assert.ok(isSelected, "'Selection Controller' shows that selection is partial");
             // 7. Verify that only 2 items(groups) are displayed:
