@@ -26,8 +26,8 @@ describe('filter.panel.spec Principal Filter Panel specification', function () {
             await filterPanel.waitForClosed();
         });
 
-    //Verify issue https://github.com/enonic/app-users/issues/1075
-    //Incorrect behavior of filtering #1075
+    // Verify issue https://github.com/enonic/app-users/issues/1075
+    // Incorrect behavior of filtering #1075
     it("GIVEN 'Filter Panel' is opened WHEN non existent name has been typed THEN grid should be empty",
         async () => {
             let userBrowsePanel = new UserBrowsePanel();

@@ -16,7 +16,7 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
         webDriverHelper.setupBrowser();
     }
 
-    const AUTH_APP_NAME_ADFS = 'Second Selenium App'
+    const AUTH_APP_NAME_ADFS = 'Second Selenium App';
 
     it("GIVEN name and app-provider has been selected WHEN there are required inputs in app-config THEN 'Save' button should be disabled",
         async () => {
@@ -80,7 +80,8 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
             await idProviderWizard.typeData(testIdProvider);
             // 2. Open the configurator dialog:
             await providerConfig.openConfigurator();
-            await providerConfig.typeInClientIdInput('1234567');
+            let clientId = '1234567';
+            await providerConfig.typeInClientIdInput(clientId);
             // 3. Click on 'Add Proxy' button
             await providerConfig.clickOnAddProxyButton();
             // 4. type a text in the required host-input

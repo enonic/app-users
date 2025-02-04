@@ -135,16 +135,23 @@ class ChangeUserPasswordDialog extends Page {
         return await this.pause(400);
     }
 
-    getUserPath() {
-        return this.getTextInElements(this.userPath);
+    async getUserPath() {
+        try {
+            await this.waitForElementDisplayed(this.userPath, appConst.mediumTimeout);
+            return await this.getTextInElements(this.userPath);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_ch_pass_user_path');
+            throw new Error(`Change Password dialog: User path was not found! screenshot: ${screenshot} ` + err);
+        }
     }
 
     async waitForDialogLoaded() {
         try {
-            return await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_pwd_dlg_load');
-            throw new Error("Change Password dialog was not loaded! screenshot:" + screenshot + '  ' + err);
+            throw new Error(`Change Password dialog was not loaded! screenshot: ${screenshot}` + err);
         }
     }
 
@@ -154,7 +161,7 @@ class ChangeUserPasswordDialog extends Page {
             return status;
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_pswd_dlg');
-            throw new Error("Password status was not found! screenshot:" + screenshot + '  ' + err);
+            throw new Error(`Password status was not found! screenshot: ${screenshot} ` + err);
         }
     }
 

@@ -227,9 +227,8 @@ class Page {
             await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
             return await this.getText(selector);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_notification');
-            await this.saveScreenshot(screenshot);
-            throw new Error("Error notification message is not shown, screenshot: " + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName(screenshot);
+            throw new Error(`Error notification message is not shown, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -268,6 +267,25 @@ class Page {
                     button: 2
                 }]
         }]);
+    }
+
+    async performScrollWithWheelActions(element, deltaY) {
+        await this.browser.performActions([
+            {
+                type: 'wheel',
+                id: 'wheel1',
+                actions: [
+                    {
+                        type: 'scroll',
+                        origin: element,
+                        x: 0,
+                        y: 0,
+                        deltaX: 0,  // horizontal scroll
+                        deltaY: deltaY,
+                    },
+                ],
+            },
+        ]);
     }
 
     //is checkbox selected...

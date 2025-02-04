@@ -11,6 +11,8 @@ describe('filter.panel.aggregation.spec - tests for Principal Aggregation', func
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
+    const USER_ADMIN_ROLE_NAME = '/roles/system.user.admin';
+    const SU_USER_NAME = '/system/users/su';
 
     it("GIVEN 'User' aggregation checkbox is checked WHEN the checkbox has been clicked THEN grid returns to the initial state",
         async () => {
@@ -46,7 +48,9 @@ describe('filter.panel.aggregation.spec - tests for Principal Aggregation', func
             await userBrowsePanel.waitForItemByDisplayNameNotDisplayed('System Id Provider');
             await testUtils.saveScreenshot('aggregation_in_users');
             // 5. Verify that SU is present in the filtered grid
-            let isDisplayed = await userBrowsePanel.isItemDisplayed('/system/users/su');
+            // Verify that '/system/users/su' is displayed in the filtered panel:
+            let isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem(SU_USER_NAME, 300, 10);
+            await testUtils.saveScreenshot('users_scrolled');
             assert.ok(isDisplayed, "'SU' should be displayed in the filtered panel");
         });
 
@@ -58,10 +62,11 @@ describe('filter.panel.aggregation.spec - tests for Principal Aggregation', func
             // Click on 'Role' checkbox:
             await filterPanel.clickOnRoleAggregation();
             await testUtils.saveScreenshot('aggregation_in_role');
-            // Verify that 'System Id Provider' is not displayed in the filtered grid:
+            // Verify that 'System Id Provider' is not displayed when 'Role' checkbox is checked:
             await userBrowsePanel.waitForItemByDisplayNameNotDisplayed('System Id Provider');
-            // Verify that 'Users Administrator' role is displayed:
-            let isDisplayed = await userBrowsePanel.isItemDisplayed('/roles/system.user.admin');
+            // Verify that 'Users Administrator' role is displayed in the Grid:
+            let isDisplayed = await userBrowsePanel.scrollListBoxPanelAndFindItem(USER_ADMIN_ROLE_NAME, 300, 10);
+            await testUtils.saveScreenshot('panel_scrolled_role_displayed');
             assert.ok(isDisplayed, 'expected role should be displayed in the filtered panel');
         });
 
