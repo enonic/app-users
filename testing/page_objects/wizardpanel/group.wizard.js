@@ -10,8 +10,8 @@ const UsersPrincipalCombobox = require('../selectors/users.principal.combobox');
 
 const XPATH = {
     container: `//div[contains(@id,'GroupWizardPanel')]`,
-    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Members']]",
-    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]",
+    memberOptionsFilterInput: "//div[contains(@id,'FormItem') and descendant::span[text()='Members']]",
+    roleOptionsFilterInput: "//div[contains(@id,'FormItem') and descendant::span[text()='Roles']]",
     rolesLink: `//li[child::a[text()='Roles']]`,
     membersLink: `//li[child::a[text()='Members']]`,
     membersStepForm: `//div[contains(@id,'MembersWizardStepForm')]`,

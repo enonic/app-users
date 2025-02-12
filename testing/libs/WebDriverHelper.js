@@ -29,6 +29,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
     let _this = this;
     let ww = w;
     let hh = h;
+
     before(async function () {
         let PropertiesReader = require('properties-reader');
         let path = require('path');
@@ -47,6 +48,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
         let options = {
             logLevel: "error",
             automationProtocol: "webdriver",
+            "wdio:enforceWebDriverClassic": true,
             capabilities: {
                 "wdio:enforceWebDriverClassic": true,
                 browserName: browser_name,

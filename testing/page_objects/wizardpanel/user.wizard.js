@@ -6,14 +6,13 @@ const wpXpath = require('./wizard.panel').XPATH;
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const UsersPrincipalCombobox = require('../selectors/users.principal.combobox');
-const ChangePasswordDialog = require('../../page_objects/wizardpanel/change.password.dialog');
 
 const XPATH = {
     container: "//div[contains(@id,'UserWizardPanel')]",
     emailInput: "//input[@type = 'email']",
-    groupsForm: "//div[contains(@id,'FormItem') and child::label[text()='Groups']]",
-    rolesForm: "//div[contains(@id,'FormItem') and child::label[text()='Roles']]",
-    publicKeyFormItem: "//div[contains(@id,'FormItem') and child::label[contains(.,'Public Keys')]]",
+    groupsForm: "//div[contains(@id,'FormItem') and descendant::span[text()='Groups']]",
+    rolesForm: "//div[contains(@id,'FormItem') and descendant::span[text()='Roles']]",
+    publicKeyFormItem: "//div[contains(@id,'FormItem') and descendant::span[contains(.,'Public Keys')]]",
     rolesGroupLink: "//li[child::a[text()='Roles & Groups']]",
     passwordGenerator: "//div[contains(@id,'PasswordGenerator')]",
     showPasswordLink: "//a[@data-i18n='Show']",
