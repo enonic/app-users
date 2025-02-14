@@ -232,6 +232,10 @@ export class UserBrowsePanel
             this.treeListBox.resetFilter();
         });
 
+        this.selectionWrapper.whenRendered(() => {
+            this.treeListBox.load();
+        });
+
         this.initSelectionListeners();
     }
 
