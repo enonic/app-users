@@ -5,10 +5,6 @@
 
   .tree-grid-toolbar {
     margin-top: 0;
-
-    .selection-controller {
-      padding-left: 11px;
-    }
   }
 
   .user-list-box-wrapper {
@@ -23,6 +19,21 @@
           .xp-admin-common-names-view * {
             color: @admin-white;
           }
+        }
+      }
+    }
+  }
+}
+
+body {
+  &._0-240,
+  &._240-360,
+  &._360-540,
+  &._540-720 {
+    .user-items-tree-list {
+      .item-view-wrapper {
+        &.checkbox-left {
+          .checkbox-right();
         }
       }
     }
