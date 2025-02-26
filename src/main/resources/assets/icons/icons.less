@@ -24,3 +24,27 @@
     content: "\e36b";
   }
 }
+
+.icon-system {
+  .icon();
+
+  position: relative;
+
+  &::after {
+    content: "\e1df";
+    position: absolute;
+  }
+
+  &.icon-large::after {
+    font-size: 12px;
+    right: -6px;
+    top: 0;
+    line-height: 14px;
+  }
+
+  &.icon-xlarge::after {
+    font-size: 18px;
+    right: -15px;
+    top: 0;
+  }
+}

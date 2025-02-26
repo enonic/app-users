@@ -42,4 +42,8 @@ export class UserItemWizardPanelParams<USER_ITEM_TYPE extends UserItem> {
     isSystemKey(): boolean {
         return !!this.idProviderKey && this.idProviderKey.isSystem();
     }
+
+    isInternalKey(): boolean {
+        return this.isSystemKey();
+    }
 }
