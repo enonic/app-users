@@ -160,31 +160,34 @@ export class UserTreeGridItem
         return this.getItemDisplayName();
     }
 
-    getIconClass(): string {
+    getIconClass(iconSizeClass: string = 'icon-xlarge'): string {
+        let iconClass = iconSizeClass;
+        const isSystemIdProvider = this.getIdProvider()?.getKey()?.isSystem() ?? false;
+
         switch (this.getType()) {
-        case UserTreeGridItemType.ID_PROVIDER:
-            return 'icon-address-book icon-large';
+            case UserTreeGridItemType.ID_PROVIDER:
+                if (isSystemIdProvider) {
+                    iconClass += ' icon-system';
+                }
 
-        case UserTreeGridItemType.PRINCIPAL:
-            if (this.getPrincipal().isRole()) {
-                return 'icon-masks icon-large';
+                return `icon-address-book ${iconClass}`;
 
-            } else if (this.getPrincipal().isUser()) {
-                return 'icon-user icon-large';
+            case UserTreeGridItemType.PRINCIPAL:
+                if (this.getPrincipal().isRole()) {
+                    return `icon-masks ${iconClass}`;
+                } else if (this.getPrincipal().isUser()) {
+                    if (isSystemIdProvider || this.getPrincipal().isSystem()) {
+                        iconClass += ' icon-system';
+                    }
 
-            } else if (this.getPrincipal().isGroup()) {
-                return 'icon-users icon-large';
-            }
-            break;
+                    return `icon-user ${iconClass}`;
+                } else if (this.getPrincipal().isGroup()) {
+                    return `icon-users ${iconClass}`;
+                }
+                break;
 
-        case UserTreeGridItemType.GROUPS:
-            return 'icon-folder icon-large';
-
-        case UserTreeGridItemType.ROLES:
-            return 'icon-folder icon-large';
-
-        case UserTreeGridItemType.USERS:
-            return 'icon-folder icon-large';
+            default:
+                return `icon-folder ${iconClass}`;
         }
     }
 

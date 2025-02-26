@@ -37,4 +37,8 @@ export class PrincipalWizardPanelParams extends UserItemWizardPanelParams<Princi
     isSystemKey(): boolean {
         return !!this.principalKey && this.principalKey.isSystem();
     }
+
+    isInternalKey(): boolean {
+        return (this.isSystemKey() || this.persistedType === PrincipalType.USER && this.idProvider.getKey().isSystem()) ?? false;
+    }
 }

@@ -111,6 +111,10 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         return super.getWizardHeader() as WizardHeaderWithDisplayNameAndName;
     }
 
+    isInternalUserItem(): boolean {
+        return this.getParams().isInternalKey();
+    }
+
     isSystemUserItem(): boolean {
         return this.getParams().isSystemKey();
     }
@@ -120,7 +124,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         let formIcon = new FormIcon(iconUrl, 'icon');
         formIcon.addClass('icon icon-xlarge');
 
-        if (this.isSystemUserItem()) {
+        if (this.isInternalUserItem()) {
             formIcon.addClass('icon-system');
         }
         return formIcon;
