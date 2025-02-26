@@ -15,6 +15,7 @@ import {MenuButton, MenuButtonConfig} from '@enonic/lib-admin-ui/ui/button/MenuB
 import {DropdownButtonRow} from '@enonic/lib-admin-ui/ui/dialog/DropdownButtonRow';
 import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
+import {HelpTextContainer} from '@enonic/lib-admin-ui/form/HelpTextContainer';
 
 export class NewPublicKeyDialog
     extends ModalDialog {
@@ -131,6 +132,10 @@ export class NewPublicKeyDialog
     private createForm(): Form {
         this.labelFormItem =
             new FormItemBuilder(this.labelTextInput).setLabel(i18n('field.label')).setValidator(Validators.required).build();
+
+        const helpTextContainer = new HelpTextContainer(i18n('dialog.addUserKey.helpText'));
+        this.labelFormItem.appendChild(helpTextContainer.getHelpText());
+        helpTextContainer.toggleHelpText(true);
 
         const fieldSet = new Fieldset();
         fieldSet.add(this.labelFormItem);
