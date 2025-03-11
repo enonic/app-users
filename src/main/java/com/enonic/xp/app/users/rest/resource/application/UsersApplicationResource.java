@@ -1,14 +1,17 @@
 package com.enonic.xp.app.users.rest.resource.application;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Locale;
+
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -66,7 +69,7 @@ public final class UsersApplicationResource
 
     @GET
     @Path("getIdProviderApplications")
-    public ListApplicationJson getIdProviderApplications()
+    public ListApplicationJson getIdProviderApplications( final List<Locale> locales )
     {
         final ListApplicationJson json = new ListApplicationJson();
 
@@ -89,7 +92,7 @@ public final class UsersApplicationResource
                     setSiteDescriptor( siteDescriptor ).
                     setIdProviderDescriptor( idProviderDescriptor ).
                     setIconUrlResolver( this.iconUrlResolver ).
-                    setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey ) ).
+                    setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey, locales ) ).
                     setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
                     build() );
             }

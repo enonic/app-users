@@ -4,12 +4,10 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.WebApplicationException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import com.enonic.xp.app.users.rest.resource.AdminResourceTestSupport;
