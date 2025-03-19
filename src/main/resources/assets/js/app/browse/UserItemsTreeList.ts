@@ -22,7 +22,7 @@ export class UserItemsTreeList
 
     protected createItemView(item: UserTreeGridItem, readOnly: boolean): UserItemsTreeListElement {
         return new UserItemsTreeListElement(item,
-            {scrollParent: this.scrollParent, level: this.level, parentList: this});
+            {scrollParent: this.scrollParent, parentList: this});
     }
 
     protected getItemId(item: UserTreeGridItem): string {
@@ -36,7 +36,9 @@ export class UserItemsTreeList
     }
 
     protected isLoadAllowed(): boolean {
-        if (this.level === 0) { // root, load once and only if empty
+        const level = this.getLevel();
+
+        if (level === 0) { // root, load once and only if empty
             return this.getItemCount() === 0;
         }
 
@@ -44,11 +46,11 @@ export class UserItemsTreeList
             return true;
         }
 
-        if (this.level === 1) { // static users and groups folders, load only if not added yet
+        if (level === 1) { // static users and groups folders, load only if not added yet
             return this.getItemCount() === 0;
         }
 
-        if (this.level === 2) { // principals under users and groups folders, load lazily
+        if (level === 2) { // principals under users and groups folders, load lazily
             return true;
         }
 
@@ -78,10 +80,6 @@ export class UserItemsTreeList
         return !this.options.parentListElement;
     }
 
-    getLevel(): number {
-        return this.level;
-    }
-
     wasAlreadyShownAndLoaded(): boolean {
         return this.wasShownAndLoaded;
     }
@@ -97,11 +95,13 @@ export class UserItemsTreeList
             return this.fetchRoles();
         }
 
-        if (this.options.level === 1) {
+        const level = this.getLevel();
+
+        if (level === 1) {
             return this.createUsersAndGroupsFolders(parentItem);
         }
 
-        if (this.options.level === 2) {
+        if (level === 2) {
             return this.fetchPrincipals(parentItem);
         }
     }
@@ -252,7 +252,7 @@ export class UserItemsTreeListElement
     protected createItemViewer(item: UserTreeGridItem): UserTreeGridItemViewer {
         const viewer = new UserTreeGridItemViewer();
         viewer.setObject(item);
-        viewer.setIsRelativePath(this.options.level > 0);
+        viewer.setIsRelativePath(this.getLevel() > 0);
         return viewer;
     }
 
