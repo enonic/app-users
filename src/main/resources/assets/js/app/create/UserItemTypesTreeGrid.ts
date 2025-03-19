@@ -30,7 +30,7 @@ export class UserItemTypesTreeGrid
 
     protected createItemView(item: UserTypeTreeGridItem, readOnly: boolean): UserItemTypesTreeGridListElement {
         return new UserItemTypesTreeGridListElement(item,
-            {presetIdProvider: this.presetIdProvider, scrollParent: this.scrollParent, level: this.level, parentList: this});
+            {presetIdProvider: this.presetIdProvider, scrollParent: this.scrollParent, parentList: this});
     }
 
     protected getItemId(item: UserTypeTreeGridItem): string {
@@ -165,7 +165,7 @@ export class UserItemTypesTreeGridListElement
     }
 
     protected createItemViewer(item: UserTypeTreeGridItem): UserTypesTreeGridItemViewer {
-        const isRootNode = this.options.level === 0;
+        const isRootNode = this.getLevel() === 0;
         const viewer = new UserTypesTreeGridItemViewer(isRootNode);
         viewer.setObject(item);
 
@@ -182,7 +182,7 @@ export class UserItemTypesTreeGridListElement
         const userItem: UserItem = this.item.getUserItem();
 
         if (userItem instanceof IdProvider) {
-            const isRootNode: boolean = this.options.level === 0;
+            const isRootNode: boolean = this.getLevel() === 0;
 
             if (isRootNode) {
                 return {type: UserTreeGridItemType.ID_PROVIDER};
