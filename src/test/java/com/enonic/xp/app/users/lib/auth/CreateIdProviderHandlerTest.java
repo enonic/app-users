@@ -13,7 +13,8 @@ import com.enonic.xp.security.acl.IdProviderAccess;
 import com.enonic.xp.security.acl.IdProviderAccessControlEntry;
 import com.enonic.xp.testing.ScriptTestSupport;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CreateIdProviderHandlerTest
     extends ScriptTestSupport

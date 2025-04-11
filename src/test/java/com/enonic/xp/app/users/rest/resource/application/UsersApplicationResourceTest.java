@@ -2,13 +2,17 @@ package com.enonic.xp.app.users.rest.resource.application;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Locale;
 
-import javax.ws.rs.core.Response;
-
+import org.jboss.resteasy.core.ResteasyContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.osgi.framework.Version;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
 
 import com.enonic.xp.app.Application;
 import com.enonic.xp.app.ApplicationDescriptor;
@@ -55,6 +59,12 @@ public class UsersApplicationResourceTest
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
 
         when( mixinService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
+        final HttpServletRequest mockRequest = mock( HttpServletRequest.class );
+        when( mockRequest.getServerName() ).thenReturn( "localhost" );
+        when( mockRequest.getScheme() ).thenReturn( "http" );
+        when( mockRequest.getServerPort() ).thenReturn( 80 );
+        when( mockRequest.getLocales() ).thenReturn( Collections.enumeration( Collections.singleton( Locale.US ) ) );
+        ResteasyContext.getContextDataMap().put( HttpServletRequest.class, mockRequest );
 
         String response = request().
             path( "application/getIdProviderApplications" ).

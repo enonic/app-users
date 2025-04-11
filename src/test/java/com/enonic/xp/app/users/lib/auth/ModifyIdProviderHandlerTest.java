@@ -2,7 +2,6 @@ package com.enonic.xp.app.users.lib.auth;
 
 import java.util.Optional;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -17,7 +16,9 @@ import com.enonic.xp.security.acl.IdProviderAccessControlEntry;
 import com.enonic.xp.security.acl.IdProviderAccessControlList;
 import com.enonic.xp.testing.ScriptTestSupport;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 public class ModifyIdProviderHandlerTest
     extends ScriptTestSupport
@@ -48,10 +49,10 @@ public class ModifyIdProviderHandlerTest
     private IdProvider invokeUpdate( final UpdateIdProviderParams params )
     {
         final IdProviderEditor editor = params.getEditor();
-        Assert.assertNotNull( editor );
+        assertNotNull( editor );
 
         final IdProviderAccessControlList permissions = params.getIdProviderPermissions();
-        Assert.assertNotNull( "Permissions should not be empty", permissions );
+        assertNotNull( permissions, "Permissions should not be empty" );
         final IdProviderAccessControlEntry entry = permissions.getEntry( PrincipalKey.from( "group:myIdProvider:group" ) );
         assertNotNull( entry );
         assertEquals( entry.getAccess(), IdProviderAccess.CREATE_USERS );
@@ -76,7 +77,7 @@ public class ModifyIdProviderHandlerTest
     private IdProvider invokeUpdateWithNullValues( final UpdateIdProviderParams params )
     {
         final IdProviderEditor editor = params.getEditor();
-        Assert.assertNotNull( editor );
+        assertNotNull( editor );
 
         final EditableIdProvider editable = new EditableIdProvider( TestDataFixtures.getTestIdProvider() );
 
