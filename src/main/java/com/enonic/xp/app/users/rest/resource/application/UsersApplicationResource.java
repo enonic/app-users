@@ -61,13 +61,10 @@ public final class UsersApplicationResource
 
     private MixinService mixinService;
 
-    private final ApplicationIconUrlResolver iconUrlResolver;
-
     private static final ApplicationImageHelper HELPER = new ApplicationImageHelper();
 
     public UsersApplicationResource()
     {
-        iconUrlResolver = new ApplicationIconUrlResolver();
     }
 
     @GET
@@ -95,7 +92,7 @@ public final class UsersApplicationResource
                     setApplicationDescriptor( appDescriptor ).
                     setSiteDescriptor( siteDescriptor ).
                     setIdProviderDescriptor( idProviderDescriptor ).
-                    setIconUrlResolver( this.iconUrlResolver ).
+                    setIconUrlResolver( new ApplicationIconUrlResolver( request ) ).
                     setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey, locales ) ).
                     setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
                     build() );
