@@ -11,7 +11,7 @@ function getConfigAsJson() {
     const user = authLib.getUser();
 
     return JSON.stringify({
-        adminUrl: admin.getBaseUri(),
+        adminUrl: admin.getHomeToolUrl(),
         appId: app.name,
         assetsUri: assetLib.assetUrl({path: ''}),
         toolUri: admin.getToolUrl(app.name, 'main'),
@@ -50,7 +50,7 @@ function getConfigAsJson() {
     }, null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1");
 }
 
-function handleGet() {
+function handleGet(req) {
     const view = resolve('./main.html');
 
     const params = {
@@ -58,7 +58,7 @@ function handleGet() {
         appName: i18n.localize({
             key: 'admin.tool.displayName',
             bundles: ['i18n/phrases'],
-            locale: admin.getLocales()
+            locale: req.locales
         }),
         configScriptId: 'app-users-config-as-json',
         configAsJson: getConfigAsJson(),
