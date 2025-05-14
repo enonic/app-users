@@ -31,8 +31,13 @@ class NewPrincipalDialog extends Page {
 
     //clicks on User, User Group, Id Provider....
     async clickOnItem(itemName) {
-        let selector = XPATH.itemViewer + lib.itemByDisplayName(itemName);
-        return await this.clickOnElement(selector)
+        try {
+            let selector = XPATH.itemViewer + lib.itemByDisplayName(itemName);
+            return await this.clickOnElement(selector)
+        }catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_principal_dialog_click_item');
+            throw new Error(`New principal modal dialog, try clicking on the item: '${itemName}' , screenshot ${screenshot}: ` + err);
+        }
     }
 
     isCancelButtonDisplayed() {
@@ -76,8 +81,8 @@ class NewPrincipalDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_principal_dialog_close');
-            throw new Error("New Principal Dialog was not closed  " + err);
+            let screenshot = await this.saveScreenshot('err_principal_dialog_close');
+            throw new Error(`New Principal Dialog was not closed ${screenshot} ` + err);
         }
     }
 
