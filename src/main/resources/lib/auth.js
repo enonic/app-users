@@ -74,16 +74,6 @@ exports.getPermissions = function (params) {
 };
 
 /**
- * Returns default id provider permissions.
- *
- * @returns {object[]} Returns the list of principals with access level.
- */
-exports.defaultPermissions = function () {
-    var bean = __.newBean('com.enonic.xp.app.users.lib.auth.DefaultPermissionsHandler');
-    return __.toNativeObject(bean.defaultPermissions());
-};
-
-/**
  * Creates an id provider.
  *
  * @param {string} name Id provider name.

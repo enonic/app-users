@@ -62,7 +62,7 @@ public final class ScriptValueToIdProviderConfigTranslator
         {
             if ( propertyValue != null && propertyValue.hasMember( "set" ) )
             {
-                final PropertySet newSet = parent.newSet();
+                final PropertySet newSet = parent.getTree().newSet();
                 for ( ScriptValue propertyArray : propertyValue.getMember( "set" ).getArray() )
                 {
                     addPropertyArray( propertyArray, newSet );
@@ -78,7 +78,7 @@ public final class ScriptValueToIdProviderConfigTranslator
         {
             final ScriptValue member = propertyValue == null ? null : propertyValue.getMember( "v" );
             value = type.fromJsonValue( member == null ? null : member.getValue() );
-        }        
+        }
         parent.addProperty( name, value );
     }
 }
