@@ -1,8 +1,6 @@
 var common = require('./common');
 var authLib = require('./auth');
 
-var DEFAULT_KEY = 'default';
-
 module.exports = {
     getByKey: function(key) {
         return authLib.getIdProvider({key: key});
@@ -43,10 +41,7 @@ module.exports = {
     getIdProviderMode: function(applicationKey) {
         return authLib.getIdProviderMode({key:applicationKey});
     },
-    getPermissions: function(key) {
-        if (key === DEFAULT_KEY) {
-            return authLib.defaultPermissions();
-        }
+    getPermissions: function (key) {
         return authLib.getPermissions({key: key});
     }
 };
