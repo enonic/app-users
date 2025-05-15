@@ -42,6 +42,9 @@ module.exports = {
         return authLib.getIdProviderMode({key:applicationKey});
     },
     getPermissions: function (key) {
+        if (key === 'default') {
+            return authLib.defaultPermissions();
+        }
         return authLib.getPermissions({key: key});
     }
 };
