@@ -19,7 +19,7 @@ const XPATH = {
     occurrenceMoreButton: label => `//div[contains(@id,'FormItemSetView') and descendant::h5[text()='${label}']]//button[contains(@id,'MoreButton')]`
 };
 
-class FirstIdProviderConfiguratorDialog extends Page {
+class AdfsIdProviderConfiguratorDialog extends Page {
 
     get container() {
         return XPATH.container;
@@ -94,11 +94,14 @@ class FirstIdProviderConfiguratorDialog extends Page {
         })
     }
 
-    typeInClientSecretInput(text) {
-        return this.typeTextInInput(this.clientSecretInput, text).catch(err => {
-            this.saveScreenshot('err_type_secretInput');
-            throw new Error(err);
-        })
+    async typeInClientSecretInput(text) {
+        try {
+            await this.waitForElementDisplayed(this.clientSecretInput, appConst.mediumTimeout);
+            await this.typeTextInInput(this.clientSecretInput, text);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_client_secret_input');
+            throw new Error(`ADFS config, client secret input, screenshot:${screenshot} ` + err);
+        }
     }
 
     typeInClientIdInput(clientId) {
@@ -143,7 +146,8 @@ class FirstIdProviderConfiguratorDialog extends Page {
             let selectedOptions = XPATH.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
             return await this.getTextInElements(selectedOptions);
         } catch (err) {
-            throw new Error('Error when getting selected Groups in the form: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_adfs_get_selected_groups');
+            throw new Error(`ADFS provider config -  get selected groups screenshot:${screenshot} ` + err);
         }
     }
 
@@ -172,4 +176,4 @@ class FirstIdProviderConfiguratorDialog extends Page {
     }
 }
 
-module.exports = FirstIdProviderConfiguratorDialog;
+module.exports = AdfsIdProviderConfiguratorDialog;

@@ -21,7 +21,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             await userBrowsePanel.rightClickOnRowByDisplayName(appConst.ROLES);
             await gridContextMenu.waitForContextMenuVisible();
             let items = await gridContextMenu.getGridContextMenuItems();
-            assert.equal(items[0], 'New Role', "New Role menu item should be first");
+            assert.equal(items[0], 'New Role', `'New Role' menu item should be first`);
             // 2. 'Delete menu item should be disabled,otherwise exception will be thrown in 3 seconds:
             await gridContextMenu.waitForDeleteMenuItemDisabled();
             // 3. 'Edit' 'Delete' menu items should be disabled
@@ -34,7 +34,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             let gridContextMenu = new GridContextMenu();
             let userBrowsePanel = new UserBrowsePanel();
             // 1. Do right-click on 'System Id Provider'
-            await userBrowsePanel.rightClickOnRowByDisplayName('System Id Provider');
+            await userBrowsePanel.rightClickOnRowByDisplayName(appConst.ID_PROVIDERS.SYSTEM_ID_PROVIDER);
             await gridContextMenu.waitForContextMenuVisible();
             // 2. 'Edit'  menu items should be enabled
             await gridContextMenu.waitForMenuItemEnabled('Edit');

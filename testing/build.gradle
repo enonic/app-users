@@ -38,6 +38,8 @@ dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$version@zip"
     apps "com.enonic.uitest:auth0-idprovider:1.0.0-SNAPSHOT"
     apps "com.enonic.uitest:adfs-idprovider:1.0.0-SNAPSHOT"
+    // This app using for testing of permissions reporting
+    apps "com.enonic.uitest:contenttypes:1.0.0-SNAPSHOT"
 }
 
 tasks.register( 'unpackDistro', Copy ) {

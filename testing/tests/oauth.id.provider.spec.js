@@ -7,28 +7,28 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard');
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
-const AdfsIdProviderConfiguratorDialog = require('../page_objects/wizardpanel/provider-config/asfs.provider.config');
+const Oauth0IdProviderConfiguratorDialog = require('../page_objects/wizardpanel/provider-config/oauth0.idprovider.config');
 
-describe('ADFS Id Provider, tests for provider configuration dialog with item set', function () {
+describe('Oauth0 Id Provider, tests for provider configuration dialog with item set', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
-    const AUTH_APP_NAME_ADFS = 'Second Selenium App';
+    const APP_OAUTH0_PROVIDER_NAME = appConst.ID_PROVIDERS.APP_OAUTH0_PROVIDER;
 
     it("GIVEN name and app-provider has been selected WHEN there are required inputs in app-config THEN 'Save' button should be disabled",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');
-            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', AUTH_APP_NAME_ADFS, null);
+            let oauthIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_OAUTH0_PROVIDER_NAME, null);
             // 1. Wizard for a new id-provider has been opened:
-            await testUtils.openIdProviderWizard(idProvider);
+            await testUtils.openIdProviderWizard(oauthIdProvider);
             // 2. type the name:
             await idProviderWizard.typeDisplayName(name);
             // 3. Select an application(ADFS provider wit required inputs)
-            await idProviderWizard.filterOptionsAndSelectApplication(AUTH_APP_NAME_ADFS);
+            await idProviderWizard.filterOptionsAndSelectApplication(APP_OAUTH0_PROVIDER_NAME);
             // 4. Verify that Save button is disabled when required inputs are not filled:
             await testUtils.saveScreenshot('id_prov_wizard_save_disabled');
             await idProviderWizard.waitForSaveButtonDisabled();
@@ -39,12 +39,12 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
     it("GIVEN provider's data is filled WHEN Provider-configuration has been opened THEN required inputs should be loaded",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', AUTH_APP_NAME_ADFS, null);
+            let oauthIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_OAUTH0_PROVIDER_NAME, null);
             let idProviderWizard = new IdProviderWizard();
-            let providerConfig = new AdfsIdProviderConfiguratorDialog();
+            let providerConfig = new Oauth0IdProviderConfiguratorDialog();
             // 1. Open new ID Provider wizard and type the data:
-            await testUtils.openIdProviderWizard(testIdProvider);
-            await idProviderWizard.typeData(testIdProvider);
+            await testUtils.openIdProviderWizard(oauthIdProvider);
+            await idProviderWizard.typeData(oauthIdProvider);
             // 2. Open the configurator dialog:
             await providerConfig.openConfigurator();
             // 3. Verify that the modal dialog is loaded:
@@ -55,12 +55,12 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
     it("GIVEN Provider-configuration is opened WHEN 'Add Proxy' button has been clicked THEN proxy form should be loaded",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
+            let oauthIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_OAUTH0_PROVIDER_NAME, null);
             let idProviderWizard = new IdProviderWizard();
-            let providerConfig = new AdfsIdProviderConfiguratorDialog();
+            let providerConfig = new Oauth0IdProviderConfiguratorDialog();
             // 1. Open new ID Provider wizard and type the data:
-            await testUtils.openIdProviderWizard(testIdProvider);
-            await idProviderWizard.typeData(testIdProvider);
+            await testUtils.openIdProviderWizard(oauthIdProvider);
+            await idProviderWizard.typeData(oauthIdProvider);
             // 2. Open the configurator dialog:
             await providerConfig.openConfigurator();
             // 3. Click on Add Proxy button
@@ -72,12 +72,12 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
     it("GIVEN all required inputs have been filed in configurator dialog WHEN 'Apply' button has been pressed THEN 'Save' button gets enabled",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', 'Second Selenium App', null);
+            let oauthIdProvider = userItemsBuilder.buildIdProvider(name, 'test oauth Id provider', APP_OAUTH0_PROVIDER_NAME, null);
             let idProviderWizard = new IdProviderWizard();
-            let providerConfig = new AdfsIdProviderConfiguratorDialog();
+            let providerConfig = new Oauth0IdProviderConfiguratorDialog();
             // 1. Open new ID Provider wizard and type the data:
-            await testUtils.openIdProviderWizard(testIdProvider);
-            await idProviderWizard.typeData(testIdProvider);
+            await testUtils.openIdProviderWizard(oauthIdProvider);
+            await idProviderWizard.typeData(oauthIdProvider);
             // 2. Open the configurator dialog:
             await providerConfig.openConfigurator();
             let clientId = '1234567';
@@ -86,13 +86,13 @@ describe('ADFS Id Provider, tests for provider configuration dialog with item se
             await providerConfig.clickOnAddProxyButton();
             // 4. type a text in the required host-input
             await providerConfig.typeInProxyHostInput('http://proxy.com');
-            // 5.Click on 'Apply' button
+            // 5. Click on 'Apply' button
             await providerConfig.clickOnApplyButton();
             // 6. Save the provider:
             await idProviderWizard.waitAndClickOnSave();
             let message = await idProviderWizard.waitForNotificationMessage();
             // 'Id provider was created'
-            assert.equal(message, appConst.NOTIFICATION_MESSAGE.PROVIDER_CREATED, "Expected message should appear");
+            assert.equal(message, appConst.NOTIFICATION_MESSAGE.PROVIDER_CREATED, "Id provider was created -  message should appear");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

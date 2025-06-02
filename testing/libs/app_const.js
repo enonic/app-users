@@ -38,7 +38,9 @@ module.exports = Object.freeze({
     },
     ID_PROVIDERS: {
         STANDARD_ID_PROVIDER: 'Standard ID Provider',
-        FIRST_SELENIUM_APP: 'First Selenium App',
+        APP_ADFS_PROVIDER: 'Test ADFS ID Provider',
+        APP_OAUTH0_PROVIDER: 'Test Auth0 ID Provider',
+        SYSTEM_ID_PROVIDER: 'System Id Provider',
     },
 
     PASSWORD: {
