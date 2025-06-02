@@ -15,6 +15,7 @@ repositories {
 
 configurations {
     distro
+    apps
 }
 
 enonic {
@@ -35,6 +36,8 @@ def appUrl = project.hasProperty( 'appUrl' ) ? appUrl : "file:///$projectDir/../
 
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$version@zip"
+    apps "com.enonic.uitest:auth0-idprovider:1.0.0-SNAPSHOT"
+    apps "com.enonic.uitest:adfs-idprovider:1.0.0-SNAPSHOT"
 }
 
 tasks.register( 'unpackDistro', Copy ) {
@@ -53,10 +56,10 @@ tasks.register( 'copyConfig', Copy ) {
     mustRunAfter unpackDistro
 }
 
-tasks.register( 'copyApps', Copy ) {
-    println appDir
-    from file( appDir )
-    include '*.jar'
+tasks.register( 'downloadApps', Copy ) {
+    from {
+        configurations.apps
+    }
     into deployDir
     mustRunAfter unpackDistro
 }
@@ -121,7 +124,7 @@ tasks.register( 'generateReportAndStopServer', NpmTask ) {
 
 // wdio_chrome is a script defined in package.json
 tasks.register( 'w_testUsersApp', NpmTask ) {
-    dependsOn ( npmInstall, unpackDistro, copyConfig, copyApps, deployApp, startServer )
+    dependsOn ( npmInstall, unpackDistro, copyConfig, downloadApps, deployApp, startServer )
     args = ['run-script', 'test_users:wdio_chrome']
     finalizedBy generateReportAndStopServer
 }
