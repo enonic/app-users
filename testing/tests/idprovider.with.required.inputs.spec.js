@@ -9,52 +9,49 @@ const IdProviderWizard = require('../page_objects/wizardpanel/idprovider.wizard'
 const testUtils = require('../libs/test.utils');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
-const ProviderConfigDialog = require('../page_objects/wizardpanel/provider-config/first.idprovider.configurator.dialog');
+const AdfsIdProviderConfiguratorDialog = require('../page_objects/wizardpanel/provider-config/adfs.idprovider.configurator.dialog');
 const GroupWizard = require('../page_objects/wizardpanel/group.wizard');
 
-describe('Id Provider, provider-dialog specification', function () {
+describe('ADFS id-provider configurator dialog specification', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
-    const APP_PROVIDER_WITH_CONFIG = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
-    let TEST_ID_PROVIDER_NAME;
+    const APP_ADFS_ID_PROVIDER = appConst.ID_PROVIDERS.APP_ADFS_PROVIDER;
+    let TEST_ADFS_ID_PROVIDER_NAME;
     const NOTIFICATION_MESSAGE = "The application selected for this id provider does not allow to create users.";
     const GROUP_NAME = userItemsBuilder.generateRandomName('group');
-
-    const APP_PROVIDER_NAME = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
 
     it("WHEN app-provider with required inputs has been selected in the wizard THEN 'Save' button gets disabled",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');
-            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_NAME, null);
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             // 1. Wizard for a new id-provider has been opened:
             await testUtils.openIdProviderWizard(idProvider);
             // 2. type a name:
             await idProviderWizard.typeDisplayName(name);
             // 3. Select an application with required inputs in provider-config:
-            await idProviderWizard.filterOptionsAndSelectApplication(APP_PROVIDER_NAME);
+            await idProviderWizard.filterOptionsAndSelectApplication(APP_ADFS_ID_PROVIDER);
             // 4. Verify that Save button gets disabled:
             await idProviderWizard.waitForSaveButtonDisabled();
         });
 
-
-    it("GIVEN providerConfigDialog is opened WHEN  all required inputs has been filled in AND Apply button pressed in the dialog THEN 'Save' button gets enabled",
+    it("GIVEN AdfsIdProviderConfiguratorDialog is opened WHEN  all required inputs has been filled in AND Apply button pressed in the dialog THEN 'Save' button gets enabled",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');
-            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_NAME, null);
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             // 1. Wizard for a new id-provider has been opened:
             await testUtils.openIdProviderWizard(idProvider);
             // 2. type a name:
             await idProviderWizard.typeDisplayName(name);
             // 3. Select an application with required inputs in provider-config:
-            await idProviderWizard.filterOptionsAndSelectApplication(APP_PROVIDER_NAME);
+            await idProviderWizard.filterOptionsAndSelectApplication(APP_ADFS_ID_PROVIDER);
             // 4. Open the configurator
             await idProviderWizard.clickOnEditAuthAppConfig();
-            let providerConfigDialog = new ProviderConfigDialog();
+            let providerConfigDialog = new AdfsIdProviderConfiguratorDialog();
             // 5. Fill in the required inputs:
             await providerConfigDialog.typeInDomainInput('test');
             await providerConfigDialog.typeInClientIdInput('id');
@@ -66,11 +63,10 @@ describe('Id Provider, provider-dialog specification', function () {
             await idProviderWizard.waitForSaveButtonEnabled();
         });
 
-
-    it(`GIVEN provider's data is filled WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Confirmation' dialog should appear after 'Close' has been clicked`,
+    it(`GIVEN provider's data is filled in WHEN Provider-configuration has required inputs THEN 'Save' button should be disabled AND 'Confirmation' dialog should appear after 'Close' has been clicked`,
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
             // 1. Open new ID Provider wizard and type the data:
@@ -89,7 +85,7 @@ describe('Id Provider, provider-dialog specification', function () {
     it("GIVEN new ID provider with invalid configuration WHEN click on close icon THEN click on 'Yes' button in confirmation dialog THEN error notification message should appear",
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             let userBrowsePanel = new UserBrowsePanel();
             let idProviderWizard = new IdProviderWizard();
             // 1. Open new ID Provider wizard and select the provider with invalid configuration:
@@ -111,9 +107,9 @@ describe('Id Provider, provider-dialog specification', function () {
     it(`GIVEN Provider-configuration dialog is opened WHEN required inputs in Provider-dialog are filled THEN the Id Provider is getting valid`,
         async () => {
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             let idProviderWizard = new IdProviderWizard();
-            let providerConfigDialog = new ProviderConfigDialog();
+            let providerConfigDialog = new AdfsIdProviderConfiguratorDialog();
             // 1. Open new id provider wizard, type the data:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
@@ -129,12 +125,12 @@ describe('Id Provider, provider-dialog specification', function () {
     it(`GIVEN wizard for new Id Provider is opened AND required inputs in provider-configuration dialog are filled WHEN Save and close the wizard THEN 'Save Before' dialog should not appear`,
         async () => {
             let confirmationDialog = new ConfirmationDialog();
-            TEST_ID_PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(TEST_ID_PROVIDER_NAME, 'test Id provider', APP_PROVIDER_WITH_CONFIG,
+            TEST_ADFS_ID_PROVIDER_NAME = userItemsBuilder.generateRandomName('adfsprovider');
+            let testIdProvider = userItemsBuilder.buildIdProvider(TEST_ADFS_ID_PROVIDER_NAME, 'test Id provider', APP_ADFS_ID_PROVIDER,
                 null);
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
-            let providerConfigDialog = new ProviderConfigDialog();
+            let providerConfigDialog = new AdfsIdProviderConfiguratorDialog();
             // 1. Open new id provider wizard, type the data:
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
@@ -147,7 +143,7 @@ describe('Id Provider, provider-dialog specification', function () {
             // 4. Click on close-icon:
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
             await idProviderWizard.pause(500);
-            await testUtils.saveScreenshot('idprovider_wizard_modal_dialog_should_be_closed');
+            await testUtils.saveScreenshot('idprovider_wizard_should_be_closed');
             // 5. Verify that confirmation modal dialog should not be loaded:
             let result = await confirmationDialog.isDialogLoaded();
             assert.ok(result === false, 'Confirmation dialog should not appear, all changes were saved');
@@ -158,7 +154,7 @@ describe('Id Provider, provider-dialog specification', function () {
             let userBrowsePanel = new UserBrowsePanel();
             await userBrowsePanel.pause(2000);
             // 1. Select an existing provider with configurator then click on Create User menu item in the modal dialog:
-            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, 'User');
+            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ADFS_ID_PROVIDER_NAME, 'User');
             // 2. Verify the actual notification message - The application does not allow to create users
             let actualMessages = await userBrowsePanel.waitForNotificationMessage();
             await testUtils.saveScreenshot('app_does_not_allow_users');
@@ -167,15 +163,15 @@ describe('Id Provider, provider-dialog specification', function () {
 
     it(`GIVEN id provider with a configuration is selected WHEN Create New User Group menu item has been clicked THEN expected notification message should appear`,
         async () => {
-            // 1. Select an existing provider with configurator then click on Create User Group menu item in the modal dialog:
-            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ID_PROVIDER_NAME, "User Group");
+            // 1. Select an existing provider with adfs-configurator then click on 'Create User Group' menu item in the modal dialog:
+            await testUtils.selectIdProviderAndClickOnMenuItem(TEST_ADFS_ID_PROVIDER_NAME, 'User Group');
             let groupWizard = new GroupWizard();
             // 2. Group Wizard should be loaded:
             await groupWizard.waitForOpened();
             await groupWizard.typeDisplayName(GROUP_NAME);
             // 3. Save the group:
             await groupWizard.waitAndClickOnSave();
-            await testUtils.saveScreenshot('group_saved_in_provider');
+            await testUtils.saveScreenshot('group_saved_in_adfs_provider');
             // 4. Verify that group is saved:
             let messages = await groupWizard.waitForNotificationMessage();
             assert.ok(messages.includes(appConst.NOTIFICATION_MESSAGE.GROUP_WAS_CREATED),
@@ -184,14 +180,14 @@ describe('Id Provider, provider-dialog specification', function () {
 
     // Verify Error in group selector inside ID providers config form #940
     // https://github.com/enonic/app-users/issues/940
-    it(`GIVEN Provider Config Dialog is opened WHEN existing group has been selected in the dialog THEN expected group should be present in selected options`,
+    it(`GIVEN ADFS Provider Config Dialog is opened WHEN existing group has been selected in the dialog THEN expected group should be present in selected options`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            let providerConfigDialog = new ProviderConfigDialog();
+            let providerConfigDialog = new AdfsIdProviderConfiguratorDialog();
             // 1. Create new test group:
             let groupName = userItemsBuilder.generateRandomName('group')
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             let idProviderWizard = new IdProviderWizard();
             let groupWizard = new GroupWizard();
             await testUtils.clickOnSystemAndOpenGroupWizard();
@@ -210,7 +206,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await providerConfigDialog.openDialogFillRequiredInputs('domain', 'id', 'secret');
             // 5. Select a group:
             await providerConfigDialog.selectGroup(groupName);
-            await testUtils.saveScreenshot('idprovider_config_group_selected');
+            await testUtils.saveScreenshot('adfs_idprovider_config_group_selected');
             // 6. Verify the selected option:
             let actualGroups = await providerConfigDialog.getSelectedGroups();
             assert.equal(actualGroups[0], groupName, "Expected group should be present in selected options");
@@ -218,9 +214,9 @@ describe('Id Provider, provider-dialog specification', function () {
 
     it(`GIVEN Provider Config Dialog is opened WHEN required inputs are not filled THEN Apply button should be disabled`,
         async () => {
-            let providerConfigDialog = new ProviderConfigDialog();
+            let providerConfigDialog = new AdfsIdProviderConfiguratorDialog();
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             let idProviderWizard = new IdProviderWizard();
 
             // 1. Open new id provider wizard, fill in the display name input, select the application :
@@ -236,7 +232,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await providerConfigDialog.typeInClientSecretInput('secret');
             await providerConfigDialog.typeInClientIdInput('id');
             // 5. Verify that 'Apply' button gets enabled
-            await testUtils.saveScreenshot("idprovider_config_apply_enabled");
+            await testUtils.saveScreenshot('adfs_idprovider_config_apply_enabled');
             await providerConfigDialog.waitForApplyButtonEnabled();
         });
 
@@ -244,9 +240,9 @@ describe('Id Provider, provider-dialog specification', function () {
     //https://github.com/enonic/lib-admin-ui/issues/1964
     it(`GIVEN Provider Config Dialog is opened AND all required inputs are filled in WHEN occurrence of required input has been added THEN 'Apply' button gets disabled`,
         async () => {
-            let providerConfigDialog = new ProviderConfigDialog();
+            let providerConfigDialog = new AdfsIdProviderConfiguratorDialog();
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             let idProviderWizard = new IdProviderWizard();
             // 1. Open new id provider wizard, fill in the display name input, select the application :
             await testUtils.openIdProviderWizard(testIdProvider);
@@ -261,17 +257,17 @@ describe('Id Provider, provider-dialog specification', function () {
             // 4. Verify that 'Apply' button gets enabled:
             await providerConfigDialog.waitForApplyButtonEnabled();
             await providerConfigDialog.clickOnAddKeyButton();
-            await testUtils.saveScreenshot("idprovider_config_apply_disabled_2");
+            await testUtils.saveScreenshot('adfs_idprovider_config_apply_disabled_2');
             await providerConfigDialog.waitForApplyButtonDisabled();
         });
 
-    //Verify issue https://github.com/enonic/lib-admin-ui/issues/1822
-    //Site/Provider configurator - menu button is not displayed in occurrence view #1822
+    // Verify issue https://github.com/enonic/lib-admin-ui/issues/1822
+    // Site/Provider configurator - menu button is not displayed in occurrence view #1822
     it(`GIVEN occurrence of required input has been added WHEN 'Menu button' in the occurrence has been clicked AND 'Delete' item clicked THEN 'Apply' button gets disabled`,
         async () => {
-            let providerConfigDialog = new ProviderConfigDialog();
+            let providerConfigDialog = new AdfsIdProviderConfiguratorDialog();
             let name = userItemsBuilder.generateRandomName('provider');
-            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_WITH_CONFIG, null);
+            let testIdProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_ADFS_ID_PROVIDER, null);
             let idProviderWizard = new IdProviderWizard();
 
             // 1. Open new id provider wizard, fill in the display name input, select the application :
@@ -287,11 +283,11 @@ describe('Id Provider, provider-dialog specification', function () {
             // 4. Click on 'Add' button, add the form:
             await providerConfigDialog.clickOnAddKeyButton();
             // 5. Click on 'Menu button' in the occurrence and expand the menu:
-            await providerConfigDialog.clickOnOccurrenceMenuButton("site key");
-            await testUtils.saveScreenshot("idprovider_config_occur_menu");
+            await providerConfigDialog.clickOnOccurrenceMenuButton('site key');
+            await testUtils.saveScreenshot('adfs_idprovider_config_occur_menu');
             // 6. Click on 'Delete' menu item:
-            await providerConfigDialog.clickOnOccurrenceMenuItem("site key", "Delete");
-            await testUtils.saveScreenshot("idprovider_config_apply_enabled_2");
+            await providerConfigDialog.clickOnOccurrenceMenuItem('site key', 'Delete');
+            await testUtils.saveScreenshot('adfs_idprovider_config_apply_enabled_2');
             // 7. Verify that 'Apply' button gets enabled after deleting the form with required inputs:
             await providerConfigDialog.waitForApplyButtonEnabled();
         });

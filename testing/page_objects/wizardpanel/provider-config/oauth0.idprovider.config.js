@@ -19,7 +19,7 @@ const XPATH = {
     permissionsTabItem: "//li[contains(@id,'TabBarItem') and child::a[contains(.,'Permissions')]]"
 };
 
-class AdfsIdProviderConfiguratorDialog extends Page {
+class Oauth0IdProviderConfiguratorDialog extends Page {
 
     get applyButton() {
         return `${XPATH.container}` + `${XPATH.applyButton}`;
@@ -74,8 +74,18 @@ class AdfsIdProviderConfiguratorDialog extends Page {
         return await this.pause(300);
     }
 
-    clickOnApplyButton() {
-        return this.clickOnElement(this.applyButton);
+    async waitForApplyButtonEnabled() {
+        await await this.waitForElementEnabled(this.applyButton, appConst.mediumTimeout);
+    }
+
+    async clickOnApplyButton() {
+        try {
+            await this.waitForApplyButtonEnabled();
+            await this.clickOnElement(this.applyButton);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_apply_button');
+            throw new Error(`Oauth ID provider, apply button, screenshot: ${screenshot}` + err);
+        }
     }
 
     clickOnCancelButton() {
@@ -101,24 +111,26 @@ class AdfsIdProviderConfiguratorDialog extends Page {
             await this.typeTextInInput(this.domainInput, domain);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_domain_input');
-            throw new Error("Error in domain input screenshot: " + screenshot + " " + err);
+            throw new Error(`Oauth ID provider, domain input screenshot:${screenshot} ` + err);
         }
     }
 
     async typeInClientSecretInput(text) {
         try {
-            return this.typeTextInInput(this.clientSecretInput, text)
+            return await this.typeTextInInput(this.clientSecretInput, text)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_type_secretInput');
-            throw new Error("ID provider, client secret input, screenshot: " + screenshot + ' ' + err);
+            throw new Error(`Oauth ID provider, client secret input, screenshot: ${screenshot}` + err);
         }
     }
 
-    typeInClientIdInput(clientId) {
-        return this.typeTextInInput(this.clientIdInput, clientId).catch(err => {
-            this.saveScreenshot('err_type_clientIdInput');
-            throw new Error(err);
-        });
+    async typeInClientIdInput(clientId) {
+        try {
+            await this.typeTextInInput(this.clientIdInput, clientId)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_type_clientIdInput');
+            throw new Error(`Oauth ID provider config , Client ID  input, screenshot:${screenshot} ` + err);
+        }
     }
 
     typeInProxyHostInput(host) {
@@ -138,4 +150,4 @@ class AdfsIdProviderConfiguratorDialog extends Page {
     }
 }
 
-module.exports = AdfsIdProviderConfiguratorDialog;
+module.exports = Oauth0IdProviderConfiguratorDialog;

@@ -10,14 +10,14 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
-describe("Id Provider - checks unsaved changes", function () {
+describe("Id Provider wizard - checks unsaved changes in wizards", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
 
-    const APP_PROVIDER_NAME = appConst.ID_PROVIDERS.FIRST_SELENIUM_APP;
+    const APP_ADFS_PROVIDER_NAME = appConst.ID_PROVIDERS.APP_ADFS_PROVIDER;
 
     // Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
     it("GIVEN wizard for new Id Provider is opened WHEN no changes in the wizard AND 'close' icon has been pressed THEN Confirmation dialog must not be loaded",
@@ -37,7 +37,7 @@ describe("Id Provider - checks unsaved changes", function () {
             assert.ok(result === false, "Confirmation dialog must not be loaded");
         });
 
-    it("GIVEN description input has been filled in WHEN `close` tab icon has been pressed THEN Confirmation dialog should appear",
+    it("GIVEN description input has been filled in WHEN 'close tab icon' has been pressed THEN Confirmation dialog should appear",
         async () => {
             let idProviderWizard = new IdProviderWizard();
             let userBrowsePanel = new UserBrowsePanel();
@@ -58,19 +58,18 @@ describe("Id Provider - checks unsaved changes", function () {
             let idProviderWizard = new IdProviderWizard();
             let name = userItemsBuilder.generateRandomName('provider');
             let userBrowsePanel = new UserBrowsePanel();
-            let idProvider = userItemsBuilder.buildIdProvider(name, 'test Id provider', APP_PROVIDER_NAME, null);
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test adfs Id provider', APP_ADFS_PROVIDER_NAME, null);
             // 1. Wizard for new provider has been opened:
             await testUtils.openIdProviderWizard(idProvider);
             // 2. type the data:
             await idProviderWizard.typeData(idProvider);
-            await testUtils.saveScreenshot("application_should_be_selected");
+            await testUtils.saveScreenshot('provider_should_be_selected');
             // 3. Click on close wizard icon:
             await userBrowsePanel.doClickOnCloseTabButton(idProvider.displayName);
             let confirmationDialog = new ConfirmationDialog();
             // 4. Verify that 'Confirmation' dialog should appear, otherwise exception will be thrown:
             await confirmationDialog.waitForDialogLoaded();
         });
-
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
