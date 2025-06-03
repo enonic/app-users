@@ -15,7 +15,9 @@ repositories {
 
 configurations {
     distro
-    apps
+    apps {
+        transitive false
+    }
 }
 
 enonic {
