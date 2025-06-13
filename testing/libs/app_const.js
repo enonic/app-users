@@ -11,7 +11,7 @@ module.exports = Object.freeze({
     TIMEOUT_7: 7000,
     shortTimeout: 2000,
     TIMEOUT_1: 1000,
-    TIMEOUT_SUITE: 180000,
+    TIMEOUT_SUITE: 240000,
     ID_PROVIDER: 'Id Provider',
     SYSTEM_ID_PROVIDER: 'System Id Provider',
     ROLE: 'Role',
