@@ -31,8 +31,12 @@ class NewPrincipalDialog extends Page {
 
     //clicks on User, User Group, Id Provider....
     async clickOnItem(itemName) {
-        let selector = XPATH.itemViewer + lib.itemByDisplayName(itemName);
-        return await this.clickOnElement(selector)
+        try {
+            let selector = XPATH.itemViewer + lib.itemByDisplayName(itemName);
+            return await this.clickOnElement(selector);
+        } catch (err) {
+            await this.handleError('New Principal Dialog', 'err_click_on_item', err,)
+        }
     }
 
     isCancelButtonDisplayed() {
@@ -92,5 +96,6 @@ class NewPrincipalDialog extends Page {
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
     }
 }
+
 module.exports = NewPrincipalDialog;
 
