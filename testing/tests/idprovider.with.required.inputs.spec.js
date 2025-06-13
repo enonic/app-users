@@ -199,7 +199,7 @@ describe('Id Provider, provider-dialog specification', function () {
             await userBrowsePanel.waitForUsersGridLoaded(appConst.shortTimeout);
             // 2. Unselect the system id provider(move the focus to the grid(it is the first click on the row), then unselect the item in the grid):
             await userBrowsePanel.clickOnRowByName('system');
-            await userBrowsePanel.clickOnRowByName('system');
+            //await userBrowsePanel.clickOnRowByName('system');
             // 3. Open new id provider wizard, fill in the display name input, select the application :
             await testUtils.openIdProviderWizard(testIdProvider);
             await idProviderWizard.typeData(testIdProvider);
