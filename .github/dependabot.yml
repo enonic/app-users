@@ -18,6 +18,8 @@ updates:
       - "alansemenov"
     reviewers:
       - "alansemenov"
+    ignore:
+      - dependency-name: "@enonic/lib-admin-ui"
   - package-ecosystem: "npm"
     directory: "/testing"
     schedule:
