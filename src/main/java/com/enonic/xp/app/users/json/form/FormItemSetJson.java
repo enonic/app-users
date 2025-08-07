@@ -1,15 +1,13 @@
 package com.enonic.xp.app.users.json.form;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Preconditions;
-
 import com.enonic.xp.app.users.rest.resource.schema.content.LocaleMessageResolver;
 import com.enonic.xp.form.FormItem;
 import com.enonic.xp.form.FormItemSet;
-import com.enonic.xp.form.FormItems;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Preconditions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -33,7 +31,7 @@ public class FormItemSetJson
         this.formItemSet = formItemSet;
         this.localeMessageResolver = localeMessageResolver;
 
-        this.items = wrapFormItems( formItemSet.getFormItems(), localeMessageResolver );
+        this.items = wrapFormItems( formItemSet, localeMessageResolver );
         this.occurrences = new OccurrencesJson( formItemSet.getOccurrences() );
     }
 
@@ -47,7 +45,7 @@ public class FormItemSetJson
         return formItems;
     }
 
-    static List<FormItemJson> wrapFormItems( final FormItems items, final LocaleMessageResolver localeMessageResolver )
+    static List<FormItemJson> wrapFormItems( final Iterable<FormItem> items, final LocaleMessageResolver localeMessageResolver )
     {
         final List<FormItemJson> formItemJsonList = new ArrayList<>();
         for ( FormItem formItem : items )

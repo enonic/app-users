@@ -1,21 +1,19 @@
 package com.enonic.xp.app.users.json.form;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Preconditions;
-
 import com.enonic.xp.app.users.rest.resource.schema.content.LocaleMessageResolver;
 import com.enonic.xp.form.FieldSet;
 import com.enonic.xp.form.FormItem;
-import com.enonic.xp.form.FormItems;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Preconditions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
 @SuppressWarnings("UnusedDeclaration")
 public class FieldSetJson
-    extends LayoutJson<FieldSet>
+        extends FormItemJson<FieldSet>
 {
     private final FieldSet fieldSet;
 
@@ -25,15 +23,13 @@ public class FieldSetJson
 
     public FieldSetJson( final FieldSet fieldSet, final LocaleMessageResolver localeMessageResolver )
     {
-        super( fieldSet );
-
         Preconditions.checkNotNull( fieldSet );
         Preconditions.checkNotNull( localeMessageResolver );
 
         this.fieldSet = fieldSet;
         this.localeMessageResolver = localeMessageResolver;
 
-        this.items = wrapFormItems( fieldSet.getFormItems(), localeMessageResolver );
+        this.items = wrapFormItems( fieldSet, localeMessageResolver );
     }
 
     static Iterable<FormItem> unwrapFormItems( final List<FormItemJson> items )
@@ -46,7 +42,7 @@ public class FieldSetJson
         return formItems;
     }
 
-    static List<FormItemJson> wrapFormItems( final FormItems items, final LocaleMessageResolver localeMessageResolver )
+    static List<FormItemJson> wrapFormItems( final Iterable<FormItem> items, final LocaleMessageResolver localeMessageResolver )
     {
         final List<FormItemJson> formItemJsonList = new ArrayList<>();
         for ( FormItem formItem : items )
@@ -79,4 +75,16 @@ public class FieldSetJson
         return items;
     }
 
+    @JsonIgnore
+    @Override
+    public FieldSet getFormItem()
+    {
+        return fieldSet;
+    }
+
+    @Override
+    public String getName()
+    {
+        return fieldSet.getName();
+    }
 }

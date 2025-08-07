@@ -1,26 +1,19 @@
 package com.enonic.xp.app.users.json.form;
 
-import java.util.Iterator;
-
 import com.enonic.xp.data.Value;
-import com.enonic.xp.form.FieldSet;
-import com.enonic.xp.form.Form;
-import com.enonic.xp.form.FormItem;
-import com.enonic.xp.form.FormOptionSetOption;
-import com.enonic.xp.form.Input;
+import com.enonic.xp.form.*;
 import com.enonic.xp.inputtype.InputTypes;
 
-import static com.enonic.xp.form.FormItemType.FORM_ITEM_SET;
-import static com.enonic.xp.form.FormItemType.FORM_OPTION_SET;
-import static com.enonic.xp.form.FormItemType.INPUT;
-import static com.enonic.xp.form.FormItemType.LAYOUT;
+import java.util.Iterator;
+
+import static com.enonic.xp.form.FormItemType.*;
 
 final class FormDefaultValuesJsonProcessor
 {
 
     static void setDefaultValues( final Form form, final FormJson formJson )
     {
-        processFormItems( form.getFormItems(), formJson.getFormItems() );
+        processFormItems( form, formJson.getFormItems() );
     }
 
     private static void processFormItems( final Iterable<FormItem> formItems, final Iterable<FormItemJson> formItemsJson )
@@ -55,7 +48,7 @@ final class FormDefaultValuesJsonProcessor
             }
             else if ( formItem.getType() == FORM_ITEM_SET )
             {
-                processFormItems( formItem.toFormItemSet().getFormItems(), ( (FormItemSetJson) formItemJson ).getItems() );
+                processFormItems( formItem.toFormItemSet(), ( (FormItemSetJson) formItemJson ).getItems() );
             }
             else if ( formItem.getType() == LAYOUT && formItem.toLayout() instanceof FieldSet )
             {
@@ -72,7 +65,7 @@ final class FormDefaultValuesJsonProcessor
                     final FormOptionSetOption formOptionSetOption = formOptionSetOptionIt.next();
                     final FormOptionSetOptionJson formOptionSetOptionJson = formOptionSetOptionJsonIt.next();
 
-                    processFormItems( formOptionSetOption.getFormItems(), formOptionSetOptionJson.getItems() );
+                    processFormItems( formOptionSetOption, formOptionSetOptionJson.getItems() );
                 }
             }
         }
