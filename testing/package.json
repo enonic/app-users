@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "properties-reader": "2.3.0",
-    "webdriverio": "9.18.4",
+    "webdriverio": "9.19.0",
     "@wdio/local-runner": "9.18.4",
     "@wdio/concise-reporter": "^9.19.0",
     "@wdio/cli": "^9.18.4",
