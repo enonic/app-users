@@ -13,11 +13,10 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {TabbedAppBar} from '@enonic/lib-admin-ui/app/bar/TabbedAppBar';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
-import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
 import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
 import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
 import {Class} from '@enonic/lib-admin-ui/Class';
-import {JSONObject} from '@enonic/lib-admin-ui/types';
 import {LauncherHelper} from '@enonic/lib-admin-ui/util/LauncherHelper';
 import {AuthContext} from '@enonic/lib-admin-ui/auth/AuthContext';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
@@ -94,7 +93,7 @@ function startApplication() {
     }
 
     const configScriptEl: HTMLElement = document.getElementById(configScriptId);
-    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as JSONObject);
+    CONFIG.setConfig(JSON.parse(configScriptEl.innerText) as ConfigObject);
     AuthContext.init(Principal.fromJson(CONFIG.get('user') as PrincipalJson),
         (CONFIG.get('principals') as PrincipalJson[]).map(Principal.fromJson));
 
