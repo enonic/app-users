@@ -1,9 +1,8 @@
-Enonic XP - Users App
-===
+# Enonic XP - Users App
 
 [![Actions Status](https://github.com/enonic/app-users/workflows/Gradle%20Build/badge.svg)](https://github.com/enonic/app-users/actions)
 [![License][license-image]][license-url]
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/98a3593d448f4cb29d165048609434dd)](https://www.codacy.com/app/enonic/app-users?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=enonic/app-users&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/98a3593d448f4cb29d165048609434dd)](https://www.codacy.com/app/enonic/app-users?utm_source=github.com&utm_medium=referral&utm_content=enonic/app-users&utm_campaign=Badge_Grade)
 
 Manage permissions for users, user groups and roles in [Enonic XP](https://github.com/enonic/xp).
 
@@ -39,38 +38,23 @@ If the environment is set, the Gradle will look for the local `lib-admin-ui` and
 The environment parameter will also be passed to `lib-admin-ui`.
 
 Both environments are almost identical, except that building in the development environment will result in creating the DTS files, sourcemaps and other things, critical for the debugging.
-The build itself may also be a bit slower sometimes. 
+The build itself may also be a bit slower sometimes.
 
 #### Quick
 
-Sometimes, you may want to build your project faster. To do so, just skip the linting (`lint` task) and testing (`test` task):
+Sometimes, you may want to build your project faster. To do so, just skip some tasks. You can skip them manually, like this:
 
 ```
-./gradlew build -x lint -x test
+./gradlew build -x check -x test
 ```
 
-In cases, when you set the environment type explicitly, skipping the `lint` or `test` will also result in skipping those two tasks in local `lib-admin-ui` build.
-
-#### Clean
-
-To rebuild the project from scratch, you may want to remove all compiles sources and dependencies. In that case, using `clean` command may not be enough. To remove the build and dependencies, use:
+or run even faster with the `yolo` task, that will skip all tasks, that won't affect the code operability, and do deploy build:
 
 ```
-./gradlew flush
+./gradlew yolo
 ```
-
-#### NPM upgrade
-
-In case you want forcefully update all your node dependencies, use:
-
-```
-./gradlew npmInstallForce
-```
-
-Take a note, that you can also use aliases in Gradle, and `nIF` would be just enough to run `npmInstallForce`.
 
 <!-- Links -->
-[travis-url]:    https://travis-ci.org/enonic/app-users
-[travis-image]:  https://travis-ci.org/enonic/app-users.svg?branch=master "Build status"
-[license-url]:   LICENSE.txt
+
+[license-url]: LICENSE.txt
 [license-image]: https://img.shields.io/github/license/enonic/app-users.svg "GPL 3.0"
