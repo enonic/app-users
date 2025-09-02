@@ -13,7 +13,7 @@ import {UrlHelper} from '../../util/UrlHelper';
 import {LazyListBox} from '@enonic/lib-admin-ui/ui/selector/list/LazyListBox';
 import {PrincipalContainerViewer} from '@enonic/lib-admin-ui/ui/security/PrincipalContainerViewer';
 import {LoadedDataEvent} from '@enonic/lib-admin-ui/util/loader/event/LoadedDataEvent';
-import * as Q from 'q';
+import Q from 'q';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ValueChangedEvent} from '@enonic/lib-admin-ui/ValueChangedEvent';
 import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';

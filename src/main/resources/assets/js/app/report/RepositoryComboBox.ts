@@ -9,7 +9,7 @@ import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {FormInputEl} from '@enonic/lib-admin-ui/dom/FormInputEl';
 import {ListRepositoriesRequest} from '../../graphql/repository/ListRepositoriesRequest';
-import * as Q from 'q';
+import Q from 'q';
 import {Dropdown} from '@enonic/lib-admin-ui/ui/Dropdown';
 
 export class RepositoryComboBox

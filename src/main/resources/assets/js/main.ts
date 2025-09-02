@@ -1,3 +1,6 @@
+/// <reference types="vite/client" />
+// ⬑ This is necessary to use the `import.meta` with Vite
+
 import {UserAppPanel} from './app/UserAppPanel';
 import {ChangeUserPasswordDialog} from './app/wizard/ChangeUserPasswordDialog';
 import {Router} from './app/Router';
@@ -26,9 +29,15 @@ const body = Body.get();
 
 // Dynamically import and execute all input types, since they are used
 // on-demand, when parsing XML schemas and has not real usage in app
-declare let require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
-const importAll = r => r.keys().forEach(r);
-importAll(require.context('./app/inputtype', true, /^(?!\.[\/\\]ui).*/));
+const inputTypeModules = import.meta.glob('./app/inputtype/**/*.ts', {
+    eager: true
+});
+// Import all modules except those in ui subdirectories (they register themselves as side effects)
+Object.entries(inputTypeModules).forEach(([path, module]) => {
+    if (!path.includes('/ui/')) {
+        // Module is already imported due to eager: true
+    }
+});
 
 function getApplication(): Application {
     const assetsUri: string = CONFIG.getString('assetsUri');

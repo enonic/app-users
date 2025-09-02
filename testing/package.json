@@ -4,8 +4,7 @@
   "author": "Hauruseu Siarhei",
   "license": "ISC",
   "scripts": {
-    "test:firefox": "npx wdio ./wdio.conf.js",
-    "test_users:wdio_chrome": "npx wdio ./wdio.users.chrome.conf.js",
+    "test_users:wdio_chrome": "wdio ./wdio.chrome.conf.js",
     "allure-report": "allure generate ./build/reports/allure --output ./build/reports/allure-report --clean --single-file"
   },
   "devDependencies": {
@@ -19,7 +18,8 @@
     "allure-commandline": "^2.34.1"
   },
   "engines": {
-    "node": ">= 22.16.0",
-    "npm": ">= 10.9.2"
+    "node": ">= 22.18.0",
+    "npm": ">= 10.9.2",
+    "pnpm": ">= 10.14.0"
   }
 }

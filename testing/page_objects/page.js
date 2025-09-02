@@ -302,6 +302,17 @@ class Page {
     async getBrowserStatus() {
         return await this.getBrowser().status();
     }
+
+    // Utility method for error handling
+    async handleError(errorMessage, screenshotName, error) {
+        let screenshot = await this.saveScreenshotUniqueName(screenshotName);
+        throw new Error(`${errorMessage}, screenshot: ${screenshot} ` + error);
+    }
+
+    async isMacOS() {
+        const status = await this.getBrowserStatus();
+        return status.os.name.includes('Mac');
+    }
 }
 
 module.exports = Page;

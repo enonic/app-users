@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {PrincipalDescriptionWizardStepForm} from './PrincipalDescriptionWizardStepForm';
 import {PrincipalWizardPanel} from './PrincipalWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';

@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {MembersWizardPanel} from './MembersWizardPanel';
 import {PrincipalWizardPanelParams} from './PrincipalWizardPanelParams';
 import {CreateGroupRequest} from '../../graphql/principal/group/CreateGroupRequest';

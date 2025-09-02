@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {ListIdProvidersRequest} from '../../graphql/idprovider/ListIdProvidersRequest';
 import {ListPrincipalsData, ListPrincipalsRequest} from '../../graphql/principal/ListPrincipalsRequest';

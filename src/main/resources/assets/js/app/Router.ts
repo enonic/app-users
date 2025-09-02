@@ -1,4 +1,4 @@
-import * as hasher from 'hasher';
+import hasher from 'hasher';
 
 export class Router {
     static setHash(path: string): void {

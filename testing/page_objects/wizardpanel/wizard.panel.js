@@ -29,8 +29,7 @@ class WizardPanel extends Page {
         try {
             return await this.waitForElementEnabled(this.saveButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_save_button');
-            throw new Error(`Save button is not enabled:${screenshot} ` + err);
+            await this.handleError('Save button should be enabled', 'err_save_button', err);
         }
     }
 
@@ -51,8 +50,7 @@ class WizardPanel extends Page {
             await this.typeTextInInput(this.displayNameInput, displayName);
             await this.pause(500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_displayName_input');
-            throw new Error("Error during inserting the display name, screenshot: " + screenshot + '  ' + err);
+            await this.handleError('Wizard panel, display name input', 'err_displayName_input', err);
         }
     }
 
@@ -70,16 +68,16 @@ class WizardPanel extends Page {
             await this.clickOnElement(this.saveButton);
             return await this.pause(700);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_save_button');
-            throw new Error(`Error occurred during clicking on Save button ! ${screenshot} ` + err);
+            await this.handleError('Click on Save button', 'err_click_save_button', err);
         }
     }
 
-    clickOnDeleteButton() {
-        return this.clickOnElement(this.deleteButton).catch(err => {
-            this.saveScreenshot('err_delete_wizard');
-            throw new Error('Error when Delete button has been clicked ' + err);
-        });
+    async clickOnDeleteButton() {
+        try {
+            await this.clickOnElement(this.deleteButton)
+        } catch (err) {
+            await this.handleError('Wizard toolbar - Click on Delete button', 'err_click_delete_button', err);
+        }
     }
 
     async isItemInvalid(displayName) {
@@ -88,7 +86,7 @@ class WizardPanel extends Page {
             let result = await this.getAttribute(selector, 'class');
             return result.includes('invalid');
         } catch (err) {
-            throw new Error('tabItem: ' + err);
+            await this.handleError('tabItem invalid check', 'err_tabItem_invalid_check', err);
         }
     }
 
@@ -110,21 +108,15 @@ class WizardPanel extends Page {
     }
 
     async hotKeySave() {
-        let status = await this.getBrowserStatus();
-        if (status.os.name.includes('Mac')) {
-            return await this.getBrowser().keys([Key.Command, 's']);
-        } else {
-            return await this.getBrowser().keys([Key.Ctrl, 's']);
-        }
+        const isMacOS = await this.isMacOS();
+        const keyCombination = isMacOS ? [Key.Command, 's'] : [Key.Ctrl, 's'];
+        return await this.getBrowser().keys(keyCombination);
     }
 
     async hotKeyDelete() {
-        let status = await this.getBrowserStatus();
-        if (status.os.name.includes('Mac')) {
-            return await this.getBrowser().keys([Key.Command, Key.Delete]);
-        } else {
-            return await this.getBrowser().keys([Key.Ctrl, Key.Delete]);
-        }
+        const isMacOS = await this.isMacOS();
+        const keyCombination = isMacOS ? [Key.Command, Key.Delete] : [Key.Ctrl, Key.Delete];
+        return await this.getBrowser().keys(keyCombination);
     }
 }
 

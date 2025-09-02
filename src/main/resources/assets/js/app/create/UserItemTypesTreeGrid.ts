@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {UserTypeTreeGridItem, UserTypeTreeGridItemBuilder} from './UserTypeTreeGridItem';
 import {NewPrincipalEvent} from '../browse/NewPrincipalEvent';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from '../browse/UserTreeGridItem';
