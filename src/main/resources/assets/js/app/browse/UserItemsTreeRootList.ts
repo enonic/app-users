@@ -1,6 +1,6 @@
 import {UserItemsTreeList} from './UserItemsTreeList';
 import {UserItemType} from './UserItemType';
-import * as Q from 'q';
+import Q from 'q';
 import {UserTreeGridItem, UserTreeGridItemBuilder, UserTreeGridItemType} from './UserTreeGridItem';
 import {ListUserItemsRequest} from '../../graphql/principal/ListUserItemsRequest';
 import {IdProvider} from '../principal/IdProvider';

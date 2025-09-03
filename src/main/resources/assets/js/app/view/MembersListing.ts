@@ -9,7 +9,7 @@ import {PrincipalViewer} from '@enonic/lib-admin-ui/ui/security/PrincipalViewer'
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {GetPrincipalsByKeysRequest} from '../../graphql/principal/GetPrincipalsByKeysRequest';
 import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
-import * as Q from 'q';
+import Q from 'q';
 
 export class MembersListing extends DivEl {
 

@@ -4,7 +4,7 @@ import {HttpRequest} from '@enonic/lib-admin-ui/rest/HttpRequest';
 import {PostRequest} from '@enonic/lib-admin-ui/rest/PostRequest';
 import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import * as Q from 'q';
+import Q from 'q';
 
 export interface GraphQlMutationResponse {
     error?: string;

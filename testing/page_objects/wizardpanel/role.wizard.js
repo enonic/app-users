@@ -80,8 +80,7 @@ class RoleWizard extends WizardPanel {
             await this.clickOnElement(selector);
             return await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_remove_member');
-            throw new Error(`Error - remove-icon for the role, screenshot:${screenshot} ` + err);
+            await this.handleError('Role Wizard Remove member button','err_remove_member',err)
         }
     }
 

@@ -59,11 +59,13 @@ function handleGet(req) {
         configAsJson: getConfigAsJson(),
     };
 
+    const contentSecurityPolicy = `default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self'; img-src data: 'self'; font-src data: 'self'`;
+
     return {
         contentType: 'text/html',
         body: mustache.render(view, params),
         headers: {
-            'Content-Security-Policy': 'default-src \'self\'; script-src \'self\' \'unsafe-eval\'; style-src \'self\' \'unsafe-inline\'; object-src \'none\'; img-src \'self\' data:'
+            'Content-Security-Policy': contentSecurityPolicy,
         }
     };
 }

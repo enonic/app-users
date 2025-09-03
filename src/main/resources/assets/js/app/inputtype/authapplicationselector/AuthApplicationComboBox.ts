@@ -10,7 +10,7 @@ import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 import {ApplicationConfigProvider} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
 import {FormInputEl} from '@enonic/lib-admin-ui/dom/FormInputEl';
 import {ListIdProviderApplicationsRequest} from '../../resource/ListIdProviderApplicationsRequest';
-import * as Q from 'q';
+import Q from 'q';
 import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 

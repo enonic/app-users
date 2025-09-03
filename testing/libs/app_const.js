@@ -44,17 +44,17 @@ module.exports = Object.freeze({
     },
 
     PASSWORD: {
-        MEDIUM: "userA567$",
-        STRONG: "userA567$=",
-        WEAK: "1q2w3e",
-        WITH_SPACES: " userA567$ "
+        MEDIUM: 'AUserA567$',
+        STRONG: '1User%#567$=',
+        WEAK: 'test12345',
+        WITH_SPACES: ' userA567$ '
     },
     PASSWORD_STATE: {
-        MEDIUM: "Medium",
-        STRONG: "Strong",
-        WEAK: "Weak",
-        EXCELLENT: "Excellent",
-        BAD: "Bad"
+        MEDIUM: 'Medium',
+        STRONG: 'Strong',
+        WEAK: 'Weak',
+        EXCELLENT: 'Excellent',
+        BAD: 'Bad'
     },
     ROLES_DISPLAY_NAME: {
         CM_ADMIN: 'Content Manager Administrator',

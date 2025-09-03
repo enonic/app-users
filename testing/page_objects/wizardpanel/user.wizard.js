@@ -86,8 +86,7 @@ class UserWizard extends wizards.WizardPanel {
             await this.waitForChangePasswordButtonDisplayed();
             return await this.clickOnElement(this.changePasswordButton);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_change_password_btn');
-            throw new Error(`Error occurred during clicking on 'Change Password' button, screenshot: ${screenshot} ` + err);
+            await this.handleError(`User Wizard, 'Change Password' button`, 'err_change_password_btn', err);
         }
     }
 
@@ -141,8 +140,7 @@ class UserWizard extends wizards.WizardPanel {
             await this.clickOnElement(this.setPasswordButton);
             await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_set_password_btn');
-            throw new Error(`Error occurred when tried to click on 'Set Password' button, screenshot: ${screenshot} ` + err);
+            await this.handleError(`User Wizard, 'Set Password' button`, 'err_set_password_btn', err);
         }
     }
 

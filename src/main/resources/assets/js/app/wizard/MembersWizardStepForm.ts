@@ -13,7 +13,7 @@ import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 import {PrincipalLoader} from '../principal/PrincipalLoader';
 import {Option} from '@enonic/lib-admin-ui/ui/selector/Option';
-import * as Q from 'q';
+import Q from 'q';
 import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {RoleKeys} from '@enonic/lib-admin-ui/security/RoleKeys';
 import {UrlHelper} from '../../util/UrlHelper';
