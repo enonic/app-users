@@ -1,8 +1,7 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
-    id 'java'
-    alias( libs.plugins.enonic.defaults )
+    id 'base'
     alias( libs.plugins.enonic.xp.base )
     alias( libs.plugins.node.gradle )
 }
@@ -18,25 +17,13 @@ repositories {
 configurations {
     distro
     apps {
-        transitive false
+        transitive = false
     }
-}
-
-enonic {
-    publishRepo = 'inhouse'
 }
 
 def unpackDir = layout.buildDirectory.dir( 'install' ).get()
 def distroDir = unpackDir.dir( "enonic-xp-generic-$version" )
-def testDataDir = "$projectDir/test-data/common-config"
-
-def xpHome = "$distroDir/home"
-def configDir = "$xpHome/config"
-def deployDir = "$xpHome/deploy"
-def appName = 'app-users'
-def appFile = "$distroDir/system/40/${appName}-${version}.jar"
-def appUrl = project.hasProperty( 'appUrl' ) ? appUrl : "file:///$projectDir/../build/libs/${appName}.jar"
-
+def xpHome = distroDir.dir('home')
 
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:${version}@tgz"
@@ -62,10 +49,10 @@ tasks.register( 'copyConfig', Copy ) {
     description = 'Copy common configuration files'
     group = 'setup'
 
-    from testDataDir
+    from layout.projectDirectory.dir('test-config/common-config')
     include '**.*.cfg'
     include '*.properties'
-    into file( configDir )
+    into xpHome.dir('config')
     mustRunAfter tasks.named( 'unpackDistro' )
 }
 
@@ -76,24 +63,26 @@ tasks.register( 'downloadApps', Copy ) {
     from {
         configurations.apps
     }
-    into deployDir
+    into xpHome.dir( 'deploy' )
     mustRunAfter tasks.named( 'unpackDistro' )
 }
 
 tasks.register( 'deployApp', DefaultTask ) {
     description = 'Deploy the main application'
     group = 'setup'
+    def appName = rootProject.tasks.named("jar", Jar).get().archiveBaseName.get()
+    def appFile = distroDir.file("system/40/${appName}-${version}.jar").asFile
 
     outputs.files( appFile )
     outputs.upToDateWhen { false }
     doLast {
-        def f = new File( appFile as String )
-        println "Deleting  ${appFile}. Exists ${f.exists()}"
+        def appUrl = (findProperty('appUrl') ?: "file:///$rootDir/build/libs/${appName}.jar") as String
 
-        f.delete()
+        println "Deleting ${appFile}. Exists ${appFile.exists()}"
+        appFile.delete()
 
         println "Copying from ${appUrl} to ${appFile}"
-        new URL( appUrl as String ).withInputStream { i -> f.withOutputStream { it << i } }
+        uri( appUrl ).toURL().withInputStream { i -> appFile.withOutputStream { it << i } }
     }
     mustRunAfter tasks.named( 'unpackDistro' )
 }
@@ -194,7 +183,7 @@ tasks.register( 'cleanup', Delete ) {
     description = 'Clean up test reports'
     group = 'verification'
 
-    delete './build/reports/allure'
+    delete layout.buildDirectory.dir('reports/allure')
 }
 
 tasks.register( 'generateReportAndStopServer', PnpmTask ) {
