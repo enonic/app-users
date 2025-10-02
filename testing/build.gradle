@@ -104,7 +104,6 @@ tasks.register( 'startServer' ) {
     group = 'Test Execution'
     dependsOn tasks.named( 'unpackDistro' )
     doLast {
-        sleep( 5000 )
         logger.lifecycle( 'Starting XP Server at: {}', xpHome )
         logger.lifecycle( 'Server logs will be written to: build/reports/logs/xp.log' )
         def pb
@@ -122,7 +121,41 @@ tasks.register( 'startServer' ) {
         pb.redirectOutput( logsPath.file( 'xp.log' ).asFile )
         pb.redirectErrorStream( true )
         process = pb.start()
-        sleep( 60000 )
+    }
+}
+
+tasks.register( 'waitForServer') {
+    doLast {
+        long maxWaitMs = 60000
+        long deadline = System.nanoTime() + maxWaitMs * 1_000_000L
+
+        boolean ready = false
+        while (!ready && System.nanoTime() < deadline) {
+            logger.lifecycle("Waiting for server server...")
+
+            try {
+                HttpURLConnection conn = (HttpURLConnection) uri("http://localhost:2609/ready").toURL().openConnection()
+                conn.setConnectTimeout(1000)
+                conn.setReadTimeout(1000)
+                conn.connect()
+                int code = conn.getResponseCode()
+                if (code == 200) {
+                    ready = true
+                    break
+                }
+            } catch (IOException ignored) {
+                // Not up yet; retry
+            }
+            sleep(1000)
+
+        }
+        if (ready) {
+            logger.lifecycle('Server is ready.')
+        } else {
+            throw new GradleException("Server not ready after ${maxWaitMs} ms.")
+        }
+
+        sleep(1000)
     }
 }
 
