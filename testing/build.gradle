@@ -216,6 +216,7 @@ tasks.register( 'w_testUsersApp', PnpmTask ) {
     dependsOn tasks.named( 'downloadApps' )
     dependsOn tasks.named( 'deployApp' )
     dependsOn tasks.named( 'startServer' )
+    dependsOn tasks.named( 'waitForServer' )
     args = ['--color', 'run', 'test_users:wdio_chrome']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
