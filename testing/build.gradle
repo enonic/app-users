@@ -194,6 +194,7 @@ tasks.register( 'cleanup', Delete ) {
 tasks.register( 'generateReport', PnpmTask ) {
     description = 'Generates test report and stops server'
     group = 'Test Reporting'
+
     args = ['--color', 'run', 'allure-report']
     finalizedBy tasks.named( 'cleanup' )
 }
