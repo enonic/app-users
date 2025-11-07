@@ -29,16 +29,17 @@ import com.enonic.xp.app.users.rest.resource.ResourceConstants;
 import com.enonic.xp.app.users.rest.resource.application.json.ApplicationJson;
 import com.enonic.xp.app.users.rest.resource.application.json.ListApplicationJson;
 import com.enonic.xp.app.users.rest.resource.schema.content.LocaleMessageResolver;
-import com.enonic.xp.app.users.rest.resource.schema.mixin.InlineMixinResolver;
+import com.enonic.xp.app.users.rest.resource.schema.mixin.CmsFormFragmentServiceResolver;
 import com.enonic.xp.i18n.LocaleService;
 import com.enonic.xp.icon.Icon;
 import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.jaxrs.JaxRsComponent;
+import com.enonic.xp.schema.content.CmsFormFragmentService;
 import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.security.RoleKeys;
-import com.enonic.xp.site.SiteDescriptor;
-import com.enonic.xp.site.SiteService;
+import com.enonic.xp.site.CmsDescriptor;
+import com.enonic.xp.site.CmsService;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -53,13 +54,13 @@ public final class UsersApplicationResource
 
     private ApplicationDescriptorService applicationDescriptorService;
 
-    private SiteService siteService;
+    private CmsService cmsService;
 
     private IdProviderDescriptorService idProviderDescriptorService;
 
     private LocaleService localeService;
 
-    private MixinService mixinService;
+    private CmsFormFragmentService cmsFormFragmentService;
 
     private static final ApplicationImageHelper HELPER = new ApplicationImageHelper();
 
@@ -81,7 +82,7 @@ public final class UsersApplicationResource
 
             if ( idProviderDescriptor != null )
             {
-                final SiteDescriptor siteDescriptor = this.siteService.getDescriptor( applicationKey );
+                final CmsDescriptor cmsDescriptor = this.cmsService.getDescriptor( applicationKey );
                 final boolean localApplication = this.applicationService.isLocalApplication( applicationKey );
                 final ApplicationDescriptor appDescriptor = this.applicationDescriptorService.get( applicationKey );
                 final List<Locale> locales = Collections.list( request.getLocales() );
@@ -89,12 +90,11 @@ public final class UsersApplicationResource
                 json.add( ApplicationJson.create().
                     setApplication( application ).
                     setLocal( localApplication ).
-                    setApplicationDescriptor( appDescriptor ).
-                    setSiteDescriptor( siteDescriptor ).
+                    setApplicationDescriptor( appDescriptor ).setCmsDescriptor( cmsDescriptor ).
                     setIdProviderDescriptor( idProviderDescriptor ).
                     setIconUrlResolver( new ApplicationIconUrlResolver( request ) ).
                     setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey, locales ) ).
-                    setInlineMixinResolver( new InlineMixinResolver( this.mixinService ) ).
+                    setCmsFormFragmentServiceResolver( new CmsFormFragmentServiceResolver( this.cmsFormFragmentService ) ).
                     build() );
             }
         }
@@ -151,9 +151,9 @@ public final class UsersApplicationResource
     }
 
     @Reference
-    public void setSiteService( final SiteService siteService )
+    public void setCmsService( final CmsService cmsService )
     {
-        this.siteService = siteService;
+        this.cmsService = cmsService;
     }
 
     @Reference
@@ -169,9 +169,9 @@ public final class UsersApplicationResource
     }
 
     @Reference
-    public void setMixinService( final MixinService mixinService )
+    public void setCmsFormFragmentService( final CmsFormFragmentService cmsFormFragmentService )
     {
-        this.mixinService = mixinService;
+        this.cmsFormFragmentService = cmsFormFragmentService;
     }
 }
 
