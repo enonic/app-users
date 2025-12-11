@@ -40,9 +40,9 @@ public class ApplicationJson
         this.local = builder.local;
 
         this.config =
-            builder.cmsDescriptor != null && builder.cmsDescriptor.getForm() != null ? new FormJson( builder.cmsDescriptor.getForm(),
-                                                                                                     builder.localeMessageResolver,
-                                                                                                     builder.cmsFormFragmentServiceResolver ) : null;
+            builder.cmsDescriptor != null && builder.cmsDescriptor.getForm() != null
+                ? new FormJson( builder.cmsDescriptor.getForm(), builder.localeMessageResolver, builder.cmsFormFragmentServiceResolver )
+                : null;
 
         this.idProviderConfig = builder.idProviderDescriptor != null && builder.idProviderDescriptor.getConfig() != null ? new FormJson(
             builder.idProviderDescriptor.getConfig(), builder.localeMessageResolver, builder.cmsFormFragmentServiceResolver ) : null;

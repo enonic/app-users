@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
@@ -15,9 +18,6 @@ import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import com.enonic.xp.app.Application;
 import com.enonic.xp.app.ApplicationDescriptor;
@@ -36,7 +36,6 @@ import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.jaxrs.JaxRsComponent;
 import com.enonic.xp.schema.content.CmsFormFragmentService;
-import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.site.CmsDescriptor;
 import com.enonic.xp.site.CmsService;
@@ -90,7 +89,8 @@ public final class UsersApplicationResource
                 json.add( ApplicationJson.create().
                     setApplication( application ).
                     setLocal( localApplication ).
-                    setApplicationDescriptor( appDescriptor ).setCmsDescriptor( cmsDescriptor ).
+                    setApplicationDescriptor( appDescriptor ).
+                    setCmsDescriptor( cmsDescriptor ).
                     setIdProviderDescriptor( idProviderDescriptor ).
                     setIconUrlResolver( new ApplicationIconUrlResolver( request ) ).
                     setLocaleMessageResolver( new LocaleMessageResolver( this.localeService, applicationKey, locales ) ).

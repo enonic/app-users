@@ -19,7 +19,8 @@ public class FormJson
     private final List<FormItemJson> items;
 
 
-    public FormJson( final Form form, final LocaleMessageResolver localeMessageResolver, final CmsFormFragmentServiceResolver inlineMixinResolver )
+    public FormJson( final Form form, final LocaleMessageResolver localeMessageResolver,
+                     final CmsFormFragmentServiceResolver inlineMixinResolver )
     {
         this.form = inlineMixinResolver.inlineForm( form );
 
