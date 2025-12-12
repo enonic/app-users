@@ -54,7 +54,7 @@ export class AuthApplicationSelector
         return null;
     }
 
-    private readConfig(inputConfig: Record<string, Record<string, string>[]>): void {
+    private readConfig(inputConfig: Record<string, Record<string, unknown>[]>): void {
         let readOnlyConfig = inputConfig['readOnly'] && inputConfig['readOnly'][0];
         let readOnlyValue = readOnlyConfig && readOnlyConfig['value'];
         this.readOnly = readOnlyValue === 'true';
