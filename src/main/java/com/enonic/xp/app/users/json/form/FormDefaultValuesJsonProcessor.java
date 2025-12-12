@@ -1,12 +1,15 @@
 package com.enonic.xp.app.users.json.form;
 
 import java.util.Iterator;
+import java.util.Optional;
 
+import com.enonic.xp.data.ValueFactory;
 import com.enonic.xp.form.FieldSet;
 import com.enonic.xp.form.Form;
 import com.enonic.xp.form.FormItem;
 import com.enonic.xp.form.FormOptionSetOption;
 import com.enonic.xp.form.Input;
+import com.enonic.xp.util.GenericValue;
 
 import static com.enonic.xp.form.FormItemType.FORM_ITEM_SET;
 import static com.enonic.xp.form.FormItemType.FORM_OPTION_SET;
@@ -34,22 +37,21 @@ final class FormDefaultValuesJsonProcessor
             {
                 final Input input = formItem.toInput();
                 final InputJson inputJson = (InputJson) formItemJson;
-//                if ( input.getDefaultValue() != null )
-//                {
-//                    try
-//                    {
-//                        final Value defaultValue = InputTypes.BUILTIN.resolve( input.getInputType() ).
-//                            createDefaultValue( input );
-//                        if ( defaultValue != null )
-//                        {
-//                            inputJson.setDefaultValue( defaultValue );
-//                        }
-//                    }
-//                    catch ( IllegalArgumentException ex )
-//                    {
-//                        // DO NOTHING
-//                    }
-//                }
+
+                final Optional<GenericValue> defaultValue = input.getInputTypeConfig().optional( "default" );
+
+                if ( defaultValue.isPresent() )
+                {
+                    try
+                    {
+                        // TODO resolve type
+                        inputJson.setDefaultValue( ValueFactory.newString( defaultValue.get().asString() ) );
+                    }
+                    catch ( final Exception e )
+                    {
+                        // do nothing
+                    }
+                }
             }
             else if ( formItem.getType() == FORM_ITEM_SET )
             {
