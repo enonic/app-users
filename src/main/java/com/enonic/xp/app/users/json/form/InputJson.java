@@ -13,6 +13,7 @@ import com.enonic.xp.app.users.rest.resource.schema.content.LocaleMessageResolve
 import com.enonic.xp.data.Value;
 import com.enonic.xp.form.Input;
 import com.enonic.xp.inputtype.InputTypeName;
+import com.enonic.xp.schema.LocalizedText;
 import com.enonic.xp.util.GenericValue;
 
 import static com.google.common.base.Strings.nullToEmpty;
@@ -124,12 +125,13 @@ public class InputJson
             final Optional<GenericValue> label = item.optional( "label" );
             if ( label.isPresent() )
             {
-                final GenericValue labelValue = label.get();
+                final LocalizedText localizedText = LocalizedText.from( label.get() );
 
-                String labelText = labelValue.optional( "text" ).map( GenericValue::asString ).orElse( null );
-                if ( labelValue.optional( "i18n" ).isPresent() )
+                String labelText = localizedText.text();
+
+                if ( localizedText.i18n() != null )
                 {
-                    final String i18nKey = labelValue.property( "i18n" ).asString();
+                    final String i18nKey = localizedText.i18n();
                     json.put( "@i18n", i18nKey );
 
                     if ( InputTypeName.RADIO_BUTTON.equals( this.input.getInputType() ) )
