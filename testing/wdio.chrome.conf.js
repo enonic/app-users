@@ -9,7 +9,10 @@ exports.config = {
         path.join(__dirname, './tests/*.spec.js')
     ],
 
-    maxInstances: 5,
+    maxInstances: 1,
+
+    specFileRetries: 1,
+    specFileRetriesDelay: 1000,
 
     capabilities: [{
         browserName: 'chrome',
@@ -20,12 +23,11 @@ exports.config = {
                 "--headless", "--disable-gpu", "--no-sandbox",
                 "--lang=en",
                 '--disable-extensions',
-                // Performance optimizations for headless Chrome:
-                '--disable-dev-shm-usage',  // Overcome limited resource problems in containers
-                '--disable-software-rasterizer',  // Disable software rasterizer for better performance
-                '--disable-background-timer-throttling',  // Prevent background tab throttling
-                '--disable-backgrounding-occluded-windows',  // Keep windows active when occluded
-                '--disable-renderer-backgrounding',  // Prevent renderer process backgrounding
+                '--disable-dev-shm-usage',
+                '--disable-software-rasterizer',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding',
                 'window-size=1970,1000'
             ]
         }
