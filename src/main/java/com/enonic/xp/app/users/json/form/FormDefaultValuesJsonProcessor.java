@@ -3,12 +3,14 @@ package com.enonic.xp.app.users.json.form;
 import java.util.Iterator;
 import java.util.Optional;
 
+import com.enonic.xp.data.Value;
 import com.enonic.xp.data.ValueFactory;
 import com.enonic.xp.form.FieldSet;
 import com.enonic.xp.form.Form;
 import com.enonic.xp.form.FormItem;
 import com.enonic.xp.form.FormOptionSetOption;
 import com.enonic.xp.form.Input;
+import com.enonic.xp.inputtype.InputTypes;
 import com.enonic.xp.util.GenericValue;
 
 import static com.enonic.xp.form.FormItemType.FORM_ITEM_SET;
@@ -37,15 +39,15 @@ final class FormDefaultValuesJsonProcessor
             {
                 final Input input = formItem.toInput();
                 final InputJson inputJson = (InputJson) formItemJson;
-
                 final Optional<GenericValue> defaultValue = input.getInputTypeConfig().optional( "default" );
 
                 if ( defaultValue.isPresent() )
                 {
                     try
                     {
-                        // TODO resolve type
-                        inputJson.setDefaultValue( ValueFactory.newString( defaultValue.get().asString() ) );
+                        final Value value = InputTypes.BUILTIN.resolve( input.getInputType() ).createValue(
+                            ValueFactory.newString( defaultValue.get().asString() ), input.getInputTypeConfig() );
+                        inputJson.setDefaultValue( value );
                     }
                     catch ( final Exception e )
                     {
