@@ -293,7 +293,7 @@ module.exports = {
         await idProviderWizard.pause(300);
         // 2. Save the data:
         await idProviderWizard.waitAndClickOnSave();
-        await idProviderWizard.pause(500);
+        await idProviderWizard.pause(300);
         return await idProviderWizard.waitForSpinnerNotVisible();
     },
     async openIdProviderWizard() {

@@ -13,7 +13,7 @@ exports.config = {
 
     // Retry failed specs
     specFileRetries: 1,
-    specFileRetriesDelay: 0,
+    specFileRetriesDelay: 1000,
 
     capabilities: [{
         browserName: 'chrome',
