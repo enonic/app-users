@@ -35,7 +35,7 @@ module.exports = {
         await this.typeNameInFilterPanel(name);
         await browsePanel.waitForRowByNameVisible(name);
         await browsePanel.clickOnRowByName(name);
-        return await browsePanel.pause(500);
+        return await browsePanel.pause(300);
     },
     async openFilterPanel() {
         let filterPanel = new FilterPanel();
@@ -61,7 +61,7 @@ module.exports = {
         let confirmationDialog = new ConfirmationDialog();
         await this.findAndSelectItem(name);
         await browsePanel.waitForDeleteButtonEnabled();
-        await browsePanel.pause(1000);
+        await browsePanel.pause(300);
         await browsePanel.clickOnDeleteButton();
         await confirmationDialog.waitForDialogLoaded();
         await confirmationDialog.clickOnYesButton();
@@ -117,7 +117,7 @@ module.exports = {
         await loginPage.doLogin(userName, password);
         let launcherPanel = new LauncherPanel();
         await launcherPanel.clickOnUsersLink();
-        return await loginPage.pause(1000);
+        return await loginPage.pause(300);
     },
     async doSwitchToUsersApp() {
         try {
@@ -160,7 +160,7 @@ module.exports = {
         await browsePanel.waitForEditButtonEnabled();
         await browsePanel.clickOnEditButton();
         await userWizard.waitForOpened();
-        return await userWizard.pause(500);
+        return await userWizard.pause(300);
 
     },
     async openWizardAndSaveGroup(group) {
@@ -168,10 +168,10 @@ module.exports = {
         //Select System ID Provider and open new Group Wizard:
         await this.clickOnSystemAndOpenGroupWizard();
         await groupWizard.typeData(group);
-        await groupWizard.pause(500);
+        await groupWizard.pause(300);
         //Close the wizard:
         await this.saveAndCloseWizard(group.displayName);
-        return await groupWizard.pause(500);
+        return await groupWizard.pause(300);
     },
     async clickOnSystemAndOpenGroupWizard() {
         let browsePanel = new UserBrowsePanel();
@@ -200,7 +200,7 @@ module.exports = {
         }
         //2. Open New Principal dialog:
         await browsePanel.waitForNewButtonEnabled();
-        await browsePanel.pause(1000);
+        await browsePanel.pause(300);
         await browsePanel.clickOnNewButton();
         await newPrincipalDialog.waitForDialogLoaded();
         //3. Click on Group item in the modal dialog:
@@ -211,7 +211,7 @@ module.exports = {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
         await wizardPanel.waitAndClickOnSave();
-        await wizardPanel.pause(700);
+        await wizardPanel.pause(300);
         // Click on 'Close' icon and close the wizard:
         return await browsePanel.closeTabAndWaitForGrid(displayName);
     },
@@ -220,9 +220,9 @@ module.exports = {
         //Open Role-wizard:
         await this.clickOnRolesFolderAndOpenWizard();
         await roleWizard.typeData(role);
-        await roleWizard.pause(500);
+        await roleWizard.pause(300);
         await this.saveAndCloseWizard(role.displayName);
-        return await roleWizard.pause(500);
+        return await roleWizard.pause(300);
     },
     async clickOnRolesFolderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
@@ -268,7 +268,7 @@ module.exports = {
             await browsePanel.waitForEditButtonEnabled();
             await browsePanel.clickOnEditButton();
             await roleWizard.waitForLoaded();
-            await roleWizard.pause(500);
+            await roleWizard.pause(300);
         } catch (err) {
             throw new Error("Error when open the role: " + err);
         }
@@ -290,10 +290,10 @@ module.exports = {
         // 1. Open new ID Provider Wizard:
         await this.openIdProviderWizard();
         await idProviderWizard.typeData(idProviderData);
-        await idProviderWizard.pause(500);
+        await idProviderWizard.pause(300);
         // 2. Save the data:
         await idProviderWizard.waitAndClickOnSave();
-        await idProviderWizard.pause(2000);
+        await idProviderWizard.pause(500);
         return await idProviderWizard.waitForSpinnerNotVisible();
     },
     async openIdProviderWizard() {
