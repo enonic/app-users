@@ -1,5 +1,8 @@
 package com.enonic.xp.app.users.json.form;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.enonic.xp.data.Value;
@@ -15,7 +18,18 @@ public class PropertyValueJson
     PropertyValueJson( final Value value )
     {
         this.value = value.getObject();
-        this.type = value.getType().getName();
+        if ( Instant.class.isAssignableFrom( value.getType().getJavaType() ) )
+        {
+            this.type = "Instant";
+        }
+        else if ( LocalDateTime.class.isAssignableFrom( value.getType().getJavaType() ) )
+        {
+            this.type = "DateTime";
+        }
+        else
+        {
+            this.type = value.getType().getName();
+        }
     }
 
     public Object getValue()
