@@ -4,7 +4,8 @@
 
 class TimingLogger {
     constructor() {
-        this.enabled = process.env.LOG_TIMING === 'true';
+        // Enabled by default, can be disabled with LOG_TIMING=false
+        this.enabled = process.env.LOG_TIMING !== 'false';
     }
 
     /**

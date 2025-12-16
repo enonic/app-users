@@ -11,17 +11,18 @@ Before trying to run tests, you need to verify that the following software are i
 
 ### Performance Monitoring
 
-To enable timing logs for wait and pause operations, set the `LOG_TIMING` environment variable:
+Timing logs for wait and pause operations are **enabled by default** to help identify slow operations:
 
-```bash
-export LOG_TIMING=true
-```
-
-This will output timing information for all wait operations, helping identify slow operations:
 ```
 [TIMING] waitForRowByNameVisible [testuser]: 1250ms
 [TIMING] pause [after typeSearchText]: 200ms
 [TIMING] waitForSpinnerNotVisible [after typeSearchText]: 340ms
+```
+
+To disable timing logs, set the `LOG_TIMING` environment variable to `false`:
+
+```bash
+export LOG_TIMING=false
 ```
 
 Run tests for app-users:
