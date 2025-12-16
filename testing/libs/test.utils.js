@@ -62,9 +62,8 @@ module.exports = {
         }
         console.log('filter panel is opened, insert the text: ' + name);
         await filterPanel.typeSearchText(name);
-        const startTime = Date.now();
         await filterPanel.pause(200);
-        timingLogger.logPause(Date.now() - startTime, 'after typeSearchText');
+        timingLogger.logPause(200, 'after typeSearchText');
         return await timingLogger.measureAsync(
             () => browsePanel.waitForSpinnerNotVisible(),
             'waitForSpinnerNotVisible',
@@ -203,9 +202,8 @@ module.exports = {
         //Select System ID Provider and open new Group Wizard:
         await this.clickOnSystemAndOpenGroupWizard();
         await groupWizard.typeData(group);
-        const startTime = Date.now();
         await groupWizard.pause(300);
-        timingLogger.logPause(Date.now() - startTime, 'after typeData');
+        timingLogger.logPause(300, 'after typeData');
         //Close the wizard:
         await this.saveAndCloseWizard(group.displayName);
         // Removed duplicate pause - saveAndCloseWizard has proper waits
@@ -256,9 +254,8 @@ module.exports = {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
         await wizardPanel.waitAndClickOnSave();
-        const startTime = Date.now();
         await wizardPanel.pause(300);
-        timingLogger.logPause(Date.now() - startTime, 'after waitAndClickOnSave');
+        timingLogger.logPause(300, 'after waitAndClickOnSave');
         // Click on 'Close' icon and close the wizard:
         return await browsePanel.closeTabAndWaitForGrid(displayName);
     },
@@ -267,9 +264,8 @@ module.exports = {
         //Open Role-wizard:
         await this.clickOnRolesFolderAndOpenWizard();
         await roleWizard.typeData(role);
-        const startTime = Date.now();
         await roleWizard.pause(300);
-        timingLogger.logPause(Date.now() - startTime, 'after typeData');
+        timingLogger.logPause(300, 'after typeData');
         await this.saveAndCloseWizard(role.displayName);
         // Removed duplicate pause - saveAndCloseWizard has proper waits
     },
@@ -355,15 +351,13 @@ module.exports = {
         // 1. Open new ID Provider Wizard:
         await this.openIdProviderWizard();
         await idProviderWizard.typeData(idProviderData);
-        const startTime1 = Date.now();
         await idProviderWizard.pause(300);
-        timingLogger.logPause(Date.now() - startTime1, 'after typeData');
+        timingLogger.logPause(300, 'after typeData');
         // 2. Save the data:
         await idProviderWizard.waitAndClickOnSave();
         // ID provider operations may require more processing time
-        const startTime2 = Date.now();
         await idProviderWizard.pause(500);
-        timingLogger.logPause(Date.now() - startTime2, 'after waitAndClickOnSave (ID provider)');
+        timingLogger.logPause(500, 'after waitAndClickOnSave (ID provider)');
         return await timingLogger.measureAsync(
             () => idProviderWizard.waitForSpinnerNotVisible(),
             'waitForSpinnerNotVisible',
