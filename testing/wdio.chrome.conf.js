@@ -11,6 +11,9 @@ exports.config = {
 
     maxInstances: 1,
 
+    specFileRetries: 1,
+    specFileRetriesDelay: 1000,
+
     capabilities: [{
         browserName: 'chrome',
         browserVersion: browser_version,
@@ -20,6 +23,11 @@ exports.config = {
                 "--headless", "--disable-gpu", "--no-sandbox",
                 "--lang=en",
                 '--disable-extensions',
+                '--disable-dev-shm-usage',
+                '--disable-software-rasterizer',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding',
                 'window-size=1970,1000'
             ]
         }
@@ -32,7 +40,7 @@ exports.config = {
     baseUrl: 'http://localhost:8080/admin',
     //
     // Default timeout for all waitForXXX commands.
-    waitforTimeout: 3000,
+    waitforTimeout: 5000,
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response

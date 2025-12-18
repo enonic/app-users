@@ -15,6 +15,7 @@ const FilterPanel = require("../page_objects/browsepanel/principal.filter.panel"
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 const appConst = require("./app_const");
 const webDriverHelper = require("./WebDriverHelper");
+const timingLogger = require("./timing.logger");
 const fs = require('fs');
 const path = require('path');
 
@@ -33,9 +34,13 @@ module.exports = {
     async findAndSelectItem(name) {
         let browsePanel = new UserBrowsePanel();
         await this.typeNameInFilterPanel(name);
-        await browsePanel.waitForRowByNameVisible(name);
+        await timingLogger.measureAsync(
+            () => browsePanel.waitForRowByNameVisible(name),
+            'waitForRowByNameVisible',
+            name
+        );
         await browsePanel.clickOnRowByName(name);
-        return await browsePanel.pause(500);
+        // Removed redundant pause - waitForRowByNameVisible already waits for element
     },
     async openFilterPanel() {
         let filterPanel = new FilterPanel();
@@ -49,23 +54,44 @@ module.exports = {
         let isVisible = await filterPanel.isPanelVisible();
         if (!isVisible) {
             await browsePanel.clickOnSearchButton();
-            await filterPanel.waitForOpened();
+            await timingLogger.measureAsync(
+                () => filterPanel.waitForOpened(),
+                'waitForOpened',
+                'FilterPanel'
+            );
         }
         console.log('filter panel is opened, insert the text: ' + name);
         await filterPanel.typeSearchText(name);
         await filterPanel.pause(200);
-        return await browsePanel.waitForSpinnerNotVisible();
+        timingLogger.logPause(200, 'after typeSearchText');
+        return await timingLogger.measureAsync(
+            () => browsePanel.waitForSpinnerNotVisible(),
+            'waitForSpinnerNotVisible',
+            'after typeSearchText'
+        );
     },
     async selectAndDeleteItem(name) {
         let browsePanel = new UserBrowsePanel();
         let confirmationDialog = new ConfirmationDialog();
         await this.findAndSelectItem(name);
-        await browsePanel.waitForDeleteButtonEnabled();
-        await browsePanel.pause(1000);
+        await timingLogger.measureAsync(
+            () => browsePanel.waitForDeleteButtonEnabled(),
+            'waitForDeleteButtonEnabled',
+            name
+        );
+        // Removed redundant pause after waitForDeleteButtonEnabled
         await browsePanel.clickOnDeleteButton();
-        await confirmationDialog.waitForDialogLoaded();
+        await timingLogger.measureAsync(
+            () => confirmationDialog.waitForDialogLoaded(),
+            'waitForDialogLoaded',
+            'ConfirmationDialog'
+        );
         await confirmationDialog.clickOnYesButton();
-        return await browsePanel.waitForSpinnerNotVisible();
+        return await timingLogger.measureAsync(
+            () => browsePanel.waitForSpinnerNotVisible(),
+            'waitForSpinnerNotVisible',
+            'after delete'
+        );
     },
     async confirmDelete() {
         try {
@@ -117,7 +143,7 @@ module.exports = {
         await loginPage.doLogin(userName, password);
         let launcherPanel = new LauncherPanel();
         await launcherPanel.clickOnUsersLink();
-        return await loginPage.pause(1000);
+        // Removed redundant pause - next operation (doSwitchToUsersApp) has proper waits
     },
     async doSwitchToUsersApp() {
         try {
@@ -157,10 +183,18 @@ module.exports = {
         let browsePanel = new UserBrowsePanel();
         let userWizard = new UserWizard();
         await this.findAndSelectItem(displayName);
-        await browsePanel.waitForEditButtonEnabled();
+        await timingLogger.measureAsync(
+            () => browsePanel.waitForEditButtonEnabled(),
+            'waitForEditButtonEnabled',
+            displayName
+        );
         await browsePanel.clickOnEditButton();
-        await userWizard.waitForOpened();
-        return await userWizard.pause(500);
+        return await timingLogger.measureAsync(
+            () => userWizard.waitForOpened(),
+            'waitForOpened',
+            'UserWizard'
+        );
+        // Removed redundant pause after waitForOpened
 
     },
     async openWizardAndSaveGroup(group) {
@@ -168,10 +202,11 @@ module.exports = {
         //Select System ID Provider and open new Group Wizard:
         await this.clickOnSystemAndOpenGroupWizard();
         await groupWizard.typeData(group);
-        await groupWizard.pause(500);
+        await groupWizard.pause(300);
+        timingLogger.logPause(300, 'after typeData');
         //Close the wizard:
         await this.saveAndCloseWizard(group.displayName);
-        return await groupWizard.pause(500);
+        // Removed duplicate pause - saveAndCloseWizard has proper waits
     },
     async clickOnSystemAndOpenGroupWizard() {
         let browsePanel = new UserBrowsePanel();
@@ -199,10 +234,18 @@ module.exports = {
             await browsePanel.clickOnRowByName(providerName);
         }
         //2. Open New Principal dialog:
-        await browsePanel.waitForNewButtonEnabled();
-        await browsePanel.pause(1000);
+        await timingLogger.measureAsync(
+            () => browsePanel.waitForNewButtonEnabled(),
+            'waitForNewButtonEnabled',
+            providerName
+        );
+        // Removed redundant pause after waitForNewButtonEnabled
         await browsePanel.clickOnNewButton();
-        await newPrincipalDialog.waitForDialogLoaded();
+        await timingLogger.measureAsync(
+            () => newPrincipalDialog.waitForDialogLoaded(),
+            'waitForDialogLoaded',
+            'NewPrincipalDialog'
+        );
         //3. Click on Group item in the modal dialog:
         await newPrincipalDialog.clickOnItem(menuItem);
     },
@@ -211,7 +254,8 @@ module.exports = {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
         await wizardPanel.waitAndClickOnSave();
-        await wizardPanel.pause(700);
+        await wizardPanel.pause(300);
+        timingLogger.logPause(300, 'after waitAndClickOnSave');
         // Click on 'Close' icon and close the wizard:
         return await browsePanel.closeTabAndWaitForGrid(displayName);
     },
@@ -220,9 +264,10 @@ module.exports = {
         //Open Role-wizard:
         await this.clickOnRolesFolderAndOpenWizard();
         await roleWizard.typeData(role);
-        await roleWizard.pause(500);
+        await roleWizard.pause(300);
+        timingLogger.logPause(300, 'after typeData');
         await this.saveAndCloseWizard(role.displayName);
-        return await roleWizard.pause(500);
+        // Removed duplicate pause - saveAndCloseWizard has proper waits
     },
     async clickOnRolesFolderAndOpenWizard() {
         let browsePanel = new UserBrowsePanel();
@@ -237,11 +282,19 @@ module.exports = {
         let userWizard = new UserWizard();
         let newPrincipalDialog = new NewPrincipalDialog();
         await browsePanel.clickOnRowByName('system');
-        await browsePanel.waitForNewButtonEnabled();
+        await timingLogger.measureAsync(
+            () => browsePanel.waitForNewButtonEnabled(),
+            'waitForNewButtonEnabled',
+            'system'
+        );
         await browsePanel.clickOnNewButton();
-        await browsePanel.pause(300);
+        // Removed redundant pause - waitForNewButtonEnabled already waits
         await newPrincipalDialog.clickOnItem('User');
-        return await userWizard.waitForOpened();
+        return await timingLogger.measureAsync(
+            () => userWizard.waitForOpened(),
+            'waitForOpened',
+            'UserWizard'
+        );
     },
     // Opens System ID Provider folder:
     async selectSystemIdProviderAndOpenWizard() {
@@ -265,10 +318,18 @@ module.exports = {
         let roleWizard = new RoleWizard();
         try {
             await this.findAndSelectItem(displayName);
-            await browsePanel.waitForEditButtonEnabled();
+            await timingLogger.measureAsync(
+                () => browsePanel.waitForEditButtonEnabled(),
+                'waitForEditButtonEnabled',
+                displayName
+            );
             await browsePanel.clickOnEditButton();
-            await roleWizard.waitForLoaded();
-            await roleWizard.pause(500);
+            await timingLogger.measureAsync(
+                () => roleWizard.waitForLoaded(),
+                'waitForLoaded',
+                'RoleWizard'
+            );
+            // Removed redundant pause after waitForLoaded
         } catch (err) {
             throw new Error("Error when open the role: " + err);
         }
@@ -290,11 +351,18 @@ module.exports = {
         // 1. Open new ID Provider Wizard:
         await this.openIdProviderWizard();
         await idProviderWizard.typeData(idProviderData);
-        await idProviderWizard.pause(500);
+        await idProviderWizard.pause(300);
+        timingLogger.logPause(300, 'after typeData');
         // 2. Save the data:
         await idProviderWizard.waitAndClickOnSave();
-        await idProviderWizard.pause(2000);
-        return await idProviderWizard.waitForSpinnerNotVisible();
+        // ID provider operations may require more processing time
+        await idProviderWizard.pause(500);
+        timingLogger.logPause(500, 'after waitAndClickOnSave (ID provider)');
+        return await timingLogger.measureAsync(
+            () => idProviderWizard.waitForSpinnerNotVisible(),
+            'waitForSpinnerNotVisible',
+            'after save ID provider'
+        );
     },
     async openIdProviderWizard() {
         let browsePanel = new UserBrowsePanel();
