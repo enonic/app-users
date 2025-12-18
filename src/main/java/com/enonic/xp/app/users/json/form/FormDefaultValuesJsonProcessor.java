@@ -1,12 +1,22 @@
 package com.enonic.xp.app.users.json.form;
 
-import com.enonic.xp.data.Value;
-import com.enonic.xp.form.*;
-import com.enonic.xp.inputtype.InputTypes;
-
 import java.util.Iterator;
+import java.util.Optional;
 
-import static com.enonic.xp.form.FormItemType.*;
+import com.enonic.xp.data.Value;
+import com.enonic.xp.data.ValueFactory;
+import com.enonic.xp.form.FieldSet;
+import com.enonic.xp.form.Form;
+import com.enonic.xp.form.FormItem;
+import com.enonic.xp.form.FormOptionSetOption;
+import com.enonic.xp.form.Input;
+import com.enonic.xp.inputtype.InputTypes;
+import com.enonic.xp.util.GenericValue;
+
+import static com.enonic.xp.form.FormItemType.FORM_ITEM_SET;
+import static com.enonic.xp.form.FormItemType.FORM_OPTION_SET;
+import static com.enonic.xp.form.FormItemType.INPUT;
+import static com.enonic.xp.form.FormItemType.LAYOUT;
 
 final class FormDefaultValuesJsonProcessor
 {
@@ -29,20 +39,22 @@ final class FormDefaultValuesJsonProcessor
             {
                 final Input input = formItem.toInput();
                 final InputJson inputJson = (InputJson) formItemJson;
-                if ( input.getDefaultValue() != null )
+                final Optional<GenericValue> defaultValue = input.getInputTypeConfig().optional( "default" );
+
+                if ( defaultValue.isPresent() )
                 {
                     try
                     {
-                        final Value defaultValue = InputTypes.BUILTIN.resolve( input.getInputType() ).
-                            createDefaultValue( input );
-                        if ( defaultValue != null )
+                        final Value value = InputTypes.BUILTIN.resolve( input.getInputType() ).createValue(
+                            ValueFactory.newString( defaultValue.get().asString() ), input.getInputTypeConfig() );
+                        if ( value != null )
                         {
-                            inputJson.setDefaultValue( defaultValue );
+                            inputJson.setDefaultValue( value );
                         }
                     }
-                    catch ( IllegalArgumentException ex )
+                    catch ( final Exception e )
                     {
-                        // DO NOTHING
+                        // do nothing
                     }
                 }
             }
