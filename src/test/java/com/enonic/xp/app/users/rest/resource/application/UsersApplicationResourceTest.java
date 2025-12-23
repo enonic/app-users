@@ -9,7 +9,6 @@ import org.jboss.resteasy.core.ResteasyContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
-import org.osgi.framework.Version;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
@@ -30,6 +29,7 @@ import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.inputtype.InputTypeName;
 import com.enonic.xp.schema.mixin.MixinService;
 import com.enonic.xp.site.SiteService;
+import com.enonic.xp.util.Version;
 
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -111,7 +111,7 @@ public class UsersApplicationResourceTest
     {
         final Application application = mock( Application.class );
         when( application.getKey() ).thenReturn( ApplicationKey.from( "testapplication" ) );
-        when( application.getVersion() ).thenReturn( new Version( 1, 0, 0 ) );
+        when( application.getVersion() ).thenReturn( Version.parseVersion( "1.0.0" ) );
         when( application.getDisplayName() ).thenReturn( "application display name" );
         when( application.getUrl() ).thenReturn( "http://enonic.net" );
         when( application.getVendorName() ).thenReturn( "Enonic" );
