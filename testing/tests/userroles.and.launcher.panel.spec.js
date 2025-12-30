@@ -33,7 +33,7 @@ describe('Checks links in Launcher Panel when an user has no administrator role'
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(TEST_USER);
             await userWizard.waitAndClickOnSave();
-            await userWizard.pause(1000);
+            await userWizard.waitForNotificationMessage();
             await userBrowsePanel.closeTabAndWaitForGrid(userName);
             // 2. Type the user-name in Filter Panel:
             await testUtils.typeNameInFilterPanel(userName);

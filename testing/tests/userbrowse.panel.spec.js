@@ -73,7 +73,7 @@ describe('User Browse Panel specification', function () {
             // 1. Click on the 'System Id Provider' checkbox:
             await userBrowsePanel.clickCheckboxAndSelectRowByDisplayName('System Id Provider');
             await userBrowsePanel.waitForSelectionToggleDisplayed();
-            await userBrowsePanel.pause(1000);
+            await userBrowsePanel.pause(500);
             // 2. Click on 'Show Selection' button:
             await userBrowsePanel.clickOnSelectionToggler();
             // 3. The grid should be filtered:

@@ -72,7 +72,6 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Group's data has been typed:
             await groupWizard.typeDisplayName(TEST_GROUP.displayName);
             await groupWizard.waitForSaveButtonEnabled();
-            await groupWizard.pause(500);
             // 3. keyboard shortcut to save button has been pressed:
             await groupWizard.hotKeySave();
             await testUtils.saveScreenshot('group_shortcut_save');
@@ -104,7 +103,6 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. Role's data has been typed:
             await roleWizard.typeDisplayName(TEST_ROLE.displayName);
             await roleWizard.waitForSaveButtonEnabled();
-            await roleWizard.pause(1000);
             // 3. keyboard shortcut to Save button has been pressed:
             await roleWizard.hotKeySave();
             await testUtils.saveScreenshot('role_shortcut_save');
@@ -136,7 +134,6 @@ describe(`wizard.toolbar.shortcut.spec, wizard's toolbar shortcut specification`
             // 2. data has been typed:
             await idProviderWizard.typeDisplayName(TEST_PROVIDER.displayName);
             await idProviderWizard.waitForSaveButtonEnabled();
-            await idProviderWizard.pause(700);
             // 3. keyboard shortcut to 'Save' button has been pressed:
             await idProviderWizard.hotKeySave();
             await testUtils.saveScreenshot('provider_shortcut_save');

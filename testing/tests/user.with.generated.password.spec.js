@@ -37,7 +37,7 @@ describe("Create an user with generated password and do login with the user", fu
             PASSWORD = await userWizard.typeDataAndGeneratePassword(TEST_USER);
             // 4. Save the user:
             await userWizard.waitAndClickOnSave();
-            await userWizard.pause(500);
+            await userWizard.waitForNotificationMessage();
             await userBrowsePanel.closeTabAndWaitForGrid(USER_NAME);
             // 5. Verify that user is created:
             await testUtils.typeNameInFilterPanel(USER_NAME);

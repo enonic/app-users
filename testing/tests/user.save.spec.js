@@ -33,7 +33,7 @@ describe('Save User specification - save an user', function () {
             await userWizard.typeData(testUser);
             // 2. Save the user:
             await userWizard.waitAndClickOnSave();
-            await userWizard.pause(3000);
+            await userWizard.pause(1000);
             // 3. update the name:
             await userWizard.typeDisplayName(userName + '123');
             await userWizard.pause(300);
