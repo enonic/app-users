@@ -96,8 +96,10 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             await userBrowsePanel.clickOnTabBarItem(group2.displayName);
             await groupWizard.removeMember(group1.displayName);
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 4. Go to the grid
             await userBrowsePanel.clickOnAppHomeButton();
+            await groupStatisticsPanel.waitForGroupListNotDisplayed();
             await testUtils.saveScreenshot('one_group_removed');
             let groups = await groupStatisticsPanel.getDisplayNamesInGroupList();
             // 5. Verify that group stats should be correctly updated:
@@ -107,7 +109,9 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });

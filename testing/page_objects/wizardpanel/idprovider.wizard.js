@@ -76,8 +76,7 @@ class IdProviderWizard extends WizardPanel {
             await this.waitForDeleteButtonEnabled();
             return await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            await this.saveScreenshot('err_delete_in_idprovider_wizard');
-            throw new Error('Error when Delete button has been clicked ' + err);
+            await this.handleError('ID Provider Wizard, clicked on Delete button', 'err_click_delete_in_idprovider_wizard', err);
         }
     }
 
@@ -151,8 +150,7 @@ class IdProviderWizard extends WizardPanel {
             await authApplicationComboBox.selectFilteredByDisplayNameProviderApp(authAppName, XPATH.container);
             return await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_id_provider_select_application');
-            throw new Error(`ID Provider - Error when selecting the auth-application:${screenshot} ` + err);
+            await this.handleError('ID Provider - Auth Application selector', 'err_id_provider_select_application', err);
         }
     }
 
@@ -219,8 +217,7 @@ class IdProviderWizard extends WizardPanel {
             await this.waitForElementDisplayed(XPATH.aclList);
             return await this.getTextInElements(items);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_id_provider_wizard_perm');
-            throw new Error(`ID Provider, error occurred during getting permissions in the wizard-step. screenshot:${screenshot}  ` + err);
+            await this.handleError('ID Provider Wizard - tried to get permissions' , 'err_get_id_provider_permissions' , err);
         }
     }
 
@@ -239,7 +236,6 @@ class IdProviderWizard extends WizardPanel {
 
     async waitForOpened() {
         await this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout);
-        await this.pause(300);
     }
 }
 

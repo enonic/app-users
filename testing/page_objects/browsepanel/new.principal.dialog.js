@@ -9,7 +9,7 @@ const XPATH = {
     container: "//div[contains(@id,'NewPrincipalDialog')]",
     itemViewer: "//div[contains(@id,'UserTypesTreeGridItemViewer')]",
     header: "//h2[@class='title']",
-    expanderIconByName: function (name) {
+    expanderIconByName(name) {
         return lib.itemByDisplayName(name) +
                `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
     },
@@ -29,14 +29,13 @@ class NewPrincipalDialog extends Page {
         return this.clickOnElement(this.cancelButton);
     }
 
-    //clicks on User, User Group, Id Provider....
+    // clicks on User, User Group, Id Provider....
     async clickOnItem(itemName) {
         try {
             let selector = XPATH.itemViewer + lib.itemByDisplayName(itemName);
             return await this.clickOnElement(selector)
-        }catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_principal_dialog_click_item');
-            throw new Error(`New principal modal dialog, try clicking on the item: '${itemName}' , screenshot ${screenshot}: ` + err);
+        } catch (err) {
+            await this.handleError(`New principal dialog, Clicked on the item: '${itemName}'`, 'err_principal_dialog_click_item', err);
         }
     }
 
@@ -47,10 +46,9 @@ class NewPrincipalDialog extends Page {
     async waitForDialogLoaded() {
         try {
             await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
-            await this.pause(500);
+            await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_principal_dialog_load');
-            throw new Error(`New Principal dialog is not loaded screenshot${screenshot}: ` + err);
+            await this.handleError('New Principal Dialog was not loaded', 'err_principal_dialog_load', err);
         }
     }
 
@@ -81,8 +79,7 @@ class NewPrincipalDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshot('err_principal_dialog_close');
-            throw new Error(`New Principal Dialog was not closed ${screenshot} ` + err);
+            await this.handleError('New Principal Dialog was not closed', 'err_principal_dialog_close', err);
         }
     }
 
@@ -97,5 +94,6 @@ class NewPrincipalDialog extends Page {
         return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
     }
 }
+
 module.exports = NewPrincipalDialog;
 

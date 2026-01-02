@@ -29,8 +29,7 @@ class RoleWizard extends WizardPanel {
         try {
             await this.waitForElementDisplayed(xpath.container + this.displayNameInput, appConst.mediumTimeout);
         } catch (e) {
-            let screenshot = await this.saveScreenshotUniqueName('err_role_wizard');
-            throw new Error(`Role wizard was not loaded! Screenshot:${screenshot} ` + e);
+            await this.handleError('Role wizard was not loaded', 'err_role_wizard_not_loaded', e);
         }
     }
 
@@ -52,8 +51,7 @@ class RoleWizard extends WizardPanel {
             await this.waitForDeleteButtonEnabled();
             return await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_delete_button_in_role_wizard');
-            throw new Error(`Role wizard - delete button, screenshot: ${screenshot}` + err);
+            await this.handleError('Role Wizard, tried to click on Delete button', 'err_click_delete_in_role_wizard', err);
         }
     }
 
@@ -69,8 +67,7 @@ class RoleWizard extends WizardPanel {
             let selectedOptions = xpath.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
             return await this.getTextInElements(selectedOptions);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_role_members');
-            throw new Error(`Error when getting text from elements, screenshot:${screenshot} ` + err);
+            await this.handleError('Role Wizard - tried to get members', 'err_get_role_members', err);
         }
     }
 
@@ -80,7 +77,7 @@ class RoleWizard extends WizardPanel {
             await this.clickOnElement(selector);
             return await this.pause(300);
         } catch (err) {
-            await this.handleError('Role Wizard Remove member button','err_remove_member',err)
+            await this.handleError('Role Wizard Remove member button', 'err_remove_member', err)
         }
     }
 
@@ -109,8 +106,7 @@ class RoleWizard extends WizardPanel {
             let membersPrincipalCombobox = new MembersPrincipalCombobox();
             await membersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, xpath.container);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_role_member');
-            throw new Error(`Error occurred in Role wizard screenshot: ${screenshot} ` + err);
+            await this.handleError('Role Wizard - tried to add member', 'err_role_wizard_add_member', err);
         }
     }
 }

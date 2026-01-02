@@ -87,6 +87,7 @@ module.exports = {
             'ConfirmationDialog'
         );
         await confirmationDialog.clickOnYesButton();
+        await confirmationDialog.waitForDialogClosed();
         return await timingLogger.measureAsync(
             () => browsePanel.waitForSpinnerNotVisible(),
             'waitForSpinnerNotVisible',
@@ -99,6 +100,7 @@ module.exports = {
             let browsePanel = new UserBrowsePanel();
             await confirmationDialog.waitForDialogLoaded();
             await confirmationDialog.clickOnYesButton();
+            await confirmationDialog.waitForDialogClosed();
             return await browsePanel.waitForSpinnerNotVisible();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_confirm_dialog');
@@ -119,7 +121,7 @@ module.exports = {
     async navigateToUsersApp(userName, password) {
         try {
             let launcherPanel = new LauncherPanel();
-            let result = await launcherPanel.waitForPanelDisplayed(appConst.mediumTimeout);
+            let result = await launcherPanel.waitForPanelDisplayed(appConst.loginPageTimeout);
             if (result) {
                 console.log("Launcher Panel is opened, click on the `Users` link...");
                 await launcherPanel.clickOnUsersLink();
@@ -154,7 +156,7 @@ module.exports = {
             await browsePanel.waitForSpinnerNotVisible();
             return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
         } catch (err) {
-            throw new Error("Error when switching to Users App " + err);
+            throw new Error("Tried to navigate to Users App " + err);
         }
     },
 
@@ -171,13 +173,18 @@ module.exports = {
             })
         });
     },
+
     async doCloseUsersApp() {
-        let title = await this.getBrowser().getTitle();
-        if (title === appConst.BROWSER_TITLES.USERS_APP) {
-            await this.getBrowser().closeWindow();
+        let handles = await this.getBrowser().getWindowHandles();
+        for (const item of handles) {
+            let result = await this.switchAndCheckTitle(item, "Enonic XP Home");
+            if (!result) {
+                await this.getBrowser().closeWindow();
+            }
         }
-        await this.doSwitchToHome();
+        return await this.doSwitchToHome();
     },
+
     // Select a user by its display name that is present in the path
     async selectUserAndOpenWizard(displayName) {
         let browsePanel = new UserBrowsePanel();
@@ -254,7 +261,8 @@ module.exports = {
         let wizardPanel = new wizard.WizardPanel();
         let browsePanel = new UserBrowsePanel();
         await wizardPanel.waitAndClickOnSave();
-        await wizardPanel.pause(300);
+        await wizardPanel.waitForNotificationMessage();
+        await wizardPanel.pause(700);
         timingLogger.logPause(300, 'after waitAndClickOnSave');
         // Click on 'Close' icon and close the wizard:
         return await browsePanel.closeTabAndWaitForGrid(displayName);

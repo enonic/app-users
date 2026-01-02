@@ -98,6 +98,7 @@ describe('ADFS id-provider configurator dialog specification', function () {
             await confirmationDialog.waitForDialogLoaded();
             // 4. Click on 'Yes' button:
             await confirmationDialog.clickOnYesButton();
+            await confirmationDialog.waitForDialogClosed();
             // 5. Expected notification message should appear:
             await testUtils.saveScreenshot('provider_save_before_close_yes');
             let message = await idProviderWizard.waitForNotificationMessage();
@@ -139,6 +140,7 @@ describe('ADFS id-provider configurator dialog specification', function () {
             await providerConfigDialog.openDialogFillRequiredInputsAndApply('domain', 'id', 'secret');
             // 3. 'Save' button should be enabled:
             await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForNotificationMessage();
             await idProviderWizard.waitForSpinnerNotVisible();
             // 4. Click on close-icon:
             await userBrowsePanel.doClickOnCloseTabButton(testIdProvider.displayName);
@@ -193,6 +195,7 @@ describe('ADFS id-provider configurator dialog specification', function () {
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeDisplayName(groupName);
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             await userBrowsePanel.doClickOnCloseTabButton(groupName);
             await userBrowsePanel.waitForUsersGridLoaded(appConst.shortTimeout);
             // 2. Unselect the system id provider(move the focus to the grid, then unselect the item in the grid):
@@ -294,9 +297,11 @@ describe('ADFS id-provider configurator dialog specification', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
-        return console.log('specification starting: ' + this.title);
-    });
+        before(async () => {
+                if (typeof browser !== 'undefined') {
+                        await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+                }
+                return console.log('specification starting: ' + this.title);
+        });
 });
 

@@ -19,8 +19,7 @@ class UsersPrincipalCombobox extends BaseDropdown {
         try {
             await this.clickOnFilteredByDisplayNameItemAndClickOnApply(optionName, parentElement);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_principal_dropdown');
-            throw new Error(`UsersPrincipalCombobox - Error during selecting the option, screenshot: ${screenshot}` + err);
+            await this.handleError('UsersPrincipalCombobox - tried to select the option', 'err_users_dropdown', err);
         }
     }
 

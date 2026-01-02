@@ -27,6 +27,8 @@ class BrowseFilterPanel extends Page {
 
     async getNumberInUserAggregationCheckbox() {
         let userAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.userAggregationCheckbox + `/label`;
+        await this.waitForElementDisplayed(userAggregationLocator, appConst.shortTimeout);
+        await this.pause(500);
         let text = await this.getText(userAggregationLocator);
         let startIndex = text.indexOf('(');
         let endIndex = text.indexOf(')');
@@ -35,6 +37,8 @@ class BrowseFilterPanel extends Page {
 
     async getNumberInGroupAggregationCheckbox() {
         let groupAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.groupAggregationCheckbox + `/label`;
+        await this.waitForElementDisplayed(groupAggregationLocator, appConst.shortTimeout);
+        await this.pause(500);
         let text = await this.getText(groupAggregationLocator);
         let startIndex = text.indexOf('(');
         let endIndex = text.indexOf(')');
@@ -43,6 +47,8 @@ class BrowseFilterPanel extends Page {
 
     async getNumberInRoleAggregationCheckbox() {
         let roleAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + `/label`;
+        await this.waitForElementDisplayed(roleAggregationLocator, appConst.shortTimeout);
+        await this.pause(500);
         let result = await this.getText(roleAggregationLocator);
         let startIndex = result.indexOf('(');
         let endIndex = result.indexOf(')');
@@ -78,16 +84,15 @@ class BrowseFilterPanel extends Page {
         return await this.pause(400);
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.mediumTimeout);
+    async waitForOpened() {
+        return await this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.mediumTimeout);
     }
 
     async waitForClosed() {
         try {
             await this.waitForElementNotDisplayed(xpath.userAggregationCheckbox, appConst.shortTimeout)
         } catch (err) {
-            await this.saveScreenshot('err_filter_panel_not_closed');
-            throw new Error('Filter Panel was not closed. ' + err);
+            await this.handleError('Filter Panel was not closed', 'err_filter_panel_not_closed', err);
         }
     }
 
@@ -97,8 +102,7 @@ class BrowseFilterPanel extends Page {
             await this.typeTextInInput(this.searchTextInput, text);
             return await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_search_input');
-            throw new Error("Filter Panel, search input - screenshot:" + screenshot + ' ' + err);
+            await this.handleError("Filter Panel, search input", 'err_filter_panel_search_input', err);
         }
     }
 
@@ -106,8 +110,7 @@ class BrowseFilterPanel extends Page {
         try {
             await this.waitForElementDisplayed(this.clearFilterLink, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_clear_link');
-            throw new Error('Clear link should be visible, screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('Clear link should be visible', 'err_wait_clear_link_visible', err);
         }
     }
 

@@ -27,9 +27,7 @@ class UserStatisticsPanel extends UserItemStatisticsPanel {
             await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, appConst.mediumTimeout)
             return await this.getTextInElements(items);
         } catch (err) {
-            await this.saveScreenshot('err_user_statistic');
-            throw new Error("Roles & Groups was not loaded!" + err);
-
+            await this.handleError('User Statistics - Roles were not found!', 'err_user_roles', err);
         }
     }
 }

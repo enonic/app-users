@@ -35,9 +35,10 @@ describe('Role - save a role and check the number in aggregations', function () 
             await testUtils.clickOnRolesFolderAndOpenWizard();
             await roleWizard.typeDisplayName(roleName);
             await roleWizard.waitAndClickOnSave();
-            await roleWizard.pause(1000);
+            await roleWizard.waitForNotificationMessage();
             // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
+            await filterPanel.waitForOpened();
             let result = await filterPanel.getNumberInRoleAggregationCheckbox();
             assert.ok(result - initialNumber === 1, "Number of roles in Filter panel should be increased ");
         });
@@ -45,7 +46,9 @@ describe('Role - save a role and check the number in aggregations', function () 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });

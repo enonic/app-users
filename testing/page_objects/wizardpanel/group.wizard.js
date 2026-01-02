@@ -52,10 +52,12 @@ class GroupWizard extends WizardPanel {
         return this.clickOnElement(this.membersStepLink);
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(this.memberOptionsFilterInput, appConst.mediumTimeout).catch(e => {
-            throw new Error("Group wizard was not loaded! " + e);
-        });
+    async waitForOpened() {
+        try {
+            await this.waitForElementDisplayed(this.memberOptionsFilterInput, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError('Group wizard was not opened', 'err_group_wizard_not_opened', err);
+        }
     }
 
     typeDescription(description) {
@@ -102,8 +104,7 @@ class GroupWizard extends WizardPanel {
             let usersPrincipalCombobox = new UsersPrincipalCombobox();
             await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, XPATH.container);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_group_wizard_role_selector');
-            throw new Error(`Error occurred in Roles selector , screenshot: ${screenshot} ` + err);
+            await this.handleError('Group Wizard - tried to add the role:', 'err_group_wizard_role_selector', err);
         }
     }
 
@@ -119,17 +120,15 @@ class GroupWizard extends WizardPanel {
         try {
             let membersPrincipalCombobox = new MembersPrincipalCombobox();
             await membersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, XPATH.container);
-            return await this.pause(400);
+            return await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_members_selector');
-            throw new Error(`Error occurred in MembersPrincipalCombobox, screenshot: ${screenshot}  ` + err);
+            await this.handleError('Group Wizard - add member', 'err_group_wizard_add_member', err);
         }
     }
 
     async clickOnDelete() {
         await this.waitForDeleteButtonEnabled();
         await this.clickOnElement(this.deleteButton);
-        await this.pause(500);
     }
 
     async getSelectedMembers() {
@@ -143,19 +142,20 @@ class GroupWizard extends WizardPanel {
     }
 
     async removeMember(displayName) {
-        let selector = XPATH.container + XPATH.membersStepForm + lib.selectedPrincipalByDisplayName(displayName) + lib.REMOVE_ICON;
-        await this.clickOnElement(selector);
-        return await this.pause(300);
+        try {
+            let selector = XPATH.container + XPATH.membersStepForm + lib.selectedPrincipalByDisplayName(displayName) + lib.REMOVE_ICON;
+            await this.clickOnElement(selector);
+        }catch (err){
+            await this.handleError('Group Wizard - tried to remove the member', 'err_group_wizard_remove_member_icon', err);
+        }
     }
 
     async removeRole(displayName) {
         try {
             let removeRoleIcon = XPATH.container + XPATH.rolesStepForm + lib.selectedPrincipalByDisplayName(displayName) + lib.REMOVE_ICON;
             await this.clickOnElement(removeRoleIcon);
-            return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_group_wizard_remove_role_icon', err);
-            throw new Error("Group Wizard, remove role icon - " + err);
+            await this.handleError('Group Wizard - tried to remove the role', 'err_group_wizard_remove_role_icon', err);
         }
     }
 

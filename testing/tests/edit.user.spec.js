@@ -100,6 +100,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Update the display name:
             await userWizard.typeDisplayName(NEW_DISPLAY_NAME);
+            await userWizard.pause(300);
             // 3. Save new display name:
             await testUtils.saveAndCloseWizard(NEW_DISPLAY_NAME);
             // 4. Insert the new display name in Filter Panel:
@@ -175,7 +176,9 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });

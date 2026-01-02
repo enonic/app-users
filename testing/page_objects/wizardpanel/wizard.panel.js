@@ -66,9 +66,8 @@ class WizardPanel extends Page {
         try {
             await this.waitForSaveButtonEnabled();
             await this.clickOnElement(this.saveButton);
-            return await this.pause(700);
         } catch (err) {
-            await this.handleError('Click on Save button', 'err_click_save_button', err);
+            await this.handleError('Clicked on Save button', 'err_click_save_button', err);
         }
     }
 

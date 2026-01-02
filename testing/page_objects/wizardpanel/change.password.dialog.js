@@ -64,10 +64,8 @@ class ChangeUserPasswordDialog extends Page {
     async waitForClosed() {
         try {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
-            await this.pause(300);
-        } catch (error) {
-            let screenshot = await this.saveScreenshotUniqueName('err_ch_password_dlg');
-            throw new Error(`Change Password Dialog is not closed, screenshot ${screenshot} ` + error);
+        } catch (err) {
+            await this.handleError('Change Password Dialog should be closed', 'err_ch_password_dlg_close', err);
         }
     }
 
@@ -75,10 +73,8 @@ class ChangeUserPasswordDialog extends Page {
         try {
             return await this.waitForElementDisplayed(this.hidePasswordLink, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_hide_link');
-            throw new Error(`Hide link is not displayed! screenshot: ${screenshot} ` + err);
+            await this.handleError('Change Password Dialog - Hide link should be displayed', 'err_ch_password_hide_link', err);
         }
-
     }
 
     async waitForGenerateLinkDisplayed() {
@@ -100,16 +96,15 @@ class ChangeUserPasswordDialog extends Page {
     }
 
     async clickOnShowPasswordLink() {
+        await this.waitForElementDisplayed(this.showPasswordLink, appConst.mediumTimeout);
         await this.clickOnElement(this.showPasswordLink);
-        return await this.pause(300);
     }
 
     async waitForHidePasswordLinkDisplayed() {
         try {
             return await this.waitForElementDisplayed(this.hidePasswordLink, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_hide_pswd_link');
-            throw new Error(`Hide password link is not displayed! screenshot: ${screenshot} ` + err);
+            await this.handleError('Change Password Dialog - Hide password link', 'err_hide_pswd_link', err);
         }
     }
 
@@ -140,18 +135,15 @@ class ChangeUserPasswordDialog extends Page {
             await this.waitForElementDisplayed(this.userPath, appConst.mediumTimeout);
             return await this.getTextInElements(this.userPath);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_ch_pass_user_path');
-            throw new Error(`Change Password dialog: User path was not found! screenshot: ${screenshot} ` + err);
+            await this.handleError('Change Password dialog - get user path','err_get_user_path',err);
         }
     }
 
     async waitForDialogLoaded() {
         try {
             await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
-            await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_pwd_dlg_load');
-            throw new Error(`Change Password dialog was not loaded! screenshot: ${screenshot}` + err);
+            await this.handleError('Change Password dialog should be loaded','err_ch_pwd_dlg_load',err);
         }
     }
 
@@ -160,8 +152,7 @@ class ChangeUserPasswordDialog extends Page {
             let status = await this.getAttribute(XPATH.container + XPATH.passwordGenerator, 'data-i18n');
             return status;
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_pswd_dlg');
-            throw new Error(`Password status was not found! screenshot: ${screenshot} ` + err);
+            await this.handleError('Change Password dialog - get password status','err_get_pswd_status',err);
         }
     }
 
@@ -179,8 +170,7 @@ class ChangeUserPasswordDialog extends Page {
         try {
             return await this.waitForElementEnabled(this.setPasswordButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_set_pswd_btn');
-            throw new Error(`Set Password button is not enabled! screenshot: ${screenshot} ` + err);
+            await this.handleError('Change Password dialog - Set Password button should be enabled','err_wait_set_pswd_btn_enabled',err);
         }
     }
 
@@ -188,8 +178,7 @@ class ChangeUserPasswordDialog extends Page {
         try {
             return await this.waitForElementDisabled(this.setPasswordButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_set_pswd_btn_disabled');
-            throw new Error(`Set Password button is not disabled! screenshot: ${screenshot} ` + err);
+            await this.handleError('Change Password dialog - Set Password button should be disabled','err_wait_set_pswd_btn_disabled',err);
         }
     }
 

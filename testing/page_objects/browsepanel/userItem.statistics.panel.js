@@ -44,8 +44,7 @@ class UserItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout);
             return await this.getText(itemName);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('err_statistic_item_name');
-            throw new Error('Item name string was not found, screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('Item name string was not found', 'err_statistic_item_name', err);
         }
     }
 
@@ -54,8 +53,7 @@ class UserItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(XPATH.container + XPATH.header, appConst.mediumTimeout);
             return await this.getText(XPATH.container + XPATH.header + XPATH.itemPath);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_statistic_item_path');
-            throw new Error('Item path string was not found. screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('Item path string was not found', 'err_statistic_item_path', err);
         }
     }
 
@@ -64,16 +62,11 @@ class UserItemStatisticsPanel extends Page {
         await this.waitForSpinnerNotVisible();
     }
 
-    isReportDataGroupVisible() {
-        return this.isElementDisplayed(XPATH.reportDataGroup);
-    }
-
     async waitForGenerateButtonEnabled() {
         try {
             return await this.waitForElementEnabled(this.generateReportButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_generate_btn');
-            throw new Error("Generate button is not enabled, screenshot " + screenshot + ' ' + err);
+            await this.handleError('Generate button should be enabled', 'err_generate_btn_enabled', err);
         }
     }
 
@@ -81,8 +74,7 @@ class UserItemStatisticsPanel extends Page {
         try {
             await this.clickOnElement(this.generateReportButton);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_click_on_generate_report_button");
-            throw new Error("Error generate report , screenshot" + screenshot + ' ' + err);
+            await this.handleError('Clicked on Generate Report button', 'err_click_on_generate_report_button', err);
         }
     }
 
@@ -99,8 +91,7 @@ class UserItemStatisticsPanel extends Page {
         return repositoryComboBox.selectFilteredOptionAndClickOnApply(name, XPATH.reportDataGroup);
     }
 
-
-    //clicks on dropDown handle and selects draft/master
+    // clicks on dropDown handle and selects draft/master
     async clickOnDropDownHandleAndSelectBranch(optionName) {
         let dropDownHandle = XPATH.reportSelectedOptionsView + lib.BUTTONS.DROP_DOWN_HANDLE;
         await this.waitForElementDisplayed(dropDownHandle, appConst.mediumTimeout);
@@ -108,7 +99,6 @@ class UserItemStatisticsPanel extends Page {
         let optionSelector = XPATH.reportSelectedOptionsView + XPATH.repositoryBranchOption(optionName);
         await this.waitForElementDisplayed(optionSelector, appConst.mediumTimeout);
         await this.clickOnElement(optionSelector);
-        return await this.pause(400);
     }
 
     // Generate Report form, select a branch for selected repo:
@@ -120,10 +110,8 @@ class UserItemStatisticsPanel extends Page {
                 throw new Error("Branch selector was not found for the repo in Generate Report form!");
             }
             await elements[0].selectByVisibleText(branchName);
-            return await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_select_branch');
-            throw new Error(`Error occurred in Report,  Select repository form, screenshot: ${screenshot} ` + err);
+            await this.handleError('Item Statistics, tried to Select the branch', 'err_select_branch', err);
         }
     }
 
@@ -137,7 +125,7 @@ class UserItemStatisticsPanel extends Page {
         let locator = XPATH.selectedOptionByRepoName(repoName) + this.branchDropdown;
         let elements = await this.findElements(locator);
         if (elements.length === 0) {
-            throw new Error("Branch selector was not found for the repo in Generate Report form!");
+            throw new Error('Branch selector was not found for the repo in Generate Report form!');
         }
         return await elements[0].getValue();
     }

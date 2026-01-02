@@ -34,6 +34,7 @@ describe("group.wizard.spec - validation and check inputs", function () {
             await groupWizard.typeDisplayName(appConst.generateRandomName('group'));
             // 3. Save the group:
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 4. Press Ctrl/Command+Delete:
             await groupWizard.hotKeyDelete();
             // 5.`Confirmation dialog` should appear:
@@ -99,7 +100,9 @@ describe("group.wizard.spec - validation and check inputs", function () {
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });

@@ -43,7 +43,6 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await userBrowsePanel.clickOnNewButton();
             await roleWizard.waitForLoaded();
             await roleWizard.typeData(TEST_ROLE);
-            await roleWizard.pause(500);
             await roleWizard.waitAndClickOnSave();
             // Verify the notification message:
             let actualMessage = await roleWizard.waitForNotificationMessage();
@@ -58,8 +57,9 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await testUtils.clickOnRolesFolderAndOpenWizard();
             // 2. Type existing name:
             await roleWizard.typeDisplayName(TEST_ROLE.displayName);
-            await roleWizard.pause(1000);
+            await roleWizard.pause(500);
             await roleWizard.waitAndClickOnSave();
+            await roleWizard.waitForNotificationMessage();
             await testUtils.saveScreenshot('role_already_exists_notification');
             let errorMessages = await roleWizard.waitForErrorNotificationMessage();
             // 3. Error message should appear:
@@ -78,9 +78,10 @@ describe('Role Wizard and Statistics Panel spec', function () {
             await roleWizard.waitForLoaded();
             // 2. Add SU in members:
             await roleWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
-            await roleWizard.pause(700);
+            await roleWizard.pause(300);
             // 3.click on Save:
             await roleWizard.waitAndClickOnSave();
+            await roleWizard.waitForNotificationMessage();
             // 4. Get selected options in members:
             let selectedOptions = await roleWizard.getMembers();
             assert.equal(selectedOptions[0], appConst.SUPER_USER_DISPLAY_NAME, "Super User should be in selected options");
@@ -142,7 +143,9 @@ describe('Role Wizard and Statistics Panel spec', function () {
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });
