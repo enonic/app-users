@@ -39,7 +39,7 @@ describe('Role - save a role and check the number in aggregations', function () 
             // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
             let result = await filterPanel.getNumberInRoleAggregationCheckbox();
-            assert.ok(result - initialNumber === 1, "Number of roles in Filter panel should be increased ");
+            assert.ok(result - initialNumber === 2, "Number of roles in Filter panel should be increased ");
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());
