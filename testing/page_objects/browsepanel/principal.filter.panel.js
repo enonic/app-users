@@ -43,6 +43,8 @@ class BrowseFilterPanel extends Page {
 
     async getNumberInRoleAggregationCheckbox() {
         let roleAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + `/label`;
+        await this.waitForElementDisplayed(roleAggregationLocator, appConst.shortTimeout);
+        await this.pause(300);
         let result = await this.getText(roleAggregationLocator);
         let startIndex = result.indexOf('(');
         let endIndex = result.indexOf(')');
@@ -78,8 +80,8 @@ class BrowseFilterPanel extends Page {
         return await this.pause(400);
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.mediumTimeout);
+    async waitForOpened() {
+        return await this.waitForElementDisplayed(xpath.aggregationGroupView, appConst.mediumTimeout);
     }
 
     async waitForClosed() {

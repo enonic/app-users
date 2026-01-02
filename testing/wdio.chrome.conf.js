@@ -62,4 +62,9 @@ exports.config = {
     beforeSuite: function (suite) {
         browser.url(this.baseUrl);
     },
+    afterTest: async function(test, context, { error, result, duration, passed, retries }) {
+        if (!passed) {
+            await browser.deleteSession();
+        }
+    }
 };

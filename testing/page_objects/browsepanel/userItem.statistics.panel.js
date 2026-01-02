@@ -99,7 +99,6 @@ class UserItemStatisticsPanel extends Page {
         let optionSelector = XPATH.reportSelectedOptionsView + XPATH.repositoryBranchOption(optionName);
         await this.waitForElementDisplayed(optionSelector, appConst.mediumTimeout);
         await this.clickOnElement(optionSelector);
-        return await this.pause(400);
     }
 
     // Generate Report form, select a branch for selected repo:
@@ -111,7 +110,6 @@ class UserItemStatisticsPanel extends Page {
                 throw new Error("Branch selector was not found for the repo in Generate Report form!");
             }
             await elements[0].selectByVisibleText(branchName);
-            return await this.pause(200);
         } catch (err) {
             await this.handleError('Item Statistics, tried to Select the branch', 'err_select_branch', err);
         }
@@ -127,7 +125,7 @@ class UserItemStatisticsPanel extends Page {
         let locator = XPATH.selectedOptionByRepoName(repoName) + this.branchDropdown;
         let elements = await this.findElements(locator);
         if (elements.length === 0) {
-            throw new Error("Branch selector was not found for the repo in Generate Report form!");
+            throw new Error('Branch selector was not found for the repo in Generate Report form!');
         }
         return await elements[0].getValue();
     }

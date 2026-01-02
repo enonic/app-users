@@ -60,6 +60,16 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
             await this.handleError('Groups data-group is not present on the page!','err_group_list', err);
         }
     }
+
+    // wait for Groups is not displayed in Roles & Groups section
+    async waitForGroupListNotDisplayed() {
+        try {
+            let groupsList = XPATH.container + XPATH.groupList ;
+            await this.waitForElementNotDisplayed(groupsList, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError('Groups list should not be displayed  Roles & Groups section!','err_group_list', err);
+        }
+    }
 }
 
 module.exports = GroupStatisticsPanel;

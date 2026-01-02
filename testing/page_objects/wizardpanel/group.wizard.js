@@ -120,7 +120,7 @@ class GroupWizard extends WizardPanel {
         try {
             let membersPrincipalCombobox = new MembersPrincipalCombobox();
             await membersPrincipalCombobox.selectFilteredOptionAndClickOnApply(displayName, XPATH.container);
-            return await this.pause(400);
+            return await this.pause(200);
         } catch (err) {
             await this.handleError('Group Wizard - add member', 'err_group_wizard_add_member', err);
         }

@@ -99,6 +99,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             await groupWizard.waitForNotificationMessage();
             // 4. Go to the grid
             await userBrowsePanel.clickOnAppHomeButton();
+            await groupStatisticsPanel.waitForGroupListNotDisplayed();
             await testUtils.saveScreenshot('one_group_removed');
             let groups = await groupStatisticsPanel.getDisplayNamesInGroupList();
             // 5. Verify that group stats should be correctly updated:

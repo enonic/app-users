@@ -193,6 +193,7 @@ class UserBrowsePanel extends Page {
     async clickOnAppHomeButton() {
         await this.waitForElementEnabled(this.appHomeButton, appConst.mediumTimeout);
         await this.clickOnElement(this.appHomeButton);
+        await this.waitForUsersGridLoaded(appConst.mediumTimeout);
     }
 
     async clickOnEditButton() {
