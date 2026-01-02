@@ -40,6 +40,7 @@ describe("User Wizard generate password spec", function () {
             await testUtils.clickOnSystemOpenUserWizard();
             // 2. Click on 'Set password' button:
             await userWizard.clickOnSetPasswordButton();
+            await userWizard.waitForPasswordInputDisplayed();
             // 3. Click on 'generate' link in the wizard:
             await userWizard.clickOnGeneratePasswordLink();
             await testUtils.saveScreenshot('generate_password_link_clicked');

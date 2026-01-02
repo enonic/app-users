@@ -142,6 +142,7 @@ class UserWizard extends wizards.WizardPanel {
         try {
             await this.waitForSetPasswordButtonDisplayed();
             await this.clickOnElement(this.setPasswordButton);
+            await this.pause(100);
         } catch (err) {
             await this.handleError(`User Wizard, 'Set Password' button`, 'err_set_password_btn', err);
         }

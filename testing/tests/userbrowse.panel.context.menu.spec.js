@@ -145,6 +145,7 @@ describe('userbrowse.panel.context.menu.spec - User Browse Panel Context Menu sp
             // 1. Open the wizard and save new provider:
             await testUtils.openWizardAndSaveIdProvider(idProvider);
             await userBrowsePanel.closeTabAndWaitForGrid(idProvider.displayName);
+            await userBrowsePanel.pause(1000);
             await testUtils.saveScreenshot("provider_saved_" + idProvider.displayName);
             // 2. Go to browse panel and do right-click on the provider:
             await userBrowsePanel.rightClickOnRowByDisplayName(idProvider.displayName);
