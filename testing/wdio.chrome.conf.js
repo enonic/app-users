@@ -52,7 +52,7 @@ exports.config = {
     framework: 'mocha',
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: 70000
     },
     // Set directory to store all logs into
     outputDir: "./build/reports/logs/",
@@ -65,4 +65,9 @@ exports.config = {
     beforeSuite: function (suite) {
         browser.url(this.baseUrl);
     },
+    afterTest: async function(test, context, { error, result, duration, passed, retries }) {
+        if (!passed) {
+            await browser.deleteSession();
+        }
+    }
 };

@@ -110,6 +110,7 @@ jobs:
       - name: Run Selenium Tests
         id: selenium
         run: ./gradlew --refresh-dependencies :testing:${{ matrix.suite }}
+        timeout-minutes: 30
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
