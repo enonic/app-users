@@ -34,8 +34,8 @@ module.exports = {
     async findAndSelectItem(name) {
         let browsePanel = new UserBrowsePanel();
         await this.typeNameInFilterPanel(name);
-        await timingLogger.measureAsync(
-            () => browsePanel.waitForRowByNameVisible(name),
+        await timingLogger.measureAsync(async
+            () => await browsePanel.waitForRowByNameVisible(name),
             'waitForRowByNameVisible',
             name
         );
@@ -54,8 +54,8 @@ module.exports = {
         let isVisible = await filterPanel.isPanelVisible();
         if (!isVisible) {
             await browsePanel.clickOnSearchButton();
-            await timingLogger.measureAsync(
-                () => filterPanel.waitForOpened(),
+            await timingLogger.measureAsync(async
+                () => await filterPanel.waitForOpened(),
                 'waitForOpened',
                 'FilterPanel'
             );
@@ -64,8 +64,8 @@ module.exports = {
         await filterPanel.typeSearchText(name);
         await filterPanel.pause(200);
         timingLogger.logPause(200, 'after typeSearchText');
-        return await timingLogger.measureAsync(
-            () => browsePanel.waitForSpinnerNotVisible(),
+        return await timingLogger.measureAsync(async
+            () => await browsePanel.waitForSpinnerNotVisible(),
             'waitForSpinnerNotVisible',
             'after typeSearchText'
         );
@@ -74,21 +74,21 @@ module.exports = {
         let browsePanel = new UserBrowsePanel();
         let confirmationDialog = new ConfirmationDialog();
         await this.findAndSelectItem(name);
-        await timingLogger.measureAsync(
-            () => browsePanel.waitForDeleteButtonEnabled(),
+        await timingLogger.measureAsync(async
+            () => await browsePanel.waitForDeleteButtonEnabled(),
             'waitForDeleteButtonEnabled',
             name
         );
         // Removed redundant pause after waitForDeleteButtonEnabled
         await browsePanel.clickOnDeleteButton();
-        await timingLogger.measureAsync(
-            () => confirmationDialog.waitForDialogLoaded(),
+        await timingLogger.measureAsync(async
+            () => await confirmationDialog.waitForDialogLoaded(),
             'waitForDialogLoaded',
             'ConfirmationDialog'
         );
         await confirmationDialog.clickOnYesButton();
-        return await timingLogger.measureAsync(
-            () => browsePanel.waitForSpinnerNotVisible(),
+        return await timingLogger.measureAsync(async
+            () => await browsePanel.waitForSpinnerNotVisible(),
             'waitForSpinnerNotVisible',
             'after delete'
         );
@@ -189,8 +189,8 @@ module.exports = {
             displayName
         );
         await browsePanel.clickOnEditButton();
-        return await timingLogger.measureAsync(
-            () => userWizard.waitForOpened(),
+        return await timingLogger.measureAsync(async
+            () => await userWizard.waitForOpened(),
             'waitForOpened',
             'UserWizard'
         );
@@ -234,15 +234,15 @@ module.exports = {
             await browsePanel.clickOnRowByName(providerName);
         }
         //2. Open New Principal dialog:
-        await timingLogger.measureAsync(
-            () => browsePanel.waitForNewButtonEnabled(),
+        await timingLogger.measureAsync(async
+            () => await browsePanel.waitForNewButtonEnabled(),
             'waitForNewButtonEnabled',
             providerName
         );
         // Removed redundant pause after waitForNewButtonEnabled
         await browsePanel.clickOnNewButton();
-        await timingLogger.measureAsync(
-            () => newPrincipalDialog.waitForDialogLoaded(),
+        await timingLogger.measureAsync(async
+            () => await newPrincipalDialog.waitForDialogLoaded(),
             'waitForDialogLoaded',
             'NewPrincipalDialog'
         );
@@ -282,16 +282,16 @@ module.exports = {
         let userWizard = new UserWizard();
         let newPrincipalDialog = new NewPrincipalDialog();
         await browsePanel.clickOnRowByName('system');
-        await timingLogger.measureAsync(
-            () => browsePanel.waitForNewButtonEnabled(),
+        await timingLogger.measureAsync(async
+            () => await browsePanel.waitForNewButtonEnabled(),
             'waitForNewButtonEnabled',
             'system'
         );
         await browsePanel.clickOnNewButton();
         // Removed redundant pause - waitForNewButtonEnabled already waits
         await newPrincipalDialog.clickOnItem('User');
-        return await timingLogger.measureAsync(
-            () => userWizard.waitForOpened(),
+        return await timingLogger.measureAsync(async
+            () => await userWizard.waitForOpened(),
             'waitForOpened',
             'UserWizard'
         );
@@ -318,14 +318,14 @@ module.exports = {
         let roleWizard = new RoleWizard();
         try {
             await this.findAndSelectItem(displayName);
-            await timingLogger.measureAsync(
-                () => browsePanel.waitForEditButtonEnabled(),
+            await timingLogger.measureAsync(async
+                () => await browsePanel.waitForEditButtonEnabled(),
                 'waitForEditButtonEnabled',
                 displayName
             );
             await browsePanel.clickOnEditButton();
-            await timingLogger.measureAsync(
-                () => roleWizard.waitForLoaded(),
+            await timingLogger.measureAsync(async
+                () => await roleWizard.waitForLoaded(),
                 'waitForLoaded',
                 'RoleWizard'
             );
@@ -358,8 +358,8 @@ module.exports = {
         // ID provider operations may require more processing time
         await idProviderWizard.pause(500);
         timingLogger.logPause(500, 'after waitAndClickOnSave (ID provider)');
-        return await timingLogger.measureAsync(
-            () => idProviderWizard.waitForSpinnerNotVisible(),
+        return await timingLogger.measureAsync(async
+            () => await idProviderWizard.waitForSpinnerNotVisible(),
             'waitForSpinnerNotVisible',
             'after save ID provider'
         );
