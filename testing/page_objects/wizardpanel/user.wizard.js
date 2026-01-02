@@ -95,7 +95,11 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     async waitForChangePasswordButtonNotDisplayed() {
-        return await this.waitForElementNotDisplayed(this.changePasswordButton, appConst.mediumTimeout);
+        try {
+            return await this.waitForElementNotDisplayed(this.changePasswordButton, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError(`User Wizard, 'Change Password' button should not be displayed`, 'err_change_password', err);
+        }
     }
 
     async clickOnGenerateLink() {

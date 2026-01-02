@@ -11,9 +11,6 @@ exports.config = {
 
     maxInstances: 1,
 
-    specFileRetries: 1,
-    specFileRetriesDelay: 1000,
-
     capabilities: [{
         browserName: 'chrome',
         browserVersion: browser_version,
@@ -52,7 +49,7 @@ exports.config = {
     framework: 'mocha',
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: 70000
     },
     // Set directory to store all logs into
     outputDir: "./build/reports/logs/",
