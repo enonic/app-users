@@ -29,6 +29,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await groupWizard.typeData(testGroup);
             // 2. The Group has been saved:
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 3. Delete button in toolbar has been clicked:
             await groupWizard.clickOnDelete();
             await testUtils.saveScreenshot('group_wizard_confirm_delete1');
@@ -53,6 +54,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await groupWizard.typeData(groupToDelete);
             // 1. Save new group:
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 2. Click on delete:
             await groupWizard.clickOnDelete();
             // 3. Confirm:
@@ -106,6 +108,7 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await testUtils.clickOnSystemAndOpenGroupWizard();
             await groupWizard.typeData(TEST_GROUP);
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             await groupWizard.pause(1000);
             // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();

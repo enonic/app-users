@@ -34,6 +34,7 @@ describe("group.wizard.spec - validation and check inputs", function () {
             await groupWizard.typeDisplayName(appConst.generateRandomName('group'));
             // 3. Save the group:
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 4. Press Ctrl/Command+Delete:
             await groupWizard.hotKeyDelete();
             // 5.`Confirmation dialog` should appear:

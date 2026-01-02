@@ -20,8 +20,7 @@ class GridContextMenu extends Page {
             await this.waitUntilDisplayed(XPATH.container, appConst.mediumTimeout);
             return await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_grid_context_menu');
-            throw new Error(`tree grid context menu is not loaded, screenshot: ` + screenshot + '  ' + err);
+            await this.handleError('Tree grid context menu was not loaded', 'err_grid_context_menu', err);
         }
     }
 
@@ -48,10 +47,9 @@ class GridContextMenu extends Page {
             await this.getBrowser().waitUntil(async () => {
                 let text = await this.getAttribute(locator, 'class');
                 return !text.includes('disabled');
-            }, {timeout: appConst.shortTimeout, timeoutMsg: "Context menu item should be enabled"});
+            }, {timeout: appConst.shortTimeout, timeoutMsg: 'Context menu item should be enabled'});
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_context_menu');
-            throw new Error("The grid-context menu item should be enabled, screenshot: " + screenshot + ' ' + err);
+            await this.handleError('The grid-context menu item should be enabled', 'err_menu_item_enabled_check', err);
         }
     }
 
@@ -61,10 +59,9 @@ class GridContextMenu extends Page {
             await this.getBrowser().waitUntil(async () => {
                 let text = await this.getAttribute(locator, 'class');
                 return text.includes('disabled');
-            }, {timeout: appConst.shortTimeout, timeoutMsg: "Context menu item should be enabled"});
+            }, {timeout: appConst.shortTimeout, timeoutMsg: 'Context menu item should be enabled'});
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_context_menu');
-            throw new Error("The grid-context menu item should be disabled, screenshot: " + screenshot + ' ' + err);
+            await this.handleError('The grid-context menu item should be disabled', 'err_menu_item_disabled_check', err);
         }
     }
 
@@ -80,10 +77,9 @@ class GridContextMenu extends Page {
             await this.waitUntilDisplayed(menuItemLocator, appConst.mediumTimeout);
             let elements = await this.getDisplayedElements(menuItemLocator);
             await elements[0].click();
-            await this.pause(500);
+            await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_menu_item');
-            throw Error('Menu Item, screenshot  ' + screenshot + ' ' + err);
+            await this.handleError(`Grid Context Menu - Clicked on the item: '${menuItem}'`, 'err_grid_context_menu_click_item', err);
         }
     }
 }

@@ -96,6 +96,7 @@ describe("group.transitive.memberships.spec: checks transitive memberships", fun
             await userBrowsePanel.clickOnTabBarItem(group2.displayName);
             await groupWizard.removeMember(group1.displayName);
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 4. Go to the grid
             await userBrowsePanel.clickOnAppHomeButton();
             await testUtils.saveScreenshot('one_group_removed');

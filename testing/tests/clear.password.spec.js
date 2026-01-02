@@ -9,7 +9,7 @@ const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 
-describe('edit.user.spec: Edit an user - change e-mail, name and roles', function () {
+describe('clear.password.spec: tests for Clear password button', function () {
     this.timeout(appConst.TIMEOUT_SUITE);
 
     if (typeof browser === 'undefined') {
@@ -66,13 +66,12 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             await confirmationDialog.clickOnYesButton();
             await confirmationDialog.waitForDialogClosed();
             await testUtils.saveScreenshot('password_cleared');
-            // 4. Verify that 'Change password' button is not displayed now and 'Clear password' button is not displayed:
+            // 6. Verify that 'Set password' button is displayed
+            await userWizard.waitForSetPasswordButtonDisplayed();
+            // 5. Verify that 'Change password' button is not displayed now and 'Clear password' button is not displayed:
             await userWizard.waitForChangePasswordButtonNotDisplayed();
             await userWizard.waitForClearPasswordButtonNotDisplayed();
             await userWizard.waitForAddPublicKeyButtonDisplayed();
-
-            // 5. Verify that 'Set password' button is displayed
-            await userWizard.waitForSetPasswordButtonDisplayed();
             await userWizard.waitForSaveButtonEnabled();
         });
 

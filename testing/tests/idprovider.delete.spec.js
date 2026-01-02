@@ -28,13 +28,13 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             await idProviderWizard.typeData(ID_PROVIDER);
             // 2. Save the provider:
             await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForNotificationMessage();
             await idProviderWizard.waitForSpinnerNotVisible();
-            await idProviderWizard.pause(1000);
             // 3. Click on Delete button:
             await idProviderWizard.clickOnDelete();
-            await testUtils.saveScreenshot("idprovider_wizard_confirm_delete1");
+            await testUtils.saveScreenshot('id_provider_wizard_confirm_delete1');
             let confirmationDialog = new ConfirmationDialog();
-            // "Confirmation Dialog" should appear:
+            // 'Confirmation Dialog' should appear:
             await confirmationDialog.waitForDialogLoaded();
         });
 
@@ -56,11 +56,11 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             await idProviderWizard.clickOnAceMenuOperation('Administrator');
             // 5. save the 'Id Provider' - click on Save button
             await idProviderWizard.waitAndClickOnSave();
-            await idProviderWizard.pause(1000);
-            // gets selected operation
+            await idProviderWizard.waitForNotificationMessage();
+            // check the selected operation:
             let result = await idProviderWizard.getSelectedAceOperation('Everyone');
-            await testUtils.saveScreenshot('idprovider_administrator_for_everyone');
-            assert.equal(result, "Administrator", "Administrator access should be displayed for Everyone acl entry");
+            await testUtils.saveScreenshot('id_provider_administrator_for_everyone');
+            assert.equal(result, 'Administrator', "Administrator access should be displayed for Everyone acl entry");
         });
 
     // Verifies https://github.com/enonic/app-users/issues/281  Delete button does not get enabled after saving of new provider
@@ -73,8 +73,8 @@ describe("Confirm and delete 'Id Provider' in wizard and in browse panel", funct
             await testUtils.openIdProviderWizard();
             await idProviderWizard.typeData(ID_PROVIDER);
             await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForNotificationMessage();
             await idProviderWizard.waitForSpinnerNotVisible();
-            await idProviderWizard.pause(1000);
             // 2. click on Delete in wizard-toolbar:
             await idProviderWizard.clickOnDelete();
             // 3. Confirm the deleting:

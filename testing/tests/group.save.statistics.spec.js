@@ -67,6 +67,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             await groupWizard.typeData(TEST_GROUP);
             await groupWizard.pause(300);
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 2. Close the wizard:
             await userBrowsePanel.closeTabAndWaitForGrid(TEST_GROUP.displayName);
             // 3. Type the name in Filter Panel:
@@ -87,6 +88,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             // 2. Add 'Users App' role
             await groupWizard.filterOptionsAndAddRole(appConst.ROLES_DISPLAY_NAME.USERS_APP);
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 3. Verify that new role should be added in roles-step:
             let actualRoles = await groupWizard.getSelectedRoles();
             assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.USERS_APP, "Expected role gets visible in roles-step");
@@ -103,7 +105,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             // 2. Add 'Super User' in members:
             await groupWizard.filterOptionsAndAddMember(appConst.SUPER_USER_DISPLAY_NAME);
             await groupWizard.waitAndClickOnSave();
-            await groupWizard.pause(1000);
+            await groupWizard.waitForNotificationMessage();
             // 3. Verify that actual members and expected are equal:
             let actualMembers = await groupWizard.getSelectedMembers();
             await testUtils.saveScreenshot('group_member_added');
@@ -121,7 +123,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             assert.equal(actualMembers[0], appConst.SUPER_USER_DISPLAY_NAME, "Expected members should be loaded");
 
             let actualRoles = await groupStatisticsPanel.getDisplayNameOfRoles();
-            assert.equal(actualRoles.length, 1, "One roles should be loaded");
+            assert.equal(actualRoles.length, 1, 'One roles should be loaded');
             assert.equal(actualRoles[0], appConst.ROLES_DISPLAY_NAME.USERS_APP, "Expected roles should be loaded");
 
         });
@@ -136,6 +138,7 @@ describe('group.save.statistics.spec: Save a group and check the info in Statist
             await groupWizard.waitForOpened();
             await groupWizard.removeRole(appConst.ROLES_DISPLAY_NAME.USERS_APP);
             await groupWizard.waitAndClickOnSave();
+            await groupWizard.waitForNotificationMessage();
             // 2. Verify roles:
             let actualRoles = await groupWizard.getSelectedRoles();
             await testUtils.saveScreenshot('group_wizard_role_removed');

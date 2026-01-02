@@ -102,7 +102,7 @@ class Page {
 
     async clearInputText(selector) {
         let inputElement = await this.findElement(selector);
-        await inputElement.waitForDisplayed({timeout: 1000});
+        await inputElement.waitForDisplayed({timeout: appConst.mediumTimeout});
         await inputElement.clearValue();
         return await this.pause(200);
     }
@@ -202,11 +202,10 @@ class Page {
             await this.getBrowser().waitUntil(async () => {
                 return await this.isElementDisplayed(notificationXpath);
             }, {timeout: appConst.mediumTimeout});
-            await this.pause(400);
+            await this.pause(300);
             return await this.getText(notificationXpath);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_notification');
-            throw new Error(`Error occurred - notification message:screenshot:${screenshot} ` + err);
+            await this.handleError('Notification message should be shown', 'err_notification', err);
         }
     }
 
@@ -215,9 +214,7 @@ class Page {
             let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-text') and contains(.,'${expectedMessage}')]`;
             await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_notification');
-            await this.saveScreenshot(screenshot);
-            throw new Error('expected notification message was not shown, screenshot ' + screenshot + "  " + err);
+            await this.handleError(`Notification message should be shown - ${expectedMessage}`, 'err_notification', err);
         }
     }
 
@@ -227,8 +224,7 @@ class Page {
             await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
             return await this.getText(selector);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName(screenshot);
-            throw new Error(`Error notification message is not shown, screenshot:${screenshot} ` + err);
+            await this.handleError('Error Notification message should be shown', 'err_notification', err);
         }
     }
 
@@ -239,8 +235,7 @@ class Page {
             await this.pause(300);
             return await this.getTextInDisplayedElements(lib.NOTIFICATION_TEXT);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_notification');
-            throw new Error('Error when wait for notification message, screenshot: ' + screenshot + "  " + err);
+            await this.handleError('Notification messages should be shown', 'err_notification', err);
         }
     }
 
@@ -296,7 +291,6 @@ class Page {
 
     async pressEscKey() {
         await this.keys('Escape');
-        return await this.pause(300);
     }
 
     async getBrowserStatus() {

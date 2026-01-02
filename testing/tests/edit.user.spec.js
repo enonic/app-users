@@ -100,6 +100,7 @@ describe('edit.user.spec: Edit an user - change e-mail, name and roles', functio
             await testUtils.selectUserAndOpenWizard(TEST_USER.displayName);
             // 2. Update the display name:
             await userWizard.typeDisplayName(NEW_DISPLAY_NAME);
+            await userWizard.pause(300);
             // 3. Save new display name:
             await testUtils.saveAndCloseWizard(NEW_DISPLAY_NAME);
             // 4. Insert the new display name in Filter Panel:

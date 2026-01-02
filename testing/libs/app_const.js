@@ -6,6 +6,7 @@ module.exports = Object.freeze({
         return part + Math.round(Math.random() * 1000000);
     },
     //waitForTimeout
+    loginPageTimeout: 1500,
     mediumTimeout: 4000,
     TIMEOUT_4: 4000,
     TIMEOUT_7: 7000,

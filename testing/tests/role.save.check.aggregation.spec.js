@@ -35,7 +35,7 @@ describe('Role - save a role and check the number in aggregations', function () 
             await testUtils.clickOnRolesFolderAndOpenWizard();
             await roleWizard.typeDisplayName(roleName);
             await roleWizard.waitAndClickOnSave();
-            await roleWizard.pause(1000);
+            await roleWizard.waitForNotificationMessage();
             // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
             let result = await filterPanel.getNumberInRoleAggregationCheckbox();

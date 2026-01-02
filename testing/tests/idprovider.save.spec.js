@@ -103,8 +103,8 @@ describe('Id Provider specification - save and edit a provider', function () {
             await idProviderWizard.typeData(testProvider);
             // 2. click on Save button:
             await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForNotificationMessage();
             await idProviderWizard.waitForSpinnerNotVisible();
-            await idProviderWizard.pause(1500);
             // 3. Close the wizard-tab:
             await userBrowsePanel.closeTabAndWaitForGrid(testProvider.displayName);
             let result = await userBrowsePanel.isItemDisplayed(testProvider.displayName);
@@ -161,6 +161,7 @@ describe('Id Provider specification - save and edit a provider', function () {
             // 2. Update the description and save:
             await idProviderWizard.typeDescription("new description");
             await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForNotificationMessage();
             // 3. Delete button should be disabled(id provider has users):
             await idProviderWizard.waitForDeleteButtonDisabled();
         });
