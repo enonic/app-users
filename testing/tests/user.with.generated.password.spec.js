@@ -59,7 +59,9 @@ describe("Create an user with generated password and do login with the user", fu
         });
 
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });

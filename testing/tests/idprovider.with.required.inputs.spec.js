@@ -297,9 +297,11 @@ describe('ADFS id-provider configurator dialog specification', function () {
 
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
-    before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
-        return console.log('specification starting: ' + this.title);
-    });
+        before(async () => {
+                if (typeof browser !== 'undefined') {
+                        await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+                }
+                return console.log('specification starting: ' + this.title);
+        });
 });
 

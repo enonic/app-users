@@ -78,7 +78,9 @@ describe('clear.password.spec: tests for Clear password button', function () {
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });
