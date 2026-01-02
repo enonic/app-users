@@ -27,6 +27,8 @@ class BrowseFilterPanel extends Page {
 
     async getNumberInUserAggregationCheckbox() {
         let userAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.userAggregationCheckbox + `/label`;
+        await this.waitForElementDisplayed(userAggregationLocator, appConst.shortTimeout);
+        await this.pause(500);
         let text = await this.getText(userAggregationLocator);
         let startIndex = text.indexOf('(');
         let endIndex = text.indexOf(')');
@@ -35,6 +37,8 @@ class BrowseFilterPanel extends Page {
 
     async getNumberInGroupAggregationCheckbox() {
         let groupAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.groupAggregationCheckbox + `/label`;
+        await this.waitForElementDisplayed(groupAggregationLocator, appConst.shortTimeout);
+        await this.pause(500);
         let text = await this.getText(groupAggregationLocator);
         let startIndex = text.indexOf('(');
         let endIndex = text.indexOf(')');
@@ -44,7 +48,7 @@ class BrowseFilterPanel extends Page {
     async getNumberInRoleAggregationCheckbox() {
         let roleAggregationLocator = xpath.container + xpath.aggregationGroupView + xpath.roleAggregationCheckbox + `/label`;
         await this.waitForElementDisplayed(roleAggregationLocator, appConst.shortTimeout);
-        await this.pause(300);
+        await this.pause(500);
         let result = await this.getText(roleAggregationLocator);
         let startIndex = result.indexOf('(');
         let endIndex = result.indexOf(')');

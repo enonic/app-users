@@ -109,9 +109,9 @@ describe('group.delete.spec: confirm and delete a group in wizard and in Browse 
             await groupWizard.typeData(TEST_GROUP);
             await groupWizard.waitAndClickOnSave();
             await groupWizard.waitForNotificationMessage();
-            await groupWizard.pause(1000);
             // 4. Go to browse panel:
             await userBrowsePanel.clickOnAppHomeButton();
+            await groupWizard.pause(1000);
             await testUtils.saveScreenshot('group_number_after_recreating');
             // 5. Verify that the number of groups is increased
             let newNumberOfGroup = await filterPanel.getNumberInGroupAggregationCheckbox();
