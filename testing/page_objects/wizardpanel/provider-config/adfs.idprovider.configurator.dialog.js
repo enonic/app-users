@@ -82,8 +82,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
         try {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_close_id_provider_config_dialog');
-            throw new Error(`ID Provider config Dialog was not closed, screenshot:${screenshot} ` + err);
+            await this.handleError('ADFS ID Provider config Dialog should be closed' , 'err_adfs_id_provider_config_dialog_close' , err);
         }
     }
 
@@ -99,8 +98,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
             await this.waitForElementDisplayed(this.clientSecretInput, appConst.mediumTimeout);
             await this.typeTextInInput(this.clientSecretInput, text);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_client_secret_input');
-            throw new Error(`ADFS config, client secret input, screenshot:${screenshot} ` + err);
+            await this.handleError('ADFS config, client secret input' , 'err_adfs_client_secret_input' , err);
         }
     }
 
@@ -116,14 +114,12 @@ class AdfsIdProviderConfiguratorDialog extends Page {
         await this.waitForApplyButtonEnabled();
         await this.clickOnApplyButton();
         await this.waitForClosed();
-        return await this.pause(500);
     }
 
     async openProviderConfigDialog() {
         let editButton = XPATH.selectedProviderView + lib.EDIT_ICON;
         await this.clickOnElement(XPATH.permissionsTabItem);
         await this.clickOnElement(XPATH.idProviderTabItem);
-        await this.pause(700);
         await this.waitForElementDisplayed(editButton, appConst.mediumTimeout);
         await this.clickOnElement(editButton);
         await this.waitForDialogOpened();
@@ -146,8 +142,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
             let selectedOptions = XPATH.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
             return await this.getTextInElements(selectedOptions);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_adfs_get_selected_groups');
-            throw new Error(`ADFS provider config -  get selected groups screenshot:${screenshot} ` + err);
+            await this.handleError('ADFS provider config - get selected groups' , 'err_adfs_get_selected_groups' , err);
         }
     }
 
@@ -155,12 +150,12 @@ class AdfsIdProviderConfiguratorDialog extends Page {
         let locator = XPATH.container + "//button[@title='Add site key']";
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         await this.clickOnElement(locator);
-        return await this.pause(500);
     }
 
     async clickOnOccurrenceMenuButton(label) {
         let locator = XPATH.container + `//div[contains(@id,'FormItemSetView') and descendant::h5[text()='${label}']]` +
                       "//button[contains(@id,'MoreButton')]";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         return await this.clickOnElement(locator);
     }
 

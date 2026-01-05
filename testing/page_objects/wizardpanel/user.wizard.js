@@ -95,7 +95,11 @@ class UserWizard extends wizards.WizardPanel {
     }
 
     async waitForChangePasswordButtonNotDisplayed() {
-        return await this.waitForElementNotDisplayed(this.changePasswordButton, appConst.mediumTimeout);
+        try {
+            return await this.waitForElementNotDisplayed(this.changePasswordButton, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError(`User Wizard, 'Change Password' button should not be displayed`, 'err_change_password', err);
+        }
     }
 
     async clickOnGenerateLink() {
@@ -138,7 +142,7 @@ class UserWizard extends wizards.WizardPanel {
         try {
             await this.waitForSetPasswordButtonDisplayed();
             await this.clickOnElement(this.setPasswordButton);
-            await this.pause(300);
+            await this.pause(100);
         } catch (err) {
             await this.handleError(`User Wizard, 'Set Password' button`, 'err_set_password_btn', err);
         }
@@ -179,8 +183,7 @@ class UserWizard extends wizards.WizardPanel {
             await this.waitForDeleteButtonEnabled();
             await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_delete_btn');
-            throw new Error(`Error occurred after clicking on Delete button, screenshot:${screenshot} ` + err);
+            await this.handleError('User Wizard - clicked on Delete button', 'err_click_delete_user_wizard', err);
         }
     }
 
@@ -206,8 +209,7 @@ class UserWizard extends wizards.WizardPanel {
             let removeIconLocator = XPATH.container + `${lib.selectedPrincipalByDisplayName(roleDisplayName)}` + lib.REMOVE_ICON;
             return await this.waitForElementNotDisplayed(removeIconLocator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_remove_icon');
-            throw new Error(`Remove role icon should not be displayed, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Remove role icon should not be displayed  for ${roleDisplayName}`, 'err_remove_role_icon_not_displayed', err);
         }
     }
 
@@ -230,23 +232,21 @@ class UserWizard extends wizards.WizardPanel {
             await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(roleDisplayName, XPATH.container + XPATH.rolesForm);
             await this.pause(500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_role_selector');
-            throw new Error(`Error when selecting the role-option, screenshot:${screenshot} ` + err);
+            await this.handleError('User Wizard - tried to add the role:', 'err_user_wizard_role_selector', err);
         }
     }
 
     async filterOptionsAndAddGroup(groupDisplayName) {
         let usersPrincipalCombobox = new UsersPrincipalCombobox();
         await usersPrincipalCombobox.selectFilteredOptionAndClickOnApply(groupDisplayName, XPATH.container + XPATH.groupsForm);
-        return await this.pause(500);
+        return await this.pause(300);
     }
 
     async typeEmail(email) {
         try {
             return await this.typeTextInInput(this.emailInput, email);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_email_input');
-            throw new Error(`Error during inserting the text in email input, screenshot:${screenshot} ` + err);
+            await this.handleError('User Wizard - tried insert the email', 'err_type_email_input', err);
         }
     }
 
@@ -281,8 +281,7 @@ class UserWizard extends wizards.WizardPanel {
         try {
             return await this.waitForElementDisplayed(this.displayNameInput, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_user_wizard');
-            throw new Error(`User Wizard is not loaded! screenshot: ${screenshot} ` + err);
+            await this.handleError('User Wizard - should be loaded', 'err_user_wizard_opened', err);
         }
     }
 
@@ -296,9 +295,9 @@ class UserWizard extends wizards.WizardPanel {
 
     async clearPasswordInput() {
         await this.clearInputText(this.passwordInput);
-        //insert a letter:
+        // insert a letter:
         await this.typeTextInInput(this.passwordInput, 'a');
-        //press on BACKSPACE, remove the letter:
+        // press on BACKSPACE, remove the letter:
         return await this.getBrowser().keys('\uE003');
     }
 
@@ -306,8 +305,7 @@ class UserWizard extends wizards.WizardPanel {
         try {
             return await this.getTextInInput(this.passwordInput);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_get_text_password');
-            throw new Error(`Error when getting text in password input , ${screenshot} ` + err);
+            await this.handleError('User Wizard - tried to get text in password input', 'err_get_text_password_input', err);
         }
     }
 
@@ -320,10 +318,8 @@ class UserWizard extends wizards.WizardPanel {
         try {
             return await this.waitForElementNotDisplayed(this.passwordInput, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_password_input');
-            throw new Error(`Password input should not be displayed, screenshot: ${screenshot} ` + err);
+            await this.handleError('Password input should not be displayed', 'err_password_input_not_displayed', err);
         }
-
     }
 
     async typePassword(password) {
@@ -351,7 +347,6 @@ class UserWizard extends wizards.WizardPanel {
         return await this.clickOnElement(this.generateLink);
     }
 
-
     async waitForShowPasswordLinkDisplayed() {
         return await this.waitForElementDisplayed(this.showPasswordLink, appConst.mediumTimeout);
     }
@@ -360,8 +355,7 @@ class UserWizard extends wizards.WizardPanel {
         try {
             return await this.waitForElementNotDisplayed(this.addPublicKeyButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_add_public_key');
-            throw new Error(`Add public key button should not be displayed, screenshot: ${screenshot} ` + err);
+            await this.handleError('Add public key button should not be displayed', 'err_add_public_key_btn_not_displayed', err);
         }
     }
 
@@ -373,8 +367,7 @@ class UserWizard extends wizards.WizardPanel {
         try {
             return await this.waitForElementNotDisplayed(this.clearPasswordButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_clear_password');
-            throw new Error(`Clear password button should not be displayed, screenshot: ${screenshot} ` + err);
+            await this.handleError('Clear password button should not be displayed', 'err_clear_password_btn_not_displayed', err);
         }
     }
 
@@ -388,8 +381,7 @@ class UserWizard extends wizards.WizardPanel {
             await this.waitForElementDisplayed(XPATH.container + XPATH.passwordSectionRemoveIcon);
             return await this.clickOnElement(XPATH.container + XPATH.passwordSectionRemoveIcon);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_remove_password_section');
-            throw new Error(`Error occurred when tried to click on remove password section icon, screenshot: ${screenshot} ` + err);
+            await this.handleError('User Wizard - tried to click on remove password section icon', 'err_click_remove_password_section', err);
         }
     }
 }

@@ -47,6 +47,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             await testUtils.clickOnRolesFolderAndOpenWizard();
             await roleWizard.typeDisplayName(roleName);
             await roleWizard.waitAndClickOnSave();
+            await roleWizard.waitForNotificationMessage();
             await userBrowsePanel.clickOnAppHomeButton();
             // 2. Expand Roles-folder:
             await userBrowsePanel.clickOnExpanderIcon('roles');
@@ -65,6 +66,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             await roleWizard.typeData(TEST_ROLE);
             // 2. Save the role:
             await roleWizard.waitAndClickOnSave();
+            await roleWizard.waitForNotificationMessage();
             // 3. Click on Delete button:
             await roleWizard.clickOnDelete();
             await testUtils.saveScreenshot('role_wizard_confirm_delete1');
@@ -98,7 +100,7 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
             await testUtils.clickOnRolesFolderAndOpenWizard();
             await roleWizard.typeData(TEST_ROLE);
             await roleWizard.waitAndClickOnSave();
-            await roleWizard.pause(1000);
+            await roleWizard.waitForNotificationMessage();
             // 2. Click on Delete and confirm the deleting:
             await roleWizard.clickOnDelete();
             await testUtils.confirmDelete();
@@ -141,7 +143,9 @@ describe('Deleting of a role - confirm and delete it in wizard and in browse pan
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
-        await testUtils.getBrowser().maximizeWindow();
+        if (typeof browser !== 'undefined') {
+            await testUtils.getBrowser().setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
+        }
         return console.log('specification starting: ' + this.title);
     });
 });

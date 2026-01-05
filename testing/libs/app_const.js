@@ -5,7 +5,10 @@ module.exports = Object.freeze({
     generateRandomName: function (part) {
         return part + Math.round(Math.random() * 1000000);
     },
+    BROWSER_WIDTH: 1950,
+    BROWSER_HEIGHT: 1050,
     //waitForTimeout
+    loginPageTimeout: 1500,
     mediumTimeout: 4000,
     TIMEOUT_4: 4000,
     TIMEOUT_7: 7000,

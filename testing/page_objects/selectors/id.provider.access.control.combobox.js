@@ -22,8 +22,7 @@ class IdProviderAccessControlComboBox extends BaseDropdown {
         try {
             await this.clickOnFilteredByDisplayNameItemAndClickOnApply(optionName, parentElement);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_access_control_dropdown');
-            throw new Error('IdProviderAccessControlComboBox - Error during selecting the option, screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('IdProviderAccessControlComboBox - tried to select the option', 'err_access_control_dropdown', err);
         }
     }
 

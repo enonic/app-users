@@ -22,8 +22,7 @@ class RoleStatisticsPanel extends ItemStatistic {
             await this.waitForElementDisplayed(XPATH.membersDataGroup, appConst.mediumTimeout);
             return await this.getTextInElements(items);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_role_stat_members');
-            throw new Error('Members data-group was not in Role Statistic panel! screenshot: ' + screenshot + ' ' + err);
+            await this.handleError("Role Statistics - Members were not found!", 'err_role_members', err);
         }
     }
 }
