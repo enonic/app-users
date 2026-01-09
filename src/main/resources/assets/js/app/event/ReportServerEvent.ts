@@ -19,7 +19,7 @@ export class ReportServerEvent
     }
 
     static is(eventJson: NodeEventJson): boolean {
-        return eventJson.data.nodes.some(node => node.path.indexOf('/reports') === 0);
+        return eventJson.data.nodes?.some(node => node.path.indexOf('/reports') === 0);
     }
 
     static fromJson(nodeEventJson: NodeEventJson): ReportServerEvent {

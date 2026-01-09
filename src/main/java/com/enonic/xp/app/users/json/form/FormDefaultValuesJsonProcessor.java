@@ -39,24 +39,24 @@ final class FormDefaultValuesJsonProcessor
             {
                 final Input input = formItem.toInput();
                 final InputJson inputJson = (InputJson) formItemJson;
-                final Optional<GenericValue> defaultValue = input.getInputTypeConfig().optional( "default" );
-
-                if ( defaultValue.isPresent() )
-                {
-                    try
-                    {
-                        final Value value = InputTypes.BUILTIN.resolve( input.getInputType() ).createValue(
-                            ValueFactory.newString( defaultValue.get().asString() ), input.getInputTypeConfig() );
-                        if ( value != null )
-                        {
-                            inputJson.setDefaultValue( value );
-                        }
-                    }
-                    catch ( final Exception e )
-                    {
-                        // do nothing
-                    }
-                }
+//                final Optional<GenericValue> defaultValue = input.getInputTypeConfig().optional( "default" );
+//
+//                if ( defaultValue.isPresent() )
+//                {
+//                    try
+//                    {
+//                        final Value value = InputTypes.BUILTIN.resolve( input.getInputType() ).createValue(
+//                            ValueFactory.newString( defaultValue.get().asString() ), input.getInputTypeConfig() );
+//                        if ( value != null )
+//                        {
+//                            inputJson.setDefaultValue( value );
+//                        }
+//                    }
+//                    catch ( final Exception e )
+//                    {
+//                        // do nothing
+//                    }
+//                }
             }
             else if ( formItem.getType() == FORM_ITEM_SET )
             {
