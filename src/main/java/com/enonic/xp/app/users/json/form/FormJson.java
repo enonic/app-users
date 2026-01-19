@@ -29,7 +29,6 @@ public class FormJson
         {
             items.add( FormItemJsonFactory.create( formItem, localeMessageResolver ) );
         }
-        FormDefaultValuesJsonProcessor.setDefaultValues( this.form, this );
     }
 
     public List<FormItemJson> getFormItems()
