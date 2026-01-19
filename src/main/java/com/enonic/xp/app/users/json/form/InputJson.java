@@ -7,10 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import com.enonic.xp.app.users.rest.resource.schema.content.LocaleMessageResolver;
-import com.enonic.xp.data.Value;
 import com.enonic.xp.form.Input;
 import com.enonic.xp.inputtype.InputTypeName;
 import com.enonic.xp.schema.LocalizedText;
@@ -28,8 +26,6 @@ public class InputJson
     private final String inputType;
 
     private final LocaleMessageResolver localeMessageResolver;
-
-    private Value defaultValue;
 
     public InputJson( final Input input, final LocaleMessageResolver localeMessageResolver )
     {
@@ -149,20 +145,9 @@ public class InputJson
         return result;
     }
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public PropertyValueJson getDefaultValue()
-    {
-        return defaultValue != null ? new PropertyValueJson( defaultValue ) : null;
-    }
-
-    public void setDefaultValue( final Value defaultValue )
-    {
-        this.defaultValue = defaultValue;
-    }
-
     private List<Map<String, Object>> toJsonAsList( final GenericValue value )
     {
-        final List<Map<String, Object>> json = new ArrayList<>( );
+        final List<Map<String, Object>> json = new ArrayList<>();
         for ( final GenericValue property : value.values() )
         {
             json.add( toJson( property ) );
