@@ -60,7 +60,7 @@ public class UsersSecurityResourceTest
         final ArgumentCaptor<PrincipalQuery> queryCaptor = ArgumentCaptor.forClass( PrincipalQuery.class );
 
         final PrincipalQueryResult principalQueryResult = PrincipalQueryResult.create().
-            addPrincipal( User.ANONYMOUS ).
+            addPrincipal( User.anonymous() ).
             addPrincipal( Role.create().key( RoleKeys.EVERYONE ).displayName( "everyone" ).build() ).
             build();
 
