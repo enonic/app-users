@@ -27,8 +27,9 @@ import com.enonic.xp.icon.Icon;
 import com.enonic.xp.idprovider.IdProviderDescriptor;
 import com.enonic.xp.idprovider.IdProviderDescriptorService;
 import com.enonic.xp.inputtype.InputTypeName;
+import com.enonic.xp.schema.content.CmsFormFragmentService;
 import com.enonic.xp.schema.mixin.MixinService;
-import com.enonic.xp.site.SiteService;
+import com.enonic.xp.site.CmsService;
 import com.enonic.xp.util.Version;
 
 import static org.mockito.ArgumentMatchers.isA;
@@ -44,7 +45,7 @@ public class UsersApplicationResourceTest
 
     private IdProviderDescriptorService idProviderDescriptorService;
 
-    private MixinService mixinService;
+    private CmsFormFragmentService cmsFormFragmentService;
 
     @Test
     public void getIdProviderApplications()
@@ -58,7 +59,7 @@ public class UsersApplicationResourceTest
         final ApplicationDescriptor appDescriptor = createApplicationDescriptor();
         when( this.applicationDescriptorService.get( isA( ApplicationKey.class ) ) ).thenReturn( appDescriptor );
 
-        when( mixinService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
+        when( cmsFormFragmentService.inlineFormItems( isA( Form.class ) ) ).then( AdditionalAnswers.returnsFirstArg() );
         final HttpServletRequest mockRequest = mock( HttpServletRequest.class );
         when( mockRequest.getServerName() ).thenReturn( "localhost" );
         when( mockRequest.getScheme() ).thenReturn( "http" );
@@ -155,17 +156,17 @@ public class UsersApplicationResourceTest
         this.applicationService = mock( ApplicationService.class );
         this.applicationDescriptorService = mock( ApplicationDescriptorService.class );
         this.idProviderDescriptorService = mock( IdProviderDescriptorService.class );
-        this.mixinService = mock( MixinService.class );
+        this.cmsFormFragmentService = mock( CmsFormFragmentService.class );
         LocaleService localeService = mock( LocaleService.class );
-        SiteService siteService = mock( SiteService.class );
+        CmsService cmsService = mock( CmsService.class );
 
         final UsersApplicationResource resource = new UsersApplicationResource();
         resource.setApplicationService( this.applicationService );
-        resource.setSiteService( siteService );
+        resource.setCmsService( cmsService );
         resource.setIdProviderDescriptorService( this.idProviderDescriptorService );
         resource.setApplicationDescriptorService( this.applicationDescriptorService );
         resource.setLocaleService( localeService );
-        resource.setMixinService( this.mixinService );
+        resource.setCmsFormFragmentService( this.cmsFormFragmentService );
 
         return resource;
     }

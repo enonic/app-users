@@ -1,0 +1,17 @@
+displayName:
+  text: "Users"
+  i18n: "admin.tool.displayName"
+description:
+  text: "Manage users and roles"
+  i18n: "admin.tool.description"
+allow:
+  - "role:system.admin"
+  - "role:system.user.admin"
+  - "role:system.user.app"
+apis:
+  - "graphql"
+  - "i18n"
+  - "permissionReport"
+  - "admin:extension"
+  - "admin:status"
+  - "admin:event"

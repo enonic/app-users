@@ -38,7 +38,9 @@ public final class ScriptValueToIdProviderConfigTranslator
     private static void addPropertyArray( final ScriptValue array, final PropertySet parent )
     {
         final String name = array.getMember( "name" ).getValue( String.class );
-        final ValueType type = ValueTypes.getByName( array.getMember( "type" ).getValue( String.class ) );
+        final String valueType = array.getMember( "type" ).getValue( String.class );
+        final ValueType type =
+            "Instant".equals( valueType ) ? ValueTypes.getByName( ValueTypes.DATE_TIME.getName() ) : ValueTypes.getByName( valueType );
         final List<ScriptValue> values = array.getMember( "values" ).getArray();
 
         if ( values.isEmpty() )
