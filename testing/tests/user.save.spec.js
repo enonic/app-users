@@ -33,12 +33,14 @@ describe('Save User specification - save an user', function () {
             await userWizard.typeData(testUser);
             // 2. Save the user:
             await userWizard.waitAndClickOnSave();
-            await userWizard.pause(3000);
+            await userWizard.pause(2000);
             // 3. update the name:
             await userWizard.typeDisplayName(userName + '123');
             await userWizard.pause(300);
             // 4. Click on Save button:
             await userWizard.waitAndClickOnSave();
+            await userWizard.waitForNotificationMessage();
+            await userWizard.pause(1000);
             // 5. Click on 'close tab' icon
             await userBrowsePanel.doClickOnCloseTabButton(userName + '123');
             await userWizard.pause(400);
@@ -79,6 +81,8 @@ describe('Save User specification - save an user', function () {
             await testUtils.clickOnSystemOpenUserWizard();
             await userWizard.typeData(testUser);
             await userWizard.waitAndClickOnSave();
+            await userWizard.waitForNotificationMessage();
+            await userWizard.pause(1000);
             await userBrowsePanel.closeTabAndWaitForGrid(userName);
             await userBrowsePanel.pause(500);
             // 2. Expand System  then Users folders:
