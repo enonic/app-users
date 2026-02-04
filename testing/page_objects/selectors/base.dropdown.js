@@ -182,6 +182,7 @@ class BaseDropdown extends Page {
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         let result = await this.findElements(locator);
         await result[0].click();
+        return await this.pause(300);
     }
 
     // tree mode if 'active' is present in @class attribute

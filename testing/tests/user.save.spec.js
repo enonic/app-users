@@ -39,6 +39,7 @@ describe('Save User specification - save an user', function () {
             await userWizard.pause(300);
             // 4. Click on Save button:
             await userWizard.waitAndClickOnSave();
+            await userWizard.waitForNotificationMessage();
             // 5. Click on 'close tab' icon
             await userBrowsePanel.doClickOnCloseTabButton(userName + '123');
             await userWizard.pause(400);
