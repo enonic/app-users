@@ -39,7 +39,7 @@ public final class IdProviderConfigMapper
     {
         gen.map();
         gen.value( "name", value.getName() );
-        gen.value( "type", value.getValueType().getName() );
+        gen.value( "type", ValueTypes.DATE_TIME.equals( value.getValueType() ) ? "Instant" : value.getValueType().getName() );
         gen.array( "values" );
         for ( final Property property : value.getProperties() )
         {
