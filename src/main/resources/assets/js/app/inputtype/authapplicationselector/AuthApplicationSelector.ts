@@ -1,24 +1,24 @@
-import Q from 'q';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {ApplicationConfig} from '@enonic/lib-admin-ui/application/ApplicationConfig';
+import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
+import {Class} from '@enonic/lib-admin-ui/Class';
 import {PropertyArray} from '@enonic/lib-admin-ui/data/PropertyArray';
-import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {Value} from '@enonic/lib-admin-ui/data/Value';
 import {ValueType} from '@enonic/lib-admin-ui/data/ValueType';
 import {ValueTypes} from '@enonic/lib-admin-ui/data/ValueTypes';
-import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
-import {Application} from '@enonic/lib-admin-ui/application/Application';
-import {ApplicationKey} from '@enonic/lib-admin-ui/application/ApplicationKey';
-import {ApplicationConfig} from '@enonic/lib-admin-ui/application/ApplicationConfig';
-import {ApplicationConfigProvider} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
-import {InputTypeViewContext} from '@enonic/lib-admin-ui/form/inputtype/InputTypeViewContext';
 import {FormContext} from '@enonic/lib-admin-ui/form/FormContext';
-import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
-import {AuthApplicationComboBox, AuthApplicationComboBoxWrapper} from './AuthApplicationComboBox';
-import {BaseInputTypeManagingAdd} from '@enonic/lib-admin-ui/form/inputtype/support/BaseInputTypeManagingAdd';
-import {Class} from '@enonic/lib-admin-ui/Class';
-import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
+import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {Input} from '@enonic/lib-admin-ui/form/Input';
-import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
+import {ApplicationConfigProvider} from '@enonic/lib-admin-ui/form/inputtype/appconfig/ApplicationConfigProvider';
+import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
+import {InputTypeViewContext} from '@enonic/lib-admin-ui/form/inputtype/InputTypeViewContext';
+import {BaseInputTypeManagingAdd} from '@enonic/lib-admin-ui/form/inputtype/support/BaseInputTypeManagingAdd';
+import {SelectedOption} from '@enonic/lib-admin-ui/ui/selector/combobox/SelectedOption';
 import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
+import Q from 'q';
+import {AuthApplicationComboBox, AuthApplicationComboBoxWrapper} from './AuthApplicationComboBox';
+import {AuthApplicationSelectedOptionsView} from './AuthApplicationSelectedOptionsView';
+import {AuthApplicationSelectedOptionView} from './AuthApplicationSelectedOptionView';
 
 export interface AuthApplicationSelectorConfig
     extends InputTypeViewContext {
@@ -58,6 +58,10 @@ export class AuthApplicationSelector
         let readOnlyConfig = inputConfig['readOnly'] && inputConfig['readOnly'][0];
         let readOnlyValue = readOnlyConfig && readOnlyConfig['value'];
         this.readOnly = readOnlyValue === 'true';
+    }
+
+    createDefaultValue(rawValue: unknown): Value {
+        return this.getValueType().newNullValue();
     }
 
     layout(input: Input, propertyArray: PropertyArray): Q.Promise<void> {
