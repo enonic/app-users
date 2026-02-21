@@ -17,13 +17,13 @@ function getConfigAsJson() {
         toolUri: admin.getToolUrl(app.name, 'main'),
         apis: {
             graphQlUrl: portal.apiUrl({
-                api: 'graphql',
+                api: `${app.name}:graphql`,
             }),
             reportServiceUrl: portal.apiUrl({
-                api: 'permissionReport',
+                api: `${app.name}:permissionReport`,
             }),
             i18nUrl: portal.apiUrl({
-                api: 'i18n',
+                api: `${app.name}:i18n`,
             }),
         },
         eventApiUrl: portal.apiUrl({
@@ -32,9 +32,9 @@ function getConfigAsJson() {
         statusApiUrl: portal.apiUrl({
             api: 'admin:status',
         }),
-        launcherUrl: admin.widgetUrl({
+        launcherUrl: admin.extensionUrl({
             application: 'com.enonic.xp.app.main',
-            widget: 'launcher',
+            extension: 'launcher',
             params: {
                 appName: app.name,
                 theme: 'dark',
