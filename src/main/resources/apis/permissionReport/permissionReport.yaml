@@ -1,0 +1,4 @@
+kind: "API"
+title: "Permission report API"
+allow:
+  - "role:system.admin"
