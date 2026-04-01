@@ -1,3 +1,5 @@
+kind: "API"
+title: "GraphQL API"
 allow:
   - "role:system.admin"
   - "role:system.user.admin"
