@@ -12,6 +12,7 @@ allow:
 apis:
   - "graphql"
   - "i18n"
+  - "asset"
   - "permissionReport"
   - "admin:extension"
   - "admin:status"
