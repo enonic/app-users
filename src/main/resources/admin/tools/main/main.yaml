@@ -13,6 +13,7 @@ apis:
   - "graphql"
   - "i18n"
   - "asset"
+  - "com.enonic.xp.app.main:asset"
   - "permissionReport"
   - "admin:extension"
   - "admin:status"
