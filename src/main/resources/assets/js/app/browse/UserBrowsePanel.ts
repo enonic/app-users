@@ -257,6 +257,10 @@ export class UserBrowsePanel
         return this.treeActions;
     }
 
+    protected createKeyNavigator() {
+        return new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
+    }
+
     protected createListBoxPanel(): SelectableListBoxPanel<UserTreeGridItem> {
         this.treeListBox = new UserItemsTreeRootList({scrollParent: this});
 
@@ -272,8 +276,6 @@ export class UserBrowsePanel
         this.toolbar = new ListBoxToolbar<UserTreeGridItem>(this.selectionWrapper, {
             refreshAction: () => void this.treeListBox.load(),
         });
-
-        new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
 
         return new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
     }

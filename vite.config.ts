@@ -34,7 +34,7 @@ export default defineConfig(({mode}) => {
         outDir: OUT_PATH,
         emptyOutDir: false,
         target: 'ES2023',
-        minify: isProduction,
+        minify: isProduction ? 'esbuild' : false,
         sourcemap: isDevelopment ? true : false,
         ...(isProduction && {
           reportCompressedSize: true,
