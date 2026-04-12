@@ -27,6 +27,8 @@ import {DeleteUserItemRequest} from '../../graphql/useritem/DeleteUserItemReques
 import {DeleteIdProviderRequest} from '../../graphql/idprovider/DeleteIdProviderRequest';
 import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
 import {UserItemKey} from '@enonic/lib-admin-ui/security/UserItemKey';
+import {PropertyTree} from '@enonic/lib-admin-ui/data/PropertyTree';
+import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 
 export class IdProviderWizardPanel
     extends UserItemWizardPanel<IdProvider> {
@@ -148,13 +150,12 @@ export class IdProviderWizardPanel
         return wizardHeader.getName() !== '' ||
                wizardHeader.getDisplayName() !== '' ||
                !ObjectHelper.stringEquals(this.idProviderWizardStepForm.getDescription(), this.defaultIdProvider.getDescription()) ||
-               !(!idProviderConfig || idProviderConfig.equals(this.defaultIdProvider.getIdProviderConfig())) ||
+               !this.isIdProviderConfigEqual(idProviderConfig, this.defaultIdProvider.getIdProviderConfig()) ||
                !this.permissionsWizardStepForm.getPermissions().equals(this.defaultIdProvider.getPermissions());
     }
 
     isPersistedEqualsViewed(): boolean {
-        const viewedPrincipal: IdProvider = this.assembleViewedIdProvider();
-        return viewedPrincipal.equals(this.getPersistedItem());
+        return this.isIdProviderEqual(this.assembleViewedIdProvider(), this.getPersistedItem());
     }
 
     protected doLoadData(): Q.Promise<IdProvider> {
@@ -207,6 +208,83 @@ export class IdProviderWizardPanel
             .setDisplayName(this.getWizardHeader().getDisplayName())
             .setDescription(this.idProviderWizardStepForm.getDescription())
             .build();
+    }
+
+    private isIdProviderEqual(left: IdProvider, right: IdProvider): boolean {
+        if (!left || !right) {
+            return left === right;
+        }
+
+        return ObjectHelper.equals(left.getKey(), right.getKey()) &&
+               ObjectHelper.stringEquals(left.getDisplayName(), right.getDisplayName()) &&
+               ObjectHelper.stringEquals(left.getDescription(), right.getDescription()) &&
+               this.isIdProviderConfigEqual(left.getIdProviderConfig(), right.getIdProviderConfig()) &&
+               left.getPermissions().equals(right.getPermissions());
+    }
+
+    private isIdProviderConfigEqual(left: IdProviderConfig, right: IdProviderConfig): boolean {
+        if (!left || !right) {
+            return left === right;
+        }
+
+        return left.getApplicationKey().equals(right.getApplicationKey()) &&
+               ObjectHelper.objectEquals(this.normalizeConfigTree(left.getConfig()), this.normalizeConfigTree(right.getConfig()));
+    }
+
+    private normalizeConfigTree(config: PropertyTree): unknown {
+        if (!config) {
+            return null;
+        }
+
+        const copy = config.copy();
+        copy.removeEmptyValues();
+
+        return this.normalizeConfigJson(copy.toJson());
+    }
+
+    private normalizeConfigJson(value: unknown): unknown {
+        if (typeof value === 'string') {
+            return StringHelper.htmlToString(value);
+        }
+
+        if (Array.isArray(value)) {
+            const normalizedValues = value
+                .map((item) => this.normalizeConfigJson(item))
+                .filter((item) => item !== undefined);
+
+            const isPropertyArrayJson = normalizedValues.every((item) => {
+                return !!item && typeof item === 'object' && 'name' in item && 'type' in item && 'values' in item;
+            });
+
+            if (isPropertyArrayJson) {
+                return normalizedValues.sort((a, b) => {
+                    const left = a as {name: string};
+                    const right = b as {name: string};
+
+                    return left.name.localeCompare(right.name);
+                });
+            }
+
+            return normalizedValues;
+        }
+
+        if (value && typeof value === 'object') {
+            const normalizedObject = Object.keys(value as Record<string, unknown>)
+                .sort()
+                .reduce((result: Record<string, unknown>, key: string) => {
+                    const normalizedValue = this.normalizeConfigJson((value as Record<string, unknown>)[key]);
+
+                    if (normalizedValue !== undefined) {
+                        result[key] = normalizedValue;
+                    }
+
+                    return result;
+                }, {});
+
+            return Object.keys(normalizedObject).length > 0 ? normalizedObject : undefined;
+        }
+
+        return value;
     }
 
     private listenToUserItemEvents() {

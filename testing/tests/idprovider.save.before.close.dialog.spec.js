@@ -9,6 +9,7 @@ const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
+const Oauth0IdProviderConfiguratorDialog = require('../page_objects/wizardpanel/provider-config/oauth0.idprovider.config');
 
 describe("Id Provider wizard - checks unsaved changes in wizards", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -18,6 +19,7 @@ describe("Id Provider wizard - checks unsaved changes in wizards", function () {
     }
 
     const APP_ADFS_PROVIDER_NAME = appConst.ID_PROVIDERS.APP_ADFS_PROVIDER;
+    const APP_OAUTH0_PROVIDER_NAME = appConst.ID_PROVIDERS.APP_OAUTH0_PROVIDER;
 
     // Id Provider wizard - Confirmation about unsaved changes when no changes were made #689
     it("GIVEN wizard for new Id Provider is opened WHEN no changes in the wizard AND 'close' icon has been pressed THEN Confirmation dialog must not be loaded",
@@ -71,6 +73,63 @@ describe("Id Provider wizard - checks unsaved changes in wizards", function () {
             await confirmationDialog.waitForDialogLoaded();
         });
 
+    it("GIVEN new id provider has been saved WHEN 'close' icon has been clicked THEN 'Confirmation dialog' should not appear",
+        async () => {
+            let idProviderWizard = new IdProviderWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            let confirmationDialog = new ConfirmationDialog();
+            let name = userItemsBuilder.generateRandomName('provider');
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test adfs Id provider', APP_ADFS_PROVIDER_NAME, null);
+
+            // 1. Open new id provider wizard and fill in the required fields:
+            await testUtils.openIdProviderWizard(idProvider);
+            await idProviderWizard.typeData(idProvider);
+
+            // 2. Save the id provider:
+            await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForNotificationMessage();
+            await idProviderWizard.pause(1000);
+
+            // 3. Close the saved wizard tab:
+            await userBrowsePanel.doClickOnCloseTabButton(idProvider.displayName);
+            await idProviderWizard.pause(400);
+
+            // 4. Verify that confirmation dialog is not loaded after save:
+            let isLoaded = await confirmationDialog.isDialogLoaded();
+            assert.ok(isLoaded === false, 'Confirmation dialog should not be loaded, because all changes were saved');
+        });
+
+    it("GIVEN existing id provider with app config is opened WHEN 'close' icon has been clicked without edits THEN 'Confirmation dialog' should not appear",
+        async () => {
+            let idProviderWizard = new IdProviderWizard();
+            let userBrowsePanel = new UserBrowsePanel();
+            let confirmationDialog = new ConfirmationDialog();
+            let providerConfig = new Oauth0IdProviderConfiguratorDialog();
+            let name = userItemsBuilder.generateRandomName('provider');
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test oauth Id provider', APP_OAUTH0_PROVIDER_NAME, null);
+
+            // 1. Create and save a provider with application config:
+            await testUtils.openIdProviderWizard(idProvider);
+            await idProviderWizard.typeData(idProvider);
+            await providerConfig.openConfigurator();
+            await providerConfig.typeInClientIdInput('1234567');
+            await providerConfig.clickOnAddProxyButton();
+            await providerConfig.typeInProxyHostInput('http://proxy.com');
+            await providerConfig.clickOnApplyButton();
+            await idProviderWizard.waitAndClickOnSave();
+            await idProviderWizard.waitForNotificationMessage();
+            await userBrowsePanel.closeTabAndWaitForGrid(idProvider.displayName);
+
+            // 2. Reopen the saved provider and close it without making any edits:
+            await testUtils.selectAndOpenIdProvider(idProvider.displayName);
+            await userBrowsePanel.doClickOnCloseTabButton(idProvider.displayName);
+            await idProviderWizard.pause(400);
+
+            // 3. Verify that confirmation dialog is not loaded:
+            let isLoaded = await confirmationDialog.isDialogLoaded();
+            assert.ok(isLoaded === false, 'Confirmation dialog should not be loaded when no changes were made');
+        });
+
     beforeEach(() => testUtils.navigateToUsersApp());
     afterEach(() => testUtils.doCloseUsersApp());
     before(async () => {
@@ -80,4 +139,3 @@ describe("Id Provider wizard - checks unsaved changes in wizards", function () {
         return console.log('specification starting: ' + this.title);
     });
 });
-
