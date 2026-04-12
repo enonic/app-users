@@ -32,7 +32,8 @@ export class Repository
         const r = new Repository();
         r.id = json.id;
         r.name = json.name;
-        r.branches = json.branches;
+        //r.branches = json.branches;
+        r.branches = ['draft', 'master'];
         return r;
     }
 }
