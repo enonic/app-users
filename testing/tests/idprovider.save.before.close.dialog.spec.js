@@ -79,7 +79,7 @@ describe("Id Provider wizard - checks unsaved changes in wizards", function () {
             let userBrowsePanel = new UserBrowsePanel();
             let confirmationDialog = new ConfirmationDialog();
             let name = userItemsBuilder.generateRandomName('provider');
-            let idProvider = userItemsBuilder.buildIdProvider(name, 'test adfs Id provider', APP_ADFS_PROVIDER_NAME, null);
+            let idProvider = userItemsBuilder.buildIdProvider(name, 'test adfs Id provider', appConst.ID_PROVIDERS.STANDARD_ID_PROVIDER, null);
 
             // 1. Open new id provider wizard and fill in the required fields:
             await testUtils.openIdProviderWizard(idProvider);

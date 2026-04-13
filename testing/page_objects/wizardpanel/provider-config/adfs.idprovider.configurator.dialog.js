@@ -8,9 +8,9 @@ const PrincipalComboBox = require('../../selectors/principal.combobox');
 
 const XPATH = {
     container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
-    domainInput: "//input[contains(@id,'TextInput') and contains(@name,'appDomain')]",
-    clientIdInput: "//input[contains(@id,'TextInput') and contains(@name,'appClientId')]",
-    clientSecretInput: "//input[contains(@id,'TextInput') and contains(@name,'appSecret')]",
+    domainInput: "//input[contains(@name,'appDomain')]",
+    clientIdInput: "//input[contains(@name,'appClientId')]",
+    clientSecretInput: "//input[contains(@name,'appSecret')]",
     applyButton: `//button[contains(@id,'DialogButton') and child::span[text()='Apply']]`,
     cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
     selectedProviderView: `//div[contains(@id,'AuthApplicationSelectedOptionView')]`,
@@ -80,25 +80,28 @@ class AdfsIdProviderConfiguratorDialog extends Page {
 
     async waitForClosed() {
         try {
-            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+            await this.waitForElementNotDisplayed(XPATH.container);
+            await this.pause(500);
         } catch (err) {
-            await this.handleError('ADFS ID Provider config Dialog should be closed' , 'err_adfs_id_provider_config_dialog_close' , err);
+            await this.handleError('ADFS ID Provider config Dialog should be closed', 'err_adfs_id_provider_config_dialog_close', err);
         }
     }
 
-    typeInDomainInput(domain) {
-        return this.typeTextInInput(this.domainInput, domain).catch(err => {
-            this.saveScreenshot('err_type_domainInput');
-            throw new Error(err);
-        })
+    async typeInDomainInput(domain) {
+        try {
+            await this.waitForElementDisplayed(this.domainInput);
+            return this.typeTextInInput(this.domainInput, domain);
+        } catch (err) {
+            await this.handleError('ADFS config, domain input', 'err_adfs_domain_input', err);
+        }
     }
 
     async typeInClientSecretInput(text) {
         try {
-            await this.waitForElementDisplayed(this.clientSecretInput, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.clientSecretInput);
             await this.typeTextInInput(this.clientSecretInput, text);
         } catch (err) {
-            await this.handleError('ADFS config, client secret input' , 'err_adfs_client_secret_input' , err);
+            await this.handleError('ADFS config, client secret input', 'err_adfs_client_secret_input', err);
         }
     }
 
@@ -142,7 +145,7 @@ class AdfsIdProviderConfiguratorDialog extends Page {
             let selectedOptions = XPATH.container + lib.PRINCIPAL_SELECTED_OPTION + lib.H6_DISPLAY_NAME;
             return await this.getTextInElements(selectedOptions);
         } catch (err) {
-            await this.handleError('ADFS provider config - get selected groups' , 'err_adfs_get_selected_groups' , err);
+            await this.handleError('ADFS provider config - get selected groups', 'err_adfs_get_selected_groups', err);
         }
     }
 
