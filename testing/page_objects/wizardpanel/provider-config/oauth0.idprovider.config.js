@@ -6,11 +6,11 @@ const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 const XPATH = {
     container: `//div[contains(@id,'ApplicationConfiguratorDialog')]`,
-    authorizationUrl: "//input[contains(@id,'TextInput') and contains(@name,'authorizationUrl')]",
-    tokenUrl: "//input[contains(@id,'TextInput') and contains(@name,'tokenUrl')]",
-    logoutUrl: "//input[contains(@id,'TextInput') and contains(@name,'logoutUrl')]",
-    proxyHostInput: "//input[contains(@id,'TextInput') and contains(@name,'host')]",
-    clientIdInput: "//input[contains(@id,'TextInput') and contains(@name,'clientId')]",
+    authorizationUrl: "//input[contains(@name,'authorizationUrl')]",
+    tokenUrl: "//input[contains(@name,'tokenUrl')]",
+    logoutUrl: "//input[contains(@name,'logoutUrl')]",
+    proxyHostInput: "//input[contains(@name,'host')]",
+    clientIdInput: "//input[contains(@name,'clientId')]",
     applyButton: `//button[contains(@id,'DialogButton')]/span[text()='Apply']`,
     addProxyButton: "//div[contains(@id,'FormItemSetView')]//button[@title='Add Proxy' and child::span[text()='Add']]",
     cancelButton: `//button[contains(@id,'DialogButton')]/span[text()='Cancel']`,
