@@ -28,6 +28,8 @@ import {DeleteIdProviderRequest} from '../../graphql/idprovider/DeleteIdProvider
 import {DeleteUserItemResult} from '../../graphql/useritem/DeleteUserItemResult';
 import {UserItemKey} from '@enonic/lib-admin-ui/security/UserItemKey';
 import {PropertyTree} from '@enonic/lib-admin-ui/data/PropertyTree';
+import {Property} from '@enonic/lib-admin-ui/data/Property';
+import {PropertySet} from '@enonic/lib-admin-ui/data/PropertySet';
 import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 
 export class IdProviderWizardPanel
@@ -227,8 +229,11 @@ export class IdProviderWizardPanel
             return left === right;
         }
 
-        return left.getApplicationKey().equals(right.getApplicationKey()) &&
-               ObjectHelper.objectEquals(this.normalizeConfigTree(left.getConfig()), this.normalizeConfigTree(right.getConfig()));
+        const appKeyEqual = left.getApplicationKey().equals(right.getApplicationKey());
+        const leftNormalized = this.normalizeConfigTree(left.getConfig());
+        const rightNormalized = this.normalizeConfigTree(right.getConfig());
+        const configEqual = ObjectHelper.objectEquals(leftNormalized, rightNormalized);
+        return appKeyEqual && configEqual;
     }
 
     private normalizeConfigTree(config: PropertyTree): unknown {
@@ -237,7 +242,7 @@ export class IdProviderWizardPanel
         }
 
         const copy = config.copy();
-        copy.removeEmptyValues();
+        this.removeEmptyValuesFromSet(copy.getRoot());
 
         return this.normalizeConfigJson(copy.toJson());
     }
@@ -285,6 +290,30 @@ export class IdProviderWizardPanel
         }
 
         return value;
+    }
+
+    // Custom removeEmptyValues that uses type name strings instead of type.equals().
+    // Needed because the IIFE bundle and ESM modules have different ValueType class instances
+    // in production builds, causing PropertyTree.removeEmptyValues() to skip some properties.
+    private removeEmptyValuesFromSet(propertySet: PropertySet): void {
+        const toRemove: Property[] = [];
+        propertySet.forEach((property: Property) => {
+            const typeName = property.getType().toString();
+            if (property.hasNullValue()) {
+                toRemove.push(property);
+            } else if (typeName === 'String' && property.getValue().getString() === '') {
+                toRemove.push(property);
+            } else if (typeName === 'PropertySet') {
+                const childSet = property.getValue().getPropertySet();
+                this.removeEmptyValuesFromSet(childSet);
+                if (childSet.isEmpty()) {
+                    toRemove.push(property);
+                }
+            } else if (typeName === 'Boolean' && property.getValue().getBoolean() === false) {
+                toRemove.push(property);
+            }
+        });
+        propertySet.removeProperties(toRemove);
     }
 
     private listenToUserItemEvents() {
