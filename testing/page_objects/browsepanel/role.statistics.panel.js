@@ -19,7 +19,7 @@ class RoleStatisticsPanel extends ItemStatistic {
     async getDisplayNameOfMembers() {
         try {
             let items = XPATH.div + XPATH.memberList + lib.H6_DISPLAY_NAME;
-            await this.waitForElementDisplayed(XPATH.membersDataGroup, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(XPATH.membersDataGroup);
             return await this.getTextInElements(items);
         } catch (err) {
             await this.handleError("Role Statistics - Members were not found!", 'err_role_members', err);

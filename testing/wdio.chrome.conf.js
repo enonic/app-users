@@ -11,6 +11,7 @@ exports.config = {
         path.join(__dirname, './tests/*.spec.js')
     ],
 
+
     maxInstances: 1,
 
     capabilities: [{

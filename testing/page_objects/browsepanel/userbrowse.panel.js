@@ -73,7 +73,7 @@ class UserBrowsePanel extends Page {
 
     async clickOnNewButton() {
         try {
-            await this.waitForElementEnabled(this.newButton, appConst.mediumTimeout)
+            await this.waitForElementEnabled(this.newButton);
             return await this.clickOnElement(this.newButton);
         } catch (err) {
             await this.handleError('Tried to click on New button!', 'err_new_btn', err);
@@ -132,7 +132,7 @@ class UserBrowsePanel extends Page {
 
     async waitForItemNotDisplayed(itemName) {
         try {
-            await this.waitForElementNotDisplayed(xpath.rowByName(itemName), appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(xpath.rowByName(itemName));
         } catch (err) {
             await this.handleError(`The item ${itemName} should not be displayed`, 'err_item_not_displayed', err);
         }
@@ -140,7 +140,7 @@ class UserBrowsePanel extends Page {
 
     async waitForItemByDisplayNameNotDisplayed(itemDisplayName) {
         try {
-            await this.waitForElementNotDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(xpath.rowByDisplayName(itemDisplayName));
         } catch (err) {
             await this.handleError(`The item ${itemDisplayName} should not be displayed`, 'err_item_not_displayed', err);
         }
@@ -148,7 +148,7 @@ class UserBrowsePanel extends Page {
 
     async waitForItemByDisplayNameDisplayed(itemDisplayName) {
         try {
-            await this.waitForElementDisplayed(xpath.rowByDisplayName(itemDisplayName), appConst.mediumTimeout);
+            await this.waitForElementDisplayed(xpath.rowByDisplayName(itemDisplayName));
         } catch (err) {
             await this.handleError(`The item ${itemDisplayName} should be displayed`, 'err_item_displayed', err);
         }
@@ -157,7 +157,7 @@ class UserBrowsePanel extends Page {
     async clickOnRowByName(name) {
         try {
             let nameXpath = xpath.rowByName(name);
-            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(nameXpath);
             await this.clickOnElement(nameXpath);
             return await this.pause(100);
         } catch (err) {
@@ -167,7 +167,7 @@ class UserBrowsePanel extends Page {
 
     async waitForFolderUsersVisible() {
         try {
-            return this.waitForElementDisplayed(xpath.rowByName('users'), appConst.mediumTimeout);
+            return this.waitForElementDisplayed(xpath.rowByName('users'));
         } catch (err) {
             await this.handleError('Users folder was not found!', 'err_users_folder', err);
         }
@@ -175,7 +175,7 @@ class UserBrowsePanel extends Page {
 
     async clickOnSearchButton() {
         try {
-            await this.waitForElementDisplayed(this.searchButton, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.searchButton);
             return await this.clickOnElement(this.searchButton);
         } catch (err) {
             await this.handleError('Click on search button', 'err_search_button', err);
@@ -191,7 +191,7 @@ class UserBrowsePanel extends Page {
     }
 
     async clickOnAppHomeButton() {
-        await this.waitForElementEnabled(this.appHomeButton, appConst.mediumTimeout);
+        await this.waitForElementEnabled(this.appHomeButton);
         await this.clickOnElement(this.appHomeButton);
         await this.waitForUsersGridLoaded(appConst.mediumTimeout);
     }
@@ -208,7 +208,7 @@ class UserBrowsePanel extends Page {
 
     async waitForNewButtonEnabled() {
         try {
-            return await this.waitForElementEnabled(this.newButton, appConst.mediumTimeout);
+            return await this.waitForElementEnabled(this.newButton);
         } catch (err) {
             await this.handleError('New button is not enabled!', 'err_new_button', err);
         }
@@ -216,7 +216,7 @@ class UserBrowsePanel extends Page {
 
     async waitForEditButtonEnabled() {
         try {
-            await this.waitForElementEnabled(this.editButton, appConst.mediumTimeout)
+            await this.waitForElementEnabled(this.editButton);
         } catch (err) {
             await this.handleError('Edit button is not enabled !', 'err_edit_button_not_enabled', err);
         }
@@ -224,7 +224,7 @@ class UserBrowsePanel extends Page {
 
     async waitForDeleteButtonEnabled() {
         try {
-            await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout);
+            await this.waitForElementEnabled(this.deleteButton);
         } catch (err) {
             await this.handleError('Delete button is not enabled in the toolbar!', 'err_delete_button_not_enabled', err);
         }
@@ -232,24 +232,24 @@ class UserBrowsePanel extends Page {
 
     async waitForDeleteButtonDisabled() {
         try {
-            return await this.waitForElementDisabled(this.deleteButton, appConst.mediumTimeout);
+            return await this.waitForElementDisabled(this.deleteButton);
         } catch (err) {
             await this.handleError('Delete button should be disabled!', 'err_delete_button_disabled', err);
         }
     }
 
     isEditButtonEnabled() {
-        return this.waitForElementEnabled(this.editButton, appConst.mediumTimeout);
+        return this.waitForElementEnabled(this.editButton);
     }
 
     waitForEditButtonDisabled() {
-        return this.waitForElementDisabled(this.editButton, appConst.mediumTimeout);
+        return this.waitForElementDisabled(this.editButton);
     }
 
     async waitForRowByNameVisible(name) {
         try {
             let nameXpath = xpath.rowByName(name);
-            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout)
+            await this.waitForElementDisplayed(nameXpath);
         } catch (err) {
             await this.handleError(`Row with item by the name ${name} was not found`, 'err_find_item', err);
         }
@@ -258,7 +258,7 @@ class UserBrowsePanel extends Page {
     async clickCheckboxAndSelectRowByDisplayName(displayName) {
         try {
             let checkboxElement = lib.TREE_GRID.itemTreeGridListElementByDisplayName(displayName) + lib.DIV.CHECKBOX_DIV + '/label';
-            await this.waitForElementDisplayed(checkboxElement, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(checkboxElement);
             await this.clickOnElement(checkboxElement);
             return await this.pause(200);
         } catch (err) {
@@ -299,14 +299,14 @@ class UserBrowsePanel extends Page {
     // Clicks on existing Tab-Item and switches to the opened wizard:
     async clickOnTabBarItem(displayName) {
         let tabItem = xpath.itemTabByDisplayName(displayName);
-        await this.waitForElementDisplayed(tabItem, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(tabItem);
         return await this.clickOnElement(tabItem);
     }
 
     async closeTabAndWaitForGrid(displayName) {
         let closeIcon = xpath.closeItemTabButton(displayName);
-        await this.waitForElementDisplayed(closeIcon, appConst.mediumTimeout);
-        await this.waitForElementEnabled(closeIcon, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(closeIcon);
+        await this.waitForElementEnabled(closeIcon);
         await this.clickOnElement(closeIcon);
         await this.pause(500);
         let confirmationDialog = new ConfirmationDialog();
@@ -337,8 +337,8 @@ class UserBrowsePanel extends Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: 'any-selected style should be present for selection toggle'});
     }
 
-    waitForSelectionToggleNotDisplayed() {
-        return this.waitForElementNotDisplayed(this.selectionToggler, appConst.mediumTimeout);
+    async waitForSelectionToggleNotDisplayed() {
+        return await this.waitForElementNotDisplayed(this.selectionToggler);
     }
 
     // Clicks on Show/Hide selections
@@ -396,7 +396,7 @@ class UserBrowsePanel extends Page {
 
     async isRowHighlighted(displayName) {
         let locator = lib.TREE_GRID.listItemByDisplayName(displayName);
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(locator);
         let attribute = await this.getAttribute(locator, 'class');
         return attribute.includes('selected') && !attribute.includes('checked');
     }

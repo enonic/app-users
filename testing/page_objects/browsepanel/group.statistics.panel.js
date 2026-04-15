@@ -23,7 +23,7 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
 
     async clickOnTransitiveCheckBox() {
         try {
-            await this.waitForElementDisplayed(this.transitiveCheckBox, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.transitiveCheckBox);
             await this.clickOnElement(this.transitiveCheckBox);
             return await this.pause(200);
         } catch (err) {
@@ -44,7 +44,7 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
     async getDisplayNameOfRoles() {
         try {
             let itemsLocator = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
-            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup);
             return await this.getTextInElements(itemsLocator);
         } catch (err) {
             await this.handleError('Roles data-group is not present on the page!','err_role_list', err);
@@ -54,7 +54,7 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
     async getDisplayNamesInGroupList() {
         try {
             let groupsList = XPATH.container + XPATH.groupList + lib.H6_DISPLAY_NAME;
-            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, 1000);
+            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup);
             return await this.getTextInElements(groupsList);
         } catch (err) {
             await this.handleError('Groups data-group is not present on the page!','err_group_list', err);
@@ -65,7 +65,7 @@ class GroupStatisticsPanel extends UserItemStatisticsPanel {
     async waitForGroupListNotDisplayed() {
         try {
             let groupsList = XPATH.container + XPATH.groupList ;
-            await this.waitForElementNotDisplayed(groupsList, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(groupsList);
         } catch (err) {
             await this.handleError('Groups list should not be displayed  Roles & Groups section!','err_group_list', err);
         }
