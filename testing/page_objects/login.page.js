@@ -43,6 +43,11 @@ class LoginPage extends Page {
         await passwordInput.addValue(pass);
         await this.clickOnLoginButton();
     }
+
+    async isLoaded(){
+        let usernameInput = await this.findElement(this.usernameInput);
+        return await usernameInput.isDisplayed();
+    }
 }
 
 module.exports = LoginPage;

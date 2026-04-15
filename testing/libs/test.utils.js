@@ -118,21 +118,16 @@ module.exports = {
         }
         throw new Error('Browser tab with title ' + title + ' was not found');
     },
+
     async navigateToUsersApp(userName, password) {
         try {
-            let launcherPanel = new LauncherPanel();
-            let result = await launcherPanel.waitForPanelDisplayed(appConst.loginPageTimeout);
-            if (result) {
-                console.log("Launcher Panel is opened, click on the `Users` link...");
-                await launcherPanel.clickOnUsersLink();
-            } else {
-                console.log("Login Page is opened, type a password and name...");
-                await this.doLoginAndClickOnUsersLink(userName, password);
-            }
-            await this.doSwitchToUsersApp();
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnUsersLink();
+            await this.waitForUsersBrowsePanelLoaded();
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_navigation');
-            throw new Error('navigateToUsersApp  - error during navigation to Users app, screenshot: ' + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_navigate_cs');
+            throw new Error(`Error occurred after clicking on Content Studio link in Launcher Panel,  screenshot:${screenshot}  ` + err);
         }
     },
     async saveScreenshotUniqueName(namePart) {
@@ -160,6 +155,17 @@ module.exports = {
         }
     },
 
+    async waitForUsersBrowsePanelLoaded() {
+        try {
+            let browsePanel = new UserBrowsePanel();
+            console.log("Users app loads...");
+            await browsePanel.waitForSpinnerNotVisible();
+            return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
+        } catch (err) {
+            throw new Error("Tried to navigate to Users App " + err);
+        }
+    },
+
     async doSwitchToHome() {
         console.log('testUtils:switching to Home page...');
         let homePage = new HomePage();
@@ -175,14 +181,9 @@ module.exports = {
     },
 
     async doCloseUsersApp() {
-        let handles = await this.getBrowser().getWindowHandles();
-        for (const item of handles) {
-            let result = await this.switchAndCheckTitle(item, "Enonic XP Home");
-            if (!result) {
-                await this.getBrowser().closeWindow();
-            }
-        }
-        return await this.doSwitchToHome();
+        await this.getBrowser().url('http://localhost:8080/admin');
+        let homePage = new HomePage();
+        await homePage.waitForUsersLinkDisplayed();
     },
 
     // Select a user by its display name that is present in the path
@@ -412,5 +413,14 @@ module.exports = {
         }).catch(err => {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);
         })
-    }
+    },
+    async doLogin(userName, password) {
+        let loginPage = new LoginPage();
+        let result = await loginPage.isLoaded();
+        if (result) {
+            await loginPage.doLogin(userName, password);
+        }
+        let homePage = new HomePage();
+        await homePage.waitForContentLinkDisplayed();
+    },
 };
