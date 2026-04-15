@@ -24,7 +24,7 @@ class UserStatisticsPanel extends UserItemStatisticsPanel {
     async getDisplayNameOfRoles() {
         try {
             let items = XPATH.container + XPATH.roleList + lib.H6_DISPLAY_NAME;
-            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup, appConst.mediumTimeout)
+            await this.waitForElementDisplayed(XPATH.rolesAndGroupDataGroup);
             return await this.getTextInElements(items);
         } catch (err) {
             await this.handleError('User Statistics - Roles were not found!', 'err_user_roles', err);

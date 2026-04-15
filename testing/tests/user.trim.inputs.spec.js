@@ -8,7 +8,7 @@ const UserBrowsePanel = require('../page_objects/browsepanel/userbrowse.panel');
 const testUtils = require('../libs/test.utils');
 const userItemsBuilder = require('../libs/userItems.builder.js');
 const appConst = require('../libs/app_const');
-const LauncherPanel = require('../page_objects/launcher.panel');
+const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 
 describe('user.trim.inputs.spec Save user, trim the password and display name', function () {
@@ -67,17 +67,18 @@ describe('user.trim.inputs.spec Save user, trim the password and display name', 
 
     it("WHEN trimmed password have been typed in the login page AND 'login-button' pressed THEN the user should be 'logged in'",
         async () => {
-            let launcherPanel = new LauncherPanel();
+            let homePage = new HomePage();
             let loginPage = new LoginPage();
             let trimmedPassword = appConst.PASSWORD.WITH_SPACES.trim();
             await testUtils.doCloseUsersApp();
-            // 1. Do log out:
-            await launcherPanel.clickOnLogoutLink();
+            // 1. Sign out:
+            await homePage.clickOnAvatarButton();
+            await homePage.clickOnLogoutDropdownMenuItem();
             // 2. Log in with the generated password
             await loginPage.doLogin(TEST_USER.displayName, trimmedPassword);
             await testUtils.saveScreenshot('trimmed_pass_logged_in')
             // 3. Check that user is logged in:
-            await launcherPanel.waitForPanelDisplayed();
+            await homePage.waitForDashboardLinkDisplayed();
         });
 
     beforeEach(() => testUtils.navigateToUsersApp());

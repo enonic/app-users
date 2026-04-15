@@ -11,6 +11,7 @@ const appConst = require('../libs/app_const');
 const LoginPage = require('../page_objects/login.page');
 const LauncherPanel = require('../page_objects/launcher.panel');
 const ChangePasswordDialog = require('../page_objects/wizardpanel/change.password.dialog');
+const HomePage = require('../page_objects/home.page');
 
 describe("Create an user with generated password and do login with the user", function () {
     this.timeout(appConst.TIMEOUT_SUITE);
@@ -36,8 +37,9 @@ describe("Create an user with generated password and do login with the user", fu
             // 2. Type the data and click on 'Generate' button, save the generated password:
             PASSWORD = await userWizard.typeDataAndGeneratePassword(TEST_USER);
             // 4. Save the user:
-            await userWizard.waitAndClickOnSave();
             await userWizard.pause(500);
+            await userWizard.waitAndClickOnSave();
+            await userWizard.waitForNotificationMessage();
             await userBrowsePanel.closeTabAndWaitForGrid(USER_NAME);
             // 5. Verify that user is created:
             await testUtils.typeNameInFilterPanel(USER_NAME);
@@ -47,15 +49,16 @@ describe("Create an user with generated password and do login with the user", fu
 
     it("WHEN user name and 'generated' password have been typed AND 'login-button' pressed THEN user should be 'logged in'",
         async () => {
-            let launcherPanel = new LauncherPanel();
+            let homePage = new HomePage();
             let loginPage = new LoginPage();
             await testUtils.doCloseUsersApp();
-            // 1. Do log out:
-            await launcherPanel.clickOnLogoutLink();
+            // 1. Sign out:
+            await homePage.clickOnAvatarButton();
+            await homePage.clickOnLogoutDropdownMenuItem();
             // 2. Log in with the generated password
             await loginPage.doLogin(USER_NAME, PASSWORD);
             // 3. Check that user is logged in:
-            await launcherPanel.waitForPanelDisplayed();
+            await homePage.waitForDashboardLinkDisplayed();
         });
 
     before(async () => {
