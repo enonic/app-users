@@ -184,6 +184,7 @@ module.exports = {
         await this.getBrowser().url('http://localhost:8080/admin');
         let homePage = new HomePage();
         await homePage.waitForDashboardLinkDisplayed();
+        await homePage.pause(1000);
     },
 
     // Select a user by its display name that is present in the path
