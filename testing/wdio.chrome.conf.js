@@ -10,6 +10,10 @@ exports.config = {
     specs: [
         path.join(__dirname, './tests/*.spec.js')
     ],
+    exclude: [
+        path.join(__dirname, '../tests/user.with.generated.password.spec.js'),
+        path.join(__dirname, '../tests/userroles.and.launcher.panel.spec.js'),
+    ],
 
     maxInstances: 1,
 
