@@ -126,8 +126,8 @@ module.exports = {
             await homePage.clickOnUsersLink();
             await this.waitForUsersBrowsePanelLoaded();
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_navigate_cs');
-            throw new Error(`Error occurred after clicking on Content Studio link in Launcher Panel,  screenshot:${screenshot}  ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_navigate_users');
+            throw new Error(`Error occurred after clicking on Users link Home page,  screenshot:${screenshot}  ` + err);
         }
     },
     async saveScreenshotUniqueName(namePart) {
