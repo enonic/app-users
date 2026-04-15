@@ -183,7 +183,7 @@ module.exports = {
     async doCloseUsersApp() {
         await this.getBrowser().url('http://localhost:8080/admin');
         let homePage = new HomePage();
-        await homePage.waitForUsersLinkDisplayed();
+        await homePage.waitForDashboardLinkDisplayed();
     },
 
     // Select a user by its display name that is present in the path
@@ -415,12 +415,17 @@ module.exports = {
         })
     },
     async doLogin(userName, password) {
-        let loginPage = new LoginPage();
-        let result = await loginPage.isLoaded();
-        if (result) {
-            await loginPage.doLogin(userName, password);
+        try {
+            let loginPage = new LoginPage();
+            let result = await loginPage.isLoaded();
+            if (result) {
+                await loginPage.doLogin(userName, password);
+            }
+            let homePage = new HomePage();
+            await homePage.waitForUsersLinkDisplayed();
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_login');
+            throw new Error(`Login page error,  screenshot:${screenshot}  ` + err);
         }
-        let homePage = new HomePage();
-        await homePage.waitForUsersLinkDisplayed();
     },
 };
