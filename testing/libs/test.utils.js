@@ -421,6 +421,6 @@ module.exports = {
             await loginPage.doLogin(userName, password);
         }
         let homePage = new HomePage();
-        await homePage.waitForContentLinkDisplayed();
+        await homePage.waitForUsersLinkDisplayed();
     },
 };
