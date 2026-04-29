@@ -16,7 +16,7 @@ const home = {
 const selectors = {
     usersLink: 'a[id="com.enonic.xp.app.users"] span.app-tile-name',
     applicationsLink: 'a[id="com.enonic.xp.app.applications"] span.app-tile-name',
-    dashboardLink: 'a.home-app span.app-tile-name',
+    dashboardLink: 'a[id="com.enonic.xp.app.main"] span.app-tile-name',
     avatarButton:'button#avatar-button',
     logoutMenuItem: 'a.avatar-dropdown-item',
 };
@@ -69,17 +69,6 @@ class HomePage extends Page {
             await span.click();
         } catch (err) {
             await this.handleError('Applications link was not found', 'err_applications_link', err);
-        }
-    }
-
-    async clickOnDashboardLink() {
-        try {
-            const host = await this.getXpMenuShadowHost();
-            const span = await host.shadow$(selectors.dashboardLink);
-            await span.waitForDisplayed({timeout: appConst.mediumTimeout});
-            await span.click();
-        } catch (err) {
-            await this.handleError('Dashboard link was not found', 'err_dashboard_link', err);
         }
     }
 
