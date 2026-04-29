@@ -20,7 +20,7 @@ import {CONFIG, ConfigObject} from '@enonic/lib-admin-ui/util/Config';
 import {PrincipalSelector} from './app/inputtype/selector/PrincipalSelector';
 import {InputTypeManager} from '@enonic/lib-admin-ui/form/inputtype/InputTypeManager';
 import {Class} from '@enonic/lib-admin-ui/Class';
-import {LauncherHelper} from '@enonic/lib-admin-ui/util/LauncherHelper';
+import {CustomElement} from '@enonic/lib-admin-ui/dom/CustomElement';
 import {AuthContext} from '@enonic/lib-admin-ui/auth/AuthContext';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
@@ -88,7 +88,22 @@ function startApplication() {
         newPrincipalDialog.setSelection(event.getSelection()).open();
     });
 
-    LauncherHelper.appendLauncherPanel();
+    appendMenuPanel();
+}
+
+function appendMenuPanel(): void {
+    const menuUrl = CONFIG.getString('menuUrl');
+    if (!menuUrl) {
+        throw new Error('Menu URL is not defined');
+    }
+    const menuElement = CustomElement.create('xp-menu');
+    document.body.appendChild(menuElement);
+    fetch(menuUrl)
+        .then(response => response.text())
+        .then((html: string) => menuElement.setHtml(html))
+        .catch((e: Error) => {
+            throw new Error(`Failed to fetch the Menu extension panel at ${menuUrl}: ${e.toString()}`);
+        });
 }
 
 (async () => {
