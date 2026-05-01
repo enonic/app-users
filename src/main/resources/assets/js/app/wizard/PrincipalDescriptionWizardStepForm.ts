@@ -2,7 +2,6 @@ import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {TextInput} from '@enonic/lib-admin-ui/ui/text/TextInput';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
-import {Validators} from '@enonic/lib-admin-ui/ui/form/Validators';
 import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
 import {UserItemWizardStepForm} from './UserItemWizardStepForm';
 
@@ -23,7 +22,7 @@ export class PrincipalDescriptionWizardStepForm
 
     protected createFormItems(): FormItem[] {
         const descriptionFormItem: FormItem =
-            new FormItemBuilder(this.description).setLabel(i18n('field.description')).setValidator(Validators.required).build();
+            new FormItemBuilder(this.description).setLabel(i18n('field.description')).build();
         return [descriptionFormItem];
     }
 
