@@ -5,15 +5,19 @@ module.exports = {
     getByKeys: function (keys) {
         var noKeys = keys == null || (keys instanceof Array && keys.length === 0);
 
-        // users and groups have their keys as _id, but roles have them stored as key
-        var principals = noKeys ? [] : common.queryAll({
-            query:
-                common.createQueryByField('_id', keys) +
-                ' OR ' +
-                common.createQueryByField('key', keys)
-        }).hits;
+        if (noKeys) {
+            return keys instanceof Array ? [] : null;
+        }
 
-        return keys instanceof Array ? principals : common.singleOrArray(principals);
+        if (keys instanceof Array) {
+            return keys.map(function (key) {
+                return authLib.getPrincipal(key);
+            }).filter(function (principal) {
+                return principal != null;
+            });
+        }
+
+        return authLib.getPrincipal(keys);
     },
     getMemberships: function (key, transitive) {
         return authLib.getMemberships(key, transitive);
