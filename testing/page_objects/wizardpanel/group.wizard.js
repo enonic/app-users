@@ -28,6 +28,15 @@ class GroupWizard extends WizardPanel {
         return XPATH.container + "//div[contains(@id,'PrincipalDescriptionWizardStepForm')]" + lib.TEXT_INPUT;
     }
 
+    get descriptionLabel() {
+        return XPATH.container + "//div[contains(@id,'PrincipalDescriptionWizardStepForm')]//label";
+    }
+
+    async isDescriptionLabelMarkedAsRequired() {
+        let cls = await this.getAttribute(this.descriptionLabel, 'class');
+        return cls != null && cls.split(/\s+/).includes('required');
+    }
+
     get memberOptionsFilterInput() {
         return XPATH.container + XPATH.memberOptionsFilterInput + lib.DROPDOWN_SELECTOR.OPTION_FILTER_INPUT;
     }

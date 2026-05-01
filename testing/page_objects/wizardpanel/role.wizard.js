@@ -17,6 +17,15 @@ class RoleWizard extends WizardPanel {
         return xpath.container + `//div[contains(@id,'PrincipalDescriptionWizardStepForm')]` + lib.TEXT_INPUT;
     }
 
+    get descriptionLabel() {
+        return xpath.container + `//div[contains(@id,'PrincipalDescriptionWizardStepForm')]//label`;
+    }
+
+    async isDescriptionLabelMarkedAsRequired() {
+        let cls = await this.getAttribute(this.descriptionLabel, 'class');
+        return cls != null && cls.split(/\s+/).includes('required');
+    }
+
     get deleteButton() {
         return xpath.container + baseXpath.deleteButton;
     }
