@@ -95,7 +95,11 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
 
         if (existing) {
             displayName = existing.getDisplayName();
+        } else if (this.getParams().persistedDisplayName) {
+            displayName = this.getParams().persistedDisplayName;
+        }
 
+        if (existing || this.getParams().persistedDisplayName) {
             wizardHeader.toggleNameInput(false);
             wizardHeader.setAutoGenerationEnabled(false);
         }
