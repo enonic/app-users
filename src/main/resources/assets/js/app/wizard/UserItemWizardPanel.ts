@@ -22,6 +22,22 @@ import {IdProvider} from '../principal/IdProvider';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {UserItemNamedEvent} from '../event/UserItemNamedEvent';
 
+class UserItemWizardHeader extends WizardHeaderWithDisplayNameAndName {
+    private nameInputLocked = false;
+
+    lockNameInput(): void {
+        this.nameInputLocked = true;
+        super.toggleNameInput(false);
+    }
+
+    toggleNameInput(value: boolean): void {
+        if (this.nameInputLocked) {
+            return;
+        }
+        super.toggleNameInput(value);
+    }
+}
+
 export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     extends WizardPanel<USER_ITEM_TYPE> {
 
@@ -87,7 +103,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
     }
 
     protected createWizardHeader(): WizardHeaderWithDisplayNameAndName {
-        const wizardHeader: WizardHeaderWithDisplayNameAndName = new WizardHeaderWithDisplayNameAndName();
+        const wizardHeader: UserItemWizardHeader = new UserItemWizardHeader();
         const existing: USER_ITEM_TYPE = this.getPersistedItem();
         const name: string = this.getWizardNameValue();
 
@@ -100,7 +116,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         }
 
         if (existing || this.getParams().persistedDisplayName) {
-            wizardHeader.toggleNameInput(false);
+            wizardHeader.lockNameInput();
             wizardHeader.setAutoGenerationEnabled(false);
         }
 
@@ -200,7 +216,7 @@ export abstract class UserItemWizardPanel<USER_ITEM_TYPE extends UserItem>
         super.setPersistedItem(newPersistedItem);
 
         if (this.wizardHeader) {
-            (this.wizardHeader as WizardHeaderWithDisplayNameAndName).toggleNameInput(false);
+            (this.wizardHeader as UserItemWizardHeader).lockNameInput();
         }
     }
 
