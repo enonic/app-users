@@ -5,15 +5,17 @@ module.exports = {
     getByKeys: function (keys) {
         var noKeys = keys == null || (keys instanceof Array && keys.length === 0);
 
-        // users and groups have their keys as _id, but roles have them stored as key
-        var principals = noKeys ? [] : common.queryAll({
-            query:
-                common.createQueryByField('_id', keys) +
-                ' OR ' +
-                common.createQueryByField('key', keys)
-        }).hits;
+        if (noKeys) {
+            return keys instanceof Array ? [] : null;
+        }
 
-        return keys instanceof Array ? principals : common.singleOrArray(principals);
+        if (keys instanceof Array) {
+            return keys.map(fetchPrincipal).filter(function (principal) {
+                return principal != null;
+            });
+        }
+
+        return fetchPrincipal(keys);
     },
     getMemberships: function (key, transitive) {
         return authLib.getMemberships(key, transitive);
@@ -109,6 +111,25 @@ module.exports = {
     },
     Type: common.PrincipalType
 };
+
+// authLib.getPrincipal does not include the user 'profile' or the group/role
+// 'member' set, but the GraphQL Principal resolvers (publicKeys, members, ...)
+// read those fields from the source. Enrich the returned principal with the
+// extra data via authLib so callers get the shape they expect.
+function fetchPrincipal(key) {
+    var principal = authLib.getPrincipal(key);
+    if (principal == null) {
+        return null;
+    }
+    if (principal.type === 'user') {
+        principal.profile = authLib.getProfile({key: key});
+    } else {
+        principal.member = authLib.getMembers(key).map(function (member) {
+            return member.key;
+        });
+    }
+    return principal;
+}
 
 function createPrincipalQuery(idProviderKey, types, query) {
     var q = query ? textQuery(query) : '';
