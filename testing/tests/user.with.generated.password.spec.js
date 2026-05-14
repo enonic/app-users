@@ -25,7 +25,7 @@ describe("Create an user with generated password and do login with the user", fu
 
     it("WHEN new 'user' with required roles has been added THEN the user should be searchable",
         async () => {
-            let permissions = ['Administration Console Login', 'Content Manager App'];
+            let permissions = [appConst.ROLES_DISPLAY_NAME.ADMIN_CONSOLE, appConst.ROLES_DISPLAY_NAME.CM_EXPERT];
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
             let changePasswordDialog = new ChangePasswordDialog();
