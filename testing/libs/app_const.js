@@ -62,7 +62,7 @@ module.exports = Object.freeze({
     ROLES_DISPLAY_NAME: {
         CM_ADMIN: 'Content Manager Administrator',
         ADMIN_CONSOLE: 'Administration Console Login',
-        CM_APP: 'Content Manager App',
+        CM_EXPERT: 'Content Manager Expert',
         ADMINISTRATOR: 'Administrator',
         USERS_APP: 'Users App',
         AUTHENTICATED: 'Authenticated',
@@ -71,6 +71,7 @@ module.exports = Object.freeze({
     },
     ROLES_NAME: {
         CM_ADMIN: 'cms.admin',
+        CM_EXPERT: 'cms.expert',
         ADMINISTRATOR: 'system.admin',
         USERS_APP: 'system.user.admin',
     },

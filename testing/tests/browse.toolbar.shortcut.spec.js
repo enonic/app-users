@@ -39,7 +39,7 @@ describe('User Browse panel, toolbar shortcut spec', function () {
     it(`GIVEN cms role is selected WHEN 'Ctrl+del' has been pressed THEN Confirmation Dialog should appear`,
         async () => {
             let userBrowsePanel = new UserBrowsePanel();
-            let roleName = 'cms.cm.app';
+            let roleName = appConst.ROLES_NAME.CM_EXPERT;
             await testUtils.findAndSelectItem(roleName);
             await userBrowsePanel.hotKeyDelete();
             await testUtils.saveScreenshot('hot_key_delete_role');
