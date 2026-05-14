@@ -24,7 +24,7 @@ describe('Checks links on Home Page when an user has no administrator role', fun
 
     it("WHEN new user with required roles has been added THEN the user should be searchable",
         async () => {
-            let roles = ['Administration Console Login', 'Content Manager App'];
+            let roles = [appConst.ROLES_DISPLAY_NAME.ADMIN_CONSOLE, appConst.ROLES_DISPLAY_NAME.CM_EXPERT];
             userName = userItemsBuilder.generateRandomName('user');
             let userWizard = new UserWizard();
             let userBrowsePanel = new UserBrowsePanel();
