@@ -3,7 +3,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     alias( libs.plugins.enonic.defaults )
-    alias( libs.plugins.enonic.xp.app )
+    id 'com.enonic.xp.app'
     alias( libs.plugins.node.gradle )
 }
 
@@ -39,15 +39,15 @@ configurations {
 }
 
 dependencies {
-    implementation "com.enonic.xp:core-api:${version}"
-    implementation "com.enonic.xp:jaxrs-api:${version}"
-    implementation "com.enonic.xp:portal-api:${version}"
+    implementation xplibs.api.core
+    implementation xplibs.api.jaxrs
+    implementation xplibs.api.portal
 
-    include "com.enonic.xp:lib-admin:${version}"
-    include "com.enonic.xp:lib-auth:${version}"
-    include "com.enonic.xp:lib-i18n:${version}"
-    include "com.enonic.xp:lib-node:${version}"
-    include "com.enonic.xp:lib-portal:${version}"
+    include xplibs.admin
+    include xplibs.auth
+    include xplibs.i18n
+    include xplibs.node
+    include xplibs.portal
 
     include libs.lib.asset
     include libs.lib.graphql
@@ -56,21 +56,18 @@ dependencies {
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
 
-    testImplementation "com.enonic.xp:testing:${version}"
+    testImplementation "com.enonic.xp:testing:${xpVersion}"
     testImplementation platform( libs.junit.bom )
     testImplementation platform( libs.mockito.bom )
     testImplementation libs.junit.jupiter
     testImplementation libs.mockito.jupiter
-    testImplementation testFixtures( "com.enonic.xp:jaxrs-impl:${version}" )
+    testImplementation testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" )
     testRuntimeOnly libs.junit.launcher
 }
 
 app {
     name = "${group}.${projectName}"
-    displayName = 'Applications'
     systemApp = true
-    systemVersion = "${version}"
-    devSourcePaths += file( "$rootDir/../lib-admin-ui/src/main/resources" )
 }
 
 // Verification tasks
