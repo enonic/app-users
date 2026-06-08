@@ -3,7 +3,6 @@
 junit = "6.1.0"
 mockito = "5.23.0"
 enonicDefaults = "2.1.7"
-enonicXpGradle = "4.0.0-A1"
 nodeGradle = "7.1.0"
 
 # App
@@ -26,6 +25,4 @@ lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "libMusta
 
 [plugins]
 enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonicDefaults" }
-enonic-xp-app = { id = "com.enonic.xp.app", version.ref = "enonicXpGradle" }
-enonic-xp-base = { id = "com.enonic.xp.base" }
 node-gradle = { id = "com.github.node-gradle.node", version.ref = "nodeGradle" }
