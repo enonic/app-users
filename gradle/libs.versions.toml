@@ -6,9 +6,9 @@ enonicDefaults = "2.1.7"
 nodeGradle = "7.1.0"
 
 # App
-libAsset = "2.1.0-SNAPSHOT"
-libGraphql = "3.1.0-SNAPSHOT"
-libMustache = "3.1.0-SNAPSHOT"
+libAsset = "2.0.0-B1"
+libGraphql = "3.0.0-B2"
+libMustache = "3.0.0-B1"
 
 [libraries]
 
