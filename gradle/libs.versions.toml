@@ -6,7 +6,7 @@ enonicDefaults = "2.1.7"
 nodeGradle = "7.1.0"
 
 # App
-libAsset = "2.0.0"
+libAsset = "2.0.1"
 libGraphql = "3.0.0"
 libMustache = "3.0.0"
 
