@@ -45,7 +45,7 @@
     "enonic-admin-artifacts": "^2.3.2",
     "eslint": "^9.39.4",
     "globals": "^16.3.0",
-    "jiti": "^2.5.1",
+    "jiti": "^2.7.0",
     "jsondiffpatch": "^0.7.3",
     "less": "^4.6.0",
     "postcss": "^8.5.6",
