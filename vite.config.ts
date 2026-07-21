@@ -2,6 +2,7 @@ import inject from '@rollup/plugin-inject';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import path from 'path';
+import postcssNormalize from 'postcss-normalize';
 import postcssSortMediaQueries from 'postcss-sort-media-queries';
 import {fileURLToPath} from 'url';
 import {defineConfig, type UserConfig} from 'vite';
@@ -146,6 +147,7 @@ export default defineConfig(({mode}) => {
         },
         postcss: {
           plugins: [
+            postcssNormalize(),
             autoprefixer(),
             postcssSortMediaQueries({sort: 'desktop-first'}),
             ...(isProduction ? [cssnano({preset: ['default', {normalizeUrl: false}]})] : [])
