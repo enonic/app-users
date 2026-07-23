@@ -47,7 +47,7 @@
     "globals": "^17.7.0",
     "jiti": "^2.7.0",
     "jsondiffpatch": "^0.7.6",
-    "less": "^4.6.0",
+    "less": "^4.8.0",
     "postcss": "^8.5.22",
     "postcss-normalize": "^13.0.1",
     "postcss-sort-media-queries": "^6.6.2",
