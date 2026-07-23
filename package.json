@@ -44,7 +44,7 @@
     "cssnano": "^8.0.2",
     "enonic-admin-artifacts": "^2.5.0",
     "eslint": "^9.39.5",
-    "globals": "^16.3.0",
+    "globals": "^17.7.0",
     "jiti": "^2.7.0",
     "jsondiffpatch": "^0.7.6",
     "less": "^4.6.0",
