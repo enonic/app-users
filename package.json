@@ -46,7 +46,7 @@
     "eslint": "^9.39.5",
     "globals": "^16.3.0",
     "jiti": "^2.7.0",
-    "jsondiffpatch": "^0.7.3",
+    "jsondiffpatch": "^0.7.6",
     "less": "^4.6.0",
     "postcss": "^8.5.20",
     "postcss-normalize": "^13.0.1",
