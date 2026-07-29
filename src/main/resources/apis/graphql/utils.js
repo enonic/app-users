@@ -9,5 +9,5 @@ exports.toArray = function(object) {
 };
 
 exports.toInt = function(number, defaultValue) {
-    return number == null ? defaultValue.intValue() : number.intValue();
+    return number == null ? defaultValue : Number(number);
 };
