@@ -112,8 +112,8 @@ importers:
         specifier: ^13.0.1
         version: 13.0.1(browserslist@4.28.6)(postcss@8.5.22)
       postcss-sort-media-queries:
-        specifier: ^6.6.2
-        version: 6.6.2(postcss@8.5.22)
+        specifier: ^6.7.1
+        version: 6.7.1(postcss@8.5.22)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -837,6 +837,10 @@ packages:
     resolution: {integrity: sha512-7oFy703dxfY3/NLxC1fh2SUCQ0H9rmAY+5EpDVfXjUTTs+HEwR2nYaqLv+GWcTsumwxPfiz6CzCNkwXwBUwqCA==}
     engines: {node: 18 || 20 || >=22}
 
+  brace-expansion@5.0.8:
+    resolution: {integrity: sha512-JZyDyq3D4AUifKTPOB7DELf6XsB3WdPuNxCtob1vFXPsSXhdAiHBWJ/tJ8HAc9aH84BK+5JFZLNkJKx3G9kzQg==}
+    engines: {node: 20 || >=22}
+
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
@@ -1351,6 +1355,10 @@ packages:
     resolution: {integrity: sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==}
     engines: {node: 18 || 20 || >=22}
 
+  minimatch@10.2.6:
+    resolution: {integrity: sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==}
+    engines: {node: 18 || 20 || >=22}
+
   minimatch@3.1.5:
     resolution: {integrity: sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w==}
 
@@ -1604,11 +1612,11 @@ packages:
     resolution: {integrity: sha512-HeP7D2wyhkR+XaK6v4W8oRF62Dsz4flyuczALJp61GckGm42u1saSSJ/0auvcBqxs3jMRFEcPK34At/0JBKdOg==}
     engines: {node: '>=4'}
 
-  postcss-sort-media-queries@6.6.2:
-    resolution: {integrity: sha512-4whmLOUtFFX2V0w5JM7Wqp1Du+DiOsfgFhJuxdy1d5kBoNy/dfkq4He8eNDGI3ZEJlCk95yQhG75aVcEMKGaFQ==}
+  postcss-sort-media-queries@6.7.1:
+    resolution: {integrity: sha512-NU+cVdLaPMYspggR6JSpk7YdAoRY9Y9jNacHRjA/5vJ0iP6/Stgg2FV82IVnryTQKbtp7B5cQ33KrWbVe07VSQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      postcss: ^8.5.6
+      postcss: ^8.5.21
 
   postcss-svgo@8.0.1:
     resolution: {integrity: sha512-HpnvWii7W0/FPrsejJa6ZTi0kNtTJP/Iba7CUMPX0xPV6QpnndOp+SDP74tFtgjA2cYKYNWJPOlmLXMsvi/9yA==}
@@ -2342,7 +2350,7 @@ snapshots:
       '@typescript-eslint/types': 8.56.0
       '@typescript-eslint/visitor-keys': 8.56.0
       debug: 4.4.3
-      minimatch: 10.2.5
+      minimatch: 10.2.6
       semver: 7.8.5
       tinyglobby: 0.2.17
       ts-api-utils: 2.5.0(typescript@5.9.3)
@@ -2406,6 +2414,10 @@ snapshots:
   boolbase@1.0.0: {}
 
   brace-expansion@5.0.7:
+    dependencies:
+      balanced-match: 4.0.4
+
+  brace-expansion@5.0.8:
     dependencies:
       balanced-match: 4.0.4
 
@@ -2960,6 +2972,10 @@ snapshots:
     dependencies:
       brace-expansion: 5.0.7
 
+  minimatch@10.2.6:
+    dependencies:
+      brace-expansion: 5.0.8
+
   minimatch@3.1.5:
     dependencies:
       brace-expansion: 5.0.7
@@ -3194,7 +3210,7 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss-sort-media-queries@6.6.2(postcss@8.5.22):
+  postcss-sort-media-queries@6.7.1(postcss@8.5.22):
     dependencies:
       postcss: 8.5.22
       sort-css-media-queries: 3.0.5
