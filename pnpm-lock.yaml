@@ -103,8 +103,8 @@ importers:
         specifier: ^0.7.6
         version: 0.7.6
       less:
-        specifier: ^4.8.0
-        version: 4.8.0
+        specifier: ^4.8.1
+        version: 4.8.1
       postcss:
         specifier: ^8.5.22
         version: 8.5.22
@@ -122,7 +122,7 @@ importers:
         version: 8.42.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       vite:
         specifier: ^8.1.5
-        version: 8.1.5(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.8.0)(tsx@4.20.5)
+        version: 8.1.5(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.8.1)(tsx@4.20.5)
 
 packages:
 
@@ -1231,8 +1231,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  less@4.8.0:
-    resolution: {integrity: sha512-7Y7DJBMbsW29UGjOG6NGvxQEx71AaDcrryBwYCMaFwn0kj8FkSueKN9r9WexVOetKEhXh38kL++WJncfkEpS+g==}
+  less@4.8.1:
+    resolution: {integrity: sha512-jQ3lRIo1aUtiWVYXZ7mk4+V4BjCGswF3IxTLJ+4RUta8ZiHh8lhkig2G8dya2eCcyR1dYUvzuV46EkJN8PSwww==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -1687,8 +1687,8 @@ packages:
   sanitize.css@13.0.0:
     resolution: {integrity: sha512-ZRwKbh/eQ6w9vmTjkuG0Ioi3HBwPFce0O+v//ve+aOq1oeCy7jMV2qzzAlpsNuqpqCBjjriM1lbtZbF/Q8jVyA==}
 
-  sax@1.6.0:
-    resolution: {integrity: sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA==}
+  sax@1.6.1:
+    resolution: {integrity: sha512-42tBVwLWnaQvW5zc4HbZrTuWccECCZfBi92FDuwtqxasH+JbPB3/FOKb1m222K42R4WxuxzzMsTswfzgtSu64Q==}
     engines: {node: '>=11.0.0'}
 
   semver@7.7.2:
@@ -2870,7 +2870,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  less@4.8.0:
+  less@4.8.1:
     dependencies:
       copy-anything: 3.0.5
       parse-node-version: 1.0.1
@@ -2997,7 +2997,7 @@ snapshots:
     dependencies:
       debug: 3.2.7
       iconv-lite: 0.4.24
-      sax: 1.6.0
+      sax: 1.6.1
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -3005,7 +3005,7 @@ snapshots:
   needle@3.5.0:
     dependencies:
       iconv-lite: 0.6.3
-      sax: 1.6.0
+      sax: 1.6.1
     optional: true
 
   node-releases@2.0.51: {}
@@ -3291,7 +3291,7 @@ snapshots:
 
   sanitize.css@13.0.0: {}
 
-  sax@1.6.0: {}
+  sax@1.6.1: {}
 
   semver@7.7.2: {}
 
@@ -3339,7 +3339,7 @@ snapshots:
       css-what: 6.2.2
       csso: 5.0.5
       picocolors: 1.1.1
-      sax: 1.6.0
+      sax: 1.6.1
 
   tinyglobby@0.2.17:
     dependencies:
@@ -3405,7 +3405,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite@8.1.5(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.8.0)(tsx@4.20.5):
+  vite@8.1.5(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.8.1)(tsx@4.20.5):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.5
@@ -3417,7 +3417,7 @@ snapshots:
       esbuild: 0.27.2
       fsevents: 2.3.3
       jiti: 2.7.0
-      less: 4.8.0
+      less: 4.8.1
       tsx: 4.20.5
 
   which@2.0.2:
