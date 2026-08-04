@@ -156,6 +156,10 @@ tasks.named( 'test' ).configure {
     jvmArgs '-XX:TieredStopAtLevel=1'
 }
 
+xp {
+    scriptEngines = ['Nashorn', 'GraalJS']
+}
+
 tasks.named( 'jacocoTestReport' ).configure {
     reports {
         xml.required = true
