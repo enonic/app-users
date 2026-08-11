@@ -40,7 +40,7 @@ export class AddPublicKeyRequest
         return vars;
     }
 
-    /* eslint-disable max-len */
+     
     getMutation(): string {
         return `mutation ($userKey: String!, $publicKey: String!, $label: String!) {
             addPublicKey(userKey: $userKey, publicKey: $publicKey, label: $label) {
@@ -52,7 +52,7 @@ export class AddPublicKeyRequest
         }`;
     }
 
-    /* eslint-enable max-len */
+     
 
     sendAndParse(): Q.Promise<PublicKey> {
         return this.mutate().then((json: AddPublicKeyMutationResponse) => this.fromJson(json.addPublicKey, json.error));

@@ -17,7 +17,7 @@ export class NewPrincipalDialog
         super({
             title: i18n('dialog.new'),
             class: 'new-principal-dialog'
-        } as ModalDialogConfig);
+        });
     }
 
     protected initElements(): void {

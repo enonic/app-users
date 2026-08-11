@@ -48,7 +48,7 @@ export class SaveIdProviderRequest
         return vars;
     }
 
-    /* eslint-disable max-len */
+     
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $description: String, $idProviderConfig: IdProviderConfigInput, $permissions: [IdProviderAccessControlInput]) {
             ${this.mutationType}(key: $key, displayName: $displayName, description: $description, idProviderConfig: $idProviderConfig, permissions: $permissions) {
@@ -71,7 +71,7 @@ export class SaveIdProviderRequest
         }`;
     }
 
-    /* eslint-enable max-len */
+     
 
     setKey(idProviderKey: IdProviderKey): SaveIdProviderRequest {
         this.idProviderKey = idProviderKey;
@@ -110,7 +110,7 @@ export class SaveIdProviderRequest
         }
 
         if (us.idProviderConfig && typeof us.idProviderConfig.config === 'string') {
-            us.idProviderConfig.config = JSON.parse(us.idProviderConfig.config as string);
+            us.idProviderConfig.config = JSON.parse(us.idProviderConfig.config);
         }
         return IdProvider.fromJson(us);
     }

@@ -94,7 +94,7 @@ export class ListPrincipalsRequest
             return Role.fromJson(json);
 
         } else if (pKey.isGroup()) {
-            return Group.fromJson(json as GroupJson);
+            return Group.fromJson(json);
 
         } else if (pKey.isUser()) {
             return User.fromJson(json as UserJson);

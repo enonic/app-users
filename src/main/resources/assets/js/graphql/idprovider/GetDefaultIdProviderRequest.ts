@@ -41,7 +41,7 @@ export class GetDefaultIdProviderRequest
         }
         if (us.idProviderConfig && typeof us.idProviderConfig.config === 'string') {
             // config is passed as string
-            us.idProviderConfig.config = JSON.parse(us.idProviderConfig.config as string);
+            us.idProviderConfig.config = JSON.parse(us.idProviderConfig.config);
         }
         return IdProvider.fromJson(us);
     }
