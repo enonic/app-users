@@ -106,13 +106,13 @@ export class UserItemStatisticsPanel
 
             switch (principal.getType()) {
             case PrincipalType.USER:
-                metaGroups = this.createUserMetadataGroups(principal as User, mainGroup);
+                metaGroups = this.createUserMetadataGroups(principal, mainGroup);
                 break;
             case PrincipalType.GROUP:
-                metaGroups = this.createGroupMetadataGroups(principal as Group, mainGroup);
+                metaGroups = this.createGroupMetadataGroups(principal, mainGroup);
                 break;
             case PrincipalType.ROLE:
-                metaGroups = this.createRoleMetadataGroups(principal as Role, mainGroup);
+                metaGroups = this.createRoleMetadataGroups(principal, mainGroup);
                 break;
             }
 

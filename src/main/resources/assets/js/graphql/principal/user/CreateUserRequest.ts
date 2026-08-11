@@ -67,7 +67,7 @@ export class CreateUserRequest
         return vars;
     }
 
-    /* eslint-disable max-len */
+     
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String, $memberships: [String]) {
             createUser(key: $key, displayName: $displayName, email: $email, login: $login, password: $password, memberships: $memberships) {
@@ -85,7 +85,7 @@ export class CreateUserRequest
         }`;
     }
 
-    /* eslint-enable max-len */
+     
 
     sendAndParse(): Q.Promise<User> {
         return this.mutate().then((json: CreateUserMutationResponse) => this.fromJson(json.createUser, json.error));

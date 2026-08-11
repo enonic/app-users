@@ -127,7 +127,7 @@ export class GroupWizardPanel
             .setMembers(this.getMembersWizardStepForm().getMembersKeys().sort(this.sortMembers))
             .setDisplayName(this.getWizardHeader().getDisplayName())
             .setDescription(this.getDescriptionWizardStepForm().getDescription())
-            .build() as Members;
+            .build();
     }
 
     protected assemblePersistedItem(): Principal {
