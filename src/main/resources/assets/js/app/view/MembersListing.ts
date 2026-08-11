@@ -62,7 +62,7 @@ export class MembersListing extends DivEl {
         this.membersKeysChunks = chunkArray<PrincipalKey>(membersKeys, MembersListing.CHUNK_SIZE);
     }
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+     
     async populateList(chunkIndex: number = 0) {
         const memberKeys = this.parent
             ? this.membersKeysChunks[chunkIndex]
@@ -75,7 +75,7 @@ export class MembersListing extends DivEl {
 
         principalsViewer.forEach((pv) => {
             const liEl = new LiEl();
-            liEl.appendChild(pv as Element);
+            liEl.appendChild(pv);
             this.ulList.appendChild(liEl);
         });
 

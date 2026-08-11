@@ -92,7 +92,7 @@ export class GetPrincipalsByKeysRequest
                 return Role.fromJson(principalJson);
 
             } else if (pKey.isGroup()) {
-                return Group.fromJson(principalJson as GroupJson);
+                return Group.fromJson(principalJson);
 
             } else if (pKey.isUser()) {
                 return User.fromJson(principalJson as UserJson);

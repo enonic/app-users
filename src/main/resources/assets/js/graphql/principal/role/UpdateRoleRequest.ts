@@ -51,7 +51,7 @@ export class UpdateRoleRequest
         return vars;
     }
 
-    /* eslint-disable max-len */
+     
     getMutation(): string {
         return `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String]) {
             updateRole(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers) {
@@ -63,7 +63,7 @@ export class UpdateRoleRequest
         }`;
     }
 
-    /* eslint-enable max-len */
+     
 
     sendAndParse(): Q.Promise<Role> {
         return this.mutate().then((json: UpdateRoleMutationResponse) => this.fromJson(json.updateRole, json.error));

@@ -61,7 +61,7 @@ export class IdProvider
     }
 
     getKey(): IdProviderKey {
-        return super.getKey() as IdProviderKey;
+        return super.getKey();
     }
 
     equals(o: Equitable, ignoreEmptyValues: boolean = false): boolean {

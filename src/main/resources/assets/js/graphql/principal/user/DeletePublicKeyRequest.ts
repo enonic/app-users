@@ -29,14 +29,14 @@ export class DeletePublicKeyRequest
         return vars;
     }
 
-    /* eslint-disable max-len */
+     
     getMutation(): string {
         return `mutation ($userKey: String!, $kid: String!) {
             removePublicKey(userKey: $userKey, kid: $kid)
         }`;
     }
 
-    /* eslint-enable max-len */
+     
 
     sendAndParse(): Q.Promise<boolean> {
         return this.mutate().then((json: DeletePublicKeyMutationResponse) => this.fromJson(json.removePublicKey, json.error));
