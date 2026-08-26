@@ -70,8 +70,10 @@ export default defineConfig(({ mode }) => {
     passWithNoTests: true,
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
+      '/lib/graphql': join(REPO, 'test/mocks/lib-graphql.ts'),
       '/lib/xp/i18n': join(REPO, 'test/mocks/lib-xp-i18n.ts'),
-      '/extensions/i18n': join(REPO, 'src/main/resources/extensions/i18n.ts'),
+      '/lib/xp/io': join(REPO, 'test/mocks/lib-xp-io.ts'),
+      '/extensions': join(REPO, 'src/main/resources/extensions'),
     },
   };
 

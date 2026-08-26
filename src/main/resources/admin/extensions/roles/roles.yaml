@@ -1,0 +1,15 @@
+kind: 'AdminExtension'
+title:
+  text: 'Roles'
+  i18n: 'section.roles.title'
+description:
+  text: 'Grant permissions through roles'
+  i18n: 'section.roles.description'
+allow:
+  - 'role:system.user.admin'
+  - 'role:system.user.app'
+interfaces:
+  - 'settings.section'
+config:
+  order: 22
+  path: 'roles'

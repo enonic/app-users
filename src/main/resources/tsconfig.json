@@ -12,6 +12,8 @@
     "paths": {
       "/lib/xp/core": ["../../../node_modules/@enonic-types/core"],
       "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
+      // No @enonic-types package exists for lib-graphql at any version.
+      "/lib/graphql": ["./types/graphql.d.ts"],
       "/extensions/*": ["./extensions/*"]
     },
     "typeRoots": ["../../../node_modules"]

@@ -31,6 +31,7 @@ dependencies {
     include xplibs.admin
     include xplibs.auth
     include xplibs.i18n
+    include xplibs.io
     include xplibs.node
     include xplibs.portal
 
@@ -47,6 +48,9 @@ dependencies {
 app {
     name = "${group}.${projectName}"
     systemApp = true
+
+    // ! `vp pack` emits es2023, which Nashorn cannot parse.
+    scriptEngine = 'GraalJS'
 }
 
 // Download and pin the toolchain, so a clean checkout and CI build the same thing.
@@ -153,17 +157,15 @@ tasks.named( 'compileTestJava' ).configure {
 }
 
 tasks.withType( Test ).configureEach {
-    mustRunAfter tasks.named( 'pnpmBuild' ), tasks.named( 'pnpmPack' )
+    // SectionEndpointTest requires the packed `/extensions/section-endpoint` off the classpath.
+    dependsOn tasks.named( 'pnpmPack' )
+    mustRunAfter tasks.named( 'pnpmBuild' )
 }
 
 tasks.named( 'test' ).configure {
     useJUnitPlatform()
     systemProperty 'java.awt.headless', 'true'
     jvmArgs '-XX:TieredStopAtLevel=1'
-}
-
-xp {
-    scriptEngines = ['Nashorn', 'GraalJS']
 }
 
 tasks.named( 'jacocoTestReport' ).configure {
