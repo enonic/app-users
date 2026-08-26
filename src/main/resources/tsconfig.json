@@ -14,10 +14,10 @@
       "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
       // No @enonic-types package exists for lib-graphql at any version.
       "/lib/graphql": ["./types/graphql.d.ts"],
+      "/lib/*": ["./lib/*"],
       "/extensions/*": ["./extensions/*"]
     },
     "typeRoots": ["../../../node_modules"]
   },
-  // Only the packed trees — lib/ stays plain .js.
-  "include": ["./extensions/**/*.ts", "./admin/extensions/**/*.ts"]
+  "include": ["./extensions/**/*.ts", "./admin/extensions/**/*.ts", "./lib/**/*.ts"]
 }

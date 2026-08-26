@@ -43,6 +43,43 @@ exports.answersPhrasesAsAReadableJsonMap = function () {
     t.assertEquals('Brukere', response.body.data.phrases['section.users.title']);
 };
 
+// Introspection, so no data service has to be stubbed: what this pins is that the principals
+// slice is wired into the schema graphql-java actually built, root fields and mutations alike.
+exports.exposesThePrincipalsSchema = function () {
+    // ! One root per request: graphql-java refuses a document naming `__Type.fields` more than
+    // ! once ("not asking for introspection in good faith"), so the two cannot be asked together.
+    var queries = graphql('{ __schema { queryType { fields { name } } } }');
+    var mutations = graphql('{ __schema { mutationType { fields { name } } } }');
+
+    t.assertNull(queries.body.errors);
+    t.assertNull(mutations.body.errors);
+
+    t.assertEquals('', missingFrom(queries.body.data.__schema.queryType.fields,
+        ['config', 'phrases', 'users', 'roles', 'groups', 'idProviders']));
+
+    t.assertEquals('', missingFrom(mutations.body.data.__schema.mutationType.fields,
+        ['createUser', 'updateUser', 'createGroup', 'createRole', 'createIdProvider',
+            'updateIdProvider', 'deleteIdProviders', 'deletePrincipals']));
+};
+
+// Names the fields that are absent, so a failure says which rather than just `false`. Written with
+// index access because graphql-java hands back host lists, which carry no JS array methods.
+function missingFrom(fields, expected) {
+    var present = {};
+    for (var i = 0; i < fields.length; i++) {
+        present[fields[i].name] = true;
+    }
+
+    var missing = [];
+    for (var j = 0; j < expected.length; j++) {
+        if (!present[expected[j]]) {
+            missing.push(expected[j]);
+        }
+    }
+
+    return missing.join(', ');
+}
+
 exports.reportsAnUnknownFieldAsAGraphQlError = function () {
     var response = graphql('{ nothingHere }');
 

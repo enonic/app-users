@@ -63,6 +63,12 @@ public class SectionEndpointTest
     }
 
     @Test
+    public void testExposesThePrincipalsSchema()
+    {
+        runFunction( TEST_SCRIPT, "exposesThePrincipalsSchema" );
+    }
+
+    @Test
     public void testReportsAnUnknownFieldAsAGraphQlError()
     {
         runFunction( TEST_SCRIPT, "reportsAnUnknownFieldAsAGraphQlError" );

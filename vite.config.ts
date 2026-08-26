@@ -34,12 +34,12 @@ export default defineConfig(({ mode }) => {
   };
 
   // `vp pack` (tsdown) compiles the server-side .ts to per-file CommonJS, mirroring the tree into
-  // build/ so XP runs each file in place. Only `extensions/` and `admin/extensions/`: `lib/` stays
-  // plain .js — it binds the java beans, and a shared tree would emit over it.
+  // build/ so XP runs each file in place.
   const pack = {
     entry: [
       join(REPO, 'src/main/resources/extensions/**/*.ts'),
       join(REPO, 'src/main/resources/admin/extensions/**/*.ts'),
+      join(REPO, 'src/main/resources/lib/**/*.ts'),
       `!${join(REPO, 'src/main/resources/**/*.d.ts')}`,
       `!${join(REPO, 'src/main/resources/**/*.test.ts')}`,
     ],
@@ -71,6 +71,10 @@ export default defineConfig(({ mode }) => {
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
       '/lib/graphql': join(REPO, 'test/mocks/lib-graphql.ts'),
+      '/lib/idprovider': join(REPO, 'test/mocks/lib-idprovider.ts'),
+      '/lib/publickey': join(REPO, 'test/mocks/lib-publickey.ts'),
+      '/lib/xp/app': join(REPO, 'test/mocks/lib-xp-app.ts'),
+      '/lib/xp/auth': join(REPO, 'test/mocks/lib-xp-auth.ts'),
       '/lib/xp/i18n': join(REPO, 'test/mocks/lib-xp-i18n.ts'),
       '/lib/xp/io': join(REPO, 'test/mocks/lib-xp-io.ts'),
       '/extensions': join(REPO, 'src/main/resources/extensions'),
