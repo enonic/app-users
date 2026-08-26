@@ -29,6 +29,7 @@ dependencies {
     implementation xplibs.api.portal
 
     include xplibs.admin
+    include xplibs.app
     include xplibs.auth
     include xplibs.i18n
     include xplibs.io
@@ -105,6 +106,7 @@ tasks.register( 'pnpmPack', PnpmTask ) {
     inputs.files fileTree( 'src/main/resources' ) {
         include 'extensions/**/*.ts'
         include 'admin/extensions/**/*.ts'
+        include 'lib/**/*.ts'
     }
     outputs.dir layout.buildDirectory.dir( 'resources/main/extensions' )
     outputs.cacheIf { false }
@@ -116,6 +118,7 @@ tasks.register( 'pnpmPack', PnpmTask ) {
         delete fileTree( layout.buildDirectory.dir( 'resources/main' ) ) {
             include 'extensions/**/*.js'
             include 'admin/extensions/**/*.js'
+            include 'lib/**/*.js'
         }
     }
 }
