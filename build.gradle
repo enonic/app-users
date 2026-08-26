@@ -1,3 +1,6 @@
+import com.github.gradle.node.pnpm.task.PnpmInstallTask
+import com.github.gradle.node.pnpm.task.PnpmTask
+
 plugins {
     id 'java'
     id 'jacoco'
@@ -7,22 +10,13 @@ plugins {
     alias( libs.plugins.node.gradle )
 }
 
-allprojects {
-    pluginManager.withPlugin( 'java' ) {
-        java {
-            toolchain {
-                languageVersion = JavaLanguageVersion.of( 25 )
-            }
-        }
-    }
-
-    apply from: "$rootDir/gradle/env.gradle"
-    apply from: "$rootDir/gradle/node.gradle"
-
-    if ( project.name != 'testing' ) {
-        apply from: "$rootDir/gradle/lib-admin.gradle"
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of( 25 )
     }
 }
+
+apply from: "$rootDir/gradle/env.gradle"
 
 repositories {
     mavenLocal()
@@ -30,17 +24,8 @@ repositories {
     xp.enonicRepo( 'dev' )
 }
 
-configurations {
-    devResources {
-        attributes {
-            attribute( LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named( LibraryElements, 'dev-resources' ) )
-        }
-    }
-}
-
 dependencies {
     implementation xplibs.api.core
-    implementation xplibs.api.jaxrs
     implementation xplibs.api.portal
 
     include xplibs.admin
@@ -49,19 +34,13 @@ dependencies {
     include xplibs.node
     include xplibs.portal
 
-    include libs.lib.asset
     include libs.lib.graphql
-    include libs.lib.mustache
-
-    include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
 
     testImplementation "com.enonic.xp:testing:${xpVersion}"
     testImplementation platform( libs.junit.bom )
     testImplementation platform( libs.mockito.bom )
     testImplementation libs.junit.jupiter
     testImplementation libs.mockito.jupiter
-    testImplementation testFixtures( "com.enonic.xp:jaxrs-impl:${xpVersion}" )
     testRuntimeOnly libs.junit.launcher
 }
 
@@ -70,52 +49,79 @@ app {
     systemApp = true
 }
 
+// Download and pin the toolchain, so a clean checkout and CI build the same thing.
+node {
+    download = true
+    version = '24.18.0'
+    pnpmVersion = '10.33.4' // match packageManager in package.json
+}
+
+def ci = System.getenv( 'CI' ) != null
+
+tasks.named( 'pnpmInstall', PnpmInstallTask ) {
+    if ( ci ) {
+        args.add( '--frozen-lockfile' )
+    }
+}
+
 // Verification tasks
-tasks.register( 'checkTypes', PnpmTask ) {
-    dependsOn tasks.named( 'pnpmInstall' )
-    group = 'verification'
-    args = ['run', 'check:types']
-    outputs.cacheIf { false }
-}
-
-tasks.register( 'checkLint', PnpmTask ) {
-    dependsOn tasks.named( 'pnpmInstall' )
-    group = 'verification'
-    args = ['run', 'check:lint']
-    outputs.cacheIf { false }
-}
-
 tasks.register( 'pnpmCheck', PnpmTask ) {
     dependsOn tasks.named( 'pnpmInstall' )
     group = 'verification'
-    args = ['run', 'check']
-    outputs.cacheIf { false }
+    description = 'Format, lint, typecheck and test the UI and server code.'
+    // No inputs/outputs on purpose: a verification task should always run.
+    args = ['run', ci ? 'check' : 'check:fix']
 }
 
 // Build tasks
 tasks.register( 'pnpmBuild', PnpmTask ) {
-    dependsOn tasks.named( 'pnpmInstall' )
-    description = 'Build UI resources (ts, css, etc) with Vite.'
-    args = ['run', "build:${environmentShort()}"]
+    dependsOn tasks.named( 'pnpmInstall' ), tasks.named( 'pnpmCheck' )
+    // Writes into build/resources/main after processResources has laid the resources down.
+    mustRunAfter tasks.named( 'processResources' )
+    group = 'build'
+    description = 'Build UI resources with Vite.'
+    args = ['run', isProd() ? 'build' : 'build:dev']
     environment = ['NODE_ENV': nodeEnvironment()]
-    inputs.dir '.xp/dev'
-    inputs.dir 'src/main'
+
+    inputs.property 'env', environmentShort()
+    inputs.dir 'assets'
     inputs.file 'vite.config.ts'
     inputs.file 'tsconfig.json'
-    outputs.dir "${buildDir}/resources/main"
+    inputs.file 'package.json'
+    outputs.dir layout.buildDirectory.dir( 'resources/main/assets/_static' )
+}
+
+tasks.register( 'pnpmPack', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' ), tasks.named( 'pnpmCheck' )
+    mustRunAfter tasks.named( 'processResources' )
+    group = 'build'
+    description = 'Compile server-side TypeScript to per-file CommonJS.'
+    args = ['run', 'pack:server']
+
+    inputs.files fileTree( 'src/main/resources' ) {
+        include 'extensions/**/*.ts'
+        include 'admin/extensions/**/*.ts'
+    }
+    outputs.dir layout.buildDirectory.dir( 'resources/main/extensions' )
+    outputs.cacheIf { false }
+
+    // `vp pack` runs clean:false — it shares this tree with processResources — so without this a
+    // deleted .ts keeps shipping its .js. Scoped to the two trees pack emits into: a blanket
+    // '**/*.js' would take lib/*.js, which processResources has already copied and will not redo.
+    doFirst {
+        delete fileTree( layout.buildDirectory.dir( 'resources/main' ) ) {
+            include 'extensions/**/*.js'
+            include 'admin/extensions/**/*.js'
+        }
+    }
 }
 
 tasks.register( 'yolo' ) {
-    description = 'Build without running install, check, or test tasks'
+    description = 'Build without running check or test tasks'
 
     dependsOn tasks.named( 'deploy' )
-    dependsOn tasks.named( 'checkTypes' )
 
-    nodeSetup.enabled = false
-    npmSetup.enabled = false
-    pnpmSetup.enabled = false
     pnpmCheck.enabled = false
-    checkLint.enabled = false
     check.enabled = false
     test.enabled = false
     javadoc.enabled = false
@@ -123,31 +129,31 @@ tasks.register( 'yolo' ) {
 
 // Task configurations
 tasks.named( 'jar' ).configure {
-    exclude 'assets/**/tsconfig.tsbuildinfo'
-
     if ( isProd() ) {
         exclude 'assets/**/*.map'
     }
 
     includeEmptyDirs = false
 
-    dependsOn tasks.named( 'pnpmBuild' )
+    dependsOn tasks.named( 'pnpmBuild' ), tasks.named( 'pnpmPack' )
 }
 
 tasks.named( 'processResources' ).configure {
-    // Don't need source files
-    exclude 'assets/js/**'
-    exclude 'assets/styles/**'
-
-    // Inlined by the Vite into CSS
-    exclude 'assets/fonts/**'
-    exclude 'assets/img/**'
+    // Server sources; pnpmPack emits them as .js into the same tree
+    exclude '**/*.ts'
+    exclude '**/*.tsx'
+    exclude '**/tsconfig.json'
 
     includeEmptyDirs = false
 }
 
+// pnpmBuild and pnpmPack write into build/resources/main, which these read.
 tasks.named( 'compileTestJava' ).configure {
-    dependsOn tasks.named( 'pnpmBuild' )
+    mustRunAfter tasks.named( 'pnpmBuild' ), tasks.named( 'pnpmPack' )
+}
+
+tasks.withType( Test ).configureEach {
+    mustRunAfter tasks.named( 'pnpmBuild' ), tasks.named( 'pnpmPack' )
 }
 
 tasks.named( 'test' ).configure {

@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+
+/* Tailwind scans for class names; the sections' tree is the only source today. */
+@source '../js/';
