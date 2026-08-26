@@ -1,0 +1,15 @@
+kind: 'AdminExtension'
+title:
+  text: 'Users'
+  i18n: 'section.users.title'
+description:
+  text: 'Create and manage users'
+  i18n: 'section.users.description'
+allow:
+  - 'role:system.user.admin'
+  - 'role:system.user.app'
+interfaces:
+  - 'settings.section'
+config:
+  order: 20
+  path: 'users'

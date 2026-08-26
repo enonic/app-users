@@ -1,0 +1,15 @@
+kind: 'AdminExtension'
+title:
+  text: 'Groups'
+  i18n: 'section.groups.title'
+description:
+  text: 'Organise users into groups'
+  i18n: 'section.groups.description'
+allow:
+  - 'role:system.user.admin'
+  - 'role:system.user.app'
+interfaces:
+  - 'settings.section'
+config:
+  order: 21
+  path: 'groups'

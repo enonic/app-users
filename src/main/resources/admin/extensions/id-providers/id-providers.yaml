@@ -1,0 +1,15 @@
+kind: 'AdminExtension'
+title:
+  text: 'ID Providers'
+  i18n: 'section.idProviders.title'
+description:
+  text: 'Configure how users authenticate'
+  i18n: 'section.idProviders.description'
+allow:
+  - 'role:system.user.admin'
+  - 'role:system.user.app'
+interfaces:
+  - 'settings.section'
+config:
+  order: 23
+  path: 'id-providers'
