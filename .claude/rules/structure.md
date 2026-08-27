@@ -18,13 +18,18 @@ app  →  pages  →  widgets / features  →  entities  →  shared
 - `pages/<section>/` — composition only: users, groups, roles, id-providers.
 - `entities/principal/` — one domain slice (users, groups, roles and ID providers share
   `PrincipalKey` and each other's member lists), segments `api/`, `model/`, rarely `ui/`.
-- `shared/` — transport, config, i18n, sections contract, styles. `shared/sections/contract.ts` is
-  **byte-identical with the host's** (`../app-settings/src/main/resources/assets/js/shared/sections/contract.ts`)
-  until `@enonic/toolkit` publishes it — change every copy or none.
+- `shared/` — transport, config, i18n, sections contract, styles, and `host/`: the host object and
+  the routing it owns. `shared/sections/contract.ts` is **byte-identical with the host's**
+  (`../app-settings/src/main/resources/assets/js/shared/sections/contract.ts`) — change every copy or
+  none.
+- **A section reaches the shell through `shared/host`, never through a router or a socket of its
+  own**: `host.path`/`host.navigate` are its whole history, and `host.notify` its toast stack.
 - File names, barrels, component and store conventions: as in the other rule files here.
 
-The browse framework arrives from `@enonic/toolkit` when it is published — do not copy widgets from
-app-settings into this repo.
+`widgets/` holds the browse framework, copied from app-settings with the sections (#2640) rather than
+waited for: `@enonic/toolkit` does not exist on npm and the repository meant to publish it carries
+nothing yet. It is a fork, not a fetch — a fix made here does not reach app-settings, and the other
+way round.
 
 ## Server — `src/main/resources`
 

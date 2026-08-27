@@ -1,5 +1,6 @@
 import { type GraphQLType } from '/lib/graphql';
 
+import { idProviderApplicationQueryFields } from '../application/id-provider-application.fields';
 import { configQueryFields } from '../config/config.fields';
 import { phrasesQueryFields } from '../phrases/phrases.fields';
 import { groupQueryFields } from '../principal/group.fields';
@@ -27,5 +28,6 @@ export const QueryType: GraphQLType = generator.createObjectType({
     ...roleQueryFields,
     ...groupQueryFields,
     ...idProviderQueryFields,
+    ...idProviderApplicationQueryFields,
   },
 });
