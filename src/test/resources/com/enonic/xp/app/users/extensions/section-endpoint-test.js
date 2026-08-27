@@ -55,7 +55,7 @@ exports.exposesThePrincipalsSchema = function () {
     t.assertNull(mutations.body.errors);
 
     t.assertEquals('', missingFrom(queries.body.data.__schema.queryType.fields,
-        ['config', 'phrases', 'users', 'roles', 'groups', 'idProviders']));
+        ['config', 'phrases', 'users', 'roles', 'groups', 'idProviders', 'idProviderApplications']));
 
     t.assertEquals('', missingFrom(mutations.body.data.__schema.mutationType.fields,
         ['createUser', 'updateUser', 'createGroup', 'createRole', 'createIdProvider',
