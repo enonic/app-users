@@ -53,7 +53,7 @@ importers:
         version: 9.31.2
       '@wdio/local-runner':
         specifier: ^9.31.2
-        version: 9.31.2(@wdio/globals@9.31.1)(webdriverio@9.30.1)
+        version: 9.31.2(@wdio/globals@9.31.1)(webdriverio@9.31.2)
       '@wdio/mocha-framework':
         specifier: ^9.31.2
         version: 9.31.2
@@ -64,8 +64,8 @@ importers:
         specifier: 2.3.0
         version: 2.3.0
       webdriverio:
-        specifier: 9.30.1
-        version: 9.30.1
+        specifier: 9.31.2
+        version: 9.31.2
 
 packages:
 
@@ -1816,6 +1816,15 @@ packages:
       puppeteer-core:
         optional: true
 
+  webdriverio@9.31.2:
+    resolution: {integrity: sha512-uVrh+ChODUwG01/Rp2nSb9tlTI46b3IFQe6P7CShMPKAJRJ6ONXn5qr2ZCp+gisp4vU3UXITcc5F9j6VDTgWpw==}
+    engines: {node: '>=18.20.0'}
+    peerDependencies:
+      puppeteer-core: '>=22.x <=24.x'
+    peerDependenciesMeta:
+      puppeteer-core:
+        optional: true
+
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
@@ -2343,24 +2352,24 @@ snapshots:
 
   '@wdio/globals@9.29.1(expect-webdriverio@6.0.7)(webdriverio@9.30.1)':
     dependencies:
-      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1)
+      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
       webdriverio: 9.30.1
 
-  '@wdio/globals@9.31.1(expect-webdriverio@6.0.7)(webdriverio@9.30.1)':
+  '@wdio/globals@9.31.1(expect-webdriverio@6.0.7)(webdriverio@9.31.2)':
     dependencies:
-      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1)
-      webdriverio: 9.30.1
+      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
+      webdriverio: 9.31.2
 
-  '@wdio/local-runner@9.31.2(@wdio/globals@9.31.1)(webdriverio@9.30.1)':
+  '@wdio/local-runner@9.31.2(@wdio/globals@9.31.1)(webdriverio@9.31.2)':
     dependencies:
       '@types/node': 20.19.43
       '@wdio/logger': 9.29.1
       '@wdio/repl': 9.16.2
-      '@wdio/runner': 9.31.2(expect-webdriverio@6.0.7)(webdriverio@9.30.1)
+      '@wdio/runner': 9.31.2(expect-webdriverio@6.0.7)(webdriverio@9.31.2)
       '@wdio/types': 9.31.2
       '@wdio/xvfb': 9.31.2
       exit-hook: 4.0.0
-      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1)
+      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
       split2: 4.2.0
       stream-buffers: 3.0.3
     transitivePeerDependencies:
@@ -2411,19 +2420,19 @@ snapshots:
       diff: 9.0.0
       object-inspect: 1.13.4
 
-  '@wdio/runner@9.31.2(expect-webdriverio@6.0.7)(webdriverio@9.30.1)':
+  '@wdio/runner@9.31.2(expect-webdriverio@6.0.7)(webdriverio@9.31.2)':
     dependencies:
       '@types/node': 20.19.43
       '@wdio/config': 9.31.2
       '@wdio/dot-reporter': 9.31.2
-      '@wdio/globals': 9.31.1(expect-webdriverio@6.0.7)(webdriverio@9.30.1)
+      '@wdio/globals': 9.31.1(expect-webdriverio@6.0.7)(webdriverio@9.31.2)
       '@wdio/logger': 9.29.1
       '@wdio/types': 9.31.2
       '@wdio/utils': 9.31.2
       deepmerge-ts: 7.1.6
-      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1)
+      expect-webdriverio: 6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2)
       webdriver: 9.31.2
-      webdriverio: 9.30.1
+      webdriverio: 9.31.2
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
@@ -2921,15 +2930,15 @@ snapshots:
 
   exit-hook@4.0.0: {}
 
-  expect-webdriverio@6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.30.1):
+  expect-webdriverio@6.0.7(@wdio/globals@9.31.1)(@wdio/logger@9.29.1)(webdriverio@9.31.2):
     dependencies:
       '@vitest/snapshot': 4.1.11
-      '@wdio/globals': 9.31.1(expect-webdriverio@6.0.7)(webdriverio@9.30.1)
+      '@wdio/globals': 9.31.1(expect-webdriverio@6.0.7)(webdriverio@9.31.2)
       '@wdio/logger': 9.29.1
       deep-eql: 5.0.2
       expect: 30.4.1
       jest-matcher-utils: 30.4.1
-      webdriverio: 9.30.1
+      webdriverio: 9.31.2
 
   expect@30.4.1:
     dependencies:
@@ -3834,6 +3843,41 @@ snapshots:
       serialize-error: 12.0.0
       urlpattern-polyfill: 10.1.0
       webdriver: 9.30.1
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - bufferutil
+      - react-native-b4a
+      - supports-color
+      - utf-8-validate
+
+  webdriverio@9.31.2:
+    dependencies:
+      '@types/node': 20.19.43
+      '@types/sinonjs__fake-timers': 8.1.5
+      '@wdio/config': 9.31.2
+      '@wdio/logger': 9.29.1
+      '@wdio/protocols': 9.31.1
+      '@wdio/repl': 9.16.2
+      '@wdio/types': 9.31.2
+      '@wdio/utils': 9.31.2
+      archiver: 7.0.1
+      aria-query: 5.3.2
+      cheerio: 1.2.0
+      css-shorthand-properties: 1.1.2
+      css-value: 0.0.1
+      grapheme-splitter: 1.0.4
+      htmlfy: 0.8.1
+      is-plain-obj: 4.1.0
+      jszip: 3.10.1
+      lodash.clonedeep: 4.5.0
+      lodash.zip: 4.2.0
+      query-selector-shadow-dom: 1.0.1
+      resq: 1.11.0
+      rgb2hex: 0.2.5
+      serialize-error: 12.0.0
+      urlpattern-polyfill: 10.1.0
+      webdriver: 9.31.2
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
