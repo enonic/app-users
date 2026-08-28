@@ -35,6 +35,11 @@ export type UserEditorDialogProps = {
   onSaved: (written: User, mode: 'create' | 'edit') => void;
 };
 
+const NOTIFY = {
+  created: 'users.notify.created',
+  updated: 'users.notify.updated',
+} as const;
+
 export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
   const editor = useStore($userEditor);
   const detail = useStore($userEditDetail);
@@ -200,6 +205,9 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
 
     written.match(
       (user) => {
+        notifySuccess(
+          i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, user.displayName),
+        );
         forgetUserEditDetail();
         closeUserEditor();
         onSaved(user, editor.mode);

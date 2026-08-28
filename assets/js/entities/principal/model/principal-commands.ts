@@ -1,10 +1,12 @@
-import { notifyError } from '../../../shared/host';
+import { notifyError, notifySuccess } from '../../../shared/host';
 import { i18n } from '../../../shared/i18n';
 import type { SelectionStore } from '../../../shared/selection';
 import { sendPrincipalDeletion } from '../api/principal-deletion.api';
 import type { PrincipalKey } from './principal.types';
 
 const TEXT = {
+  deleted: 'principal.notify.deleted',
+  deletedMany: 'principal.notify.deletedMany',
   deleteFailed: 'principal.notify.deleteFailed',
   deleteFailedReason: 'principal.notify.deleteFailedReason',
 } as const;
@@ -33,14 +35,16 @@ export async function deletePrincipals(
 
   result.match(
     (outcomes) => {
+      const deletedKeys = outcomes.filter(({ deleted }) => deleted).map(({ key }) => key);
+      // Success first: errors live longer and only three toasts show, so raised after a batch of
+      // refusals the confirmation would queue behind them for half a minute.
+      notifyDeleted(deletedKeys, targets);
+
       outcomes
         .filter(({ deleted }) => !deleted)
         .forEach(({ key, reason }) => notifyFailure(nameOf(targets, key), reason));
 
-      reconcile(
-        outcomes.filter(({ deleted }) => deleted).map(({ key }) => key),
-        scope,
-      );
+      reconcile(deletedKeys, scope);
     },
     (error) => {
       targets.forEach(({ displayName }) => notifyFailure(displayName, error.message));
@@ -61,6 +65,18 @@ function reconcile(
   }
 
   resync();
+}
+
+/** A deleted row just leaves the list, so the toast is what says the command worked. */
+function notifyDeleted(
+  keys: readonly PrincipalKey[],
+  targets: readonly DeletablePrincipal[],
+): void {
+  if (keys.length === 1) {
+    notifySuccess(i18n(TEXT.deleted, nameOf(targets, keys[0])));
+  } else if (keys.length > 1) {
+    notifySuccess(i18n(TEXT.deletedMany, keys.length));
+  }
 }
 
 function notifyFailure(name: string, reason: string | undefined): void {

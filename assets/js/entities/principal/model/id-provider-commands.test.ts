@@ -64,6 +64,8 @@ beforeEach(() => {
   setHost(fakeHost());
   setPhrases(
     {
+      'idProviders.notify.deleted': '{0} deleted',
+      'idProviders.notify.deletedMany': '{0} ID providers deleted',
       'idProviders.notify.deleteFailed': 'Could not delete {0}',
       'idProviders.notify.deleteFailedReason': 'Could not delete {0}: {1}',
     },
@@ -136,6 +138,14 @@ describe('deleteIdProviders', () => {
 
     expect(selection.$selected.get().has('ldap')).toBe(false);
     expect(resync).toHaveBeenCalled();
+  });
+
+  it('names the one deleted provider', async () => {
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'ldap', deleted: true }]));
+
+    await deleteIdProviders([ldap], scope());
+
+    expect(notificationTexts()).toContain('Company directory deleted');
   });
 
   it('names the provider and the reason a refusal came with', async () => {

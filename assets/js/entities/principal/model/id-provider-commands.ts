@@ -1,7 +1,7 @@
 import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
-import { notifyError } from '../../../shared/host';
+import { notifyError, notifySuccess } from '../../../shared/host';
 import { i18n } from '../../../shared/i18n';
 import type { SelectionStore } from '../../../shared/selection';
 import {
@@ -13,6 +13,8 @@ import {
 import type { IdProvider, IdProviderPermission } from './principal.types';
 
 const TEXT = {
+  deleted: 'idProviders.notify.deleted',
+  deletedMany: 'idProviders.notify.deletedMany',
   deleteFailed: 'idProviders.notify.deleteFailed',
   deleteFailedReason: 'idProviders.notify.deleteFailedReason',
 } as const;
@@ -69,14 +71,16 @@ export async function deleteIdProviders(
 
   result.match(
     (outcomes) => {
+      const deletedKeys = outcomes.filter(({ deleted }) => deleted).map(({ key }) => key);
+      // Success first: errors live longer and only three toasts show, so raised after a batch of
+      // refusals the confirmation would queue behind them for half a minute.
+      notifyDeleted(deletedKeys, targets);
+
       outcomes
         .filter(({ deleted }) => !deleted)
         .forEach(({ key, reason }) => notifyFailure(nameOf(targets, key), reason));
 
-      reconcile(
-        outcomes.filter(({ deleted }) => deleted).map(({ key }) => key),
-        scope,
-      );
+      reconcile(deletedKeys, scope);
     },
     (error) => {
       targets.forEach(({ displayName }) => notifyFailure(displayName, error.message));
@@ -116,6 +120,15 @@ function toInput(draft: IdProviderDraft): IdProviderInput {
       access,
     })),
   };
+}
+
+/** A deleted row just leaves the list, so the toast is what says the command worked. */
+function notifyDeleted(keys: readonly string[], targets: readonly DeletableIdProvider[]): void {
+  if (keys.length === 1) {
+    notifySuccess(i18n(TEXT.deleted, nameOf(targets, keys[0])));
+  } else if (keys.length > 1) {
+    notifySuccess(i18n(TEXT.deletedMany, keys.length));
+  }
 }
 
 function notifyFailure(name: string, reason: string | undefined): void {

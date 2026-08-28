@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import { createGroup, updateGroup, useIdProviderNames } from '../../entities/principal';
 import { diffByKey, mergeByKey, visitedErrors } from '../../shared/form';
+import { notifySuccess } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { DialogIdentityHeader } from '../../shared/ui/dialogs/DialogIdentityHeader';
 import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
@@ -28,6 +29,11 @@ export type GroupEditorDialogProps = {
   /** Puts the section's list back in step with what was written. */
   onSaved: () => void;
 };
+
+const NOTIFY = {
+  created: 'groups.notify.created',
+  updated: 'groups.notify.updated',
+} as const;
 
 export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
   const editor = useStore($groupEditor);
@@ -148,6 +154,9 @@ export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
 
     written.match(
       () => {
+        notifySuccess(
+          i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, values.displayName),
+        );
         forgetGroupEditDetail();
         closeGroupEditor();
         onSaved();

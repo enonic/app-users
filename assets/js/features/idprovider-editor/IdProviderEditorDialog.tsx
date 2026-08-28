@@ -13,6 +13,7 @@ import {
   type IdProvider,
 } from '../../entities/principal';
 import { visitedErrors } from '../../shared/form';
+import { notifySuccess } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { DialogIdentityHeader } from '../../shared/ui/dialogs/DialogIdentityHeader';
 import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
@@ -38,6 +39,11 @@ export type IdProviderEditorDialogProps = {
   /** The written provider rather than a reload, for the reason `receiveIdProvider` gives. */
   onSaved: (written: IdProvider) => void;
 };
+
+const NOTIFY = {
+  created: 'idProviders.notify.created',
+  updated: 'idProviders.notify.updated',
+} as const;
 
 export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps) {
   const editor = useStore($idProviderEditor);
@@ -200,6 +206,9 @@ export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps)
 
     written.match(
       (provider) => {
+        notifySuccess(
+          i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, provider.displayName),
+        );
         forgetIdProviderEditDetail();
         closeIdProviderEditor();
         onSaved(provider);
