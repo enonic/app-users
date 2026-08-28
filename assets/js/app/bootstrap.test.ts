@@ -10,7 +10,11 @@ const { requestGraphQlRoots, setGraphQlEndpoint } = vi.hoisted(() => ({
 
 vi.mock('../shared/api', () => ({ requestGraphQlRoots, setGraphQlEndpoint }));
 
-const CONFIG = { appId: 'com.enonic.xp.app.users', appVersion: '8.1.0' };
+const CONFIG = {
+  appId: 'com.enonic.xp.app.users',
+  appVersion: '8.1.0',
+  eventsUrl: '/_/admin:events',
+};
 const PHRASES = { 'users.heading': 'Users' };
 
 const BASE_URL =

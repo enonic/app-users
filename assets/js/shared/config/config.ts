@@ -7,4 +7,6 @@ export type Config = {
   /** This application, not the shell hosting it. */
   appId: string;
   appVersion: string;
+  /** The admin events hub api; `client.js` under it is the client to import. */
+  eventsUrl: string;
 };

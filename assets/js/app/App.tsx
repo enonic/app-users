@@ -10,6 +10,7 @@ import { UsersPage } from '../pages/users/UsersPage';
 import type { Host } from '../shared/sections';
 import { $stylesheets } from '../shared/styles';
 import { $bootstrap } from './bootstrap.store';
+import { startSectionEvents, stopSectionEvents } from './events';
 import type { Section } from './section';
 
 export type AppProps = {
@@ -30,6 +31,15 @@ export function App({ host, section }: AppProps) {
   const [theme, setTheme] = useState(host.theme.get());
 
   useEffect(() => host.theme.subscribe(setTheme), [host]);
+
+  useEffect(() => {
+    if (status !== 'ready') {
+      return;
+    }
+
+    startSectionEvents(section);
+    return stopSectionEvents;
+  }, [status, section]);
 
   const Page = PAGES[section];
 

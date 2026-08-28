@@ -41,7 +41,6 @@ export function fakeHost(overrides: Partial<Host> = {}): Host {
     path: pathStore('/'),
     navigate: vi.fn(),
     url: (subPath: string) => `#${subPath}`,
-    subscribeEvents: vi.fn(() => () => undefined),
     notify: vi.fn((notification: Notification) => {
       notified.push(notification);
       return () => undefined;

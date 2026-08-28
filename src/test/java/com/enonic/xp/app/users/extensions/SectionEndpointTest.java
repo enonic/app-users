@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 
 import com.enonic.xp.i18n.LocaleService;
 import com.enonic.xp.i18n.MessageBundle;
+import com.enonic.xp.portal.url.PortalUrlService;
 import com.enonic.xp.testing.ScriptTestSupport;
 
 /**
@@ -20,7 +21,10 @@ public class SectionEndpointTest
 {
     private static final String TEST_SCRIPT = "/com/enonic/xp/app/users/extensions/section-endpoint-test.js";
 
-    /** ScriptTestSupport registers no LocaleService, so `phrases` would fail to fetch without one. */
+    /**
+     * ScriptTestSupport registers no LocaleService, so `phrases` would fail to fetch without one —
+     * nor a PortalUrlService, which the `config` resolver needs for `eventsUrl`.
+     */
     @Override
     public void initialize()
         throws Exception
@@ -36,6 +40,12 @@ public class SectionEndpointTest
         Mockito.when( localeService.getBundle( Mockito.any(), Mockito.any(), Mockito.<String>any() ) ).thenReturn( bundle );
 
         addService( LocaleService.class, localeService );
+
+        final PortalUrlService portalUrlService = Mockito.mock( PortalUrlService.class );
+        Mockito.when( portalUrlService.apiUrl( Mockito.any() ) )
+            .thenReturn( "/admin/com.enonic.xp.app.settings/main/_/admin:events" );
+
+        addService( PortalUrlService.class, portalUrlService );
     }
 
     @Test
