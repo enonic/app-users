@@ -67,7 +67,8 @@ public class CreateIdProviderHandlerTest
         assertNull( config.getLong( "sessionTimeout" ) );
 
         // The entry naming the principal that no longer exists never reaches the platform.
-        final IdProviderAccessControlEntry entry = params.getIdProviderPermissions().getEntry( PrincipalKey.from( "group:myIdProvider:group" ) );
+        final IdProviderAccessControlEntry entry =
+            params.getIdProviderPermissions().getEntry( PrincipalKey.from( "group:myIdProvider:group" ) );
 
         assertNotNull( entry );
         assertEquals( IdProviderAccess.CREATE_USERS, entry.getAccess() );
