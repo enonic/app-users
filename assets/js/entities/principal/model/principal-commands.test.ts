@@ -38,6 +38,8 @@ beforeEach(() => {
   setHost(fakeHost());
   setPhrases(
     {
+      'principal.notify.deleted': '{0} deleted',
+      'principal.notify.deletedMany': '{0} items deleted',
       'principal.notify.deleteFailed': 'Could not delete {0}',
       'principal.notify.deleteFailedReason': 'Could not delete {0}: {1}',
     },
@@ -64,15 +66,28 @@ describe('deletePrincipals', () => {
     expect(sendPrincipalDeletion).toHaveBeenCalledWith([editors.key, admin.key]);
   });
 
-  it('is silent on success and puts the list back in step', async () => {
+  it('names the one deleted principal and puts the list back in step', async () => {
     vi.mocked(sendPrincipalDeletion).mockReturnValue(
       okAsync([{ key: editors.key, deleted: true }]),
     );
 
     await deletePrincipals([editors], scope());
 
-    expect(notificationTexts()).toEqual([]);
+    expect(notificationTexts()).toEqual(['Editors deleted']);
     expect(resync).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports a count when several principals went together', async () => {
+    vi.mocked(sendPrincipalDeletion).mockReturnValue(
+      okAsync([
+        { key: editors.key, deleted: true },
+        { key: admin.key, deleted: true },
+      ]),
+    );
+
+    await deletePrincipals([editors, admin], scope());
+
+    expect(notificationTexts()).toEqual(['2 items deleted']);
   });
 
   it('names the principal the server refused, with the reason it gave', async () => {
@@ -85,7 +100,10 @@ describe('deletePrincipals', () => {
 
     await deletePrincipals([editors, admin], scope());
 
-    expect(notificationTexts()).toEqual(['Could not delete Administrator: Not allowed']);
+    expect(notificationTexts()).toEqual([
+      'Editors deleted',
+      'Could not delete Administrator: Not allowed',
+    ]);
   });
 
   it('reports a refusal that carried no reason by name alone', async () => {
