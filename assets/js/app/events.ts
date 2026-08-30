@@ -1,5 +1,6 @@
-import { connectAdminEvents, PRINCIPALS_TOPIC, subscribeTopic } from '../shared/admin-events';
+import { connectAdminEvents, subscribeTopic } from '../shared/admin-events';
 import { $config } from '../shared/config';
+import { HUB_TOPICS } from '../shared/sections';
 import type { Section } from './section';
 
 let unsubscribe: (() => void) | undefined;
@@ -22,7 +23,7 @@ export function startSectionEvents(section: Section): void {
   connectAdminEvents(eventsUrl);
 
   // TODO: Temporary logging until the sections decide what a message means to them.
-  unsubscribe = subscribeTopic(PRINCIPALS_TOPIC, {
+  unsubscribe = subscribeTopic(HUB_TOPICS.principals, {
     onMessage: (data) => {
       console.log(`[${section}] principals message:`, data);
     },

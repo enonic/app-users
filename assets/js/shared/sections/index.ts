@@ -1,3 +1,4 @@
+export { HUB_TOPICS } from './contract';
 export type {
   Host,
   MountOptions,

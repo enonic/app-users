@@ -12,6 +12,18 @@
  */
 export type Readable<T> = { get(): T; subscribe(cb: (v: T) => void): () => void };
 
+/**
+ * Canonical admin events hub topics the host registers and publishes; a section subscribes with
+ * the platform-served client (`<eventsUrl>/client.js` → `connect().subscribe(topic)`). Each
+ * topic's `allow` is server-side; payloads carry ids only.
+ */
+export const HUB_TOPICS = {
+  /** Application lifecycle, `{eventType, key, systemApplication}`; `PROGRESS` excluded. */
+  applications: 'com.enonic.xp.app.settings:applications',
+  /** Principal changes, `{operation, changes: [{kind, key}]}`. */
+  principals: 'com.enonic.xp.app.settings:principals',
+} as const;
+
 export type Notification = {
   level: 'info' | 'success' | 'warning' | 'error';
   /** Already localized by the guest: no i18n key crosses the boundary. */

@@ -85,6 +85,10 @@ export function createAdminEvents(
 
       return () => {
         set.delete(handlers);
+        // ! Identity-checked: a stale unsubscribe must not evict a later subscriber's set.
+        if (set.size === 0 && registry.get(topic) === set) {
+          registry.delete(topic);
+        }
       };
     },
   };

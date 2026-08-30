@@ -5,7 +5,6 @@ const subscribeTopic = vi.hoisted(() => vi.fn());
 vi.mock('../shared/admin-events', () => ({
   connectAdminEvents,
   subscribeTopic,
-  PRINCIPALS_TOPIC: 'com.enonic.xp.app.settings:principals',
 }));
 
 import { setConfig } from '../shared/config';

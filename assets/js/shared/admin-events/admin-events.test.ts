@@ -102,6 +102,22 @@ describe('createAdminEvents', () => {
     expect(onMessage).not.toHaveBeenCalled();
   });
 
+  it('keeps a later subscriber when a stale unsubscribe is called twice', async () => {
+    const { events, emit, arrive } = harness();
+    const early = vi.fn();
+    const late = vi.fn();
+    const unsubscribeEarly = events.subscribeTopic('app:mine', { onMessage: early });
+    events.connect('/hub');
+    await arrive();
+
+    unsubscribeEarly();
+    events.subscribeTopic('app:mine', { onMessage: late });
+    unsubscribeEarly();
+    emit('app:mine', { n: 1 });
+
+    expect(late).toHaveBeenCalledWith({ n: 1 });
+  });
+
   it('connects once, whatever asks again', async () => {
     let imports = 0;
     const events = createAdminEvents(() => {
