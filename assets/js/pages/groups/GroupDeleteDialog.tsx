@@ -2,6 +2,7 @@ import { useStore } from '@nanostores/preact';
 
 import { deletePrincipals } from '../../entities/principal';
 import { PrincipalLabel } from '../../entities/principal/ui/PrincipalLabel';
+import { useHostFrame } from '../../shared/host';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { groupsDeletion } from './model/deletion.store';
 import { loadGroupsScreen } from './model/groups.screen';
@@ -14,6 +15,7 @@ export type GroupDeleteDialogProps = {
 
 export function GroupDeleteDialog({ activeKey, onCloseItem }: GroupDeleteDialogProps) {
   const targets = useStore(groupsDeletion.$payload);
+  const { notifyError, notifySuccess } = useHostFrame();
 
   return (
     <DeleteConfirmDialog
@@ -32,6 +34,11 @@ export function GroupDeleteDialog({ activeKey, onCloseItem }: GroupDeleteDialogP
           closeItem: onCloseItem,
           activeKey,
           selection: groupsSelection,
+        }).then(({ success, failures }) => {
+          if (success !== undefined) {
+            notifySuccess(success);
+          }
+          failures.forEach(notifyError);
         });
       }}
     />

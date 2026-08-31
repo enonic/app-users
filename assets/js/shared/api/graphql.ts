@@ -6,8 +6,12 @@ import { AppError } from './errors';
 export type GraphQlVariables = Record<string, unknown>;
 
 /**
- * Where this section's data plane lives. Only the shell knows it — the url carries the admin tool's
- * base path — so `mount` sets it from `host.baseUrl` before anything can ask.
+ * Where this module's data plane lives. Only the shell knows it — the url carries the admin tool's
+ * base path — so the bootstrap sets it from `host.baseUrl` before anything can ask.
+ *
+ * ? Module-level, so with several sections mounted the first mount's prefix answers for all. Sound
+ * ? here because every section prefix of this app serves the same schema behind the same audience —
+ * ? a provider whose sections have different data planes must scope this per mount instead.
  */
 let endpoint: string | undefined;
 

@@ -3,15 +3,15 @@ import { $config } from '../shared/config';
 import { HUB_TOPICS } from '../shared/sections';
 import type { Section } from './section';
 
-let unsubscribe: (() => void) | undefined;
+/** One module instance can serve several mounted sections, so each holds its own subscription. */
+const subscriptions = new Map<Section, () => void>();
 
 /**
- * Connects this section to the hub's `principals` topic. The module runs once per section, so each
- * mounted section holds its own subscription.
+ * Connects a section to the hub's `principals` topic.
  * ? What a section does with a message is still open (#2656); until then it is only logged.
  */
 export function startSectionEvents(section: Section): void {
-  if (unsubscribe != null) {
+  if (subscriptions.has(section)) {
     return;
   }
 
@@ -23,17 +23,21 @@ export function startSectionEvents(section: Section): void {
   connectAdminEvents(eventsUrl);
 
   // TODO: Temporary logging until the sections decide what a message means to them.
-  unsubscribe = subscribeTopic(HUB_TOPICS.principals, {
-    onMessage: (data) => {
-      console.log(`[${section}] principals message:`, data);
-    },
-    onLoss: (count) => {
-      console.log(`[${section}] principals loss:`, count);
-    },
-  });
+  subscriptions.set(
+    section,
+    subscribeTopic(HUB_TOPICS.principals, {
+      onMessage: (data) => {
+        console.log(`[${section}] principals message:`, data);
+      },
+      onLoss: (count) => {
+        console.log(`[${section}] principals loss:`, count);
+      },
+    }),
+  );
 }
 
-export function stopSectionEvents(): void {
+export function stopSectionEvents(section: Section): void {
+  const unsubscribe = subscriptions.get(section);
+  subscriptions.delete(section);
   unsubscribe?.();
-  unsubscribe = undefined;
 }

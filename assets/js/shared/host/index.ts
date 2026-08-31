@@ -1,3 +1,2 @@
-export { $host, setHost } from './host.store';
-export { $itemId, closeItem, openItem, useItemId } from './routing';
-export { notifyError, notifyInfo, notifySuccess, notifyWarning } from './notify';
+export { createHostFrame, type HostFrame } from './frame';
+export { HostFrameProvider, useHostFrame, useItemId } from './useHostFrame';

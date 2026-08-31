@@ -59,4 +59,10 @@ export type MountOptions = {
 /** Idempotent, and must not throw. The host wraps it anyway. */
 export type Unmount = () => void;
 
+/**
+ * ! One module instance may serve several sections: the host imports the same URL for every section
+ * ! an application ships (unless a section opts out with `config.module`), so `mount` runs once per
+ * ! section from one instance and module-level state is shared across those mounts. Anything
+ * ! derived from `host` belongs to the mount it was handed to.
+ */
 export type SectionModule = { mount(opts: MountOptions): Unmount };

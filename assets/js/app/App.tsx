@@ -7,14 +7,14 @@ import { GroupsPage } from '../pages/groups/GroupsPage';
 import { IdProvidersPage } from '../pages/id-providers/IdProvidersPage';
 import { RolesPage } from '../pages/roles/RolesPage';
 import { UsersPage } from '../pages/users/UsersPage';
-import type { Host } from '../shared/sections';
+import { HostFrameProvider, type HostFrame } from '../shared/host';
 import { $stylesheets } from '../shared/styles';
 import { $bootstrap } from './bootstrap.store';
 import type { Section } from './section';
 import { useSectionEvents } from './useSectionEvents';
 
 export type AppProps = {
-  host: Host;
+  frame: HostFrame;
   section: Section;
 };
 
@@ -25,24 +25,26 @@ const PAGES: Record<Section, FunctionComponent> = {
   'id-providers': IdProvidersPage,
 };
 
-export function App({ host, section }: AppProps) {
+export function App({ frame, section }: AppProps) {
   useSectionEvents(section);
   const { status, error } = useStore($bootstrap);
   const stylesheets = useStore($stylesheets);
-  const [theme, setTheme] = useState(host.theme.get());
+  const [theme, setTheme] = useState(frame.host.theme.get());
 
-  useEffect(() => host.theme.subscribe(setTheme), [host]);
+  useEffect(() => frame.host.theme.subscribe(setTheme), [frame]);
 
   const Page = PAGES[section];
 
   // ! `AppRoot` adopts the sheet, sets the theme class (`.dark` never crosses the shadow boundary)
   // ! and portals overlays inside this root. Needs `@enonic/ui` >= 1.2.0.
   return (
-    <AppRoot theme={theme} stylesheets={stylesheets} className="flex min-h-0 flex-1 flex-col">
-      {status === 'loading' && <BootstrapSkeleton />}
-      {status === 'error' && <BootstrapFailed error={error} />}
-      {status === 'ready' && <Page />}
-    </AppRoot>
+    <HostFrameProvider value={frame}>
+      <AppRoot theme={theme} stylesheets={stylesheets} className="flex min-h-0 flex-1 flex-col">
+        {status === 'loading' && <BootstrapSkeleton />}
+        {status === 'error' && <BootstrapFailed error={error} />}
+        {status === 'ready' && <Page />}
+      </AppRoot>
+    </HostFrameProvider>
   );
 }
 

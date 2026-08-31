@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import { createGroup, updateGroup, useIdProviderNames } from '../../entities/principal';
 import { diffByKey, mergeByKey, visitedErrors } from '../../shared/form';
-import { notifySuccess } from '../../shared/host';
+import { useHostFrame } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { DialogIdentityHeader } from '../../shared/ui/dialogs/DialogIdentityHeader';
 import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
@@ -37,6 +37,7 @@ const NOTIFY = {
 
 export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
   const editor = useStore($groupEditor);
+  const { notifySuccess } = useHostFrame();
   const detail = useStore($groupEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.group.key : undefined;
   const { items: providers } = useIdProviderNames();

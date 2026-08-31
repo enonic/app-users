@@ -76,8 +76,11 @@ stays with its domain.
   it resyncs.
 - **It never writes list state.** A failed command means the list is unchanged, not that the list failed
   to load; flipping a section to `error` over a refused Stop would report the wrong thing.
-- **Its outcome goes to `notifyError`**, because a command has no screen of its own to fail on: the user
-  may have moved on. The mirror of the loading rule — a load failure never becomes a notification.
+- **Its refusals come back as localized messages** for the caller to toast through its own mount's
+  `HostFrame`, because a command has no screen of its own to fail on: the user may have moved on. A
+  command never touches the host — one module serves several mounts, and only the component tree
+  knows which mount it is in. The mirror of the loading rule — a load failure never becomes a
+  notification.
 - **The truth comes from a refetch, never from a local edit.** No optimistic writes: the list is a whole
   set fetched in one round trip, so `load<Domain>()` after the command is cheap, while a local state that
   quietly disagrees with the server is not. A command that needs optimism has to argue for it here first.

@@ -1,4 +1,3 @@
-import { notifyError, notifySuccess } from '../../../shared/host';
 import { i18n } from '../../../shared/i18n';
 import type { SelectionStore } from '../../../shared/selection';
 import { sendPrincipalDeletion } from '../api/principal-deletion.api';
@@ -23,32 +22,47 @@ export type PrincipalSectionScope = {
   selection: SelectionStore;
 };
 
+/**
+ * What the command has to say, localized and in showing order. What to say is the domain's — the
+ * names, the counts, the phrases; where to say it is the caller's, through its own mount's frame.
+ * A command never reaches the host.
+ */
+export type DeletionNotices = {
+  /** The one deleted principal by name, several as a count. Absent when nothing was deleted. */
+  success?: string;
+  /**
+   * One refusal per target that stayed. Shown after the success: errors live longer and only three
+   * toasts show, so raised before a batch of refusals the confirmation would queue behind them.
+   */
+  failures: string[];
+};
+
 export async function deletePrincipals(
   targets: readonly DeletablePrincipal[],
   scope: PrincipalSectionScope,
-): Promise<void> {
+): Promise<DeletionNotices> {
   if (targets.length === 0) {
-    return;
+    return { failures: [] };
   }
 
   const result = await sendPrincipalDeletion(targets.map(({ key }) => key));
 
-  result.match(
+  return result.match(
     (outcomes) => {
       const deletedKeys = outcomes.filter(({ deleted }) => deleted).map(({ key }) => key);
-      // Success first: errors live longer and only three toasts show, so raised after a batch of
-      // refusals the confirmation would queue behind them for half a minute.
-      notifyDeleted(deletedKeys, targets);
-
-      outcomes
-        .filter(({ deleted }) => !deleted)
-        .forEach(({ key, reason }) => notifyFailure(nameOf(targets, key), reason));
 
       reconcile(deletedKeys, scope);
+
+      return {
+        success: successMessage(deletedKeys, targets),
+        failures: outcomes
+          .filter(({ deleted }) => !deleted)
+          .map(({ key, reason }) => failureMessage(nameOf(targets, key), reason)),
+      };
     },
-    (error) => {
-      targets.forEach(({ displayName }) => notifyFailure(displayName, error.message));
-    },
+    (error) => ({
+      failures: targets.map(({ displayName }) => failureMessage(displayName, error.message)),
+    }),
   );
 }
 
@@ -68,23 +82,23 @@ function reconcile(
 }
 
 /** A deleted row just leaves the list, so the toast is what says the command worked. */
-function notifyDeleted(
+function successMessage(
   keys: readonly PrincipalKey[],
   targets: readonly DeletablePrincipal[],
-): void {
-  if (keys.length === 1) {
-    notifySuccess(i18n(TEXT.deleted, nameOf(targets, keys[0])));
-  } else if (keys.length > 1) {
-    notifySuccess(i18n(TEXT.deletedMany, keys.length));
+): string | undefined {
+  const [only] = keys;
+
+  if (keys.length === 1 && only !== undefined) {
+    return i18n(TEXT.deleted, nameOf(targets, only));
   }
+
+  return keys.length > 1 ? i18n(TEXT.deletedMany, keys.length) : undefined;
 }
 
-function notifyFailure(name: string, reason: string | undefined): void {
-  notifyError(
-    reason === undefined
-      ? i18n(TEXT.deleteFailed, name)
-      : i18n(TEXT.deleteFailedReason, name, reason),
-  );
+function failureMessage(name: string, reason: string | undefined): string {
+  return reason === undefined
+    ? i18n(TEXT.deleteFailed, name)
+    : i18n(TEXT.deleteFailedReason, name, reason);
 }
 
 function nameOf(targets: readonly DeletablePrincipal[], key: PrincipalKey): string {

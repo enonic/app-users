@@ -9,6 +9,7 @@ vi.mock('../shared/admin-events', () => ({
 
 import { setConfig } from '../shared/config';
 import { startSectionEvents, stopSectionEvents } from './events';
+import { SECTIONS } from './section';
 
 describe('startSectionEvents', () => {
   beforeEach(() => {
@@ -21,7 +22,7 @@ describe('startSectionEvents', () => {
   });
 
   afterEach(() => {
-    stopSectionEvents();
+    SECTIONS.forEach(stopSectionEvents);
     vi.clearAllMocks();
   });
 
@@ -41,11 +42,29 @@ describe('startSectionEvents', () => {
     subscribeTopic.mockReturnValue(unsubscribe);
 
     startSectionEvents('users');
-    stopSectionEvents();
+    stopSectionEvents('users');
 
     expect(unsubscribe).toHaveBeenCalled();
 
     startSectionEvents('users');
     expect(subscribeTopic).toHaveBeenCalledTimes(2);
+  });
+
+  // ! One module instance can serve several mounted sections: each holds its own subscription, and
+  // ! stopping one section must not silence another.
+  it('keeps each mounted section on its own subscription', () => {
+    const dropUsers = vi.fn();
+    const dropRoles = vi.fn();
+    subscribeTopic.mockReturnValueOnce(dropUsers).mockReturnValueOnce(dropRoles);
+
+    startSectionEvents('users');
+    startSectionEvents('roles');
+
+    expect(subscribeTopic).toHaveBeenCalledTimes(2);
+
+    stopSectionEvents('users');
+
+    expect(dropUsers).toHaveBeenCalled();
+    expect(dropRoles).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,7 @@
 import { useStore } from '@nanostores/preact';
 
 import { deleteIdProviders, loadIdProviders } from '../../entities/principal';
+import { useHostFrame } from '../../shared/host';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { idProvidersDeletion } from './model/deletion.store';
 import { idProvidersSelection } from './model/selection.store';
@@ -12,6 +13,7 @@ export type IdProviderDeleteDialogProps = {
 
 export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDeleteDialogProps) {
   const targets = useStore(idProvidersDeletion.$payload);
+  const { notifyError, notifySuccess } = useHostFrame();
 
   return (
     <DeleteConfirmDialog
@@ -27,6 +29,11 @@ export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDel
           closeItem: onCloseItem,
           activeKey,
           selection: idProvidersSelection,
+        }).then(({ success, failures }) => {
+          if (success !== undefined) {
+            notifySuccess(success);
+          }
+          failures.forEach(notifyError);
         });
       }}
     />

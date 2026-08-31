@@ -28,9 +28,9 @@ type BootstrapData = {
  * the host object: where this section's data lives and which locale to ask in. One document, because
  * one round trip is what a screen costs on this app's single JS thread.
  *
- * ! Memoized for the life of the module. That is per section rather than per app: the browser imports
- * ! the module once per extension prefix, so the four sections do not share this — nor the stylesheet,
- * ! nor any other module-level state.
+ * ! Memoized for the life of the module, however many sections mount from it. The first mount's host
+ * ! supplies `baseUrl` and `locale` for all — sound because every section prefix serves the same
+ * ! schema, and the locale is the tool's, identical across sections.
  */
 let started: Promise<void> | undefined;
 

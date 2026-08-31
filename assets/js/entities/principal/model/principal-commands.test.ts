@@ -1,9 +1,7 @@
 import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fakeHost, forgetNotifications, notified } from '../../../../../test/mocks/fake-host';
 import { AppError } from '../../../shared/api';
-import { setHost } from '../../../shared/host';
 import { setPhrases } from '../../../shared/i18n';
 import { createSelectionStore, type SelectionStore } from '../../../shared/selection';
 import { sendPrincipalDeletion } from '../api/principal-deletion.api';
@@ -21,10 +19,6 @@ function target(key: string, displayName: string) {
 const editors = target('role:editors', 'Editors');
 const admin = target('role:system.admin', 'Administrator');
 
-function notificationTexts(): string[] {
-  return notified.map(({ message }) => message);
-}
-
 let resync: () => void;
 let closeItem: () => void;
 let selection: SelectionStore;
@@ -34,8 +28,6 @@ function scope(activeKey?: string): PrincipalSectionScope {
 }
 
 beforeEach(() => {
-  forgetNotifications();
-  setHost(fakeHost());
   setPhrases(
     {
       'principal.notify.deleted': '{0} deleted',
@@ -71,9 +63,9 @@ describe('deletePrincipals', () => {
       okAsync([{ key: editors.key, deleted: true }]),
     );
 
-    await deletePrincipals([editors], scope());
+    const notices = await deletePrincipals([editors], scope());
 
-    expect(notificationTexts()).toEqual(['Editors deleted']);
+    expect(notices).toEqual({ success: 'Editors deleted', failures: [] });
     expect(resync).toHaveBeenCalledTimes(1);
   });
 
@@ -85,9 +77,9 @@ describe('deletePrincipals', () => {
       ]),
     );
 
-    await deletePrincipals([editors, admin], scope());
+    const notices = await deletePrincipals([editors, admin], scope());
 
-    expect(notificationTexts()).toEqual(['2 items deleted']);
+    expect(notices).toEqual({ success: '2 items deleted', failures: [] });
   });
 
   it('names the principal the server refused, with the reason it gave', async () => {
@@ -98,20 +90,21 @@ describe('deletePrincipals', () => {
       ]),
     );
 
-    await deletePrincipals([editors, admin], scope());
+    const notices = await deletePrincipals([editors, admin], scope());
 
-    expect(notificationTexts()).toEqual([
-      'Editors deleted',
-      'Could not delete Administrator: Not allowed',
-    ]);
+    expect(notices).toEqual({
+      success: 'Editors deleted',
+      failures: ['Could not delete Administrator: Not allowed'],
+    });
   });
 
   it('reports a refusal that carried no reason by name alone', async () => {
     vi.mocked(sendPrincipalDeletion).mockReturnValue(okAsync([{ key: admin.key, deleted: false }]));
 
-    await deletePrincipals([admin], scope());
+    const notices = await deletePrincipals([admin], scope());
 
-    expect(notificationTexts()).toEqual(['Could not delete Administrator']);
+    expect(notices.success).toBeUndefined();
+    expect(notices.failures).toEqual(['Could not delete Administrator']);
   });
 
   it('reloads the list even when every key was refused', async () => {
@@ -171,9 +164,10 @@ describe('deletePrincipals', () => {
   it('reports every target when the request itself fails, and reloads nothing', async () => {
     vi.mocked(sendPrincipalDeletion).mockReturnValue(errAsync(new AppError('Forbidden')));
 
-    await deletePrincipals([editors, admin], scope());
+    const notices = await deletePrincipals([editors, admin], scope());
 
-    expect(notificationTexts()).toEqual([
+    expect(notices.success).toBeUndefined();
+    expect(notices.failures).toEqual([
       'Could not delete Editors: Forbidden',
       'Could not delete Administrator: Forbidden',
     ]);
