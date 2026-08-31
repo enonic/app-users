@@ -14,8 +14,10 @@ endpoint set once at mount from `host.baseUrl`. Do not add a second http helper,
 - Pass an `AbortSignal` for anything a user can retrigger and cancel the previous request.
 - Surface load failures as store state (`status: 'loading' | 'ready' | 'error'`); a command's
   failure goes to a notification through `host.notify`. Never both for one failure.
-- Server events arrive through `host.subscribeEvents` — the host fans out the whole stream, filter
-  in the callback.
+- Server events arrive over the admin events hub: `shared/admin-events` imports the platform's
+  client from the `eventsUrl` the section's own `config` root field delivers, and subscribes by the
+  canonical names in `HUB_TOPICS` (`shared/sections/contract.ts`). The contract carries no event
+  member — `app/useSectionEvents.ts` owns the subscription's lifecycle.
 
 ## Server side
 

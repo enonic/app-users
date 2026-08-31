@@ -11,6 +11,7 @@ import type { Host } from '../shared/sections';
 import { $stylesheets } from '../shared/styles';
 import { $bootstrap } from './bootstrap.store';
 import type { Section } from './section';
+import { useSectionEvents } from './useSectionEvents';
 
 export type AppProps = {
   host: Host;
@@ -25,6 +26,7 @@ const PAGES: Record<Section, FunctionComponent> = {
 };
 
 export function App({ host, section }: AppProps) {
+  useSectionEvents(section);
   const { status, error } = useStore($bootstrap);
   const stylesheets = useStore($stylesheets);
   const [theme, setTheme] = useState(host.theme.get());

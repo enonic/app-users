@@ -12,7 +12,17 @@
  */
 export type Readable<T> = { get(): T; subscribe(cb: (v: T) => void): () => void };
 
-export type XpServerEvent = { type: string; timestamp?: number; data?: Record<string, unknown> };
+/**
+ * Canonical admin events hub topics the host registers and publishes; a section subscribes with
+ * the platform-served client (`<eventsUrl>/client.js` → `connect().subscribe(topic)`). Each
+ * topic's `allow` is server-side; payloads carry ids only.
+ */
+export const HUB_TOPICS = {
+  /** Application lifecycle, `{eventType, key, systemApplication}`; `PROGRESS` excluded. */
+  applications: 'com.enonic.xp.app.settings:applications',
+  /** Principal changes, `{operation, changes: [{kind, key}]}`. */
+  principals: 'com.enonic.xp.app.settings:principals',
+} as const;
 
 export type Notification = {
   level: 'info' | 'success' | 'warning' | 'error';
@@ -35,8 +45,6 @@ export type Host = {
   navigate(subPath: string, opts?: { replace?: boolean }): void;
   /** Href builder for real anchors within the module's own segment. */
   url(subPath: string): string;
-  /** The host's single socket, fanned out; filter in the callback. */
-  subscribeEvents(cb: (event: XpServerEvent) => void): () => void;
   /** Toast on the host's stack; returns dismiss. */
   notify(n: Notification): () => void;
 };
