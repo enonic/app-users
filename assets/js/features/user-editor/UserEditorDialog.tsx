@@ -12,7 +12,7 @@ import {
   type User,
 } from '../../entities/principal';
 import { diffByKey, mergeByKey, visitedErrors } from '../../shared/form';
-import { notifySuccess } from '../../shared/host';
+import { useHostFrame } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { DialogIdentityHeader } from '../../shared/ui/dialogs/DialogIdentityHeader';
 import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
@@ -45,6 +45,7 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
   const detail = useStore($userEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.user.key : undefined;
   const { items: providers } = useIdProviderNames();
+  const { notifySuccess } = useHostFrame();
 
   const createTitle = useI18n('users.dialog.createTitle');
   const editTitle = useI18n('users.dialog.editTitle');

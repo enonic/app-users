@@ -13,7 +13,7 @@ import {
   type IdProvider,
 } from '../../entities/principal';
 import { visitedErrors } from '../../shared/form';
-import { notifySuccess } from '../../shared/host';
+import { useHostFrame } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { DialogIdentityHeader } from '../../shared/ui/dialogs/DialogIdentityHeader';
 import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
@@ -47,6 +47,7 @@ const NOTIFY = {
 
 export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps) {
   const editor = useStore($idProviderEditor);
+  const { notifySuccess } = useHostFrame();
   const detail = useStore($idProviderEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.provider.key : undefined;
 

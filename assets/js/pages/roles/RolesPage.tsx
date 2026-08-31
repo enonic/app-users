@@ -4,7 +4,7 @@ import { useMemo } from 'preact/hooks';
 import { useRoles } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { RoleEditorDialog } from '../../features/role-editor/RoleEditorDialog';
-import { closeItem, openItem } from '../../shared/host';
+import { useHostFrame } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { sortByDisplayName, type SortDirection } from '../../widgets/browse-list/browse-sort';
@@ -28,6 +28,7 @@ export function RolesPage() {
   // One request for the three domains this screen reads — the roles, the providers that name a member's
   // origin.
   useRolesScreen();
+  const { openItem, closeItem } = useHostFrame();
   const { status, items } = useRoles();
   const query = useStore(rolesSearch.$query);
   const selectedBuckets = useStore(rolesFilter.$selected);

@@ -2,6 +2,7 @@ import { useStore } from '@nanostores/preact';
 
 import { deletePrincipals } from '../../entities/principal';
 import { PrincipalLabel } from '../../entities/principal/ui/PrincipalLabel';
+import { useHostFrame } from '../../shared/host';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { rolesDeletion } from './model/deletion.store';
 import { loadRolesScreen } from './model/roles.screen';
@@ -14,6 +15,7 @@ export type RoleDeleteDialogProps = {
 
 export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogProps) {
   const targets = useStore(rolesDeletion.$payload);
+  const { notifyError, notifySuccess } = useHostFrame();
 
   return (
     <DeleteConfirmDialog
@@ -32,6 +34,11 @@ export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogPro
           closeItem: onCloseItem,
           activeKey,
           selection: rolesSelection,
+        }).then(({ success, failures }) => {
+          if (success !== undefined) {
+            notifySuccess(success);
+          }
+          failures.forEach(notifyError);
         });
       }}
     />

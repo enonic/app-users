@@ -1,9 +1,7 @@
 import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fakeHost, forgetNotifications, notified } from '../../../../../test/mocks/fake-host';
 import { AppError } from '../../../shared/api';
-import { setHost } from '../../../shared/host';
 import { setPhrases } from '../../../shared/i18n';
 import { createSelectionStore, type SelectionStore } from '../../../shared/selection';
 import {
@@ -47,10 +45,6 @@ function written(displayName: string): IdProvider {
   return { key: 'ldap', displayName, users: { total: 0 }, groups: { total: 0 } };
 }
 
-function notificationTexts(): string[] {
-  return notified.map(({ message }) => message);
-}
-
 let resync: () => void;
 let closeItem: () => void;
 let selection: SelectionStore;
@@ -60,8 +54,6 @@ function scope(activeKey?: string): IdProviderSectionScope {
 }
 
 beforeEach(() => {
-  forgetNotifications();
-  setHost(fakeHost());
   setPhrases(
     {
       'idProviders.notify.deleted': '{0} deleted',
@@ -143,9 +135,9 @@ describe('deleteIdProviders', () => {
   it('names the one deleted provider', async () => {
     vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'ldap', deleted: true }]));
 
-    await deleteIdProviders([ldap], scope());
+    const notices = await deleteIdProviders([ldap], scope());
 
-    expect(notificationTexts()).toContain('Company directory deleted');
+    expect(notices).toEqual({ success: 'Company directory deleted', failures: [] });
   });
 
   it('names the provider and the reason a refusal came with', async () => {
@@ -153,18 +145,19 @@ describe('deleteIdProviders', () => {
       okAsync([{ key: 'system', deleted: false, reason: 'It holds users' }]),
     );
 
-    await deleteIdProviders([system], scope());
+    const notices = await deleteIdProviders([system], scope());
 
-    expect(notificationTexts()).toEqual(['Could not delete System: It holds users']);
+    expect(notices.failures).toEqual(['Could not delete System: It holds users']);
   });
 
   // ! `deleted: false` also covers a provider somebody else deleted first, so the list still reloads.
   it('reloads even when every key was refused', async () => {
     vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'system', deleted: false }]));
 
-    await deleteIdProviders([system], scope());
+    const notices = await deleteIdProviders([system], scope());
 
-    expect(notificationTexts()).toEqual(['Could not delete System']);
+    expect(notices.success).toBeUndefined();
+    expect(notices.failures).toEqual(['Could not delete System']);
     expect(resync).toHaveBeenCalled();
   });
 
@@ -187,9 +180,10 @@ describe('deleteIdProviders', () => {
   it('names every target when the request itself failed', async () => {
     vi.mocked(sendIdProviderDeletion).mockReturnValue(errAsync(new AppError('Offline')));
 
-    await deleteIdProviders([ldap, system], scope());
+    const notices = await deleteIdProviders([ldap, system], scope());
 
-    expect(notificationTexts()).toEqual([
+    expect(notices.success).toBeUndefined();
+    expect(notices.failures).toEqual([
       'Could not delete Company directory: Offline',
       'Could not delete System: Offline',
     ]);

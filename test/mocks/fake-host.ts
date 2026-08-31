@@ -26,9 +26,6 @@ export function pathStore(initial: string): Readable<string> & { set(value: stri
   };
 }
 
-/** Everything the host was asked to show, in order, so a command can be tested by what it said. */
-export const notified: Notification[] = [];
-
 /**
  * A stand-in for the object the shell hands to `mount`. Only what a test drives is real; the rest
  * answers plausibly so nothing has to be stubbed twice.
@@ -41,14 +38,7 @@ export function fakeHost(overrides: Partial<Host> = {}): Host {
     path: pathStore('/'),
     navigate: vi.fn(),
     url: (subPath: string) => `#${subPath}`,
-    notify: vi.fn((notification: Notification) => {
-      notified.push(notification);
-      return () => undefined;
-    }),
+    notify: vi.fn((_notification: Notification) => () => undefined),
     ...overrides,
   };
-}
-
-export function forgetNotifications(): void {
-  notified.length = 0;
 }

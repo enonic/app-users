@@ -15,6 +15,6 @@ export function useSectionEvents(section: Section): void {
     }
 
     startSectionEvents(section);
-    return stopSectionEvents;
+    return () => stopSectionEvents(section);
   }, [status, section]);
 }

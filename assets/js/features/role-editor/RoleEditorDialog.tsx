@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import { createRole, updateRole } from '../../entities/principal';
 import { diffByKey, mergeByKey, visitedErrors } from '../../shared/form';
-import { notifySuccess } from '../../shared/host';
+import { useHostFrame } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
 import { DialogIdentityHeader } from '../../shared/ui/dialogs/DialogIdentityHeader';
 import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
@@ -33,6 +33,7 @@ const NOTIFY = {
 
 export function RoleEditorDialog({ onSaved }: RoleEditorDialogProps) {
   const editor = useStore($roleEditor);
+  const { notifySuccess } = useHostFrame();
   const detail = useStore($roleEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.role.key : undefined;
 
