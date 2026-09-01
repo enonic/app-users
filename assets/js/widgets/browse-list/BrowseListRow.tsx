@@ -46,7 +46,12 @@ export function BrowseListRow({
 
   useEffect(() => {
     const row = rowRef.current;
-    if (!focused || !row || document.activeElement === row) {
+    if (!focused || !row) {
+      return;
+    }
+
+    const active = (row.getRootNode() as Document | ShadowRoot).activeElement;
+    if (active === row) {
       return;
     }
 
@@ -54,7 +59,7 @@ export function BrowseListRow({
     // ! comes and goes as a query filters it in and out, and it must not yank the focus out of the
     // ! search field it came back under. focusVisible keeps the ring across keyboard moves, which
     // ! a plain programmatic focus() drops.
-    if (row.closest('[role="listbox"]')?.contains(document.activeElement) === true) {
+    if (row.closest('[role="listbox"]')?.contains(active) === true) {
       row.focus({ focusVisible: true });
     }
   }, [focused]);
