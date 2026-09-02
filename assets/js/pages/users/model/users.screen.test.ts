@@ -1,4 +1,4 @@
-import { errAsync, okAsync } from 'neverthrow';
+import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { $idProviderNames } from '../../../entities/principal/model/id-providers.store';
@@ -8,7 +8,8 @@ import { $users } from '../../../entities/principal/model/users.store';
 import { AppError, requestGraphQlDocument } from '../../../shared/api';
 import { fetchUsersScreen } from '../api/users-screen.api';
 import { $usersQuery, setUsersSearch, toggleUsersIdProvider } from './query.store';
-import { loadMoreUsers, reloadUsersScreen } from './users.screen';
+import { usersSelection } from './selection.store';
+import { loadMoreUsers, refreshUsersScreen, reloadUsersScreen } from './users.screen';
 
 // The screen owns the query, the paging and the cancelling; stubbing the api keeps the transport out of
 // it and lets a test hold one answer back.
@@ -59,6 +60,7 @@ afterEach(() => {
   $users.set({ status: 'loading', items: [], total: 0, appending: false, exhausted: false });
   $idProviderNames.set({ status: 'loading', items: [] });
   $usersQuery.set({ idProviders: [], sort: 'displayNameAsc' });
+  usersSelection.clear();
 });
 
 describe('reloadUsersScreen', () => {
@@ -290,5 +292,57 @@ describe('loadMoreUsers', () => {
     await stale;
 
     expect($users.get().items.map(({ login }) => login)).toEqual(['dave']);
+  });
+});
+
+describe('refreshUsersScreen', () => {
+  it('asks for every page loaded so far, in one request from the start', async () => {
+    const pageOf = (n: number) =>
+      answered(
+        Array.from({ length: 50 }, (_, i) => `u${n}-${i}`),
+        137,
+      );
+    vi.mocked(fetchUsersScreen)
+      .mockReturnValueOnce(pageOf(0))
+      .mockReturnValueOnce(pageOf(1))
+      .mockReturnValueOnce(pageOf(2))
+      .mockReturnValueOnce(answered(['alice'], 1));
+    await reloadUsersScreen();
+    await loadMoreUsers();
+    await loadMoreUsers();
+
+    await refreshUsersScreen();
+
+    expect(askedOn(3)?.start).toBe(0);
+    expect(askedOn(3)?.count).toBe(150);
+  });
+
+  it('asks for at least one page when nothing is loaded', async () => {
+    await refreshUsersScreen();
+
+    expect(askedOn()?.count).toBe(50);
+  });
+
+  // The refresh cancels the page in flight, so it has to bring that page itself.
+  it('covers a page in flight rather than losing it', async () => {
+    await reloadUsersScreen();
+    vi.mocked(fetchUsersScreen).mockReturnValueOnce(
+      ResultAsync.fromSafePromise(new Promise(() => {})) as never,
+    );
+
+    void loadMoreUsers();
+    await refreshUsersScreen();
+
+    expect(askedOn(2)?.count).toBe(100);
+  });
+
+  it('keeps the ticks on rows that came back and drops the rest', async () => {
+    await reloadUsersScreen();
+    usersSelection.replace(['user:system:alice', 'user:system:bob']);
+    vi.mocked(fetchUsersScreen).mockReturnValue(answered(['alice'], 1));
+
+    await refreshUsersScreen();
+
+    expect([...usersSelection.$selected.get()]).toEqual(['user:system:alice']);
   });
 });

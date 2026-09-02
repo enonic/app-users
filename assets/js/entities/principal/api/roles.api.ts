@@ -57,6 +57,12 @@ const ROLE_DOCUMENT = `
   }
 `;
 
+const ROLE_ROW_DOCUMENT = `
+  query RoleRow($key: String!) {
+    role(key: $key) {${ROLE_FIELDS}}
+  }
+`;
+
 type PrincipalRefDto = {
   key: string;
   type: PrincipalRef['type'];
@@ -112,6 +118,16 @@ type RoleDetailData = { role: RoleDetailDto | null };
 
 export function toRoles(dtos: readonly RoleDto[]): Role[] {
   return dtos.map(toRole);
+}
+
+/** `undefined` for a key nothing answers to, or nothing the caller may read. */
+export function fetchRole(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<Role | undefined, AppError> {
+  return requestGraphQlDocument<{ role: RoleDto | null }>(ROLE_ROW_DOCUMENT, { key }, signal).map(
+    ({ role }) => (role == null ? undefined : toRole(role)),
+  );
 }
 
 /** The role a details panel shows. `undefined` for a key nothing answers to. */

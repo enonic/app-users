@@ -110,6 +110,24 @@ export function toIdProviderNames(dtos: readonly IdProviderNameDto[]): IdProvide
   return dtos.map(({ key, displayName }) => ({ key, displayName }));
 }
 
+const ID_PROVIDER_ROW_DOCUMENT = `
+  query IdProviderRow($key: String!) {
+    idProvider(key: $key) ${ID_PROVIDERS_SELECTION}
+  }
+`;
+
+/** `undefined` for a key nothing answers to. */
+export function fetchIdProvider(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<IdProvider | undefined, AppError> {
+  return requestGraphQlDocument<{ idProvider: IdProviderDto | null }>(
+    ID_PROVIDER_ROW_DOCUMENT,
+    { key },
+    signal,
+  ).map(({ idProvider }) => (idProvider == null ? undefined : toIdProvider(idProvider)));
+}
+
 /** For the ID Providers section, which needs nothing else. */
 export function fetchIdProviders(signal?: AbortSignal): ResultAsync<IdProvider[], AppError> {
   return requestGraphQl<{ idProviders: IdProviderDto[] }>(ID_PROVIDERS_ROOT, { signal }).map(

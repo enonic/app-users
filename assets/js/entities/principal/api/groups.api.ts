@@ -61,6 +61,12 @@ const GROUP_DOCUMENT = `
   }
 `;
 
+const GROUP_ROW_DOCUMENT = `
+  query GroupRow($key: String!) {
+    group(key: $key) {${GROUP_FIELDS}}
+  }
+`;
+
 /**
  * The memberships alone, for the panel already showing the group: the transitive toggle changes only
  * those, and re-reading the members would cost a `getMembers` call for a list that has not moved.
@@ -136,6 +142,18 @@ type GroupMembershipsData = { group: MembershipsDto | null };
 
 export function toGroups(dtos: readonly GroupDto[]): Group[] {
   return dtos.map(toGroup);
+}
+
+/** `undefined` for a key nothing answers to, or nothing the caller may read. */
+export function fetchGroup(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<Group | undefined, AppError> {
+  return requestGraphQlDocument<{ group: GroupDto | null }>(
+    GROUP_ROW_DOCUMENT,
+    { key },
+    signal,
+  ).map(({ group }) => (group == null ? undefined : toGroup(group)));
 }
 
 /** The group a details panel shows. `undefined` for a key nothing answers to. */

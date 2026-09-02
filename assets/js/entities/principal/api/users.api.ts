@@ -90,6 +90,13 @@ const USER_DOCUMENT = `
   }
 `;
 
+// The row alone: the list shows no memberships, so re-reading them would pay `getMemberships` for nothing.
+const USER_ROW_DOCUMENT = `
+  query UserRow($key: String!) {
+    user(key: $key) {${USER_FIELDS}}
+  }
+`;
+
 type UserDto = {
   key: string;
   displayName: string;
@@ -135,6 +142,16 @@ type MembershipsDto = {
 type UserDetailData = { user: UserDetailDto | null };
 
 type UserMembershipsData = { user: MembershipsDto | null };
+
+/** `undefined` for a key nothing answers to, or nothing the caller may read. */
+export function fetchUser(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<User | undefined, AppError> {
+  return requestGraphQlDocument<{ user: UserDto | null }>(USER_ROW_DOCUMENT, { key }, signal).map(
+    ({ user }) => (user == null ? undefined : toUser(user)),
+  );
+}
 
 /**
  * The whole user, for a panel with no row to build on. `undefined` for a key nothing answers to.

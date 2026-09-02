@@ -57,6 +57,8 @@ export type DetailLoader<T> = {
    * ! panel and a cached hit could serve stale detail beside an updated row.
    */
   invalidate: () => void;
+  /** One item changed elsewhere: its cached copy goes, and it is re-read in place if it is the selected one. */
+  evict: (key: string) => void;
 };
 
 /**
@@ -172,6 +174,14 @@ export function createDetailLoader<T extends { key: string }>({
 
       if (selected !== undefined) {
         show(selected);
+      }
+    },
+
+    evict(key: string): void {
+      cache.delete(key);
+
+      if (selected === key) {
+        show(key);
       }
     },
   };

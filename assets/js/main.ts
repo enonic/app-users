@@ -16,7 +16,7 @@ export function mount({ container, host }: MountOptions): Unmount {
   }
 
   // Everything derived from the host lives on the frame — one per mount, never at module level.
-  const frame = createHostFrame(host);
+  const frame = createHostFrame(host, container);
 
   // ! Not awaited. `mount` owes the shell its disposer synchronously, so the section paints while its
   // ! own configuration is still in flight and `$bootstrap` is what moves it on.

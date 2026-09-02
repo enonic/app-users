@@ -4,6 +4,7 @@ import type { Result } from 'neverthrow';
 import type { AppError } from '../../../shared/api';
 import type { IdProviderUserCount } from '../api/id-providers.api';
 import type { IdProvider, IdProviderName } from './principal.types';
+import { upsert } from './upsert';
 
 export type IdProvidersState = {
   status: 'loading' | 'ready' | 'error';
@@ -76,15 +77,18 @@ export function receiveIdProviders(result: Result<IdProvider[], AppError>): void
  * ! See `docs/platform-facts.md`. Order is the section's business, so a new one is appended.
  */
 export function receiveIdProvider(provider: IdProvider): void {
-  const { items } = $idProviders.get();
-  const known = items.some(({ key }) => key === provider.key);
+  $idProviders.setKey('items', upsert($idProviders.get().items, provider));
+}
 
-  $idProviders.setKey(
-    'items',
-    known
-      ? items.map((loaded) => (loaded.key === provider.key ? provider : loaded))
-      : [...items, provider],
-  );
+export function removeIdProvider(key: string): void {
+  const { items } = $idProviders.get();
+
+  if (items.some((provider) => provider.key === key)) {
+    $idProviders.setKey(
+      'items',
+      items.filter((provider) => provider.key !== key),
+    );
+  }
 }
 
 /**

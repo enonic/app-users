@@ -19,3 +19,5 @@ export const showGroup = loader.show;
 export const forgetGroups = loader.forget;
 
 export const forgetGroupDetails = loader.invalidate;
+
+export const evictGroupDetail = loader.evict;

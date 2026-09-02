@@ -35,3 +35,5 @@ export const showUser = loader.show;
 export const forgetUsers = loader.forget;
 
 export const forgetUserDetails = loader.invalidate;
+
+export const evictUserDetail = loader.evict;

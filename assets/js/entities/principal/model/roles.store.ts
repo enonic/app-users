@@ -3,6 +3,7 @@ import type { Result } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import type { Role } from './principal.types';
+import { upsert } from './upsert';
 
 export type RolesState = {
   status: 'loading' | 'ready' | 'error';
@@ -21,6 +22,22 @@ export const $roles = map<RolesState>({ status: 'loading', items: [] });
  */
 export function beginRolesLoad(): void {
   $roles.setKey('status', 'loading');
+}
+
+/** Order is the page's business, so a new role is appended. */
+export function receiveRole(role: Role): void {
+  $roles.setKey('items', upsert($roles.get().items, role));
+}
+
+export function removeRole(key: string): void {
+  const { items } = $roles.get();
+
+  if (items.some((role) => role.key === key)) {
+    $roles.setKey(
+      'items',
+      items.filter((role) => role.key !== key),
+    );
+  }
 }
 
 export function receiveRoles(result: Result<Role[], AppError>): void {

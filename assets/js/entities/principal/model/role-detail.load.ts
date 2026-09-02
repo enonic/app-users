@@ -20,3 +20,5 @@ export const showRole = loader.show;
 export const forgetRoles = loader.forget;
 
 export const forgetRoleDetails = loader.invalidate;
+
+export const evictRoleDetail = loader.evict;

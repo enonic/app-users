@@ -22,8 +22,9 @@ export { fetchUserDetail, fetchUserMemberships, USERS_ROOT, toUsersPage } from '
 export type { UsersData, UsersPage } from './api/users.api';
 export { createGroup, updateGroup } from './model/group-commands';
 export type { GroupDraft, GroupEdit } from './model/group-commands';
-export { forgetGroupDetails, forgetGroups } from './model/group-detail.load';
-export { beginGroupsLoad, receiveGroups } from './model/groups.store';
+export { evictGroupDetail, forgetGroupDetails, forgetGroups } from './model/group-detail.load';
+export { loadGroup } from './model/groups.load';
+export { beginGroupsLoad, receiveGroup, receiveGroups, removeGroup } from './model/groups.store';
 export type { GroupsState } from './model/groups.store';
 export {
   createIdProvider,
@@ -41,7 +42,7 @@ export type {
   IdProviderPrincipalsState,
   PrincipalSetState,
 } from './model/id-provider-principals.store';
-export { loadIdProviders } from './model/id-providers.load';
+export { loadIdProvider, loadIdProviders } from './model/id-providers.load';
 export {
   $idProviderUserCounts,
   beginIdProviderNamesLoad,
@@ -51,6 +52,7 @@ export {
   receiveIdProviderNames,
   receiveIdProviders,
   receiveIdProviderUserCounts,
+  removeIdProvider,
 } from './model/id-providers.store';
 export type {
   IdProviderNamesState,
@@ -59,6 +61,10 @@ export type {
 } from './model/id-providers.store';
 export { deletePrincipals } from './model/principal-commands';
 export type { DeletablePrincipal, PrincipalSectionScope } from './model/principal-commands';
+export { collapsePrincipalChanges } from './model/principal-changes';
+export type { PrincipalEvent } from './model/principal-changes';
+export { createPrincipalReaction } from './model/principal-reaction';
+export type { PrincipalReactionOptions, PrincipalReactionScope } from './model/principal-reaction';
 export { derivePrincipalName, isIllegalPrincipalName } from './model/principal-name';
 export {
   idProviderOf,
@@ -71,7 +77,8 @@ export {
 } from './model/principal.keys';
 export { addPublicKey, createUser, removePublicKey, updateUser } from './model/user-commands';
 export type { UserDraft, UserEdit } from './model/user-commands';
-export { forgetUserDetails, forgetUsers } from './model/user-detail.load';
+export { evictUserDetail, forgetUserDetails, forgetUsers } from './model/user-detail.load';
+export { loadUser } from './model/users.load';
 export type {
   Group,
   GroupDetail,
@@ -99,16 +106,20 @@ export type {
 } from './model/principal.types';
 export { createRole, updateRole } from './model/role-commands';
 export type { RoleDraft, RoleEdit } from './model/role-commands';
-export { forgetRoleDetails, forgetRoles } from './model/role-detail.load';
-export { beginRolesLoad, receiveRoles } from './model/roles.store';
+export { evictRoleDetail, forgetRoleDetails, forgetRoles } from './model/role-detail.load';
+export { loadRole } from './model/roles.load';
+export { beginRolesLoad, receiveRole, receiveRoles, removeRole } from './model/roles.store';
 export type { RolesState } from './model/roles.store';
 export {
   appendUsers,
   beginUsersAppend,
   beginUsersLoad,
   receiveUsers,
+  removeUser,
   replaceUser,
   usersAppendStart,
+  usersLoadedExtent,
+  usersLoadedKeys,
 } from './model/users.store';
 export type { UsersState } from './model/users.store';
 export { useGroup } from './model/useGroup';

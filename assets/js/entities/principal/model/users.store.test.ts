@@ -10,7 +10,9 @@ import {
   beginUsersAppend,
   beginUsersLoad,
   receiveUsers,
+  removeUser,
   usersAppendStart,
+  usersLoadedExtent,
 } from './users.store';
 
 function user(name: string): User {
@@ -162,5 +164,22 @@ describe('users.store', () => {
     expect(items).toHaveLength(1);
     expect(appending).toBe(false);
     expect(error).toBe('Principals are unreachable');
+  });
+
+  it('lets one user go, and the total with it', () => {
+    receiveUsers(page(['alice', 'bob'], 137));
+
+    removeUser('user:system:alice');
+
+    expect($users.get().items.map(({ login }) => login)).toEqual(['bob']);
+    expect($users.get().total).toBe(136);
+  });
+
+  it('counts the page on its way into what a re-read has to cover', () => {
+    receiveUsers(page(['alice', 'bob'], 137));
+    expect(usersLoadedExtent(50)).toBe(2);
+
+    beginUsersAppend();
+    expect(usersLoadedExtent(50)).toBe(52);
   });
 });

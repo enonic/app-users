@@ -2,7 +2,7 @@ import { err, ok } from 'neverthrow';
 import { describe, expect, it } from 'vitest';
 
 import { AppError } from '../../../shared/api';
-import { $groups, beginGroupsLoad, receiveGroups } from './groups.store';
+import { $groups, beginGroupsLoad, receiveGroup, receiveGroups, removeGroup } from './groups.store';
 import type { Group } from './principal.types';
 
 function group(name: string): Group {
@@ -44,5 +44,29 @@ describe('groups.store', () => {
     expect(status).toBe('error');
     expect(items).toEqual([]);
     expect(error).toBe('Principals are unreachable');
+  });
+
+  it('takes one group in, replacing its row or joining the list', () => {
+    receiveGroups(ok([group('administrators')]));
+
+    receiveGroup({ ...group('administrators'), displayName: 'Admins' });
+    receiveGroup(group('developers'));
+
+    expect($groups.get().items.map(({ displayName }) => displayName)).toEqual([
+      'Admins',
+      'developers',
+    ]);
+  });
+
+  it('lets one group go, and leaves the rest as they were', () => {
+    const before = [group('administrators'), group('developers')];
+    receiveGroups(ok(before));
+
+    removeGroup('group:system:administrators');
+    expect($groups.get().items).toEqual([group('developers')]);
+
+    const items = $groups.get().items;
+    removeGroup('group:system:nobody');
+    expect($groups.get().items).toBe(items);
   });
 });
