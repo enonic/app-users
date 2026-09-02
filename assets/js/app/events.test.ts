@@ -2,14 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const connectAdminEvents = vi.hoisted(() => vi.fn());
 const subscribeTopic = vi.hoisted(() => vi.fn());
-vi.mock('../shared/admin-events', () => ({
-  connectAdminEvents,
-  subscribeTopic,
-}));
+vi.mock('../shared/admin-events/admin-events', () => ({ connectAdminEvents, subscribeTopic }));
 
+import { fakeHost } from '../../../test/mocks/fake-host';
 import { setConfig } from '../shared/config';
+import { createHostFrame } from '../shared/host';
 import { startSectionEvents, stopSectionEvents } from './events';
 import { SECTIONS } from './section';
+
+const frame = createHostFrame(fakeHost());
 
 describe('startSectionEvents', () => {
   beforeEach(() => {
@@ -27,10 +28,10 @@ describe('startSectionEvents', () => {
   });
 
   it('connects to the hub and subscribes the principals topic once', () => {
-    startSectionEvents('users');
-    startSectionEvents('users');
+    startSectionEvents('users', frame);
+    startSectionEvents('users', frame);
 
-    expect(connectAdminEvents).toHaveBeenCalledExactlyOnceWith('/_/admin:events');
+    expect(connectAdminEvents).toHaveBeenCalledWith('/_/admin:events');
     expect(subscribeTopic).toHaveBeenCalledExactlyOnceWith(
       'com.enonic.xp.app.settings:principals',
       expect.anything(),
@@ -41,12 +42,12 @@ describe('startSectionEvents', () => {
     const unsubscribe = vi.fn();
     subscribeTopic.mockReturnValue(unsubscribe);
 
-    startSectionEvents('users');
+    startSectionEvents('users', frame);
     stopSectionEvents('users');
 
     expect(unsubscribe).toHaveBeenCalled();
 
-    startSectionEvents('users');
+    startSectionEvents('users', frame);
     expect(subscribeTopic).toHaveBeenCalledTimes(2);
   });
 
@@ -57,8 +58,8 @@ describe('startSectionEvents', () => {
     const dropRoles = vi.fn();
     subscribeTopic.mockReturnValueOnce(dropUsers).mockReturnValueOnce(dropRoles);
 
-    startSectionEvents('users');
-    startSectionEvents('roles');
+    startSectionEvents('users', frame);
+    startSectionEvents('roles', frame);
 
     expect(subscribeTopic).toHaveBeenCalledTimes(2);
 

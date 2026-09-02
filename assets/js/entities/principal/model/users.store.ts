@@ -92,6 +92,16 @@ export function usersAppendStart(): number | undefined {
     : state.items.length;
 }
 
+/** What a re-read has to cover: the rows loaded, plus the page on its way so cancelling it loses no click. */
+export function usersLoadedExtent(pageSize: number): number {
+  const { items, appending } = $users.get();
+  return items.length + (appending ? pageSize : 0);
+}
+
+export function usersLoadedKeys(): string[] {
+  return $users.get().items.map(({ key }) => key);
+}
+
 function hasMore({ items, total, exhausted }: UsersState): boolean {
   return !exhausted && items.length < total;
 }
@@ -107,6 +117,20 @@ export function replaceUser(user: User): void {
     'items',
     current.items.map((loaded) => (loaded.key === user.key ? user : loaded)),
   );
+}
+
+export function removeUser(key: string): void {
+  const current = $users.get();
+
+  if (!current.items.some((user) => user.key === key)) {
+    return;
+  }
+
+  $users.set({
+    ...current,
+    items: current.items.filter((user) => user.key !== key),
+    total: Math.max(0, current.total - 1),
+  });
 }
 
 export function receiveUsers(result: Result<UsersPage, AppError>): void {

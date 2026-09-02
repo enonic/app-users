@@ -3,6 +3,7 @@ import type { Result } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import type { Group } from './principal.types';
+import { upsert } from './upsert';
 
 export type GroupsState = {
   status: 'loading' | 'ready' | 'error';
@@ -21,6 +22,22 @@ export const $groups = map<GroupsState>({ status: 'loading', items: [] });
  */
 export function beginGroupsLoad(): void {
   $groups.setKey('status', 'loading');
+}
+
+/** Order is the page's business, so a new group is appended. */
+export function receiveGroup(group: Group): void {
+  $groups.setKey('items', upsert($groups.get().items, group));
+}
+
+export function removeGroup(key: string): void {
+  const { items } = $groups.get();
+
+  if (items.some((group) => group.key === key)) {
+    $groups.setKey(
+      'items',
+      items.filter((group) => group.key !== key),
+    );
+  }
 }
 
 export function receiveGroups(result: Result<Group[], AppError>): void {

@@ -1,6 +1,7 @@
 import { atom, type ReadableAtom } from 'nanostores';
 
 import type { Host, Notification } from '../sections';
+import { observeVisibility } from './visibility';
 
 type Level = Notification['level'];
 
@@ -21,6 +22,8 @@ export type HostFrame = {
    * ? shell owns several sections at once; here `host.navigate` is the only history there is.
    */
   $itemId: ReadableAtom<string | undefined>;
+  /** Whether this mount is on screen: the shell keeps a section mounted while the operator is on another. */
+  $visible: ReadableAtom<boolean>;
   openItem: (key: string) => void;
   closeItem: () => void;
   notifyError: (message: string) => void;
@@ -31,23 +34,28 @@ export type HostFrame = {
   dispose: () => void;
 };
 
-export function createHostFrame(host: Host): HostFrame {
+export function createHostFrame(host: Host, container?: Element): HostFrame {
   // ! Read before subscribing: `path` does not call back on subscribe (app-settings
   // ! `host-facts.md`), so a deep link would otherwise leave its row unopened until the first
   // ! navigation.
   const $itemId = atom<string | undefined>(itemIdOf(host.path.get()));
   const unfollow = host.path.subscribe((path) => $itemId.set(itemIdOf(path)));
+  const visibility = container === undefined ? undefined : observeVisibility(container);
 
   return {
     host,
     $itemId,
+    $visible: visibility?.$visible ?? atom(true),
     openItem: (key) => host.navigate(`/${encodeURIComponent(key)}`, { replace: true }),
     closeItem: () => host.navigate('/', { replace: true }),
     notifyError: (message) => raise(host, 'error', message),
     notifyWarning: (message) => raise(host, 'warning', message),
     notifySuccess: (message) => raise(host, 'success', message),
     notifyInfo: (message) => raise(host, 'info', message),
-    dispose: () => unfollow(),
+    dispose: () => {
+      unfollow();
+      visibility?.dispose();
+    },
   };
 }
 

@@ -26,7 +26,7 @@ const PAGES: Record<Section, FunctionComponent> = {
 };
 
 export function App({ frame, section }: AppProps) {
-  useSectionEvents(section);
+  useSectionEvents(section, frame);
   const { status, error } = useStore($bootstrap);
   const stylesheets = useStore($stylesheets);
   const [theme, setTheme] = useState(frame.host.theme.get());

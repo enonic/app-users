@@ -4,7 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppError } from '../../../shared/api';
 import { fetchUserDetail, fetchUserMemberships } from '../api/users.api';
 import type { PrincipalRef, User, UserDetail } from './principal.types';
-import { $userDetail, forgetUserDetails, forgetUsers, showUser } from './user-detail.load';
+import {
+  $userDetail,
+  evictUserDetail,
+  forgetUserDetails,
+  forgetUsers,
+  showUser,
+} from './user-detail.load';
 import { $users } from './users.store';
 
 // The api is stubbed rather than the transport: which of the two reads the panel makes is the interesting
@@ -260,6 +266,45 @@ describe('showUser', () => {
     expect($userDetail.get().status).toBe('loading');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
     expect(reads()).toBe(beforeReload + 2);
+  });
+
+  it('forgets one changed key without touching the rest of the cache', async () => {
+    loadRows('alice', 'bob');
+
+    showUser('user:system:bob');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    showUser('user:system:alice');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    const before = reads();
+
+    evictUserDetail('user:system:bob');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(reads()).toBe(before);
+    expect($userDetail.get().item?.login).toBe('alice');
+
+    showUser('user:system:bob');
+    expect($userDetail.get().status).toBe('loading');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    expect(reads()).toBe(before + 1);
+
+    showUser('user:system:alice');
+    expect($userDetail.get().status).toBe('ready');
+    expect(reads()).toBe(before + 1);
+  });
+
+  it('re-reads the user on screen when it is the one that changed', async () => {
+    loadRows('alice');
+
+    showUser('user:system:alice');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    const before = reads();
+
+    evictUserDetail('user:system:alice');
+    expect($userDetail.get().item?.login).toBe('alice');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(reads()).toBe(before + 1);
   });
 
   it('carries no stale message into the next load', async () => {

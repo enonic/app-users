@@ -72,7 +72,7 @@ export function isSystemUser(key: PrincipalKey): boolean {
  * `cms.admin`. This is the string the real data carries and the one shown under a display name;
  * the provider it belongs to is provenance and goes in a meta cell instead.
  */
-export function principalName(key: PrincipalKey): string {
+export function principalName(key: string): string {
   return key.slice(key.lastIndexOf(':') + 1);
 }
 
@@ -80,7 +80,7 @@ export function principalName(key: PrincipalKey): string {
  * Provenance, read off the key: `user:system:su` and `group:system:administrators` both belong to
  * the `system` provider. A role belongs to none.
  */
-export function idProviderOf(key: PrincipalKey): string | undefined {
+export function idProviderOf(key: string): string | undefined {
   const [type, provider] = key.split(':');
   return type === 'role' ? undefined : provider;
 }

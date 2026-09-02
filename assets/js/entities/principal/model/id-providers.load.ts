@@ -1,7 +1,13 @@
 import { err, ok } from 'neverthrow';
 
-import { fetchIdProviders } from '../api/id-providers.api';
-import { beginIdProvidersLoad, receiveIdProviders } from './id-providers.store';
+import { fetchIdProvider, fetchIdProviders } from '../api/id-providers.api';
+import {
+  beginIdProvidersLoad,
+  receiveIdProvider,
+  receiveIdProviders,
+  removeIdProvider,
+} from './id-providers.store';
+import { createRowLoader } from './row.load';
 
 /**
  * The providers with everything their own section shows, for that section alone.
@@ -36,3 +42,9 @@ export function loadIdProviders(): Promise<void> {
     },
   );
 }
+
+export const loadIdProvider: (key: string) => Promise<void> = createRowLoader({
+  fetch: fetchIdProvider,
+  receive: receiveIdProvider,
+  missing: removeIdProvider,
+});

@@ -15,7 +15,7 @@ import type { IdProvider } from './principal.types';
 
 // The store owns cancellation and status, not transport: stubbing the api keeps the request out of
 // it and lets a test hold one answer back to show a slow load losing to a fast one.
-vi.mock('../api/id-providers.api', () => ({ fetchIdProviders: vi.fn() }));
+vi.mock('../api/id-providers.api', () => ({ fetchIdProvider: vi.fn(), fetchIdProviders: vi.fn() }));
 
 function provider(key: string, users = 0, bound = true): IdProvider {
   return {

@@ -14,11 +14,14 @@ import {
   toIdProviderUserCounts,
   toUsersPage,
   usersAppendStart,
+  usersLoadedExtent,
+  usersLoadedKeys,
   type UsersPage,
 } from '../../../entities/principal';
 import { AppError } from '../../../shared/api';
 import { fetchUsersScreen, type UsersScreenData } from '../api/users-screen.api';
 import { $usersQuery, PAGE_SIZE } from './query.store';
+import { usersSelection } from './selection.store';
 
 /**
  * Loads the Users screen: one page of users plus the id providers, in one request.
@@ -31,34 +34,15 @@ import { $usersQuery, PAGE_SIZE } from './query.store';
 let pending: AbortController | undefined;
 
 export function reloadUsersScreen(): Promise<void> {
-  const { signal } = start();
+  return readFromStart(PAGE_SIZE);
+}
 
-  beginUsersLoad();
-  beginIdProviderNamesLoad();
-  beginIdProviderUserCountsLoad();
+/** The screen re-read in place — every loaded page in one request — where `reload` would be a first page again. */
+export function refreshUsersScreen(): Promise<void> {
+  const loaded = usersLoadedExtent(PAGE_SIZE);
+  const count = Math.max(PAGE_SIZE, Math.ceil(loaded / PAGE_SIZE) * PAGE_SIZE);
 
-  return fetchUsersScreen({ ...$usersQuery.get(), start: 0, count: PAGE_SIZE }, signal).match(
-    (answer) => {
-      if (!signal.aborted) {
-        receiveUsers(page(answer.data, answer.message));
-
-        receiveIdProviderNames(providers(answer.data, answer.message));
-        receiveIdProviderUserCounts(providerCounts(answer.data, answer.message));
-
-        // ! After the rows, not before. The cached details are built from rows, so invalidating at request
-        // ! time would re-read the open user against the page that is about to be replaced — and the
-        // ! re-read fires 250 ms later, which on this section is well inside one request.
-        forgetUserDetails();
-      }
-    },
-    (error) => {
-      if (!signal.aborted) {
-        receiveUsers(err(error));
-        receiveIdProviderNames(err(error));
-        receiveIdProviderUserCounts(err(error));
-      }
-    },
-  );
+  return readFromStart(count).then(keepSelectionOnScreen);
 }
 
 /** The next page of the same query. Ignored while one is already on its way, so a double click is one page. */
@@ -93,6 +77,52 @@ export function loadMoreUsers(): Promise<void> {
 //
 // * Helpers
 //
+
+function readFromStart(count: number): Promise<void> {
+  const { signal } = start();
+
+  beginUsersLoad();
+  beginIdProviderNamesLoad();
+  beginIdProviderUserCountsLoad();
+
+  return fetchUsersScreen({ ...$usersQuery.get(), start: 0, count }, signal).match(
+    (answer) => {
+      if (!signal.aborted) {
+        receiveUsers(page(answer.data, answer.message));
+
+        receiveIdProviderNames(providers(answer.data, answer.message));
+        receiveIdProviderUserCounts(providerCounts(answer.data, answer.message));
+
+        // ! After the rows, not before. The cached details are built from rows, so invalidating at request
+        // ! time would re-read the open user against the page that is about to be replaced — and the
+        // ! re-read fires 250 ms later, which on this section is well inside one request.
+        forgetUserDetails();
+      }
+    },
+    (error) => {
+      if (!signal.aborted) {
+        receiveUsers(err(error));
+        receiveIdProviderNames(err(error));
+        receiveIdProviderUserCounts(err(error));
+      }
+    },
+  );
+}
+
+// An invisible tick on a row the re-read dropped would widen what `Delete` applies to.
+function keepSelectionOnScreen(): void {
+  const selected = usersSelection.$selected.get();
+  if (selected.size === 0) {
+    return;
+  }
+
+  const onScreen = new Set(usersLoadedKeys());
+  const kept = [...selected].filter((key) => onScreen.has(key));
+
+  if (kept.length !== selected.size) {
+    usersSelection.replace(kept);
+  }
+}
 
 function start(): AbortController {
   pending?.abort();
