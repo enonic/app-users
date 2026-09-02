@@ -1,18 +1,12 @@
-import type { ReactNode } from 'react';
-
 import { useI18n } from '../../i18n';
-import { ConfirmDialog } from './ConfirmDialog';
+import { ConfirmValueDialog } from './ConfirmValueDialog';
+import { deleteExpectation, type DeleteTarget } from './delete-confirm';
 
-export type DeleteTarget = {
-  key: string;
-  /** How the item reads elsewhere in the app: the caller renders it, so the dialog knows no domain. */
-  label: ReactNode;
-};
+export type { DeleteTarget };
 
 export type DeleteConfirmDialogProps = {
   open: boolean;
   targets: readonly DeleteTarget[];
-  confirmDisabled?: boolean;
   onClose: () => void;
   onConfirm?: () => void;
 };
@@ -20,10 +14,11 @@ export type DeleteConfirmDialogProps = {
 export function DeleteConfirmDialog({
   open,
   targets,
-  confirmDisabled,
   onClose,
   onConfirm,
 }: DeleteConfirmDialogProps) {
+  const title = useI18n('browse.confirm.title');
+  const deleteLabel = useI18n('browse.confirm.delete');
   const question = useI18n(
     targets.length === 1
       ? 'browse.confirm.deleteQuestion'
@@ -31,10 +26,12 @@ export function DeleteConfirmDialog({
   );
 
   return (
-    <ConfirmDialog
+    <ConfirmValueDialog
       open={open}
-      question={question}
-      confirmDisabled={confirmDisabled}
+      title={title}
+      description={question}
+      expected={deleteExpectation(targets)}
+      confirmLabel={deleteLabel}
       onClose={onClose}
       onConfirm={onConfirm}
     >
@@ -43,6 +40,6 @@ export function DeleteConfirmDialog({
           <li key={key}>{label}</li>
         ))}
       </ul>
-    </ConfirmDialog>
+    </ConfirmValueDialog>
   );
 }

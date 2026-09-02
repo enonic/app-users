@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/preact';
 
-import { deletePrincipals } from '../../entities/principal';
+import { deletePrincipals, principalName } from '../../entities/principal';
 import { PrincipalLabel } from '../../entities/principal/ui/PrincipalLabel';
 import { useHostFrame } from '../../shared/host';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
@@ -22,6 +22,7 @@ export function UserDeleteDialog({ activeKey, onCloseItem }: UserDeleteDialogPro
       open={targets !== undefined}
       targets={(targets ?? []).map((user) => ({
         key: user.key,
+        name: principalName(user.key),
         label: <PrincipalLabel principal={user} />,
       }))}
       onClose={usersDeletion.close}

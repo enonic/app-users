@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/preact';
 
-import { deletePrincipals } from '../../entities/principal';
+import { deletePrincipals, principalName } from '../../entities/principal';
 import { PrincipalLabel } from '../../entities/principal/ui/PrincipalLabel';
 import { useHostFrame } from '../../shared/host';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
@@ -22,6 +22,7 @@ export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogPro
       open={targets !== undefined}
       targets={(targets ?? []).map((role) => ({
         key: role.key,
+        name: principalName(role.key),
         label: <PrincipalLabel principal={role} />,
       }))}
       onClose={rolesDeletion.close}
