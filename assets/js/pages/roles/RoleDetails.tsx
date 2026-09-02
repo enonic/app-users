@@ -9,6 +9,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { PermissionReportSection } from '../../features/permission-report';
 import { openRoleEditorAt } from '../../features/role-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { formatDateTime } from '../../shared/format';
@@ -142,6 +143,8 @@ export function RoleDetails({
           )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
+
+      <PermissionReportSection principalKey={key} />
     </DetailsPanel>
   );
 }

@@ -11,6 +11,7 @@ function request(path, body, headers) {
         rawPath: CONTEXT + path,
         contextPath: CONTEXT,
         body: body,
+        params: {},
         getHeader: function (name) {
             return sent[name.toLowerCase()] || null;
         }
@@ -65,7 +66,8 @@ exports.exposesThePrincipalsSchema = function () {
     t.assertNull(mutations.body.errors);
 
     t.assertEquals('', missingFrom(queries.body.data.__schema.queryType.fields,
-        ['config', 'phrases', 'users', 'roles', 'groups', 'idProviders', 'idProviderApplications']));
+        ['config', 'phrases', 'users', 'roles', 'groups', 'idProviders', 'idProviderApplications',
+            'repositories']));
 
     t.assertEquals('', missingFrom(mutations.body.data.__schema.mutationType.fields,
         ['createUser', 'updateUser', 'createGroup', 'createRole', 'createIdProvider',
@@ -105,4 +107,10 @@ exports.rejectsACrossSiteRequest = function () {
     var headers = {'sec-fetch-site': 'cross-site', 'content-type': 'application/json'};
 
     t.assertEquals(403, endpoint.post(request('/graphql', '{"query":"{ config { appId } }"}', headers)).status);
+};
+
+// The test context carries no roles, which is the case that matters: the sections are open wider than
+// the report is, so the refusal has to come from the report's own gate on the engine XP runs it on.
+exports.refusesAPermissionReportWithoutTheAdminRole = function () {
+    t.assertEquals(403, endpoint.get(request('/report')).status);
 };

@@ -11,4 +11,10 @@ export type Config = {
   eventsUrl: string;
   /** Neither `system.admin` nor `system.user.admin`: XP refuses every write, so none is offered. */
   readOnlyMode: boolean;
+  /**
+   * Whether the visitor holds `role:system.admin`. A section is open to user administrators too, and
+   * the permission report is not theirs — this is what lets the panel leave the section out rather
+   * than offer a button that answers 403.
+   */
+  admin: boolean;
 };

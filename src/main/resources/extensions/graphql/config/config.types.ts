@@ -26,5 +26,10 @@ export const ConfigType: GraphQLType = generator.createObjectType({
       description:
         'Whether the caller holds neither `system.admin` nor `system.user.admin`, so every write would be refused.',
     },
+    admin: {
+      type: nonNull(GraphQLBoolean),
+      description:
+        'Whether the visitor holds `role:system.admin`. A section is open to user administrators too, and the permission report is not theirs — this is what lets the UI leave it out rather than offer a button that answers 403.',
+    },
   },
 });

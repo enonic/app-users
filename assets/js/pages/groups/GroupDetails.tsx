@@ -15,6 +15,7 @@ import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalEditButton } from '../../entities/principal/ui/PrincipalEditButton';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openGroupEditorAt } from '../../features/group-editor';
+import { PermissionReportSection } from '../../features/permission-report';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -212,6 +213,8 @@ export function GroupDetails({
           )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
+
+      <PermissionReportSection principalKey={key} />
     </DetailsPanel>
   );
 }
