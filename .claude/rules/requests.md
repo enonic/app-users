@@ -27,6 +27,11 @@ The extension endpoint (`/extensions/section-endpoint`, arrives with the skeleto
 does — the schema does no role check of its own, but it also must never widen what those gates
 decided.
 
+`GET /report` is the one route beside those two, and the exception that proves the rule: its body is
+a CSV file the browser saves, which a JSON envelope would encode and decode for nothing. It checks
+`role:system.admin` itself — narrowing, never widening, because the sections are open to user
+administrators and a repository's whole content tree is not theirs.
+
 - The schema is built once per module require; every root nullable; `config` and `phrases(locale)`
   are schema root fields — the guest bootstraps from them.
 - Queries are built on the server: no variable ever carries a raw query or sort expression; escape

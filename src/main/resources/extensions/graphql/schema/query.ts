@@ -7,6 +7,7 @@ import { groupQueryFields } from '../principal/group.fields';
 import { idProviderQueryFields } from '../principal/id-provider.fields';
 import { roleQueryFields } from '../principal/role.fields';
 import { userQueryFields } from '../principal/user.fields';
+import { repositoryQueryFields } from '../repository/repository.fields';
 import { generator } from './generator';
 
 /**
@@ -29,5 +30,6 @@ export const QueryType: GraphQLType = generator.createObjectType({
     ...groupQueryFields,
     ...idProviderQueryFields,
     ...idProviderApplicationQueryFields,
+    ...repositoryQueryFields,
   },
 });

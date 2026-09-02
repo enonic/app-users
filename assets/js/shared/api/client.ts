@@ -56,3 +56,20 @@ export function requestJson<T>(
     toAppError,
   );
 }
+
+/**
+ * A body that is not JSON — the permission report's CSV is the only one.
+ *
+ * ? Fetched rather than linked to. An anchor pointed at the endpoint would download whatever comes
+ * ? back, a refusal included, leaving the section with a file named like a report and no way to say
+ * ? what went wrong. Read through here, a failure is a value like any other and reaches a toast.
+ */
+export function requestText(
+  url: string,
+  options: RequestOptions = {},
+): ResultAsync<string, AppError> {
+  return ResultAsync.fromPromise(
+    requestRaw(url, options).then((response) => response.text()),
+    toAppError,
+  );
+}

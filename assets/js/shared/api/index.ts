@@ -1,4 +1,4 @@
-export { requestJson } from './client';
+export { requestJson, requestText } from './client';
 export type { RequestMethod, RequestOptions } from './client';
 export { AppError } from './errors';
 export { nonEmpty, written } from './wire';

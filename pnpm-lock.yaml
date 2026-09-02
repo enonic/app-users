@@ -61,7 +61,13 @@ importers:
       '@enonic-types/lib-io':
         specifier: ^8.0.4
         version: 8.0.4
+      '@enonic-types/lib-node':
+        specifier: ^8.0.4
+        version: 8.0.4
       '@enonic-types/lib-portal':
+        specifier: ^8.0.4
+        version: 8.0.4
+      '@enonic-types/lib-repo':
         specifier: ^8.0.4
         version: 8.0.4
       '@tailwindcss/vite':
@@ -130,8 +136,14 @@ packages:
   '@enonic-types/lib-io@8.0.4':
     resolution: {integrity: sha512-nrcExEXKGu1DiLfAhrm7/X2w+O4nXa08VJsA/CP2GPkdWUDHdpjDUPmfIYwzRxiRzT2DNUPf0/0B/eENbr7kgA==}
 
+  '@enonic-types/lib-node@8.0.4':
+    resolution: {integrity: sha512-1ltjqQ+5a0DXDDHRWe7eQTfnpFOPXblDF+zKiJI+oMpY4PL9EzODeUTc938FxNl2wxG8gi2KMbdkvTTAelwAdw==}
+
   '@enonic-types/lib-portal@8.0.4':
     resolution: {integrity: sha512-XetDnczRi2JnpDxj14hsjcTPgtTrMiZhOVij+RB4JXwnWmidgZv1WuDXVsOdJcPLh/41V9LGTqT8I1wbrkfoCQ==}
+
+  '@enonic-types/lib-repo@8.0.4':
+    resolution: {integrity: sha512-i+n28eN5Vu1gsV0RZARq0lxWjylG4jd1+vP72AZ8nPJ6dbGDEM+81jrNDLfyLNRIrnYToVsHArwjG2a+iQLqFQ==}
 
   '@enonic/ui@1.2.0':
     resolution: {integrity: sha512-M5UC7FeXPTrkaD+qhOmNXsc753ahCU5bs+zCqk+EXkSLB7h6rmu+wbAG6kq6rUiUjEnPwQsgISvsMrpZUEePIQ==}
@@ -1554,7 +1566,15 @@ snapshots:
     dependencies:
       '@enonic-types/core': 8.0.4
 
+  '@enonic-types/lib-node@8.0.4':
+    dependencies:
+      '@enonic-types/core': 8.0.4
+
   '@enonic-types/lib-portal@8.0.4':
+    dependencies:
+      '@enonic-types/core': 8.0.4
+
+  '@enonic-types/lib-repo@8.0.4':
     dependencies:
       '@enonic-types/core': 8.0.4
 

@@ -10,6 +10,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openGroupEditor } from '../../features/group-editor';
+import { PermissionReportSection } from '../../features/permission-report';
 import { getInitials } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
 import { filledSections } from '../../widgets/details-panel/details-panel';
@@ -136,6 +137,8 @@ export function GroupDetails({ group }: GroupDetailsProps) {
           ))}
         </DetailsPanel.Section>
       )}
+
+      <PermissionReportSection principalKey={key} />
     </DetailsPanel>
   );
 }

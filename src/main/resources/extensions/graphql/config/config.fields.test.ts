@@ -1,3 +1,4 @@
+import { hasRole } from '/lib/xp/auth';
 import { apiUrl } from '/lib/xp/portal';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -26,5 +27,18 @@ describe('config', () => {
       eventsUrl: '/_/admin:events',
     });
     expect(vi.mocked(apiUrl)).toHaveBeenCalledWith({ api: 'admin:events' });
+  });
+
+  it('tells the section whether the visitor is a system administrator', () => {
+    vi.mocked(hasRole).mockReturnValue(true);
+
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ admin: true });
+    expect(vi.mocked(hasRole)).toHaveBeenCalledWith('role:system.admin');
+  });
+
+  it('says so plainly for a user administrator, who is not one', () => {
+    vi.mocked(hasRole).mockReturnValue(false);
+
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ admin: false });
   });
 });

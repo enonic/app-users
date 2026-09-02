@@ -2,6 +2,7 @@ import { Avatar, Button } from '@enonic/ui';
 
 import { principalName, useIdProviderName, type RoleDetail } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { PermissionReportSection } from '../../features/permission-report';
 import { openRoleEditor } from '../../features/role-editor';
 import { formatDateTime, getInitials } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
@@ -78,6 +79,8 @@ export function RoleDetails({ role }: RoleDetailsProps) {
           ))}
         </DetailsPanel.Section>
       )}
+
+      <PermissionReportSection principalKey={key} />
     </DetailsPanel>
   );
 }
