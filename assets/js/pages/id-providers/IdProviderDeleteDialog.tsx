@@ -18,7 +18,11 @@ export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDel
   return (
     <DeleteConfirmDialog
       open={targets !== undefined}
-      targets={(targets ?? []).map(({ key, displayName }) => ({ key, label: displayName }))}
+      targets={(targets ?? []).map(({ key, displayName }) => ({
+        key,
+        name: key,
+        label: displayName,
+      }))}
       onClose={idProvidersDeletion.close}
       onConfirm={() => {
         const confirmed = targets ?? [];
