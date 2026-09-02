@@ -1,5 +1,5 @@
-import type { AppError } from '@enonic/ui-utils';
-import type { ResultAsync } from 'neverthrow';
+import { AppError } from '@enonic/ui-utils';
+import { Result, type ResultAsync } from 'neverthrow';
 
 import type { Repository } from '../../../entities/repository';
 import { requestText } from '../../../shared/api';
@@ -55,18 +55,29 @@ export function reportTargets(
     }));
 }
 
+/**
+ * ! Saving is inside the chain, not after it. `ResultAsync.map` lets a throw from its own callback
+ * ! reject the promise — and building a blob out of a report is exactly where a browser gives up on a
+ * ! large one. Rejected, it escapes the caller's `isErr` check and takes the button's "Generating…"
+ * ! with it; as a value, a failed save reads like a failed request.
+ */
 export function downloadPermissionReport(
   baseUrl: string,
   target: ReportTarget,
 ): ResultAsync<void, AppError> {
-  return requestText(reportUrl(baseUrl, target)).map((csv) => {
-    save(csv, reportFileName(target));
-  });
+  return requestText(reportUrl(baseUrl, target)).andThen((csv) => saved(csv, target));
 }
 
 //
 // * Internal
 //
+
+const saved = Result.fromThrowable(
+  (csv: string, target: ReportTarget) => {
+    save(csv, reportFileName(target));
+  },
+  (error) => new AppError('The report could not be saved', error),
+);
 
 function save(csv: string, fileName: string): void {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));

@@ -176,7 +176,9 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
                     aria-label={i18n('report.remove', repository.id)}
                     icon={X}
                     variant="text"
-                    onClick={() => setPicked(picked.filter((id) => id !== repository.id))}
+                    onClick={() =>
+                      setPicked((current) => current.filter((id) => id !== repository.id))
+                    }
                   />
                 </GridList.Action>
               </GridList.Cell>
