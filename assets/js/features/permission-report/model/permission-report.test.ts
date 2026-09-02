@@ -87,13 +87,22 @@ describe('reportTargets', () => {
 });
 
 /**
- * Only the refusal, which is the half that stays out of the DOM: the environment is `node` and saving
- * a blob needs a document. What matters here is that a 403 arrives as a value the section can show,
- * rather than as a file called `perm-report-…csv` holding an error.
+ * Both failures, and neither reaches the DOM: the environment is `node`, so there is no document to
+ * save into — which is what the second case leans on. What matters is that either way the section is
+ * handed a value it can show, rather than a rejected promise or a file holding an error.
  */
 describe('downloadPermissionReport', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it('fails as a value when the browser cannot save the file', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response('Path, Read\n/,X'));
+
+    const result = await downloadPermissionReport(BASE_URL, TARGET);
+
+    expect(result.isErr()).toBe(true);
+    expect(result._unsafeUnwrapErr().message).toBe('The report could not be saved');
   });
 
   it('fails with the message the endpoint refused with', async () => {
