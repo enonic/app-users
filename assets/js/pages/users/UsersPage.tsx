@@ -10,7 +10,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { UserEditorDialog } from '../../features/user-editor/UserEditorDialog';
-import { useHostFrame } from '../../shared/host';
+import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { type SortDirection } from '../../widgets/browse-list/browse-sort';
@@ -39,6 +39,7 @@ export function UsersPage() {
   // One request for a page of users and the providers that name them.
   useUsersScreen();
   const { openItem, closeItem } = useHostFrame();
+  const activeKey = useItemId();
   const { status, items, appending, error, hasMore } = useUsers();
   const { items: providerCounts, status: providersStatus } = useStore($idProviderUserCounts);
   const providerName = useIdProviderName();
@@ -67,6 +68,7 @@ export function UsersPage() {
   );
 
   const section = useBrowseSection({
+    activeKey,
     openItem,
     closeItem,
     items,

@@ -33,7 +33,7 @@ const NOTIFY = {
 
 export function RoleEditorDialog({ onSaved }: RoleEditorDialogProps) {
   const editor = useStore($roleEditor);
-  const { notifySuccess } = useHostFrame();
+  const { notify } = useHostFrame();
   const detail = useStore($roleEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.role.key : undefined;
 
@@ -137,7 +137,8 @@ export function RoleEditorDialog({ onSaved }: RoleEditorDialogProps) {
 
     written.match(
       () => {
-        notifySuccess(
+        notify(
+          'success',
           i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, values.displayName),
         );
         forgetRoleEditDetail();

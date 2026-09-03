@@ -1,9 +1,11 @@
 import { atom, type ReadableAtom } from 'nanostores';
 
-import type { Host, Notification } from '../sections';
-import { observeVisibility } from './visibility';
+import type { Host, Notification, SectionHost } from '../sections';
 
 type Level = Notification['level'];
+
+/** What a command is handed to say how it went: the `notify` of the mount that ran it. */
+export type Notify = (level: Level, message: string) => void;
 
 /**
  * The host object and everything this section derives from it, for one mount. `mount` can run more
@@ -12,49 +14,48 @@ type Level = Notification['level'];
  * `HostFrameProvider`, and disposes it with the unmount.
  */
 export type HostFrame = {
-  host: Host;
+  host: SectionHost;
   /**
    * The selected row, as the section's own sub-path carries it: `/` is the list with nothing open,
    * `/<key>` is that item.
    *
-   * ? A section has exactly one nested route — the details of one principal — so the host's `path`
-   * ? is the whole of its routing. app-settings expressed the same thing with a router because the
-   * ? shell owns several sections at once; here `host.navigate` is the only history there is.
+   * ? A section has exactly one nested route — the details of one item — so the host's `path` is the
+   * ? whole of its routing; `host.navigate` is the only history there is.
    */
   $itemId: ReadableAtom<string | undefined>;
-  /** Whether this mount is on screen: the shell keeps a section mounted while the operator is on another. */
+  /** `host.visible` as a store: the shell keeps a section mounted while the operator is on another. */
   $visible: ReadableAtom<boolean>;
   openItem: (key: string) => void;
   closeItem: () => void;
-  notifyError: (message: string) => void;
-  notifyWarning: (message: string) => void;
-  notifySuccess: (message: string) => void;
-  notifyInfo: (message: string) => void;
-  /** Stops following the host's path. Runs with the unmount, after the components are gone. */
+  /**
+   * A toast on the shell's stack, already localized: a component names the level where it knows the
+   * outcome, and a command takes this as its `Notify` argument rather than reaching for the host.
+   */
+  notify: Notify;
+  /** Stops following the host. Runs with the unmount, after the components are gone. */
   dispose: () => void;
 };
 
-export function createHostFrame(host: Host, container?: Element): HostFrame {
-  // ! Read before subscribing: `path` does not call back on subscribe (app-settings
-  // ! `host-facts.md`), so a deep link would otherwise leave its row unopened until the first
-  // ! navigation.
+export function createHostFrame(host: SectionHost): HostFrame {
+  // ! Read before subscribing: a `Readable` never calls back on subscribe, so a deep link would
+  // ! otherwise leave its row unopened until the first navigation.
   const $itemId = atom<string | undefined>(itemIdOf(host.path.get()));
-  const unfollow = host.path.subscribe((path) => $itemId.set(itemIdOf(path)));
-  const visibility = container === undefined ? undefined : observeVisibility(container);
+  const unfollowPath = host.path.subscribe((path) => $itemId.set(itemIdOf(path)));
+  const $visible = atom(host.visible.get());
+  const unfollowVisible = host.visible.subscribe((visible) => $visible.set(visible));
 
   return {
     host,
     $itemId,
-    $visible: visibility?.$visible ?? atom(true),
+    $visible,
+    // ! Both replace rather than push: the active row moves with the arrow keys too, and every step a
+    // ! user holds a key through would otherwise land in the shell's history.
     openItem: (key) => host.navigate(`/${encodeURIComponent(key)}`, { replace: true }),
     closeItem: () => host.navigate('/', { replace: true }),
-    notifyError: (message) => raise(host, 'error', message),
-    notifyWarning: (message) => raise(host, 'warning', message),
-    notifySuccess: (message) => raise(host, 'success', message),
-    notifyInfo: (message) => raise(host, 'info', message),
+    notify: (level, message) => raise(host, level, message),
     dispose: () => {
-      unfollow();
-      visibility?.dispose();
+      unfollowPath();
+      unfollowVisible();
     },
   };
 }
@@ -76,6 +77,15 @@ function raise(host: Host, level: Level, message: string): void {
 
 function itemIdOf(path: string): string | undefined {
   const [segment] = path.replace(/^\/+/, '').split(/[/?#]/);
+  if (segment === undefined || segment === '') {
+    return undefined;
+  }
 
-  return segment === undefined || segment === '' ? undefined : decodeURIComponent(segment);
+  // ! A typed url may carry an escape that does not decode; that is a key naming no row, not a
+  // ! reason to throw out of `mount` or out of the shell's path listener.
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
 }

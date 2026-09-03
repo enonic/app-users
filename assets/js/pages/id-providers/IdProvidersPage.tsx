@@ -9,7 +9,7 @@ import {
   useIdProviders,
 } from '../../entities/principal';
 import { IdProviderEditorDialog } from '../../features/idprovider-editor/IdProviderEditorDialog';
-import { useHostFrame } from '../../shared/host';
+import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { sortByDisplayName, type SortDirection } from '../../widgets/browse-list/browse-sort';
@@ -35,6 +35,7 @@ import { useIdProvidersScreen } from './model/useIdProvidersScreen';
 export function IdProvidersPage() {
   useIdProvidersScreen();
   const { openItem, closeItem } = useHostFrame();
+  const activeKey = useItemId();
   const { status, items } = useIdProviders();
   const query = useStore(idProvidersSearch.$query);
   const selectedApplications = useStore(idProvidersFilter.$selected);
@@ -70,6 +71,7 @@ export function IdProvidersPage() {
   );
 
   const section = useBrowseSection({
+    activeKey,
     openItem,
     closeItem,
     items,

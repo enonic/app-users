@@ -27,7 +27,7 @@ export type RoleEdit = {
 /**
  * Both return a `Result` rather than notifying: the dialog stays open on failure and is the screen the
  * save fails on. A command whose caller has no such screen — every toolbar action — still reports through
- * `notifyError` itself.
+ * `notify` itself.
  */
 export function createRole(draft: RoleDraft): ResultAsync<Role, AppError> {
   return sendRoleCreation(draft.name.trim(), {

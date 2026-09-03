@@ -1,9 +1,10 @@
-export { HUB_TOPICS } from './contract';
 export type {
   Host,
   MountOptions,
   Notification,
   Readable,
+  Routed,
+  SectionHost,
   SectionModule,
   Unmount,
 } from './contract';

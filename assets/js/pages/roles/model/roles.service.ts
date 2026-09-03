@@ -29,7 +29,7 @@ export function startRolesEvents(frame: HostFrame): void {
       $visible: frame.$visible,
       activeKey: () => frame.$itemId.get(),
       closeItem: frame.closeItem,
-      notify: frame.notifyInfo,
+      notify: (message) => frame.notify('info', message),
       selection: rolesSelection,
     },
     loadRow: loadRole,

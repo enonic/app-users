@@ -3,6 +3,7 @@ import { useStore } from '@nanostores/preact';
 import { deletePrincipals, principalName } from '../../entities/principal';
 import { PrincipalLabel } from '../../entities/principal/ui/PrincipalLabel';
 import { useHostFrame } from '../../shared/host';
+import { deleteExpectation } from '../../shared/ui/dialogs/delete-confirm';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { rolesDeletion } from './model/deletion.store';
 import { loadRolesScreen } from './model/roles.screen';
@@ -15,16 +16,19 @@ export type RoleDeleteDialogProps = {
 
 export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogProps) {
   const targets = useStore(rolesDeletion.$payload);
-  const { notifyError, notifySuccess } = useHostFrame();
+  const { notify } = useHostFrame();
+
+  const deleteTargets = (targets ?? []).map((role) => ({
+    key: role.key,
+    name: principalName(role.key),
+    label: <PrincipalLabel principal={role} />,
+  }));
 
   return (
     <DeleteConfirmDialog
       open={targets !== undefined}
-      targets={(targets ?? []).map((role) => ({
-        key: role.key,
-        name: principalName(role.key),
-        label: <PrincipalLabel principal={role} />,
-      }))}
+      targets={deleteTargets}
+      expected={deleteExpectation(deleteTargets)}
       onClose={rolesDeletion.close}
       onConfirm={() => {
         const confirmed = targets ?? [];
@@ -37,9 +41,9 @@ export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogPro
           selection: rolesSelection,
         }).then(({ success, failures }) => {
           if (success !== undefined) {
-            notifySuccess(success);
+            notify('success', success);
           }
-          failures.forEach(notifyError);
+          failures.forEach((failure) => notify('error', failure));
         });
       }}
     />

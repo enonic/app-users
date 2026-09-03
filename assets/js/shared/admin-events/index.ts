@@ -2,7 +2,7 @@ export { connectAdminEvents, createAdminEvents, subscribeTopic } from './admin-e
 export type { AdminEvents, TopicHandlers } from './admin-events';
 export { createTopicReaction } from './topic-reaction';
 export type { TopicReaction, TopicReactionOptions } from './topic-reaction';
-export { toPrincipalsMessage } from './topics';
+export { HUB_TOPICS, toPrincipalsMessage } from './topics';
 export type {
   PrincipalChange,
   PrincipalKind,

@@ -47,7 +47,7 @@ const NOTIFY = {
 
 export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps) {
   const editor = useStore($idProviderEditor);
-  const { notifySuccess } = useHostFrame();
+  const { notify } = useHostFrame();
   const detail = useStore($idProviderEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.provider.key : undefined;
 
@@ -207,7 +207,8 @@ export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps)
 
     written.match(
       (provider) => {
-        notifySuccess(
+        notify(
+          'success',
           i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, provider.displayName),
         );
         forgetIdProviderEditDetail();

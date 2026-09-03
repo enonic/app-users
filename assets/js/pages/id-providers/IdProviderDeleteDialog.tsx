@@ -2,6 +2,7 @@ import { useStore } from '@nanostores/preact';
 
 import { deleteIdProviders, loadIdProviders } from '../../entities/principal';
 import { useHostFrame } from '../../shared/host';
+import { deleteExpectation } from '../../shared/ui/dialogs/delete-confirm';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { idProvidersDeletion } from './model/deletion.store';
 import { idProvidersSelection } from './model/selection.store';
@@ -13,16 +14,19 @@ export type IdProviderDeleteDialogProps = {
 
 export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDeleteDialogProps) {
   const targets = useStore(idProvidersDeletion.$payload);
-  const { notifyError, notifySuccess } = useHostFrame();
+  const { notify } = useHostFrame();
+
+  const deleteTargets = (targets ?? []).map(({ key, displayName }) => ({
+    key,
+    name: key,
+    label: displayName,
+  }));
 
   return (
     <DeleteConfirmDialog
       open={targets !== undefined}
-      targets={(targets ?? []).map(({ key, displayName }) => ({
-        key,
-        name: key,
-        label: displayName,
-      }))}
+      targets={deleteTargets}
+      expected={deleteExpectation(deleteTargets)}
       onClose={idProvidersDeletion.close}
       onConfirm={() => {
         const confirmed = targets ?? [];
@@ -35,9 +39,9 @@ export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDel
           selection: idProvidersSelection,
         }).then(({ success, failures }) => {
           if (success !== undefined) {
-            notifySuccess(success);
+            notify('success', success);
           }
-          failures.forEach(notifyError);
+          failures.forEach((failure) => notify('error', failure));
         });
       }}
     />

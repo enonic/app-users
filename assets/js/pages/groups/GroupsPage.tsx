@@ -4,7 +4,7 @@ import { useMemo } from 'preact/hooks';
 import { useGroups, useIdProviderName } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { GroupEditorDialog } from '../../features/group-editor/GroupEditorDialog';
-import { useHostFrame } from '../../shared/host';
+import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { sortByDisplayName, type SortDirection } from '../../widgets/browse-list/browse-sort';
@@ -29,6 +29,7 @@ export function GroupsPage() {
   // group key carries only the provider's name.
   useGroupsScreen();
   const { openItem, closeItem } = useHostFrame();
+  const activeKey = useItemId();
   const { status, items } = useGroups();
   const providerName = useIdProviderName();
   const query = useStore(groupsSearch.$query);
@@ -64,6 +65,7 @@ export function GroupsPage() {
   );
 
   const section = useBrowseSection({
+    activeKey,
     openItem,
     closeItem,
     items,

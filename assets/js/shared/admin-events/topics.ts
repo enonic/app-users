@@ -1,3 +1,13 @@
+/**
+ * The admin events hub topics these sections subscribe. The names are the host's — app-settings
+ * registers and publishes them — copied from the table in its `docs/extensions/docs.md` § Events,
+ * which is the source of truth.
+ */
+export const HUB_TOPICS = {
+  /** Principal changes, `{operation, changes: [{kind, key}]}`, kinds user/group/role/idProvider. */
+  principals: 'com.enonic.xp.app.settings:principals',
+} as const;
+
 /** Ids only, never data: a subscriber re-reads through its gateway. `idProvider` keys are the bare provider name. */
 export type PrincipalsMessage = {
   operation: PrincipalOperation;

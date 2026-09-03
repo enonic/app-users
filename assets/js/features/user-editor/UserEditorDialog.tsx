@@ -45,7 +45,7 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
   const detail = useStore($userEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.user.key : undefined;
   const { items: providers } = useIdProviderNames();
-  const { notifySuccess } = useHostFrame();
+  const { notify } = useHostFrame();
 
   const createTitle = useI18n('users.dialog.createTitle');
   const editTitle = useI18n('users.dialog.editTitle');
@@ -206,7 +206,8 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
 
     written.match(
       (user) => {
-        notifySuccess(
+        notify(
+          'success',
           i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, user.displayName),
         );
         forgetUserEditDetail();
@@ -269,7 +270,7 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
           onRemoveKey={handleRemoveKey}
           onKeyGenerated={(pair, stored) => {
             downloadPrivateKey(editor.mode === 'edit' ? editor.user : undefined, pair, stored);
-            notifySuccess(i18n('users.dialog.keySaved', stored.kid));
+            notify('success', i18n('users.dialog.keySaved', stored.kid));
           }}
           onBlur={(field) => setVisited((current) => new Set(current).add(field))}
         />

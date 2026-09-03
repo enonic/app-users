@@ -2,7 +2,6 @@ import type { JSX } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import type { ReactNode } from 'react';
 
-import { useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { DetailsEmpty } from '../details-panel/DetailsEmpty';
 import {
@@ -16,8 +15,13 @@ import {
 export type BrowseLayoutProps = {
   toolbar: ReactNode;
   list: ReactNode;
-  /** The details column, always on screen; empty until an item route is matched. */
+  /** The details column, always on screen; empty until an item is on show. */
   details?: ReactNode;
+  /**
+   * Whether that item is there yet. ! A prop rather than a route match: this widget is mounted inside the
+   * shell, not under a router of its own, so only the section — which owns its sub-path — knows.
+   */
+  detailsShown?: boolean;
 };
 
 // Content Studio's SplitView.Handle, thin variant: a 1px line whose grab area is wider than
@@ -27,11 +31,10 @@ const HANDLE_CLASS =
   'relative z-10 w-px shrink-0 cursor-col-resize transition-colors outline-none ' +
   'focus-visible:ring-3 after:absolute after:inset-y-0 after:-inset-x-2 after:content-[""]';
 
-export function BrowseLayout({ toolbar, list, details }: BrowseLayoutProps) {
+export function BrowseLayout({ toolbar, list, details, detailsShown }: BrowseLayoutProps) {
   const resizeLabel = useI18n('browse.details.resize');
   const columnsRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
-  const itemRouteMatched = useItemId() !== undefined;
   const [detailsWidth, setDetailsWidth] = useState(readDetailsWidth);
   const [dragging, setDragging] = useState(false);
 
@@ -105,7 +108,7 @@ export function BrowseLayout({ toolbar, list, details }: BrowseLayoutProps) {
           }}
           className="bg-surface-neutral flex min-h-0 shrink-0 flex-col overflow-auto"
         >
-          {itemRouteMatched ? details : <DetailsEmpty labelKey="browse.details.empty" />}
+          {detailsShown === true ? details : <DetailsEmpty labelKey="browse.details.empty" />}
         </div>
       </>
     );
