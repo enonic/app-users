@@ -37,8 +37,10 @@ describe('reportUrl', () => {
 });
 
 describe('reportFileName', () => {
-  it('names the file the way the legacy report did', () => {
-    expect(reportFileName(TARGET)).toBe('perm-report-com.enonic.cms.default(master).csv');
+  it('names the principal as well as the repository, without the colons a file system refuses', () => {
+    expect(reportFileName(TARGET)).toBe(
+      'perm-report-user_system_jdoe-com.enonic.cms.default(master).csv',
+    );
   });
 });
 

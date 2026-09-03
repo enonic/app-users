@@ -1,20 +1,30 @@
 import { err, ok } from 'neverthrow';
 
 import { fetchRepositories } from '../api/repositories.api';
-import { receiveRepositories } from './repositories.store';
+import { beginRepositoriesLoad, receiveRepositories } from './repositories.store';
 
-/**
- * ! Once per module instance, and no refresh: repositories are created and deleted by Content Studio,
- * ! not here, and a list that changed under an administrator mid-session would still generate the
- * ! report they asked for. Retrying a failure means reopening the section.
- */
+// ? No refresh: repositories change in Content Studio, not here. A failure is forgotten so the next
+// ? mount asks again.
 let started: Promise<void> | undefined;
 
 export function loadRepositories(): Promise<void> {
-  started ??= fetchRepositories().match(
-    (items) => receiveRepositories(ok(items)),
-    (error) => receiveRepositories(err(error)),
-  );
+  started ??= load();
 
   return started;
+}
+
+//
+// * Internal
+//
+
+function load(): Promise<void> {
+  beginRepositoriesLoad();
+
+  return fetchRepositories().match(
+    (items) => receiveRepositories(ok(items)),
+    (error) => {
+      started = undefined;
+      receiveRepositories(err(error));
+    },
+  );
 }

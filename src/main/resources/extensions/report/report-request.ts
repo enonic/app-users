@@ -57,7 +57,7 @@ export function handleReportRequest(request: ReportRequest): Response {
       status: 200,
       contentType: 'text/csv; charset=utf-8',
       headers: {
-        'Content-Disposition': `attachment; filename="${fileName(repositoryId, branch)}"`,
+        'Content-Disposition': `attachment; filename="${fileName(principalKey, repositoryId, branch)}"`,
       },
       body: generatePermissionReport({ principalKey, repositoryId, branch }),
     };
@@ -77,17 +77,13 @@ function single(value: string | string[] | undefined): string | undefined {
   return first != null && first.length > 0 ? first : undefined;
 }
 
-/**
- * The name the legacy report downloaded under, kept so the two are filed together.
- *
- * ! Stripped rather than escaped: the value reaches a response header, and a quote or a newline in it
- * ! would let a query parameter write headers of its own. Repository ids and branch names hold none
- * ! of that, so nothing legitimate is lost.
- */
-function fileName(repositoryId: string, branch: string): string {
+// ! Stripped rather than escaped: the value reaches a response header, and a quote or a newline in it
+// ! would let a query parameter write headers of its own.
+function fileName(principalKey: string, repositoryId: string, branch: string): string {
   const safe = (value: string): string => value.replace(/[^A-Za-z0-9._-]/g, '');
+  const principal = safe(principalKey.replace(/:/g, '_'));
 
-  return `perm-report-${safe(repositoryId)}(${safe(branch)}).csv`;
+  return `perm-report-${principal}-${safe(repositoryId)}(${safe(branch)}).csv`;
 }
 
 function messageOf(error: unknown): string {

@@ -11,7 +11,11 @@ import {
 import { X } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
-import { useRepositories, type Repository } from '../../entities/repository';
+import {
+  useRepositories,
+  type RepositoriesState,
+  type Repository,
+} from '../../entities/repository';
 import { useConfig } from '../../shared/config';
 import { useHostFrame } from '../../shared/host';
 import { i18n, useI18n } from '../../shared/i18n';
@@ -58,6 +62,7 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
   const placeholder = useI18n('report.repositoriesPlaceholder');
   const generateLabel = useI18n('report.generate');
   const generatingLabel = useI18n('report.generating');
+  const loadingLabel = useI18n('report.loading');
   const emptyLabel = useI18n('report.empty');
   const failedLabel = useI18n('report.failed');
 
@@ -101,12 +106,6 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
         />
       }
     >
-      {status === 'error' && <p className="text-error text-sm">{failedLabel}</p>}
-
-      {status === 'ready' && items.length === 0 && (
-        <p className="text-subtle text-sm">{emptyLabel}</p>
-      )}
-
       <Combobox
         open={open}
         onOpenChange={setOpen}
@@ -128,7 +127,14 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
 
           <Combobox.Portal>
             <Combobox.Popup>
-              <RepositoryOptions repositories={offered} />
+              <RepositoryOptions
+                repositories={offered}
+                status={status}
+                empty={items.length === 0}
+                loadingLabel={loadingLabel}
+                emptyLabel={emptyLabel}
+                failedLabel={failedLabel}
+              />
             </Combobox.Popup>
           </Combobox.Portal>
         </Combobox.Content>
@@ -192,14 +198,35 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
 
 type RepositoryOptionsProps = {
   repositories: readonly Repository[];
+  status: RepositoriesState['status'];
+  /** No repositories at all, not just none matching the query. */
+  empty: boolean;
+  loadingLabel: string;
+  emptyLabel: string;
+  failedLabel: string;
 };
 
-function RepositoryOptions({ repositories }: RepositoryOptionsProps) {
+function RepositoryOptions({
+  repositories,
+  status,
+  empty,
+  loadingLabel,
+  emptyLabel,
+  failedLabel,
+}: RepositoryOptionsProps) {
   // The combobox's own selection, which is the applied one here: every click commits.
   const { selection } = useCombobox();
 
   return (
     <Combobox.ListContent className="max-h-60 overflow-y-auto">
+      {status === 'error' && <p className="text-error px-2.5 py-1 text-sm">{failedLabel}</p>}
+
+      {status === 'loading' && <p className="text-subtle px-2.5 py-1 text-sm">{loadingLabel}</p>}
+
+      {status === 'ready' && empty && (
+        <p className="text-subtle px-2.5 py-1 text-sm">{emptyLabel}</p>
+      )}
+
       {repositories.map(({ id }) => (
         <Listbox.Item key={id} value={id} className="px-2.5 py-1.5">
           <span className="flex-1 truncate text-sm">{id}</span>

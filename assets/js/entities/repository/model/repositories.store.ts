@@ -13,6 +13,10 @@ export type RepositoriesState = {
 /** One list for the module, so the four sections mounted from it ask for it once between them. */
 export const $repositories = map<RepositoriesState>({ status: 'loading', items: [] });
 
+export function beginRepositoriesLoad(): void {
+  $repositories.set({ status: 'loading', items: [] });
+}
+
 export function receiveRepositories(result: Result<Repository[], AppError>): void {
   result.match(
     (items) => $repositories.set({ status: 'ready', items }),

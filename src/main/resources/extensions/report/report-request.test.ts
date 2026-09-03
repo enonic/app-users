@@ -39,7 +39,7 @@ describe('handleReportRequest', () => {
     expect(response.contentType).toBe('text/csv; charset=utf-8');
     expect(response.headers).toEqual({
       'Content-Disposition':
-        'attachment; filename="perm-report-com.enonic.cms.default(master).csv"',
+        'attachment; filename="perm-report-user_system_jdoe-com.enonic.cms.default(master).csv"',
     });
     // The tree is empty here, so the whole file is its header — the generator has its own tests.
     expect(response.body).toBe(
@@ -117,7 +117,8 @@ describe('handleReportRequest', () => {
     const response = ask({ ...PARAMS, repositoryId: 'evil"\r\nX-Injected: 1' });
 
     expect(response.headers).toEqual({
-      'Content-Disposition': 'attachment; filename="perm-report-evilX-Injected1(master).csv"',
+      'Content-Disposition':
+        'attachment; filename="perm-report-user_system_jdoe-evilX-Injected1(master).csv"',
     });
   });
 });
