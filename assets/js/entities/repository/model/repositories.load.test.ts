@@ -56,4 +56,29 @@ describe('loadRepositories', () => {
 
     expect($repositories.get()).toEqual({ status: 'error', items: [], error: 'no' });
   });
+
+  it('asks again after a failure, so the next section to mount is not stuck with it', async () => {
+    fetchRepositories.mockReturnValueOnce(errAsync(new AppError('no')));
+
+    const { loadRepositories, $repositories } = await run();
+
+    await loadRepositories();
+    await loadRepositories();
+
+    expect(fetchRepositories).toHaveBeenCalledTimes(2);
+    expect($repositories.get()).toEqual({ status: 'ready', items: REPOSITORIES });
+  });
+
+  it('shows the retry as loading rather than as the failure it replaces', async () => {
+    fetchRepositories.mockReturnValueOnce(errAsync(new AppError('no')));
+
+    const { loadRepositories, $repositories } = await run();
+
+    await loadRepositories();
+    const retry = loadRepositories();
+
+    expect($repositories.get()).toEqual({ status: 'loading', items: [] });
+
+    await retry;
+  });
 });

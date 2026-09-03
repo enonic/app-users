@@ -25,9 +25,9 @@ export function reportUrl(baseUrl: string, target: ReportTarget): string {
   return `${baseUrl}/report?${params.toString()}`;
 }
 
-/** The name the legacy report saved under, kept so old and new files file together. */
-export function reportFileName({ repositoryId, branch }: ReportTarget): string {
-  return `perm-report-${repositoryId}(${branch}).csv`;
+// ! `:` replaced by hand: Windows refuses it in a file name, and each browser substitutes its own.
+export function reportFileName({ principalKey, repositoryId, branch }: ReportTarget): string {
+  return `perm-report-${principalKey.replace(/:/g, '_')}-${repositoryId}(${branch}).csv`;
 }
 
 /** The branch a repository starts on: the server puts `master` first where the repository has one. */
