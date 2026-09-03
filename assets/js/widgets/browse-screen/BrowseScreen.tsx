@@ -30,7 +30,7 @@ export type BrowseScreenProps<T> = {
   query: string;
   /** Shown when the section itself is empty; a query with no match says so on its own. */
   emptyLabel: string;
-  /** The details column, normally the section's `<Outlet />`. */
+  /** The details column, rendered once `activeKey` names a row. */
   details: ReactNode;
   /** Managed mode: no action is offered anywhere — toolbar, row menu or double click. */
   managedMode?: boolean;
@@ -49,10 +49,9 @@ export type BrowseScreenProps<T> = {
 };
 
 /**
- * The whole browse screen, so a section states its data and its actions and nothing else. Every
- * section renders the same toolbar, search, header, list and details column, wired the same way —
- * the wiring is here rather than copied per section, which is what kept the two first sections
- * identical below the props.
+ * The whole browse screen, so a section states its data and actions and nothing else. Every section
+ * renders the same toolbar, search, header, list and details column, and the wiring lives here rather
+ * than being copied per section.
  */
 export function BrowseScreen<T>({
   actions,
@@ -82,9 +81,9 @@ export function BrowseScreen<T>({
   const labelledActions = useLabelled(actions);
 
   /**
-   * A double click acts on the row it hit, so the context is built from that row rather than read off
-   * the screen — the clicks under it have just cleared the ticks and toggled the active row. The
-   * action's own `enabled` still decides, and the row stays on show, since it is the one being worked on.
+   * A double click acts on the row it hit, so the context is built from that row rather than read off the
+   * screen — the clicks under it just cleared the ticks and toggled the active row. The action's own
+   * `enabled` still decides, and the row stays on show.
    */
   const handleRowActivate = (key: string): void => {
     const active = itemAt(key);
@@ -109,6 +108,9 @@ export function BrowseScreen<T>({
   return (
     <BrowseLayout
       toolbar={managedMode ? notice : <BrowseToolbar actions={labelledActions} context={context} />}
+      // The active row is what the shell's url resolved to, so it is also what says whether the
+      // details column has anything to show.
+      detailsShown={activeKey !== undefined}
       list={
         <>
           <BrowseSearch value={query} onChange={onQueryChange} />

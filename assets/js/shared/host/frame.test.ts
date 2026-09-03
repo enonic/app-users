@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { fakeHost, pathStore } from '../../../../test/mocks/fake-host';
-import type { Host, Notification } from '../sections';
+import { fakeHost, pathStore, readable } from '../../../../test/mocks/fake-host';
+import type { Notification, SectionHost } from '../sections';
 import { createHostFrame } from './frame';
 
 describe('$itemId', () => {
-  // ! The case a nanostores atom would have hidden: `path` does not call back on subscribe.
+  // ! The case a nanostores atom would have hidden: a `Readable` never calls back on subscribe.
   it('reads the path already in place, so a deep link opens its row', () => {
     const frame = createHostFrame(fakeHost({ path: pathStore('/user:store:bob') }));
 
@@ -41,6 +41,17 @@ describe('$itemId', () => {
     expect(frame.$itemId.get()).toBe('user:store:a b');
   });
 
+  it('keeps a segment that does not decode, rather than throwing', () => {
+    const path = pathStore('/100%');
+    const frame = createHostFrame(fakeHost({ path }));
+
+    expect(frame.$itemId.get()).toBe('100%');
+
+    path.set('/foo%zz');
+
+    expect(frame.$itemId.get()).toBe('foo%zz');
+  });
+
   it('stops following the path once disposed', () => {
     const path = pathStore('/');
     const frame = createHostFrame(fakeHost({ path }));
@@ -52,9 +63,32 @@ describe('$itemId', () => {
   });
 });
 
+describe('$visible', () => {
+  it('mirrors the host, reading the current value before following changes', () => {
+    const visible = readable(false);
+    const frame = createHostFrame(fakeHost({ visible }));
+
+    expect(frame.$visible.get()).toBe(false);
+
+    visible.set(true);
+
+    expect(frame.$visible.get()).toBe(true);
+  });
+
+  it('stops following once disposed', () => {
+    const visible = readable(true);
+    const frame = createHostFrame(fakeHost({ visible }));
+    frame.dispose();
+
+    visible.set(false);
+
+    expect(frame.$visible.get()).toBe(true);
+  });
+});
+
 describe('navigation', () => {
   it('opens an item by replacing, so browsing rows leaves no history', () => {
-    const navigate = vi.fn<Host['navigate']>();
+    const navigate = vi.fn<SectionHost['navigate']>();
     const frame = createHostFrame(fakeHost({ navigate }));
 
     frame.openItem('user:store:bob');
@@ -63,7 +97,7 @@ describe('navigation', () => {
   });
 
   it('closes back to the section root', () => {
-    const navigate = vi.fn<Host['navigate']>();
+    const navigate = vi.fn<SectionHost['navigate']>();
     const frame = createHostFrame(fakeHost({ navigate }));
 
     frame.closeItem();
@@ -74,11 +108,11 @@ describe('navigation', () => {
 
 describe('notifications', () => {
   it('hands the message to the host with its level', () => {
-    const notify = vi.fn<Host['notify']>(() => () => undefined);
+    const notify = vi.fn<SectionHost['notify']>(() => () => undefined);
     const frame = createHostFrame(fakeHost({ notify }));
 
-    frame.notifyError('It broke');
-    frame.notifySuccess('It worked');
+    frame.notify('error', 'It broke');
+    frame.notify('success', 'It worked');
 
     expect(notify).toHaveBeenCalledWith({ level: 'error', message: 'It broke' });
     expect(notify).toHaveBeenCalledWith({ level: 'success', message: 'It worked' });
@@ -90,10 +124,10 @@ describe('notifications', () => {
 describe('two mounts from one module instance', () => {
   it('keeps their routing and notifications apart', () => {
     const usersPath = pathStore('/user:store:bob');
-    const usersNavigate = vi.fn<Host['navigate']>();
-    const usersNotify = vi.fn<Host['notify']>(() => () => undefined);
+    const usersNavigate = vi.fn<SectionHost['navigate']>();
+    const usersNotify = vi.fn<SectionHost['notify']>(() => () => undefined);
     const rolesPath = pathStore('/');
-    const rolesNavigate = vi.fn<Host['navigate']>();
+    const rolesNavigate = vi.fn<SectionHost['navigate']>();
 
     const users = createHostFrame(
       fakeHost({ path: usersPath, navigate: usersNavigate, notify: usersNotify }),
@@ -111,7 +145,7 @@ describe('two mounts from one module instance', () => {
     expect(rolesNavigate).toHaveBeenCalledWith('/role%3Aadmin', { replace: true });
     expect(usersNavigate).not.toHaveBeenCalled();
 
-    users.notifyError('Only for Users');
+    users.notify('error', 'Only for Users');
     expect(usersNotify).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ message: 'Only for Users' }) as Notification,
     );

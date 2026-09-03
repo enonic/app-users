@@ -45,9 +45,8 @@ One contract, so that "where does this list come from" has one answer.
   else. Not from `onMount` on the store: a store that fetches on subscribe hides the request from the
   section that pays for it, and the moment a second domain joins the screen it has to be unpicked.
 - Prefer `onMount` for a store that owns a browser subscription, as `theme.store.ts` does.
-- Connection and transport logic stays out of the store file: `server-events.store.ts` holds the
-  `$serverEventsConnected` atom and its setter, `server-events.ts` owns the websocket and calls that
-  setter.
+- Transport and parsing stay out of the store file: `bootstrap.store.ts` holds the `$bootstrap` map
+  and its two setters, `bootstrap.ts` owns the request that feeds it.
 
 ## Reading
 
@@ -76,11 +75,12 @@ stays with its domain.
   it resyncs.
 - **It never writes list state.** A failed command means the list is unchanged, not that the list failed
   to load; flipping a section to `error` over a refused Stop would report the wrong thing.
-- **Its refusals come back as localized messages** for the caller to toast through its own mount's
-  `HostFrame`, because a command has no screen of its own to fail on: the user may have moved on. A
-  command never touches the host — one module serves several mounts, and only the component tree
-  knows which mount it is in. The mirror of the loading rule — a load failure never becomes a
-  notification.
+- **Its notices are localized messages that reach the user through the caller's own mount's
+  `HostFrame`** — returned for the caller to toast (`deletePrincipals` in app-users), or sent to the
+  frame's `notify` the caller passed in (`application-commands.ts` here, whose uploads report as each
+  jar lands). A command never touches the host — one module serves several mounts, and only the
+  component tree knows which mount it is in. The mirror of the loading rule — a load failure never
+  becomes a notification.
 - **The truth comes from a refetch, never from a local edit.** No optimistic writes: the list is a whole
   set fetched in one round trip, so `load<Domain>()` after the command is cheap, while a local state that
   quietly disagrees with the server is not. A command that needs optimism has to argue for it here first.
@@ -94,11 +94,9 @@ stays with its domain.
   `application-commands.ts` reloads the list instead as soon as there are two.
 - **It returns `Promise<void>` only when nothing can act on the outcome**, which is what a toolbar action
   is. A caller that must branch — a dialog staying open on failure, a wizard needing the created key —
-  gets a `ResultAsync` and branches on it. `role-commands.ts` settled that shape: a save hands the
-  failure back and does **not** notify, because the dialog is still open and is the screen the save
-  failed on, and two reports of one failure is one too many. The rule it does not escape is that the
-  failure must land somewhere the user is looking — a caller that cannot show it takes the
-  `Promise<void>` form and lets the command notify.
+  gets a `Result` and branches on it, as `installApplication` hands `runMarketInstall` the result it
+  waits on. The rule it does not escape is that the failure must land somewhere the user is looking —
+  which is what the `notify` argument is for.
 - **Silence on success is not a rule, visibility is.** Start and Stop say nothing because the row's state
   cell changes under the user. A command whose effect the screen does not show — and Delete of a row on
   another page is one — notifies instead.

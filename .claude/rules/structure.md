@@ -27,9 +27,11 @@ app  →  pages  →  widgets / features  →  entities  →  shared
 - File names, barrels, component and store conventions: as in the other rule files here.
 
 `widgets/` holds the browse framework, copied from app-settings with the sections (#2640) rather than
-waited for: `@enonic/toolkit` does not exist on npm and the repository meant to publish it carries
-nothing yet. It is a fork, not a fetch — a fix made here does not reach app-settings, and the other
-way round.
+waited for; app-settings has since deleted its copy, so this one and app-applications' are the
+canonical pair `@enonic/ui-kit` (`../npm-enonic-ui-toolkit`) extracts from. They are kept
+byte-identical where the code is the same — `cmp` against `../app-applications` is the drift check —
+and a widget takes what it needs as props (`activeKey`, `detailsShown`) rather than reaching into
+`shared/host`, which is what keeps it portable.
 
 ## Server — `src/main/resources`
 

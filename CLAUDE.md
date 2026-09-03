@@ -53,9 +53,15 @@ the plain-`.js` binding layer, its golden test fixtures, docs and CI — is list
 Sibling checkouts, read-only. `../app-settings` (branch `extensions`) is the **host**: the mount
 contract is `shared/sections/contract.ts` there, and `docs/extensions/` — `docs.md`,
 `host-facts.md`, `provider-facts.md`, `progress.md` — is authoritative on how a section is
-discovered, mounted, routed and revoked. `../app-applications` (branch `issue-2295`) is the **first provider** and the
-template this project copies. `../npm-enonic-ui` is the source of `@enonic/ui` — read a component
-before composing it.
+discovered, mounted, routed and revoked; its `docs/platform-facts.md` is what XP actually does where
+its types mislead. `../app-applications` (branch `extensions`) is the **other provider**: `widgets/`,
+`shared/ui` and most of `shared/` are kept byte-identical between the two (`cmp` is the drift check)
+until `@enonic/ui-kit` and `@enonic/ui-utils` in `../npm-enonic-ui-toolkit` extract them; the browse
+screen they make up is specified in that repository's `docs/browse-framework.md`. `../npm-enonic-ui`
+is the source of `@enonic/ui` — read a component before composing it.
+
+`docs/unified-api.md` is the design of the GraphQL layer under `extensions/graphql/`, written while
+it lived in app-settings and moved here with the sections.
 
 ## Conventions
 

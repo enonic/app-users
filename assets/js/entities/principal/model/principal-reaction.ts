@@ -1,5 +1,6 @@
 import type { ReadableAtom } from 'nanostores';
 
+import { HUB_TOPICS } from '../../../shared/admin-events';
 import {
   createTopicReaction,
   toPrincipalsMessage,
@@ -7,7 +8,6 @@ import {
   type TopicReaction,
 } from '../../../shared/admin-events';
 import { i18n } from '../../../shared/i18n';
-import { HUB_TOPICS } from '../../../shared/sections';
 import type { SelectionStore } from '../../../shared/selection';
 import { collapsePrincipalChanges, type PrincipalEvent } from './principal-changes';
 import { principalName } from './principal.keys';

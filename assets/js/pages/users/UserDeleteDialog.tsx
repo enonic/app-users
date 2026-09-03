@@ -3,6 +3,7 @@ import { useStore } from '@nanostores/preact';
 import { deletePrincipals, principalName } from '../../entities/principal';
 import { PrincipalLabel } from '../../entities/principal/ui/PrincipalLabel';
 import { useHostFrame } from '../../shared/host';
+import { deleteExpectation } from '../../shared/ui/dialogs/delete-confirm';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { usersDeletion } from './model/deletion.store';
 import { usersSelection } from './model/selection.store';
@@ -15,16 +16,19 @@ export type UserDeleteDialogProps = {
 
 export function UserDeleteDialog({ activeKey, onCloseItem }: UserDeleteDialogProps) {
   const targets = useStore(usersDeletion.$payload);
-  const { notifyError, notifySuccess } = useHostFrame();
+  const { notify } = useHostFrame();
+
+  const deleteTargets = (targets ?? []).map((user) => ({
+    key: user.key,
+    name: principalName(user.key),
+    label: <PrincipalLabel principal={user} />,
+  }));
 
   return (
     <DeleteConfirmDialog
       open={targets !== undefined}
-      targets={(targets ?? []).map((user) => ({
-        key: user.key,
-        name: principalName(user.key),
-        label: <PrincipalLabel principal={user} />,
-      }))}
+      targets={deleteTargets}
+      expected={deleteExpectation(deleteTargets)}
       onClose={usersDeletion.close}
       onConfirm={() => {
         const confirmed = targets ?? [];
@@ -37,9 +41,9 @@ export function UserDeleteDialog({ activeKey, onCloseItem }: UserDeleteDialogPro
           selection: usersSelection,
         }).then(({ success, failures }) => {
           if (success !== undefined) {
-            notifySuccess(success);
+            notify('success', success);
           }
-          failures.forEach(notifyError);
+          failures.forEach((failure) => notify('error', failure));
         });
       }}
     />

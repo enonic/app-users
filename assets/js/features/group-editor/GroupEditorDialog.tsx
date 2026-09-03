@@ -37,7 +37,7 @@ const NOTIFY = {
 
 export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
   const editor = useStore($groupEditor);
-  const { notifySuccess } = useHostFrame();
+  const { notify } = useHostFrame();
   const detail = useStore($groupEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.group.key : undefined;
   const { items: providers } = useIdProviderNames();
@@ -155,7 +155,8 @@ export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
 
     written.match(
       () => {
-        notifySuccess(
+        notify(
+          'success',
           i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, values.displayName),
         );
         forgetGroupEditDetail();

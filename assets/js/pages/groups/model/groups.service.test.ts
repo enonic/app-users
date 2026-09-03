@@ -70,7 +70,7 @@ function frame(): HostFrame {
     $visible: atom(true),
     $itemId: atom<string | undefined>(DEVS),
     closeItem: vi.fn(),
-    notifyInfo: vi.fn(),
+    notify: vi.fn(),
   } as unknown as HostFrame;
 }
 
