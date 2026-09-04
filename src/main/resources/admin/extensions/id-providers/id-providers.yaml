@@ -11,5 +11,5 @@ allow:
 interfaces:
   - 'settings.section'
 config:
-  order: 23
+  order: 24
   path: 'id-providers'

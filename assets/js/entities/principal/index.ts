@@ -74,9 +74,27 @@ export {
   isSystemUser,
   principalName,
   projectRoleIdOf,
+  SYSTEM_ID_PROVIDER,
 } from './model/principal.keys';
 export { addPublicKey, createUser, removePublicKey, updateUser } from './model/user-commands';
 export type { UserDraft, UserEdit } from './model/user-commands';
+export {
+  evictServiceAccountDetail,
+  forgetServiceAccountDetails,
+  forgetServiceAccounts,
+} from './model/service-account-detail.load';
+export { loadServiceAccount } from './model/service-accounts.load';
+export {
+  appendServiceAccounts,
+  beginServiceAccountsAppend,
+  beginServiceAccountsLoad,
+  receiveServiceAccounts,
+  removeServiceAccount,
+  replaceServiceAccount,
+  serviceAccountsAppendStart,
+  serviceAccountsLoadedExtent,
+  serviceAccountsLoadedKeys,
+} from './model/service-accounts.store';
 export { evictUserDetail, forgetUserDetails, forgetUsers } from './model/user-detail.load';
 export { loadUser } from './model/users.load';
 export type {
@@ -132,6 +150,8 @@ export { useIdProviders } from './model/useIdProviders';
 export { useRole } from './model/useRole';
 export { useRoles } from './model/useRoles';
 export { useTransitiveMemberships } from './model/useTransitiveMemberships';
+export { useServiceAccount } from './model/useServiceAccount';
+export { useServiceAccounts } from './model/useServiceAccounts';
 export { useUser } from './model/useUser';
 export { useUsers } from './model/useUsers';
 export type { UsersView } from './model/useUsers';
