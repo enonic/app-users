@@ -24,6 +24,8 @@ export type UserFormProps = {
   providers: readonly IdProviderName[];
   persisted: boolean;
   systemUser: boolean;
+  /** The provider is `system` by definition, so the field is not offered. */
+  serviceAccount: boolean;
   hasPassword: boolean;
   onChange: (values: UserFormValues) => void;
   onAddKey: (publicKey: string, label?: string) => Promise<AddOutcome>;
@@ -43,6 +45,7 @@ export function UserForm({
   providers,
   persisted,
   systemUser,
+  serviceAccount,
   hasPassword,
   onChange,
   onAddKey,
@@ -86,33 +89,35 @@ export function UserForm({
           />
         </div>
 
-        <div className="flex max-w-md flex-col gap-1.5">
-          <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
-          <Selector.Root
-            value={values.idProvider}
-            onValueChange={(idProvider) => {
-              onBlur('idProvider');
-              onChange({ ...values, idProvider });
-            }}
-            disabled={persisted}
-            error={providerError !== undefined}
-          >
-            <Selector.Trigger aria-labelledby={PROVIDER_LABEL_ID}>
-              <Selector.Value placeholder={providerPlaceholder}>
-                {values.idProvider.length > 0 ? providerName : undefined}
-              </Selector.Value>
-              <Selector.Icon />
-            </Selector.Trigger>
-            <SelectorPopup>
-              {providers.map(({ key, displayName }) => (
-                <Selector.Item key={key} value={key} textValue={displayName}>
-                  <Selector.ItemText>{displayName}</Selector.ItemText>
-                </Selector.Item>
-              ))}
-            </SelectorPopup>
-          </Selector.Root>
-          {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
-        </div>
+        {!serviceAccount && (
+          <div className="flex max-w-md flex-col gap-1.5">
+            <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
+            <Selector.Root
+              value={values.idProvider}
+              onValueChange={(idProvider) => {
+                onBlur('idProvider');
+                onChange({ ...values, idProvider });
+              }}
+              disabled={persisted}
+              error={providerError !== undefined}
+            >
+              <Selector.Trigger aria-labelledby={PROVIDER_LABEL_ID}>
+                <Selector.Value placeholder={providerPlaceholder}>
+                  {values.idProvider.length > 0 ? providerName : undefined}
+                </Selector.Value>
+                <Selector.Icon />
+              </Selector.Trigger>
+              <SelectorPopup>
+                {providers.map(({ key, displayName }) => (
+                  <Selector.Item key={key} value={key} textValue={displayName}>
+                    <Selector.ItemText>{displayName}</Selector.ItemText>
+                  </Selector.Item>
+                ))}
+              </SelectorPopup>
+            </Selector.Root>
+            {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
+          </div>
+        )}
 
         {!systemUser && (
           <div className="flex flex-col gap-1.5">

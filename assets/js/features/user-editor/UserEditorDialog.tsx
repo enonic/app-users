@@ -7,6 +7,7 @@ import {
   createUser,
   isSystemUser,
   removePublicKey,
+  SYSTEM_ID_PROVIDER,
   updateUser,
   useIdProviderNames,
   type User,
@@ -18,6 +19,15 @@ import { DialogIdentityHeader } from '../../shared/ui/dialogs/DialogIdentityHead
 import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
 import type { AddOutcome } from './AddPublicKeyDialog';
 import { downloadPrivateKey } from './model/key-file';
+import {
+  $serviceAccountEditDetail,
+  forgetServiceAccountEditDetail,
+  showServiceAccountForEdit,
+} from './model/service-account-edit-detail';
+import {
+  $serviceAccountEditor,
+  closeServiceAccountEditor,
+} from './model/service-account-editor.store';
 import { $userEditDetail, forgetUserEditDetail, showUserForEdit } from './model/user-edit-detail';
 import { $userEditor, closeUserEditor } from './model/user-editor.store';
 import {
@@ -33,22 +43,41 @@ import { UserForm } from './UserForm';
 
 export type UserEditorDialogProps = {
   onSaved: (written: User, mode: 'create' | 'edit') => void;
+  /**
+   * The Service Accounts variant: its own dialog store — both sections stay mounted, so sharing one
+   * would open the dialog in each — the provider fixed to `system` and never offered, and its own copy.
+   */
+  serviceAccount?: boolean;
 };
 
-const NOTIFY = {
+const USER_TEXT = {
+  createTitle: 'users.dialog.createTitle',
+  editTitle: 'users.dialog.editTitle',
   created: 'users.notify.created',
   updated: 'users.notify.updated',
 } as const;
 
-export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
-  const editor = useStore($userEditor);
-  const detail = useStore($userEditDetail);
+const SERVICE_ACCOUNT_TEXT = {
+  createTitle: 'serviceAccounts.dialog.createTitle',
+  editTitle: 'serviceAccounts.dialog.editTitle',
+  created: 'serviceAccounts.notify.created',
+  updated: 'serviceAccounts.notify.updated',
+} as const;
+
+export function UserEditorDialog({ onSaved, serviceAccount = false }: UserEditorDialogProps) {
+  const editor = useStore(serviceAccount ? $serviceAccountEditor : $userEditor);
+  const detail = useStore(serviceAccount ? $serviceAccountEditDetail : $userEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.user.key : undefined;
   const { items: providers } = useIdProviderNames();
   const { notify } = useHostFrame();
 
-  const createTitle = useI18n('users.dialog.createTitle');
-  const editTitle = useI18n('users.dialog.editTitle');
+  const close = serviceAccount ? closeServiceAccountEditor : closeUserEditor;
+  const forgetEditDetail = serviceAccount ? forgetServiceAccountEditDetail : forgetUserEditDetail;
+  const showForEdit = serviceAccount ? showServiceAccountForEdit : showUserForEdit;
+  const text = serviceAccount ? SERVICE_ACCOUNT_TEXT : USER_TEXT;
+
+  const createTitle = useI18n(text.createTitle);
+  const editTitle = useI18n(text.editTitle);
   const displayNameLabel = useI18n('users.dialog.displayName');
   const displayNamePlaceholder = useI18n('users.dialog.displayNamePlaceholder');
   const membershipsFailed = useI18n('users.dialog.membershipsFailed');
@@ -65,7 +94,11 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
   const [failure, setFailure] = useState<string | undefined>();
   const [seeded, setSeeded] = useState(false);
 
-  const onlyProvider = providers.length === 1 ? providers[0]?.key : undefined;
+  const onlyProvider = serviceAccount
+    ? SYSTEM_ID_PROVIDER
+    : providers.length === 1
+      ? providers[0]?.key
+      : undefined;
 
   useEffect(() => {
     const opened = editor === undefined ? undefined : initialUserForm(editor, onlyProvider);
@@ -76,7 +109,7 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
     setSaving(false);
     setFailure(undefined);
     setSeeded(false);
-    showUserForEdit(editedKey);
+    showForEdit(editedKey);
   }, [editor, editedKey, onlyProvider]);
 
   useEffect(() => {
@@ -134,8 +167,8 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
 
   const reloadKeys = (): void => {
     if (editedKey !== undefined) {
-      forgetUserEditDetail();
-      showUserForEdit(editedKey);
+      forgetEditDetail();
+      showForEdit(editedKey);
     }
   };
 
@@ -208,18 +241,18 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
       (user) => {
         notify(
           'success',
-          i18n(editor.mode === 'edit' ? NOTIFY.updated : NOTIFY.created, user.displayName),
+          i18n(editor.mode === 'edit' ? text.updated : text.created, user.displayName),
         );
-        forgetUserEditDetail();
-        closeUserEditor();
+        forgetEditDetail();
+        close();
         onSaved(user, editor.mode);
       },
       (error) => {
         setSaving(false);
         setFailure(error.message);
         if (editedKey !== undefined) {
-          forgetUserEditDetail();
-          showUserForEdit(editedKey);
+          forgetEditDetail();
+          showForEdit(editedKey);
         }
       },
     );
@@ -237,7 +270,7 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
       error={failure ?? (detail.status === 'error' ? membershipsFailed : undefined)}
       onClose={() => {
         if (!saving) {
-          closeUserEditor();
+          close();
         }
       }}
       onPrimary={() => void handleSave()}
@@ -264,6 +297,7 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
           providers={providers}
           persisted={editor.mode === 'edit'}
           systemUser={systemUser}
+          serviceAccount={serviceAccount}
           hasPassword={editor.mode === 'edit' && editor.user.hasPassword === true}
           onChange={handleChange}
           onAddKey={handleAddKey}

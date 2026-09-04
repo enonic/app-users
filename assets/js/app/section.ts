@@ -1,4 +1,4 @@
-export const SECTIONS = ['users', 'groups', 'roles', 'id-providers'] as const;
+export const SECTIONS = ['users', 'groups', 'roles', 'service-accounts', 'id-providers'] as const;
 
 export type Section = (typeof SECTIONS)[number];
 
