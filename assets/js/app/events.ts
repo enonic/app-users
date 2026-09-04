@@ -4,6 +4,10 @@ import {
   stopIdProvidersEvents,
 } from '../pages/id-providers/model/id-providers.service';
 import { startRolesEvents, stopRolesEvents } from '../pages/roles/model/roles.service';
+import {
+  startServiceAccountsEvents,
+  stopServiceAccountsEvents,
+} from '../pages/service-accounts/model/service-accounts.service';
 import { startUsersEvents, stopUsersEvents } from '../pages/users/model/users.service';
 import { connectAdminEvents } from '../shared/admin-events';
 import { $config } from '../shared/config';
@@ -20,6 +24,7 @@ const SERVICES: Record<Section, SectionEvents> = {
   users: { start: startUsersEvents, stop: stopUsersEvents },
   groups: { start: startGroupsEvents, stop: stopGroupsEvents },
   roles: { start: startRolesEvents, stop: stopRolesEvents },
+  'service-accounts': { start: startServiceAccountsEvents, stop: stopServiceAccountsEvents },
   'id-providers': { start: startIdProvidersEvents, stop: stopIdProvidersEvents },
 };
 

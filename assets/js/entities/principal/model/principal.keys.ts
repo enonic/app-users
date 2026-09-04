@@ -59,6 +59,9 @@ export const IMPLICIT_ROLE_KEYS: ReadonlySet<string> = new Set([
   'role:system.authenticated',
 ]);
 
+/** The built-in store whose users are service accounts. It cannot be created, renamed or deleted. */
+export const SYSTEM_ID_PROVIDER = 'system';
+
 // The two users the platform owns and lib-admin-ui's `isSystem()` refuses to delete.
 const SYSTEM_USER_KEYS = ['user:system:su', 'user:system:anonymous'];
 

@@ -19,28 +19,38 @@ const GLYPHS: Record<PrincipalType, LucideIcon> = {
 
 const PIXELS = { sm: 24, lg: 48 } as const;
 
+/**
+ * ! The cog carries no disc — it is drawn in `currentColor`, same as the glyph, so both follow the row's
+ * ! text color together (`text-alt` on the inverse selected row included). What keeps the glyph's strokes
+ * ! from crossing it is this notch, cut out of the glyph alone: a hole centred where the badge sits —
+ * ! badge box offset -3px into the corner, so sm (14px box on a 24px glyph) centres at 20,4 and lg (18px
+ * ! box on 48px) at 42,6 — with the radius leaving ~2px of clear ground around the cog on any background.
+ */
+const NOTCH = {
+  sm: '[mask-image:radial-gradient(circle_at_20px_4px,transparent_7px,#000_7.5px)]',
+  lg: '[mask-image:radial-gradient(circle_at_42px_6px,transparent_9px,#000_9.5px)]',
+} as const;
+
 /** The glyph for a principal's type, with a cog badge on the ones the platform owns. */
 export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
   const { key, type } = principal;
 
   const Glyph = GLYPHS[type];
-  const glyph = <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden />;
 
   const badgeLabelKey = systemBadgeKey(type, key);
   if (badgeLabelKey === undefined) {
-    return glyph;
+    return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden />;
   }
 
   return (
     <span className="relative inline-flex shrink-0">
-      {glyph}
+      <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden className={NOTCH[size]} />
 
       <IconBadge
         icon={Settings}
-        color="var(--color-main)"
         size={size === 'lg' ? 'md' : 'sm'}
         label={i18n(badgeLabelKey)}
-        className="absolute -top-0.75 -right-0.75"
+        className="absolute -top-0.75 -right-0.75 text-current"
       />
     </span>
   );

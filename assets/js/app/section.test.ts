@@ -11,6 +11,9 @@ describe('sectionOf', () => {
 
   it('keeps a hyphenated section name whole', () => {
     expect(sectionOf(`${PREFIX}/com.enonic.xp.app.users:id-providers`)).toBe('id-providers');
+    expect(sectionOf(`${PREFIX}/com.enonic.xp.app.users:service-accounts`)).toBe(
+      'service-accounts',
+    );
   });
 
   it('ignores a trailing slash', () => {

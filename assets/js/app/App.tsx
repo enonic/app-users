@@ -6,6 +6,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { GroupsPage } from '../pages/groups/GroupsPage';
 import { IdProvidersPage } from '../pages/id-providers/IdProvidersPage';
 import { RolesPage } from '../pages/roles/RolesPage';
+import { ServiceAccountsPage } from '../pages/service-accounts/ServiceAccountsPage';
 import { UsersPage } from '../pages/users/UsersPage';
 import { HostFrameProvider, type HostFrame } from '../shared/host';
 import { $stylesheets } from '../shared/styles';
@@ -22,6 +23,7 @@ const PAGES: Record<Section, FunctionComponent> = {
   users: UsersPage,
   groups: GroupsPage,
   roles: RolesPage,
+  'service-accounts': ServiceAccountsPage,
   'id-providers': IdProvidersPage,
 };
 
