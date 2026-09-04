@@ -17,4 +17,5 @@ apis:
   - "admin:extension"
   - "admin:status"
   - "admin:event"
+  - "admin:events"
   - "com.enonic.xp.app.main:events"
