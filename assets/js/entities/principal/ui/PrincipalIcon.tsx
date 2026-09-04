@@ -1,49 +1,67 @@
-import { Settings, User, Users, UserShield, type LucideIcon } from 'lucide-react';
+import { Avatar, cn } from '@enonic/ui';
+import { Settings, Users, UserShield, type LucideIcon } from 'lucide-react';
 
+import { getInitials } from '../../../shared/format';
 import { i18n } from '../../../shared/i18n';
 import { IconBadge } from '../../../shared/ui/IconBadge';
 import { isPlatformRole, isSystemUser } from '../model/principal.keys';
 import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
 
 export type PrincipalIconProps = {
-  principal: Pick<PrincipalRef, 'key' | 'type'>;
+  principal: PrincipalRef;
   /** `sm` for a list row, `lg` for the details header. */
   size?: 'sm' | 'lg';
 };
 
-const GLYPHS: Record<PrincipalType, LucideIcon> = {
-  user: User,
+const GLYPHS: Record<Exclude<PrincipalType, 'user'>, LucideIcon> = {
   group: Users,
   role: UserShield,
 };
 
 const PIXELS = { sm: 24, lg: 48 } as const;
 
-/** The glyph for a principal's type, with a cog badge on the ones the platform owns. */
+/** A user's initials, or the glyph for a group or role, with a cog badge on the ones the platform owns. */
 export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
-  const { key, type } = principal;
+  const { key, type, displayName } = principal;
 
-  const Glyph = GLYPHS[type];
-  const glyph = <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden />;
+  const icon = type === 'user' ? initialsAvatar(displayName, size) : glyph(type, size);
 
   const badgeLabelKey = systemBadgeKey(type, key);
   if (badgeLabelKey === undefined) {
-    return glyph;
+    return icon;
   }
 
   return (
     <span className="relative inline-flex shrink-0">
-      {glyph}
+      {icon}
 
       <IconBadge
         icon={Settings}
         color="var(--color-main)"
         size={size === 'lg' ? 'md' : 'sm'}
         label={i18n(badgeLabelKey)}
-        className="absolute -top-0.75 -right-0.75"
+        className={cn(
+          'absolute -top-0.75 -right-0.75',
+          // ? Badge and avatar are the same black in the light theme; the ring is what separates them.
+          type === 'user' && 'ring-surface-neutral ring-2',
+        )}
       />
     </span>
   );
+}
+
+function initialsAvatar(displayName: string, size: 'sm' | 'lg') {
+  return (
+    <Avatar size={size} aria-hidden>
+      {/* The fallback hardcodes `cursor-default`, an arrow over the avatar alone in a clickable row. */}
+      <Avatar.Fallback className="cursor-[inherit]">{getInitials(displayName)}</Avatar.Fallback>
+    </Avatar>
+  );
+}
+
+function glyph(type: Exclude<PrincipalType, 'user'>, size: 'sm' | 'lg') {
+  const Glyph = GLYPHS[type];
+  return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden />;
 }
 
 /**
