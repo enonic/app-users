@@ -207,6 +207,42 @@ describe('listUsers', () => {
     expect(calledWith()?.query).toBe('');
   });
 
+  // ? What keeps the system store's users off the Users screen: they are served by the Service Accounts
+  // ? section instead, and the exclusion holds whatever else narrows the query.
+  it('excludes a provider through the same node property, negated', () => {
+    vi.mocked(findUsers).mockReturnValue(found([]));
+
+    listUsers({ excludeIdProviders: ['system'] });
+
+    expect(calledWith()?.query).toBe('userStoreKey!="system"');
+  });
+
+  it('ANDs an exclusion onto the search and the provider filter', () => {
+    vi.mocked(findUsers).mockReturnValue(found([]));
+
+    listUsers({ search: 'alice', idProviders: ['ldap'], excludeIdProviders: ['system'] });
+
+    expect(calledWith()?.query).toBe(
+      '(fulltext("_allText,displayName","alice","AND") OR ngram("_allText,displayName","alice","AND")) AND userStoreKey="ldap" AND userStoreKey!="system"',
+    );
+  });
+
+  it('escapes an excluded provider like every other value', () => {
+    vi.mocked(findUsers).mockReturnValue(found([]));
+
+    listUsers({ excludeIdProviders: ['od"d'] });
+
+    expect(calledWith()?.query).toBe('userStoreKey!="od\\"d"');
+  });
+
+  it('ignores an empty exclusion list', () => {
+    vi.mocked(findUsers).mockReturnValue(found([]));
+
+    listUsers({ excludeIdProviders: [] });
+
+    expect(calledWith()?.query).toBe('');
+  });
+
   it('combines a search and a provider filter', () => {
     vi.mocked(findUsers).mockReturnValue(found([]));
 

@@ -2,6 +2,7 @@ import type { ResultAsync } from 'neverthrow';
 
 import {
   ID_PROVIDER_USER_COUNTS_ROOT,
+  SYSTEM_ID_PROVIDER,
   USERS_ROOT,
   type IdProviderUserCountsData,
   type UsersData,
@@ -56,6 +57,9 @@ function valuesFor(query: UsersPageQuery): GraphQlVariables {
     count: query.count,
     search: query.search ?? null,
     idProviders: query.idProviders.length === 0 ? null : query.idProviders,
+    // ! Pinned, not a choice: the system store's users are the Service Accounts section's (#2674), so
+    // ! this screen never sees them, whatever the filter ticks.
+    excludeIdProviders: [SYSTEM_ID_PROVIDER],
     sort: query.sort,
   };
 }

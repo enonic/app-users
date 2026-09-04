@@ -41,6 +41,7 @@ describe('fetchServiceAccountsScreen', () => {
       count: 50,
       search: 'reporting',
       idProviders: ['system'],
+      excludeIdProviders: null,
       sort: 'displayNameDesc',
     });
   });
