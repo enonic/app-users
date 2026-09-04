@@ -4,7 +4,7 @@ var endpoint = require('/extensions/section-endpoint');
 var CONTEXT = '/admin/com.enonic.xp.app.settings/main/_/admin:extension/com.enonic.xp.app.users:users';
 
 function request(path, body) {
-    return {rawPath: CONTEXT + path, contextPath: CONTEXT, body: body};
+    return {rawPath: CONTEXT + path, contextPath: CONTEXT, body: body, params: {}};
 }
 
 function graphql(query) {
@@ -55,7 +55,8 @@ exports.exposesThePrincipalsSchema = function () {
     t.assertNull(mutations.body.errors);
 
     t.assertEquals('', missingFrom(queries.body.data.__schema.queryType.fields,
-        ['config', 'phrases', 'users', 'roles', 'groups', 'idProviders', 'idProviderApplications']));
+        ['config', 'phrases', 'users', 'roles', 'groups', 'idProviders', 'idProviderApplications',
+            'repositories']));
 
     t.assertEquals('', missingFrom(mutations.body.data.__schema.mutationType.fields,
         ['createUser', 'updateUser', 'createGroup', 'createRole', 'createIdProvider',
@@ -89,4 +90,10 @@ exports.reportsAnUnknownFieldAsAGraphQlError = function () {
 
 exports.rejectsABodyThatIsNotAQuery = function () {
     t.assertEquals(400, endpoint.post(request('/graphql', '{"nope":1}')).status);
+};
+
+// The test context carries no roles, which is the case that matters: the sections are open wider than
+// the report is, so the refusal has to come from the report's own gate on the engine XP runs it on.
+exports.refusesAPermissionReportWithoutTheAdminRole = function () {
+    t.assertEquals(403, endpoint.get(request('/report')).status);
 };

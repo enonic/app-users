@@ -1,4 +1,4 @@
-import { GraphQLString, nonNull, type GraphQLType } from '/lib/graphql';
+import { GraphQLBoolean, GraphQLString, nonNull, type GraphQLType } from '/lib/graphql';
 
 import { generator } from '../schema/generator';
 
@@ -20,6 +20,11 @@ export const ConfigType: GraphQLType = generator.createObjectType({
     eventsUrl: {
       type: nonNull(GraphQLString),
       description: 'The admin events hub api; `client.js` under it is the client to import.',
+    },
+    admin: {
+      type: nonNull(GraphQLBoolean),
+      description:
+        'Whether the visitor holds `role:system.admin`. A section is open to user administrators too, and the permission report is not theirs — this is what lets the UI leave it out rather than offer a button that answers 403.',
     },
   },
 });

@@ -8,7 +8,10 @@ import org.mockito.Mockito;
 
 import com.enonic.xp.i18n.LocaleService;
 import com.enonic.xp.i18n.MessageBundle;
+import com.enonic.xp.node.NodeService;
 import com.enonic.xp.portal.url.PortalUrlService;
+import com.enonic.xp.repository.RepositoryService;
+import com.enonic.xp.security.SecurityService;
 import com.enonic.xp.testing.ScriptTestSupport;
 
 /**
@@ -24,6 +27,10 @@ public class SectionEndpointTest
     /**
      * ScriptTestSupport registers no LocaleService, so `phrases` would fail to fetch without one —
      * nor a PortalUrlService, which the `config` resolver needs for `eventsUrl`.
+     * <p>
+     * The three below are what loading the controller at all costs: lib-node and lib-repo bind their
+     * script beans inside `require`, so with any of them missing every test here fails on the import,
+     * not on what it asserts.
      */
     @Override
     public void initialize()
@@ -46,6 +53,10 @@ public class SectionEndpointTest
             .thenReturn( "/admin/com.enonic.xp.app.settings/main/_/admin:events" );
 
         addService( PortalUrlService.class, portalUrlService );
+
+        addService( NodeService.class, Mockito.mock( NodeService.class ) );
+        addService( SecurityService.class, Mockito.mock( SecurityService.class ) );
+        addService( RepositoryService.class, Mockito.mock( RepositoryService.class ) );
     }
 
     @Test
@@ -88,5 +99,11 @@ public class SectionEndpointTest
     public void testRejectsABodyThatIsNotAQuery()
     {
         runFunction( TEST_SCRIPT, "rejectsABodyThatIsNotAQuery" );
+    }
+
+    @Test
+    public void testRefusesAPermissionReportWithoutTheAdminRole()
+    {
+        runFunction( TEST_SCRIPT, "refusesAPermissionReportWithoutTheAdminRole" );
     }
 }

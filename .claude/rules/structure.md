@@ -35,7 +35,7 @@ and a widget takes what it needs as props (`activeKey`, `detailsShown`) rather t
 
 ## Server — `src/main/resources`
 
-- New server TS lives under `extensions/` (shared modules: endpoint, i18n, schema) and
+- New server TS lives under `extensions/` (shared modules: endpoint, i18n, schema, report) and
   `admin/extensions/<section>/` (descriptor `.yaml` + `.svg` + a controller re-exporting the shared
   endpoint). It is required absolutely as `/extensions/<name>`.
 - **Keep new server code out of `lib/`**: that tree is the plain-`.js` binding to the java beans,

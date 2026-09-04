@@ -77,7 +77,9 @@ export default defineConfig(({ mode }) => {
       '/lib/xp/auth': join(REPO, 'test/mocks/lib-xp-auth.ts'),
       '/lib/xp/i18n': join(REPO, 'test/mocks/lib-xp-i18n.ts'),
       '/lib/xp/io': join(REPO, 'test/mocks/lib-xp-io.ts'),
+      '/lib/xp/node': join(REPO, 'test/mocks/lib-xp-node.ts'),
       '/lib/xp/portal': join(REPO, 'test/mocks/lib-xp-portal.ts'),
+      '/lib/xp/repo': join(REPO, 'test/mocks/lib-xp-repo.ts'),
       '/extensions': join(REPO, 'src/main/resources/extensions'),
     },
   };

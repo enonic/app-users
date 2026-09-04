@@ -9,6 +9,7 @@ import {
   type UserDetail,
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { PermissionReportSection } from '../../features/permission-report';
 import { openUserEditor } from '../../features/user-editor';
 import { useI18n } from '../../shared/i18n';
 import { filledSections } from '../../widgets/details-panel/details-panel';
@@ -100,6 +101,8 @@ export function UserDetails({ user }: UserDetailsProps) {
           </DetailsPanel.List>
         </DetailsPanel.Section>
       ))}
+
+      <PermissionReportSection principalKey={key} />
     </DetailsPanel>
   );
 }

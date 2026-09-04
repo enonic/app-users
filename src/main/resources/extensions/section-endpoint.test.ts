@@ -1,3 +1,4 @@
+import { hasRole } from '/lib/xp/auth';
 import { getMimeType, getResource } from '/lib/xp/io';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,8 +8,8 @@ import { get, post } from './section-endpoint';
 const CONTEXT =
   '/admin/com.enonic.xp.app.settings/main/_/admin:extension/com.enonic.xp.app.users:users';
 
-function request(path: string) {
-  return { rawPath: `${CONTEXT}${path}`, contextPath: CONTEXT };
+function request(path: string, params: Record<string, string> = {}) {
+  return { rawPath: `${CONTEXT}${path}`, contextPath: CONTEXT, params };
 }
 
 beforeEach(() => {
@@ -45,6 +46,13 @@ describe('get', () => {
 
   it('answers 404 below the prefix but outside the static base', () => {
     expect(get(request('/graphql')).status).toBe(404);
+  });
+
+  // The report's own gates are covered beside it; what this pins is that the path reaches them at all.
+  it('routes the report path to the report handler', () => {
+    vi.mocked(hasRole).mockReturnValue(false);
+
+    expect(get(request('/report')).status).toBe(403);
   });
 
   it('leaves the content type of anything else to lib-io', () => {

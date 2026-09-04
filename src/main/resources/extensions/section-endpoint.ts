@@ -2,6 +2,7 @@ import type { Request, Response } from '/lib/xp/core';
 import { getMimeType, getResource, readText } from '/lib/xp/io';
 
 import { handleGraphQlRequest, type GraphQlRequest } from './graphql/request';
+import { handleReportRequest, type ReportRequest } from './report/report-request';
 
 /** The two names that locate a call below this extension's prefix. */
 type PrefixRequest = Pick<Request, 'rawPath' | 'contextPath'>;
@@ -9,12 +10,19 @@ type PrefixRequest = Pick<Request, 'rawPath' | 'contextPath'>;
 const STATIC_BASE = '/_static';
 const ASSET_ROOT = '/assets';
 const GRAPHQL_PATH = '/graphql';
+const REPORT_PATH = '/report';
 
-export function get(request: PrefixRequest): Response {
+export function get(request: PrefixRequest & ReportRequest): Response {
   const path = extensionPath(request);
 
   if (path.startsWith(`${STATIC_BASE}/`) && !path.includes('..')) {
     return serveText(`${ASSET_ROOT}${path}`);
+  }
+
+  // ? The one thing this prefix serves that is neither an asset nor GraphQL: a permission report is a
+  // ? file the browser saves, and a CSV routed through a JSON envelope would be paid for twice.
+  if (path === REPORT_PATH) {
+    return handleReportRequest(request);
   }
 
   return { status: 404 };

@@ -19,6 +19,7 @@ describe('startSectionEvents', () => {
       appId: 'com.enonic.xp.app.users',
       appVersion: '8.1.0',
       eventsUrl: '/_/admin:events',
+      admin: true,
     });
   });
 
