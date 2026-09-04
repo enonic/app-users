@@ -7,10 +7,12 @@ import { IconBadge } from '../../../shared/ui/IconBadge';
 import { isPlatformRole, isSystemUser } from '../model/principal.keys';
 import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
 
+export type PrincipalIconSize = 'sm' | 'lg';
+
 export type PrincipalIconProps = {
   principal: PrincipalRef;
   /** `sm` for a list row, `lg` for the details header. */
-  size?: 'sm' | 'lg';
+  size?: PrincipalIconSize;
 };
 
 const GLYPHS: Record<Exclude<PrincipalType, 'user'>, LucideIcon> = {
@@ -18,7 +20,14 @@ const GLYPHS: Record<Exclude<PrincipalType, 'user'>, LucideIcon> = {
   role: UserShield,
 };
 
-const PIXELS = { sm: 24, lg: 48 } as const;
+const PIXELS: Record<PrincipalIconSize, number> = { sm: 28, lg: 48 };
+
+// ? 28px is between the library's `sm` and `md`, so the avatar takes `md` for its type size and `size-7`
+// ? for its box, which wins over the variant's `size-8` through tailwind-merge.
+const AVATAR: Record<PrincipalIconSize, { size: 'md' | 'lg'; className?: string }> = {
+  sm: { size: 'md', className: 'size-7' },
+  lg: { size: 'lg' },
+};
 
 /** A user's initials, or the glyph for a group or role, with a cog badge on the ones the platform owns. */
 export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
@@ -50,16 +59,16 @@ export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
   );
 }
 
-function initialsAvatar(displayName: string, size: 'sm' | 'lg') {
+function initialsAvatar(displayName: string, size: PrincipalIconSize) {
   return (
-    <Avatar size={size} aria-hidden>
+    <Avatar {...AVATAR[size]} aria-hidden>
       {/* The fallback hardcodes `cursor-default`, an arrow over the avatar alone in a clickable row. */}
       <Avatar.Fallback className="cursor-[inherit]">{getInitials(displayName)}</Avatar.Fallback>
     </Avatar>
   );
 }
 
-function glyph(type: Exclude<PrincipalType, 'user'>, size: 'sm' | 'lg') {
+function glyph(type: Exclude<PrincipalType, 'user'>, size: PrincipalIconSize) {
   const Glyph = GLYPHS[type];
   return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden />;
 }
