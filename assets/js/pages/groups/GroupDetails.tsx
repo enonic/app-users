@@ -1,4 +1,4 @@
-import { Avatar, Button, Checkbox } from '@enonic/ui';
+import { Button, Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
@@ -8,9 +8,9 @@ import {
   type GroupDetail,
   type PrincipalRef,
 } from '../../entities/principal';
+import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openGroupEditor } from '../../features/group-editor';
-import { getInitials } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
 import { filledSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -43,17 +43,9 @@ export function GroupDetails({ group }: GroupDetailsProps) {
     { labelKey: 'groups.details.roles', items: roles },
   ]);
 
-  // Users first, groups last, both flat: a group inside a group is a row, not a branch.
-  const memberSubsections = filledSections([
-    {
-      labelKey: 'groups.details.users',
-      items: members.filter(({ type }) => type === 'user'),
-    },
-    {
-      labelKey: 'groups.details.groups',
-      items: members.filter(({ type }) => type === 'group'),
-    },
-  ]);
+  // Users first as a row of avatars, groups last as rows: a group inside a group is a row, not a branch.
+  const users = members.filter(({ type }) => type === 'user');
+  const memberGroups = members.filter(({ type }) => type === 'group');
 
   return (
     <DetailsPanel>
@@ -115,17 +107,19 @@ export function GroupDetails({ group }: GroupDetailsProps) {
 
       {members.length > 0 && (
         <DetailsPanel.Section labelKey="groups.details.members" count={members.length}>
-          {memberSubsections.map(({ labelKey, items }) => (
-            <DetailsPanel.Subsection key={labelKey} labelKey={labelKey} count={items.length}>
+          {users.length > 0 && (
+            <DetailsPanel.Subsection labelKey="groups.details.users" count={users.length}>
+              <PrincipalAvatars principals={users} />
+            </DetailsPanel.Subsection>
+          )}
+
+          {memberGroups.length > 0 && (
+            <DetailsPanel.Subsection labelKey="groups.details.groups" count={memberGroups.length}>
               <DetailsPanel.List>
-                {items.map((member) => (
+                {memberGroups.map((member) => (
                   <DetailsPanel.ListItem
                     key={member.key}
-                    icon={
-                      <Avatar size="sm">
-                        <Avatar.Fallback>{getInitials(member.displayName)}</Avatar.Fallback>
-                      </Avatar>
-                    }
+                    icon={<PrincipalIcon principal={member} />}
                     title={member.displayName}
                     subtitle={principalName(member.key)}
                     meta={providerName(member.key)}
@@ -133,7 +127,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
                 ))}
               </DetailsPanel.List>
             </DetailsPanel.Subsection>
-          ))}
+          )}
         </DetailsPanel.Section>
       )}
     </DetailsPanel>
