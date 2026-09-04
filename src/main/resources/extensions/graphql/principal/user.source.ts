@@ -52,6 +52,7 @@ export type UserQuery = {
   count?: number;
   search?: string;
   idProviders?: readonly string[];
+  excludeIdProviders?: readonly string[];
   sort?: UserSort;
 };
 
@@ -106,11 +107,18 @@ const SORT_EXPRESSIONS: Record<UserSort, string> = {
   displayNameDesc: 'displayName DESC, _path ASC',
 };
 
-export function listUsers({ start, count, search, idProviders, sort }: UserQuery): UserPage {
+export function listUsers({
+  start,
+  count,
+  search,
+  idProviders,
+  excludeIdProviders,
+  sort,
+}: UserQuery): UserPage {
   const { total, hits } = findUsers({
     start: clampStart(start),
     count: clampCount(count),
-    query: queryExpression(search, idProviders),
+    query: queryExpression(search, idProviders, excludeIdProviders),
     sort: SORT_EXPRESSIONS[sort ?? 'displayNameAsc'],
   });
 
@@ -304,12 +312,16 @@ export function escapeQueryValue(value: string): string {
 }
 
 /**
- * The constraint expression: the search, the provider filter, both, or nothing.
+ * The constraint expression: the search, the provider filter, the provider exclusion, or any of them.
  *
  * `findUsers` adds only `principalType = USER` of its own (`UserQueryNodeQueryTranslator`), so every
  * other narrowing belongs here. The provider lives on the node under its old name, `userStoreKey`.
  */
-function queryExpression(search?: string, idProviders?: readonly string[]): string {
+function queryExpression(
+  search?: string,
+  idProviders?: readonly string[],
+  excludeIdProviders?: readonly string[],
+): string {
   const parts: string[] = [];
 
   const needle = search?.trim();
@@ -320,7 +332,7 @@ function queryExpression(search?: string, idProviders?: readonly string[]): stri
 
   // Several providers are an OR of the same constraint, so the filter can tick more than one, as the
   // client-side filters of the other sections do.
-  const providers = (idProviders ?? []).filter((provider) => provider.length > 0);
+  const providers = named(idProviders);
   if (providers.length > 0) {
     const constraints = providers
       .map((provider) => `userStoreKey="${escapeQueryValue(provider)}"`)
@@ -328,7 +340,17 @@ function queryExpression(search?: string, idProviders?: readonly string[]): stri
     parts.push(providers.length === 1 ? constraints : `(${constraints})`);
   }
 
+  // An exclusion is an AND of `!=`: the Users section keeps the system store out whatever else narrows
+  // the query, since its users are served by the Service Accounts section instead.
+  named(excludeIdProviders).forEach((provider) => {
+    parts.push(`userStoreKey!="${escapeQueryValue(provider)}"`);
+  });
+
   return parts.join(' AND ');
+}
+
+function named(providers?: readonly string[]): readonly string[] {
+  return (providers ?? []).filter((provider) => provider.length > 0);
 }
 
 function clampCount(count?: number): number {

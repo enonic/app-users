@@ -55,6 +55,7 @@ function valuesFor(query: ServiceAccountsPageQuery): GraphQlVariables {
     count: query.count,
     search: query.search ?? null,
     idProviders: [SYSTEM_ID_PROVIDER],
+    excludeIdProviders: null,
     sort: query.sort,
   };
 }

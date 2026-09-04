@@ -68,8 +68,11 @@ export function UserEditorDialog({ onSaved, serviceAccount = false }: UserEditor
   const editor = useStore(serviceAccount ? $serviceAccountEditor : $userEditor);
   const detail = useStore(serviceAccount ? $serviceAccountEditDetail : $userEditDetail);
   const editedKey = editor?.mode === 'edit' ? editor.user.key : undefined;
-  const { items: providers } = useIdProviderNames();
+  const { items: names } = useIdProviderNames();
   const { notify } = useHostFrame();
+
+  // The system store is never offered: a user there is a service account, created in its own section.
+  const providers = names.filter(({ key }) => key !== SYSTEM_ID_PROVIDER);
 
   const close = serviceAccount ? closeServiceAccountEditor : closeUserEditor;
   const forgetEditDetail = serviceAccount ? forgetServiceAccountEditDetail : forgetUserEditDetail;
