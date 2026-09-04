@@ -108,7 +108,11 @@ tasks.register( 'pnpmPack', PnpmTask ) {
         include 'admin/extensions/**/*.ts'
         include 'lib/**/*.ts'
     }
+    // All three trees pack emits into. Declaring fewer lets gradle call the task UP-TO-DATE while an
+    // undeclared tree is missing its .js, and the jar then ships without it (500 on the first require).
     outputs.dir layout.buildDirectory.dir( 'resources/main/extensions' )
+    outputs.dir layout.buildDirectory.dir( 'resources/main/admin/extensions' )
+    outputs.dir layout.buildDirectory.dir( 'resources/main/lib' )
     outputs.cacheIf { false }
 
     // `vp pack` runs clean:false — it shares this tree with processResources — so without this a
