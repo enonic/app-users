@@ -97,6 +97,18 @@ const USER_ROW_DOCUMENT = `
   }
 `;
 
+/**
+ * Whether a key is taken, and nothing else about whoever holds it. The wizard asks this of a name the
+ * user is still typing, so it selects the key alone rather than reusing the row document.
+ */
+const USER_EXISTS_DOCUMENT = `
+  query UserExists($key: String!) {
+    user(key: $key) {
+      key
+    }
+  }
+`;
+
 type UserDto = {
   key: string;
   displayName: string;
@@ -151,6 +163,18 @@ export function fetchUser(
   return requestGraphQlDocument<{ user: UserDto | null }>(USER_ROW_DOCUMENT, { key }, signal).map(
     ({ user }) => (user == null ? undefined : toUser(user)),
   );
+}
+
+/** Whether a user answers to the key. A caller that may not read it is told the same as an empty seat. */
+export function requestUserExists(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestGraphQlDocument<{ user: { key: string } | null }>(
+    USER_EXISTS_DOCUMENT,
+    { key },
+    signal,
+  ).map(({ user }) => user != null);
 }
 
 /**

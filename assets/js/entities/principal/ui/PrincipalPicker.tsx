@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
+import { idProviderOf } from '../model/principal.keys';
 import type { PrincipalRef, PrincipalType } from '../model/principal.types';
 import { usePrincipalSearch, type PrincipalSearchState } from '../model/usePrincipalSearch';
 import { PrincipalLabel } from './PrincipalLabel';
@@ -29,6 +30,8 @@ export type PrincipalPickerProps = {
   locked?: ReadonlySet<string>;
   /** Principals kept out of the offer altogether, unlike `locked`, which shows them inert. */
   excluded?: ReadonlySet<string>;
+  /** Offers only principals from this ID provider. */
+  idProvider?: string;
 };
 
 const INCOMPLETE_KEYS: Record<PrincipalType, string> = {
@@ -46,6 +49,7 @@ export function PrincipalPicker({
   rowTrailing,
   locked,
   excluded,
+  idProvider,
 }: PrincipalPickerProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -60,8 +64,13 @@ export function PrincipalPicker({
 
   const { status, principals, incompleteKinds } = usePrincipalSearch(query, open, kinds);
 
-  const offered =
-    excluded === undefined ? principals : principals.filter(({ key }) => !excluded.has(key));
+  // ? The filters sit on the offer alone: a principal already picked stays in the list below even when
+  // ? a later change would no longer offer it, rather than disappearing from under the user.
+  const offered = principals.filter(
+    ({ key }) =>
+      excluded?.has(key) !== true &&
+      (idProvider === undefined || idProvider.length === 0 || idProviderOf(key) === idProvider),
+  );
 
   const pickedKeys = selected.map(({ key }) => key);
 
