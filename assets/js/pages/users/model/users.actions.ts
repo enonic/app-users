@@ -20,7 +20,7 @@ export const USER_ACTIONS: readonly SectionAction<User>[] = [
     run: (ctx) => {
       const [target] = actionTargets(ctx);
       if (target !== undefined) {
-        openUserEditor({ mode: 'edit', user: target });
+        openUserEditor({ mode: 'edit', entity: target });
       }
     },
   },

@@ -1,19 +1,14 @@
-import { Dialog } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import type { ReactNode } from 'react';
 
 import { useIdProviderNames, type PrincipalRef } from '../../../../entities/principal';
 import { PrincipalIcon } from '../../../../entities/principal/ui/PrincipalIcon';
 import { i18n, useI18n } from '../../../../shared/i18n';
-import { USER_EDITOR_STEPS } from '../../model/user-editor-steps';
-import { $userEditor, $userEditorStepLocks } from '../../model/user-editor.store';
+import { $userEditor } from '../../model/user-editor.store';
 import { userSummaryRows } from '../../model/user-summary';
-
-const STEP = USER_EDITOR_STEPS.summary;
 
 export function UserEditorDialogSummaryStep() {
   const { form } = useStore($userEditor, { keys: ['form'] });
-  const locks = useStore($userEditorStepLocks);
   const { items: providers } = useIdProviderNames();
 
   const rolesLabel = useI18n('users.dialog.roles');
@@ -23,22 +18,18 @@ export function UserEditorDialogSummaryStep() {
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
 
   return (
-    <Dialog.StepContent step={STEP} locked={locks[STEP]}>
-      <dl className="bg-surface-primary grid grid-cols-[25%_auto] gap-x-5 gap-y-4 rounded-md p-6 text-sm">
-        {userSummaryRows(form, providerName).map((row) => (
-          <SummaryRow key={row.labelKey} label={i18n(row.labelKey)}>
-            <span className="break-words">
-              {row.valueKey === undefined
-                ? row.value
-                : i18n(row.valueKey, ...(row.valueArgs ?? []))}
-            </span>
-          </SummaryRow>
-        ))}
+    <dl className="bg-surface-primary grid grid-cols-[25%_auto] gap-x-5 gap-y-4 rounded-md p-6 text-sm">
+      {userSummaryRows(form, providerName).map((row) => (
+        <SummaryRow key={row.labelKey} label={i18n(row.labelKey)}>
+          <span className="break-words">
+            {row.valueKey === undefined ? row.value : i18n(row.valueKey, ...(row.valueArgs ?? []))}
+          </span>
+        </SummaryRow>
+      ))}
 
-        <PrincipalsRow label={rolesLabel} principals={form.roles} />
-        <PrincipalsRow label={groupsLabel} principals={form.groups} />
-      </dl>
-    </Dialog.StepContent>
+      <PrincipalsRow label={rolesLabel} principals={form.roles} />
+      <PrincipalsRow label={groupsLabel} principals={form.groups} />
+    </dl>
   );
 }
 

@@ -1,13 +1,15 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { User } from '../../../entities/principal';
-import { USER_EDITOR_STEPS } from './user-editor-steps';
 import {
   $userEditor,
+  $userEditorErrors,
   closeUserEditor,
   openUserEditor,
   openUserEditorAt,
+  updateUserEditorForm,
 } from './user-editor.store';
+import { failUserNameCheck, receiveUserNameCheck } from './user-name-check.store';
 
 const ALICE: User = {
   type: 'user',
@@ -29,35 +31,53 @@ describe('openUserEditor', () => {
 
     const { open, view, step } = $userEditor.get();
 
-    expect(open).toBe(true);
-    expect(view).toBe('wizard');
-    expect(step).toBe(USER_EDITOR_STEPS.identity);
+    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'identity' });
+  });
+
+  it('derives the name from the display name until it is typed', () => {
+    openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ displayName: 'Alice Anderson' });
+
+    expect($userEditor.get().form.name).toBe('alice.anderson');
   });
 });
 
 describe('openUserEditorAt', () => {
   it('opens one step of an existing user, with the form seeded from it', () => {
-    openUserEditorAt(ALICE, USER_EDITOR_STEPS.roles);
+    openUserEditorAt(ALICE, 'roles');
 
-    const { open, mode, view, step, form, saved, user } = $userEditor.get();
+    const { open, mode, view, step, form, saved, entity } = $userEditor.get();
 
     expect({ open, mode, view, step }).toEqual({
       open: true,
       mode: 'edit',
       view: 'step',
-      step: USER_EDITOR_STEPS.roles,
+      step: 'roles',
     });
-    expect(user).toBe(ALICE);
+    expect(entity).toBe(ALICE);
     expect(form.name).toBe('alice');
-    // Nothing to save until something changes: the baseline is what the server answered.
     expect(saved).toEqual(form);
   });
+});
 
-  it('leaves the wizard behind it, so the next open walks every step again', () => {
-    openUserEditorAt(ALICE, USER_EDITOR_STEPS.groups);
-    closeUserEditor();
+describe('$userEditorErrors', () => {
+  it('reports a taken name, and only once the local rules accept it', () => {
     openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ idProvider: 'system', displayName: 'Alice' });
+    receiveUserNameCheck('user:system:alice', true);
 
-    expect($userEditor.get().view).toBe('wizard');
+    expect($userEditorErrors.get().name).toBe('users.dialog.nameTaken');
+
+    updateUserEditorForm({ name: '' });
+
+    expect($userEditorErrors.get().name).toBe('users.dialog.nameRequired');
+  });
+
+  it('says nothing about a check that failed', () => {
+    openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ idProvider: 'system', displayName: 'Alice' });
+    failUserNameCheck('user:system:alice');
+
+    expect($userEditorErrors.get().name).toBeUndefined();
   });
 });

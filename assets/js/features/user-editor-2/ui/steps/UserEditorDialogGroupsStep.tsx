@@ -1,23 +1,18 @@
-import { Checkbox, Dialog } from '@enonic/ui';
+import { Checkbox } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { useState } from 'preact/hooks';
 
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { $userEditDetail } from '../../model/user-edit-detail';
-import { USER_EDITOR_STEPS } from '../../model/user-editor-steps';
 import {
   $userEditor,
-  $userEditorStepLocks,
   $userEditorSystemUser,
   updateUserEditorForm,
 } from '../../model/user-editor.store';
 
-const STEP = USER_EDITOR_STEPS.groups;
-
 export function UserEditorDialogGroupsStep() {
   const { form } = useStore($userEditor, { keys: ['form'] });
-  const locks = useStore($userEditorStepLocks);
   const systemUser = useStore($userEditorSystemUser);
   const { status } = useStore($userEditDetail);
 
@@ -28,15 +23,11 @@ export function UserEditorDialogGroupsStep() {
   const failedNotice = useI18n('users.dialog.membershipsFailed');
 
   if (systemUser) {
-    return (
-      <Dialog.StepContent step={STEP} locked={locks[STEP]}>
-        <p className="text-subtle text-sm">{i18n('users.dialog.platformOwnedGroups')}</p>
-      </Dialog.StepContent>
-    );
+    return <p className="text-subtle text-sm">{i18n('users.dialog.platformOwnedGroups')}</p>;
   }
 
   return (
-    <Dialog.StepContent step={STEP} locked={locks[STEP]}>
+    <>
       {status === 'error' && <p className="text-error mb-3 text-sm">{failedNotice}</p>}
 
       <div className="flex items-start gap-4">
@@ -62,6 +53,6 @@ export function UserEditorDialogGroupsStep() {
           />
         </div>
       </div>
-    </Dialog.StepContent>
+    </>
   );
 }
