@@ -50,21 +50,21 @@ describe('initialUserForm', () => {
   });
 
   it('takes the name from the login, not from the key', () => {
-    expect(initialUserForm({ mode: 'edit', user }).name).toBe('alice');
+    expect(initialUserForm({ mode: 'edit', entity: user }).name).toBe('alice');
   });
 
   it('reads the provider out of the key', () => {
-    expect(initialUserForm({ mode: 'edit', user }).idProvider).toBe('store');
+    expect(initialUserForm({ mode: 'edit', entity: user }).idProvider).toBe('store');
   });
 
   it('takes the memberships it is handed', () => {
     const roles = [{ key: 'role:cms.admin', type: 'role', displayName: 'CS Admin' }] as const;
 
-    expect(initialUserForm({ mode: 'edit', user }, '', { roles }).roles).toEqual(roles);
+    expect(initialUserForm({ mode: 'edit', entity: user }, '', { roles }).roles).toEqual(roles);
   });
 
   it('starts with no memberships while they are still being loaded', () => {
-    const values = initialUserForm({ mode: 'edit', user });
+    const values = initialUserForm({ mode: 'edit', entity: user });
 
     expect(values.roles).toEqual([]);
     expect(values.groups).toEqual([]);
@@ -77,28 +77,25 @@ describe('nextUserForm', () => {
   it('lets the login follow the display name while the user has not touched it', () => {
     const next = { ...previous, displayName: 'Alice B Anderson' };
 
-    expect(nextUserForm(previous, next, 'create', false).values.name).toBe('alice.b.anderson');
+    expect(nextUserForm(previous, next, { mode: 'create' }).name).toBe('alice.b.anderson');
   });
 
   it('keeps a typed login exactly as typed, in the same edit that reports it', () => {
     const next = { ...previous, name: 'a' };
 
-    expect(nextUserForm(previous, next, 'create', false)).toEqual({
-      values: next,
-      nameEdited: true,
-    });
+    expect(nextUserForm(previous, next, { mode: 'create' })).toEqual({ ...next, nameEdited: true });
   });
 
   it('stops deriving once the login is the user’s', () => {
-    const next = { ...previous, displayName: 'Renamed' };
+    const next = { ...previous, displayName: 'Renamed', nameEdited: true };
 
-    expect(nextUserForm(previous, next, 'create', true).values.name).toBe('alice');
+    expect(nextUserForm(previous, next, { mode: 'create' }).name).toBe('alice');
   });
 
   it('never derives while editing, where the field is locked', () => {
     const next = { ...previous, displayName: 'Renamed' };
 
-    expect(nextUserForm(previous, next, 'edit', false).values.name).toBe('alice');
+    expect(nextUserForm(previous, next, { mode: 'edit' }).name).toBe('alice');
   });
 });
 

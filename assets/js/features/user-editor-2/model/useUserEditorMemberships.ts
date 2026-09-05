@@ -9,10 +9,10 @@ import { $userEditor, seedUserEditorMemberships } from './user-editor.store';
  * carries both, so this costs no request of its own.
  */
 export function useUserEditorMemberships(): void {
-  const { user } = useStore($userEditor, { keys: ['user'] });
+  const { entity } = useStore($userEditor, { keys: ['entity'] });
   const { item } = useStore($userEditDetail);
 
-  const target = user?.key;
+  const target = entity?.key;
   const loaded = item?.key === target ? item : undefined;
 
   useEffect(() => {
