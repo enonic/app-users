@@ -44,6 +44,7 @@ export type {
 } from './model/id-provider-principals.store';
 export { loadIdProvider, loadIdProviders } from './model/id-providers.load';
 export {
+  $idProviderNames,
   $idProviderUserCounts,
   beginIdProviderNamesLoad,
   beginIdProvidersLoad,
@@ -76,7 +77,13 @@ export {
   projectRoleIdOf,
   SYSTEM_ID_PROVIDER,
 } from './model/principal.keys';
-export { addPublicKey, createUser, removePublicKey, updateUser } from './model/user-commands';
+export {
+  addPublicKey,
+  createUser,
+  isUserNameTaken,
+  removePublicKey,
+  updateUser,
+} from './model/user-commands';
 export type { UserDraft, UserEdit } from './model/user-commands';
 export {
   evictServiceAccountDetail,

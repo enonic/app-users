@@ -7,11 +7,11 @@ import { IconBadge } from '../../../shared/ui/IconBadge';
 import { isPlatformRole, isSystemUser } from '../model/principal.keys';
 import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
 
-export type PrincipalIconSize = 'sm' | 'lg';
+export type PrincipalIconSize = 'xs' | 'sm' | 'lg';
 
 export type PrincipalIconProps = {
   principal: PrincipalRef;
-  /** `sm` for a list row, `lg` for the details header. */
+  /** `xs` inline in text, `sm` for a list row, `lg` for the details header. */
   size?: PrincipalIconSize;
 };
 
@@ -20,11 +20,12 @@ const GLYPHS: Record<Exclude<PrincipalType, 'user'>, LucideIcon> = {
   role: UserShield,
 };
 
-const PIXELS: Record<PrincipalIconSize, number> = { sm: 28, lg: 48 };
+const PIXELS: Record<PrincipalIconSize, number> = { xs: 18, sm: 28, lg: 48 };
 
 // ? 28px is between the library's `sm` and `md`, so the avatar takes `md` for its type size and `size-7`
 // ? for its box, which wins over the variant's `size-8` through tailwind-merge.
-const AVATAR: Record<PrincipalIconSize, { size: 'md' | 'lg'; className?: string }> = {
+const AVATAR: Record<PrincipalIconSize, { size: 'sm' | 'md' | 'lg'; className?: string }> = {
+  xs: { size: 'sm', className: 'size-4.5' },
   sm: { size: 'md', className: 'size-7' },
   lg: { size: 'lg' },
 };
@@ -38,6 +39,7 @@ const AVATAR: Record<PrincipalIconSize, { size: 'md' | 'lg'; className?: string 
  * ! The avatar and the glyph share a box per size, so one notch fits both.
  */
 const NOTCH: Record<PrincipalIconSize, string> = {
+  xs: '[mask-image:radial-gradient(circle_at_14px_4px,transparent_7px,#000_7.5px)]',
   sm: '[mask-image:radial-gradient(circle_at_24px_4px,transparent_7px,#000_7.5px)]',
   lg: '[mask-image:radial-gradient(circle_at_42px_6px,transparent_9px,#000_9.5px)]',
 };
