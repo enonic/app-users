@@ -1,5 +1,5 @@
 import { isSystemUser, type User } from '../../../entities/principal';
-import { openUserCreator, openUserEditor } from '../../../features/user-editor';
+import { openUserEditor } from '../../../features/user-editor';
 import { actionTargets, type SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { usersDeletion } from './deletion.store';
 
@@ -10,7 +10,7 @@ export const USER_ACTIONS: readonly SectionAction<User>[] = [
     id: 'new',
     labelKey: 'users.action.new',
     enabled: () => true,
-    run: openUserCreator,
+    run: () => openUserEditor({ mode: 'create' }),
   },
   {
     id: 'edit',
@@ -20,7 +20,7 @@ export const USER_ACTIONS: readonly SectionAction<User>[] = [
     run: (ctx) => {
       const [target] = actionTargets(ctx);
       if (target !== undefined) {
-        openUserEditor(target);
+        openUserEditor({ mode: 'edit', entity: target });
       }
     },
   },

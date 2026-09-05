@@ -9,7 +9,7 @@ import {
   useUsers,
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { UserEditorDialog } from '../../features/user-editor/UserEditorDialog';
+import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';

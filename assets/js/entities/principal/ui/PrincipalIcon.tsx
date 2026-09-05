@@ -7,8 +7,7 @@ import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/princip
 
 export type PrincipalIconProps = {
   principal: Pick<PrincipalRef, 'key' | 'type'>;
-  /** `sm` for a list row, `lg` for the details header. */
-  size?: 'sm' | 'lg';
+  size?: 'xs' | 'sm' | 'lg';
 };
 
 const GLYPHS: Record<PrincipalType, LucideIcon> = {
@@ -17,7 +16,7 @@ const GLYPHS: Record<PrincipalType, LucideIcon> = {
   role: UserShield,
 };
 
-const PIXELS = { sm: 24, lg: 48 } as const;
+const PIXELS = { xs: 18, sm: 24, lg: 48 } as const;
 
 /** The glyph for a principal's type, with a cog badge on the ones the platform owns. */
 export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {

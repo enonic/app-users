@@ -59,7 +59,7 @@ export function UserDetails({ user }: UserDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openUserEditor(user)}
+            onClick={() => openUserEditor({ mode: 'edit', entity: user })}
           />
         }
       >
