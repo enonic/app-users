@@ -51,7 +51,7 @@ the plain-`.js` binding layer, its golden test fixtures, docs and CI — is list
 ## Reference repositories
 
 Sibling checkouts, read-only. `../app-settings` (branch `extensions`) is the **host**: the mount
-contract is `shared/sections/contract.ts` there, and `docs/extensions/` — `docs.md`,
+contract is `@enonic/ui-types`, and `docs/extensions/` there — `docs.md`,
 `host-facts.md`, `provider-facts.md`, `progress.md` — is authoritative on how a section is
 discovered, mounted, routed and revoked; its `docs/platform-facts.md` is what XP actually does where
 its types mislead. `../app-applications` (branch `extensions`) is the **other provider**: `widgets/`,

@@ -31,7 +31,7 @@ export function App({ frame, section }: AppProps) {
   const stylesheets = useStore($stylesheets);
   const [theme, setTheme] = useState(frame.host.theme.get());
 
-  useEffect(() => frame.host.theme.subscribe(setTheme), [frame]);
+  useEffect(() => frame.host.theme.listen(setTheme), [frame]);
 
   const Page = PAGES[section];
 

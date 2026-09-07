@@ -16,7 +16,7 @@ endpoint set once at mount from `host.baseUrl`. Do not add a second http helper,
   failure goes to a notification through `host.notify`. Never both for one failure.
 - Server events arrive over the admin events hub: `shared/admin-events` imports the platform's
   client from the `eventsUrl` the section's own `config` root field delivers, and subscribes by the
-  canonical names in `HUB_TOPICS` (`shared/sections/contract.ts`). The contract carries no event
+  canonical names in `HUB_TOPICS` (`shared/admin-events/topics.ts`). The contract carries no event
   member — `app/useSectionEvents.ts` owns the subscription's lifecycle.
 
 ## Server side

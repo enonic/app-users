@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { fakeHost, pathStore, readable } from '../../../../test/mocks/fake-host';
-import type { Notification, SectionHost } from '../sections';
+import type { RoutedHost } from '../sections';
 import { createHostFrame } from './frame';
 
 describe('$itemId', () => {
@@ -88,7 +88,7 @@ describe('$visible', () => {
 
 describe('navigation', () => {
   it('opens an item by replacing, so browsing rows leaves no history', () => {
-    const navigate = vi.fn<SectionHost['navigate']>();
+    const navigate = vi.fn<RoutedHost['navigate']>();
     const frame = createHostFrame(fakeHost({ navigate }));
 
     frame.openItem('user:store:bob');
@@ -97,7 +97,7 @@ describe('navigation', () => {
   });
 
   it('closes back to the section root', () => {
-    const navigate = vi.fn<SectionHost['navigate']>();
+    const navigate = vi.fn<RoutedHost['navigate']>();
     const frame = createHostFrame(fakeHost({ navigate }));
 
     frame.closeItem();
@@ -108,14 +108,14 @@ describe('navigation', () => {
 
 describe('notifications', () => {
   it('hands the message to the host with its level', () => {
-    const notify = vi.fn<SectionHost['notify']>(() => () => undefined);
+    const notify = vi.fn<RoutedHost['notify']>(() => () => undefined);
     const frame = createHostFrame(fakeHost({ notify }));
 
     frame.notify('error', 'It broke');
     frame.notify('success', 'It worked');
 
-    expect(notify).toHaveBeenCalledWith({ level: 'error', message: 'It broke' });
-    expect(notify).toHaveBeenCalledWith({ level: 'success', message: 'It worked' });
+    expect(notify).toHaveBeenCalledWith('error', 'It broke', undefined);
+    expect(notify).toHaveBeenCalledWith('success', 'It worked', undefined);
   });
 });
 
@@ -124,10 +124,10 @@ describe('notifications', () => {
 describe('two mounts from one module instance', () => {
   it('keeps their routing and notifications apart', () => {
     const usersPath = pathStore('/user:store:bob');
-    const usersNavigate = vi.fn<SectionHost['navigate']>();
-    const usersNotify = vi.fn<SectionHost['notify']>(() => () => undefined);
+    const usersNavigate = vi.fn<RoutedHost['navigate']>();
+    const usersNotify = vi.fn<RoutedHost['notify']>(() => () => undefined);
     const rolesPath = pathStore('/');
-    const rolesNavigate = vi.fn<SectionHost['navigate']>();
+    const rolesNavigate = vi.fn<RoutedHost['navigate']>();
 
     const users = createHostFrame(
       fakeHost({ path: usersPath, navigate: usersNavigate, notify: usersNotify }),
@@ -146,8 +146,6 @@ describe('two mounts from one module instance', () => {
     expect(usersNavigate).not.toHaveBeenCalled();
 
     users.notify('error', 'Only for Users');
-    expect(usersNotify).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({ message: 'Only for Users' }) as Notification,
-    );
+    expect(usersNotify).toHaveBeenCalledExactlyOnceWith('error', 'Only for Users', undefined);
   });
 });
