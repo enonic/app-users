@@ -1,11 +1,11 @@
-import { Avatar, Button } from '@enonic/ui';
+import { Button } from '@enonic/ui';
 
 import { principalName, useIdProviderName, type RoleDetail } from '../../entities/principal';
+import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openRoleEditor } from '../../features/role-editor';
-import { formatDateTime, getInitials } from '../../shared/format';
+import { formatDateTime } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
-import { filledSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type RoleDetailsProps = {
@@ -20,11 +20,9 @@ export function RoleDetails({ role }: RoleDetailsProps) {
 
   const { key, displayName, description, modifiedTime, members } = role;
 
-  // Users first, groups last, both flat: a group in a role is a row, not a branch.
-  const memberSubsections = filledSections([
-    { labelKey: 'roles.details.users', items: members.filter(({ type }) => type === 'user') },
-    { labelKey: 'roles.details.groups', items: members.filter(({ type }) => type === 'group') },
-  ]);
+  // Users first as a row of avatars, groups last as rows: a group in a role is a row, not a branch.
+  const users = members.filter(({ type }) => type === 'user');
+  const groups = members.filter(({ type }) => type === 'group');
 
   return (
     <DetailsPanel>
@@ -57,17 +55,19 @@ export function RoleDetails({ role }: RoleDetailsProps) {
 
       {members.length > 0 && (
         <DetailsPanel.Section labelKey="roles.details.members" count={members.length}>
-          {memberSubsections.map(({ labelKey, items }) => (
-            <DetailsPanel.Subsection key={labelKey} labelKey={labelKey} count={items.length}>
+          {users.length > 0 && (
+            <DetailsPanel.Subsection labelKey="roles.details.users" count={users.length}>
+              <PrincipalAvatars principals={users} />
+            </DetailsPanel.Subsection>
+          )}
+
+          {groups.length > 0 && (
+            <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
               <DetailsPanel.List>
-                {items.map((member) => (
+                {groups.map((member) => (
                   <DetailsPanel.ListItem
                     key={member.key}
-                    icon={
-                      <Avatar size="sm">
-                        <Avatar.Fallback>{getInitials(member.displayName)}</Avatar.Fallback>
-                      </Avatar>
-                    }
+                    icon={<PrincipalIcon principal={member} />}
                     title={member.displayName}
                     subtitle={principalName(member.key)}
                     meta={providerName(member.key)}
@@ -75,7 +75,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
                 ))}
               </DetailsPanel.List>
             </DetailsPanel.Subsection>
-          ))}
+          )}
         </DetailsPanel.Section>
       )}
     </DetailsPanel>

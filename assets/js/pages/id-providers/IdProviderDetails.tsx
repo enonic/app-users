@@ -9,6 +9,7 @@ import {
   type IdProviderPrincipalsState,
   type PrincipalSetType,
 } from '../../entities/principal';
+import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openIdProviderEditor } from '../../features/idprovider-editor';
 import { useI18n } from '../../shared/i18n';
@@ -86,7 +87,12 @@ export function IdProviderDetails({
         <DetailsPanel.Section key={labelKey} labelKey={labelKey} count={set.total}>
           {/* Absent rows are "not read yet", not "none", so the heading and its count stand alone
               rather than over an empty list. */}
-          {rows !== undefined && (
+          {/* Ten of the first page, the rest counted off the total: nothing for a `Load more` to add. */}
+          {rows !== undefined && type === 'user' && (
+            <PrincipalAvatars principals={rows.items} total={set.total} />
+          )}
+
+          {rows !== undefined && type === 'group' && (
             <>
               <DetailsPanel.List>
                 {rows.items.map((principal) => (
