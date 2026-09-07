@@ -4,14 +4,16 @@ import { App } from './app/App';
 import { bootstrap } from './app/bootstrap';
 import { sectionOf } from './app/section';
 import { createHostFrame } from './shared/host';
-import type { MountOptions, SectionHost, Unmount } from './shared/sections';
+import type { Mount, RoutedHost } from './shared/sections';
 
 /** Renders the section into the container the host owns, inside the shadow root it created. */
-export function mount({ container, host }: MountOptions<SectionHost>): Unmount {
-  const section = sectionOf(host.baseUrl);
+// ? A const carrying the contract's `Mount` rather than a function declaration: the annotation is
+// ? what makes "this module needs a routed host" a compile-time check.
+export const mount: Mount<RoutedHost> = ({ container, host }) => {
+  const section = sectionOf(host.extension);
 
   if (section === undefined) {
-    console.error(`No section in this module answers to ${host.baseUrl}`);
+    console.error(`No section in this module answers to ${host.extension}`);
     return () => undefined;
   }
 
@@ -29,4 +31,4 @@ export function mount({ container, host }: MountOptions<SectionHost>): Unmount {
     render(null, container);
     frame.dispose();
   };
-}
+};

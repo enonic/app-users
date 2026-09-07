@@ -2,12 +2,9 @@ export const SECTIONS = ['users', 'groups', 'roles', 'id-providers'] as const;
 
 export type Section = (typeof SECTIONS)[number];
 
-/**
- * ? Read off `host.baseUrl`, whose last segment is the extension's `<app>:<name>`, because the
- * ? contract carries no section identity and `mount` is not told which section it is.
- */
-export function sectionOf(baseUrl: string): Section | undefined {
-  const name = baseUrl.replace(/\/+$/, '').split('/').pop()?.split(':').pop();
+/** The section behind an extension key `<app>:<name>`, which the host hands over as `host.extension`. */
+export function sectionOf(extension: string): Section | undefined {
+  const name = extension.split(':').pop();
 
   return SECTIONS.find((section) => section === name);
 }

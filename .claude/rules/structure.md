@@ -13,15 +13,14 @@ app  →  pages  →  widgets / features  →  entities  →  shared
 ```
 
 - `app/` — the module entry's glue: `mount`, bootstrap, section switch. This app ships **four
-  sections from one module**: `app/section.ts` picks the section off `host.baseUrl`; nothing below
+  sections from one module**: `app/section.ts` picks the section off `host.extension`; nothing below
   `app/` may switch on a section id.
 - `pages/<section>/` — composition only: users, groups, roles, id-providers.
 - `entities/principal/` — one domain slice (users, groups, roles and ID providers share
   `PrincipalKey` and each other's member lists), segments `api/`, `model/`, rarely `ui/`.
 - `shared/` — transport, config, i18n, sections contract, styles, and `host/`: the host object and
-  the routing it owns. `shared/sections/contract.ts` is **byte-identical with the host's**
-  (`../app-settings/src/main/resources/assets/js/shared/sections/contract.ts`) — change every copy or
-  none.
+  the routing it owns. The contract is `@enonic/ui-types`, re-exported by `shared/sections`; a change to
+  it is a toolkit release the host and every provider take together.
 - **A section reaches the shell through `shared/host`, never through a router or a socket of its
   own**: `host.path`/`host.navigate` are its whole history, and `host.notify` its toast stack.
 - File names, barrels, component and store conventions: as in the other rule files here.
