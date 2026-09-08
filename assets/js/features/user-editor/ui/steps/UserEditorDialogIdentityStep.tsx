@@ -41,7 +41,6 @@ export function UserEditorDialogIdentityStep() {
   const providerLabel = useI18n('users.dialog.idProvider');
   const providerPlaceholder = useI18n('users.dialog.idProviderPlaceholder');
   const displayNameLabel = useI18n('users.dialog.displayName');
-  const displayNamePlaceholder = useI18n('users.dialog.displayNamePlaceholder');
   const nameLabel = useI18n('users.dialog.name');
   const emailLabel = useI18n('users.dialog.email');
 
@@ -49,10 +48,7 @@ export function UserEditorDialogIdentityStep() {
   const shown = visitedErrors(errors, visited);
   const providerError = shown.idProvider === undefined ? undefined : i18n(shown.idProvider);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
-  // ! A taken name shows whether or not the field was ever entered: the display name fills it in, so a
-  // ! user who tabs from there to Email would otherwise face a dead `Next` with nothing explaining it.
   const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
-  // The name's phrases are the only ones that name what they are about; the rest ignore the values.
   const nameError =
     nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name, providerName);
   const emailError = shown.email === undefined ? undefined : i18n(shown.email);
@@ -96,7 +92,6 @@ export function UserEditorDialogIdentityStep() {
         <Input
           id={DISPLAY_NAME_ID}
           value={form.displayName}
-          placeholder={displayNamePlaceholder}
           error={displayNameError}
           onInput={({ currentTarget }) => setUserEditorDisplayName(currentTarget.value)}
           onBlur={() => markUserEditorFieldVisited('displayName')}

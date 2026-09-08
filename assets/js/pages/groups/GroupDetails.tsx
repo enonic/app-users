@@ -10,7 +10,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openGroupEditor } from '../../features/group-editor';
+import { openGroupEditor } from '../../features/group-editor-2';
 import { useI18n } from '../../shared/i18n';
 import { filledSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -62,7 +62,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openGroupEditor(group)}
+            onClick={() => openGroupEditor({ mode: 'edit', entity: group })}
           />
         }
       >
