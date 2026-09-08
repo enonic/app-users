@@ -20,13 +20,13 @@ onChange />` with no children is an empty bordered box. Compose `<SearchField.Ic
   child is dropped silently.
 - **`SelectableListItem` is just `ListItem` + a `Checkbox` in `Left`** with no way to stop the
   checkbox click from bubbling. `ListItem` fits a static list — the details panel uses it — but not a
-  browse row: its root is a plain function component, so it takes no `ref`, which a row needs for
-  roving focus. Browse rows are a plain `div` styled from `treeListRowVariants`, see
-  `docs/browse-framework.md` § 3.3.
-- **`TreeList` / `VirtualizedTreeList` are for trees.** Content Studio's content tree is the model for
-  row geometry, hover, selected state and keyboard navigation, and `treeListRowVariants` in
-  `../npm-enonic-ui/src/components/tree-list/tree-list.tsx` is where those classes are written down —
-  copy the styles, do not adopt the component for a flat list.
+  browse row.
+- **Browse rows are `TreeList.Row` inside a flat `TreeList`**, which owns the keyboard navigation, the
+  roving focus and the focus ring; `widgets/browse-list` keeps the row click, the right-click and the
+  checkbox, because `TreeList`'s click never drops the ticks and its `RowSelectionControl` labels itself
+  in English. `TreeList.Row` spreads props after its own handlers, so `onClick` and `data-tone` on it
+  replace the component's. `useTreeList` is not exported: what the row needs, it gets through the
+  controlled `selection` and `active` on the root.
 - **A `Selector` inside a dialog needs `shared/ui/SelectorPopup`**, never a bare `Selector.Content`.
   `Selector.Content` registers its portalled element with the enclosing dialog so that picking an option
   does not read as a click outside the dialog — but it registers once and renders `null` while closed
