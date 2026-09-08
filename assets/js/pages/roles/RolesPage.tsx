@@ -3,7 +3,7 @@ import { useMemo } from 'preact/hooks';
 
 import { useRoles } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { RoleEditorDialog } from '../../features/role-editor-2/ui/RoleEditorDialog';
+import { RoleEditorDialog } from '../../features/role-editor/ui/RoleEditorDialog';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';

@@ -5,7 +5,6 @@ import {
   ROLE_FORM_FIELDS,
   initialRoleForm,
   nextRoleForm,
-  roleNameOf,
   sameRoleForm,
   validateRoleForm,
   type RoleForm,
@@ -41,113 +40,64 @@ describe('initialRoleForm', () => {
   });
 
   it('takes the name off the key, not off the display name', () => {
-    expect(initialRoleForm({ mode: 'edit', role }).name).toBe('store.manager');
+    expect(initialRoleForm({ mode: 'edit', entity: role }).name).toBe('store.manager');
+  });
+
+  it('keeps the dots a role name is made of', () => {
+    const entity = { ...role, key: 'role:cms.project.intranet.owner' } as Role;
+
+    expect(initialRoleForm({ mode: 'edit', entity }).name).toBe('cms.project.intranet.owner');
   });
 
   it('takes the members it is handed, which the list row does not carry', () => {
-    expect(initialRoleForm({ mode: 'edit', role }, members).members).toEqual(members);
+    expect(initialRoleForm({ mode: 'edit', entity: role }, members).members).toEqual(members);
   });
 
   it('starts with no members while they are still being loaded', () => {
-    expect(initialRoleForm({ mode: 'edit', role }).members).toEqual([]);
+    expect(initialRoleForm({ mode: 'edit', entity: role }).members).toEqual([]);
   });
 
-  it('reads a missing description as an empty field, not as undefined', () => {
-    const described = initialRoleForm({ mode: 'edit', role: { ...role, description: undefined } });
-
-    expect(described.description).toBe('');
-  });
-});
-
-describe('roleNameOf', () => {
-  it('drops the role prefix and nothing else', () => {
-    expect(roleNameOf({ ...role, key: 'role:cms.project.intranet.owner' })).toBe(
-      'cms.project.intranet.owner',
-    );
+  it('reads a missing description as an empty field', () => {
+    expect(
+      initialRoleForm({ mode: 'edit', entity: { ...role, description: undefined } }).description,
+    ).toBe('');
   });
 });
 
 describe('nextRoleForm', () => {
-  const previous = form({ name: 'store.manager', displayName: 'Store Manager' });
+  const previous = form();
 
   it('lets the name follow the display name while the user has not touched it', () => {
     const next = { ...previous, displayName: 'Store Floor Manager' };
 
-    expect(nextRoleForm(previous, next, 'create', false)).toEqual({
-      values: { ...next, name: 'store.floor.manager' },
-      nameEdited: false,
-    });
+    expect(nextRoleForm(previous, next, { mode: 'create' }).name).toBe('store.floor.manager');
   });
 
   it('keeps a typed name exactly as typed, in the same edit that reports it', () => {
     const next = { ...previous, name: 's' };
 
-    expect(nextRoleForm(previous, next, 'create', false)).toEqual({
-      values: next,
+    expect(nextRoleForm(previous, next, { mode: 'create' })).toEqual({
+      ...next,
       nameEdited: true,
     });
   });
 
   it('stops deriving once the name is the user’s', () => {
-    const next = { ...previous, displayName: 'Something Else' };
+    const next = { ...previous, displayName: 'Something Else', nameEdited: true };
 
-    expect(nextRoleForm(previous, next, 'create', true)).toEqual({
-      values: next,
-      nameEdited: true,
-    });
+    expect(nextRoleForm(previous, next, { mode: 'create' }).name).toBe('store.manager');
   });
 
   it('never derives while editing, where the name is fixed', () => {
     const next = { ...previous, displayName: 'Renamed' };
 
-    expect(nextRoleForm(previous, next, 'edit', false)).toEqual({
-      values: next,
-      nameEdited: false,
-    });
+    expect(nextRoleForm(previous, next, { mode: 'edit' }).name).toBe('store.manager');
   });
 
   it('leaves the other fields alone', () => {
-    const next = { ...previous, description: 'Runs the shop', members: [] };
+    const next = { ...previous, description: 'Runs the shop', nameEdited: true };
 
-    expect(nextRoleForm(previous, next, 'create', true).values.description).toBe('Runs the shop');
-  });
-});
-
-describe('validateRoleForm', () => {
-  it('passes a filled form', () => {
-    expect(validateRoleForm(form(), 'create')).toEqual({});
-  });
-
-  it('requires a display name', () => {
-    expect(validateRoleForm(form({ displayName: '  ' }), 'create')).toEqual({
-      displayName: 'roles.dialog.displayNameRequired',
-    });
-  });
-
-  it('requires a name while creating', () => {
-    expect(validateRoleForm(form({ name: '' }), 'create')).toEqual({
-      name: 'roles.dialog.nameRequired',
-    });
-  });
-
-  it('refuses a name carrying a character XP rejects', () => {
-    expect(validateRoleForm(form({ name: 'store manager' }), 'create').name).toBe(
-      'roles.dialog.nameInvalid',
-    );
-    expect(validateRoleForm(form({ name: 'store:manager' }), 'create').name).toBe(
-      'roles.dialog.nameInvalid',
-    );
-  });
-
-  it('says nothing about the name while editing', () => {
-    expect(validateRoleForm(form({ name: '' }), 'edit')).toEqual({});
-  });
-
-  it('reports both fields at once rather than one at a time', () => {
-    expect(validateRoleForm(form({ name: '', displayName: '' }), 'create')).toEqual({
-      name: 'roles.dialog.nameRequired',
-      displayName: 'roles.dialog.displayNameRequired',
-    });
+    expect(nextRoleForm(previous, next, { mode: 'create' }).description).toBe('Runs the shop');
   });
 });
 
@@ -182,6 +132,45 @@ describe('sameRoleForm', () => {
 
   it('ignores the order members are held in, which is not part of the role', () => {
     expect(sameRoleForm(form({ members: [su, jane] }), form({ members: [jane, su] }))).toBe(true);
+  });
+});
+
+describe('validateRoleForm', () => {
+  it('passes a filled form', () => {
+    expect(validateRoleForm(form(), 'create')).toEqual({});
+  });
+
+  it('requires a display name', () => {
+    expect(validateRoleForm(form({ displayName: '  ' }), 'create')).toEqual({
+      displayName: 'roles.dialog.displayNameRequired',
+    });
+  });
+
+  it('requires a name while creating', () => {
+    expect(validateRoleForm(form({ name: '' }), 'create')).toEqual({
+      name: 'roles.dialog.nameRequired',
+    });
+  });
+
+  it('refuses a name carrying a character XP rejects', () => {
+    expect(validateRoleForm(form({ name: 'store manager' }), 'create').name).toBe(
+      'roles.dialog.nameInvalid',
+    );
+    expect(validateRoleForm(form({ name: 'store:manager' }), 'create').name).toBe(
+      'roles.dialog.nameInvalid',
+    );
+  });
+
+  // Fixed once the role exists: the key is the name.
+  it('says nothing about the name while editing', () => {
+    expect(validateRoleForm(form({ name: '' }), 'edit')).toEqual({});
+  });
+
+  it('reports both fields at once rather than one at a time', () => {
+    expect(validateRoleForm(form({ name: '', displayName: '' }), 'create')).toEqual({
+      name: 'roles.dialog.nameRequired',
+      displayName: 'roles.dialog.displayNameRequired',
+    });
   });
 });
 

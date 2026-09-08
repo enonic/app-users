@@ -1,16 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  failPrincipalNameCheck,
-  receivePrincipalNameCheck,
-  type Role,
-} from '../../../entities/principal';
+import type { Role } from '../../../entities/principal';
 import {
   $roleEditor,
   $roleEditorErrors,
   closeRoleEditor,
   openRoleEditor,
   openRoleEditorAt,
+  roleNameCheck,
   seedRoleEditorMembers,
   updateRoleEditorForm,
 } from './role-editor.store';
@@ -81,7 +78,7 @@ describe('$roleEditorErrors', () => {
   it('reports a taken name, and only once the local rules accept it', () => {
     openRoleEditor({ mode: 'create' });
     updateRoleEditorForm({ displayName: 'Store Manager' });
-    receivePrincipalNameCheck('role:store.manager', true);
+    roleNameCheck.receive('role:store.manager', true);
 
     expect($roleEditorErrors.get().name).toBe('roles.dialog.nameTaken');
 
@@ -93,7 +90,7 @@ describe('$roleEditorErrors', () => {
   it('says nothing about a check that failed', () => {
     openRoleEditor({ mode: 'create' });
     updateRoleEditorForm({ displayName: 'Store Manager' });
-    failPrincipalNameCheck('role:store.manager');
+    roleNameCheck.fail('role:store.manager');
 
     expect($roleEditorErrors.get().name).toBeUndefined();
   });

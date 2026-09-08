@@ -1,5 +1,5 @@
 import { isReservedRole, type Role } from '../../../entities/principal';
-import { openRoleEditor } from '../../../features/role-editor-2';
+import { openRoleEditor } from '../../../features/role-editor';
 import {
   type ActionContext,
   actionTargets,

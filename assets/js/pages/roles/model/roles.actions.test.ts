@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { Role } from '../../../entities/principal';
-import { $roleEditor, closeRoleEditor } from '../../../features/role-editor-2';
+import { $roleEditor, closeRoleEditor } from '../../../features/role-editor';
 import type { ActionContext, SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { rolesDeletion } from './deletion.store';
 import { ROLE_ACTIONS } from './roles.actions';

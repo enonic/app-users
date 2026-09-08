@@ -1,7 +1,6 @@
 import { Input, TextArea } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
-import { $principalNameCheck } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
@@ -9,6 +8,7 @@ import {
   $roleEditor,
   $roleEditorErrors,
   markRoleEditorFieldVisited,
+  roleNameCheck,
   setRoleEditorDisplayName,
   setRoleEditorName,
   updateRoleEditorForm,
@@ -21,7 +21,7 @@ const DESCRIPTION_ID = 'role-editor-description';
 export function RoleEditorDialogIdentityStep() {
   const { form, visited, mode } = useStore($roleEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($roleEditorErrors);
-  const nameCheck = useStore($principalNameCheck);
+  const nameCheck = useStore(roleNameCheck.$state);
 
   const persisted = mode === 'edit';
 
