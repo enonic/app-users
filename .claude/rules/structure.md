@@ -32,6 +32,19 @@ byte-identical where the code is the same — `cmp` against `../app-applications
 and a widget takes what it needs as props (`activeKey`, `detailsShown`) rather than reaching into
 `shared/host`, which is what keeps it portable.
 
+`shared/step-dialog/` is the base of every dialog made of steps, as `shared/ui/dialogs/ModalDialog` is of
+the single-page ones. It is `@enonic/ui-kit` material like `widgets/`, so it imports nothing from
+`entities/**`: a feature hands it the domain — `defineSteps` table, `initialForm`, `validate`, `same`,
+`next` — through `createStepDialogStore`, once at module level, and re-exports the pieces under its own
+names (`features/user-editor/model/user-editor.store.ts` is the worked example). The barrel carries the
+model alone; `StepDialog` is imported by path so `@enonic/ui` stays out of the DOM-less test run. Panels
+are pure content — the dialog wraps them in `StepContent` and applies the locks — and a rule that runs
+outside the form reports through the `$external` slot rather than by patching `$errors`.
+
+A feature two sections share keeps one store, not one per section. The sections stay mounted side by
+side — the host keeps a section alive on switch — so a dialog both pages render must know which copy it
+is (`UserEditorDialog`'s `section` prop) and render nothing when the open is not its own.
+
 ## Server — `src/main/resources`
 
 - New server TS lives under `extensions/` (shared modules: endpoint, i18n, schema) and
