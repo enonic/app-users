@@ -2,10 +2,13 @@ export { USER_EDITOR_STEPS, type UserEditorStep } from './model/user-editor-step
 export {
   $userEditor,
   $userEditorErrors,
+  $userEditorServiceAccount,
   $userEditorStepLocks,
   $userEditorSystemUser,
   closeUserEditor,
   markUserEditorFieldVisited,
+  openServiceAccountEditor,
+  openServiceAccountEditorAt,
   openUserEditor,
   openUserEditorAt,
   type UserEditorMode,

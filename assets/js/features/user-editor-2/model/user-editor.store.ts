@@ -1,4 +1,4 @@
-import { computed } from 'nanostores';
+import { atom, computed } from 'nanostores';
 
 import {
   $idProviderNames,
@@ -23,6 +23,7 @@ import {
   sameUserForm,
   validateUserForm,
   type PendingPublicKey,
+  type UserEditorPayload,
   type UserForm,
   type UserFormField,
 } from './user-form';
@@ -46,6 +47,13 @@ export const $userEditorProviders = computed(
   ({ items }): readonly IdProviderName[] => items.filter(({ key }) => key !== SYSTEM_ID_PROVIDER),
 );
 
+/**
+ * Whether the Service Accounts section opened the dialog. Users and Service Accounts stay mounted side
+ * by side and share this one store, so each section's dialog shows only what its own section opened.
+ * A service account is a user of the system store: the provider is settled, never offered.
+ */
+export const $userEditorServiceAccount = atom(false);
+
 export const userEditorDialog = createStepDialogStore<
   UserEditorStep,
   UserFormField,
@@ -53,7 +61,7 @@ export const userEditorDialog = createStepDialogStore<
   User
 >({
   steps: USER_EDITOR_STEPS,
-  initialForm: (payload) => initialUserForm(payload, soleProvider()),
+  initialForm: (payload) => initialUserForm(payload, createProvider()),
   validate: (form, { mode, entity }) =>
     validateUserForm(form, mode, entity !== undefined && isSystemUser(entity.key)),
   same: sameUserForm,
@@ -71,8 +79,26 @@ export const $userEditorSystemUser = computed(
   ({ entity }) => entity !== undefined && isSystemUser(entity.key),
 );
 
-export const openUserEditor = userEditorDialog.open;
-export const openUserEditorAt = userEditorDialog.openAt;
+export function openUserEditor(payload: UserEditorPayload): void {
+  $userEditorServiceAccount.set(false);
+  userEditorDialog.open(payload);
+}
+
+export function openUserEditorAt(user: User, step: UserEditorStep): void {
+  $userEditorServiceAccount.set(false);
+  userEditorDialog.openAt(user, step);
+}
+
+export function openServiceAccountEditor(payload: UserEditorPayload): void {
+  $userEditorServiceAccount.set(true);
+  userEditorDialog.open(payload);
+}
+
+export function openServiceAccountEditorAt(user: User, step: UserEditorStep): void {
+  $userEditorServiceAccount.set(true);
+  userEditorDialog.openAt(user, step);
+}
+
 export const closeUserEditor = userEditorDialog.close;
 export const goToUserEditorStep = userEditorDialog.goToStep;
 export const markUserEditorFieldVisited = userEditorDialog.markVisited;
@@ -156,7 +182,12 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
   }
 }
 
-function soleProvider(): string {
+// Where a create starts: the system store for a service account, otherwise the one provider there is.
+function createProvider(): string {
+  if ($userEditorServiceAccount.get()) {
+    return SYSTEM_ID_PROVIDER;
+  }
+
   const providers = $userEditorProviders.get();
 
   return providers.length === 1 ? (providers[0]?.key ?? '') : '';

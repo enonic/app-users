@@ -6,7 +6,10 @@ import {
   $userEditor,
   $userEditorErrors,
   $userEditorProviders,
+  $userEditorServiceAccount,
   closeUserEditor,
+  openServiceAccountEditor,
+  openServiceAccountEditorAt,
   openUserEditor,
   openUserEditorAt,
   updateUserEditorForm,
@@ -81,6 +84,28 @@ describe('$userEditorErrors', () => {
     failUserNameCheck('user:system:alice');
 
     expect($userEditorErrors.get().name).toBeUndefined();
+  });
+});
+
+describe('openServiceAccountEditor', () => {
+  it('starts a create in the system store, and says the Service Accounts section opened it', () => {
+    receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP' }]));
+
+    openServiceAccountEditor({ mode: 'create' });
+
+    expect($userEditorServiceAccount.get()).toBe(true);
+    expect($userEditor.get().form.idProvider).toBe('system');
+  });
+
+  it('hands the dialog back to the Users section on its next open', () => {
+    openServiceAccountEditorAt(ALICE, 'roles');
+
+    expect($userEditorServiceAccount.get()).toBe(true);
+
+    closeUserEditor();
+    openUserEditor({ mode: 'create' });
+
+    expect($userEditorServiceAccount.get()).toBe(false);
   });
 });
 
