@@ -1,5 +1,5 @@
 import type { Group } from '../../../entities/principal';
-import { openGroupEditor } from '../../../features/group-editor-2';
+import { openGroupEditor } from '../../../features/group-editor';
 import { actionTargets, type SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { groupsDeletion } from './deletion.store';
 

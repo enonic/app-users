@@ -52,21 +52,21 @@ describe('initialGroupForm', () => {
   });
 
   it('reads the provider and the name out of the key', () => {
-    const values = initialGroupForm({ mode: 'edit', group });
+    const values = initialGroupForm({ mode: 'edit', entity: group });
 
     expect(values.idProvider).toBe('store');
     expect(values.name).toBe('managers');
   });
 
   it('takes members and roles it is handed, separately', () => {
-    const values = initialGroupForm({ mode: 'edit', group }, '', members, roles);
+    const values = initialGroupForm({ mode: 'edit', entity: group }, '', { members, roles });
 
     expect(values.members).toEqual(members);
     expect(values.roles).toEqual(roles);
   });
 
   it('starts with neither while they are still being loaded', () => {
-    const values = initialGroupForm({ mode: 'edit', group });
+    const values = initialGroupForm({ mode: 'edit', entity: group });
 
     expect(values.members).toEqual([]);
     expect(values.roles).toEqual([]);
@@ -74,7 +74,7 @@ describe('initialGroupForm', () => {
 
   it('reads a missing description as an empty field', () => {
     expect(
-      initialGroupForm({ mode: 'edit', group: { ...group, description: undefined } }).description,
+      initialGroupForm({ mode: 'edit', entity: { ...group, description: undefined } }).description,
     ).toBe('');
   });
 });
@@ -85,31 +85,34 @@ describe('nextGroupForm', () => {
   it('lets the name follow the display name while the user has not touched it', () => {
     const next = { ...previous, displayName: 'Store Floor Managers' };
 
-    expect(nextGroupForm(previous, next, 'create', false)).toEqual({
-      values: { ...next, name: 'store.floor.managers' },
-      nameEdited: false,
-    });
+    expect(nextGroupForm(previous, next, { mode: 'create' }).name).toBe('store.floor.managers');
   });
 
   it('keeps a typed name exactly as typed, in the same edit that reports it', () => {
     const next = { ...previous, name: 'm' };
 
-    expect(nextGroupForm(previous, next, 'create', false)).toEqual({
-      values: next,
+    expect(nextGroupForm(previous, next, { mode: 'create' })).toEqual({
+      ...next,
       nameEdited: true,
     });
+  });
+
+  it('stops deriving once the name is the user’s', () => {
+    const next = { ...previous, displayName: 'Renamed', nameEdited: true };
+
+    expect(nextGroupForm(previous, next, { mode: 'create' }).name).toBe('managers');
   });
 
   it('never derives while editing, where the name is fixed', () => {
     const next = { ...previous, displayName: 'Renamed' };
 
-    expect(nextGroupForm(previous, next, 'edit', false).values.name).toBe('managers');
+    expect(nextGroupForm(previous, next, { mode: 'edit' }).name).toBe('managers');
   });
 
   it('leaves a provider change alone', () => {
     const next = { ...previous, idProvider: 'system' };
 
-    expect(nextGroupForm(previous, next, 'create', false).values.idProvider).toBe('system');
+    expect(nextGroupForm(previous, next, { mode: 'create' }).idProvider).toBe('system');
   });
 });
 

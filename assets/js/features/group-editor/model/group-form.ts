@@ -3,10 +3,13 @@ import {
   idProviderOf,
   isIllegalPrincipalName,
   principalName,
+  type Group,
   type PrincipalRef,
 } from '../../../entities/principal';
 import { sameKeys, type FieldErrors } from '../../../shared/form';
-import type { GroupEditorPayload } from './group-editor.store';
+import type { StepDialogMode, StepDialogPayload } from '../../../shared/step-dialog';
+
+export type GroupEditorPayload = StepDialogPayload<Group>;
 
 export type GroupForm = {
   idProvider: string;
@@ -15,6 +18,8 @@ export type GroupForm = {
   description: string;
   members: readonly PrincipalRef[];
   roles: readonly PrincipalRef[];
+  /** Whether the user has taken the name over; until then a create derives it from the display name. */
+  nameEdited?: boolean;
 };
 
 export type GroupFormField = 'idProvider' | 'name' | 'displayName';
@@ -23,16 +28,10 @@ export type GroupFormErrors = FieldErrors<GroupFormField>;
 
 export const GROUP_FORM_FIELDS: readonly GroupFormField[] = ['idProvider', 'name', 'displayName'];
 
-export type GroupFormChange = {
-  values: GroupForm;
-  nameEdited: boolean;
-};
-
 export function initialGroupForm(
   payload: GroupEditorPayload,
   defaultProvider = '',
-  members: readonly PrincipalRef[] = [],
-  roles: readonly PrincipalRef[] = [],
+  lists: { members?: readonly PrincipalRef[]; roles?: readonly PrincipalRef[] } = {},
 ): GroupForm {
   if (payload.mode === 'create') {
     return {
@@ -45,33 +44,32 @@ export function initialGroupForm(
     };
   }
 
-  const { group } = payload;
+  const { entity: group } = payload;
 
   return {
     idProvider: idProviderOf(group.key) ?? '',
     name: principalName(group.key),
     displayName: group.displayName,
     description: group.description ?? '',
-    members,
-    roles,
+    members: lists.members ?? [],
+    roles: lists.roles ?? [],
   };
 }
 
 export function nextGroupForm(
   previous: GroupForm,
   next: GroupForm,
-  mode: GroupEditorPayload['mode'],
-  nameEdited: boolean,
-): GroupFormChange {
+  { mode }: { mode: StepDialogMode },
+): GroupForm {
   if (next.name !== previous.name) {
-    return { values: next, nameEdited: true };
+    return { ...next, nameEdited: true };
   }
 
-  if (nameEdited || mode === 'edit') {
-    return { values: next, nameEdited };
+  if (next.nameEdited === true || mode === 'edit') {
+    return next;
   }
 
-  return { values: { ...next, name: derivePrincipalName(next.displayName) }, nameEdited: false };
+  return { ...next, name: derivePrincipalName(next.displayName) };
 }
 
 /**
@@ -92,10 +90,7 @@ export function sameGroupForm(saved: GroupForm, edited: GroupForm): boolean {
   );
 }
 
-export function validateGroupForm(
-  form: GroupForm,
-  mode: GroupEditorPayload['mode'],
-): GroupFormErrors {
+export function validateGroupForm(form: GroupForm, mode: StepDialogMode): GroupFormErrors {
   const errors: GroupFormErrors = {};
 
   if (form.displayName.trim().length === 0) {

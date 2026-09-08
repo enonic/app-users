@@ -3,7 +3,7 @@ import { useMemo } from 'preact/hooks';
 
 import { useGroups, useIdProviderName } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { GroupEditorDialog } from '../../features/group-editor-2/ui/GroupEditorDialog';
+import { GroupEditorDialog } from '../../features/group-editor/ui/GroupEditorDialog';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
