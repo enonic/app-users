@@ -9,6 +9,7 @@ import {
   $userEditor,
   $userEditorErrors,
   $userEditorProviders,
+  $userEditorServiceAccount,
   $userEditorSystemUser,
   markUserEditorFieldVisited,
   setUserEditorDisplayName,
@@ -27,6 +28,7 @@ export function UserEditorDialogIdentityStep() {
   const { form, visited, mode } = useStore($userEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($userEditorErrors);
   const systemUser = useStore($userEditorSystemUser);
+  const serviceAccount = useStore($userEditorServiceAccount);
   const nameCheck = useStore($userNameCheck);
   const providers = useStore($userEditorProviders);
 
@@ -57,34 +59,36 @@ export function UserEditorDialogIdentityStep() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* IdProvider Selector */}
-      <div className="flex flex-col gap-1.5">
-        <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
-        <Selector.Root
-          disabled={persisted}
-          value={form.idProvider}
-          error={providerError !== undefined}
-          onValueChange={(next) => {
-            markUserEditorFieldVisited('idProvider');
-            setUserEditorIdProvider(next);
-          }}
-        >
-          <Selector.Trigger aria-labelledby={PROVIDER_LABEL_ID}>
-            <Selector.Value placeholder={providerPlaceholder}>
-              {form.idProvider.length > 0 ? providerName : undefined}
-            </Selector.Value>
-            <Selector.Icon />
-          </Selector.Trigger>
-          <SelectorPopup>
-            {providers.map(({ key, displayName }) => (
-              <Selector.Item key={key} value={key} textValue={displayName}>
-                <Selector.ItemText>{displayName}</Selector.ItemText>
-              </Selector.Item>
-            ))}
-          </SelectorPopup>
-        </Selector.Root>
-        {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
-      </div>
+      {/* IdProvider Selector — a service account's is the system store, so there is nothing to choose. */}
+      {!serviceAccount && (
+        <div className="flex flex-col gap-1.5">
+          <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
+          <Selector.Root
+            disabled={persisted}
+            value={form.idProvider}
+            error={providerError !== undefined}
+            onValueChange={(next) => {
+              markUserEditorFieldVisited('idProvider');
+              setUserEditorIdProvider(next);
+            }}
+          >
+            <Selector.Trigger aria-labelledby={PROVIDER_LABEL_ID}>
+              <Selector.Value placeholder={providerPlaceholder}>
+                {form.idProvider.length > 0 ? providerName : undefined}
+              </Selector.Value>
+              <Selector.Icon />
+            </Selector.Trigger>
+            <SelectorPopup>
+              {providers.map(({ key, displayName }) => (
+                <Selector.Item key={key} value={key} textValue={displayName}>
+                  <Selector.ItemText>{displayName}</Selector.ItemText>
+                </Selector.Item>
+              ))}
+            </SelectorPopup>
+          </Selector.Root>
+          {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
+        </div>
+      )}
 
       {/* Display Name input */}
       <div className="flex flex-col gap-1.5">

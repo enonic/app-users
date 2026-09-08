@@ -12,30 +12,59 @@ import { applyPublicKeyChanges } from '../model/public-key-writes';
 import { userDraftFrom } from '../model/user-draft';
 import { userEditFrom } from '../model/user-edit';
 import { forgetUserEditDetail, showUserForEdit } from '../model/user-edit-detail';
-import { $userEditor, userEditorDialog } from '../model/user-editor.store';
+import {
+  $userEditor,
+  $userEditorServiceAccount,
+  userEditorDialog,
+} from '../model/user-editor.store';
 import type { UserForm } from '../model/user-form';
 import { useUserEditorMemberships } from '../model/useUserEditorMemberships';
 import { USER_EDITOR_STEP_PANELS } from './steps';
 
-const TITLES: Record<StepDialogMode, string> = {
-  create: 'users.dialog.createTitle',
-  edit: 'users.dialog.editTitle',
+type Text = {
+  titles: Record<StepDialogMode, string>;
+  notices: Record<'created' | 'updated' | 'createFailed' | 'updateFailed', string>;
 };
 
-const NOTICES = {
-  created: 'users.notify.created',
-  updated: 'users.notify.updated',
-  createFailed: 'users.notify.createFailed',
-  updateFailed: 'users.notify.updateFailed',
+const USER_TEXT: Text = {
+  titles: { create: 'users.dialog.createTitle', edit: 'users.dialog.editTitle' },
+  notices: {
+    created: 'users.notify.created',
+    updated: 'users.notify.updated',
+    createFailed: 'users.notify.createFailed',
+    updateFailed: 'users.notify.updateFailed',
+  },
+};
+
+const SERVICE_ACCOUNT_TEXT: Text = {
+  titles: {
+    create: 'serviceAccounts.dialog.createTitle',
+    edit: 'serviceAccounts.dialog.editTitle',
+  },
+  notices: {
+    created: 'serviceAccounts.notify.created',
+    updated: 'serviceAccounts.notify.updated',
+    createFailed: 'serviceAccounts.notify.createFailed',
+    updateFailed: 'serviceAccounts.notify.updateFailed',
+  },
 };
 
 export type UserEditorDialogProps = {
   onSaved: (written: User, mode: StepDialogMode) => void;
+  /**
+   * The section this copy belongs to. Users and Service Accounts stay mounted side by side, each with a
+   * copy of this dialog over the one store: the store says which section opened it, the prop is how a
+   * copy knows whether that is itself.
+   */
+  section: 'users' | 'service-accounts';
 };
 
-export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
+export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
   const { entity } = useStore($userEditor, { keys: ['entity'] });
+  const openedAsServiceAccount = useStore($userEditorServiceAccount);
   const { notify } = useHostFrame();
+
+  const serviceAccount = section === 'service-accounts';
 
   useUserEditorMemberships();
 
@@ -62,6 +91,8 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
     }
   };
 
+  const text = serviceAccount ? SERVICE_ACCOUNT_TEXT : USER_TEXT;
+
   const save = (): Promise<void> =>
     runStepDialogSave(userEditorDialog, {
       write: (form, { saved, mode, entity: edited }) =>
@@ -69,16 +100,20 @@ export function UserEditorDialog({ onSaved }: UserEditorDialogProps) {
           ? updateUser(edited.key, userEditFrom(form, saved))
           : createUser(userDraftFrom(form)),
       afterWrite: writeStagedPublicKeys,
-      notices: NOTICES,
+      notices: text.notices,
       notify,
       onSaved,
     });
+
+  if (openedAsServiceAccount !== serviceAccount) {
+    return null;
+  }
 
   return (
     <StepDialog
       store={userEditorDialog}
       glyph={<UserGlyph size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
-      titles={TITLES}
+      titles={text.titles}
       panels={USER_EDITOR_STEP_PANELS}
       onSave={() => void save()}
     />

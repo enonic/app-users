@@ -1,3 +1,4 @@
+import { SYSTEM_ID_PROVIDER } from '../../../entities/principal';
 import { publicKeyChangeCounts } from './public-key-changes';
 import type { UserForm } from './user-form';
 
@@ -18,7 +19,7 @@ export type UserSummaryRow = { labelKey: string } & (
 /**
  * The wizard's answers as the summary reads them back, in the order the steps asked for them. A row
  * whose value is empty is dropped, as the Content Studio project wizard does — except credentials,
- * which say so when nothing was chosen.
+ * which say so when nothing was chosen. A service account's provider is a given, so it is not read back.
  *
  * ! The password is reported as set, never echoed.
  */
@@ -27,10 +28,13 @@ export function userSummaryRows(
   providerName: string,
   hasPassword: boolean,
 ): readonly UserSummaryRow[] {
-  const rows: UserSummaryRow[] = [
-    { labelKey: 'users.dialog.idProvider', value: providerName },
-    { labelKey: 'users.dialog.section', value: `${form.displayName} (${form.name})` },
-  ];
+  const rows: UserSummaryRow[] = [];
+
+  if (form.idProvider !== SYSTEM_ID_PROVIDER) {
+    rows.push({ labelKey: 'users.dialog.idProvider', value: providerName });
+  }
+
+  rows.push({ labelKey: 'users.dialog.section', value: `${form.displayName} (${form.name})` });
 
   if (form.email.trim().length > 0) {
     rows.push({ labelKey: 'users.dialog.email', value: form.email });

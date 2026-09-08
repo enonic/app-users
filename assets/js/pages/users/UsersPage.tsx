@@ -116,6 +116,7 @@ export function UsersPage() {
       />
 
       <UserEditorDialog
+        section="users"
         onSaved={(written, mode) => {
           if (mode === 'create') {
             void reloadUsersScreen();

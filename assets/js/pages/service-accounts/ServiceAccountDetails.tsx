@@ -9,7 +9,7 @@ import {
   type UserDetail,
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openServiceAccountEditor } from '../../features/user-editor';
+import { openServiceAccountEditor } from '../../features/user-editor-2';
 import { useI18n } from '../../shared/i18n';
 import { filledSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -58,7 +58,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openServiceAccountEditor(user)}
+            onClick={() => openServiceAccountEditor({ mode: 'edit', entity: user })}
           />
         }
       >

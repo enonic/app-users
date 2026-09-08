@@ -4,7 +4,7 @@ import type { UserForm } from './user-form';
 import { userSummaryRows } from './user-summary';
 
 const FORM: UserForm = {
-  idProvider: 'system',
+  idProvider: 'ldap',
   name: 'jane',
   displayName: 'Jane Doe',
   email: 'jane@example.com',
@@ -15,13 +15,13 @@ const FORM: UserForm = {
 };
 
 const credentials = (form: Partial<UserForm>, hasPassword = false) =>
-  userSummaryRows({ ...FORM, ...form }, 'System', hasPassword).find(
+  userSummaryRows({ ...FORM, ...form }, 'Corporate LDAP', hasPassword).find(
     ({ labelKey }) => labelKey === 'users.dialog.credentials',
   )?.lines;
 
 describe('userSummaryRows', () => {
   it('reads the answers back in the order the steps asked for them', () => {
-    const rows = userSummaryRows(FORM, 'System', false);
+    const rows = userSummaryRows(FORM, 'Corporate LDAP', false);
 
     expect(rows.map(({ labelKey }) => labelKey)).toEqual([
       'users.dialog.idProvider',
@@ -32,19 +32,26 @@ describe('userSummaryRows', () => {
   });
 
   it('names the provider as the caller resolved it, not by key', () => {
-    const [provider] = userSummaryRows(FORM, 'System', false);
+    const [provider] = userSummaryRows(FORM, 'Corporate LDAP', false);
 
-    expect(provider?.value).toBe('System');
+    expect(provider?.value).toBe('Corporate LDAP');
+  });
+
+  it('leaves the provider out for a service account: the system store is a given', () => {
+    const rows = userSummaryRows({ ...FORM, idProvider: 'system' }, 'System', false);
+
+    expect(rows.some(({ labelKey }) => labelKey === 'users.dialog.idProvider')).toBe(false);
+    expect(rows[0]?.labelKey).toBe('users.dialog.section');
   });
 
   it('pairs the display name with the name', () => {
-    const rows = userSummaryRows(FORM, 'System', false);
+    const rows = userSummaryRows(FORM, 'Corporate LDAP', false);
 
     expect(rows[1]?.value).toBe('Jane Doe (jane)');
   });
 
   it('drops the email row while the email is blank', () => {
-    const rows = userSummaryRows({ ...FORM, email: '  ' }, 'System', false);
+    const rows = userSummaryRows({ ...FORM, email: '  ' }, 'Corporate LDAP', false);
 
     expect(rows.some(({ labelKey }) => labelKey === 'users.dialog.email')).toBe(false);
   });
@@ -54,7 +61,7 @@ describe('userSummaryRows', () => {
   });
 
   it('reports the password as set without echoing it', () => {
-    const rows = userSummaryRows({ ...FORM, password: 'sekret-42!' }, 'System', false);
+    const rows = userSummaryRows({ ...FORM, password: 'sekret-42!' }, 'Corporate LDAP', false);
 
     expect(credentials({ password: 'sekret-42!' })).toEqual([{ key: 'users.dialog.passwordSet' }]);
     expect(JSON.stringify(rows)).not.toContain('sekret-42!');
