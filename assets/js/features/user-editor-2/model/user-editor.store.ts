@@ -3,6 +3,8 @@ import { computed } from 'nanostores';
 import {
   $idProviderNames,
   isSystemUser,
+  SYSTEM_ID_PROVIDER,
+  type IdProviderName,
   type PrincipalRef,
   type User,
 } from '../../../entities/principal';
@@ -37,6 +39,12 @@ const $userNameExternal = computed($userNameCheck, (check): StepDialogExternal<U
   errors: check.status === 'taken' ? { name: 'users.dialog.nameTaken' } : {},
   busy: check.status === 'pending' ? ['name'] : [],
 }));
+
+// ! The system store is never offered: a user there is a service account, created in its own section.
+export const $userEditorProviders = computed(
+  $idProviderNames,
+  ({ items }): readonly IdProviderName[] => items.filter(({ key }) => key !== SYSTEM_ID_PROVIDER),
+);
 
 export const userEditorDialog = createStepDialogStore<
   UserEditorStep,
@@ -149,7 +157,7 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
 }
 
 function soleProvider(): string {
-  const { items } = $idProviderNames.get();
+  const providers = $userEditorProviders.get();
 
-  return items.length === 1 ? (items[0]?.key ?? '') : '';
+  return providers.length === 1 ? (providers[0]?.key ?? '') : '';
 }

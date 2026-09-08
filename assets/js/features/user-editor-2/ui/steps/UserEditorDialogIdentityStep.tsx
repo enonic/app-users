@@ -1,7 +1,6 @@
 import { Input, Selector } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
-import { useIdProviderNames } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
@@ -9,6 +8,7 @@ import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import {
   $userEditor,
   $userEditorErrors,
+  $userEditorProviders,
   $userEditorSystemUser,
   markUserEditorFieldVisited,
   setUserEditorDisplayName,
@@ -28,7 +28,7 @@ export function UserEditorDialogIdentityStep() {
   const errors = useStore($userEditorErrors);
   const systemUser = useStore($userEditorSystemUser);
   const nameCheck = useStore($userNameCheck);
-  const { items: providers } = useIdProviderNames();
+  const providers = useStore($userEditorProviders);
 
   const persisted = mode === 'edit';
 

@@ -1,9 +1,11 @@
+import { ok } from 'neverthrow';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { User } from '../../../entities/principal';
+import { receiveIdProviderNames, type User } from '../../../entities/principal';
 import {
   $userEditor,
   $userEditorErrors,
+  $userEditorProviders,
   closeUserEditor,
   openUserEditor,
   openUserEditorAt,
@@ -79,5 +81,22 @@ describe('$userEditorErrors', () => {
     failUserNameCheck('user:system:alice');
 
     expect($userEditorErrors.get().name).toBeUndefined();
+  });
+});
+
+describe('$userEditorProviders', () => {
+  it('leaves the system store out, and defaults the form to the one provider left', () => {
+    receiveIdProviderNames(
+      ok([
+        { key: 'system', displayName: 'System' },
+        { key: 'ldap', displayName: 'Corporate LDAP' },
+      ]),
+    );
+
+    expect($userEditorProviders.get().map(({ key }) => key)).toEqual(['ldap']);
+
+    openUserEditor({ mode: 'create' });
+
+    expect($userEditor.get().form.idProvider).toBe('ldap');
   });
 });

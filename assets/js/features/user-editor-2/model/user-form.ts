@@ -2,6 +2,7 @@ import {
   derivePrincipalName,
   idProviderOf,
   isIllegalPrincipalName,
+  SYSTEM_ID_PROVIDER,
   type PrincipalRef,
   type User,
 } from '../../../entities/principal';
@@ -52,8 +53,6 @@ export const USER_FORM_FIELDS: readonly UserFormField[] = [
   'email',
   'password',
 ];
-
-export const SYSTEM_ID_PROVIDER = 'system';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
