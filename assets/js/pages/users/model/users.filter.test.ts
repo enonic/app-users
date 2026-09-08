@@ -8,14 +8,23 @@ function provider(key: string, displayName: string, users: number): IdProviderUs
   return { key, displayName, users };
 }
 
-const providers = [provider('system', 'System', 4), provider('ldap', 'Company directory', 0)];
+const providers = [
+  provider('system', 'System', 4),
+  provider('ldap', 'Company directory', 7),
+  provider('adfs', 'Federation', 0),
+];
 
 describe('providerEntries', () => {
   it('offers one entry per provider, named and counted as the provider reports', () => {
-    expect(providerEntries(providers)).toEqual([
-      { id: 'system', label: 'System', count: 4 },
-      { id: 'ldap', label: 'Company directory', count: 0 },
+    expect(providerEntries([provider('ldap', 'Company directory', 7)])).toEqual([
+      { id: 'ldap', label: 'Company directory', count: 7 },
     ]);
+  });
+
+  // ? The system store's users are the Service Accounts section's (#2674), so an entry here could only
+  // ? ever narrow the list to nothing.
+  it('leaves the system store out of the menu', () => {
+    expect(providerEntries(providers).map(({ id }) => id)).toEqual(['ldap', 'adfs']);
   });
 
   // ! The count is the provider's whole total, not the loaded page's: a provider absent from this page
@@ -23,13 +32,13 @@ describe('providerEntries', () => {
   it('leaves a provider holding no users out of the menu', () => {
     const shown = visibleEntries(providerEntries(providers), new Set());
 
-    expect(shown.map(({ id }) => id)).toEqual(['system']);
+    expect(shown.map(({ id }) => id)).toEqual(['ldap']);
   });
 
   it('keeps an empty provider that is ticked, so a filter can be unticked again', () => {
-    const shown = visibleEntries(providerEntries(providers), new Set(['ldap']));
+    const shown = visibleEntries(providerEntries(providers), new Set(['adfs']));
 
-    expect(shown.map(({ id }) => id)).toEqual(['system', 'ldap']);
+    expect(shown.map(({ id }) => id)).toEqual(['ldap', 'adfs']);
   });
 
   it('offers nothing on an instance with no providers', () => {

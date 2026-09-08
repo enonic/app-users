@@ -53,6 +53,7 @@ export const userQueryFields: GraphQLFields = {
       count: GraphQLInt,
       search: GraphQLString,
       idProviders: list(GraphQLString),
+      excludeIdProviders: list(GraphQLString),
       sort: UserSortEnum,
     },
     resolve: (env: {
@@ -61,6 +62,7 @@ export const userQueryFields: GraphQLFields = {
         count?: number;
         search?: string;
         idProviders?: string[];
+        excludeIdProviders?: string[];
         sort?: UserSort;
       };
     }) => listUsers(env.args),

@@ -28,12 +28,13 @@ const USER_FIELDS = `
  */
 export const USERS_ROOT: GraphQlRoot = {
   field: 'users',
-  args: '(start: $start, count: $count, search: $search, idProviders: $idProviders, sort: $sort)',
+  args: '(start: $start, count: $count, search: $search, idProviders: $idProviders, excludeIdProviders: $excludeIdProviders, sort: $sort)',
   variables: {
     start: 'Int',
     count: 'Int',
     search: 'String',
     idProviders: '[String]',
+    excludeIdProviders: '[String]',
     sort: 'UserSort',
   },
   selection: `{

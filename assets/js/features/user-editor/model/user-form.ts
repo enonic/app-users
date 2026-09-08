@@ -2,6 +2,7 @@ import {
   derivePrincipalName,
   idProviderOf,
   isIllegalPrincipalName,
+  SYSTEM_ID_PROVIDER,
   type PrincipalRef,
 } from '../../../entities/principal';
 import { sameKeys, type FieldErrors } from '../../../shared/form';
@@ -35,8 +36,6 @@ export type UserFormChange = {
   values: UserForm;
   nameEdited: boolean;
 };
-
-export const SYSTEM_ID_PROVIDER = 'system';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

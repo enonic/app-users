@@ -29,48 +29,66 @@ const AVATAR: Record<PrincipalIconSize, { size: 'md' | 'lg'; className?: string 
   lg: { size: 'lg' },
 };
 
+/**
+ * ! The cog carries no disc — it is drawn in `currentColor`, same as the glyph, so both follow the row's
+ * ! text color together (`text-alt` on the inverse selected row included). What keeps the icon from
+ * ! crossing it is this notch, cut out of the icon alone: a hole centred where the badge sits — badge
+ * ! box offset -3px into the corner, so sm (14px box on a 28px icon) centres at 24,4 and lg (18px box
+ * ! on 48px) at 42,6 — with the radius leaving ~2px of clear ground around the cog on any background.
+ * ! The avatar and the glyph share a box per size, so one notch fits both.
+ */
+const NOTCH: Record<PrincipalIconSize, string> = {
+  sm: '[mask-image:radial-gradient(circle_at_24px_4px,transparent_7px,#000_7.5px)]',
+  lg: '[mask-image:radial-gradient(circle_at_42px_6px,transparent_9px,#000_9.5px)]',
+};
+
 /** A user's initials, or the glyph for a group or role, with a cog badge on the ones the platform owns. */
 export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
   const { key, type, displayName } = principal;
 
-  const icon = type === 'user' ? initialsAvatar(displayName, size) : glyph(type, size);
-
   const badgeLabelKey = systemBadgeKey(type, key);
   if (badgeLabelKey === undefined) {
-    return icon;
+    return icon(type, displayName, size);
   }
 
   return (
     <span className="relative inline-flex shrink-0">
-      {icon}
+      {icon(type, displayName, size, NOTCH[size])}
 
       <IconBadge
         icon={Settings}
-        color="var(--color-main)"
         size={size === 'lg' ? 'md' : 'sm'}
         label={i18n(badgeLabelKey)}
-        className={cn(
-          'absolute -top-0.75 -right-0.75',
-          // ? Badge and avatar are the same black in the light theme; the ring is what separates them.
-          type === 'user' && 'ring-surface-neutral ring-2',
-        )}
+        className="absolute -top-0.75 -right-0.75 text-current"
       />
     </span>
   );
 }
 
-function initialsAvatar(displayName: string, size: PrincipalIconSize) {
+function icon(
+  type: PrincipalType,
+  displayName: string,
+  size: PrincipalIconSize,
+  className?: string,
+) {
+  return type === 'user'
+    ? initialsAvatar(displayName, size, className)
+    : glyph(type, size, className);
+}
+
+function initialsAvatar(displayName: string, size: PrincipalIconSize, className?: string) {
+  const { size: avatarSize, className: box } = AVATAR[size];
   return (
-    <Avatar {...AVATAR[size]} aria-hidden>
+    <Avatar size={avatarSize} className={cn(box, className)} aria-hidden>
       {/* The fallback hardcodes `cursor-default`, an arrow over the avatar alone in a clickable row. */}
       <Avatar.Fallback className="cursor-[inherit]">{getInitials(displayName)}</Avatar.Fallback>
     </Avatar>
   );
 }
 
-function glyph(type: Exclude<PrincipalType, 'user'>, size: PrincipalIconSize) {
+function glyph(type: Exclude<PrincipalType, 'user'>, size: PrincipalIconSize, className?: string) {
   const Glyph = GLYPHS[type];
-  return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden />;
+  return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden className={className} />;
 }
 
 /**
