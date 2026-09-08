@@ -13,6 +13,7 @@ import {
   closeGroupEditor,
   openGroupEditor,
   openGroupEditorAt,
+  seedGroupEditorLists,
   updateGroupEditorForm,
 } from './group-editor.store';
 
@@ -63,6 +64,22 @@ describe('openGroupEditorAt', () => {
       description: 'Runs the shops',
     });
     expect(saved).toEqual(form);
+  });
+});
+
+describe('seedGroupEditorLists', () => {
+  const ALICE = { key: 'user:store:alice', displayName: 'Alice', type: 'user' } as const;
+  const BOB = { key: 'user:store:bob', displayName: 'Bob', type: 'user' } as const;
+
+  it('lands in the baseline, and keeps what was picked while the read was in flight', () => {
+    openGroupEditor({ mode: 'edit', entity: MANAGERS });
+    updateGroupEditorForm({ members: [BOB] });
+    seedGroupEditorLists({ members: [ALICE], roles: [] });
+
+    const { form, saved } = $groupEditor.get();
+
+    expect(form.members).toEqual([ALICE, BOB]);
+    expect(saved.members).toEqual([ALICE]);
   });
 });
 

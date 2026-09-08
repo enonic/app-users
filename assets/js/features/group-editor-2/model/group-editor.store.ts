@@ -6,7 +6,9 @@ import {
   checkPrincipalName,
   forgetPrincipalNameChecks,
   type Group,
+  type PrincipalRef,
 } from '../../../entities/principal';
+import { mergeByKey } from '../../../shared/form';
 import { createStepDialogStore, type StepDialogExternal } from '../../../shared/step-dialog';
 import { GROUP_EDITOR_STEPS, type GroupEditorStep } from './group-editor-steps';
 import {
@@ -51,6 +53,18 @@ export const openGroupEditorAt = groupEditorDialog.openAt;
 export const closeGroupEditor = groupEditorDialog.close;
 export const markGroupEditorFieldVisited = groupEditorDialog.markVisited;
 export const updateGroupEditorForm = groupEditorDialog.update;
+
+/** The members and roles the server holds, which arrive long after the dialog opens. */
+export function seedGroupEditorLists(lists: {
+  members: readonly PrincipalRef[];
+  roles: readonly PrincipalRef[];
+}): void {
+  // The picks made while the read was in flight survive it.
+  groupEditorDialog.seed(lists, (seeded, current) => ({
+    members: mergeByKey(seeded.members ?? [], current.members),
+    roles: mergeByKey(seeded.roles ?? [], current.roles),
+  }));
+}
 
 /** In the create wizard the display name is also where the name comes from, so it asks the same question. */
 export function setGroupEditorDisplayName(displayName: string): void {

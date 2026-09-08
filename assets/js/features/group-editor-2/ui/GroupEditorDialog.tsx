@@ -1,4 +1,6 @@
+import { useStore } from '@nanostores/preact';
 import { Users } from 'lucide-react';
+import { useEffect } from 'preact/hooks';
 
 import { createGroup, updateGroup, type Group } from '../../../entities/principal';
 import { useHostFrame } from '../../../shared/host';
@@ -6,7 +8,9 @@ import { runStepDialogSave, type StepDialogMode } from '../../../shared/step-dia
 import { StepDialog } from '../../../shared/step-dialog/StepDialog';
 import { groupDraftFrom } from '../model/group-draft';
 import { groupEditFrom } from '../model/group-edit';
-import { groupEditorDialog } from '../model/group-editor.store';
+import { forgetGroupEditDetail, showGroupForEdit } from '../model/group-edit-detail';
+import { $groupEditor, groupEditorDialog } from '../model/group-editor.store';
+import { useGroupEditorLists } from '../model/useGroupEditorLists';
 import { GROUP_EDITOR_STEP_PANELS } from './steps';
 
 const TITLES: Record<StepDialogMode, string> = {
@@ -26,7 +30,19 @@ export type GroupEditorDialogProps = {
 };
 
 export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
+  const { entity } = useStore($groupEditor, { keys: ['entity'] });
   const { notify } = useHostFrame();
+
+  useGroupEditorLists();
+
+  const editedKey = entity?.key;
+
+  // The detail carries the members and the roles the later steps seed from.
+  useEffect(() => {
+    showGroupForEdit(editedKey);
+
+    return forgetGroupEditDetail;
+  }, [editedKey]);
 
   const save = (): Promise<void> =>
     runStepDialogSave(groupEditorDialog, {
