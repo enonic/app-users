@@ -6,17 +6,14 @@ import type { PublicKeyRow } from '../model/public-key-changes';
 
 export type PublicKeyCardProps = {
   publicKey: PublicKeyRow;
-  detailed?: boolean;
 };
 
-export function PublicKeyCard({ publicKey, detailed }: PublicKeyCardProps) {
-  const kidLabel = useI18n('users.dialog.keyKid');
-  const creationLabel = useI18n('users.dialog.keyCreationTime');
+// The card is the whole of what a key shows: its material is downloaded as a file, never viewed here.
+export function PublicKeyCard({ publicKey }: PublicKeyCardProps) {
   const unlabelled = useI18n('users.dialog.keyUnlabelled');
   const pending = useI18n('users.dialog.keyPending');
 
   const { kid, label, creationTime } = publicKey;
-  const line = kid ?? pending;
 
   return (
     <span className="flex min-w-0 items-center gap-2.5">
@@ -25,27 +22,13 @@ export function PublicKeyCard({ publicKey, detailed }: PublicKeyCardProps) {
       <span className="flex min-w-0 flex-col">
         <span className="truncate text-base">{label ?? unlabelled}</span>
 
-        {detailed === true ? (
-          <>
-            <small className="text-subtle truncate text-sm">
-              {kidLabel} {line}
-            </small>
+        <small className="text-subtle flex min-w-0 flex-wrap items-center gap-x-2 text-sm">
+          <span className="min-w-0 truncate">{kid ?? pending}</span>
 
-            {creationTime !== undefined && (
-              <small className="text-subtle truncate text-sm">
-                {creationLabel} {formatDateTime(creationTime)}
-              </small>
-            )}
-          </>
-        ) : (
-          <small className="text-subtle flex min-w-0 flex-wrap items-center gap-x-2 text-sm">
-            <span className="min-w-0 truncate">{line}</span>
-
-            {creationTime !== undefined && (
-              <span className="shrink-0">{formatDateTime(creationTime)}</span>
-            )}
-          </small>
-        )}
+          {creationTime !== undefined && (
+            <span className="shrink-0">{formatDateTime(creationTime)}</span>
+          )}
+        </small>
       </span>
     </span>
   );
