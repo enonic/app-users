@@ -2,6 +2,7 @@ import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import {
+  requestRoleExists,
   sendRoleCreation,
   sendRoleUpdate,
   type RoleChanges,
@@ -42,6 +43,20 @@ export function updateRole(key: PrincipalKey, edit: RoleEdit): ResultAsync<Role,
     addMembers: edit.addMembers,
     removeMembers: edit.removeMembers,
   } satisfies RoleChanges);
+}
+
+/**
+ * Whether a role of this name already exists — the wizard's advisory check, asked of a name as it is
+ * typed. A role has no provider: its name is unique across the platform.
+ *
+ * ! Advisory: the answer is a moment old by the time the save runs. `createRole` stays the authority on
+ * ! the duplicate.
+ */
+export function isRoleNameTaken(
+  name: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestRoleExists(`role:${name}`, signal);
 }
 
 function scalars({ displayName, description }: { displayName: string; description: string }) {

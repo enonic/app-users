@@ -9,10 +9,11 @@ import {
   type PrincipalNameCheckState,
 } from './principal-name-check.store';
 import type { PrincipalType } from './principal.types';
+import { isRoleNameTaken } from './role-commands';
 import { isUserNameTaken } from './user-commands';
 
-/** The principals a wizard names inside a provider. A role has no provider to be unique in. */
-export type NameCheckedType = Exclude<PrincipalType, 'role'>;
+/** The principals a wizard names: a user or a group inside a provider, a role on its own. */
+export type NameCheckedType = PrincipalType;
 
 export type PrincipalNameCheckOptions = {
   /** Skip the debounce: the field was left, or the provider changed under a name already typed. */
@@ -36,6 +37,7 @@ const ASK: Record<
 > = {
   user: isUserNameTaken,
   group: isGroupNameTaken,
+  role: (_idProvider, name, signal) => isRoleNameTaken(name, signal),
 };
 
 export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCheck {
@@ -84,18 +86,24 @@ export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCh
     receive,
     fail,
 
-    /** Asks whether the provider already holds this name, debounced, one request at a time. */
+    /**
+     * Asks whether the name is already held — by the provider for a user or a group, by the platform for a
+     * role, which has no provider and passes `''`. Debounced, one request at a time.
+     */
     ask(idProvider, name, { immediate = false } = {}) {
       cancel();
 
       const trimmed = name.trim();
+      const key =
+        trimmed.length === 0 || isIllegalPrincipalName(trimmed)
+          ? undefined
+          : keyOf(type, idProvider, trimmed);
 
-      if (idProvider.length === 0 || trimmed.length === 0 || isIllegalPrincipalName(trimmed)) {
+      if (key === undefined) {
         idle();
         return;
       }
 
-      const key = `${type}:${idProvider}:${trimmed}`;
       const remembered = answered.get(key);
 
       if (remembered !== undefined) {
@@ -123,4 +131,18 @@ export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCh
       idle();
     },
   };
+}
+
+//
+// * Internal
+//
+
+// The answer is filed under the key the principal would have, so one name in two providers is two
+// questions. A user or a group has no key until its provider is chosen.
+function keyOf(type: NameCheckedType, idProvider: string, name: string): string | undefined {
+  if (type === 'role') {
+    return `role:${name}`;
+  }
+
+  return idProvider.length === 0 ? undefined : `${type}:${idProvider}:${name}`;
 }
