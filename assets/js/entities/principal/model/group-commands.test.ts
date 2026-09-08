@@ -2,11 +2,18 @@ import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppError } from '../../../shared/api';
-import { sendGroupCreation, sendGroupUpdate } from '../api/groups.api';
-import { createGroup, updateGroup, type GroupDraft, type GroupEdit } from './group-commands';
+import { requestGroupExists, sendGroupCreation, sendGroupUpdate } from '../api/groups.api';
+import {
+  createGroup,
+  isGroupNameTaken,
+  updateGroup,
+  type GroupDraft,
+  type GroupEdit,
+} from './group-commands';
 import type { Group, PrincipalKey } from './principal.types';
 
 vi.mock('../api/groups.api', () => ({
+  requestGroupExists: vi.fn(),
   sendGroupCreation: vi.fn(),
   sendGroupUpdate: vi.fn(),
 }));
@@ -149,5 +156,16 @@ describe('updateGroup', () => {
       'group:store:managers',
       expect.objectContaining({ addMembers, removeMembers, addRoles, removeRoles }),
     );
+  });
+});
+
+describe('isGroupNameTaken', () => {
+  it('asks about the key the provider and the name make', async () => {
+    vi.mocked(requestGroupExists).mockReturnValue(okAsync(true));
+
+    const result = await isGroupNameTaken('store', 'managers');
+
+    expect(requestGroupExists).toHaveBeenCalledWith('group:store:managers', undefined);
+    expect(result._unsafeUnwrap()).toBe(true);
   });
 });

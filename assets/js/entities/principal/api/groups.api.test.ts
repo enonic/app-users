@@ -6,6 +6,7 @@ import {
   fetchGroupDetail,
   fetchGroupMemberships,
   GROUPS_ROOT,
+  requestGroupExists,
   sendGroupCreation,
   sendGroupUpdate,
   toGroups,
@@ -309,5 +310,34 @@ describe('sendGroupUpdate', () => {
     const result = await sendGroupUpdate('group:store:gone', changes());
 
     expect(result.isErr()).toBe(true);
+  });
+});
+
+describe('requestGroupExists', () => {
+  beforeEach(() => {
+    setGraphQlEndpoint(ENDPOINT);
+    sent = undefined;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('reads a key no group answers to as free', async () => {
+    respondWith({ data: { group: null } });
+
+    const result = await requestGroupExists('group:store:managers');
+
+    expect(result._unsafeUnwrap()).toBe(false);
+    expect(sent?.variables).toEqual({ key: 'group:store:managers' });
+  });
+
+  it('asks for the key alone, and reads an answer as taken', async () => {
+    respondWith({ data: { group: { key: 'group:store:managers' } } });
+
+    const result = await requestGroupExists('group:store:managers');
+
+    expect(result._unsafeUnwrap()).toBe(true);
+    expect(sent?.query).not.toContain('displayName');
   });
 });

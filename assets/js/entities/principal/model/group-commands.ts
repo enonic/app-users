@@ -2,6 +2,7 @@ import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import {
+  requestGroupExists,
   sendGroupCreation,
   sendGroupUpdate,
   type GroupChanges,
@@ -48,6 +49,21 @@ export function updateGroup(key: PrincipalKey, edit: GroupEdit): ResultAsync<Gro
     addRoles: edit.addRoles,
     removeRoles: edit.removeRoles,
   } satisfies GroupChanges);
+}
+
+/**
+ * Whether the provider already holds a group of this name — the wizard's advisory check, asked of a name
+ * as it is typed.
+ *
+ * ! Advisory: the answer is a moment old by the time the save runs, and a provider the caller may not
+ * ! read answers the same as an empty one. `createGroup` stays the authority on the duplicate.
+ */
+export function isGroupNameTaken(
+  idProvider: string,
+  name: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestGroupExists(`group:${idProvider}:${name}`, signal);
 }
 
 function scalars({ displayName, description }: { displayName: string; description: string }) {

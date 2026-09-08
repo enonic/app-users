@@ -67,6 +67,17 @@ export type { PrincipalEvent } from './model/principal-changes';
 export { createPrincipalReaction } from './model/principal-reaction';
 export type { PrincipalReactionOptions, PrincipalReactionScope } from './model/principal-reaction';
 export { derivePrincipalName, isIllegalPrincipalName } from './model/principal-name';
+export { checkPrincipalName, forgetPrincipalNameChecks } from './model/principal-name-check.load';
+export type { NameCheckedType, PrincipalNameCheckOptions } from './model/principal-name-check.load';
+export {
+  $principalNameCheck,
+  failPrincipalNameCheck,
+  receivePrincipalNameCheck,
+} from './model/principal-name-check.store';
+export type {
+  PrincipalNameCheckState,
+  PrincipalNameCheckStatus,
+} from './model/principal-name-check.store';
 export {
   idProviderOf,
   IMPLICIT_ROLE_KEYS,
