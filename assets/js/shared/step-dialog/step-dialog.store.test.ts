@@ -177,6 +177,38 @@ describe('seed', () => {
   });
 });
 
+describe('$dirty and $changed', () => {
+  it('counts a create as changed from the start, and dirty once a field is touched', () => {
+    store.open({ mode: 'create' });
+
+    expect(store.$changed.get()).toBe(true);
+    expect(store.$dirty.get()).toBe(false);
+
+    store.update({ displayName: 'Alice' });
+
+    expect(store.$dirty.get()).toBe(true);
+  });
+
+  it('counts an edit as neither until it differs from what was saved', () => {
+    store.open({ mode: 'edit', entity: ALICE });
+
+    expect(store.$dirty.get()).toBe(false);
+    expect(store.$changed.get()).toBe(false);
+
+    store.update({ email: 'alice@example.com' });
+
+    expect(store.$dirty.get()).toBe(true);
+    expect(store.$changed.get()).toBe(true);
+  });
+
+  it('takes a seed as baseline, not as dirt', () => {
+    store.open({ mode: 'create' });
+    store.seed({ members: ['bob'] });
+
+    expect(store.$dirty.get()).toBe(false);
+  });
+});
+
 describe('$errors and $stepLocks', () => {
   it('merges an external error onto a field the local validation accepted', () => {
     store.open({ mode: 'create' });

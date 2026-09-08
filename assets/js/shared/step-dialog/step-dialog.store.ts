@@ -58,6 +58,7 @@ export type StepDialogStore<Step extends string, Field extends string, Form, Ent
   $state: MapStore<StepDialogState<Step, Field, Form, Entity>>;
   $errors: ReadableAtom<FieldErrors<Field>>;
   $stepLocks: ReadableAtom<Record<Step, boolean>>;
+  $dirty: ReadableAtom<boolean>;
   $changed: ReadableAtom<boolean>;
   open: (payload: StepDialogPayload<Entity>) => void;
   openAt: (entity: Entity, step: Step) => void;
@@ -123,16 +124,16 @@ export function createStepDialogStore<Step extends string, Field extends string,
     steps.locked(errors, external.busy),
   );
 
-  const $changed = computed(
-    $state,
-    ({ mode, saved, form }) => mode === 'create' || !same(saved, form),
-  );
+  // Dirty is what closing would lose; changed is what a save would write, which a create always has.
+  const $dirty = computed($state, ({ saved, form }) => !same(saved, form));
+  const $changed = computed([$state, $dirty], ({ mode }, dirty) => mode === 'create' || dirty);
 
   return {
     steps,
     $state,
     $errors,
     $stepLocks,
+    $dirty,
     $changed,
 
     open(payload) {

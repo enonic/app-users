@@ -7,12 +7,14 @@ import type { StepDialogStore } from './step-dialog.store';
 export type StepDialogFooterProps<Step extends string, Field extends string, Form, Entity> = {
   store: StepDialogStore<Step, Field, Form, Entity>;
   onSave: () => void;
+  onCancel: () => void;
 };
 
 /** The stepper in wizard view; Cancel and Save in step view. */
 export function StepDialogFooter<Step extends string, Field extends string, Form, Entity>({
   store,
   onSave,
+  onCancel,
 }: StepDialogFooterProps<Step, Field, Form, Entity>) {
   const { view, mode, saving } = useStore(store.$state, { keys: ['view', 'mode', 'saving'] });
   const errors = useStore(store.$errors);
@@ -41,7 +43,7 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
         variant="text"
         label={i18n('browse.dialog.cancel')}
         disabled={saving}
-        onClick={() => store.close()}
+        onClick={onCancel}
       />
       <Button
         variant="solid"
