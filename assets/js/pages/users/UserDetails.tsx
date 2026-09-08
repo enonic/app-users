@@ -9,7 +9,7 @@ import {
   type UserDetail,
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openUserEditor } from '../../features/user-editor-2';
+import { openUserEditor } from '../../features/user-editor';
 import { useI18n } from '../../shared/i18n';
 import { filledSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';

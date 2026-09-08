@@ -1,5 +1,5 @@
 import { isSystemUser, type User } from '../../../entities/principal';
-import { openUserEditor } from '../../../features/user-editor-2';
+import { openUserEditor } from '../../../features/user-editor';
 import { actionTargets, type SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { usersDeletion } from './deletion.store';
 

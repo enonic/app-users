@@ -1,5 +1,5 @@
 import { isSystemUser, type User } from '../../../entities/principal';
-import { openServiceAccountEditor } from '../../../features/user-editor-2';
+import { openServiceAccountEditor } from '../../../features/user-editor';
 import { actionTargets, type SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { serviceAccountsDeletion } from './deletion.store';
 
