@@ -8,7 +8,7 @@ import { $userEditor } from '../../model/user-editor.store';
 import { userSummaryRows } from '../../model/user-summary';
 
 export function UserEditorDialogSummaryStep() {
-  const { form } = useStore($userEditor, { keys: ['form'] });
+  const { form, entity } = useStore($userEditor, { keys: ['form', 'entity'] });
   const { items: providers } = useIdProviderNames();
 
   const rolesLabel = useI18n('users.dialog.roles');
@@ -19,11 +19,23 @@ export function UserEditorDialogSummaryStep() {
 
   return (
     <dl className="bg-surface-primary grid grid-cols-[25%_auto] gap-x-5 gap-y-4 rounded-md p-6 text-sm">
-      {userSummaryRows(form, providerName).map((row) => (
+      {userSummaryRows(form, providerName, entity?.hasPassword === true).map((row) => (
         <SummaryRow key={row.labelKey} label={i18n(row.labelKey)}>
-          <span className="break-words">
-            {row.valueKey === undefined ? row.value : i18n(row.valueKey, ...(row.valueArgs ?? []))}
-          </span>
+          {row.lines === undefined ? (
+            <span className="break-words">
+              {row.valueKey === undefined
+                ? row.value
+                : i18n(row.valueKey, ...(row.valueArgs ?? []))}
+            </span>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {row.lines.map(({ key, args = [] }) => (
+                <span key={key} className="break-words">
+                  {i18n(key, ...args)}
+                </span>
+              ))}
+            </div>
+          )}
         </SummaryRow>
       ))}
 
