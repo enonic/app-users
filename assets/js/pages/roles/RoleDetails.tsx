@@ -3,7 +3,7 @@ import { Button } from '@enonic/ui';
 import { principalName, useIdProviderName, type RoleDetail } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openRoleEditor } from '../../features/role-editor';
+import { openRoleEditor } from '../../features/role-editor-2';
 import { formatDateTime } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -39,7 +39,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openRoleEditor(role)}
+            onClick={() => openRoleEditor({ mode: 'edit', entity: role })}
           />
         }
       >

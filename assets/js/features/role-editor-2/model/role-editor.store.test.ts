@@ -1,0 +1,83 @@
+import { afterEach, describe, expect, it } from 'vitest';
+
+import {
+  failPrincipalNameCheck,
+  receivePrincipalNameCheck,
+  type Role,
+} from '../../../entities/principal';
+import {
+  $roleEditor,
+  $roleEditorErrors,
+  closeRoleEditor,
+  openRoleEditor,
+  openRoleEditorAt,
+  updateRoleEditorForm,
+} from './role-editor.store';
+
+const MANAGER: Role = {
+  type: 'role',
+  key: 'role:store.manager',
+  displayName: 'Store Manager',
+  description: 'Runs the shop',
+};
+
+afterEach(() => {
+  closeRoleEditor();
+});
+
+describe('openRoleEditor', () => {
+  it('opens the whole wizard at its first step', () => {
+    openRoleEditor({ mode: 'create' });
+
+    const { open, view, step } = $roleEditor.get();
+
+    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'identity' });
+  });
+
+  it('derives the name from the display name until it is typed', () => {
+    openRoleEditor({ mode: 'create' });
+    updateRoleEditorForm({ displayName: 'Store Manager' });
+
+    expect($roleEditor.get().form.name).toBe('store.manager');
+  });
+});
+
+describe('openRoleEditorAt', () => {
+  it('opens one step of an existing role, with the form seeded from it', () => {
+    openRoleEditorAt(MANAGER, 'members');
+
+    const { open, mode, view, step, form, saved, entity } = $roleEditor.get();
+
+    expect({ open, mode, view, step }).toEqual({
+      open: true,
+      mode: 'edit',
+      view: 'step',
+      step: 'members',
+    });
+    expect(entity).toBe(MANAGER);
+    expect(form).toMatchObject({ name: 'store.manager', description: 'Runs the shop' });
+    expect(saved).toEqual(form);
+  });
+});
+
+describe('$roleEditorErrors', () => {
+  it('reports a taken name, and only once the local rules accept it', () => {
+    openRoleEditor({ mode: 'create' });
+    updateRoleEditorForm({ displayName: 'Store Manager' });
+    receivePrincipalNameCheck('role:store.manager', true);
+
+    expect($roleEditorErrors.get().name).toBe('roles.dialog.nameTaken');
+
+    updateRoleEditorForm({ name: '' });
+
+    expect($roleEditorErrors.get().name).toBe('roles.dialog.nameRequired');
+  });
+
+  it('says nothing about a check that failed', () => {
+    openRoleEditor({ mode: 'create' });
+    updateRoleEditorForm({ displayName: 'Store Manager' });
+    failPrincipalNameCheck('role:store.manager');
+
+    expect($roleEditorErrors.get().name).toBeUndefined();
+  });
+});
