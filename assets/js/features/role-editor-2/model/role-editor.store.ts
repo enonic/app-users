@@ -4,8 +4,10 @@ import {
   $principalNameCheck,
   checkPrincipalName,
   forgetPrincipalNameChecks,
+  type PrincipalRef,
   type Role,
 } from '../../../entities/principal';
+import { mergeByKey } from '../../../shared/form';
 import { createStepDialogStore, type StepDialogExternal } from '../../../shared/step-dialog';
 import { ROLE_EDITOR_STEPS, type RoleEditorStep } from './role-editor-steps';
 import {
@@ -50,6 +52,14 @@ export const openRoleEditorAt = roleEditorDialog.openAt;
 export const closeRoleEditor = roleEditorDialog.close;
 export const markRoleEditorFieldVisited = roleEditorDialog.markVisited;
 export const updateRoleEditorForm = roleEditorDialog.update;
+
+/** The members the server holds, which arrive after the dialog opens. */
+export function seedRoleEditorMembers(members: readonly PrincipalRef[]): void {
+  // The picks made while the read was in flight survive it.
+  roleEditorDialog.seed({ members }, (seeded, current) => ({
+    members: mergeByKey(seeded.members ?? [], current.members),
+  }));
+}
 
 /** In the create wizard the display name is also where the name comes from, so it asks the same question. */
 export function setRoleEditorDisplayName(displayName: string): void {

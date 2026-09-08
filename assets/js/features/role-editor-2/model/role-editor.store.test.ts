@@ -11,6 +11,7 @@ import {
   closeRoleEditor,
   openRoleEditor,
   openRoleEditorAt,
+  seedRoleEditorMembers,
   updateRoleEditorForm,
 } from './role-editor.store';
 
@@ -57,6 +58,22 @@ describe('openRoleEditorAt', () => {
     expect(entity).toBe(MANAGER);
     expect(form).toMatchObject({ name: 'store.manager', description: 'Runs the shop' });
     expect(saved).toEqual(form);
+  });
+});
+
+describe('seedRoleEditorMembers', () => {
+  const ALICE = { key: 'user:store:alice', displayName: 'Alice', type: 'user' } as const;
+  const BOB = { key: 'user:store:bob', displayName: 'Bob', type: 'user' } as const;
+
+  it('lands in the baseline, and keeps what was picked while the read was in flight', () => {
+    openRoleEditor({ mode: 'edit', entity: MANAGER });
+    updateRoleEditorForm({ members: [BOB] });
+    seedRoleEditorMembers([ALICE]);
+
+    const { form, saved } = $roleEditor.get();
+
+    expect(form.members).toEqual([ALICE, BOB]);
+    expect(saved.members).toEqual([ALICE]);
   });
 });
 
