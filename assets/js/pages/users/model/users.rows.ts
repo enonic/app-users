@@ -6,12 +6,10 @@ import type { BrowseRow } from '../../../widgets/browse-list/browse-list';
 export function toUserRow(
   user: User,
   icon?: ReactNode,
-  // Resolved by the page from the loaded providers: a key carries the provider's name, and the cell
-  // shows the name an administrator recognises.
-  providerName?: (key: User['key']) => string | undefined,
+  // Built by the page from the loaded providers: the list is ordered by the provider's name, so the
+  // cell shows it under the name an administrator recognises.
+  provider?: ReactNode,
 ): BrowseRow {
-  const provider = providerName?.(user.key);
-
   return {
     key: user.key,
     title: user.displayName,

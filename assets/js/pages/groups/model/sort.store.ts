@@ -1,12 +1,9 @@
 import { atom } from 'nanostores';
 
-import {
-  DEFAULT_SORT_DIRECTION,
-  type SortDirection,
-} from '../../../widgets/browse-list/browse-sort';
+import { DEFAULT_PRINCIPAL_SORT, type PrincipalSort } from '../../../entities/principal';
 
-export const $groupsSort = atom<SortDirection>(DEFAULT_SORT_DIRECTION);
+export const $groupsSort = atom<PrincipalSort>(DEFAULT_PRINCIPAL_SORT);
 
-export function setGroupsSort(direction: SortDirection): void {
-  $groupsSort.set(direction);
+export function setGroupsSort(sort: PrincipalSort): void {
+  $groupsSort.set(sort);
 }

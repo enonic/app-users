@@ -10,7 +10,7 @@ import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
-import { type SortDirection } from '../../widgets/browse-list/browse-sort';
+import { DEFAULT_SORT_DIRECTION, type SortDirection } from '../../widgets/browse-list/browse-sort';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
@@ -87,6 +87,7 @@ export function ServiceAccountsPage() {
             options={sortOptions}
             value={sortDirectionOf(query)}
             onChange={setServiceAccountsSort}
+            defaultValue={DEFAULT_SORT_DIRECTION}
           />
         }
       />

@@ -45,7 +45,7 @@ export type UserPage = {
 };
 
 /** The orders the list offers. An id, never a raw expression: `sort` is parsed, so it is injectable. */
-export type UserSort = 'displayNameAsc' | 'displayNameDesc';
+export type UserSort = 'displayNameAsc' | 'displayNameDesc' | 'idProviderAsc' | 'idProviderDesc';
 
 export type UserQuery = {
   start?: number;
@@ -102,9 +102,14 @@ const SEARCH_FIELDS = '_allText,displayName';
  *
  * Ordering is case-insensitive for free: `OrderByValueResolver` lowercases what it writes to `_orderby`.
  */
+// ! An order named after one field groups by it: only `userStoreKey` flips with the direction, and the
+// ! display name orders the users inside one group. It carries the provider's *name* — the display name
+// ! is on the provider's own node, and a sort expression is a list of fields, so it cannot reach it.
 const SORT_EXPRESSIONS: Record<UserSort, string> = {
   displayNameAsc: 'displayName ASC, _path ASC',
   displayNameDesc: 'displayName DESC, _path ASC',
+  idProviderAsc: 'userStoreKey ASC, displayName ASC, _path ASC',
+  idProviderDesc: 'userStoreKey DESC, displayName ASC, _path ASC',
 };
 
 export function listUsers({

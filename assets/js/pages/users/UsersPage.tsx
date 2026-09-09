@@ -1,19 +1,23 @@
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
+import type { ReactNode } from 'react';
 
 import {
   $idProviderUserCounts,
+  DEFAULT_PRINCIPAL_SORT,
   forgetUserDetails,
   replaceUser,
-  useIdProviderName,
+  useIdProviderLabel,
   useUsers,
+  type PrincipalKey,
+  type PrincipalSort,
 } from '../../entities/principal';
+import { IdProviderCell } from '../../entities/principal/ui/IdProviderCell';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
-import { type SortDirection } from '../../widgets/browse-list/browse-sort';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
@@ -21,9 +25,8 @@ import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import {
   $usersQuery,
   clearUsersQuery,
-  toggleUsersIdProvider,
   setUsersSort,
-  sortDirectionOf,
+  toggleUsersIdProvider,
 } from './model/query.store';
 import { usersSearch } from './model/search.store';
 import { usersSelection } from './model/selection.store';
@@ -42,22 +45,32 @@ export function UsersPage() {
   const activeKey = useItemId();
   const { status, items, appending, error, hasMore } = useUsers();
   const { items: providerCounts, status: providersStatus } = useStore($idProviderUserCounts);
-  const providerName = useIdProviderName();
+  const providerLabel = useIdProviderLabel();
+  // The provenance cell: the display name over the name, or the name alone when that is all there is.
+  const providerCell = (key: PrincipalKey): ReactNode => {
+    const label = providerLabel(key);
+    return label === undefined ? undefined : <IdProviderCell {...label} />;
+  };
+
   const { idProviders, sort } = useStore($usersQuery);
 
-  const sortAscLabel = useI18n('users.sort.nameAsc');
-  const sortDescLabel = useI18n('users.sort.nameDesc');
+  const sortNameAscLabel = useI18n('users.sort.nameAsc');
+  const sortNameDescLabel = useI18n('users.sort.nameDesc');
+  const sortProviderAscLabel = useI18n('users.sort.idProviderAsc');
+  const sortProviderDescLabel = useI18n('users.sort.idProviderDesc');
   const emptyLabel = useI18n('users.list.empty');
   const loadMoreFailedNotice = useI18n('browse.list.loadMoreFailed');
   const providersFailedNotice = useI18n('users.filter.providersFailed');
 
   const sortOptions = useMemo(
     () => [
-      { id: 'asc', label: sortAscLabel },
-      { id: 'desc', label: sortDescLabel },
+      { id: 'displayNameAsc', label: sortNameAscLabel },
+      { id: 'displayNameDesc', label: sortNameDescLabel },
+      { id: 'idProviderAsc', label: sortProviderAscLabel },
+      { id: 'idProviderDesc', label: sortProviderDescLabel },
     ],
     [],
-  ) satisfies readonly { id: SortDirection; label: string }[];
+  ) satisfies readonly { id: PrincipalSort; label: string }[];
 
   // ! Entries come from the provider list, never from the rows: the rows are one page, so a provider the
   // ! page happens not to contain would disappear from the menu while still narrowing the query. They
@@ -79,7 +92,7 @@ export function UsersPage() {
     // The server narrowed and ordered this page; the client adds nothing.
     visible: items,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
-    toRow: (user) => toUserRow(user, <PrincipalIcon principal={user} />, providerName),
+    toRow: (user) => toUserRow(user, <PrincipalIcon principal={user} />, providerCell(user.key)),
     reload: () => void reloadUsersScreen(),
   });
 
@@ -109,8 +122,9 @@ export function UsersPage() {
         sort={
           <BrowseSort
             options={sortOptions}
-            value={sortDirectionOf({ idProviders, sort })}
+            value={sort}
             onChange={setUsersSort}
+            defaultValue={DEFAULT_PRINCIPAL_SORT}
           />
         }
       />

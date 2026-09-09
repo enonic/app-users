@@ -77,6 +77,8 @@ export {
   projectRoleIdOf,
   SYSTEM_ID_PROVIDER,
 } from './model/principal.keys';
+export { DEFAULT_PRINCIPAL_SORT } from './model/principal.sort';
+export type { PrincipalSort } from './model/principal.sort';
 export {
   addPublicKey,
   createUser,
@@ -150,6 +152,7 @@ export type { UsersState } from './model/users.store';
 export { useGroup } from './model/useGroup';
 export { useGroups } from './model/useGroups';
 export { useIdProvider } from './model/useIdProvider';
+export { idProviderLabel, useIdProviderLabel } from './model/useIdProviderLabel';
 export { useIdProviderName } from './model/useIdProviderName';
 export { useIdProviderNames } from './model/useIdProviderNames';
 export { useIdProviderPrincipals } from './model/useIdProviderPrincipals';
