@@ -5,6 +5,7 @@ import { AppError } from '../../../shared/api';
 import { setPhrases } from '../../../shared/i18n';
 import { createSelectionStore, type SelectionStore } from '../../../shared/selection';
 import {
+  requestIdProviderExists,
   sendIdProviderCreation,
   sendIdProviderDeletion,
   sendIdProviderUpdate,
@@ -12,6 +13,7 @@ import {
 import {
   createIdProvider,
   deleteIdProviders,
+  isIdProviderNameTaken,
   updateIdProvider,
   type IdProviderDraft,
   type IdProviderSectionScope,
@@ -19,6 +21,7 @@ import {
 import type { IdProvider, PrincipalKey } from './principal.types';
 
 vi.mock('../api/id-providers.api', () => ({
+  requestIdProviderExists: vi.fn(),
   sendIdProviderCreation: vi.fn(),
   sendIdProviderDeletion: vi.fn(),
   sendIdProviderUpdate: vi.fn(),
@@ -188,5 +191,16 @@ describe('deleteIdProviders', () => {
       'Could not delete System: Offline',
     ]);
     expect(resync).not.toHaveBeenCalled();
+  });
+});
+
+describe('isIdProviderNameTaken', () => {
+  it('asks about the name itself, which is the key a provider answers to', async () => {
+    vi.mocked(requestIdProviderExists).mockReturnValue(okAsync(true));
+
+    const result = await isIdProviderNameTaken('ldap');
+
+    expect(requestIdProviderExists).toHaveBeenCalledWith('ldap', undefined);
+    expect(result._unsafeUnwrap()).toBe(true);
   });
 });

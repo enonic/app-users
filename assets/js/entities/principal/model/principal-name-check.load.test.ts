@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppError } from '../../../shared/api';
 import { isGroupNameTaken } from './group-commands';
+import { isIdProviderNameTaken } from './id-provider-commands';
 import { createPrincipalNameCheck, type PrincipalNameCheck } from './principal-name-check.load';
 import { isRoleNameTaken } from './role-commands';
 import { isUserNameTaken } from './user-commands';
@@ -12,10 +13,12 @@ import { isUserNameTaken } from './user-commands';
 vi.mock('./user-commands', () => ({ isUserNameTaken: vi.fn() }));
 vi.mock('./group-commands', () => ({ isGroupNameTaken: vi.fn() }));
 vi.mock('./role-commands', () => ({ isRoleNameTaken: vi.fn() }));
+vi.mock('./id-provider-commands', () => ({ isIdProviderNameTaken: vi.fn() }));
 
 const asked = vi.mocked(isUserNameTaken);
 const askedForGroup = vi.mocked(isGroupNameTaken);
 const askedForRole = vi.mocked(isRoleNameTaken);
+const askedForIdProvider = vi.mocked(isIdProviderNameTaken);
 
 const DEBOUNCE_MS = 400;
 
@@ -29,6 +32,8 @@ beforeEach(() => {
   askedForGroup.mockReturnValue(okAsync(false));
   askedForRole.mockReset();
   askedForRole.mockReturnValue(okAsync(false));
+  askedForIdProvider.mockReset();
+  askedForIdProvider.mockReturnValue(okAsync(false));
   check = createPrincipalNameCheck('user');
 });
 
@@ -91,6 +96,19 @@ describe('ask', () => {
     expect(askedForRole.mock.calls[0]?.[0]).toBe('editors');
     expect(asked).not.toHaveBeenCalled();
     expect(roleCheck.$state.get()).toEqual({ status: 'taken', key: 'role:editors' });
+  });
+
+  // A provider is no principal, but its name is asked about the same way and is its whole key.
+  it('asks the ID provider question with no provider, under the bare key', async () => {
+    askedForIdProvider.mockReturnValue(okAsync(true));
+    const idProviderCheck = createPrincipalNameCheck('idProvider');
+
+    idProviderCheck.ask('', 'ldap', { immediate: true });
+    await vi.runAllTimersAsync();
+
+    expect(askedForIdProvider.mock.calls[0]?.[0]).toBe('ldap');
+    expect(asked).not.toHaveBeenCalled();
+    expect(idProviderCheck.$state.get()).toEqual({ status: 'taken', key: 'ldap' });
   });
 
   it('answers a name it has already asked about without asking again', async () => {
