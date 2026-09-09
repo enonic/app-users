@@ -7,6 +7,7 @@ import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPick
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n, useLabelled } from '../../../../shared/i18n';
 import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
+import { ID_PROVIDER_ACCESS_LEVELS } from '../../model/idprovider-access';
 import { $idProviderDefaultPermissions } from '../../model/idprovider-defaults';
 import { $idProviderEditDetail } from '../../model/idprovider-edit-detail';
 import {
@@ -24,15 +25,6 @@ import {
 // Users, groups and roles alike: app-users offers all three, and a role is what an install usually grants.
 const KINDS: readonly PrincipalType[] = ['user', 'group', 'role'];
 
-// The platform's own order, widening.
-const ACCESS_LEVELS: readonly { value: IdProviderAccess; labelKey: string }[] = [
-  { value: 'READ', labelKey: 'idProviders.dialog.access.read' },
-  { value: 'CREATE_USERS', labelKey: 'idProviders.dialog.access.createUsers' },
-  { value: 'WRITE_USERS', labelKey: 'idProviders.dialog.access.writeUsers' },
-  { value: 'ID_PROVIDER_MANAGER', labelKey: 'idProviders.dialog.access.manager' },
-  { value: 'ADMINISTRATOR', labelKey: 'idProviders.dialog.access.administrator' },
-];
-
 export function IdProviderEditorDialogPermissionsStep() {
   const { form, visited } = useStore($idProviderEditor, { keys: ['form', 'visited'] });
   const errors = useStore($idProviderEditorErrors);
@@ -42,7 +34,7 @@ export function IdProviderEditorDialogPermissionsStep() {
   const pickerPlaceholder = useI18n('idProviders.dialog.permissionsPlaceholder');
   const failedNotice = useI18n('idProviders.dialog.permissionsFailed');
 
-  const levels = useLabelled(ACCESS_LEVELS);
+  const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
 
   const { permissions } = form;
 
