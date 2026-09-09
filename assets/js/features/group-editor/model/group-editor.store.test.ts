@@ -1,16 +1,12 @@
 import { ok } from 'neverthrow';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  failPrincipalNameCheck,
-  receiveIdProviderNames,
-  receivePrincipalNameCheck,
-  type Group,
-} from '../../../entities/principal';
+import { receiveIdProviderNames, type Group } from '../../../entities/principal';
 import {
   $groupEditor,
   $groupEditorErrors,
   closeGroupEditor,
+  groupNameCheck,
   openGroupEditor,
   openGroupEditorAt,
   seedGroupEditorLists,
@@ -87,7 +83,7 @@ describe('$groupEditorErrors', () => {
   it('reports a taken name, and only once the local rules accept it', () => {
     openGroupEditor({ mode: 'create' });
     updateGroupEditorForm({ idProvider: 'store', displayName: 'Managers' });
-    receivePrincipalNameCheck('group:store:managers', true);
+    groupNameCheck.receive('group:store:managers', true);
 
     expect($groupEditorErrors.get().name).toBe('groups.dialog.nameTaken');
 
@@ -99,7 +95,7 @@ describe('$groupEditorErrors', () => {
   it('says nothing about a check that failed', () => {
     openGroupEditor({ mode: 'create' });
     updateGroupEditorForm({ idProvider: 'store', displayName: 'Managers' });
-    failPrincipalNameCheck('group:store:managers');
+    groupNameCheck.fail('group:store:managers');
 
     expect($groupEditorErrors.get().name).toBeUndefined();
   });

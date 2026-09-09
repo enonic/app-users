@@ -1,12 +1,7 @@
 import { ok } from 'neverthrow';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  failPrincipalNameCheck,
-  receiveIdProviderNames,
-  receivePrincipalNameCheck,
-  type User,
-} from '../../../entities/principal';
+import { receiveIdProviderNames, type User } from '../../../entities/principal';
 import {
   $userEditor,
   $userEditorErrors,
@@ -18,6 +13,7 @@ import {
   openUserEditor,
   openUserEditorAt,
   updateUserEditorForm,
+  userNameCheck,
 } from './user-editor.store';
 
 const ALICE: User = {
@@ -73,7 +69,7 @@ describe('$userEditorErrors', () => {
   it('reports a taken name, and only once the local rules accept it', () => {
     openUserEditor({ mode: 'create' });
     updateUserEditorForm({ idProvider: 'system', displayName: 'Alice' });
-    receivePrincipalNameCheck('user:system:alice', true);
+    userNameCheck.receive('user:system:alice', true);
 
     expect($userEditorErrors.get().name).toBe('users.dialog.nameTaken');
 
@@ -85,7 +81,7 @@ describe('$userEditorErrors', () => {
   it('says nothing about a check that failed', () => {
     openUserEditor({ mode: 'create' });
     updateUserEditorForm({ idProvider: 'system', displayName: 'Alice' });
-    failPrincipalNameCheck('user:system:alice');
+    userNameCheck.fail('user:system:alice');
 
     expect($userEditorErrors.get().name).toBeUndefined();
   });

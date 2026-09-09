@@ -1,13 +1,12 @@
+import type { ReadableAtom } from 'nanostores';
 import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import { isGroupNameTaken } from './group-commands';
 import { isIllegalPrincipalName } from './principal-name';
 import {
-  beginPrincipalNameCheck,
-  failPrincipalNameCheck,
-  idlePrincipalNameCheck,
-  receivePrincipalNameCheck,
+  createPrincipalNameCheckStore,
+  type PrincipalNameCheckState,
 } from './principal-name-check.store';
 import type { PrincipalType } from './principal.types';
 import { isUserNameTaken } from './user-commands';
@@ -20,10 +19,17 @@ export type PrincipalNameCheckOptions = {
   immediate?: boolean;
 };
 
+export type PrincipalNameCheck = {
+  $state: ReadableAtom<PrincipalNameCheckState>;
+  ask: (idProvider: string, name: string, options?: PrincipalNameCheckOptions) => void;
+  forget: () => void;
+  receive: (key: string, taken: boolean) => void;
+  fail: (key: string) => void;
+};
+
 const DEBOUNCE_MS = 400;
 
-// The question each kind asks. One store serves every wizard: two are never open at once, and each
-// forgets on open and close.
+// The question each kind asks.
 const ASK: Record<
   NameCheckedType,
   (idProvider: string, name: string, signal?: AbortSignal) => ResultAsync<boolean, AppError>
@@ -32,93 +38,89 @@ const ASK: Record<
   group: isGroupNameTaken,
 };
 
-// One dialog's worth of answers. A name typed, deleted and typed again is the common path, and every one
-// of those keystrokes would otherwise be a request.
-const answered = new Map<string, boolean>();
+export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCheck {
+  const { $state, begin, receive, fail, idle } = createPrincipalNameCheckStore();
 
-let scheduled: ReturnType<typeof setTimeout> | undefined;
-let pending: AbortController | undefined;
+  // One dialog's worth of answers. A name typed, deleted and typed again is the common path, and every one
+  // of those keystrokes would otherwise be a request.
+  const answered = new Map<string, boolean>();
 
-/** Asks whether the provider already holds this name, debounced, one request at a time. */
-export function checkPrincipalName(
-  type: NameCheckedType,
-  idProvider: string,
-  name: string,
-  { immediate = false }: PrincipalNameCheckOptions = {},
-): void {
-  cancel();
+  let scheduled: ReturnType<typeof setTimeout> | undefined;
+  let pending: AbortController | undefined;
 
-  const trimmed = name.trim();
+  function cancel(): void {
+    if (scheduled !== undefined) {
+      clearTimeout(scheduled);
+      scheduled = undefined;
+    }
 
-  if (idProvider.length === 0 || trimmed.length === 0 || isIllegalPrincipalName(trimmed)) {
-    idlePrincipalNameCheck();
-    return;
+    pending?.abort();
+    pending = undefined;
   }
 
-  const key = `${type}:${idProvider}:${trimmed}`;
-  const remembered = answered.get(key);
+  async function request(idProvider: string, name: string, key: string): Promise<void> {
+    const controller = new AbortController();
+    pending = controller;
+    const { signal } = controller;
 
-  if (remembered !== undefined) {
-    receivePrincipalNameCheck(key, remembered);
-    return;
+    await ASK[type](idProvider, name, signal).match(
+      (taken) => {
+        if (signal.aborted) {
+          return;
+        }
+        answered.set(key, taken);
+        receive(key, taken);
+      },
+      () => {
+        if (!signal.aborted) {
+          fail(key);
+        }
+      },
+    );
   }
 
-  beginPrincipalNameCheck(key);
+  return {
+    $state,
+    receive,
+    fail,
 
-  if (immediate) {
-    void request(type, idProvider, trimmed, key);
-    return;
-  }
+    /** Asks whether the provider already holds this name, debounced, one request at a time. */
+    ask(idProvider, name, { immediate = false } = {}) {
+      cancel();
 
-  scheduled = setTimeout(() => {
-    scheduled = undefined;
-    void request(type, idProvider, trimmed, key);
-  }, DEBOUNCE_MS);
-}
+      const trimmed = name.trim();
 
-/** The dialog opened or closed: nothing asked, nothing remembered. */
-export function forgetPrincipalNameChecks(): void {
-  cancel();
-  answered.clear();
-  idlePrincipalNameCheck();
-}
-
-//
-// * Internal
-//
-
-function cancel(): void {
-  if (scheduled !== undefined) {
-    clearTimeout(scheduled);
-    scheduled = undefined;
-  }
-
-  pending?.abort();
-  pending = undefined;
-}
-
-async function request(
-  type: NameCheckedType,
-  idProvider: string,
-  name: string,
-  key: string,
-): Promise<void> {
-  const controller = new AbortController();
-  pending = controller;
-  const { signal } = controller;
-
-  await ASK[type](idProvider, name, signal).match(
-    (taken) => {
-      if (signal.aborted) {
+      if (idProvider.length === 0 || trimmed.length === 0 || isIllegalPrincipalName(trimmed)) {
+        idle();
         return;
       }
-      answered.set(key, taken);
-      receivePrincipalNameCheck(key, taken);
-    },
-    () => {
-      if (!signal.aborted) {
-        failPrincipalNameCheck(key);
+
+      const key = `${type}:${idProvider}:${trimmed}`;
+      const remembered = answered.get(key);
+
+      if (remembered !== undefined) {
+        receive(key, remembered);
+        return;
       }
+
+      begin(key);
+
+      if (immediate) {
+        void request(idProvider, trimmed, key);
+        return;
+      }
+
+      scheduled = setTimeout(() => {
+        scheduled = undefined;
+        void request(idProvider, trimmed, key);
+      }, DEBOUNCE_MS);
     },
-  );
+
+    /** The dialog opened or closed: nothing asked, nothing remembered. */
+    forget() {
+      cancel();
+      answered.clear();
+      idle();
+    },
+  };
 }

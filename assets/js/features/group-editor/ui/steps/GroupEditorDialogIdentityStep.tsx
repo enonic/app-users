@@ -1,7 +1,7 @@
 import { Input, Selector, TextArea } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
-import { $principalNameCheck, useIdProviderNames } from '../../../../entities/principal';
+import { useIdProviderNames } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
@@ -9,6 +9,7 @@ import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import {
   $groupEditor,
   $groupEditorErrors,
+  groupNameCheck,
   markGroupEditorFieldVisited,
   setGroupEditorDisplayName,
   setGroupEditorIdProvider,
@@ -24,7 +25,7 @@ const DESCRIPTION_ID = 'group-editor-description';
 export function GroupEditorDialogIdentityStep() {
   const { form, visited, mode } = useStore($groupEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($groupEditorErrors);
-  const nameCheck = useStore($principalNameCheck);
+  const nameCheck = useStore(groupNameCheck.$state);
   const { items: providers } = useIdProviderNames();
 
   const persisted = mode === 'edit';

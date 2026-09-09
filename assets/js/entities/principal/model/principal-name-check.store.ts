@@ -1,4 +1,4 @@
-import { atom } from 'nanostores';
+import { atom, type ReadableAtom } from 'nanostores';
 
 /**
  * Whether the provider already holds the name a wizard is being given.
@@ -15,20 +15,22 @@ export type PrincipalNameCheckState = {
   key?: string;
 };
 
-export const $principalNameCheck = atom<PrincipalNameCheckState>({ status: 'idle' });
+export type PrincipalNameCheckStore = {
+  $state: ReadableAtom<PrincipalNameCheckState>;
+  begin: (key: string) => void;
+  receive: (key: string, taken: boolean) => void;
+  fail: (key: string) => void;
+  idle: () => void;
+};
 
-export function beginPrincipalNameCheck(key: string): void {
-  $principalNameCheck.set({ status: 'pending', key });
-}
+export function createPrincipalNameCheckStore(): PrincipalNameCheckStore {
+  const $state = atom<PrincipalNameCheckState>({ status: 'idle' });
 
-export function receivePrincipalNameCheck(key: string, taken: boolean): void {
-  $principalNameCheck.set({ status: taken ? 'taken' : 'available', key });
-}
-
-export function failPrincipalNameCheck(key: string): void {
-  $principalNameCheck.set({ status: 'error', key });
-}
-
-export function idlePrincipalNameCheck(): void {
-  $principalNameCheck.set({ status: 'idle' });
+  return {
+    $state,
+    begin: (key) => $state.set({ status: 'pending', key }),
+    receive: (key, taken) => $state.set({ status: taken ? 'taken' : 'available', key }),
+    fail: (key) => $state.set({ status: 'error', key }),
+    idle: () => $state.set({ status: 'idle' }),
+  };
 }

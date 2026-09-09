@@ -1,7 +1,6 @@
 import { Input, Selector } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
-import { $principalNameCheck } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
@@ -17,6 +16,7 @@ import {
   setUserEditorIdProvider,
   setUserEditorName,
   updateUserEditorForm,
+  userNameCheck,
 } from '../../model/user-editor.store';
 
 const PROVIDER_LABEL_ID = 'user-editor-id-provider-label';
@@ -29,7 +29,7 @@ export function UserEditorDialogIdentityStep() {
   const errors = useStore($userEditorErrors);
   const systemUser = useStore($userEditorSystemUser);
   const serviceAccount = useStore($userEditorServiceAccount);
-  const nameCheck = useStore($principalNameCheck);
+  const nameCheck = useStore(userNameCheck.$state);
   const providers = useStore($userEditorProviders);
 
   const persisted = mode === 'edit';

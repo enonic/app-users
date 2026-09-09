@@ -2,9 +2,7 @@ import { computed } from 'nanostores';
 
 import {
   $idProviderNames,
-  $principalNameCheck,
-  checkPrincipalName,
-  forgetPrincipalNameChecks,
+  createPrincipalNameCheck,
   type Group,
   type PrincipalRef,
 } from '../../../entities/principal';
@@ -20,10 +18,12 @@ import {
   type GroupFormField,
 } from './group-form';
 
+export const groupNameCheck = createPrincipalNameCheck('group');
+
 // The name a provider already holds is an error like any other; while the answer is on its way, the name
 // holds the later steps back without a message.
 const $groupNameExternal = computed(
-  $principalNameCheck,
+  groupNameCheck.$state,
   (check): StepDialogExternal<GroupFormField> => ({
     errors: check.status === 'taken' ? { name: 'groups.dialog.nameTaken' } : {},
     busy: check.status === 'pending' ? ['name'] : [],
@@ -42,7 +42,7 @@ export const groupEditorDialog = createStepDialogStore<
   same: sameGroupForm,
   next: nextGroupForm,
   $external: $groupNameExternal,
-  reset: forgetPrincipalNameChecks,
+  reset: groupNameCheck.forget,
 });
 
 export const $groupEditor = groupEditorDialog.$state;
@@ -92,7 +92,7 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
   const { form, mode } = $groupEditor.get();
 
   if (mode === 'create') {
-    checkPrincipalName('group', form.idProvider, form.name, { immediate });
+    groupNameCheck.ask(form.idProvider, form.name, { immediate });
   }
 }
 
