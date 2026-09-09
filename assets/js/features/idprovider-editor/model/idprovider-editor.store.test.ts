@@ -1,15 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  failPrincipalNameCheck,
-  receivePrincipalNameCheck,
-  type IdProvider,
-} from '../../../entities/principal';
+import type { IdProvider } from '../../../entities/principal';
 import {
   $idProviderEditor,
   $idProviderEditorErrors,
   closeIdProviderEditor,
   idProviderEditorDialog,
+  idProviderNameCheck,
   openIdProviderEditor,
   openIdProviderEditorAt,
   seedIdProviderEditorPermissions,
@@ -98,7 +95,7 @@ describe('$idProviderEditorErrors', () => {
   it('reports a taken name, and only once the local rules accept it', () => {
     openIdProviderEditor({ mode: 'create' });
     updateIdProviderEditorForm({ displayName: 'Company directory' });
-    receivePrincipalNameCheck('company.directory', true);
+    idProviderNameCheck.receive('company.directory', true);
 
     expect($idProviderEditorErrors.get().name).toBe('idProviders.dialog.nameTaken');
 
@@ -110,7 +107,7 @@ describe('$idProviderEditorErrors', () => {
   it('says nothing about a check that failed', () => {
     openIdProviderEditor({ mode: 'create' });
     updateIdProviderEditorForm({ displayName: 'Company directory' });
-    failPrincipalNameCheck('company.directory');
+    idProviderNameCheck.fail('company.directory');
 
     expect($idProviderEditorErrors.get().name).toBeUndefined();
   });

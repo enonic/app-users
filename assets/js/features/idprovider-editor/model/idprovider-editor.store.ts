@@ -1,9 +1,7 @@
 import { computed } from 'nanostores';
 
 import {
-  $principalNameCheck,
-  checkPrincipalName,
-  forgetPrincipalNameChecks,
+  createPrincipalNameCheck,
   type IdProvider,
   type IdProviderPermission,
 } from '../../../entities/principal';
@@ -19,10 +17,12 @@ import {
   type IdProviderFormField,
 } from './idprovider-form';
 
+export const idProviderNameCheck = createPrincipalNameCheck('idProvider');
+
 // A name a provider already answers to is an error like any other; while the answer is on its way, the
 // name holds the later steps back without a message.
 const $idProviderNameExternal = computed(
-  $principalNameCheck,
+  idProviderNameCheck.$state,
   (check): StepDialogExternal<IdProviderFormField> => ({
     errors: check.status === 'taken' ? { name: 'idProviders.dialog.nameTaken' } : {},
     busy: check.status === 'pending' ? ['name'] : [],
@@ -41,7 +41,7 @@ export const idProviderEditorDialog = createStepDialogStore<
   same: sameIdProviderForm,
   next: nextIdProviderForm,
   $external: $idProviderNameExternal,
-  reset: forgetPrincipalNameChecks,
+  reset: idProviderNameCheck.forget,
 });
 
 export const $idProviderEditor = idProviderEditorDialog.$state;
@@ -87,6 +87,6 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
   const { form, mode } = $idProviderEditor.get();
 
   if (mode === 'create') {
-    checkPrincipalName('idProvider', '', form.name, { immediate });
+    idProviderNameCheck.ask('', form.name, { immediate });
   }
 }

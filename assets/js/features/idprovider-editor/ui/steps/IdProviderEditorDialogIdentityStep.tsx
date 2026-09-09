@@ -4,7 +4,6 @@ import { Pencil, X } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
 import { ApplicationIcon } from '../../../../entities/application';
-import { $principalNameCheck } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
@@ -14,6 +13,7 @@ import { $idProviderApplications } from '../../model/idprovider-applications';
 import {
   $idProviderEditor,
   $idProviderEditorErrors,
+  idProviderNameCheck,
   markIdProviderEditorFieldVisited,
   setIdProviderEditorDisplayName,
   setIdProviderEditorName,
@@ -32,7 +32,7 @@ export function IdProviderEditorDialogIdentityStep() {
     keys: ['form', 'visited', 'mode', 'entity'],
   });
   const errors = useStore($idProviderEditorErrors);
-  const nameCheck = useStore($principalNameCheck);
+  const nameCheck = useStore(idProviderNameCheck.$state);
   const applications = useStore($idProviderApplications);
 
   const persisted = mode === 'edit';
