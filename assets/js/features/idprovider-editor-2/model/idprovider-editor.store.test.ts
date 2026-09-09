@@ -9,8 +9,10 @@ import {
   $idProviderEditor,
   $idProviderEditorErrors,
   closeIdProviderEditor,
+  idProviderEditorDialog,
   openIdProviderEditor,
   openIdProviderEditorAt,
+  seedIdProviderEditorPermissions,
   updateIdProviderEditorForm,
 } from './idprovider-editor.store';
 
@@ -59,6 +61,36 @@ describe('openIdProviderEditorAt', () => {
     expect(entity).toBe(LDAP);
     expect(form).toMatchObject({ name: 'ldap', application: 'com.example.ldap' });
     expect(saved).toEqual(form);
+  });
+});
+
+describe('seedIdProviderEditorPermissions', () => {
+  const ADMINS = {
+    principal: { key: 'role:system.admin', displayName: 'Administrator', type: 'role' },
+    access: 'ADMINISTRATOR',
+  } as const;
+  const EDITORS = {
+    principal: { key: 'group:system:editors', displayName: 'Editors', type: 'group' },
+    access: 'READ',
+  } as const;
+
+  it('lands in the baseline, and keeps what was picked while the read was in flight', () => {
+    openIdProviderEditor({ mode: 'edit', entity: LDAP });
+    updateIdProviderEditorForm({ permissions: [EDITORS] });
+    seedIdProviderEditorPermissions([ADMINS]);
+
+    const { form, saved } = $idProviderEditor.get();
+
+    expect(form.permissions).toEqual([ADMINS, EDITORS]);
+    expect(saved.permissions).toEqual([ADMINS]);
+  });
+
+  it('starts a new provider from the defaults without making it dirty', () => {
+    openIdProviderEditor({ mode: 'create' });
+    seedIdProviderEditorPermissions([ADMINS]);
+
+    expect($idProviderEditor.get().form.permissions).toEqual([ADMINS]);
+    expect(idProviderEditorDialog.$dirty.get()).toBe(false);
   });
 });
 

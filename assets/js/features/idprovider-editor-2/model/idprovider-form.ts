@@ -167,6 +167,19 @@ export function pinnedPermissions(
   );
 }
 
+/**
+ * The loaded list plus whatever the form gained while it was in flight — `mergeByKey` for entries keyed
+ * by their principal. The loaded access wins for a principal on both sides: it is what the server holds.
+ */
+export function mergePermissions(
+  loaded: readonly IdProviderPermission[],
+  edited: readonly IdProviderPermission[],
+): IdProviderPermission[] {
+  const known = new Set(loaded.map(({ principal }) => principal.key));
+
+  return [...loaded, ...edited.filter(({ principal }) => !known.has(principal.key))];
+}
+
 export function withPermissionAccess(
   permissions: readonly IdProviderPermission[],
   key: string,

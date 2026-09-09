@@ -4,6 +4,7 @@ import type { IdProvider, IdProviderPermission, PrincipalRef } from '../../../en
 import {
   initialIdProviderForm,
   isSystemIdProvider,
+  mergePermissions,
   nextIdProviderForm,
   pinnedPermissions,
   sameIdProviderForm,
@@ -219,6 +220,22 @@ describe('pinnedPermissions', () => {
     const current: IdProviderPermission[] = [{ principal: admins, access: 'ADMINISTRATOR' }];
 
     expect(pinnedPermissions(current, new Set()).size).toBe(0);
+  });
+});
+
+describe('mergePermissions', () => {
+  it('keeps what was picked while the read was in flight, after what was loaded', () => {
+    const loaded: IdProviderPermission[] = [{ principal: admins, access: 'ADMINISTRATOR' }];
+    const edited: IdProviderPermission[] = [{ principal: editors, access: 'READ' }];
+
+    expect(mergePermissions(loaded, edited)).toEqual([...loaded, ...edited]);
+  });
+
+  it('lets the loaded access win for a principal on both sides', () => {
+    const loaded: IdProviderPermission[] = [{ principal: admins, access: 'ADMINISTRATOR' }];
+    const edited: IdProviderPermission[] = [{ principal: admins, access: 'READ' }];
+
+    expect(mergePermissions(loaded, edited)).toEqual(loaded);
   });
 });
 

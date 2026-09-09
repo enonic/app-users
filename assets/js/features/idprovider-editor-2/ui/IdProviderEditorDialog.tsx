@@ -7,8 +7,11 @@ import { useHostFrame } from '../../../shared/host';
 import { runStepDialogSave, type StepDialogMode } from '../../../shared/step-dialog';
 import { StepDialog } from '../../../shared/step-dialog/StepDialog';
 import { loadIdProviderApplications } from '../model/idprovider-applications';
+import { loadIdProviderDefaultPermissions } from '../model/idprovider-defaults';
 import { idProviderDraftFrom } from '../model/idprovider-draft';
+import { forgetIdProviderEditDetail, showIdProviderForEdit } from '../model/idprovider-edit-detail';
 import { $idProviderEditor, idProviderEditorDialog } from '../model/idprovider-editor.store';
+import { useIdProviderEditorPermissions } from '../model/useIdProviderEditorPermissions';
 import { ID_PROVIDER_EDITOR_STEP_PANELS } from './steps';
 
 const TITLES: Record<StepDialogMode, string> = {
@@ -29,10 +32,15 @@ export type IdProviderEditorDialogProps = {
 };
 
 export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps) {
-  const { open } = useStore($idProviderEditor, { keys: ['open'] });
+  const { open, entity } = useStore($idProviderEditor, { keys: ['open', 'entity'] });
   const { notify } = useHostFrame();
 
-  // The applications a provider may be bound to, read on every open: an install changes between two.
+  useIdProviderEditorPermissions();
+
+  const editedKey = entity?.key;
+
+  // What every open reads afresh: the applications a provider may be bound to, and the entries the
+  // platform seeds a provider with. An install changes between two opens.
   useEffect(() => {
     if (!open) {
       return;
@@ -40,9 +48,17 @@ export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps)
 
     const controller = new AbortController();
     loadIdProviderApplications(controller.signal);
+    loadIdProviderDefaultPermissions(controller.signal);
 
     return () => controller.abort();
   }, [open]);
+
+  // The provider's own permissions, which the Permissions step seeds from.
+  useEffect(() => {
+    showIdProviderForEdit(editedKey);
+
+    return forgetIdProviderEditDetail;
+  }, [editedKey]);
 
   const save = (): Promise<void> =>
     runStepDialogSave(idProviderEditorDialog, {
