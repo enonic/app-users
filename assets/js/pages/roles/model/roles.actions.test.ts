@@ -46,19 +46,19 @@ describe('what an action opens', () => {
   it('opens the editor with no role to create one', () => {
     void action('new').run(context());
 
-    expect($roleEditor.get()).toEqual({ mode: 'create' });
+    expect($roleEditor.get()).toMatchObject({ open: true, mode: 'create' });
   });
 
   it('opens the editor on the one target it was given', () => {
     void action('edit').run(context({ selected: [customRole] }));
 
-    expect($roleEditor.get()).toEqual({ mode: 'edit', role: customRole });
+    expect($roleEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: customRole });
   });
 
   it('edits the active row when nothing is ticked', () => {
     void action('edit').run(context({ active: customRole }));
 
-    expect($roleEditor.get()).toEqual({ mode: 'edit', role: customRole });
+    expect($roleEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: customRole });
   });
 
   it('confirms a delete against every target, not only the first', () => {
@@ -72,7 +72,7 @@ describe('what an action opens', () => {
   it('leaves the editor closed when a delete is confirmed', () => {
     void action('delete').run(context({ active: customRole }));
 
-    expect($roleEditor.get()).toBeUndefined();
+    expect($roleEditor.get().open).toBe(false);
   });
 });
 

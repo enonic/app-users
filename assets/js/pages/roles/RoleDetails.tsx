@@ -39,7 +39,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openRoleEditor(role)}
+            onClick={() => openRoleEditor({ mode: 'edit', entity: role })}
           />
         }
       >

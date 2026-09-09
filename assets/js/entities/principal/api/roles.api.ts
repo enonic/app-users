@@ -63,6 +63,18 @@ const ROLE_ROW_DOCUMENT = `
   }
 `;
 
+/**
+ * Whether a key is taken, and nothing else about whoever holds it. The wizard asks this of a name the
+ * user is still typing, so it selects the key alone rather than reusing the row document.
+ */
+const ROLE_EXISTS_DOCUMENT = `
+  query RoleExists($key: String!) {
+    role(key: $key) {
+      key
+    }
+  }
+`;
+
 type PrincipalRefDto = {
   key: string;
   type: PrincipalRef['type'];
@@ -128,6 +140,18 @@ export function fetchRole(
   return requestGraphQlDocument<{ role: RoleDto | null }>(ROLE_ROW_DOCUMENT, { key }, signal).map(
     ({ role }) => (role == null ? undefined : toRole(role)),
   );
+}
+
+/** Whether a role answers to the key. A caller that may not read it is told the same as an empty seat. */
+export function requestRoleExists(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestGraphQlDocument<{ role: { key: string } | null }>(
+    ROLE_EXISTS_DOCUMENT,
+    { key },
+    signal,
+  ).map(({ role }) => role != null);
 }
 
 /** The role a details panel shows. `undefined` for a key nothing answers to. */

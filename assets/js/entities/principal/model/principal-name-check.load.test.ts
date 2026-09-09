@@ -4,15 +4,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppError } from '../../../shared/api';
 import { isGroupNameTaken } from './group-commands';
 import { createPrincipalNameCheck, type PrincipalNameCheck } from './principal-name-check.load';
+import { isRoleNameTaken } from './role-commands';
 import { isUserNameTaken } from './user-commands';
 
 // Only the questions are stubbed: `isIllegalPrincipalName` decides which names are worth asking about,
 // and that decision is part of what these tests exercise.
 vi.mock('./user-commands', () => ({ isUserNameTaken: vi.fn() }));
 vi.mock('./group-commands', () => ({ isGroupNameTaken: vi.fn() }));
+vi.mock('./role-commands', () => ({ isRoleNameTaken: vi.fn() }));
 
 const asked = vi.mocked(isUserNameTaken);
 const askedForGroup = vi.mocked(isGroupNameTaken);
+const askedForRole = vi.mocked(isRoleNameTaken);
 
 const DEBOUNCE_MS = 400;
 
@@ -24,6 +27,8 @@ beforeEach(() => {
   asked.mockReturnValue(okAsync(false));
   askedForGroup.mockReset();
   askedForGroup.mockReturnValue(okAsync(false));
+  askedForRole.mockReset();
+  askedForRole.mockReturnValue(okAsync(false));
   check = createPrincipalNameCheck('user');
 });
 
@@ -73,6 +78,19 @@ describe('ask', () => {
     expect(askedForGroup.mock.calls[0]?.slice(0, 2)).toEqual(['store', 'managers']);
     expect(asked).not.toHaveBeenCalled();
     expect(groupCheck.$state.get()).toEqual({ status: 'taken', key: 'group:store:managers' });
+  });
+
+  // A role has no provider: the empty scope that leaves a user unasked is the role's normal case.
+  it('asks the role question with no provider, under the role key', async () => {
+    askedForRole.mockReturnValue(okAsync(true));
+    const roleCheck = createPrincipalNameCheck('role');
+
+    roleCheck.ask('', 'editors', { immediate: true });
+    await vi.runAllTimersAsync();
+
+    expect(askedForRole.mock.calls[0]?.[0]).toBe('editors');
+    expect(asked).not.toHaveBeenCalled();
+    expect(roleCheck.$state.get()).toEqual({ status: 'taken', key: 'role:editors' });
   });
 
   it('answers a name it has already asked about without asking again', async () => {

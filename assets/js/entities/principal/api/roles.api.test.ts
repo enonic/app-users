@@ -4,6 +4,7 @@ import { setGraphQlEndpoint } from '../../../shared/api';
 import type { PrincipalKey } from '../model/principal.types';
 import {
   fetchRoleDetail,
+  requestRoleExists,
   ROLES_ROOT,
   sendRoleCreation,
   sendRoleUpdate,
@@ -253,5 +254,34 @@ describe('sendRoleUpdate', () => {
     });
 
     expect(result.isErr()).toBe(true);
+  });
+});
+
+describe('requestRoleExists', () => {
+  beforeEach(() => {
+    setGraphQlEndpoint(ENDPOINT);
+    sent = undefined;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('reads a key no role answers to as free', async () => {
+    respondWith({ data: { role: null } });
+
+    const result = await requestRoleExists('role:editors');
+
+    expect(result._unsafeUnwrap()).toBe(false);
+    expect(sent?.variables).toEqual({ key: 'role:editors' });
+  });
+
+  it('asks for the key alone, and reads an answer as taken', async () => {
+    respondWith({ data: { role: { key: 'role:editors' } } });
+
+    const result = await requestRoleExists('role:editors');
+
+    expect(result._unsafeUnwrap()).toBe(true);
+    expect(sent?.query).not.toContain('displayName');
   });
 });

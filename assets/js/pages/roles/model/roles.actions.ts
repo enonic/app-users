@@ -1,5 +1,5 @@
 import { isReservedRole, type Role } from '../../../entities/principal';
-import { openRoleCreator, openRoleEditor } from '../../../features/role-editor';
+import { openRoleEditor } from '../../../features/role-editor';
 import {
   type ActionContext,
   actionTargets,
@@ -17,7 +17,7 @@ export const ROLE_ACTIONS: readonly SectionAction<Role>[] = [
     id: 'new',
     labelKey: 'roles.action.new',
     enabled: () => true,
-    run: openRoleCreator,
+    run: () => openRoleEditor({ mode: 'create' }),
   },
   {
     id: 'edit',
@@ -27,7 +27,7 @@ export const ROLE_ACTIONS: readonly SectionAction<Role>[] = [
     run: (ctx) => {
       const [target] = actionTargets(ctx);
       if (target !== undefined) {
-        openRoleEditor(target);
+        openRoleEditor({ mode: 'edit', entity: target });
       }
     },
   },

@@ -2,11 +2,18 @@ import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppError } from '../../../shared/api';
-import { sendRoleCreation, sendRoleUpdate } from '../api/roles.api';
+import { requestRoleExists, sendRoleCreation, sendRoleUpdate } from '../api/roles.api';
 import type { PrincipalKey, Role } from './principal.types';
-import { createRole, updateRole, type RoleDraft, type RoleEdit } from './role-commands';
+import {
+  createRole,
+  isRoleNameTaken,
+  updateRole,
+  type RoleDraft,
+  type RoleEdit,
+} from './role-commands';
 
 vi.mock('../api/roles.api', () => ({
+  requestRoleExists: vi.fn(),
   sendRoleCreation: vi.fn(),
   sendRoleUpdate: vi.fn(),
 }));
@@ -108,5 +115,16 @@ describe('updateRole', () => {
       'role:editors',
       expect.objectContaining({ addMembers, removeMembers }),
     );
+  });
+});
+
+describe('isRoleNameTaken', () => {
+  it('asks about the key the name makes on its own, there being no provider', async () => {
+    vi.mocked(requestRoleExists).mockReturnValue(okAsync(true));
+
+    const result = await isRoleNameTaken('editors');
+
+    expect(requestRoleExists).toHaveBeenCalledWith('role:editors', undefined);
+    expect(result._unsafeUnwrap()).toBe(true);
   });
 });
