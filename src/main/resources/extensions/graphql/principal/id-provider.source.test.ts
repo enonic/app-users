@@ -17,6 +17,7 @@ import {
   countPrincipals,
   createIdProvider as createProvider,
   deleteIdProviders as deleteProviders,
+  getIdProvider as readProvider,
   listIdProviders,
   listPrincipals,
   principalSetOf,
@@ -81,6 +82,32 @@ describe('listIdProviders', () => {
     vi.mocked(getIdProviders).mockReturnValue([]);
 
     expect(listIdProviders()).toEqual([]);
+  });
+});
+
+describe('getIdProvider', () => {
+  // A create leaves the index the list reads stale; the get is what answers for a row just written.
+  it('reads the one provider by key, not off the list', () => {
+    vi.mocked(getIdProvider).mockReturnValue({
+      key: 'intranet',
+      displayName: 'Intranet',
+      idProviderConfig: { applicationKey: 'com.example.oidc', config: [] },
+    });
+
+    expect(readProvider('intranet')).toEqual({
+      key: 'intranet',
+      displayName: 'Intranet',
+      description: undefined,
+      idProviderConfig: { applicationKey: 'com.example.oidc' },
+    });
+    expect(vi.mocked(getIdProvider)).toHaveBeenCalledWith({ idProvider: 'intranet' });
+    expect(vi.mocked(getIdProviders)).not.toHaveBeenCalled();
+  });
+
+  it('answers null for a key nothing answers to', () => {
+    vi.mocked(getIdProvider).mockReturnValue(null);
+
+    expect(readProvider('gone')).toBeNull();
   });
 });
 
