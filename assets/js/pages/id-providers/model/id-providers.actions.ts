@@ -1,5 +1,5 @@
 import type { IdProvider } from '../../../entities/principal';
-import { openIdProviderEditor } from '../../../features/idprovider-editor-2';
+import { openIdProviderEditor } from '../../../features/idprovider-editor';
 import {
   type ActionContext,
   actionTargets,

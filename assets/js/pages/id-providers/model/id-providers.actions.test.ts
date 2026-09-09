@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { IdProvider } from '../../../entities/principal';
-import { $idProviderEditor, closeIdProviderEditor } from '../../../features/idprovider-editor-2';
+import { $idProviderEditor, closeIdProviderEditor } from '../../../features/idprovider-editor';
 import type { ActionContext, SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { ID_PROVIDER_ACTIONS } from './id-providers.actions';
 

@@ -4,6 +4,7 @@ import type { IdProvider, IdProviderPermission, PrincipalRef } from '../../../en
 import {
   initialIdProviderForm,
   isSystemIdProvider,
+  mergePermissions,
   nextIdProviderForm,
   pinnedPermissions,
   sameIdProviderForm,
@@ -22,17 +23,6 @@ const provider: IdProvider = {
   groups: { total: 3 },
 };
 
-function form(overrides: Partial<IdProviderForm> = {}): IdProviderForm {
-  return {
-    name: 'ldap',
-    displayName: 'Company directory',
-    description: '',
-    application: 'com.example.ldap',
-    permissions: [{ principal: admins, access: 'ADMINISTRATOR' }],
-    ...overrides,
-  };
-}
-
 const admins: PrincipalRef = {
   type: 'role',
   key: 'role:system.admin',
@@ -44,6 +34,17 @@ const editors: PrincipalRef = {
   key: 'group:system:editors',
   displayName: 'Editors',
 };
+
+function form(overrides: Partial<IdProviderForm> = {}): IdProviderForm {
+  return {
+    name: 'ldap',
+    displayName: 'Company directory',
+    description: '',
+    application: 'com.example.ldap',
+    permissions: [{ principal: admins, access: 'ADMINISTRATOR' }],
+    ...overrides,
+  };
+}
 
 describe('initialIdProviderForm', () => {
   it('starts empty for a new provider', () => {
@@ -57,17 +58,19 @@ describe('initialIdProviderForm', () => {
   });
 
   it('takes the name from the key, which is the provider id itself', () => {
-    expect(initialIdProviderForm({ mode: 'edit', provider }).name).toBe('ldap');
+    expect(initialIdProviderForm({ mode: 'edit', entity: provider }).name).toBe('ldap');
   });
 
   it('takes the bound application by key, not by name', () => {
-    expect(initialIdProviderForm({ mode: 'edit', provider }).application).toBe('com.example.ldap');
+    expect(initialIdProviderForm({ mode: 'edit', entity: provider }).application).toBe(
+      'com.example.ldap',
+    );
   });
 
   it('reads an unbound provider as bound to nothing', () => {
     const unbound = initialIdProviderForm({
       mode: 'edit',
-      provider: { ...provider, application: undefined },
+      entity: { ...provider, application: undefined },
     });
 
     expect(unbound.application).toBe('');
@@ -80,7 +83,7 @@ describe('nextIdProviderForm', () => {
   it('lets the name follow the display name while the user has not touched it', () => {
     const next = { ...previous, displayName: 'Company Directory EU' };
 
-    expect(nextIdProviderForm(previous, next, 'create', false).values.name).toBe(
+    expect(nextIdProviderForm(previous, next, { mode: 'create' }).name).toBe(
       'company.directory.eu',
     );
   });
@@ -88,16 +91,23 @@ describe('nextIdProviderForm', () => {
   it('keeps a typed name exactly as typed, in the same edit that reports it', () => {
     const next = { ...previous, name: 'l' };
 
-    expect(nextIdProviderForm(previous, next, 'create', false)).toEqual({
-      values: next,
+    expect(nextIdProviderForm(previous, next, { mode: 'create' })).toEqual({
+      ...next,
       nameEdited: true,
     });
+  });
+
+  it('stops deriving once the name has been taken over', () => {
+    const taken = { ...previous, nameEdited: true };
+    const next = { ...taken, displayName: 'Renamed' };
+
+    expect(nextIdProviderForm(taken, next, { mode: 'create' }).name).toBe('ldap');
   });
 
   it('never derives while editing, where the field is locked', () => {
     const next = { ...previous, displayName: 'Renamed' };
 
-    expect(nextIdProviderForm(previous, next, 'edit', false).values.name).toBe('ldap');
+    expect(nextIdProviderForm(previous, next, { mode: 'edit' }).name).toBe('ldap');
   });
 });
 
@@ -210,6 +220,22 @@ describe('pinnedPermissions', () => {
     const current: IdProviderPermission[] = [{ principal: admins, access: 'ADMINISTRATOR' }];
 
     expect(pinnedPermissions(current, new Set()).size).toBe(0);
+  });
+});
+
+describe('mergePermissions', () => {
+  it('keeps what was picked while the read was in flight, after what was loaded', () => {
+    const loaded: IdProviderPermission[] = [{ principal: admins, access: 'ADMINISTRATOR' }];
+    const edited: IdProviderPermission[] = [{ principal: editors, access: 'READ' }];
+
+    expect(mergePermissions(loaded, edited)).toEqual([...loaded, ...edited]);
+  });
+
+  it('lets the loaded access win for a principal on both sides', () => {
+    const loaded: IdProviderPermission[] = [{ principal: admins, access: 'ADMINISTRATOR' }];
+    const edited: IdProviderPermission[] = [{ principal: admins, access: 'READ' }];
+
+    expect(mergePermissions(loaded, edited)).toEqual(loaded);
   });
 });
 
