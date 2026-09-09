@@ -11,7 +11,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openIdProviderEditor } from '../../features/idprovider-editor';
+import { openIdProviderEditor } from '../../features/idprovider-editor-2';
 import { useI18n } from '../../shared/i18n';
 import { countedSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -69,7 +69,7 @@ export function IdProviderDetails({
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openIdProviderEditor(provider)}
+            onClick={() => openIdProviderEditor({ mode: 'edit', entity: provider })}
           />
         }
       >
