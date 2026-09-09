@@ -2,6 +2,7 @@ import { atom, computed } from 'nanostores';
 
 import {
   $idProviderNames,
+  createPrincipalNameCheck,
   isSystemUser,
   SYSTEM_ID_PROVIDER,
   type IdProviderName,
@@ -27,19 +28,22 @@ import {
   type UserForm,
   type UserFormField,
 } from './user-form';
-import { checkUserName, forgetUserNameChecks } from './user-name-check.load';
-import { $userNameCheck } from './user-name-check.store';
 
 export type UserEditorMode = StepDialogMode;
 export type UserEditorView = StepDialogView;
 export type UserEditorState = StepDialogState<UserEditorStep, UserFormField, UserForm, User>;
 
+export const userNameCheck = createPrincipalNameCheck('user');
+
 // The name a provider already holds is an error like any other; while the answer is on its way, the name
 // holds the later steps back without a message.
-const $userNameExternal = computed($userNameCheck, (check): StepDialogExternal<UserFormField> => ({
-  errors: check.status === 'taken' ? { name: 'users.dialog.nameTaken' } : {},
-  busy: check.status === 'pending' ? ['name'] : [],
-}));
+const $userNameExternal = computed(
+  userNameCheck.$state,
+  (check): StepDialogExternal<UserFormField> => ({
+    errors: check.status === 'taken' ? { name: 'users.dialog.nameTaken' } : {},
+    busy: check.status === 'pending' ? ['name'] : [],
+  }),
+);
 
 // ! The system store is never offered: a user there is a service account, created in its own section.
 export const $userEditorProviders = computed(
@@ -67,7 +71,7 @@ export const userEditorDialog = createStepDialogStore<
   same: sameUserForm,
   next: nextUserForm,
   $external: $userNameExternal,
-  reset: forgetUserNameChecks,
+  reset: userNameCheck.forget,
 });
 
 export const $userEditor = userEditorDialog.$state;
@@ -178,7 +182,7 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
   const { form, mode } = $userEditor.get();
 
   if (mode === 'create') {
-    checkUserName(form.idProvider, form.name, { immediate });
+    userNameCheck.ask(form.idProvider, form.name, { immediate });
   }
 }
 

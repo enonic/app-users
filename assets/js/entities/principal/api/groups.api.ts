@@ -77,6 +77,18 @@ const GROUP_MEMBERSHIPS_DOCUMENT = `
   }
 `;
 
+/**
+ * Whether a key is taken, and nothing else about whoever holds it. The wizard asks this of a name the
+ * user is still typing, so it selects the key alone rather than reusing the row document.
+ */
+const GROUP_EXISTS_DOCUMENT = `
+  query GroupExists($key: String!) {
+    group(key: $key) {
+      key
+    }
+  }
+`;
+
 type PrincipalRefDto = {
   key: string;
   type: PrincipalRef['type'];
@@ -154,6 +166,18 @@ export function fetchGroup(
     { key },
     signal,
   ).map(({ group }) => (group == null ? undefined : toGroup(group)));
+}
+
+/** Whether a group answers to the key. A caller that may not read it is told the same as an empty seat. */
+export function requestGroupExists(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestGraphQlDocument<{ group: { key: string } | null }>(
+    GROUP_EXISTS_DOCUMENT,
+    { key },
+    signal,
+  ).map(({ group }) => group != null);
 }
 
 /** The group a details panel shows. `undefined` for a key nothing answers to. */

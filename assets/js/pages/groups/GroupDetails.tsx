@@ -62,7 +62,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openGroupEditor(group)}
+            onClick={() => openGroupEditor({ mode: 'edit', entity: group })}
           />
         }
       >

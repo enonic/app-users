@@ -1,5 +1,5 @@
 import type { Group } from '../../../entities/principal';
-import { openGroupCreator, openGroupEditor } from '../../../features/group-editor';
+import { openGroupEditor } from '../../../features/group-editor';
 import { actionTargets, type SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { groupsDeletion } from './deletion.store';
 
@@ -11,7 +11,7 @@ export const GROUP_ACTIONS: readonly SectionAction<Group>[] = [
     id: 'new',
     labelKey: 'groups.action.new',
     enabled: () => true,
-    run: openGroupCreator,
+    run: () => openGroupEditor({ mode: 'create' }),
   },
   {
     id: 'edit',
@@ -21,7 +21,7 @@ export const GROUP_ACTIONS: readonly SectionAction<Group>[] = [
     run: (ctx) => {
       const [target] = actionTargets(ctx);
       if (target !== undefined) {
-        openGroupEditor(target);
+        openGroupEditor({ mode: 'edit', entity: target });
       }
     },
   },

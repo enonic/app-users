@@ -39,7 +39,9 @@ the single-page ones. It is `@enonic/ui-kit` material like `widgets/`, so it imp
 names (`features/user-editor/model/user-editor.store.ts` is the worked example). The barrel carries the
 model alone; `StepDialog` is imported by path so `@enonic/ui` stays out of the DOM-less test run. Panels
 are pure content — the dialog wraps them in `StepContent` and applies the locks — and a rule that runs
-outside the form reports through the `$external` slot rather than by patching `$errors`.
+outside the form reports through the `$external` slot rather than by patching `$errors`. A Summary step
+reads back into `StepDialogSummary`; rows of principals are `entities/principal/ui/PrincipalsSummaryRow`,
+which is why they are not in the folder.
 
 A feature two sections share keeps one store, not one per section. The sections stay mounted side by
 side — the host keeps a section alive on switch — so a dialog both pages render must know which copy it

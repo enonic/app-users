@@ -1,9 +1,12 @@
 import { useStore } from '@nanostores/preact';
-import type { ReactNode } from 'react';
 
-import { useIdProviderNames, type PrincipalRef } from '../../../../entities/principal';
-import { PrincipalIcon } from '../../../../entities/principal/ui/PrincipalIcon';
+import { useIdProviderNames } from '../../../../entities/principal';
+import { PrincipalsSummaryRow } from '../../../../entities/principal/ui/PrincipalsSummaryRow';
 import { i18n, useI18n } from '../../../../shared/i18n';
+import {
+  StepDialogSummary,
+  StepDialogSummaryRow,
+} from '../../../../shared/step-dialog/StepDialogSummary';
 import { $userEditor } from '../../model/user-editor.store';
 import { userSummaryRows } from '../../model/user-summary';
 
@@ -18,9 +21,9 @@ export function UserEditorDialogSummaryStep() {
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
 
   return (
-    <dl className="bg-surface-primary grid grid-cols-[25%_auto] gap-x-5 gap-y-4 rounded-md p-6 text-sm">
+    <StepDialogSummary>
       {userSummaryRows(form, providerName, entity?.hasPassword === true).map((row) => (
-        <SummaryRow key={row.labelKey} label={i18n(row.labelKey)}>
+        <StepDialogSummaryRow key={row.labelKey} label={i18n(row.labelKey)}>
           {row.lines === undefined ? (
             <span className="break-words">
               {row.valueKey === undefined
@@ -36,49 +39,11 @@ export function UserEditorDialogSummaryStep() {
               ))}
             </div>
           )}
-        </SummaryRow>
+        </StepDialogSummaryRow>
       ))}
 
-      <PrincipalsRow label={rolesLabel} principals={form.roles} />
-      <PrincipalsRow label={groupsLabel} principals={form.groups} />
-    </dl>
-  );
-}
-
-type SummaryRowProps = {
-  label: string;
-  children: ReactNode;
-};
-
-function SummaryRow({ label, children }: SummaryRowProps) {
-  return (
-    <>
-      <dt className="font-semibold">{label}</dt>
-      <dd className="min-w-0">{children}</dd>
-    </>
-  );
-}
-
-type PrincipalsRowProps = {
-  label: string;
-  principals: readonly PrincipalRef[];
-};
-
-function PrincipalsRow({ label, principals }: PrincipalsRowProps) {
-  if (principals.length === 0) {
-    return null;
-  }
-
-  return (
-    <SummaryRow label={label}>
-      <div className="flex flex-col gap-2">
-        {principals.map((principal) => (
-          <span key={principal.key} className="flex items-center gap-2.5">
-            <PrincipalIcon principal={principal} size="xs" />
-            <span className="truncate">{principal.displayName}</span>
-          </span>
-        ))}
-      </div>
-    </SummaryRow>
+      <PrincipalsSummaryRow label={rolesLabel} principals={form.roles} />
+      <PrincipalsSummaryRow label={groupsLabel} principals={form.groups} />
+    </StepDialogSummary>
   );
 }
