@@ -1,5 +1,6 @@
 import {
   createPrincipalReaction,
+  evictIdProviderPermissions,
   idProviderOf,
   loadIdProvider,
   loadIdProviders,
@@ -13,6 +14,7 @@ import { idProvidersSelection } from './selection.store';
 let running: TopicReaction | undefined;
 
 // A user or group change moves its provider's counts, so that row is re-read; the open panel's principals too.
+// A provider change re-reads its row, and the panel's permissions with it.
 export function startIdProvidersEvents(frame: HostFrame): void {
   if (running !== undefined) {
     return;
@@ -34,7 +36,7 @@ export function startIdProvidersEvents(frame: HostFrame): void {
     },
     loadRow: loadIdProvider,
     removeRow: removeIdProvider,
-    evictDetail: () => undefined,
+    evictDetail: evictIdProviderPermissions,
     refresh,
     onCreated: 'load',
     foreign: (events) => {

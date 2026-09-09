@@ -33,6 +33,11 @@ export {
 } from './model/id-provider-commands';
 export type { DeletableIdProvider, IdProviderDraft } from './model/id-provider-commands';
 export {
+  evictIdProviderPermissions,
+  forgetIdProviderPermissions,
+  reloadIdProviderPermissions,
+} from './model/id-provider-permissions.load';
+export {
   forgetIdProviderPrincipalRows,
   loadMoreIdProviderPrincipals,
   reloadIdProviderPrincipalRows,
@@ -165,6 +170,7 @@ export { useIdProvider } from './model/useIdProvider';
 export { idProviderLabel, useIdProviderLabel } from './model/useIdProviderLabel';
 export { useIdProviderName } from './model/useIdProviderName';
 export { useIdProviderNames } from './model/useIdProviderNames';
+export { useIdProviderPermissions } from './model/useIdProviderPermissions';
 export { useIdProviderPrincipals } from './model/useIdProviderPrincipals';
 export { useIdProviders } from './model/useIdProviders';
 export { useRole } from './model/useRole';
