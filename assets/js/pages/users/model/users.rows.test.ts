@@ -25,13 +25,11 @@ describe('toUserRow', () => {
     expect(subtitle).toBe('alice');
   });
 
-  it('names the provider in its only meta cell', () => {
-    expect(toUserRow(user, undefined, () => 'Company directory').meta).toEqual([
-      'Company directory',
-    ]);
+  it('carries the provenance cell the page built', () => {
+    expect(toUserRow(user, undefined, 'Company directory').meta).toEqual(['Company directory']);
   });
 
-  it('leaves the cell out while the providers have not arrived', () => {
+  it('leaves the cell out where the page supplied none', () => {
     expect(toUserRow(user).meta).toBeUndefined();
   });
 

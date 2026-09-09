@@ -7,7 +7,11 @@ import { RoleEditorDialog } from '../../features/role-editor/ui/RoleEditorDialog
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
-import { sortByDisplayName, type SortDirection } from '../../widgets/browse-list/browse-sort';
+import {
+  DEFAULT_SORT_DIRECTION,
+  sortByDisplayName,
+  type SortDirection,
+} from '../../widgets/browse-list/browse-sort';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
@@ -102,7 +106,14 @@ export function RolesPage() {
             onToggle={(id) => rolesFilter.toggle(id)}
           />
         }
-        sort={<BrowseSort options={sortOptions} value={sort} onChange={setRolesSort} />}
+        sort={
+          <BrowseSort
+            options={sortOptions}
+            value={sort}
+            onChange={setRolesSort}
+            defaultValue={DEFAULT_SORT_DIRECTION}
+          />
+        }
       />
 
       <RoleEditorDialog onSaved={() => void loadRolesScreen()} />

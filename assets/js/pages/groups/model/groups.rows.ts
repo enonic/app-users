@@ -6,12 +6,10 @@ import type { BrowseRow } from '../../../widgets/browse-list/browse-list';
 export function toGroupRow(
   group: Group,
   icon?: ReactNode,
-  // Resolved by the page from the loaded providers: a key carries the provider's name, and the cell
-  // shows the name an administrator recognises.
-  providerName?: (key: Group['key']) => string | undefined,
+  // Built by the page from the loaded providers: the list is ordered by the provider's name, so the
+  // cell shows it under the name an administrator recognises.
+  provider?: ReactNode,
 ): BrowseRow {
-  const provider = providerName?.(group.key);
-
   return {
     key: group.key,
     title: group.displayName,

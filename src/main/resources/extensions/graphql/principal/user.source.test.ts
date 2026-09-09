@@ -285,6 +285,18 @@ describe('listUsers', () => {
     expect(calledWith()?.sort).toBe('displayName DESC, _path ASC');
   });
 
+  it('groups by id provider, with display name ordering the users inside one', () => {
+    vi.mocked(findUsers).mockReturnValue(found([]));
+
+    listUsers({ sort: 'idProviderAsc' });
+    expect(calledWith()?.sort).toBe('userStoreKey ASC, displayName ASC, _path ASC');
+
+    vi.resetAllMocks();
+    vi.mocked(findUsers).mockReturnValue(found([]));
+    listUsers({ sort: 'idProviderDesc' });
+    expect(calledWith()?.sort).toBe('userStoreKey DESC, displayName ASC, _path ASC');
+  });
+
   it('orders by display name ascending when nothing was asked for', () => {
     vi.mocked(findUsers).mockReturnValue(found([]));
 

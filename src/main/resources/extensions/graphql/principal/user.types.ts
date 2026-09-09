@@ -21,8 +21,8 @@ import {
 export const UserSortEnum: GraphQLType = generator.createEnumType({
   name: 'UserSort',
   description:
-    'The orders the user list offers. Display name is the only orderable field it shows.',
-  values: ['displayNameAsc', 'displayNameDesc'],
+    'The orders the user list offers: by display name, or grouped by the ID provider each user belongs to.',
+  values: ['displayNameAsc', 'displayNameDesc', 'idProviderAsc', 'idProviderDesc'],
 });
 
 const principals = nonNull(list(nonNull(PrincipalType)));

@@ -23,13 +23,11 @@ describe('toGroupRow', () => {
     expect(subtitle).toBe('developers');
   });
 
-  it('names the provider in its only meta cell', () => {
-    expect(toGroupRow(group, undefined, () => 'Company directory').meta).toEqual([
-      'Company directory',
-    ]);
+  it('carries the provenance cell the page built', () => {
+    expect(toGroupRow(group, undefined, 'Company directory').meta).toEqual(['Company directory']);
   });
 
-  it('leaves the cell out while the providers have not arrived', () => {
+  it('leaves the cell out where the page supplied none', () => {
     expect(toGroupRow(group).meta).toBeUndefined();
   });
 

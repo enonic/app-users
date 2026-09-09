@@ -1,11 +1,9 @@
 import { map } from 'nanostores';
 
-import type { SortDirection } from '../../../widgets/browse-list/browse-sort';
+import { DEFAULT_PRINCIPAL_SORT, type PrincipalSort } from '../../../entities/principal';
 
 /** One request's worth of users. Fifty is what a screen shows without asking for a second page. */
 export const PAGE_SIZE = 50;
-
-export type UsersSort = 'displayNameAsc' | 'displayNameDesc';
 
 /**
  * What the server is asked to narrow by.
@@ -18,10 +16,13 @@ export type UsersSort = 'displayNameAsc' | 'displayNameDesc';
 export type UsersQueryState = {
   search?: string;
   idProviders: readonly string[];
-  sort: UsersSort;
+  sort: PrincipalSort;
 };
 
-export const $usersQuery = map<UsersQueryState>({ idProviders: [], sort: 'displayNameAsc' });
+export const $usersQuery = map<UsersQueryState>({
+  idProviders: [],
+  sort: DEFAULT_PRINCIPAL_SORT,
+});
 
 export function setUsersSearch(search: string): void {
   const needle = search.trim();
@@ -39,14 +40,10 @@ export function toggleUsersIdProvider(idProvider: string): void {
   );
 }
 
-export function setUsersSort(direction: SortDirection): void {
-  $usersQuery.setKey('sort', direction === 'desc' ? 'displayNameDesc' : 'displayNameAsc');
-}
-
-export function sortDirectionOf({ sort }: UsersQueryState): SortDirection {
-  return sort === 'displayNameDesc' ? 'desc' : 'asc';
+export function setUsersSort(sort: PrincipalSort): void {
+  $usersQuery.setKey('sort', sort);
 }
 
 export function clearUsersQuery(): void {
-  $usersQuery.set({ idProviders: [], sort: 'displayNameAsc' });
+  $usersQuery.set({ idProviders: [], sort: DEFAULT_PRINCIPAL_SORT });
 }
