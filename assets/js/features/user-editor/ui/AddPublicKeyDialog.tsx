@@ -2,24 +2,22 @@ import { Button, Input } from '@enonic/ui';
 import { Upload } from 'lucide-react';
 import { useRef, useState } from 'preact/hooks';
 
-import type { PublicKey } from '../../entities/principal';
-import { useI18n } from '../../shared/i18n';
-import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
-import { FieldLabel } from '../../shared/ui/FieldLabel';
-import { generateKeyPair, readPublicKeyPem, type KeyPair } from './model/key-pair';
+import { useI18n } from '../../../shared/i18n';
+import { ModalDialog } from '../../../shared/ui/dialogs/ModalDialog';
+import { FieldLabel } from '../../../shared/ui/FieldLabel';
+import { generateKeyPair, readPublicKeyPem } from '../model/key-pair';
+import type { PendingPublicKey } from '../model/user-form';
 
 export type AddPublicKeyDialogProps = {
   open: boolean;
-  onAdd: (publicKey: string, label?: string) => Promise<AddOutcome>;
-  onGenerated: (pair: KeyPair, stored: PublicKey) => void;
+  /** Hands the key to the wizard, which writes it when the user is saved. */
+  onStage: (pending: Omit<PendingPublicKey, 'id'>) => void;
   onClose: () => void;
 };
 
-export type AddOutcome = { stored: PublicKey } | { error: string };
-
 const LABEL_ID = 'public-key-label';
 
-export function AddPublicKeyDialog({ open, onAdd, onGenerated, onClose }: AddPublicKeyDialogProps) {
+export function AddPublicKeyDialog({ open, onStage, onClose }: AddPublicKeyDialogProps) {
   const title = useI18n('users.dialog.addKeyTitle');
   const labelLabel = useI18n('users.dialog.keyLabel');
   const helpText = useI18n('users.dialog.addKeyHelp');
@@ -55,13 +53,8 @@ export function AddPublicKeyDialog({ open, onAdd, onGenerated, onClose }: AddPub
 
     try {
       const pair = await generateKeyPair();
-      const outcome = await onAdd(pair.publicKey, named);
-
-      if ('stored' in outcome) {
-        onGenerated(pair, outcome.stored);
-      }
-
-      finish('error' in outcome ? outcome.error : undefined);
+      onStage({ label: named, publicKey: pair.publicKey, privateKey: pair.privateKey });
+      finish(undefined);
     } catch (thrown) {
       finish(messageOf(thrown, generateFailedLabel));
     }
@@ -80,8 +73,8 @@ export function AddPublicKeyDialog({ open, onAdd, onGenerated, onClose }: AddPub
         return;
       }
 
-      const outcome = await onAdd(publicKey, named);
-      finish('error' in outcome ? outcome.error : undefined);
+      onStage({ label: named, publicKey });
+      finish(undefined);
     } catch (thrown) {
       finish(messageOf(thrown, uploadFailedLabel));
     }

@@ -2,6 +2,7 @@ import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import {
+  requestUserExists,
   sendPublicKeyAddition,
   sendPublicKeyRemoval,
   sendUserCreation,
@@ -63,6 +64,21 @@ export function addPublicKey(
 
 export function removePublicKey(key: PrincipalKey, kid: string): ResultAsync<void, AppError> {
   return sendPublicKeyRemoval(key, kid);
+}
+
+/**
+ * Whether the provider already holds a user of this name — the wizard's advisory check, asked of a name
+ * as it is typed.
+ *
+ * ! Advisory: the answer is a moment old by the time the save runs, and a provider the caller may not
+ * ! read answers the same as an empty one. `createUser` stays the authority on the duplicate.
+ */
+export function isUserNameTaken(
+  idProvider: string,
+  name: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestUserExists(`user:${idProvider}:${name}`, signal);
 }
 
 // What an optional text field sends: trimmed, and absent rather than empty. The counterpart of `nonEmpty`

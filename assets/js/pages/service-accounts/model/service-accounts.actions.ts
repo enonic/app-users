@@ -1,5 +1,5 @@
 import { isSystemUser, type User } from '../../../entities/principal';
-import { openServiceAccountCreator, openServiceAccountEditor } from '../../../features/user-editor';
+import { openServiceAccountEditor } from '../../../features/user-editor';
 import { actionTargets, type SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { serviceAccountsDeletion } from './deletion.store';
 
@@ -10,7 +10,7 @@ export const SERVICE_ACCOUNT_ACTIONS: readonly SectionAction<User>[] = [
     id: 'new',
     labelKey: 'serviceAccounts.action.new',
     enabled: () => true,
-    run: openServiceAccountCreator,
+    run: () => openServiceAccountEditor({ mode: 'create' }),
   },
   {
     id: 'edit',
@@ -20,7 +20,7 @@ export const SERVICE_ACCOUNT_ACTIONS: readonly SectionAction<User>[] = [
     run: (ctx) => {
       const [target] = actionTargets(ctx);
       if (target !== undefined) {
-        openServiceAccountEditor(target);
+        openServiceAccountEditor({ mode: 'edit', entity: target });
       }
     },
   },

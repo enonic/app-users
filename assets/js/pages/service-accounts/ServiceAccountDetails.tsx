@@ -58,7 +58,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openServiceAccountEditor(user)}
+            onClick={() => openServiceAccountEditor({ mode: 'edit', entity: user })}
           />
         }
       >

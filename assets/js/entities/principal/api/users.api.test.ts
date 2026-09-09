@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { setGraphQlEndpoint } from '../../../shared/api';
 import type { PrincipalKey } from '../model/principal.types';
-import { fetchUserDetail, sendUserCreation, sendUserUpdate } from './users.api';
+import { fetchUserDetail, requestUserExists, sendUserCreation, sendUserUpdate } from './users.api';
 
 let sent: { query?: string; variables?: Record<string, unknown> } | undefined;
 
@@ -177,5 +177,25 @@ describe('sendUserUpdate', () => {
     respondWith({ data: { updateUser: null } });
 
     expect((await sendUserUpdate('user:system:gone', changes())).isErr()).toBe(true);
+  });
+});
+
+describe('requestUserExists', () => {
+  it('reads a seat nobody answers to as free', async () => {
+    respondWith({ data: { user: null } });
+
+    const result = await requestUserExists('user:system:alice');
+
+    expect(result._unsafeUnwrap()).toBe(false);
+    expect(sent?.variables).toEqual({ key: 'user:system:alice' });
+  });
+
+  it('asks for the key alone, and reads an answer as taken', async () => {
+    respondWith({ data: { user: { key: 'user:system:alice' } } });
+
+    const result = await requestUserExists('user:system:alice');
+
+    expect(result._unsafeUnwrap()).toBe(true);
+    expect(sent?.query).not.toContain('displayName');
   });
 });
