@@ -27,32 +27,22 @@ export function UserEditorDialogGroupsStep() {
   }
 
   return (
-    <>
-      {status === 'error' && <p className="text-error mb-3 text-sm">{failedNotice}</p>}
+    <div className="flex flex-col gap-3">
+      {status === 'error' && <p className="text-error text-sm">{failedNotice}</p>}
 
-      <div className="flex items-start gap-4">
-        {/* ! `min-w-0`: the column is a flex child at `min-width: auto`, so without it a long group
-            ! name widens the picker and pushes the checkbox out of the row. */}
-        <div className="min-w-0 flex-1">
-          <PrincipalPicker
-            kinds={['group']}
-            idProvider={showAll ? undefined : form.idProvider}
-            placeholder={groupsPlaceholder}
-            selected={form.groups}
-            onChange={(groups) => updateUserEditorForm({ groups })}
-          />
-        </div>
+      <Checkbox
+        label={showAllLabel}
+        checked={showAll}
+        onCheckedChange={(checked) => setShowAll(checked === true)}
+      />
 
-        {/* The height matches the combobox, so the checkbox sits beside the input rather than beside
-            the picked list that grows under it. */}
-        <div className="flex h-12 shrink-0 items-center">
-          <Checkbox
-            label={showAllLabel}
-            checked={showAll}
-            onCheckedChange={(checked) => setShowAll(checked === true)}
-          />
-        </div>
-      </div>
-    </>
+      <PrincipalPicker
+        kinds={['group']}
+        idProvider={showAll ? undefined : form.idProvider}
+        placeholder={groupsPlaceholder}
+        selected={form.groups}
+        onChange={(groups) => updateUserEditorForm({ groups })}
+      />
+    </div>
   );
 }
