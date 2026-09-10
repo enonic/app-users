@@ -103,8 +103,8 @@ importers:
         specifier: ^0.7.6
         version: 0.7.6
       less:
-        specifier: ^4.9.0
-        version: 4.9.0
+        specifier: ^4.9.1
+        version: 4.9.1
       postcss:
         specifier: ^8.5.26
         version: 8.5.26
@@ -122,7 +122,7 @@ importers:
         version: 8.68.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       vite:
         specifier: ^8.2.2
-        version: 8.2.2(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.9.0)(tsx@4.20.5)
+        version: 8.2.2(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.9.1)(tsx@4.20.5)
 
 packages:
 
@@ -1156,8 +1156,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  less@4.9.0:
-    resolution: {integrity: sha512-umRhrCH7fCi8Uj2RcwKjJdvUORTjeWqkdKx0LbcZvjIwsAVsnIAGcxHaqowPeBFBjQuWOeC/bve0AlpFzF/+SQ==}
+  less@4.9.1:
+    resolution: {integrity: sha512-orp15PfJvvNDIqJdVWzMI9Sjpjp3VTiw3sfvbB+67LlISTEn8uVT2EdYSuyl02BLvaftv6sdk9Umnxmm5rckmg==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -2640,7 +2640,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  less@4.9.0:
+  less@4.9.1:
     dependencies:
       copy-anything: 3.0.5
       parse-node-version: 1.0.1
@@ -3139,7 +3139,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite@8.2.2(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.9.0)(tsx@4.20.5):
+  vite@8.2.2(@types/node@20.19.11)(esbuild@0.27.2)(jiti@2.7.0)(less@4.9.1)(tsx@4.20.5):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.5
@@ -3151,7 +3151,7 @@ snapshots:
       esbuild: 0.27.2
       fsevents: 2.3.3
       jiti: 2.7.0
-      less: 4.9.0
+      less: 4.9.1
       tsx: 4.20.5
 
   which@2.0.2:
