@@ -1,12 +1,16 @@
 import {
   derivePrincipalName,
   isIllegalPrincipalName,
+  SYSTEM_ID_PROVIDER,
+  type IdProvider,
   type IdProviderAccess,
   type IdProviderPermission,
   type PrincipalRef,
 } from '../../../entities/principal';
 import type { FieldErrors } from '../../../shared/form';
-import type { IdProviderEditorPayload } from './idprovider-editor.store';
+import type { StepDialogMode, StepDialogPayload } from '../../../shared/step-dialog';
+
+export type IdProviderEditorPayload = StepDialogPayload<IdProvider>;
 
 export type IdProviderForm = {
   name: string;
@@ -16,14 +20,14 @@ export type IdProviderForm = {
   application: string;
   /** Who may reach the provider, and how far. */
   permissions: readonly IdProviderPermission[];
+  /** Whether the user has taken the name over; until then a create derives it from the display name. */
+  nameEdited?: boolean;
 };
 
 /** What app-users grants a principal that was just added to the list. */
 export const DEFAULT_ID_PROVIDER_ACCESS: IdProviderAccess = 'CREATE_USERS';
 
 /** The provider XP owns. Its binding to the platform's own login may not be changed. */
-export const SYSTEM_ID_PROVIDER = 'system';
-
 export function isSystemIdProvider(key: string): boolean {
   return key === SYSTEM_ID_PROVIDER;
 }
@@ -32,54 +36,50 @@ export type IdProviderFormField = 'name' | 'displayName' | 'permissions';
 
 export type IdProviderFormErrors = FieldErrors<IdProviderFormField>;
 
-export type IdProviderFormChange = {
-  values: IdProviderForm;
-  nameEdited: boolean;
-};
-
-export function initialIdProviderForm(payload: IdProviderEditorPayload): IdProviderForm {
-  if (payload.mode === 'create') {
-    return { name: '', displayName: '', description: '', application: '', permissions: [] };
-  }
-
-  const { provider } = payload;
-
-  return {
-    name: provider.key,
-    displayName: provider.displayName,
-    description: provider.description ?? '',
-    application: provider.application?.key ?? '',
-    permissions: [],
-  };
-}
-
-export function nextIdProviderForm(
-  previous: IdProviderForm,
-  next: IdProviderForm,
-  mode: IdProviderEditorPayload['mode'],
-  nameEdited: boolean,
-): IdProviderFormChange {
-  if (next.name !== previous.name) {
-    return { values: next, nameEdited: true };
-  }
-
-  if (nameEdited || mode === 'edit') {
-    return { values: next, nameEdited };
-  }
-
-  return { values: { ...next, name: derivePrincipalName(next.displayName) }, nameEdited: false };
-}
-
-/** Every field that can carry an error, for the pass `Save` makes when one is still hidden. */
 export const ID_PROVIDER_FORM_FIELDS: readonly IdProviderFormField[] = [
   'name',
   'displayName',
   'permissions',
 ];
 
+export function initialIdProviderForm(
+  payload: IdProviderEditorPayload,
+  permissions: readonly IdProviderPermission[] = [],
+): IdProviderForm {
+  if (payload.mode === 'create') {
+    return { name: '', displayName: '', description: '', application: '', permissions };
+  }
+
+  const { entity: provider } = payload;
+
+  return {
+    name: provider.key,
+    displayName: provider.displayName,
+    description: provider.description ?? '',
+    application: provider.application?.key ?? '',
+    permissions,
+  };
+}
+
+export function nextIdProviderForm(
+  previous: IdProviderForm,
+  next: IdProviderForm,
+  { mode }: { mode: StepDialogMode },
+): IdProviderForm {
+  if (next.name !== previous.name) {
+    return { ...next, nameEdited: true };
+  }
+
+  if (next.nameEdited === true || mode === 'edit') {
+    return next;
+  }
+
+  return { ...next, name: derivePrincipalName(next.displayName) };
+}
+
 /**
- * Whether the form still says what the server holds, which is what keeps `Save` dark. Permissions are
- * compared by principal *and* access: narrowing one moves no entry but is the whole edit.
+ * Whether the form still says what was saved, which is what keeps `Save` dark. Permissions are compared
+ * by principal *and* access: narrowing one moves no entry but is the whole edit.
  */
 export function sameIdProviderForm(saved: IdProviderForm, edited: IdProviderForm): boolean {
   return (
@@ -108,7 +108,7 @@ function samePermissions(
 
 export function validateIdProviderForm(
   form: IdProviderForm,
-  mode: IdProviderEditorPayload['mode'],
+  mode: StepDialogMode,
 ): IdProviderFormErrors {
   const errors: IdProviderFormErrors = {};
 
@@ -165,6 +165,19 @@ export function pinnedPermissions(
   return new Set(
     permissions.map(({ principal }) => principal.key).filter((key) => defaults.has(key)),
   );
+}
+
+/**
+ * The loaded list plus whatever the form gained while it was in flight — `mergeByKey` for entries keyed
+ * by their principal. The loaded access wins for a principal on both sides: it is what the server holds.
+ */
+export function mergePermissions(
+  loaded: readonly IdProviderPermission[],
+  edited: readonly IdProviderPermission[],
+): IdProviderPermission[] {
+  const known = new Set(loaded.map(({ principal }) => principal.key));
+
+  return [...loaded, ...edited.filter(({ principal }) => !known.has(principal.key))];
 }
 
 export function withPermissionAccess(

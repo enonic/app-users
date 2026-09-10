@@ -38,9 +38,14 @@ export function listIdProviders(): IdProvider[] {
   return getIdProviders().sort((a, b) => byName(displayNameOf(a), displayNameOf(b)));
 }
 
+/**
+ * ! A get, not a search: `getIdProviders` reads the index, which a create leaves stale, so the row re-read
+ * ! a `created` event asks for would answer null and the new row would leave the list.
+ */
 export function getIdProvider(key: string): IdProvider | null {
-  // `lib/xp/auth` has no read-one, and the list is a handful of entries even on a large install.
-  return getIdProviders().find((provider) => provider.key === key) ?? null;
+  const provider = getProvider({ idProvider: key });
+
+  return provider == null ? null : toSource(provider);
 }
 
 /**

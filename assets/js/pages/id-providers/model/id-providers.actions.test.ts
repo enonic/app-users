@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import type { IdProvider } from '../../../entities/principal';
+import { $idProviderEditor, closeIdProviderEditor } from '../../../features/idprovider-editor';
 import type { ActionContext, SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { ID_PROVIDER_ACTIONS } from './id-providers.actions';
 
@@ -41,9 +42,31 @@ function action(id: string): SectionAction<IdProvider> {
   return found;
 }
 
+afterEach(() => {
+  closeIdProviderEditor();
+});
+
 describe('ID provider actions', () => {
   it('offers new, edit and delete in that order', () => {
     expect(ID_PROVIDER_ACTIONS.map(({ id }) => id)).toEqual(['new', 'edit', 'delete']);
+  });
+
+  it('opens the editor with no provider to create one', () => {
+    void action('new').run(context());
+
+    expect($idProviderEditor.get()).toMatchObject({ open: true, mode: 'create' });
+  });
+
+  it('opens the editor on the one target it was given', () => {
+    void action('edit').run(context({ selected: [empty] }));
+
+    expect($idProviderEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: empty });
+  });
+
+  it('edits the active row when nothing is ticked', () => {
+    void action('edit').run(context({ active: empty }));
+
+    expect($idProviderEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: empty });
   });
 });
 

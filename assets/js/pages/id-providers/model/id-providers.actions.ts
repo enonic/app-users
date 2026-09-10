@@ -1,5 +1,5 @@
 import type { IdProvider } from '../../../entities/principal';
-import { openIdProviderCreator, openIdProviderEditor } from '../../../features/idprovider-editor';
+import { openIdProviderEditor } from '../../../features/idprovider-editor';
 import {
   type ActionContext,
   actionTargets,
@@ -30,7 +30,7 @@ export const ID_PROVIDER_ACTIONS: readonly SectionAction<IdProvider>[] = [
     id: 'new',
     labelKey: 'idProviders.action.new',
     enabled: () => true,
-    run: openIdProviderCreator,
+    run: () => openIdProviderEditor({ mode: 'create' }),
   },
   {
     id: 'edit',
@@ -40,7 +40,7 @@ export const ID_PROVIDER_ACTIONS: readonly SectionAction<IdProvider>[] = [
     run: (ctx) => {
       const [target] = actionTargets(ctx);
       if (target !== undefined) {
-        openIdProviderEditor(target);
+        openIdProviderEditor({ mode: 'edit', entity: target });
       }
     },
   },

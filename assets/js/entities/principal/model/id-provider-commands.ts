@@ -4,6 +4,7 @@ import type { AppError } from '../../../shared/api';
 import { i18n } from '../../../shared/i18n';
 import type { SelectionStore } from '../../../shared/selection';
 import {
+  requestIdProviderExists,
   sendIdProviderCreation,
   sendIdProviderDeletion,
   sendIdProviderUpdate,
@@ -53,6 +54,20 @@ export function updateIdProvider(
   draft: IdProviderDraft,
 ): ResultAsync<IdProvider, AppError> {
   return sendIdProviderUpdate(key, toInput(draft));
+}
+
+/**
+ * Whether a provider of this name already exists — the wizard's advisory check, asked of a name as it is
+ * typed. A provider's name is its key: unique across the platform, inside nothing.
+ *
+ * ! Advisory: the answer is a moment old by the time the save runs. `createIdProvider` stays the
+ * ! authority on the duplicate.
+ */
+export function isIdProviderNameTaken(
+  name: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestIdProviderExists(name, signal);
 }
 
 /**

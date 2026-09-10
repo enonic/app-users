@@ -5,6 +5,7 @@ import {
   fetchIdProviderPrincipalPage,
   fetchIdProviderPrincipals,
   ID_PROVIDER_PRINCIPALS_PAGE,
+  requestIdProviderExists,
   sendIdProviderCreation,
   sendIdProviderDeletion,
   sendIdProviderUpdate,
@@ -191,5 +192,25 @@ describe('fetchIdProviderPrincipalPage', () => {
     expect(
       (await fetchIdProviderPrincipalPage('gone', 'user', 50))._unsafeUnwrap(),
     ).toBeUndefined();
+  });
+});
+
+describe('requestIdProviderExists', () => {
+  it('reads a key no provider answers to as free', async () => {
+    respondWith({ data: { idProvider: null } });
+
+    const result = await requestIdProviderExists('ldap');
+
+    expect(result._unsafeUnwrap()).toBe(false);
+    expect(sent?.variables).toEqual({ key: 'ldap' });
+  });
+
+  it('asks for the key alone, and reads an answer as taken', async () => {
+    respondWith({ data: { idProvider: { key: 'ldap' } } });
+
+    const result = await requestIdProviderExists('ldap');
+
+    expect(result._unsafeUnwrap()).toBe(true);
+    expect(sent?.query).not.toContain('displayName');
   });
 });

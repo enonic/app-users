@@ -41,7 +41,7 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
   const { blocked } = useDialogLayer(open);
   const [closing, setClosing] = useState(false);
 
-  const closeQuestion = useI18n('dialog.close.question');
+  const closeQuestion = useI18n('browse.dialog.closeQuestion');
 
   const shown = view === 'wizard' ? store.steps.order : [step];
 

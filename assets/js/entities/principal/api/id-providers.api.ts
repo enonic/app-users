@@ -128,6 +128,30 @@ export function fetchIdProvider(
   ).map(({ idProvider }) => (idProvider == null ? undefined : toIdProvider(idProvider)));
 }
 
+/**
+ * Whether a key is taken, and nothing else about whoever holds it. The wizard asks this of a name the
+ * user is still typing, so it selects the key alone rather than reusing the row document.
+ */
+const ID_PROVIDER_EXISTS_DOCUMENT = `
+  query IdProviderExists($key: String!) {
+    idProvider(key: $key) {
+      key
+    }
+  }
+`;
+
+/** Whether a provider answers to the key. A caller that may not read it is told the same as an empty seat. */
+export function requestIdProviderExists(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestGraphQlDocument<{ idProvider: { key: string } | null }>(
+    ID_PROVIDER_EXISTS_DOCUMENT,
+    { key },
+    signal,
+  ).map(({ idProvider }) => idProvider != null);
+}
+
 /** For the ID Providers section, which needs nothing else. */
 export function fetchIdProviders(signal?: AbortSignal): ResultAsync<IdProvider[], AppError> {
   return requestGraphQl<{ idProviders: IdProviderDto[] }>(ID_PROVIDERS_ROOT, { signal }).map(

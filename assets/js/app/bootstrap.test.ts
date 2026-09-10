@@ -15,7 +15,7 @@ const CONFIG = {
   appVersion: '8.1.0',
   eventsUrl: '/_/admin:events',
 };
-const PHRASES = { 'users.heading': 'Users' };
+const PHRASES = { 'browse.toolbar': 'Users' };
 
 const BASE_URL =
   '/admin/com.enonic.xp.app.settings/main/_/admin:extension/com.enonic.xp.app.users:users';
@@ -94,7 +94,7 @@ describe('bootstrap', () => {
   });
 
   it('fails when the phrases payload is not a map of strings', async () => {
-    answers({ config: CONFIG, phrases: { 'users.heading': 42 } });
+    answers({ config: CONFIG, phrases: { 'browse.toolbar': 42 } });
 
     const { $bootstrap, $phrases } = await run();
 

@@ -3,6 +3,7 @@ import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import { isGroupNameTaken } from './group-commands';
+import { isIdProviderNameTaken } from './id-provider-commands';
 import { isIllegalPrincipalName } from './principal-name';
 import {
   createPrincipalNameCheckStore,
@@ -12,8 +13,11 @@ import type { PrincipalType } from './principal.types';
 import { isRoleNameTaken } from './role-commands';
 import { isUserNameTaken } from './user-commands';
 
-/** The principals a wizard names: a user or a group inside a provider, a role on its own. */
-export type NameCheckedType = PrincipalType;
+/**
+ * What a wizard names: a user or a group inside a provider, a role on its own, and the provider itself,
+ * which is no principal but is named the same way.
+ */
+export type NameCheckedType = PrincipalType | 'idProvider';
 
 export type PrincipalNameCheckOptions = {
   /** Skip the debounce: the field was left, or the provider changed under a name already typed. */
@@ -38,6 +42,7 @@ const ASK: Record<
   user: isUserNameTaken,
   group: isGroupNameTaken,
   role: (_idProvider, name, signal) => isRoleNameTaken(name, signal),
+  idProvider: (_idProvider, name, signal) => isIdProviderNameTaken(name, signal),
 };
 
 export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCheck {
@@ -88,7 +93,7 @@ export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCh
 
     /**
      * Asks whether the name is already held — by the provider for a user or a group, by the platform for a
-     * role, which has no provider and passes `''`. Debounced, one request at a time.
+     * role or an ID provider, which have no provider and pass `''`. Debounced, one request at a time.
      */
     ask(idProvider, name, { immediate = false } = {}) {
       cancel();
@@ -137,11 +142,15 @@ export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCh
 // * Internal
 //
 
-// The answer is filed under the key the principal would have, so one name in two providers is two
-// questions. A user or a group has no key until its provider is chosen.
+// The answer is filed under the key the named thing would have, so one name in two providers is two
+// questions. A user or a group has no key until its provider is chosen; an ID provider's key is its name.
 function keyOf(type: NameCheckedType, idProvider: string, name: string): string | undefined {
   if (type === 'role') {
     return `role:${name}`;
+  }
+
+  if (type === 'idProvider') {
+    return name;
   }
 
   return idProvider.length === 0 ? undefined : `${type}:${idProvider}:${name}`;

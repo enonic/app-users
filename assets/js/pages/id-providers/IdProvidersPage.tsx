@@ -8,7 +8,7 @@ import {
   reloadIdProviderPrincipalRows,
   useIdProviders,
 } from '../../entities/principal';
-import { IdProviderEditorDialog } from '../../features/idprovider-editor/IdProviderEditorDialog';
+import { IdProviderEditorDialog } from '../../features/idprovider-editor/ui/IdProviderEditorDialog';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';

@@ -1,5 +1,5 @@
-import { useI18n } from '../../shared/i18n';
-import { ModalDialog } from '../../shared/ui/dialogs/ModalDialog';
+import { useI18n } from '../../../shared/i18n';
+import { ModalDialog } from '../../../shared/ui/dialogs/ModalDialog';
 
 export type ConfigDialogProps = {
   open: boolean;

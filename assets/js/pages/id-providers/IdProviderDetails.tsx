@@ -69,7 +69,7 @@ export function IdProviderDetails({
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openIdProviderEditor(provider)}
+            onClick={() => openIdProviderEditor({ mode: 'edit', entity: provider })}
           />
         }
       >
