@@ -11,5 +11,5 @@ allow:
 interfaces:
   - 'settings.section'
 config:
-  order: 21
+  order: 22
   path: 'groups'

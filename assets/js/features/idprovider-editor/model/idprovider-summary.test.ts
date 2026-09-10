@@ -38,11 +38,10 @@ describe('idProviderSummaryRows', () => {
     expect(rows.some(({ labelKey }) => labelKey === 'idProviders.dialog.description')).toBe(false);
   });
 
-  // A provider bound to nothing serves no login: that is an answer, not an omission.
-  it('keeps the application row for a provider bound to nothing', () => {
-    const rows = idProviderSummaryRows({ ...FORM, application: '' }, 'Bound to no application');
+  it('drops the application row for a provider bound to nothing', () => {
+    const rows = idProviderSummaryRows({ ...FORM, application: '' }, undefined);
 
-    expect(rows.at(-1)?.value).toBe('Bound to no application');
+    expect(rows.some(({ labelKey }) => labelKey === 'idProviders.dialog.application')).toBe(false);
   });
 
   // They are principals with a level each, not text: the step renders them as labels itself.

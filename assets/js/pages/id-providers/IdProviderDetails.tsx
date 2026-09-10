@@ -46,7 +46,6 @@ export function IdProviderDetails({
   const editLabel = useI18n('idProviders.details.edit');
   const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
   const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');
-  const noApplicationLabel = useI18n('idProviders.details.noApplication');
   const loadMoreLabel = useI18n('browse.list.loadMore');
   const loadingMoreLabel = useI18n('browse.list.loadingMore');
   const loadMoreFailedLabel = useI18n('browse.list.loadMoreFailed');
@@ -87,9 +86,11 @@ export function IdProviderDetails({
             {description}
           </DetailsPanel.Field>
         )}
-        <DetailsPanel.Field labelKey="idProviders.details.application">
-          {application?.displayName ?? noApplicationLabel}
-        </DetailsPanel.Field>
+        {application !== undefined && (
+          <DetailsPanel.Field labelKey="idProviders.details.application">
+            {application.displayName}
+          </DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
       {/* Heading alone until the read answers: absent is "not read yet", an empty list is "nobody". */}

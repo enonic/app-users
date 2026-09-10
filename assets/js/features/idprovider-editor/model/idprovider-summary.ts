@@ -8,13 +8,12 @@ export type IdProviderSummaryRow = { labelKey: string; value: string };
 
 /**
  * The wizard's answers as the summary reads them back, in the order the step asked for them. A description
- * nobody typed is dropped, as the Content Studio project wizard does; the binding is not, since a provider
- * bound to nothing serves no login, which is worth reading back. `application` arrives as text: the name
- * of the bound application, or what the step says for none.
+ * nobody typed and a binding nobody made are dropped, as the Content Studio project wizard does.
+ * `application` arrives as text: the name of the bound application, when there is one.
  */
 export function idProviderSummaryRows(
   form: IdProviderForm,
-  application: string,
+  application: string | undefined,
 ): readonly IdProviderSummaryRow[] {
   const rows: IdProviderSummaryRow[] = [
     { labelKey: 'idProviders.dialog.section', value: `${form.displayName} (${form.name})` },
@@ -24,7 +23,9 @@ export function idProviderSummaryRows(
     rows.push({ labelKey: 'idProviders.dialog.description', value: form.description });
   }
 
-  rows.push({ labelKey: 'idProviders.dialog.application', value: application });
+  if (application !== undefined) {
+    rows.push({ labelKey: 'idProviders.dialog.application', value: application });
+  }
 
   return rows;
 }

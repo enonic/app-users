@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/preact';
-import { User as UserGlyph } from 'lucide-react';
+import { User as UserGlyph, UserCog } from 'lucide-react';
 import { useEffect } from 'preact/hooks';
 
 import { createUser, updateUser, type User } from '../../../entities/principal';
@@ -92,6 +92,8 @@ export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
   };
 
   const text = serviceAccount ? SERVICE_ACCOUNT_TEXT : USER_TEXT;
+  // The section's own rail icon, so the dialog names the section it was opened from.
+  const Glyph = serviceAccount ? UserCog : UserGlyph;
 
   const save = (): Promise<void> =>
     runStepDialogSave(userEditorDialog, {
@@ -112,7 +114,7 @@ export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
   return (
     <StepDialog
       store={userEditorDialog}
-      glyph={<UserGlyph size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
+      glyph={<Glyph size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       titles={text.titles}
       panels={USER_EDITOR_STEP_PANELS}
       onSave={() => void save()}

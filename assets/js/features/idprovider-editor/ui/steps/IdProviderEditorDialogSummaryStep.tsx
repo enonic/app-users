@@ -16,13 +16,12 @@ export function IdProviderEditorDialogSummaryStep() {
   const applications = useStore($idProviderApplications);
 
   const permissionsLabel = useI18n('idProviders.dialog.permissions');
-  const noApplication = useI18n('idProviders.dialog.noApplication');
 
   const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
 
   const application =
     form.application === ''
-      ? noApplication
+      ? undefined
       : (applications.find(({ key }) => key === form.application)?.displayName ?? form.application);
 
   const accessLabelOf = (key: string): string | undefined => {

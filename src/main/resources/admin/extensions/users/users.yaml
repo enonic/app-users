@@ -11,5 +11,5 @@ allow:
 interfaces:
   - 'settings.section'
 config:
-  order: 20
+  order: 21
   path: 'users'
