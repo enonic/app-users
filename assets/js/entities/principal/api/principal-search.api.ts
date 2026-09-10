@@ -1,78 +1,54 @@
 import type { ResultAsync } from 'neverthrow';
 
 import { requestGraphQlDocument, type AppError } from '../../../shared/api';
-import type { PrincipalKey, PrincipalRef } from '../model/principal.types';
+import type { PrincipalPage, PrincipalRef, PrincipalType } from '../model/principal.types';
 
-const USER_SEARCH_DOCUMENT = `
-  query PrincipalSearchUsers($search: String, $count: Int) {
-    users(search: $search, count: $count) {
+const PRINCIPAL_SEARCH_DOCUMENT = `
+  query PrincipalSearch($types: [PrincipalType!], $idProvider: String, $search: String, $start: Int, $count: Int) {
+    principals(types: $types, idProvider: $idProvider, search: $search, start: $start, count: $count) {
+      total
       hits {
         key
+        type
         displayName
       }
     }
   }
 `;
 
-const GROUP_SEARCH_DOCUMENT = `
-  query PrincipalSearchGroups {
-    groups {
-      key
-      displayName
-    }
-  }
-`;
-
-const ROLE_SEARCH_DOCUMENT = `
-  query PrincipalSearchRoles {
-    roles {
-      key
-      displayName
-    }
-  }
-`;
-
-type PrincipalHitDto = {
-  key: string;
-  displayName: string;
+export type PrincipalSearchQuery = {
+  types: readonly PrincipalType[];
+  idProvider?: string;
+  search: string;
+  start: number;
+  count: number;
 };
 
-type UserSearchResult = {
-  users: { hits: PrincipalHitDto[] } | null;
+type PrincipalSearchResult = {
+  principals: { total: number; hits: PrincipalRef[] } | null;
 };
 
-type GroupSearchResult = {
-  groups: PrincipalHitDto[] | null;
-};
-
-type RoleSearchResult = {
-  roles: PrincipalHitDto[] | null;
-};
-
-export function searchUsers(
-  search: string,
-  count: number,
+export function searchPrincipals(
+  { types, idProvider, search, start, count }: PrincipalSearchQuery,
   signal?: AbortSignal,
-): ResultAsync<PrincipalRef[], AppError> {
-  return requestGraphQlDocument<UserSearchResult>(
-    USER_SEARCH_DOCUMENT,
-    { search: search.length > 0 ? search : undefined, count },
+): ResultAsync<PrincipalPage, AppError> {
+  return requestGraphQlDocument<PrincipalSearchResult>(
+    PRINCIPAL_SEARCH_DOCUMENT,
+    {
+      types,
+      idProvider: nonEmpty(idProvider),
+      search: nonEmpty(search.trim()),
+      start,
+      count,
+    },
     signal,
-  ).map((data) => (data.users?.hits ?? []).map((hit) => toRef(hit, 'user')));
-}
-
-export function fetchGroupRefs(signal?: AbortSignal): ResultAsync<PrincipalRef[], AppError> {
-  return requestGraphQlDocument<GroupSearchResult>(GROUP_SEARCH_DOCUMENT, {}, signal).map((data) =>
-    (data.groups ?? []).map((hit) => toRef(hit, 'group')),
+  ).map(({ principals }) =>
+    principals == null
+      ? { total: 0, items: [] }
+      : { total: principals.total, items: principals.hits },
   );
 }
 
-export function fetchRoleRefs(signal?: AbortSignal): ResultAsync<PrincipalRef[], AppError> {
-  return requestGraphQlDocument<RoleSearchResult>(ROLE_SEARCH_DOCUMENT, {}, signal).map((data) =>
-    (data.roles ?? []).map((hit) => toRef(hit, 'role')),
-  );
-}
-
-function toRef({ key, displayName }: PrincipalHitDto, type: PrincipalRef['type']): PrincipalRef {
-  return { key: key as PrincipalKey, type, displayName };
+function nonEmpty(value?: string): string | undefined {
+  return value !== undefined && value.length > 0 ? value : undefined;
 }

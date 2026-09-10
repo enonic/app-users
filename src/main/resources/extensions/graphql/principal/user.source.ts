@@ -16,7 +16,14 @@ import {
   type UserKey,
 } from '/lib/xp/auth';
 
-import { byName, requireIdProvider, toPrincipalItem, type PrincipalItem } from './principal.source';
+import {
+  byName,
+  clampCount,
+  clampStart,
+  requireIdProvider,
+  toPrincipalItem,
+  type PrincipalItem,
+} from './principal.source';
 
 export type UserSource = User;
 
@@ -57,26 +64,6 @@ export type UserQuery = {
 };
 
 const DEFAULT_COUNT = 50;
-
-// ! A page size clamped at both ends, and the lower bound is the interesting one: `count: -1` is
-// ! `GET_ALL_SIZE_FLAG` to `findUsers`, i.e. every user, which on a directory-backed install means the
-// ! whole directory read inside the app's single JS thread — so an upper bound alone would not do, since
-// ! `Math.min(-1, 100)` is `-1`. Zero stays allowed: it asks for the total without a single row, the same
-// ! trick `id-provider.source.ts` counts principals with — `SecurityServiceImpl` takes the total from the
-// ! search rather than from the hits, so a page of none still reports how many matched.
-const MIN_COUNT = 0;
-const MAX_COUNT = 100;
-
-/**
- * ! How far paging may reach, and it is a real limit rather than a nicety. Elasticsearch refuses a query
- * ! whose `from + size` passes `index.max_result_window` — 10 000 by default, and XP's
- * ! `search-settings.json` does not raise it — with a `QueryPhaseExecutionException` that
- * ! `SecurityServiceImpl.query` does not catch (it catches only `NodeNotFoundException`). The `users`
- * ! field would then error and the whole list would blank. Two hundred `Load more` clicks reach it, so
- * ! this is not a hypothetical on the installs this section exists for. Clamped rather than refused: a
- * ! caller asking beyond the window gets the last page it can have, not a broken screen.
- */
-const MAX_START = 10_000 - MAX_COUNT;
 
 /**
  * `displayName` and `_allText`, the pair XP itself searches principals on.
@@ -122,7 +109,7 @@ export function listUsers({
 }: UserQuery): UserPage {
   const { total, hits } = findUsers({
     start: clampStart(start),
-    count: clampCount(count),
+    count: clampCount(count, DEFAULT_COUNT),
     query: queryExpression(search, idProviders, excludeIdProviders),
     sort: SORT_EXPRESSIONS[sort ?? 'displayNameAsc'],
   });
@@ -356,14 +343,6 @@ function queryExpression(
 
 function named(providers?: readonly string[]): readonly string[] {
   return (providers ?? []).filter((provider) => provider.length > 0);
-}
-
-function clampCount(count?: number): number {
-  return Math.min(Math.max(count ?? DEFAULT_COUNT, MIN_COUNT), MAX_COUNT);
-}
-
-function clampStart(start?: number): number {
-  return Math.min(Math.max(start ?? 0, 0), MAX_START);
 }
 
 function requirePassword(password: string): void {

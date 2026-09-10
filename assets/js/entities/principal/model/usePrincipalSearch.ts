@@ -1,116 +1,83 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 
-import { fetchGroupRefs, fetchRoleRefs, searchUsers } from '../api/principal-search.api';
-import { matching } from './principal-match';
-import type { PrincipalRef, PrincipalType } from './principal.types';
+import { searchPrincipals } from '../api/principal-search.api';
+import {
+  appendPrincipalSearch,
+  beginPrincipalSearch,
+  beginPrincipalSearchAppend,
+  failPrincipalSearch,
+  failPrincipalSearchAppend,
+  IDLE_PRINCIPAL_SEARCH,
+  PRINCIPAL_SEARCH_PAGE,
+  principalSearchAppendStart,
+  receivePrincipalSearch,
+  type PrincipalSearchState,
+} from './principal-search';
+import type { PrincipalType } from './principal.types';
 
-export type PrincipalSearchState = {
-  status: 'loading' | 'ready' | 'error';
-  /** Matches in the order they are offered: users, then groups, then roles. */
-  principals: readonly PrincipalRef[];
-  error?: string;
-  /** A whole-list kind that could not be loaded, so the offer is short without saying why. */
-  incompleteKinds: readonly PrincipalType[];
+export type PrincipalSearch = PrincipalSearchState & {
+  hasMore: boolean;
+  loadMore: () => void;
 };
 
 const DEBOUNCE_MS = 250;
-
-const PAGE_SIZE = 20;
-
-const EMPTY: readonly PrincipalRef[] = [];
 
 export function usePrincipalSearch(
   query: string,
   enabled: boolean,
   kinds: readonly PrincipalType[],
-): PrincipalSearchState {
-  const wantsUsers = kinds.includes('user');
-  const wantsGroups = kinds.includes('group');
-  const wantsRoles = kinds.includes('role');
+  idProvider?: string,
+): PrincipalSearch {
+  const [state, setState] = useState<PrincipalSearchState>(IDLE_PRINCIPAL_SEARCH);
+  const pending = useRef<AbortController | undefined>(undefined);
 
-  const [users, setUsers] = useState<readonly PrincipalRef[]>(EMPTY);
-  const [groups, setGroups] = useState<readonly PrincipalRef[]>(EMPTY);
-  const [roles, setRoles] = useState<readonly PrincipalRef[]>(EMPTY);
-  const [status, setStatus] = useState<PrincipalSearchState['status']>('ready');
-  const [error, setError] = useState<string | undefined>();
-  const [groupsFailed, setGroupsFailed] = useState(false);
-  const [rolesFailed, setRolesFailed] = useState(false);
+  const kindsRef = useRef(kinds);
+  kindsRef.current = kinds;
+  const kindsKey = kinds.join(',');
+
+  const provider = idProvider === undefined || idProvider.length === 0 ? undefined : idProvider;
+
+  const settle = (controller: AbortController): void => {
+    if (pending.current === controller) {
+      pending.current = undefined;
+    }
+  };
 
   useEffect(() => {
-    if (!enabled || !wantsGroups) {
+    pending.current?.abort();
+    pending.current = undefined;
+
+    if (!enabled) {
+      setState(IDLE_PRINCIPAL_SEARCH);
       return;
     }
 
-    const controller = new AbortController();
-
-    void fetchGroupRefs(controller.signal).match(
-      (loaded) => {
-        if (!controller.signal.aborted) {
-          setGroups(loaded);
-          setGroupsFailed(false);
-        }
-      },
-      () => {
-        if (!controller.signal.aborted) {
-          setGroups(EMPTY);
-          setGroupsFailed(true);
-        }
-      },
-    );
-
-    return () => controller.abort();
-  }, [enabled, wantsGroups]);
-
-  useEffect(() => {
-    if (!enabled || !wantsRoles) {
-      return;
-    }
+    setState(beginPrincipalSearch);
 
     const controller = new AbortController();
+    pending.current = controller;
 
-    void fetchRoleRefs(controller.signal).match(
-      (loaded) => {
-        if (!controller.signal.aborted) {
-          setRoles(loaded);
-          setRolesFailed(false);
-        }
-      },
-      () => {
-        if (!controller.signal.aborted) {
-          setRoles(EMPTY);
-          setRolesFailed(true);
-        }
-      },
-    );
-
-    return () => controller.abort();
-  }, [enabled, wantsRoles]);
-
-  useEffect(() => {
-    if (!enabled || !wantsUsers) {
-      setUsers(EMPTY);
-      setStatus('ready');
-      setError(undefined);
-      return;
-    }
-
-    setStatus('loading');
-
-    const controller = new AbortController();
     const timer = setTimeout(() => {
-      void searchUsers(query, PAGE_SIZE, controller.signal).match(
-        (found) => {
+      void searchPrincipals(
+        {
+          types: kindsRef.current,
+          idProvider: provider,
+          search: query,
+          start: 0,
+          count: PRINCIPAL_SEARCH_PAGE,
+        },
+        controller.signal,
+      ).match(
+        (page) => {
           if (!controller.signal.aborted) {
-            setUsers(found);
-            setStatus('ready');
-            setError(undefined);
+            settle(controller);
+            setState(receivePrincipalSearch(page));
           }
         },
         (failure) => {
           if (!controller.signal.aborted) {
-            setUsers(EMPTY);
-            setStatus('error');
-            setError(failure.message);
+            settle(controller);
+            setState(failPrincipalSearch(failure.message));
           }
         },
       );
@@ -119,25 +86,47 @@ export function usePrincipalSearch(
     return () => {
       clearTimeout(timer);
       controller.abort();
+      pending.current?.abort();
+      pending.current = undefined;
     };
-  }, [query, enabled, wantsUsers]);
+  }, [query, enabled, kindsKey, provider]);
 
-  const incompleteKinds: PrincipalType[] = [];
-  if (groupsFailed) {
-    incompleteKinds.push('group');
-  }
-  if (rolesFailed) {
-    incompleteKinds.push('role');
-  }
+  const start = principalSearchAppendStart(state);
 
-  return {
-    status,
-    principals: [
-      ...users,
-      ...matching(groups, query).slice(0, PAGE_SIZE),
-      ...matching(roles, query).slice(0, PAGE_SIZE),
-    ],
-    error,
-    incompleteKinds,
+  const loadMore = (): void => {
+    if (start === undefined || pending.current !== undefined) {
+      return;
+    }
+
+    const controller = new AbortController();
+    pending.current = controller;
+
+    setState(beginPrincipalSearchAppend);
+
+    void searchPrincipals(
+      {
+        types: kindsRef.current,
+        idProvider: provider,
+        search: query,
+        start,
+        count: PRINCIPAL_SEARCH_PAGE,
+      },
+      controller.signal,
+    ).match(
+      (page) => {
+        if (!controller.signal.aborted) {
+          settle(controller);
+          setState((current) => appendPrincipalSearch(current, page));
+        }
+      },
+      (failure) => {
+        if (!controller.signal.aborted) {
+          settle(controller);
+          setState((current) => failPrincipalSearchAppend(current, failure.message));
+        }
+      },
+    );
   };
+
+  return { ...state, hasMore: start !== undefined, loadMore };
 }

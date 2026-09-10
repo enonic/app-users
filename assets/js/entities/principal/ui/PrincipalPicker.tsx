@@ -1,13 +1,12 @@
 import { Checkbox, Combobox, GridList, IconButton, Listbox, useCombobox } from '@enonic/ui';
 import { X } from 'lucide-react';
 import { useId, useState } from 'preact/hooks';
-import type { ReactNode } from 'react';
+import type { ReactNode, UIEvent } from 'react';
 
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
-import { idProviderOf } from '../model/principal.keys';
 import type { PrincipalRef, PrincipalType } from '../model/principal.types';
-import { usePrincipalSearch, type PrincipalSearchState } from '../model/usePrincipalSearch';
+import { usePrincipalSearch, type PrincipalSearch } from '../model/usePrincipalSearch';
 import { PrincipalLabel } from './PrincipalLabel';
 
 export type PrincipalPickerProps = {
@@ -34,11 +33,7 @@ export type PrincipalPickerProps = {
   idProvider?: string;
 };
 
-const INCOMPLETE_KEYS: Record<PrincipalType, string> = {
-  user: 'principal.picker.usersFailed',
-  group: 'principal.picker.groupsFailed',
-  role: 'principal.picker.rolesFailed',
-};
+const LOAD_MORE_MARGIN = 48;
 
 export function PrincipalPicker({
   selected,
@@ -62,15 +57,11 @@ export function PrincipalPicker({
     i18n('principal.picker.remove', principal.displayName);
   const applyLabel = useI18n('principal.picker.apply');
 
-  const { status, principals, incompleteKinds } = usePrincipalSearch(query, open, kinds);
+  const search = usePrincipalSearch(query, open, kinds, idProvider);
 
-  // ? The filters sit on the offer alone: a principal already picked stays in the list below even when
+  // ? The exclusion sits on the offer alone: a principal already picked stays in the list below even when
   // ? a later change would no longer offer it, rather than disappearing from under the user.
-  const offered = principals.filter(
-    ({ key }) =>
-      excluded?.has(key) !== true &&
-      (idProvider === undefined || idProvider.length === 0 || idProviderOf(key) === idProvider),
-  );
+  const offered = search.principals.filter(({ key }) => excluded?.has(key) !== true);
 
   const pickedKeys = selected.map(({ key }) => key);
 
@@ -127,8 +118,7 @@ export function PrincipalPicker({
             <Combobox.Popup>
               <PrincipalOptions
                 principals={offered}
-                status={status}
-                incompleteKinds={incompleteKinds}
+                search={search}
                 locked={locked}
                 searchingLabel={searchingLabel}
                 noMatchesLabel={noMatchesLabel}
@@ -172,8 +162,7 @@ export function PrincipalPicker({
 
 type PrincipalOptionsProps = {
   principals: readonly PrincipalRef[];
-  status: PrincipalSearchState['status'];
-  incompleteKinds: readonly PrincipalType[];
+  search: PrincipalSearch;
   locked?: ReadonlySet<string>;
   searchingLabel: string;
   noMatchesLabel: string;
@@ -182,8 +171,7 @@ type PrincipalOptionsProps = {
 
 function PrincipalOptions({
   principals,
-  status,
-  incompleteKinds,
+  search,
   locked,
   searchingLabel,
   noMatchesLabel,
@@ -193,23 +181,25 @@ function PrincipalOptions({
   // ! ticks the moment it is clicked while the form still holds what Apply last handed it.
   const { selection } = useCombobox();
 
-  return (
-    <Combobox.ListContent className="max-h-60 overflow-y-auto">
-      {status === 'error' && <p className="text-error px-2.5 py-1 text-sm">{failedLabel}</p>}
+  const { status, error, appending, hasMore, loadMore } = search;
 
+  const handleScroll = (event: UIEvent<HTMLDivElement>): void => {
+    const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
+
+    if (hasMore && scrollHeight - scrollTop - clientHeight <= LOAD_MORE_MARGIN) {
+      loadMore();
+    }
+  };
+
+  return (
+    <Combobox.ListContent className="max-h-60 overflow-y-auto" onScroll={handleScroll}>
       {status === 'loading' && principals.length === 0 && (
         <p className="text-subtle px-2.5 py-1 text-sm">{searchingLabel}</p>
       )}
 
-      {status === 'ready' && principals.length === 0 && incompleteKinds.length === 0 && (
+      {status === 'ready' && principals.length === 0 && (
         <p className="text-subtle px-2.5 py-1 text-sm">{noMatchesLabel}</p>
       )}
-
-      {incompleteKinds.map((kind) => (
-        <p key={kind} className="text-error px-2.5 py-1 text-sm">
-          {i18n(INCOMPLETE_KEYS[kind])}
-        </p>
-      ))}
 
       {principals.map((principal) => (
         <Listbox.Item
@@ -226,6 +216,10 @@ function PrincipalOptions({
           />
         </Listbox.Item>
       ))}
+
+      {appending && <p className="text-subtle px-2.5 py-1 text-sm">{searchingLabel}</p>}
+
+      {error !== undefined && <p className="text-error px-2.5 py-1 text-sm">{failedLabel}</p>}
     </Combobox.ListContent>
   );
 }
