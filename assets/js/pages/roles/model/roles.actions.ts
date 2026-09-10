@@ -20,18 +20,6 @@ export const ROLE_ACTIONS: readonly SectionAction<Role>[] = [
     run: () => openRoleEditor({ mode: 'create' }),
   },
   {
-    id: 'edit',
-    labelKey: 'roles.action.edit',
-    enabled: (ctx) => actionTargets(ctx).length === 1,
-    activatedByRow: true,
-    run: (ctx) => {
-      const [target] = actionTargets(ctx);
-      if (target !== undefined) {
-        openRoleEditor({ mode: 'edit', entity: target });
-      }
-    },
-  },
-  {
     id: 'delete',
     labelKey: 'roles.action.delete',
     enabled: deletable,

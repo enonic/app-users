@@ -29,26 +29,14 @@ function action(id: string): SectionAction<Group> {
 }
 
 describe('group actions', () => {
-  it('offers new, edit and delete in that order', () => {
-    expect(GROUP_ACTIONS.map(({ id }) => id)).toEqual(['new', 'edit', 'delete']);
+  it('offers new and delete in that order', () => {
+    expect(GROUP_ACTIONS.map(({ id }) => id)).toEqual(['new', 'delete']);
   });
 });
 
 describe('new group', () => {
   it('needs no target', () => {
     expect(action('new').enabled(context())).toBe(true);
-  });
-});
-
-describe('edit group', () => {
-  it('needs exactly one target', () => {
-    expect(action('edit').enabled(context())).toBe(false);
-    expect(action('edit').enabled(context({ selected: [editors] }))).toBe(true);
-    expect(action('edit').enabled(context({ selected: [editors, support] }))).toBe(false);
-  });
-
-  it('falls back to the active row when nothing is ticked', () => {
-    expect(action('edit').enabled(context({ active: editors }))).toBe(true);
   });
 });
 

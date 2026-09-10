@@ -14,18 +14,6 @@ export const GROUP_ACTIONS: readonly SectionAction<Group>[] = [
     run: () => openGroupEditor({ mode: 'create' }),
   },
   {
-    id: 'edit',
-    labelKey: 'groups.action.edit',
-    enabled: (ctx) => actionTargets(ctx).length === 1,
-    activatedByRow: true,
-    run: (ctx) => {
-      const [target] = actionTargets(ctx);
-      if (target !== undefined) {
-        openGroupEditor({ mode: 'edit', entity: target });
-      }
-    },
-  },
-  {
     id: 'delete',
     labelKey: 'groups.action.delete',
     enabled: (ctx) => actionTargets(ctx).length > 0,
