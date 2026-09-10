@@ -9,13 +9,11 @@ import {
   type IdProviderAccess,
   type IdProviderPermission,
   type IdProviderPrincipalsState,
-  type PrincipalSetType,
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openIdProviderEditorAt } from '../../features/idprovider-editor';
 import { useI18n, useLabelled } from '../../shared/i18n';
-import { countedSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 /** The levels in the platform's own order, widening, named for the panel. */
@@ -61,20 +59,9 @@ export function IdProviderDetails({
   const { key, displayName, description, application } = provider;
 
   // The row's totals until the panel's own read answers, so a count appears before the rows do.
-  const sections = countedSections([
-    {
-      labelKey: 'idProviders.details.users',
-      type: 'user' as PrincipalSetType,
-      set: principals?.users ?? provider.users,
-      rows: principals?.users,
-    },
-    {
-      labelKey: 'idProviders.details.groups',
-      type: 'group' as PrincipalSetType,
-      set: principals?.groups ?? provider.groups,
-      rows: principals?.groups,
-    },
-  ]);
+  const users = principals?.users;
+  const groups = principals?.groups;
+  const total = (users?.total ?? provider.users.total) + (groups?.total ?? provider.groups.total);
 
   return (
     <DetailsPanel>
@@ -135,48 +122,45 @@ export function IdProviderDetails({
         {permissionsFailed && <p className="text-error text-sm">{permissionsFailedLabel}</p>}
       </DetailsPanel.Section>
 
-      {sections.map(({ labelKey, type, set, rows }) => (
-        <DetailsPanel.Section key={labelKey} labelKey={labelKey} count={set.total}>
-          {/* Absent rows are "not read yet", not "none", so the heading and its count stand alone
-              rather than over an empty list. */}
-          {/* Ten of the first page, the rest counted off the total: nothing for a `Load more` to add. */}
-          {rows !== undefined && type === 'user' && (
-            <PrincipalAvatars principals={rows.items} total={set.total} />
-          )}
+      <DetailsPanel.Section labelKey="idProviders.details.members" count={total}>
+        {users !== undefined && users.total > 0 && (
+          <DetailsPanel.Subsection labelKey="idProviders.details.users" count={users.total}>
+            <PrincipalAvatars principals={users.items} total={users.total} />
+          </DetailsPanel.Subsection>
+        )}
 
-          {rows !== undefined && type === 'group' && (
-            <>
-              <DetailsPanel.List>
-                {rows.items.map((principal) => (
-                  <DetailsPanel.ListItem
-                    key={principal.key}
-                    icon={<PrincipalIcon principal={principal} />}
-                    title={principal.displayName}
-                    subtitle={principalName(principal.key)}
-                  />
-                ))}
-              </DetailsPanel.List>
-
-              {rows.error !== undefined && (
-                <p className="text-error text-sm">{loadMoreFailedLabel}</p>
-              )}
-
-              {idProviderPrincipalsHasMore(rows) && (
-                <Button
-                  variant="text"
-                  size="sm"
-                  className="self-start"
-                  label={rows.appending ? loadingMoreLabel : loadMoreLabel}
-                  disabled={rows.appending}
-                  onClick={() => loadMoreIdProviderPrincipals(type)}
+        {groups !== undefined && groups.total > 0 && (
+          <DetailsPanel.Subsection labelKey="idProviders.details.groups" count={groups.total}>
+            <DetailsPanel.List>
+              {groups.items.map((principal) => (
+                <DetailsPanel.ListItem
+                  key={principal.key}
+                  icon={<PrincipalIcon principal={principal} />}
+                  title={principal.displayName}
+                  subtitle={principalName(principal.key)}
                 />
-              )}
-            </>
-          )}
+              ))}
+            </DetailsPanel.List>
 
-          {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
-        </DetailsPanel.Section>
-      ))}
+            {groups.error !== undefined && (
+              <p className="text-error text-sm">{loadMoreFailedLabel}</p>
+            )}
+
+            {idProviderPrincipalsHasMore(groups) && (
+              <Button
+                variant="text"
+                size="sm"
+                className="self-start"
+                label={groups.appending ? loadingMoreLabel : loadMoreLabel}
+                disabled={groups.appending}
+                onClick={() => loadMoreIdProviderPrincipals('group')}
+              />
+            )}
+          </DetailsPanel.Subsection>
+        )}
+
+        {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
+      </DetailsPanel.Section>
     </DetailsPanel>
   );
 }

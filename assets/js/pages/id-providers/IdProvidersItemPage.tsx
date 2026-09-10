@@ -19,7 +19,7 @@ export function IdProvidersItemPage() {
 
   // The rows belong to the provider they were read for, and only once that read has answered: a panel
   // still reading — a selection that has just moved, a `Refresh` — shows the counts the row carries,
-  // rather than dropping its two sections to nothing and back.
+  // rather than dropping its Members section to nothing and back.
   const read = principals.key === provider.key ? principals : undefined;
 
   // The same for the access control list: the loader keeps the previous item while the next is read.
