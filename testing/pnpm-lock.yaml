@@ -55,8 +55,8 @@ importers:
         specifier: ^9.31.5
         version: 9.31.5(@wdio/globals@9.31.3)(webdriverio@9.31.5)
       '@wdio/mocha-framework':
-        specifier: ^9.31.5
-        version: 9.31.5
+        specifier: ^9.31.6
+        version: 9.31.6
       allure-commandline:
         specifier: ^2.43.0
         version: 2.43.0
@@ -515,8 +515,8 @@ packages:
     resolution: {integrity: sha512-0ZAEIo6PNyMIJPlOGkIgyOJUjcd0pC8/QHlVAAe1c91/IcjZ1X+k0yidXHaboJdN7dq1XPUacmhRdtua0U5EZg==}
     engines: {node: '>=18.20.0'}
 
-  '@wdio/mocha-framework@9.31.5':
-    resolution: {integrity: sha512-UYGNF8M77T7PKvRGidN+Iu++LSPLKbKpQ+K3eJEaDnP7hWcHk+x7VYKrXWPWorPuJfS2ocT+QWAgZlkEhTo6fQ==}
+  '@wdio/mocha-framework@9.31.6':
+    resolution: {integrity: sha512-huGMzC912yUIPKPuJht/GMtrpBZLC68L9vGoPSaPwAohkB3UZZxq6QNg0c+VV1iTPE0LcU7iptYk/Lf/hwC/7w==}
     engines: {node: '>=18.20.0'}
 
   '@wdio/protocols@9.31.5':
@@ -2387,13 +2387,13 @@ snapshots:
       safe-regex2: 5.1.1
       strip-ansi: 7.2.0
 
-  '@wdio/mocha-framework@9.31.5':
+  '@wdio/mocha-framework@9.31.6':
     dependencies:
       '@types/mocha': 10.0.10
       '@types/node': 20.19.43
       '@wdio/logger': 9.29.1
       '@wdio/types': 9.31.2
-      '@wdio/utils': 9.31.5
+      '@wdio/utils': 9.31.6
       mocha: 10.8.2
     transitivePeerDependencies:
       - bare-abort-controller
