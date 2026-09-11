@@ -18,6 +18,8 @@ export type DetailStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 export type DetailState<T> = {
   status: DetailStatus;
+  /** The key this state describes while the item is loading, ready or failed. */
+  key?: string;
   /**
    * What the panel is showing, or the last thing it showed while the next is on its way.
    *
@@ -107,10 +109,11 @@ export function createDetailLoader<T extends { key: string }>({
     cache.set(key, item);
   }
 
-  function receive(result: Result<T | undefined, AppError>): void {
+  function receive(key: string, result: Result<T | undefined, AppError>): void {
     result.match(
-      (item) => $detail.set(item === undefined ? { status: 'idle' } : { status: 'ready', item }),
-      (error) => $detail.set({ status: 'error', error: error.message }),
+      (item) =>
+        $detail.set(item === undefined ? { status: 'idle' } : { status: 'ready', key, item }),
+      (error) => $detail.set({ status: 'error', key, error: error.message }),
     );
   }
 
@@ -127,11 +130,11 @@ export function createDetailLoader<T extends { key: string }>({
         if (item !== undefined) {
           remember(key, item);
         }
-        receive(ok(item));
+        receive(key, ok(item));
       },
       (error) => {
         if (!signal.aborted) {
-          receive(err(error));
+          receive(key, err(error));
         }
       },
     );
@@ -148,13 +151,13 @@ export function createDetailLoader<T extends { key: string }>({
 
     const cached = cache.get(key);
     if (cached !== undefined) {
-      receive(ok(cached));
+      receive(key, ok(cached));
       return;
     }
 
     // ! Keeps what is on screen while the next item is fetched, so stepping through rows does not flash
     // ! empty. The message goes, though: it belonged to the load that failed, not to this one.
-    $detail.set({ status: 'loading', item: $detail.get().item });
+    $detail.set({ status: 'loading', key, item: $detail.get().item });
     scheduled = setTimeout(() => void request(key), DEBOUNCE_MS);
   }
 

@@ -191,6 +191,17 @@ describe('showUser', () => {
     expect($userDetail.get()).toEqual({ status: 'idle' });
   });
 
+  it('does not re-read after the panel cleared its selection', async () => {
+    showUser('user:system:alice');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    showUser(undefined);
+    forgetUserDetails();
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(reads()).toBe(1);
+  });
+
   it('empties the panel for a key no user answers to, without calling it a failure', async () => {
     vi.mocked(fetchUserDetail).mockReturnValue(answeredNothing());
 
@@ -211,8 +222,9 @@ describe('showUser', () => {
     showUser('user:system:bob');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
-    const { status, item: user, error } = $userDetail.get();
+    const { status, key, item: user, error } = $userDetail.get();
     expect(status).toBe('error');
+    expect(key).toBe('user:system:bob');
     expect(user).toBeUndefined();
     expect(error).toBe('Principal is gone');
   });

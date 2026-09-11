@@ -2,6 +2,7 @@ export {
   ID_PROVIDER_EDITOR_STEPS,
   type IdProviderEditorStep,
 } from './model/idprovider-editor-steps';
+export { ID_PROVIDER_ACCESS_LEVELS } from './model/idprovider-access';
 export {
   $idProviderEditor,
   closeIdProviderEditor,

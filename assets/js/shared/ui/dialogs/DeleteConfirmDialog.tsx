@@ -31,20 +31,19 @@ export function DeleteConfirmDialog({
       ? 'browse.confirm.deleteQuestion'
       : 'browse.confirm.deleteQuestionMultiple',
   );
-
-  const list = (
-    <ul className="flex flex-col gap-2.5 py-1.5">
-      {targets.map(({ key, label }) => (
-        <li key={key}>{label}</li>
-      ))}
-    </ul>
-  );
+  const [only] = targets;
+  const description =
+    targets.length === 1 && only !== undefined ? (
+      <>
+        {question} <strong>{only.displayName}</strong>?
+      </>
+    ) : (
+      question
+    );
 
   if (expected === undefined) {
     return (
-      <ConfirmDialog open={open} question={question} onClose={onClose} onConfirm={onConfirm}>
-        {list}
-      </ConfirmDialog>
+      <ConfirmDialog open={open} question={description} onClose={onClose} onConfirm={onConfirm} />
     );
   }
 
@@ -52,13 +51,11 @@ export function DeleteConfirmDialog({
     <ConfirmValueDialog
       open={open}
       title={title}
-      description={question}
+      description={description}
       expected={expected}
       confirmLabel={deleteLabel}
       onClose={onClose}
       onConfirm={onConfirm}
-    >
-      {list}
-    </ConfirmValueDialog>
+    />
   );
 }

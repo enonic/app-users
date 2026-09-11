@@ -29,4 +29,11 @@ describe('idProviderLabel', () => {
   it('does not repeat a display name that is the name', () => {
     expect(idProviderLabel('system', 'system')).toEqual({ primary: 'system' });
   });
+
+  it('keeps the name when the caller always shows both parts', () => {
+    expect(idProviderLabel('system', 'System', { alwaysShowName: true })).toEqual({
+      primary: 'System',
+      secondary: 'system',
+    });
+  });
 });

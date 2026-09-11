@@ -33,6 +33,7 @@ export {
 } from './model/id-provider-commands';
 export type { DeletableIdProvider, IdProviderDraft } from './model/id-provider-commands';
 export {
+  $idProviderPermissions,
   evictIdProviderPermissions,
   forgetIdProviderPermissions,
   reloadIdProviderPermissions,

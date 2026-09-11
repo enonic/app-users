@@ -32,7 +32,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
   const editGroupsLabel = useI18n('users.details.editGroups');
   const passwordSetLabel = useI18n('users.details.passwordSet');
   const passwordNotSetLabel = useI18n('users.details.passwordNotSet');
-  const unlabelledKeyLabel = useI18n('users.details.keyUnlabelled');
+  const unlabelledKeyLabel = useI18n('users.dialog.keyUnlabelled');
   const transitiveLabel = useI18n('users.details.transitive');
   const transitiveFailedLabel = useI18n('users.details.transitiveFailed');
 
@@ -163,7 +163,6 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
-              // A role belongs to no provider, so only a group carries one.
               meta={providerName(principal.key)}
             />
           ))}

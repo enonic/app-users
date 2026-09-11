@@ -16,5 +16,7 @@ export function useGroup(key: string | undefined): DetailState<GroupDetail> {
     showGroup(key);
   }, [key]);
 
+  useEffect(() => () => showGroup(undefined), []);
+
   return state;
 }

@@ -16,5 +16,7 @@ export function useUser(key: string | undefined): DetailState<UserDetail> {
     showUser(key);
   }, [key]);
 
+  useEffect(() => () => showUser(undefined), []);
+
   return state;
 }

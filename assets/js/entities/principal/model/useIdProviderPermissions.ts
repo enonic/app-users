@@ -15,5 +15,7 @@ export function useIdProviderPermissions(
     showIdProviderPermissions(key);
   }, [key]);
 
+  useEffect(() => () => showIdProviderPermissions(undefined), []);
+
   return state;
 }

@@ -144,7 +144,6 @@ export function UserDetails({ user }: UserDetailsProps) {
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
-              // A role belongs to no provider, so only a group carries one.
               meta={providerName(principal.key)}
             />
           ))}

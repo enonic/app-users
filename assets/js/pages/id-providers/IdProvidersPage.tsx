@@ -3,7 +3,6 @@ import { ShieldLock } from 'lucide-react';
 import { useMemo } from 'preact/hooks';
 
 import {
-  evictIdProviderPermissions,
   loadIdProviders,
   receiveIdProvider,
   reloadIdProviderPermissions,
@@ -124,8 +123,6 @@ export function IdProvidersPage() {
       <IdProviderEditorDialog
         onSaved={(written) => {
           receiveIdProvider(written);
-          // The write replaces the whole list, so the panel's copy is stale from here.
-          evictIdProviderPermissions(written.key);
         }}
       />
       <IdProviderDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />

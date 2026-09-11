@@ -19,7 +19,7 @@ export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDel
   const deleteTargets = (targets ?? []).map(({ key, displayName }) => ({
     key,
     name: key,
-    label: displayName,
+    displayName,
   }));
 
   return (

@@ -1,4 +1,4 @@
-import { Button } from '@enonic/ui';
+import { Button, Skeleton } from '@enonic/ui';
 import { ShieldLock } from 'lucide-react';
 
 import {
@@ -12,18 +12,12 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openIdProviderEditorAt } from '../../features/idprovider-editor';
+import {
+  ID_PROVIDER_ACCESS_LEVELS,
+  openIdProviderEditorAt,
+} from '../../features/idprovider-editor';
 import { useI18n, useLabelled } from '../../shared/i18n';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
-
-/** The levels in the platform's own order, widening, named for the panel. */
-const ACCESS_LEVELS: readonly { value: IdProviderAccess; labelKey: string }[] = [
-  { value: 'READ', labelKey: 'idProviders.details.access.read' },
-  { value: 'CREATE_USERS', labelKey: 'idProviders.details.access.createUsers' },
-  { value: 'WRITE_USERS', labelKey: 'idProviders.details.access.writeUsers' },
-  { value: 'ID_PROVIDER_MANAGER', labelKey: 'idProviders.details.access.manager' },
-  { value: 'ADMINISTRATOR', labelKey: 'idProviders.details.access.administrator' },
-];
 
 export type IdProviderDetailsProps = {
   provider: IdProvider;
@@ -51,7 +45,7 @@ export function IdProviderDetails({
   const loadMoreFailedLabel = useI18n('browse.list.loadMoreFailed');
   const listFailedLabel = useI18n('idProviders.details.listFailed');
 
-  const levels = useLabelled(ACCESS_LEVELS);
+  const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
   const accessLabel = (access: IdProviderAccess): string | undefined =>
     levels.find((level) => level.value === access)?.label;
 
@@ -77,6 +71,7 @@ export function IdProviderDetails({
             variant="outline"
             size="sm"
             label={editLabel}
+            disabled={permissionsFailed}
             onClick={() => openIdProviderEditorAt(provider, 'identity')}
           />
         }
@@ -102,6 +97,7 @@ export function IdProviderDetails({
             variant="outline"
             size="sm"
             label={editPermissionsLabel}
+            disabled={permissionsFailed}
             onClick={() => openIdProviderEditorAt(provider, 'permissions')}
           />
         }
@@ -163,5 +159,27 @@ export function IdProviderDetails({
         {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
       </DetailsPanel.Section>
     </DetailsPanel>
+  );
+}
+
+export function IdProviderDetailsSkeleton() {
+  return (
+    <div className="flex min-h-0 flex-col gap-5 overflow-hidden p-10" aria-busy="true">
+      <Skeleton.Group className="flex items-center gap-5">
+        <Skeleton shape="rectangle" className="size-12 shrink-0" />
+        <div className="flex flex-col gap-2.5">
+          <Skeleton shape="rectangle" className="h-7 w-52" />
+          <Skeleton shape="rectangle" className="h-5 w-32" />
+        </div>
+      </Skeleton.Group>
+
+      {Array.from({ length: 3 }, (_, index) => (
+        <Skeleton.Group key={index} className="flex flex-col gap-2.5">
+          <Skeleton shape="rectangle" className="h-5 w-full" />
+          <Skeleton shape="rectangle" className="h-4 w-40" />
+          <Skeleton shape="rectangle" className="h-4 w-64" />
+        </Skeleton.Group>
+      ))}
+    </div>
   );
 }

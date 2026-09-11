@@ -4,6 +4,7 @@ import {
   idProviderOf,
   loadIdProvider,
   loadIdProviders,
+  reloadIdProviderPermissions,
   reloadIdProviderPrincipalRows,
   removeIdProvider,
 } from '../../../entities/principal';
@@ -21,6 +22,7 @@ export function startIdProvidersEvents(frame: HostFrame): void {
   }
 
   const refresh = (): void => {
+    reloadIdProviderPermissions();
     reloadIdProviderPrincipalRows();
     void loadIdProviders();
   };
