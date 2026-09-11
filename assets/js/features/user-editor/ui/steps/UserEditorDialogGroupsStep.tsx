@@ -39,6 +39,7 @@ export function UserEditorDialogGroupsStep() {
       <PrincipalPicker
         kinds={['group']}
         idProvider={showAll ? undefined : form.idProvider}
+        showIdProvider
         placeholder={groupsPlaceholder}
         selected={form.groups}
         onChange={(groups) => updateUserEditorForm({ groups })}

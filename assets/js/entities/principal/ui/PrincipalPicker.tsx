@@ -6,7 +6,9 @@ import type { ReactNode, UIEvent } from 'react';
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
 import type { PrincipalRef, PrincipalType } from '../model/principal.types';
+import { useIdProviderLabel } from '../model/useIdProviderLabel';
 import { usePrincipalSearch, type PrincipalSearch } from '../model/usePrincipalSearch';
+import { IdProviderCell } from './IdProviderCell';
 import { PrincipalLabel } from './PrincipalLabel';
 
 export type PrincipalPickerProps = {
@@ -31,6 +33,8 @@ export type PrincipalPickerProps = {
   excluded?: ReadonlySet<string>;
   /** Offers only principals from this ID provider. */
   idProvider?: string;
+  /** Names each row's provider, for a picker whose offer can widen past the form's own. */
+  showIdProvider?: boolean;
 };
 
 const LOAD_MORE_MARGIN = 48;
@@ -45,6 +49,7 @@ export function PrincipalPicker({
   locked,
   excluded,
   idProvider,
+  showIdProvider = false,
 }: PrincipalPickerProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -120,6 +125,7 @@ export function PrincipalPicker({
                 principals={offered}
                 search={search}
                 locked={locked}
+                showIdProvider={showIdProvider}
                 searchingLabel={searchingLabel}
                 noMatchesLabel={noMatchesLabel}
                 failedLabel={failedLabel}
@@ -136,6 +142,12 @@ export function PrincipalPicker({
               <GridList.Cell interactive={false} className="flex-1 self-stretch">
                 <PrincipalLabel className="min-w-0 flex-1" principal={member} />
               </GridList.Cell>
+
+              {showIdProvider && (
+                <GridList.Cell>
+                  <ProviderCell principal={member} />
+                </GridList.Cell>
+              )}
 
               {rowTrailing !== undefined && <GridList.Cell>{rowTrailing(member)}</GridList.Cell>}
 
@@ -160,10 +172,15 @@ export function PrincipalPicker({
   );
 }
 
+//
+// * Internal
+//
+
 type PrincipalOptionsProps = {
   principals: readonly PrincipalRef[];
   search: PrincipalSearch;
   locked?: ReadonlySet<string>;
+  showIdProvider: boolean;
   searchingLabel: string;
   noMatchesLabel: string;
   failedLabel: string;
@@ -173,6 +190,7 @@ function PrincipalOptions({
   principals,
   search,
   locked,
+  showIdProvider,
   searchingLabel,
   noMatchesLabel,
   failedLabel,
@@ -219,6 +237,7 @@ function PrincipalOptions({
           className="px-2.5 py-1.5"
         >
           <PrincipalLabel className="flex-1" principal={principal} />
+          {showIdProvider && <ProviderCell principal={principal} />}
           <Checkbox
             tabIndex={-1}
             checked={selection.has(principal.key)}
@@ -233,5 +252,21 @@ function PrincipalOptions({
 
       <div ref={end} aria-hidden />
     </Combobox.ListContent>
+  );
+}
+
+/** The browse cell's look: display name over name, right aligned. Nothing for a role. */
+function ProviderCell({ principal }: { principal: PrincipalRef }) {
+  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
+  const label = providerLabel(principal.key);
+
+  if (label === undefined) {
+    return null;
+  }
+
+  return (
+    <span className="text-subtle text-sm whitespace-nowrap">
+      <IdProviderCell {...label} />
+    </span>
   );
 }
