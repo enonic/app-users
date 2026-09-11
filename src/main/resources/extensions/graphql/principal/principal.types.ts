@@ -9,6 +9,7 @@ import {
 
 import { generator } from '../schema/generator';
 import { countPrincipals, listPrincipals, type PrincipalSetSource } from './id-provider.source';
+import type { PrincipalPage } from './principal.source';
 
 // ? Lowercase values, against GraphQL habit: they mirror the platform's own discriminator, so the
 // ? wire shape is the one `Principal` from @enonic-types/core already describes and neither side
@@ -33,6 +34,21 @@ export const PrincipalType: GraphQLType = generator.createObjectType({
     displayName: {
       type: nonNull(GraphQLString),
       description: 'Falls back to the name read off the key when the principal declares none.',
+    },
+  },
+});
+
+export const PrincipalPageType: GraphQLType = generator.createObjectType({
+  name: 'PrincipalPage',
+  fields: {
+    total: {
+      type: nonNull(GraphQLInt),
+      description: 'How many principals the search matched, not how many this page carries.',
+      resolve: (env: { source: PrincipalPage }) => env.source.total,
+    },
+    hits: {
+      type: nonNull(list(nonNull(PrincipalType))),
+      resolve: (env: { source: PrincipalPage }) => env.source.hits,
     },
   },
 });
