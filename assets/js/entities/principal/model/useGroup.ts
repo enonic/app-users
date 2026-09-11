@@ -1,8 +1,8 @@
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
-import { detailFor, type DetailState } from '../../../shared/detail';
-import { $groupDetail, showGroup } from './group-detail.load';
+import type { DetailState } from '../../../shared/detail';
+import { $groupDetail, showGroup, groupDetailFor } from './group-detail.load';
 import type { GroupDetail } from './principal.types';
 
 /**
@@ -10,7 +10,8 @@ import type { GroupDetail } from './principal.types';
  * arrives from the route: it is a `PrincipalKey` only once a group answers to it.
  */
 export function useGroup(key: string | undefined): DetailState<GroupDetail> {
-  const state = useStore($groupDetail);
+  // Subscribes only: the answer below reads the store and the cache.
+  useStore($groupDetail);
 
   useEffect(() => {
     showGroup(key);
@@ -18,5 +19,5 @@ export function useGroup(key: string | undefined): DetailState<GroupDetail> {
 
   useEffect(() => () => showGroup(undefined), []);
 
-  return detailFor(state, key);
+  return groupDetailFor(key);
 }

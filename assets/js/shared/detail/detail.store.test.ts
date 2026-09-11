@@ -2,7 +2,7 @@ import { errAsync, okAsync, type ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppError } from '../api';
-import { createDetailLoader, detailFor, type DetailState } from './detail.store';
+import { createDetailLoader } from './detail.store';
 
 const DEBOUNCE_MS = 250;
 
@@ -272,18 +272,33 @@ describe('createDetailLoader', () => {
 });
 
 describe('detailFor', () => {
-  const ready: DetailState<Thing> = { status: 'ready', key: 'a', item: thing('a') };
-
   it('is idle with nothing selected', () => {
-    expect(detailFor(ready, undefined)).toEqual({ status: 'idle' });
+    expect(answering().loader.detailFor(undefined)).toEqual({ status: 'idle' });
   });
 
-  it('answers with the state that is about the key', () => {
-    expect(detailFor(ready, 'a')).toBe(ready);
+  it('answers with the store state about the key', async () => {
+    const { loader } = answering();
+
+    loader.show('a');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(loader.detailFor('a')).toBe(loader.$detail.get());
   });
 
-  // The store lags the selection by an effect and a tick; the previous key's state must not paint.
-  it('reads as loading while the state is still about another key', () => {
-    expect(detailFor(ready, 'b')).toEqual({ status: 'loading', key: 'b' });
+  // The store lags the selection by an effect and a tick; a key already read must not paint the skeleton.
+  it('answers a cached key as ready before it is shown again', async () => {
+    const { loader, calls } = answering();
+
+    loader.show('a');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    loader.show('b');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(loader.detailFor('a')).toEqual({ status: 'ready', key: 'a', item: thing('a') });
+    expect(calls).toEqual(['a', 'b']);
+  });
+
+  it('reads a key it has not seen as loading', () => {
+    expect(answering().loader.detailFor('c')).toEqual({ status: 'loading', key: 'c' });
   });
 });

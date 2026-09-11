@@ -7,6 +7,8 @@ const loader = createDetailLoader<IdProviderPermissions>({ load: fetchIdProvider
 
 export const $idProviderPermissions = loader.$detail;
 
+export const idProviderPermissionsFor = loader.detailFor;
+
 export const showIdProviderPermissions = loader.show;
 
 export const reloadIdProviderPermissions = loader.invalidate;

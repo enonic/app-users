@@ -14,6 +14,8 @@ const loader = createDetailLoader<GroupDetail>({
 
 export const $groupDetail = loader.$detail;
 
+export const groupDetailFor = loader.detailFor;
+
 export const showGroup = loader.show;
 
 export const forgetGroups = loader.forget;

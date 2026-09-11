@@ -56,6 +56,11 @@ export type DetailLoader<T> = {
   invalidate: () => void;
   /** One item changed elsewhere: its cached copy goes, and it is re-read in place if it is the selected one. */
   evict: (key: string) => void;
+  /**
+   * What a panel for `key` renders now. The store lags the selection by an effect and a tick, so another
+   * key's state is not it: the cache answers a key already read, anything else is loading.
+   */
+  detailFor: (key: string | undefined) => DetailState<T>;
 };
 
 /**
@@ -174,17 +179,21 @@ export function createDetailLoader<T extends { key: string }>({
         show(key);
       }
     },
+
+    detailFor(key: string | undefined): DetailState<T> {
+      if (key === undefined) {
+        return { status: 'idle' };
+      }
+
+      const state = $detail.get();
+      if (state.key === key) {
+        return state;
+      }
+
+      const cached = cache.get(key);
+      return cached === undefined
+        ? { status: 'loading', key }
+        : { status: 'ready', key, item: cached };
+    },
   };
-}
-
-/**
- * The state a panel for `key` renders now. The store lags the selection by an effect and a tick, so a
- * state answering another key reads as loading: the skeleton on the first frame, not the row just left.
- */
-export function detailFor<T>(state: DetailState<T>, key: string | undefined): DetailState<T> {
-  if (key === undefined) {
-    return { status: 'idle' };
-  }
-
-  return state.key === key ? state : { status: 'loading', key };
 }
