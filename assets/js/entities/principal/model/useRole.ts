@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
-import type { DetailState } from '../../../shared/detail';
+import { detailFor, type DetailState } from '../../../shared/detail';
 import type { RoleDetail } from './principal.types';
 import { $roleDetail, showRole } from './role-detail.load';
 
@@ -18,5 +18,5 @@ export function useRole(key: string | undefined): DetailState<RoleDetail> {
 
   useEffect(() => () => showRole(undefined), []);
 
-  return state;
+  return detailFor(state, key);
 }

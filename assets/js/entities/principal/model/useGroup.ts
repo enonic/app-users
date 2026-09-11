@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
-import type { DetailState } from '../../../shared/detail';
+import { detailFor, type DetailState } from '../../../shared/detail';
 import { $groupDetail, showGroup } from './group-detail.load';
 import type { GroupDetail } from './principal.types';
 
@@ -18,5 +18,5 @@ export function useGroup(key: string | undefined): DetailState<GroupDetail> {
 
   useEffect(() => () => showGroup(undefined), []);
 
-  return state;
+  return detailFor(state, key);
 }

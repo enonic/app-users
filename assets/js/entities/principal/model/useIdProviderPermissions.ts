@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
-import type { DetailState } from '../../../shared/detail';
+import { detailFor, type DetailState } from '../../../shared/detail';
 import { $idProviderPermissions, showIdProviderPermissions } from './id-provider-permissions.load';
 import type { IdProviderPermissions } from './principal.types';
 
@@ -17,5 +17,5 @@ export function useIdProviderPermissions(
 
   useEffect(() => () => showIdProviderPermissions(undefined), []);
 
-  return state;
+  return detailFor(state, key);
 }

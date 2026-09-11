@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
-import type { DetailState } from '../../../shared/detail';
+import { detailFor, type DetailState } from '../../../shared/detail';
 import type { UserDetail } from './principal.types';
 import { $serviceAccountDetail, showServiceAccount } from './service-account-detail.load';
 
@@ -18,5 +18,5 @@ export function useServiceAccount(key: string | undefined): DetailState<UserDeta
 
   useEffect(() => () => showServiceAccount(undefined), []);
 
-  return state;
+  return detailFor(state, key);
 }
