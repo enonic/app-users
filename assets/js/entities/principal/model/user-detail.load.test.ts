@@ -170,16 +170,14 @@ describe('showUser', () => {
     expect(reads()).toBe(2);
   });
 
-  it('keeps the user on screen while the next one loads, so stepping does not flash empty', async () => {
+  it('shows no user while the next one loads', async () => {
     showUser('user:system:alice');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
     vi.mocked(fetchUserDetail).mockReturnValue(answered('bob'));
     showUser('user:system:bob');
 
-    const { status, item: user } = $userDetail.get();
-    expect(status).toBe('loading');
-    expect(user?.login).toBe('alice');
+    expect($userDetail.get()).toEqual({ status: 'loading', key: 'user:system:bob' });
   });
 
   it('empties the panel when nothing is selected', async () => {
@@ -208,7 +206,7 @@ describe('showUser', () => {
     showUser('user:system:gone');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
-    expect($userDetail.get()).toEqual({ status: 'idle' });
+    expect($userDetail.get()).toEqual({ status: 'idle', key: 'user:system:gone' });
   });
 
   // ! A failure drops the user rather than keeping the previous one: the panel would otherwise describe

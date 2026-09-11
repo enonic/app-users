@@ -1,17 +1,20 @@
 import { useRole } from '../../entities/principal';
 import { useItemId } from '../../shared/host';
 import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel';
-import { DetailsEmpty } from '../../widgets/details-panel/DetailsEmpty';
+import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { RoleDetails } from './RoleDetails';
 
 export function RolesItemPage() {
   const id = useItemId();
   const { status, item: role } = useRole(id);
 
-  // Three states, never nothing: the panel loads by key, so a selection has to read as under way rather
-  // than as a click that did nothing, and a failure says so instead of showing another role's members.
+  // Loading with a role on screen is a re-read of that role: it stays.
+  if (status === 'loading' && role === undefined) {
+    return <DetailsPanel.Skeleton />;
+  }
+
   if (role === undefined) {
-    return <DetailsEmpty labelKey={detailsEmptyLabelKey(status, 'roles.details.failed')} />;
+    return <DetailsPanel.Empty labelKey={detailsEmptyLabelKey(status, 'roles.details.failed')} />;
   }
 
   return <RoleDetails role={role} />;
