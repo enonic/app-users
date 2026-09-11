@@ -1,6 +1,6 @@
 import { Checkbox, Combobox, GridList, IconButton, Listbox, useCombobox } from '@enonic/ui';
 import { X } from 'lucide-react';
-import { useId, useState } from 'preact/hooks';
+import { useEffect, useId, useRef, useState } from 'preact/hooks';
 import type { ReactNode, UIEvent } from 'react';
 
 import { i18n, useI18n } from '../../../shared/i18n';
@@ -183,6 +183,16 @@ function PrincipalOptions({
 
   const { status, error, appending, hasMore, loadMore } = search;
 
+  const end = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const list = end.current?.parentElement;
+
+    if (hasMore && list != null && list.scrollHeight <= list.clientHeight) {
+      loadMore();
+    }
+  }, [hasMore, loadMore, principals.length]);
+
   const handleScroll = (event: UIEvent<HTMLDivElement>): void => {
     const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
 
@@ -220,6 +230,8 @@ function PrincipalOptions({
       {appending && <p className="text-subtle px-2.5 py-1 text-sm">{searchingLabel}</p>}
 
       {error !== undefined && <p className="text-error px-2.5 py-1 text-sm">{failedLabel}</p>}
+
+      <div ref={end} aria-hidden />
     </Combobox.ListContent>
   );
 }

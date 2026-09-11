@@ -43,7 +43,7 @@ const DEFAULT_SEARCH_COUNT = 20;
 // ! the total without a single row — `SecurityServiceImpl` takes the total from the search rather than
 // ! from the hits, so a page of none still reports how many matched.
 const MIN_COUNT = 0;
-export const MAX_COUNT = 100;
+const MAX_COUNT = 100;
 
 /**
  * ! How far paging may reach, and it is a real limit rather than a nicety. Elasticsearch refuses a query

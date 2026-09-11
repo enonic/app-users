@@ -16,7 +16,7 @@ export const principalQueryFields: GraphQLFields = {
   principals: {
     type: PrincipalPageType,
     description:
-      'One page of principals of the kinds listed, searched by the server and kept in the order it answered: each kind in turn, so a page may end one kind and begin the next. No kinds is every kind.',
+      'One page of principals of the kinds listed, in the order the search answered. No kinds is every kind.',
     args: {
       types: list(nonNull(PrincipalTypeEnum)),
       idProvider: GraphQLString,
