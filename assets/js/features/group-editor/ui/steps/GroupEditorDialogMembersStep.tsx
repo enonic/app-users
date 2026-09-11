@@ -36,6 +36,7 @@ export function GroupEditorDialogMembersStep() {
       <PrincipalPicker
         kinds={['user', 'group']}
         idProvider={showAll ? undefined : form.idProvider}
+        showIdProvider
         placeholder={membersPlaceholder}
         selected={form.members}
         excluded={notItself}
