@@ -27,7 +27,7 @@ const NAME_ID = 'id-provider-editor-name';
 const DESCRIPTION_ID = 'id-provider-editor-description';
 const APPLICATION_LABEL_ID = 'id-provider-editor-application-label';
 
-export function IdProviderEditorDialogIdentityStep() {
+export function IdProviderEditorDialogGeneralStep() {
   const { form, visited, mode, entity } = useStore($idProviderEditor, {
     keys: ['form', 'visited', 'mode', 'entity'],
   });

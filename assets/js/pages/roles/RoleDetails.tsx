@@ -40,7 +40,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openRoleEditorAt(role, 'identity')}
+            onClick={() => openRoleEditorAt(role, 'general')}
           />
         }
       >

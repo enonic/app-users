@@ -18,7 +18,7 @@ const DISPLAY_NAME_ID = 'role-editor-display-name';
 const NAME_ID = 'role-editor-name';
 const DESCRIPTION_ID = 'role-editor-description';
 
-export function RoleEditorDialogIdentityStep() {
+export function RoleEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($roleEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($roleEditorErrors);
   const nameCheck = useStore(roleNameCheck.$state);
