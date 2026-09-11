@@ -1,6 +1,7 @@
-import { Input, Selector } from '@enonic/ui';
+import { Input, Link, Selector } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
+import { useIdProviderNames } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
@@ -11,6 +12,7 @@ import {
   $userEditorProviders,
   $userEditorServiceAccount,
   $userEditorSystemUser,
+  closeUserEditor,
   markUserEditorFieldVisited,
   setUserEditorDisplayName,
   setUserEditorIdProvider,
@@ -24,6 +26,8 @@ const DISPLAY_NAME_ID = 'user-editor-display-name';
 const NAME_ID = 'user-editor-name';
 const EMAIL_ID = 'user-editor-email';
 
+const ID_PROVIDERS_HREF = '#/id-providers';
+
 export function UserEditorDialogIdentityStep() {
   const { form, visited, mode } = useStore($userEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($userEditorErrors);
@@ -31,8 +35,11 @@ export function UserEditorDialogIdentityStep() {
   const serviceAccount = useStore($userEditorServiceAccount);
   const nameCheck = useStore(userNameCheck.$state);
   const providers = useStore($userEditorProviders);
+  const { status: providersStatus } = useIdProviderNames();
 
   const persisted = mode === 'edit';
+  // Only a settled answer says there is none to choose; a failed read keeps the selector.
+  const noProviders = !persisted && providersStatus === 'ready' && providers.length === 0;
 
   const providerName =
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
@@ -40,6 +47,8 @@ export function UserEditorDialogIdentityStep() {
   // Labels
   const providerLabel = useI18n('users.dialog.idProvider');
   const providerPlaceholder = useI18n('users.dialog.idProviderPlaceholder');
+  const noProvidersLabel = useI18n('users.dialog.noIdProviders');
+  const openProvidersLabel = useI18n('users.dialog.openIdProviders');
   const displayNameLabel = useI18n('users.dialog.displayName');
   const nameLabel = useI18n('users.dialog.name');
   const emailLabel = useI18n('users.dialog.email');
@@ -55,8 +64,18 @@ export function UserEditorDialogIdentityStep() {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* No provider to create in: the ID Providers section is where one comes from. */}
+      {!serviceAccount && noProviders && (
+        <p className="border-bdr-soft text-subtle rounded-md border p-4 text-sm">
+          {noProvidersLabel}{' '}
+          <Link href={ID_PROVIDERS_HREF} onClick={closeUserEditor}>
+            {openProvidersLabel}
+          </Link>
+        </p>
+      )}
+
       {/* IdProvider Selector — a service account's is the system store, so there is nothing to choose. */}
-      {!serviceAccount && (
+      {!serviceAccount && !noProviders && (
         <div className="flex flex-col gap-1.5">
           <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
           <Selector.Root
