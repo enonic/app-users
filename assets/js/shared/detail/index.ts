@@ -1,2 +1,2 @@
-export { createDetailLoader } from './detail.store';
+export { createDetailLoader, detailFor } from './detail.store';
 export type { DetailLoader, DetailState, DetailStatus } from './detail.store';
