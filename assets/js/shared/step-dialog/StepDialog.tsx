@@ -20,7 +20,7 @@ export type StepDialogProps<Step extends string, Field extends string, Form, Ent
 };
 
 /**
- * The shell of a dialog made of steps. `titles` are the mode eyebrows as phrase keys; `panels` are pure
+ * The shell of a dialog made of steps. `titles` are the mode headings as phrase keys, the step title their eyebrow; `panels` are pure
  * content, wrapped in `StepContent` and locked here.
  *
  * ! Every way out but a save — overlay, Escape, the header's cross, Cancel — asks first while the form

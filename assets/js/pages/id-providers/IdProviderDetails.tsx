@@ -72,7 +72,7 @@ export function IdProviderDetails({
             size="sm"
             label={editLabel}
             disabled={permissionsFailed}
-            onClick={() => openIdProviderEditorAt(provider, 'identity')}
+            onClick={() => openIdProviderEditorAt(provider, 'general')}
           />
         }
       >

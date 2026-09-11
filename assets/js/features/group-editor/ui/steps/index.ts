@@ -1,13 +1,13 @@
 import type { ComponentType } from 'preact';
 
 import type { GroupEditorStep } from '../../model/group-editor-steps';
-import { GroupEditorDialogIdentityStep } from './GroupEditorDialogIdentityStep';
+import { GroupEditorDialogGeneralStep } from './GroupEditorDialogGeneralStep';
 import { GroupEditorDialogMembersStep } from './GroupEditorDialogMembersStep';
 import { GroupEditorDialogRolesStep } from './GroupEditorDialogRolesStep';
 import { GroupEditorDialogSummaryStep } from './GroupEditorDialogSummaryStep';
 
 export const GROUP_EDITOR_STEP_PANELS: Record<GroupEditorStep, ComponentType> = {
-  identity: GroupEditorDialogIdentityStep,
+  general: GroupEditorDialogGeneralStep,
   members: GroupEditorDialogMembersStep,
   roles: GroupEditorDialogRolesStep,
   summary: GroupEditorDialogSummaryStep,

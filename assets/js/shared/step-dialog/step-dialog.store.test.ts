@@ -15,8 +15,8 @@ type Form = {
 };
 type Entity = { key: string; displayName: string; members: readonly string[] };
 
-const STEPS = defineSteps<'identity' | 'members' | 'summary', Field>({
-  identity: { title: 'dialog.identity', fields: ['name', 'displayName', 'email'] },
+const STEPS = defineSteps<'general' | 'members' | 'summary', Field>({
+  general: { title: 'dialog.general', fields: ['name', 'displayName', 'email'] },
   members: { title: 'dialog.members', fields: [] },
   summary: { title: 'dialog.summary', fields: [] },
 });
@@ -27,7 +27,7 @@ const $external = atom<StepDialogExternal<Field>>({ errors: {}, busy: [] });
 
 let resets = 0;
 
-const store = createStepDialogStore<'identity' | 'members' | 'summary', Field, Form, Entity>({
+const store = createStepDialogStore<'general' | 'members' | 'summary', Field, Form, Entity>({
   steps: STEPS,
   initialForm: (payload) =>
     payload.mode === 'create'
@@ -79,7 +79,7 @@ describe('open', () => {
       open: true,
       mode: 'create',
       view: 'wizard',
-      step: 'identity',
+      step: 'general',
       entity: undefined,
     });
   });
@@ -232,7 +232,7 @@ describe('$errors and $stepLocks', () => {
     $external.set({ errors: {}, busy: ['name'] });
 
     expect(store.$errors.get()).toEqual({});
-    expect(store.$stepLocks.get()).toEqual({ identity: false, members: true, summary: true });
+    expect(store.$stepLocks.get()).toEqual({ general: false, members: true, summary: true });
   });
 });
 

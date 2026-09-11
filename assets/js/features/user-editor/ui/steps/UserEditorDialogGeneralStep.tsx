@@ -24,7 +24,7 @@ const DISPLAY_NAME_ID = 'user-editor-display-name';
 const NAME_ID = 'user-editor-name';
 const EMAIL_ID = 'user-editor-email';
 
-export function UserEditorDialogIdentityStep() {
+export function UserEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($userEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($userEditorErrors);
   const systemUser = useStore($userEditorSystemUser);

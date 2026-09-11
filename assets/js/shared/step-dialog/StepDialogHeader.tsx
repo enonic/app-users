@@ -27,9 +27,9 @@ export function StepDialogHeader<Step extends string, Field extends string, Form
       <span className="bg-bdr-subtle h-10 w-px" aria-hidden />
 
       <span className="flex min-w-0 flex-col">
-        <span className="truncate text-sm font-semibold">{modeTitle}</span>
+        <span className="truncate text-xl font-semibold">{modeTitle}</span>
 
-        <Dialog.Title className="truncate text-2xl font-semibold">{stepTitle}</Dialog.Title>
+        <Dialog.Title className="truncate text-sm font-semibold">{stepTitle}</Dialog.Title>
       </span>
 
       <Dialog.DefaultClose className="justify-self-end" />

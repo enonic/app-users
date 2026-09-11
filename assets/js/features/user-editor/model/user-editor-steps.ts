@@ -1,11 +1,11 @@
 import { defineSteps } from '../../../shared/step-dialog';
 import type { UserFormField } from './user-form';
 
-export type UserEditorStep = 'identity' | 'credentials' | 'roles' | 'groups' | 'summary';
+export type UserEditorStep = 'general' | 'credentials' | 'roles' | 'groups' | 'summary';
 
 export const USER_EDITOR_STEPS = defineSteps<UserEditorStep, UserFormField>({
-  identity: {
-    title: 'users.dialog.identity',
+  general: {
+    title: 'users.dialog.general',
     fields: ['idProvider', 'displayName', 'name', 'email'],
   },
   credentials: { title: 'users.dialog.credentials', fields: ['password'] },

@@ -59,7 +59,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openGroupEditorAt(group, 'identity')}
+            onClick={() => openGroupEditorAt(group, 'general')}
           />
         }
       >

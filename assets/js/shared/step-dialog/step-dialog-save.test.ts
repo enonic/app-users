@@ -10,14 +10,14 @@ type Field = 'name' | 'displayName';
 type Form = { name: string; displayName: string };
 type Entity = { key: string; displayName: string };
 
-const STEPS = defineSteps<'identity' | 'summary', Field>({
-  identity: { title: 'dialog.identity', fields: ['name', 'displayName'] },
+const STEPS = defineSteps<'general' | 'summary', Field>({
+  general: { title: 'dialog.general', fields: ['name', 'displayName'] },
   summary: { title: 'dialog.summary', fields: [] },
 });
 
 const ALICE: Entity = { key: 'alice', displayName: 'Alice' };
 
-const store = createStepDialogStore<'identity' | 'summary', Field, Form, Entity>({
+const store = createStepDialogStore<'general' | 'summary', Field, Form, Entity>({
   steps: STEPS,
   initialForm: (payload) =>
     payload.mode === 'create'
@@ -61,7 +61,7 @@ describe('runStepDialogSave', () => {
 
     const { open, step, visited } = store.$state.get();
     expect(open).toBe(true);
-    expect(step).toBe('identity');
+    expect(step).toBe('general');
     expect([...visited]).toEqual(['name', 'displayName']);
     expect(opts.onSaved).not.toHaveBeenCalled();
   });
