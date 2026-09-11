@@ -13,18 +13,6 @@ export const USER_ACTIONS: readonly SectionAction<User>[] = [
     run: () => openUserEditor({ mode: 'create' }),
   },
   {
-    id: 'edit',
-    labelKey: 'users.action.edit',
-    enabled: (ctx) => actionTargets(ctx).length === 1,
-    activatedByRow: true,
-    run: (ctx) => {
-      const [target] = actionTargets(ctx);
-      if (target !== undefined) {
-        openUserEditor({ mode: 'edit', entity: target });
-      }
-    },
-  },
-  {
     id: 'delete',
     labelKey: 'users.action.delete',
     enabled: (ctx) => {

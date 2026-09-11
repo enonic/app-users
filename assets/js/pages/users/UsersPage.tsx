@@ -45,8 +45,8 @@ export function UsersPage() {
   const activeKey = useItemId();
   const { status, items, appending, error, hasMore } = useUsers();
   const { items: providerCounts, status: providersStatus } = useStore($idProviderUserCounts);
-  const providerLabel = useIdProviderLabel();
-  // The provenance cell: the display name over the name, or the name alone when that is all there is.
+  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
+  // The provenance cell always keeps the provider's display name and name visible.
   const providerCell = (key: PrincipalKey): ReactNode => {
     const label = providerLabel(key);
     return label === undefined ? undefined : <IdProviderCell {...label} />;

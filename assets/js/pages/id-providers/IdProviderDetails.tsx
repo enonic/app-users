@@ -1,4 +1,4 @@
-import { Button } from '@enonic/ui';
+import { Button, Skeleton } from '@enonic/ui';
 import { ShieldLock } from 'lucide-react';
 
 import {
@@ -6,14 +6,17 @@ import {
   loadMoreIdProviderPrincipals,
   principalName,
   type IdProvider,
+  type IdProviderAccess,
+  type IdProviderPermission,
   type IdProviderPrincipalsState,
-  type PrincipalSetType,
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openIdProviderEditor } from '../../features/idprovider-editor';
-import { useI18n } from '../../shared/i18n';
-import { countedSections } from '../../widgets/details-panel/details-panel';
+import {
+  ID_PROVIDER_ACCESS_LEVELS,
+  openIdProviderEditorAt,
+} from '../../features/idprovider-editor';
+import { useI18n, useLabelled } from '../../shared/i18n';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type IdProviderDetailsProps = {
@@ -22,37 +25,36 @@ export type IdProviderDetailsProps = {
   principals?: IdProviderPrincipalsState;
   /** That read failed: the totals the row carries still stand, the rows under them are missing. */
   principalsFailed?: boolean;
+  /** The access control list, once its own read has answered. */
+  permissions?: readonly IdProviderPermission[];
+  permissionsFailed?: boolean;
 };
 
 export function IdProviderDetails({
   provider,
   principals,
   principalsFailed,
+  permissions,
+  permissionsFailed,
 }: IdProviderDetailsProps) {
   const editLabel = useI18n('idProviders.details.edit');
-  const noApplicationLabel = useI18n('idProviders.details.noApplication');
+  const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
+  const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');
   const loadMoreLabel = useI18n('browse.list.loadMore');
   const loadingMoreLabel = useI18n('browse.list.loadingMore');
   const loadMoreFailedLabel = useI18n('browse.list.loadMoreFailed');
   const listFailedLabel = useI18n('idProviders.details.listFailed');
 
+  const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
+  const accessLabel = (access: IdProviderAccess): string | undefined =>
+    levels.find((level) => level.value === access)?.label;
+
   const { key, displayName, description, application } = provider;
 
   // The row's totals until the panel's own read answers, so a count appears before the rows do.
-  const sections = countedSections([
-    {
-      labelKey: 'idProviders.details.users',
-      type: 'user' as PrincipalSetType,
-      set: principals?.users ?? provider.users,
-      rows: principals?.users,
-    },
-    {
-      labelKey: 'idProviders.details.groups',
-      type: 'group' as PrincipalSetType,
-      set: principals?.groups ?? provider.groups,
-      rows: principals?.groups,
-    },
-  ]);
+  const users = principals?.users;
+  const groups = principals?.groups;
+  const total = (users?.total ?? provider.users.total) + (groups?.total ?? provider.groups.total);
 
   return (
     <DetailsPanel>
@@ -69,7 +71,8 @@ export function IdProviderDetails({
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openIdProviderEditor({ mode: 'edit', entity: provider })}
+            disabled={permissionsFailed}
+            onClick={() => openIdProviderEditorAt(provider, 'identity')}
           />
         }
       >
@@ -78,53 +81,105 @@ export function IdProviderDetails({
             {description}
           </DetailsPanel.Field>
         )}
-        <DetailsPanel.Field labelKey="idProviders.details.application">
-          {application?.displayName ?? noApplicationLabel}
-        </DetailsPanel.Field>
+        {application !== undefined && (
+          <DetailsPanel.Field labelKey="idProviders.details.application">
+            {application.displayName}
+          </DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
-      {sections.map(({ labelKey, type, set, rows }) => (
-        <DetailsPanel.Section key={labelKey} labelKey={labelKey} count={set.total}>
-          {/* Absent rows are "not read yet", not "none", so the heading and its count stand alone
-              rather than over an empty list. */}
-          {/* Ten of the first page, the rest counted off the total: nothing for a `Load more` to add. */}
-          {rows !== undefined && type === 'user' && (
-            <PrincipalAvatars principals={rows.items} total={set.total} />
-          )}
+      {/* Heading alone until the read answers: absent is "not read yet", an empty list is "nobody". */}
+      <DetailsPanel.Section
+        labelKey="idProviders.details.permissions"
+        count={permissions?.length}
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            label={editPermissionsLabel}
+            disabled={permissionsFailed}
+            onClick={() => openIdProviderEditorAt(provider, 'permissions')}
+          />
+        }
+      >
+        {permissions !== undefined && (
+          <DetailsPanel.List>
+            {permissions.map(({ principal, access }) => (
+              <DetailsPanel.ListItem
+                key={principal.key}
+                icon={<PrincipalIcon principal={principal} />}
+                title={principal.displayName}
+                subtitle={principalName(principal.key)}
+                meta={accessLabel(access)}
+              />
+            ))}
+          </DetailsPanel.List>
+        )}
 
-          {rows !== undefined && type === 'group' && (
-            <>
-              <DetailsPanel.List>
-                {rows.items.map((principal) => (
-                  <DetailsPanel.ListItem
-                    key={principal.key}
-                    icon={<PrincipalIcon principal={principal} />}
-                    title={principal.displayName}
-                    subtitle={principalName(principal.key)}
-                  />
-                ))}
-              </DetailsPanel.List>
+        {permissionsFailed && <p className="text-error text-sm">{permissionsFailedLabel}</p>}
+      </DetailsPanel.Section>
 
-              {rows.error !== undefined && (
-                <p className="text-error text-sm">{loadMoreFailedLabel}</p>
-              )}
+      <DetailsPanel.Section labelKey="idProviders.details.members" count={total}>
+        {users !== undefined && users.total > 0 && (
+          <DetailsPanel.Subsection labelKey="idProviders.details.users" count={users.total}>
+            <PrincipalAvatars principals={users.items} total={users.total} />
+          </DetailsPanel.Subsection>
+        )}
 
-              {idProviderPrincipalsHasMore(rows) && (
-                <Button
-                  variant="text"
-                  size="sm"
-                  className="self-start"
-                  label={rows.appending ? loadingMoreLabel : loadMoreLabel}
-                  disabled={rows.appending}
-                  onClick={() => loadMoreIdProviderPrincipals(type)}
+        {groups !== undefined && groups.total > 0 && (
+          <DetailsPanel.Subsection labelKey="idProviders.details.groups" count={groups.total}>
+            <DetailsPanel.List>
+              {groups.items.map((principal) => (
+                <DetailsPanel.ListItem
+                  key={principal.key}
+                  icon={<PrincipalIcon principal={principal} />}
+                  title={principal.displayName}
+                  subtitle={principalName(principal.key)}
                 />
-              )}
-            </>
-          )}
+              ))}
+            </DetailsPanel.List>
 
-          {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
-        </DetailsPanel.Section>
-      ))}
+            {groups.error !== undefined && (
+              <p className="text-error text-sm">{loadMoreFailedLabel}</p>
+            )}
+
+            {idProviderPrincipalsHasMore(groups) && (
+              <Button
+                variant="text"
+                size="sm"
+                className="self-start"
+                label={groups.appending ? loadingMoreLabel : loadMoreLabel}
+                disabled={groups.appending}
+                onClick={() => loadMoreIdProviderPrincipals('group')}
+              />
+            )}
+          </DetailsPanel.Subsection>
+        )}
+
+        {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
+      </DetailsPanel.Section>
     </DetailsPanel>
+  );
+}
+
+export function IdProviderDetailsSkeleton() {
+  return (
+    <div className="flex min-h-0 flex-col gap-5 overflow-hidden p-10" aria-busy="true">
+      <Skeleton.Group className="flex items-center gap-5">
+        <Skeleton shape="rectangle" className="size-12 shrink-0" />
+        <div className="flex flex-col gap-2.5">
+          <Skeleton shape="rectangle" className="h-7 w-52" />
+          <Skeleton shape="rectangle" className="h-5 w-32" />
+        </div>
+      </Skeleton.Group>
+
+      {Array.from({ length: 3 }, (_, index) => (
+        <Skeleton.Group key={index} className="flex flex-col gap-2.5">
+          <Skeleton shape="rectangle" className="h-5 w-full" />
+          <Skeleton shape="rectangle" className="h-4 w-40" />
+          <Skeleton shape="rectangle" className="h-4 w-64" />
+        </Skeleton.Group>
+      ))}
+    </div>
   );
 }

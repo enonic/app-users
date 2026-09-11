@@ -37,8 +37,8 @@ afterEach(() => {
 });
 
 describe('role actions', () => {
-  it('offers new, edit and delete in that order', () => {
-    expect(ROLE_ACTIONS.map(({ id }) => id)).toEqual(['new', 'edit', 'delete']);
+  it('offers new and delete in that order', () => {
+    expect(ROLE_ACTIONS.map(({ id }) => id)).toEqual(['new', 'delete']);
   });
 });
 
@@ -47,18 +47,6 @@ describe('what an action opens', () => {
     void action('new').run(context());
 
     expect($roleEditor.get()).toMatchObject({ open: true, mode: 'create' });
-  });
-
-  it('opens the editor on the one target it was given', () => {
-    void action('edit').run(context({ selected: [customRole] }));
-
-    expect($roleEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: customRole });
-  });
-
-  it('edits the active row when nothing is ticked', () => {
-    void action('edit').run(context({ active: customRole }));
-
-    expect($roleEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: customRole });
   });
 
   it('confirms a delete against every target, not only the first', () => {
@@ -79,24 +67,6 @@ describe('what an action opens', () => {
 describe('new role', () => {
   it('needs no selection', () => {
     expect(action('new').enabled(context())).toBe(true);
-  });
-});
-
-describe('edit role', () => {
-  it('needs exactly one target', () => {
-    expect(action('edit').enabled(context())).toBe(false);
-    expect(action('edit').enabled(context({ selected: [customRole] }))).toBe(true);
-    expect(action('edit').enabled(context({ selected: [customRole, systemRole] }))).toBe(false);
-  });
-
-  it('falls back to the active row when nothing is ticked', () => {
-    expect(action('edit').enabled(context({ active: customRole }))).toBe(true);
-  });
-
-  it('ignores the active row once something is ticked', () => {
-    expect(
-      action('edit').enabled(context({ selected: [customRole, systemRole], active: customRole })),
-    ).toBe(false);
   });
 });
 

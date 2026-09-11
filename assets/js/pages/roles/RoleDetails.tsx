@@ -3,7 +3,7 @@ import { Button } from '@enonic/ui';
 import { principalName, useIdProviderName, type RoleDetail } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openRoleEditor } from '../../features/role-editor';
+import { openRoleEditorAt } from '../../features/role-editor';
 import { formatDateTime } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -16,6 +16,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
   const providerName = useIdProviderName();
 
   const editLabel = useI18n('roles.details.edit');
+  const editMembersLabel = useI18n('roles.details.editMembers');
   const noDescriptionLabel = useI18n('roles.details.noDescription');
 
   const { key, displayName, description, modifiedTime, members } = role;
@@ -39,7 +40,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openRoleEditor({ mode: 'edit', entity: role })}
+            onClick={() => openRoleEditorAt(role, 'identity')}
           />
         }
       >
@@ -53,31 +54,40 @@ export function RoleDetails({ role }: RoleDetailsProps) {
         )}
       </DetailsPanel.Section>
 
-      {members.length > 0 && (
-        <DetailsPanel.Section labelKey="roles.details.members" count={members.length}>
-          {users.length > 0 && (
-            <DetailsPanel.Subsection labelKey="roles.details.users" count={users.length}>
-              <PrincipalAvatars principals={users} />
-            </DetailsPanel.Subsection>
-          )}
+      <DetailsPanel.Section
+        labelKey="roles.details.members"
+        count={members.length}
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            label={editMembersLabel}
+            onClick={() => openRoleEditorAt(role, 'members')}
+          />
+        }
+      >
+        {users.length > 0 && (
+          <DetailsPanel.Subsection labelKey="roles.details.users" count={users.length}>
+            <PrincipalAvatars principals={users} />
+          </DetailsPanel.Subsection>
+        )}
 
-          {groups.length > 0 && (
-            <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
-              <DetailsPanel.List>
-                {groups.map((member) => (
-                  <DetailsPanel.ListItem
-                    key={member.key}
-                    icon={<PrincipalIcon principal={member} />}
-                    title={member.displayName}
-                    subtitle={principalName(member.key)}
-                    meta={providerName(member.key)}
-                  />
-                ))}
-              </DetailsPanel.List>
-            </DetailsPanel.Subsection>
-          )}
-        </DetailsPanel.Section>
-      )}
+        {groups.length > 0 && (
+          <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
+            <DetailsPanel.List>
+              {groups.map((member) => (
+                <DetailsPanel.ListItem
+                  key={member.key}
+                  icon={<PrincipalIcon principal={member} />}
+                  title={member.displayName}
+                  subtitle={principalName(member.key)}
+                  meta={providerName(member.key)}
+                />
+              ))}
+            </DetailsPanel.List>
+          </DetailsPanel.Subsection>
+        )}
+      </DetailsPanel.Section>
     </DetailsPanel>
   );
 }

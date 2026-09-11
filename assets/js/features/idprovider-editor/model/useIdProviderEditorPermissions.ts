@@ -1,17 +1,17 @@
 import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
+import { $idProviderPermissions } from '../../../entities/principal';
 import { $idProviderDefaultPermissions } from './idprovider-defaults';
-import { $idProviderEditDetail } from './idprovider-edit-detail';
 import { $idProviderEditor, seedIdProviderEditorPermissions } from './idprovider-editor.store';
 
 /**
  * Fills the Permissions step once its list arrives: the provider's own on an edit, the platform's defaults
- * on a create. The dialog issues both reads; this only lands the answer.
+ * on a create. The details panel owns the edit read; this only lands its answer.
  */
 export function useIdProviderEditorPermissions(): void {
   const { open, mode, entity } = useStore($idProviderEditor, { keys: ['open', 'mode', 'entity'] });
-  const { item } = useStore($idProviderEditDetail);
+  const { item } = useStore($idProviderPermissions);
   const defaults = useStore($idProviderDefaultPermissions);
 
   const target = entity?.key;

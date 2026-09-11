@@ -13,18 +13,6 @@ export const SERVICE_ACCOUNT_ACTIONS: readonly SectionAction<User>[] = [
     run: () => openServiceAccountEditor({ mode: 'create' }),
   },
   {
-    id: 'edit',
-    labelKey: 'serviceAccounts.action.edit',
-    enabled: (ctx) => actionTargets(ctx).length === 1,
-    activatedByRow: true,
-    run: (ctx) => {
-      const [target] = actionTargets(ctx);
-      if (target !== undefined) {
-        openServiceAccountEditor({ mode: 'edit', entity: target });
-      }
-    },
-  },
-  {
     id: 'delete',
     labelKey: 'serviceAccounts.action.delete',
     enabled: (ctx) => {

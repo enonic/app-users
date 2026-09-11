@@ -1,11 +1,9 @@
-import type { ReactNode } from 'react';
-
 export type DeleteTarget = {
   key: string;
   /** What has to be typed back to delete this one. */
   name: string;
-  /** How the item reads elsewhere in the app: the caller renders it, so the dialog knows no domain. */
-  label: ReactNode;
+  /** The name shown in the confirmation question. */
+  displayName: string;
 };
 
 export function deleteExpectation(targets: readonly DeleteTarget[]): string | number {

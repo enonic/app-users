@@ -174,7 +174,7 @@ export type IdProviderPermission = {
  * A provider's access control list, read by key.
  *
  * Its own read: the list costs a security-service call per provider, so no list query carries it and
- * only the editor asks for it.
+ * only the selected provider's details panel and editor ask for it.
  */
 export type IdProviderPermissions = {
   key: string;

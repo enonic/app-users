@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { deleteExpectation, type DeleteTarget } from './delete-confirm';
 
 function target(key: string, name: string): DeleteTarget {
-  return { key, name, label: name };
+  return { key, name, displayName: name };
 }
 
 describe('deleteExpectation', () => {

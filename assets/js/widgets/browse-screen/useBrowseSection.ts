@@ -42,11 +42,6 @@ export type BrowseSectionOptions<T extends { key: string }> = {
 
 export type BrowseSection<T> = {
   rows: readonly BrowseRow[];
-  /**
-   * The item a row key names. ! What a double click resolves against: the two clicks under it move the
-   * active row and the second clears it, so the action context no longer names the row that was hit.
-   */
-  itemAt: (key: string) => T | undefined;
   status: BrowseListStatus;
   activeKey: string | undefined;
   selectedKeys: ReadonlySet<string>;
@@ -90,7 +85,6 @@ export function useBrowseSection<T extends { key: string }>({
 
   return {
     rows: [...(leadingRows ?? []), ...visible.map(toRow)],
-    itemAt: (key) => items.find((item) => item.key === key),
     status,
     activeKey,
     selectedKeys,

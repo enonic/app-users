@@ -11,5 +11,5 @@ allow:
 interfaces:
   - 'settings.section'
 config:
-  order: 22
+  order: 23
   path: 'roles'

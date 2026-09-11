@@ -1,7 +1,6 @@
 import { useStore } from '@nanostores/preact';
 
 import { deletePrincipals, principalName } from '../../entities/principal';
-import { PrincipalLabel } from '../../entities/principal/ui/PrincipalLabel';
 import { useHostFrame } from '../../shared/host';
 import { deleteExpectation } from '../../shared/ui/dialogs/delete-confirm';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
@@ -21,7 +20,7 @@ export function GroupDeleteDialog({ activeKey, onCloseItem }: GroupDeleteDialogP
   const deleteTargets = (targets ?? []).map((group) => ({
     key: group.key,
     name: principalName(group.key),
-    label: <PrincipalLabel principal={group} />,
+    displayName: group.displayName,
   }));
 
   return (

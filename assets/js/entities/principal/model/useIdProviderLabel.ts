@@ -5,10 +5,14 @@ import { $idProviderNameByKey } from './id-providers.store';
 import { idProviderOf } from './principal.keys';
 import type { PrincipalKey } from './principal.types';
 
-/** `secondary` is absent where it would only repeat `primary`. */
 export type IdProviderLabel = {
   primary: string;
   secondary?: string;
+};
+
+export type IdProviderLabelOptions = {
+  /** Keep the provider name on the second line even when it only differs from the display name by case. */
+  alwaysShowName?: boolean;
 };
 
 /**
@@ -25,25 +29,34 @@ export type IdProviderLabel = {
  * One line is also all there is for a provider whose display name is empty, one the loaded list does not
  * carry, and every row while the providers are still loading.
  */
-export function idProviderLabel(name: string, displayName: string | undefined): IdProviderLabel {
+export function idProviderLabel(
+  name: string,
+  displayName: string | undefined,
+  { alwaysShowName = false }: IdProviderLabelOptions = {},
+): IdProviderLabel {
   if (displayName === undefined) {
     return { primary: name };
   }
 
-  return displayName.toLowerCase() === name.toLowerCase()
+  return !alwaysShowName && displayName.toLowerCase() === name.toLowerCase()
     ? { primary: displayName }
     : { primary: displayName, secondary: name };
 }
 
 /** `undefined` where the key names no provider at all, which a role does. */
-export function useIdProviderLabel(): (key: PrincipalKey) => IdProviderLabel | undefined {
+export function useIdProviderLabel(
+  options?: IdProviderLabelOptions,
+): (key: PrincipalKey) => IdProviderLabel | undefined {
   const names = useStore($idProviderNameByKey);
+  const alwaysShowName = options?.alwaysShowName;
 
   return useCallback(
     (key: PrincipalKey) => {
       const provider = idProviderOf(key);
-      return provider === undefined ? undefined : idProviderLabel(provider, names.get(provider));
+      return provider === undefined
+        ? undefined
+        : idProviderLabel(provider, names.get(provider), { alwaysShowName });
     },
-    [names],
+    [names, alwaysShowName],
   );
 }

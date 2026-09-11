@@ -16,5 +16,7 @@ export function useServiceAccount(key: string | undefined): DetailState<UserDeta
     showServiceAccount(key);
   }, [key]);
 
+  useEffect(() => () => showServiceAccount(undefined), []);
+
   return state;
 }

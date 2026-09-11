@@ -5,6 +5,7 @@ import { useMemo } from 'preact/hooks';
 import {
   loadIdProviders,
   receiveIdProvider,
+  reloadIdProviderPermissions,
   reloadIdProviderPrincipalRows,
   useIdProviders,
 } from '../../entities/principal';
@@ -88,7 +89,8 @@ export function IdProvidersPage() {
     toRow: (provider) =>
       toIdProviderRow(provider, <ShieldLock size={24} strokeWidth={1.5} aria-hidden />),
     reload: () => {
-      // The panel's users and groups are a request of their own, so `Refresh` has to reach them too.
+      // The panel's permissions, users and groups are requests of their own, so `Refresh` has to reach them too.
+      reloadIdProviderPermissions();
       reloadIdProviderPrincipalRows();
       void loadIdProviders();
     },
@@ -118,7 +120,11 @@ export function IdProvidersPage() {
         }
       />
 
-      <IdProviderEditorDialog onSaved={receiveIdProvider} />
+      <IdProviderEditorDialog
+        onSaved={(written) => {
+          receiveIdProvider(written);
+        }}
+      />
       <IdProviderDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
     </>
   );

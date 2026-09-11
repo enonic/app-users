@@ -47,38 +47,14 @@ afterEach(() => {
 });
 
 describe('ID provider actions', () => {
-  it('offers new, edit and delete in that order', () => {
-    expect(ID_PROVIDER_ACTIONS.map(({ id }) => id)).toEqual(['new', 'edit', 'delete']);
+  it('offers new and delete in that order', () => {
+    expect(ID_PROVIDER_ACTIONS.map(({ id }) => id)).toEqual(['new', 'delete']);
   });
 
   it('opens the editor with no provider to create one', () => {
     void action('new').run(context());
 
     expect($idProviderEditor.get()).toMatchObject({ open: true, mode: 'create' });
-  });
-
-  it('opens the editor on the one target it was given', () => {
-    void action('edit').run(context({ selected: [empty] }));
-
-    expect($idProviderEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: empty });
-  });
-
-  it('edits the active row when nothing is ticked', () => {
-    void action('edit').run(context({ active: empty }));
-
-    expect($idProviderEditor.get()).toMatchObject({ open: true, mode: 'edit', entity: empty });
-  });
-});
-
-describe('edit provider', () => {
-  it('needs exactly one target', () => {
-    expect(action('edit').enabled(context())).toBe(false);
-    expect(action('edit').enabled(context({ selected: [empty] }))).toBe(true);
-    expect(action('edit').enabled(context({ selected: [empty, populated] }))).toBe(false);
-  });
-
-  it('falls back to the active row when nothing is ticked', () => {
-    expect(action('edit').enabled(context({ active: system }))).toBe(true);
   });
 });
 

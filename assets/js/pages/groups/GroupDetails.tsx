@@ -10,9 +10,8 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { openGroupEditor } from '../../features/group-editor';
+import { openGroupEditorAt } from '../../features/group-editor';
 import { useI18n } from '../../shared/i18n';
-import { filledSections } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type GroupDetailsProps = {
@@ -23,6 +22,8 @@ export function GroupDetails({ group }: GroupDetailsProps) {
   const providerName = useIdProviderName();
 
   const editLabel = useI18n('groups.details.edit');
+  const editRolesLabel = useI18n('groups.details.editRoles');
+  const editMembersLabel = useI18n('groups.details.editMembers');
   const transitiveLabel = useI18n('groups.details.transitive');
   const transitiveFailedLabel = useI18n('groups.details.transitiveFailed');
 
@@ -35,13 +36,9 @@ export function GroupDetails({ group }: GroupDetailsProps) {
 
   const inherited = useTransitiveMemberships(key, 'group', transitive && inheritable);
   const showInherited = transitive && inheritable;
+  // The lists follow the toggle; the buttons edit what is set on the group itself.
   const roles: readonly PrincipalRef[] = showInherited ? inherited.roles : group.roles;
   const groups: readonly PrincipalRef[] = showInherited ? inherited.groups : group.groups;
-
-  const memberships = filledSections([
-    { labelKey: 'groups.details.memberOf', items: groups },
-    { labelKey: 'groups.details.roles', items: roles },
-  ]);
 
   // Users first as a row of avatars, groups last as rows: a group inside a group is a row, not a branch.
   const users = members.filter(({ type }) => type === 'user');
@@ -62,7 +59,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openGroupEditor({ mode: 'edit', entity: group })}
+            onClick={() => openGroupEditorAt(group, 'identity')}
           />
         }
       >
@@ -89,10 +86,10 @@ export function GroupDetails({ group }: GroupDetailsProps) {
         </DetailsPanel.Section>
       )}
 
-      {memberships.map(({ labelKey, items }) => (
-        <DetailsPanel.Section key={labelKey} labelKey={labelKey} count={items.length}>
+      {groups.length > 0 && (
+        <DetailsPanel.Section labelKey="groups.details.memberOf" count={groups.length}>
           <DetailsPanel.List>
-            {items.map((principal) => (
+            {groups.map((principal) => (
               <DetailsPanel.ListItem
                 key={principal.key}
                 icon={<PrincipalIcon principal={principal} />}
@@ -103,33 +100,67 @@ export function GroupDetails({ group }: GroupDetailsProps) {
             ))}
           </DetailsPanel.List>
         </DetailsPanel.Section>
-      ))}
-
-      {members.length > 0 && (
-        <DetailsPanel.Section labelKey="groups.details.members" count={members.length}>
-          {users.length > 0 && (
-            <DetailsPanel.Subsection labelKey="groups.details.users" count={users.length}>
-              <PrincipalAvatars principals={users} />
-            </DetailsPanel.Subsection>
-          )}
-
-          {memberGroups.length > 0 && (
-            <DetailsPanel.Subsection labelKey="groups.details.groups" count={memberGroups.length}>
-              <DetailsPanel.List>
-                {memberGroups.map((member) => (
-                  <DetailsPanel.ListItem
-                    key={member.key}
-                    icon={<PrincipalIcon principal={member} />}
-                    title={member.displayName}
-                    subtitle={principalName(member.key)}
-                    meta={providerName(member.key)}
-                  />
-                ))}
-              </DetailsPanel.List>
-            </DetailsPanel.Subsection>
-          )}
-        </DetailsPanel.Section>
       )}
+
+      <DetailsPanel.Section
+        labelKey="groups.details.roles"
+        count={roles.length}
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            label={editRolesLabel}
+            onClick={() => openGroupEditorAt(group, 'roles')}
+          />
+        }
+      >
+        <DetailsPanel.List>
+          {roles.map((principal) => (
+            <DetailsPanel.ListItem
+              key={principal.key}
+              icon={<PrincipalIcon principal={principal} />}
+              title={principal.displayName}
+              subtitle={principalName(principal.key)}
+              meta={providerName(principal.key)}
+            />
+          ))}
+        </DetailsPanel.List>
+      </DetailsPanel.Section>
+
+      <DetailsPanel.Section
+        labelKey="groups.details.members"
+        count={members.length}
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            label={editMembersLabel}
+            onClick={() => openGroupEditorAt(group, 'members')}
+          />
+        }
+      >
+        {users.length > 0 && (
+          <DetailsPanel.Subsection labelKey="groups.details.users" count={users.length}>
+            <PrincipalAvatars principals={users} />
+          </DetailsPanel.Subsection>
+        )}
+
+        {memberGroups.length > 0 && (
+          <DetailsPanel.Subsection labelKey="groups.details.groups" count={memberGroups.length}>
+            <DetailsPanel.List>
+              {memberGroups.map((member) => (
+                <DetailsPanel.ListItem
+                  key={member.key}
+                  icon={<PrincipalIcon principal={member} />}
+                  title={member.displayName}
+                  subtitle={principalName(member.key)}
+                  meta={providerName(member.key)}
+                />
+              ))}
+            </DetailsPanel.List>
+          </DetailsPanel.Subsection>
+        )}
+      </DetailsPanel.Section>
     </DetailsPanel>
   );
 }

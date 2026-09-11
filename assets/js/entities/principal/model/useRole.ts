@@ -16,5 +16,7 @@ export function useRole(key: string | undefined): DetailState<RoleDetail> {
     showRole(key);
   }, [key]);
 
+  useEffect(() => () => showRole(undefined), []);
+
   return state;
 }

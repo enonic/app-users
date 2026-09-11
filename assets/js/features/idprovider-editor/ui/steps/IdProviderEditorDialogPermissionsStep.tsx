@@ -2,14 +2,18 @@ import { Selector } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
 
-import type { IdProviderAccess, PrincipalRef, PrincipalType } from '../../../../entities/principal';
+import {
+  $idProviderPermissions,
+  type IdProviderAccess,
+  type PrincipalRef,
+  type PrincipalType,
+} from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n, useLabelled } from '../../../../shared/i18n';
 import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import { ID_PROVIDER_ACCESS_LEVELS } from '../../model/idprovider-access';
 import { $idProviderDefaultPermissions } from '../../model/idprovider-defaults';
-import { $idProviderEditDetail } from '../../model/idprovider-edit-detail';
 import {
   $idProviderEditor,
   $idProviderEditorErrors,
@@ -26,9 +30,11 @@ import {
 const KINDS: readonly PrincipalType[] = ['user', 'group', 'role'];
 
 export function IdProviderEditorDialogPermissionsStep() {
-  const { form, visited } = useStore($idProviderEditor, { keys: ['form', 'visited'] });
+  const { form, visited, mode, entity } = useStore($idProviderEditor, {
+    keys: ['form', 'visited', 'mode', 'entity'],
+  });
   const errors = useStore($idProviderEditorErrors);
-  const { status } = useStore($idProviderEditDetail);
+  const permissionsState = useStore($idProviderPermissions);
   const defaults = useStore($idProviderDefaultPermissions);
 
   const pickerPlaceholder = useI18n('idProviders.dialog.permissionsPlaceholder');
@@ -37,6 +43,8 @@ export function IdProviderEditorDialogPermissionsStep() {
   const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
 
   const { permissions } = form;
+  const permissionsFailed =
+    mode === 'edit' && permissionsState.key === entity?.key && permissionsState.status === 'error';
 
   // The seeded principals, pinned wherever they appear: neither their access nor their presence may
   // change, since app-users lets neither stick.
@@ -64,7 +72,7 @@ export function IdProviderEditorDialogPermissionsStep() {
 
   return (
     <div className="flex flex-col gap-3">
-      {status === 'error' && <p className="text-error text-sm">{failedNotice}</p>}
+      {permissionsFailed && <p className="text-error text-sm">{failedNotice}</p>}
       {permissionsError !== undefined && <p className="text-error text-sm">{permissionsError}</p>}
 
       <PrincipalPicker
