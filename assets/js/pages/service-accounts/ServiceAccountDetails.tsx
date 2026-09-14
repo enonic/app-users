@@ -66,7 +66,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
             variant="outline"
             size="sm"
             label={editLabel}
-            onClick={() => openServiceAccountEditorAt(user, 'identity')}
+            onClick={() => openServiceAccountEditorAt(user, 'general')}
           />
         }
       >

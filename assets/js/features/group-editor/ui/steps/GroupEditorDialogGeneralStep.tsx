@@ -22,7 +22,7 @@ const DISPLAY_NAME_ID = 'group-editor-display-name';
 const NAME_ID = 'group-editor-name';
 const DESCRIPTION_ID = 'group-editor-description';
 
-export function GroupEditorDialogIdentityStep() {
+export function GroupEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($groupEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($groupEditorErrors);
   const nameCheck = useStore(groupNameCheck.$state);

@@ -36,7 +36,7 @@ describe('openUserEditor', () => {
 
     const { open, view, step } = $userEditor.get();
 
-    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'identity' });
+    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'general' });
   });
 
   it('derives the name from the display name until it is typed', () => {

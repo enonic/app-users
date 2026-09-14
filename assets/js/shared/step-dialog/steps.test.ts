@@ -4,8 +4,8 @@ import { defineSteps } from './steps';
 
 type Field = 'name' | 'email' | 'password' | 'unused';
 
-const STEPS = defineSteps<'identity' | 'credentials' | 'members' | 'summary', Field>({
-  identity: { title: 'dialog.identity', fields: ['name', 'email'] },
+const STEPS = defineSteps<'general' | 'credentials' | 'members' | 'summary', Field>({
+  general: { title: 'dialog.general', fields: ['name', 'email'] },
   credentials: { title: 'dialog.credentials', fields: ['password'] },
   members: { title: 'dialog.members', fields: [] },
   summary: { title: 'dialog.summary', fields: [] },
@@ -13,9 +13,9 @@ const STEPS = defineSteps<'identity' | 'credentials' | 'members' | 'summary', Fi
 
 describe('defineSteps', () => {
   it('keeps the table order and names each step after its key', () => {
-    expect(STEPS.order).toEqual(['identity', 'credentials', 'members', 'summary']);
+    expect(STEPS.order).toEqual(['general', 'credentials', 'members', 'summary']);
     expect(STEPS.ids).toEqual({
-      identity: 'identity',
+      general: 'general',
       credentials: 'credentials',
       members: 'members',
       summary: 'summary',
@@ -24,7 +24,7 @@ describe('defineSteps', () => {
 
   it('indexes titles and fields by step', () => {
     expect(STEPS.titles.credentials).toBe('dialog.credentials');
-    expect(STEPS.fields.identity).toEqual(['name', 'email']);
+    expect(STEPS.fields.general).toEqual(['name', 'email']);
     expect(STEPS.allFields).toEqual(['name', 'email', 'password']);
   });
 });
@@ -39,7 +39,7 @@ describe('locked', () => {
   it('locks the steps behind an unanswered one, and never the step itself', () => {
     const locks = STEPS.locked({ name: 'dialog.nameRequired' });
 
-    expect(locks.identity).toBe(false);
+    expect(locks.general).toBe(false);
     expect(locks.credentials).toBe(true);
     expect(locks.summary).toBe(true);
   });
@@ -47,7 +47,7 @@ describe('locked', () => {
   it('locks from the erroring step onwards, wherever it sits', () => {
     const locks = STEPS.locked({ password: 'dialog.passwordTooWeak' });
 
-    expect(locks.identity).toBe(false);
+    expect(locks.general).toBe(false);
     expect(locks.credentials).toBe(false);
     expect(locks.members).toBe(true);
     expect(locks.summary).toBe(true);
@@ -56,7 +56,7 @@ describe('locked', () => {
   it('holds the later steps back while a field is still being checked', () => {
     const locks = STEPS.locked({}, ['name']);
 
-    expect(locks.identity).toBe(false);
+    expect(locks.general).toBe(false);
     expect(locks.credentials).toBe(true);
     expect(locks.summary).toBe(true);
   });
@@ -79,7 +79,7 @@ describe('firstWithError', () => {
       password: 'dialog.passwordTooWeak',
     });
 
-    expect(step).toBe('identity');
+    expect(step).toBe('general');
   });
 
   it('reaches past the steps that claim no field', () => {
