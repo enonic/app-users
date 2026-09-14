@@ -13,9 +13,7 @@ import type {
   IdProviderPermission,
   IdProviderPermissions,
   IdProviderPrincipals,
-  PrincipalPage,
   PrincipalRef,
-  PrincipalSetType,
 } from '../model/principal.types';
 
 /**
@@ -177,38 +175,22 @@ const ID_PROVIDER_PERMISSIONS_DOCUMENT = `query IdProviderPermissions($key: Stri
   }
 }`;
 
-/** How many principals a page of the details panel holds. A provider may hold a whole directory. */
-export const ID_PROVIDER_PRINCIPALS_PAGE = 50;
+/** What the panel reads of each set: the rows it shows, with `total` beside them for the `+N`. */
+export const ID_PROVIDER_PRINCIPALS_SHOWN = 10;
 
 const PRINCIPAL_SET_FIELDS = `
     total
-    items(start: $start, count: $count) {${PRINCIPAL_REF_FIELDS}}
+    items(start: 0, count: $count) {${PRINCIPAL_REF_FIELDS}}
   `;
 
 /** Both sets, for a panel that has just been opened on a provider. */
-const ID_PROVIDER_PRINCIPALS_DOCUMENT = `query IdProviderPrincipals($key: String!, $start: Int!, $count: Int!) {
+const ID_PROVIDER_PRINCIPALS_DOCUMENT = `query IdProviderPrincipals($key: String!, $count: Int!) {
   idProvider(key: $key) {
     key
     users {${PRINCIPAL_SET_FIELDS}}
     groups {${PRINCIPAL_SET_FIELDS}}
   }
 }`;
-
-/** One set, for `Load more`. Two documents because a field cannot be picked by a variable. */
-const PRINCIPAL_PAGE_DOCUMENTS: Record<PrincipalSetType, string> = {
-  user: `query IdProviderUsers($key: String!, $start: Int!, $count: Int!) {
-  idProvider(key: $key) {
-    key
-    users {${PRINCIPAL_SET_FIELDS}}
-  }
-}`,
-  group: `query IdProviderGroups($key: String!, $start: Int!, $count: Int!) {
-  idProvider(key: $key) {
-    key
-    groups {${PRINCIPAL_SET_FIELDS}}
-  }
-}`,
-};
 
 type PrincipalSetDto = {
   total: number;
@@ -228,26 +210,9 @@ export function fetchIdProviderPrincipals(
 ): ResultAsync<IdProviderPrincipals | undefined, AppError> {
   return requestGraphQlDocument<{ idProvider: IdProviderPrincipalsDto | null }>(
     ID_PROVIDER_PRINCIPALS_DOCUMENT,
-    { key, start: 0, count: ID_PROVIDER_PRINCIPALS_PAGE },
+    { key, count: ID_PROVIDER_PRINCIPALS_SHOWN },
     signal,
   ).map(({ idProvider }) => idProvider ?? undefined);
-}
-
-/** The next page of one set. `undefined` for a key nothing answers to, which ends the paging. */
-export function fetchIdProviderPrincipalPage(
-  key: string,
-  type: PrincipalSetType,
-  start: number,
-  signal?: AbortSignal,
-): ResultAsync<PrincipalPage | undefined, AppError> {
-  return requestGraphQlDocument<{ idProvider: Record<string, PrincipalSetDto> | null }>(
-    PRINCIPAL_PAGE_DOCUMENTS[type],
-    { key, start, count: ID_PROVIDER_PRINCIPALS_PAGE },
-    signal,
-  ).map(({ idProvider }) => {
-    const set = idProvider?.[type === 'user' ? 'users' : 'groups'];
-    return set === undefined ? undefined : { total: set.total, items: set.items };
-  });
 }
 
 const DEFAULT_ID_PROVIDER_PERMISSIONS_ROOT: GraphQlRoot = {

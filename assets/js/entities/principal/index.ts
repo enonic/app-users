@@ -40,10 +40,8 @@ export {
 } from './model/id-provider-permissions.load';
 export {
   forgetIdProviderPrincipalRows,
-  loadMoreIdProviderPrincipals,
   reloadIdProviderPrincipalRows,
 } from './model/id-provider-principals.load';
-export { idProviderPrincipalsHasMore } from './model/id-provider-principals.store';
 export type {
   IdProviderPrincipalsState,
   PrincipalSetState,
@@ -137,7 +135,6 @@ export type {
   PrincipalKey,
   PrincipalRef,
   PrincipalSet,
-  PrincipalSetType,
   PrincipalType,
   PublicKey,
   Role,
