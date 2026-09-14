@@ -22,6 +22,8 @@ const loader = createDetailLoader<UserDetail>({
 
 export const $serviceAccountDetail = loader.$detail;
 
+export const serviceAccountDetailFor = loader.detailFor;
+
 export const showServiceAccount = loader.show;
 
 export const forgetServiceAccounts = loader.forget;

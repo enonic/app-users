@@ -15,6 +15,8 @@ const loader = createDetailLoader<RoleDetail>({
 
 export const $roleDetail = loader.$detail;
 
+export const roleDetailFor = loader.detailFor;
+
 export const showRole = loader.show;
 
 export const forgetRoles = loader.forget;

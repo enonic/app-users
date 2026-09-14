@@ -1,18 +1,39 @@
-import { useUser } from '../../entities/principal';
+import { useUser, useUsers } from '../../entities/principal';
+import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { useItemId } from '../../shared/host';
 import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel';
-import { DetailsEmpty } from '../../widgets/details-panel/DetailsEmpty';
+import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { UserDetails } from './UserDetails';
 
 export function UsersItemPage() {
   const id = useItemId();
   const { status, item: user } = useUser(id);
+  const { items } = useUsers();
 
-  // A user is shown while one is there, including the previous one while the next loads, so stepping
-  // through rows does not flash empty. With none, `detailsEmptyLabelKey` picks between the three things
-  // an empty column can mean.
+  // Loading with a user on screen is a re-read of that user: it stays.
+  if (status === 'loading' && user === undefined) {
+    const row = items.find(({ key }) => key === id);
+
+    return (
+      <DetailsPanel>
+        {row === undefined ? (
+          <DetailsPanel.Skeleton header />
+        ) : (
+          <>
+            <DetailsPanel.Header
+              icon={<PrincipalIcon principal={row} size="lg" />}
+              title={row.displayName}
+              subtitle={row.login}
+            />
+            <DetailsPanel.Skeleton />
+          </>
+        )}
+      </DetailsPanel>
+    );
+  }
+
   if (user === undefined) {
-    return <DetailsEmpty labelKey={detailsEmptyLabelKey(status, 'users.details.failed')} />;
+    return <DetailsPanel.Empty labelKey={detailsEmptyLabelKey(status, 'users.details.failed')} />;
   }
 
   return <UserDetails user={user} />;

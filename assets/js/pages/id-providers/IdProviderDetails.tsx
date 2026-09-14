@@ -1,4 +1,4 @@
-import { Button, Skeleton } from '@enonic/ui';
+import { Button } from '@enonic/ui';
 import { ShieldLock } from 'lucide-react';
 
 import {
@@ -18,23 +18,28 @@ import {
 } from '../../features/idprovider-editor';
 import { useI18n, useLabelled } from '../../shared/i18n';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
+import { DetailsListSkeleton } from '../../widgets/details-panel/DetailsSkeleton';
 
 export type IdProviderDetailsProps = {
   provider: IdProvider;
   /** The rows behind the totals, once the panel's own read has answered. */
   principals?: IdProviderPrincipalsState;
+  principalsLoading?: boolean;
   /** That read failed: the totals the row carries still stand, the rows under them are missing. */
   principalsFailed?: boolean;
   /** The access control list, once its own read has answered. */
   permissions?: readonly IdProviderPermission[];
+  permissionsLoading?: boolean;
   permissionsFailed?: boolean;
 };
 
 export function IdProviderDetails({
   provider,
   principals,
+  principalsLoading,
   principalsFailed,
   permissions,
+  permissionsLoading,
   permissionsFailed,
 }: IdProviderDetailsProps) {
   const editLabel = useI18n('idProviders.details.edit');
@@ -88,7 +93,7 @@ export function IdProviderDetails({
         )}
       </DetailsPanel.Section>
 
-      {/* Heading alone until the read answers: absent is "not read yet", an empty list is "nobody". */}
+      {/* Shimmer until the read answers: absent is "not read yet", an empty list is "nobody". */}
       <DetailsPanel.Section
         labelKey="idProviders.details.permissions"
         count={permissions?.length}
@@ -102,6 +107,8 @@ export function IdProviderDetails({
           />
         }
       >
+        {permissionsLoading === true && <DetailsListSkeleton />}
+
         {permissions !== undefined && (
           <DetailsPanel.List>
             {permissions.map(({ principal, access }) => (
@@ -120,6 +127,8 @@ export function IdProviderDetails({
       </DetailsPanel.Section>
 
       <DetailsPanel.Section labelKey="idProviders.details.members" count={total}>
+        {principalsLoading === true && <DetailsListSkeleton />}
+
         {users !== undefined && users.total > 0 && (
           <DetailsPanel.Subsection labelKey="idProviders.details.users" count={users.total}>
             <PrincipalAvatars principals={users.items} total={users.total} />
@@ -159,27 +168,5 @@ export function IdProviderDetails({
         {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
       </DetailsPanel.Section>
     </DetailsPanel>
-  );
-}
-
-export function IdProviderDetailsSkeleton() {
-  return (
-    <div className="flex min-h-0 flex-col gap-5 overflow-hidden p-10" aria-busy="true">
-      <Skeleton.Group className="flex items-center gap-5">
-        <Skeleton shape="rectangle" className="size-12 shrink-0" />
-        <div className="flex flex-col gap-2.5">
-          <Skeleton shape="rectangle" className="h-7 w-52" />
-          <Skeleton shape="rectangle" className="h-5 w-32" />
-        </div>
-      </Skeleton.Group>
-
-      {Array.from({ length: 3 }, (_, index) => (
-        <Skeleton.Group key={index} className="flex flex-col gap-2.5">
-          <Skeleton shape="rectangle" className="h-5 w-full" />
-          <Skeleton shape="rectangle" className="h-4 w-40" />
-          <Skeleton shape="rectangle" className="h-4 w-64" />
-        </Skeleton.Group>
-      ))}
-    </div>
   );
 }

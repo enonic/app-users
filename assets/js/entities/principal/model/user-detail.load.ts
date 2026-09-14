@@ -30,6 +30,8 @@ const loader = createDetailLoader<UserDetail>({
 
 export const $userDetail = loader.$detail;
 
+export const userDetailFor = loader.detailFor;
+
 export const showUser = loader.show;
 
 export const forgetUsers = loader.forget;
