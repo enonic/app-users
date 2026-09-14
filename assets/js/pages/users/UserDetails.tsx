@@ -11,6 +11,7 @@ import {
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openUserEditorAt } from '../../features/user-editor';
 import { useI18n } from '../../shared/i18n';
+import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type UserDetailsProps = {
@@ -113,15 +114,15 @@ export function UserDetails({ user }: UserDetailsProps) {
           />
         }
       >
-        <DetailsPanel.List>
-          {roles.map((principal) => (
+        <DetailsPanel.List items={roles} limit={DETAILS_LIST_LIMIT}>
+          {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
             />
-          ))}
+          )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
 
@@ -137,8 +138,8 @@ export function UserDetails({ user }: UserDetailsProps) {
           />
         }
       >
-        <DetailsPanel.List>
-          {groups.map((principal) => (
+        <DetailsPanel.List items={groups} limit={DETAILS_LIST_LIMIT}>
+          {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
               icon={<PrincipalIcon principal={principal} />}
@@ -146,7 +147,7 @@ export function UserDetails({ user }: UserDetailsProps) {
               subtitle={principalName(principal.key)}
               meta={providerName(principal.key)}
             />
-          ))}
+          )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
     </DetailsPanel>

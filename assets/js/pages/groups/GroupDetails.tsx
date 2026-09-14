@@ -12,6 +12,7 @@ import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openGroupEditorAt } from '../../features/group-editor';
 import { useI18n } from '../../shared/i18n';
+import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type GroupDetailsProps = {
@@ -88,8 +89,8 @@ export function GroupDetails({ group }: GroupDetailsProps) {
 
       {groups.length > 0 && (
         <DetailsPanel.Section labelKey="groups.details.memberOf" count={groups.length}>
-          <DetailsPanel.List>
-            {groups.map((principal) => (
+          <DetailsPanel.List items={groups} limit={DETAILS_LIST_LIMIT}>
+            {(principal) => (
               <DetailsPanel.ListItem
                 key={principal.key}
                 icon={<PrincipalIcon principal={principal} />}
@@ -97,7 +98,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
                 subtitle={principalName(principal.key)}
                 meta={providerName(principal.key)}
               />
-            ))}
+            )}
           </DetailsPanel.List>
         </DetailsPanel.Section>
       )}
@@ -114,8 +115,8 @@ export function GroupDetails({ group }: GroupDetailsProps) {
           />
         }
       >
-        <DetailsPanel.List>
-          {roles.map((principal) => (
+        <DetailsPanel.List items={roles} limit={DETAILS_LIST_LIMIT}>
+          {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
               icon={<PrincipalIcon principal={principal} />}
@@ -123,7 +124,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
               subtitle={principalName(principal.key)}
               meta={providerName(principal.key)}
             />
-          ))}
+          )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
 
@@ -147,8 +148,8 @@ export function GroupDetails({ group }: GroupDetailsProps) {
 
         {memberGroups.length > 0 && (
           <DetailsPanel.Subsection labelKey="groups.details.groups" count={memberGroups.length}>
-            <DetailsPanel.List>
-              {memberGroups.map((member) => (
+            <DetailsPanel.List items={memberGroups} limit={DETAILS_LIST_LIMIT}>
+              {(member) => (
                 <DetailsPanel.ListItem
                   key={member.key}
                   icon={<PrincipalIcon principal={member} />}
@@ -156,7 +157,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
                   subtitle={principalName(member.key)}
                   meta={providerName(member.key)}
                 />
-              ))}
+              )}
             </DetailsPanel.List>
           </DetailsPanel.Subsection>
         )}

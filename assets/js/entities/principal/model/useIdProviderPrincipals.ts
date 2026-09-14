@@ -7,7 +7,7 @@ import {
   type IdProviderPrincipalsState,
 } from './id-provider-principals.store';
 
-/** The users and groups of the provider the panel is showing, a page at a time. */
+/** The users and groups of the provider the panel is showing: the rows it shows, and their totals. */
 export function useIdProviderPrincipals(key: string | undefined): IdProviderPrincipalsState {
   const state = useStore($idProviderPrincipals);
 

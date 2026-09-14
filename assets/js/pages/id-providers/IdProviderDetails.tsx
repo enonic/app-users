@@ -2,8 +2,6 @@ import { Button, Skeleton } from '@enonic/ui';
 import { ShieldLock } from 'lucide-react';
 
 import {
-  idProviderPrincipalsHasMore,
-  loadMoreIdProviderPrincipals,
   principalName,
   type IdProvider,
   type IdProviderAccess,
@@ -17,6 +15,7 @@ import {
   openIdProviderEditorAt,
 } from '../../features/idprovider-editor';
 import { useI18n, useLabelled } from '../../shared/i18n';
+import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type IdProviderDetailsProps = {
@@ -40,9 +39,6 @@ export function IdProviderDetails({
   const editLabel = useI18n('idProviders.details.edit');
   const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
   const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');
-  const loadMoreLabel = useI18n('browse.list.loadMore');
-  const loadingMoreLabel = useI18n('browse.list.loadingMore');
-  const loadMoreFailedLabel = useI18n('browse.list.loadMoreFailed');
   const listFailedLabel = useI18n('idProviders.details.listFailed');
 
   const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
@@ -103,8 +99,8 @@ export function IdProviderDetails({
         }
       >
         {permissions !== undefined && (
-          <DetailsPanel.List>
-            {permissions.map(({ principal, access }) => (
+          <DetailsPanel.List items={permissions}>
+            {({ principal, access }) => (
               <DetailsPanel.ListItem
                 key={principal.key}
                 icon={<PrincipalIcon principal={principal} />}
@@ -112,7 +108,7 @@ export function IdProviderDetails({
                 subtitle={principalName(principal.key)}
                 meta={accessLabel(access)}
               />
-            ))}
+            )}
           </DetailsPanel.List>
         )}
 
@@ -128,31 +124,16 @@ export function IdProviderDetails({
 
         {groups !== undefined && groups.total > 0 && (
           <DetailsPanel.Subsection labelKey="idProviders.details.groups" count={groups.total}>
-            <DetailsPanel.List>
-              {groups.items.map((principal) => (
+            <DetailsPanel.List items={groups.items} limit={DETAILS_LIST_LIMIT} total={groups.total}>
+              {(principal) => (
                 <DetailsPanel.ListItem
                   key={principal.key}
                   icon={<PrincipalIcon principal={principal} />}
                   title={principal.displayName}
                   subtitle={principalName(principal.key)}
                 />
-              ))}
+              )}
             </DetailsPanel.List>
-
-            {groups.error !== undefined && (
-              <p className="text-error text-sm">{loadMoreFailedLabel}</p>
-            )}
-
-            {idProviderPrincipalsHasMore(groups) && (
-              <Button
-                variant="text"
-                size="sm"
-                className="self-start"
-                label={groups.appending ? loadingMoreLabel : loadMoreLabel}
-                disabled={groups.appending}
-                onClick={() => loadMoreIdProviderPrincipals('group')}
-              />
-            )}
           </DetailsPanel.Subsection>
         )}
 
