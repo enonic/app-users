@@ -18,6 +18,7 @@ export function RoleEditorDialogMembersStep() {
 
       <PrincipalPicker
         kinds={['user', 'group']}
+        showIdProvider
         placeholder={membersPlaceholder}
         selected={form.members}
         onChange={(members) => updateRoleEditorForm({ members })}

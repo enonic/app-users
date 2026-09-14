@@ -5,7 +5,7 @@ import type { ReactNode, UIEvent } from 'react';
 
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
-import type { PrincipalRef, PrincipalType } from '../model/principal.types';
+import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
 import { useIdProviderLabel } from '../model/useIdProviderLabel';
 import { usePrincipalSearch, type PrincipalSearch } from '../model/usePrincipalSearch';
 import { IdProviderCell } from './IdProviderCell';
@@ -63,6 +63,16 @@ export function PrincipalPicker({
   const applyLabel = useI18n('principal.picker.apply');
 
   const search = usePrincipalSearch(query, open, kinds, idProvider);
+
+  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
+  const providerCell = (key: PrincipalKey): ReactNode => {
+    const label = providerLabel(key);
+    return label === undefined ? undefined : (
+      <span className="text-subtle text-sm whitespace-nowrap">
+        <IdProviderCell {...label} />
+      </span>
+    );
+  };
 
   // ? The exclusion sits on the offer alone: a principal already picked stays in the list below even when
   // ? a later change would no longer offer it, rather than disappearing from under the user.
@@ -125,7 +135,7 @@ export function PrincipalPicker({
                 principals={offered}
                 search={search}
                 locked={locked}
-                showIdProvider={showIdProvider}
+                providerCell={showIdProvider ? providerCell : undefined}
                 searchingLabel={searchingLabel}
                 noMatchesLabel={noMatchesLabel}
                 failedLabel={failedLabel}
@@ -144,9 +154,7 @@ export function PrincipalPicker({
               </GridList.Cell>
 
               {showIdProvider && (
-                <GridList.Cell>
-                  <ProviderCell principal={member} />
-                </GridList.Cell>
+                <GridList.Cell interactive={false}>{providerCell(member.key)}</GridList.Cell>
               )}
 
               {rowTrailing !== undefined && <GridList.Cell>{rowTrailing(member)}</GridList.Cell>}
@@ -180,7 +188,7 @@ type PrincipalOptionsProps = {
   principals: readonly PrincipalRef[];
   search: PrincipalSearch;
   locked?: ReadonlySet<string>;
-  showIdProvider: boolean;
+  providerCell?: (key: PrincipalKey) => ReactNode;
   searchingLabel: string;
   noMatchesLabel: string;
   failedLabel: string;
@@ -190,7 +198,7 @@ function PrincipalOptions({
   principals,
   search,
   locked,
-  showIdProvider,
+  providerCell,
   searchingLabel,
   noMatchesLabel,
   failedLabel,
@@ -237,7 +245,7 @@ function PrincipalOptions({
           className="px-2.5 py-1.5"
         >
           <PrincipalLabel className="flex-1" principal={principal} />
-          {showIdProvider && <ProviderCell principal={principal} />}
+          {providerCell?.(principal.key)}
           <Checkbox
             tabIndex={-1}
             checked={selection.has(principal.key)}
@@ -252,21 +260,5 @@ function PrincipalOptions({
 
       <div ref={end} aria-hidden />
     </Combobox.ListContent>
-  );
-}
-
-/** The browse cell's look: display name over name, right aligned. Nothing for a role. */
-function ProviderCell({ principal }: { principal: PrincipalRef }) {
-  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
-  const label = providerLabel(principal.key);
-
-  if (label === undefined) {
-    return null;
-  }
-
-  return (
-    <span className="text-subtle text-sm whitespace-nowrap">
-      <IdProviderCell {...label} />
-    </span>
   );
 }
