@@ -5,8 +5,10 @@ import type { ReactNode, UIEvent } from 'react';
 
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
-import type { PrincipalRef, PrincipalType } from '../model/principal.types';
+import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
+import { useIdProviderLabel } from '../model/useIdProviderLabel';
 import { usePrincipalSearch, type PrincipalSearch } from '../model/usePrincipalSearch';
+import { IdProviderCell } from './IdProviderCell';
 import { PrincipalLabel } from './PrincipalLabel';
 
 export type PrincipalPickerProps = {
@@ -31,6 +33,8 @@ export type PrincipalPickerProps = {
   excluded?: ReadonlySet<string>;
   /** Offers only principals from this ID provider. */
   idProvider?: string;
+  /** Names each row's provider, for a picker whose offer can widen past the form's own. */
+  showIdProvider?: boolean;
 };
 
 const LOAD_MORE_MARGIN = 48;
@@ -45,6 +49,7 @@ export function PrincipalPicker({
   locked,
   excluded,
   idProvider,
+  showIdProvider = false,
 }: PrincipalPickerProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -58,6 +63,16 @@ export function PrincipalPicker({
   const applyLabel = useI18n('principal.picker.apply');
 
   const search = usePrincipalSearch(query, open, kinds, idProvider);
+
+  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
+  const providerCell = (key: PrincipalKey): ReactNode => {
+    const label = providerLabel(key);
+    return label === undefined ? undefined : (
+      <span className="text-subtle text-sm whitespace-nowrap">
+        <IdProviderCell {...label} />
+      </span>
+    );
+  };
 
   // ? The exclusion sits on the offer alone: a principal already picked stays in the list below even when
   // ? a later change would no longer offer it, rather than disappearing from under the user.
@@ -120,6 +135,7 @@ export function PrincipalPicker({
                 principals={offered}
                 search={search}
                 locked={locked}
+                providerCell={showIdProvider ? providerCell : undefined}
                 searchingLabel={searchingLabel}
                 noMatchesLabel={noMatchesLabel}
                 failedLabel={failedLabel}
@@ -136,6 +152,10 @@ export function PrincipalPicker({
               <GridList.Cell interactive={false} className="flex-1 self-stretch">
                 <PrincipalLabel className="min-w-0 flex-1" principal={member} />
               </GridList.Cell>
+
+              {showIdProvider && (
+                <GridList.Cell interactive={false}>{providerCell(member.key)}</GridList.Cell>
+              )}
 
               {rowTrailing !== undefined && <GridList.Cell>{rowTrailing(member)}</GridList.Cell>}
 
@@ -160,10 +180,15 @@ export function PrincipalPicker({
   );
 }
 
+//
+// * Internal
+//
+
 type PrincipalOptionsProps = {
   principals: readonly PrincipalRef[];
   search: PrincipalSearch;
   locked?: ReadonlySet<string>;
+  providerCell?: (key: PrincipalKey) => ReactNode;
   searchingLabel: string;
   noMatchesLabel: string;
   failedLabel: string;
@@ -173,6 +198,7 @@ function PrincipalOptions({
   principals,
   search,
   locked,
+  providerCell,
   searchingLabel,
   noMatchesLabel,
   failedLabel,
@@ -219,6 +245,7 @@ function PrincipalOptions({
           className="px-2.5 py-1.5"
         >
           <PrincipalLabel className="flex-1" principal={principal} />
+          {providerCell?.(principal.key)}
           <Checkbox
             tabIndex={-1}
             checked={selection.has(principal.key)}

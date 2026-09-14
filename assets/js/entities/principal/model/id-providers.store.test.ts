@@ -1,4 +1,4 @@
-import { err, ok, okAsync, ResultAsync } from 'neverthrow';
+import { err, errAsync, ok, okAsync, ResultAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppError } from '../../../shared/api';
@@ -135,6 +135,31 @@ describe('the provider names the other sections read', () => {
     expect($idProviderNames.get().items).toEqual([{ key: 'system', displayName: 'System' }]);
     expect($idProviderNames.get().status).toBe('error');
     expect($idProviderNames.get().error).toBe('Providers are unreachable');
+  });
+
+  it('is filled by the ID Providers section, from the list that section already loads', async () => {
+    vi.mocked(fetchIdProviders).mockReturnValue(
+      okAsync([{ ...provider('ldap'), displayName: 'Corporate LDAP' }]),
+    );
+
+    await loadIdProviders();
+
+    expect($idProviderNames.get().status).toBe('ready');
+    expect($idProviderNameByKey.get().get('ldap')).toBe('Corporate LDAP');
+  });
+
+  it("is left alone when that section's load fails, so a screen that filled it keeps saying so", async () => {
+    receiveIdProviderNames(ok([{ key: 'system', displayName: 'System' }]));
+    vi.mocked(fetchIdProviders).mockReturnValue(
+      errAsync(new AppError('Providers are unreachable')),
+    );
+
+    await loadIdProviders();
+
+    expect($idProviderNames.get()).toEqual({
+      status: 'ready',
+      items: [{ key: 'system', displayName: 'System' }],
+    });
   });
 });
 

@@ -4,6 +4,7 @@ import { fetchIdProvider, fetchIdProviders } from '../api/id-providers.api';
 import {
   beginIdProvidersLoad,
   receiveIdProvider,
+  receiveIdProviderNames,
   receiveIdProviders,
   removeIdProvider,
 } from './id-providers.store';
@@ -33,6 +34,7 @@ export function loadIdProviders(): Promise<void> {
     (items) => {
       if (!signal.aborted) {
         receiveIdProviders(ok(items));
+        receiveIdProviderNames(ok(items));
       }
     },
     (error) => {

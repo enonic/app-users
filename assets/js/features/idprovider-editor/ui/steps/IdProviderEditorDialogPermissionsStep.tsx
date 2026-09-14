@@ -79,6 +79,7 @@ export function IdProviderEditorDialogPermissionsStep() {
         selected={permissions.map(({ principal }) => principal)}
         onChange={handlePrincipals}
         kinds={KINDS}
+        showIdProvider
         placeholder={pickerPlaceholder}
         locked={pinned}
         rowTrailing={({ key, displayName }) => (
