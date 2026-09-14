@@ -181,16 +181,13 @@ export type IdProviderPermissions = {
   permissions: readonly IdProviderPermission[];
 };
 
-/** Which of a provider's two sets a read is about. */
-export type PrincipalSetType = 'user' | 'group';
-
-/** One page of a set, with how many there are in all. */
+/** The rows of a set that were read, and how many there are in all. */
 export type PrincipalPage = {
   total: number;
   items: readonly PrincipalRef[];
 };
 
-/** The principals a provider holds, read by key and a page at a time: it may hold a whole directory. */
+/** The principals a provider holds, read by key and only as far as the panel shows them. */
 export type IdProviderPrincipals = {
   key: string;
   users: PrincipalPage;

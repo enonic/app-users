@@ -1,20 +1,18 @@
-import { okAsync, ResultAsync } from 'neverthrow';
+import { okAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AppError } from '../../../shared/api';
-import { fetchIdProviderPrincipalPage, fetchIdProviderPrincipals } from '../api/id-providers.api';
+import { fetchIdProviderPrincipals } from '../api/id-providers.api';
 import {
   forgetIdProviderPrincipalRows,
-  loadMoreIdProviderPrincipals,
   reloadIdProviderPrincipalRows,
   showIdProviderPrincipals,
 } from './id-provider-principals.load';
 import { $idProviderPrincipals } from './id-provider-principals.store';
-import type { IdProviderPrincipals, PrincipalPage, PrincipalRef } from './principal.types';
+import type { IdProviderPrincipals, PrincipalRef } from './principal.types';
 
 vi.mock('../api/id-providers.api', () => ({
   fetchIdProviderPrincipals: vi.fn(),
-  fetchIdProviderPrincipalPage: vi.fn(),
 }));
 
 const DEBOUNCE_MS = 250;
@@ -31,19 +29,8 @@ function answered(key: string, ...names: readonly string[]) {
   });
 }
 
-function page(...names: readonly string[]) {
-  return okAsync<PrincipalPage | undefined, AppError>({
-    total: 100,
-    items: names.map(principal),
-  });
-}
-
-/** Every read for the panel, whichever of the two it was. */
 function reads(): number {
-  return (
-    vi.mocked(fetchIdProviderPrincipals).mock.calls.length +
-    vi.mocked(fetchIdProviderPrincipalPage).mock.calls.length
-  );
+  return vi.mocked(fetchIdProviderPrincipals).mock.calls.length;
 }
 
 function loaded(): string[] {
@@ -53,9 +40,7 @@ function loaded(): string[] {
 beforeEach(() => {
   vi.useFakeTimers();
   vi.mocked(fetchIdProviderPrincipals).mockReset();
-  vi.mocked(fetchIdProviderPrincipalPage).mockReset();
   vi.mocked(fetchIdProviderPrincipals).mockReturnValue(answered('ldap', 'alice'));
-  vi.mocked(fetchIdProviderPrincipalPage).mockReturnValue(page('bob'));
 });
 
 afterEach(() => {
@@ -65,7 +50,7 @@ afterEach(() => {
 });
 
 describe('showIdProviderPrincipals', () => {
-  it('reads the first page of both sets for the selected provider', async () => {
+  it('reads both sets for the selected provider', async () => {
     showIdProviderPrincipals('ldap');
     await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
 
@@ -138,49 +123,5 @@ describe('forgetIdProviderPrincipalRows', () => {
 
     expect(reads()).toBe(0);
     expect($idProviderPrincipals.get().key).toBeUndefined();
-  });
-});
-
-describe('loadMoreIdProviderPrincipals', () => {
-  it('appends the next page of the set it was asked for', async () => {
-    showIdProviderPrincipals('ldap');
-    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-
-    loadMoreIdProviderPrincipals('user');
-    await vi.advanceTimersByTimeAsync(0);
-
-    expect(vi.mocked(fetchIdProviderPrincipalPage).mock.calls[0]?.slice(0, 3)).toEqual([
-      'ldap',
-      'user',
-      1,
-    ]);
-    expect(loaded()).toEqual(['alice', 'bob']);
-  });
-
-  // ! A page that answers after the selection moved holds the previous provider's principals, and the
-  // ! panel is now showing another provider.
-  it('files no page under the provider that replaced the one it was read for', async () => {
-    let answerSlowly: ((page: PrincipalPage | undefined) => void) | undefined;
-    vi.mocked(fetchIdProviderPrincipalPage).mockReturnValueOnce(
-      ResultAsync.fromSafePromise(
-        new Promise<PrincipalPage | undefined>((resolve) => {
-          answerSlowly = resolve;
-        }),
-      ),
-    );
-
-    showIdProviderPrincipals('ldap');
-    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-    loadMoreIdProviderPrincipals('user');
-
-    vi.mocked(fetchIdProviderPrincipals).mockReturnValue(answered('azure', 'carol'));
-    showIdProviderPrincipals('azure');
-    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
-
-    answerSlowly?.({ total: 100, items: [principal('bob')] });
-    await vi.advanceTimersByTimeAsync(0);
-
-    expect($idProviderPrincipals.get().key).toBe('azure');
-    expect(loaded()).toEqual(['carol']);
   });
 });

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import { useI18n } from '../../shared/i18n';
 import { ItemLabel } from '../../shared/ui/ItemLabel';
-import { withCount } from './details-panel';
+import { sliceList, withCount } from './details-panel';
 import { DetailsEmpty } from './DetailsEmpty';
 
 export type DetailsPanelProps = {
@@ -45,8 +45,13 @@ export type DetailsFieldProps = {
   children: ReactNode;
 };
 
-export type DetailsListProps = {
-  children: ReactNode;
+export type DetailsListProps<T> = {
+  items: readonly T[];
+  /** Rows past this many collapse into a `+N more` line. */
+  limit?: number;
+  /** The size of the whole set when `items` is only the page of it that was loaded. */
+  total?: number;
+  children: (item: T) => ReactNode;
 };
 
 export type DetailsListItemProps = {
@@ -114,11 +119,20 @@ export function DetailsField({ labelKey, children }: DetailsFieldProps) {
   );
 }
 
-export function DetailsList({ children }: DetailsListProps) {
+export function DetailsList<T>({ items, limit, total, children }: DetailsListProps<T>) {
+  const { shown, hidden } = sliceList(items, limit, total);
+
+  const moreLabel = useI18n('browse.details.more', hidden);
+
+  // ? A sibling of the list rather than a row in it: `role="list"` takes list items and nothing else.
   return (
-    <div role="list" className="flex flex-col">
-      {children}
-    </div>
+    <>
+      <div role="list" className="flex flex-col">
+        {shown.map(children)}
+      </div>
+
+      {hidden > 0 && <p className="text-subtle text-sm">{moreLabel}</p>}
+    </>
   );
 }
 
