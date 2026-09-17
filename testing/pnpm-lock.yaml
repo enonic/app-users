@@ -55,8 +55,8 @@ importers:
         specifier: ^9.31.6
         version: 9.31.6(@wdio/globals@9.31.3)(webdriverio@9.31.6)
       '@wdio/mocha-framework':
-        specifier: ^9.31.6
-        version: 9.31.6
+        specifier: ^9.31.9
+        version: 9.31.9
       allure-commandline:
         specifier: ^2.43.0
         version: 2.43.0
@@ -511,8 +511,8 @@ packages:
     resolution: {integrity: sha512-0ZAEIo6PNyMIJPlOGkIgyOJUjcd0pC8/QHlVAAe1c91/IcjZ1X+k0yidXHaboJdN7dq1XPUacmhRdtua0U5EZg==}
     engines: {node: '>=18.20.0'}
 
-  '@wdio/mocha-framework@9.31.6':
-    resolution: {integrity: sha512-huGMzC912yUIPKPuJht/GMtrpBZLC68L9vGoPSaPwAohkB3UZZxq6QNg0c+VV1iTPE0LcU7iptYk/Lf/hwC/7w==}
+  '@wdio/mocha-framework@9.31.9':
+    resolution: {integrity: sha512-1kFnNNafUgNz8yg+C6EK3Ykt3K5X9+L52o3XTdYJCs2mGI/n0nCdzHr/Yh7AMGcAAvLtPtCgEnIT0nM7dmPbzg==}
     engines: {node: '>=18.20.0'}
 
   '@wdio/protocols@9.31.5':
@@ -541,12 +541,20 @@ packages:
     resolution: {integrity: sha512-yPEvnkCrxacYMP5x5EcscFgG5cjaedwJ4tg9aSgQFDWLR0zGUkuCHW95ufYlH1nMgiIhlxSqGvku5h6bjZvzAQ==}
     engines: {node: '>=18.20.0'}
 
+  '@wdio/utils@9.31.9':
+    resolution: {integrity: sha512-k0Py9L7PxRq8d8/6+B5l4078c12/7lbDzqUVrrhH7VJDV0/EM0qVTtP1LVttLYZEPazdAn0kLSFBCLiiJmfM7Q==}
+    engines: {node: '>=18.20.0'}
+
   '@wdio/xvfb@9.31.2':
     resolution: {integrity: sha512-48MqdcrvdC/Jn2YPhW6hjGLzcQqOEt1Q6KELR/TWz3vIJoZwzTngGAdT06voUnZS+PUEcd/vKSo4a6zxQ/mm7g==}
     engines: {node: '>=18.20.0'}
 
   '@zip.js/zip.js@2.11.2':
     resolution: {integrity: sha512-gvlhhtTzqoGcl3bpFpMieJgFiVGnEgD777JgERXhbU89cCnYc2Srl5gs+kcCoy31hfx+xD4UCDO1MB2+UtqcZA==}
+    engines: {bun: '>=0.7.0', deno: '>=1.0.0', node: '>=18.0.0'}
+
+  '@zip.js/zip.js@2.15.0':
+    resolution: {integrity: sha512-hYAuHAaWjt0axbofaDL5XUlmrQPsBDcK3f45ApZuh6N+8UGVk26GoGdtGDvcvzahsHytTQ6DtBVXwG9IcCMjjQ==}
     engines: {bun: '>=0.7.0', deno: '>=1.0.0', node: '>=18.0.0'}
 
   abort-controller@3.0.0:
@@ -876,6 +884,11 @@ packages:
 
   edgedriver@6.3.0:
     resolution: {integrity: sha512-ggEQL+oEyIcM4nP2QC3AtCQ04o4kDNefRM3hja0odvlPSnsaxiruMxEZ93v3gDCKWYW6BXUr51PPradb+3nffw==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
+
+  edgedriver@6.3.1:
+    resolution: {integrity: sha512-wCL/Ydgt0DPkWecjhhPj2/lnDxsGeHLPKeJYKKMTNol+ULFVg4WaTvxoB19GU4tieM6LSA3vZEdZxmDC0DwIpQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -1243,8 +1256,8 @@ packages:
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
-  js-yaml@5.4.1:
-    resolution: {integrity: sha512-28R/k+NAjeuf7+CKlTxWZVExJGwVVLwY06DgEnOMz2gEpfNkDcD7QvyiVPT0xy0XXhU8vHsd4Ot42OOPdJG7dQ==}
+  js-yaml@5.4.2:
+    resolution: {integrity: sha512-m+aqu+LwO1O6sIopafj8HUVl5aawITwZQe/yHpMCKjaWBaA/d07B/QdMb3529REftiU+RMMHL3Vlsw3hON7vWg==}
     hasBin: true
 
   json-parse-even-better-errors@3.0.2:
@@ -1511,8 +1524,8 @@ packages:
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
-  react-is@19.2.8:
-    resolution: {integrity: sha512-s5un28nYxKJw5gvUHyW5PCC28CvBqLu9r3cWgzHT4Vo/5fqqkFcdRYsGcKf50WMPpjjFZS5d76fn3YCo2njKwQ==}
+  react-is@19.3.0:
+    resolution: {integrity: sha512-UpMYezM4v5/18F28aC66AEsjXIgE02kyEMH6yLdgLXu/UTfa1Ntwck/nNLrbqJsEXW7gPb0coNO9FQse9WTovA==}
 
   read-pkg-up@10.1.0:
     resolution: {integrity: sha512-aNtBq4jR8NawpKJQldrQcSW9y/d+KWH4v24HWkHljOZ7H0av+YTGANBzRh9A5pw7v/bLVsLVPpOhJ7gHNVy8lA==}
@@ -2335,13 +2348,13 @@ snapshots:
       safe-regex2: 5.1.1
       strip-ansi: 7.2.0
 
-  '@wdio/mocha-framework@9.31.6':
+  '@wdio/mocha-framework@9.31.9':
     dependencies:
       '@types/mocha': 10.0.10
       '@types/node': 20.19.43
       '@wdio/logger': 9.29.1
       '@wdio/types': 9.31.2
-      '@wdio/utils': 9.31.6
+      '@wdio/utils': 9.31.9
       mocha: 10.8.2
     transitivePeerDependencies:
       - bare-abort-controller
@@ -2410,11 +2423,35 @@ snapshots:
       - react-native-b4a
       - supports-color
 
+  '@wdio/utils@9.31.9':
+    dependencies:
+      '@puppeteer/browsers': 2.13.2
+      '@wdio/logger': 9.29.1
+      '@wdio/types': 9.31.2
+      decamelize: 6.0.1
+      deepmerge-ts: 8.0.2
+      edgedriver: 6.3.1
+      geckodriver: 6.1.1
+      get-port: 7.2.0
+      import-meta-resolve: 4.2.0
+      locate-app: 2.5.0
+      mitt: 3.0.1
+      safaridriver: 1.0.1
+      split2: 4.2.0
+      wait-port: 1.1.0
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - react-native-b4a
+      - supports-color
+
   '@wdio/xvfb@9.31.2':
     dependencies:
       '@wdio/logger': 9.29.1
 
   '@zip.js/zip.js@2.11.2': {}
+
+  '@zip.js/zip.js@2.15.0': {}
 
   abort-controller@3.0.0:
     dependencies:
@@ -2744,6 +2781,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  edgedriver@6.3.1:
+    dependencies:
+      '@wdio/logger': 9.29.1
+      '@zip.js/zip.js': 2.15.0
+      decamelize: 6.0.1
+      edge-paths: 3.0.5
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
+      which: 6.0.1
+    transitivePeerDependencies:
+      - supports-color
+
   ejs@3.1.10:
     dependencies:
       jake: 10.9.4
@@ -2928,7 +2977,7 @@ snapshots:
   geckodriver@6.1.1:
     dependencies:
       '@wdio/logger': 9.29.1
-      '@zip.js/zip.js': 2.11.2
+      '@zip.js/zip.js': 2.15.0
       decamelize: 6.0.1
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -3146,7 +3195,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@5.4.1:
+  js-yaml@5.4.2:
     dependencies:
       argparse: 2.0.1
 
@@ -3241,7 +3290,7 @@ snapshots:
       find-up: 5.0.0
       glob: 8.1.0
       he: 1.2.0
-      js-yaml: 5.4.1
+      js-yaml: 5.4.2
       log-symbols: 4.1.0
       minimatch: 10.2.6
       ms: 2.1.3
@@ -3377,7 +3426,7 @@ snapshots:
   pretty-format@30.5.1:
     dependencies:
       '@jest/react-is-18': react-is@18.3.1
-      '@jest/react-is-19': react-is@19.2.8
+      '@jest/react-is-19': react-is@19.3.0
       '@jest/schemas': 30.5.0
       ansi-styles: 5.2.0
 
@@ -3423,7 +3472,7 @@ snapshots:
 
   react-is@18.3.1: {}
 
-  react-is@19.2.8: {}
+  react-is@19.3.0: {}
 
   read-pkg-up@10.1.0:
     dependencies:
