@@ -18,16 +18,13 @@ export type UserSummaryRow = { labelKey: string } & (
 
 /**
  * The wizard's answers as the summary reads them back, in the order the steps asked for them. A row
- * whose value is empty is dropped, as the Content Studio project wizard does — except credentials,
- * which say so when nothing was chosen. A service account's provider is a given, so it is not read back.
+ * whose value is empty is dropped, as the Content Studio project wizard does — credentials included,
+ * so they are read back only when the dialog changed them. A service account's provider is a given,
+ * so it is not read back.
  *
  * ! The password is reported as set, never echoed.
  */
-export function userSummaryRows(
-  form: UserForm,
-  providerName: string,
-  hasPassword: boolean,
-): readonly UserSummaryRow[] {
+export function userSummaryRows(form: UserForm, providerName: string): readonly UserSummaryRow[] {
   const rows: UserSummaryRow[] = [];
 
   if (form.idProvider !== SYSTEM_ID_PROVIDER) {
@@ -40,30 +37,25 @@ export function userSummaryRows(
     rows.push({ labelKey: 'users.dialog.email', value: form.email });
   }
 
-  rows.push({ labelKey: 'users.dialog.credentials', lines: credentialLines(form, hasPassword) });
+  const credentials = credentialLines(form);
+  if (credentials.length > 0) {
+    rows.push({ labelKey: 'users.dialog.credentials', lines: credentials });
+  }
 
   return rows;
 }
 
-// One line for the password, one for the keys; when neither says anything, the step's own notice does.
-function credentialLines(form: UserForm, hasPassword: boolean): readonly SummaryPhrase[] {
-  const lines = [passwordLine(form, hasPassword), publicKeyLine(form)].filter(
-    (line) => line !== undefined,
-  );
-
-  return lines.length > 0 ? lines : [{ key: 'users.dialog.passwordOptional' }];
+// One line for the password, one for the keys; a password left alone is no change and says nothing.
+function credentialLines(form: UserForm): readonly SummaryPhrase[] {
+  return [passwordLine(form), publicKeyLine(form)].filter((line) => line !== undefined);
 }
 
-function passwordLine(form: UserForm, hasPassword: boolean): SummaryPhrase | undefined {
+function passwordLine(form: UserForm): SummaryPhrase | undefined {
   if (form.password !== undefined) {
     return { key: 'users.dialog.passwordSet' };
   }
 
-  if (form.clearPassword === true) {
-    return { key: 'users.dialog.passwordCleared' };
-  }
-
-  return hasPassword ? { key: 'users.dialog.passwordAlreadySet' } : undefined;
+  return form.clearPassword === true ? { key: 'users.dialog.passwordCleared' } : undefined;
 }
 
 // ! Counts, never material: a pending key's own PEM and private half stay out of the summary.

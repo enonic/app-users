@@ -11,7 +11,7 @@ import { $userEditor } from '../../model/user-editor.store';
 import { userSummaryRows } from '../../model/user-summary';
 
 export function UserEditorDialogSummaryStep() {
-  const { form, entity } = useStore($userEditor, { keys: ['form', 'entity'] });
+  const { form } = useStore($userEditor, { keys: ['form'] });
   const { items: providers } = useIdProviderNames();
 
   const rolesLabel = useI18n('users.dialog.roles');
@@ -22,7 +22,7 @@ export function UserEditorDialogSummaryStep() {
 
   return (
     <StepDialogSummary>
-      {userSummaryRows(form, providerName, entity?.hasPassword === true).map((row) => (
+      {userSummaryRows(form, providerName).map((row) => (
         <StepDialogSummaryRow key={row.labelKey} label={i18n(row.labelKey)}>
           {row.lines === undefined ? (
             <span className="break-words">
