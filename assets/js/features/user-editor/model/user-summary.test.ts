@@ -14,14 +14,14 @@ const FORM: UserForm = {
   keyRemovals: [],
 };
 
-const credentials = (form: Partial<UserForm>, hasPassword = false) =>
-  userSummaryRows({ ...FORM, ...form }, 'Corporate LDAP', hasPassword).find(
+const credentials = (form: Partial<UserForm>) =>
+  userSummaryRows({ ...FORM, ...form }, 'Corporate LDAP').find(
     ({ labelKey }) => labelKey === 'users.dialog.credentials',
   )?.lines;
 
 describe('userSummaryRows', () => {
   it('reads the answers back in the order the steps asked for them', () => {
-    const rows = userSummaryRows(FORM, 'Corporate LDAP', false);
+    const rows = userSummaryRows({ ...FORM, password: 'sekret-42!' }, 'Corporate LDAP');
 
     expect(rows.map(({ labelKey }) => labelKey)).toEqual([
       'users.dialog.idProvider',
@@ -32,55 +32,51 @@ describe('userSummaryRows', () => {
   });
 
   it('names the provider as the caller resolved it, not by key', () => {
-    const [provider] = userSummaryRows(FORM, 'Corporate LDAP', false);
+    const [provider] = userSummaryRows(FORM, 'Corporate LDAP');
 
     expect(provider?.value).toBe('Corporate LDAP');
   });
 
   it('leaves the provider out for a service account: the system store is a given', () => {
-    const rows = userSummaryRows({ ...FORM, idProvider: 'system' }, 'System', false);
+    const rows = userSummaryRows({ ...FORM, idProvider: 'system' }, 'System');
 
     expect(rows.some(({ labelKey }) => labelKey === 'users.dialog.idProvider')).toBe(false);
     expect(rows[0]?.labelKey).toBe('users.dialog.section');
   });
 
   it('pairs the display name with the name', () => {
-    const rows = userSummaryRows(FORM, 'Corporate LDAP', false);
+    const rows = userSummaryRows(FORM, 'Corporate LDAP');
 
     expect(rows[1]?.value).toBe('Jane Doe (jane)');
   });
 
   it('drops the email row while the email is blank', () => {
-    const rows = userSummaryRows({ ...FORM, email: '  ' }, 'Corporate LDAP', false);
+    const rows = userSummaryRows({ ...FORM, email: '  ' }, 'Corporate LDAP');
 
     expect(rows.some(({ labelKey }) => labelKey === 'users.dialog.email')).toBe(false);
   });
 
-  it('repeats the notice of the Credentials step while nothing was chosen', () => {
-    expect(credentials({})).toEqual([{ key: 'users.dialog.passwordOptional' }]);
+  it('drops the credentials row while the dialog set none: a password left alone is no answer', () => {
+    const rows = userSummaryRows(FORM, 'Corporate LDAP');
+
+    expect(rows.some(({ labelKey }) => labelKey === 'users.dialog.credentials')).toBe(false);
   });
 
   it('reports the password as set without echoing it', () => {
-    const rows = userSummaryRows({ ...FORM, password: 'sekret-42!' }, 'Corporate LDAP', false);
+    const rows = userSummaryRows({ ...FORM, password: 'sekret-42!' }, 'Corporate LDAP');
 
     expect(credentials({ password: 'sekret-42!' })).toEqual([{ key: 'users.dialog.passwordSet' }]);
     expect(JSON.stringify(rows)).not.toContain('sekret-42!');
   });
 
   it('reports a password the edit will clear', () => {
-    expect(credentials({ clearPassword: true }, true)).toEqual([
-      { key: 'users.dialog.passwordCleared' },
-    ]);
+    expect(credentials({ clearPassword: true })).toEqual([{ key: 'users.dialog.passwordCleared' }]);
   });
 
   it('reports the new password rather than the clearing it replaced', () => {
-    expect(credentials({ password: 'sekret-42!', clearPassword: true }, true)).toEqual([
+    expect(credentials({ password: 'sekret-42!', clearPassword: true })).toEqual([
       { key: 'users.dialog.passwordSet' },
     ]);
-  });
-
-  it('says a password stays set when an edit leaves it alone', () => {
-    expect(credentials({}, true)).toEqual([{ key: 'users.dialog.passwordAlreadySet' }]);
   });
 
   it('names one phrase per shape of the public key change', () => {
