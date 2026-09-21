@@ -1,8 +1,9 @@
 import { Checkbox, Combobox, GridList, IconButton, Listbox, useCombobox } from '@enonic/ui';
 import { X } from 'lucide-react';
-import { useEffect, useId, useRef, useState } from 'preact/hooks';
+import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 import type { ReactNode, UIEvent } from 'react';
 
+import { sameKeys } from '../../../shared/form';
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
 import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
@@ -78,11 +79,14 @@ export function PrincipalPicker({
   // ? a later change would no longer offer it, rather than disappearing from under the user.
   const offered = search.principals.filter(({ key }) => excluded?.has(key) !== true);
 
-  const pickedKeys = selected.map(({ key }) => key);
+  const pickedKeys = useStableKeys(selected);
 
-  const known = new Map<string, PrincipalRef>(
-    [...selected, ...offered].map((principal) => [principal.key, principal]),
-  );
+  // ! Every principal offered so far, not the page on screen alone: a tick made before the query changed
+  // ! still has to name a principal when Apply hands it over.
+  const known = useRef(new Map<string, PrincipalRef>());
+  for (const principal of offered) {
+    known.current.set(principal.key, principal);
+  }
 
   // ! Staged, not single or multiple: single closes the popup on the first click, multiple commits every
   // ! click straight into the form. Staged ticks are the user's, and only Apply hands them over.
@@ -91,7 +95,7 @@ export function PrincipalPicker({
     const kept = selected.filter(({ key }) => nextKeys.has(key) || locked?.has(key) === true);
     const added = [...nextKeys]
       .filter((key) => !pickedKeys.some((picked) => picked === key))
-      .map((key) => known.get(key))
+      .map((key) => known.current.get(key))
       .filter((principal): principal is PrincipalRef => principal !== undefined);
 
     onChange([...kept, ...added]);
@@ -261,4 +265,22 @@ function PrincipalOptions({
       <div ref={end} aria-hidden />
     </Combobox.ListContent>
   );
+}
+
+/**
+ * The picked keys, one array for as long as they name the same principals.
+ *
+ * ! `Combobox` drops its staged ticks whenever `selection` is a new array, so a fresh `map` per render
+ * ! would undo them the moment another page of rows arrives.
+ */
+function useStableKeys(selected: readonly PrincipalRef[]): readonly string[] {
+  const last = useRef(selected);
+
+  if (!sameKeys(last.current, selected)) {
+    last.current = selected;
+  }
+
+  const stable = last.current;
+
+  return useMemo(() => stable.map(({ key }) => key), [stable]);
 }
