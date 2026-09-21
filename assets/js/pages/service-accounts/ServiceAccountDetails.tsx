@@ -13,6 +13,7 @@ import {
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openServiceAccountEditorAt } from '../../features/user-editor';
 import { useI18n } from '../../shared/i18n';
+import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type ServiceAccountDetailsProps = {
@@ -90,15 +91,15 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
           {hasPassword ? passwordSetLabel : passwordNotSetLabel}
         </DetailsPanel.Field>
         <DetailsPanel.Subsection labelKey="users.details.publicKeys" count={publicKeys.length}>
-          <DetailsPanel.List>
-            {publicKeys.map(({ kid, label }) => (
+          <DetailsPanel.List items={publicKeys}>
+            {({ kid, label }) => (
               <DetailsPanel.ListItem
                 key={kid}
                 icon={<KeyRound size={28} strokeWidth={1.5} aria-hidden />}
                 title={label ?? unlabelledKeyLabel}
                 subtitle={kid}
               />
-            ))}
+            )}
           </DetailsPanel.List>
         </DetailsPanel.Subsection>
       </DetailsPanel.Section>
@@ -130,15 +131,15 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List>
-          {roles.map((principal) => (
+        <DetailsPanel.List items={roles} limit={DETAILS_LIST_LIMIT}>
+          {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
             />
-          ))}
+          )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
 
@@ -156,8 +157,8 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List>
-          {groups.map((principal) => (
+        <DetailsPanel.List items={groups} limit={DETAILS_LIST_LIMIT}>
+          {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
               icon={<PrincipalIcon principal={principal} />}
@@ -165,7 +166,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
               subtitle={principalName(principal.key)}
               meta={providerName(principal.key)}
             />
-          ))}
+          )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
     </DetailsPanel>

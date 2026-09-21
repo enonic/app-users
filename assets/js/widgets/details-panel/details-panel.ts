@@ -8,6 +8,26 @@ export function detailsEmptyLabelKey(status: DetailStatus, failedLabelKey: strin
   return status === 'error' ? failedLabelKey : 'browse.details.empty';
 }
 
+/**
+ * Rows a details list shows before the rest collapse into a `+N more` line.
+ *
+ * The same number as `PrincipalAvatars`: a membership list is unbounded, and the two ways of showing
+ * principals have to cut at the same place.
+ */
+export const DETAILS_LIST_LIMIT = 10;
+
+export type ListSlice<T> = {
+  shown: readonly T[];
+  hidden: number;
+};
+
+/** The first `limit` rows and the count of the rest, off `total` when `items` is only a loaded page. */
+export function sliceList<T>(items: readonly T[], limit?: number, total?: number): ListSlice<T> {
+  const shown = limit === undefined ? items : items.slice(0, limit);
+
+  return { shown, hidden: Math.max(total ?? items.length, items.length) - shown.length };
+}
+
 /** A section or subsection label with its entry count: `Members (8)`. */
 export function withCount(label: string, count: number | undefined): string {
   return count === undefined ? label : `${label} (${count})`;
