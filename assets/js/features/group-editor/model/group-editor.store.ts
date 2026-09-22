@@ -30,9 +30,6 @@ const $groupNameExternal = computed(
   }),
 );
 
-// The create heading only: an edit is headed by the name `openAt` is handed.
-const TITLE_KEY = 'groups.dialog.createTitle';
-
 export const groupEditorDialog = createStepDialogStore<
   GroupEditorStep,
   GroupFormField,
@@ -40,7 +37,7 @@ export const groupEditorDialog = createStepDialogStore<
   Group
 >({
   steps: GROUP_EDITOR_STEPS,
-  titleKey: TITLE_KEY,
+  titleKey: 'groups.dialog.createTitle',
   initialForm: (payload) => initialGroupForm(payload, onlyProvider()),
   validate: (form, { mode }) => validateGroupForm(form, mode),
   same: sameGroupForm,

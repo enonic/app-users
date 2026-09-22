@@ -37,10 +37,10 @@ export type StepDialogExternal<Field extends string> = {
 };
 
 /**
- * The domain, injected. `titleKey` is the create heading — a phrase key, since this runs at module
- * scope. `next` settles a patched form before it is stored — a name derived from the display name is the
- * case. `same` is what makes an edit worth sending. `reset` runs on every open and close, for what the
- * feature keeps beside the form.
+ * The domain, injected. `titleKey` is the create heading and that alone — a phrase key, since this runs
+ * at module scope; an edit is headed by the name `openAt` is handed. `next` settles a patched form before
+ * it is stored — a name derived from the display name is the case. `same` is what makes an edit worth
+ * sending. `reset` runs on every open and close, for what the feature keeps beside the form.
  */
 export type StepDialogOptions<Step extends string, Field extends string, Form, Entity> = {
   steps: Steps<Step, Field>;
