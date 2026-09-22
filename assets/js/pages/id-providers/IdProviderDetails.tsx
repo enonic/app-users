@@ -55,7 +55,8 @@ export function IdProviderDetails({
   // The row's totals until the panel's own read answers, so a count appears before the rows do.
   const users = principals?.users;
   const groups = principals?.groups;
-  const total = (users?.total ?? provider.users.total) + (groups?.total ?? provider.groups.total);
+  const usersTotal = users?.total ?? provider.users.total;
+  const groupsTotal = groups?.total ?? provider.groups.total;
 
   return (
     <DetailsPanel>
@@ -122,17 +123,21 @@ export function IdProviderDetails({
         {permissionsFailed && <p className="text-error text-sm">{permissionsFailedLabel}</p>}
       </DetailsPanel.Section>
 
-      <DetailsPanel.Section labelKey="idProviders.details.members" count={total}>
-        {principalsLoading === true && <DetailsListSkeleton />}
+      {usersTotal > 0 && (
+        <DetailsPanel.Section labelKey="idProviders.details.users" count={usersTotal}>
+          {principalsLoading === true && <DetailsListSkeleton />}
 
-        {users !== undefined && users.total > 0 && (
-          <DetailsPanel.Subsection labelKey="idProviders.details.users" count={users.total}>
-            <PrincipalAvatars principals={users.items} total={users.total} />
-          </DetailsPanel.Subsection>
-        )}
+          {users !== undefined && <PrincipalAvatars principals={users.items} total={users.total} />}
 
-        {groups !== undefined && groups.total > 0 && (
-          <DetailsPanel.Subsection labelKey="idProviders.details.groups" count={groups.total}>
+          {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
+        </DetailsPanel.Section>
+      )}
+
+      {groupsTotal > 0 && (
+        <DetailsPanel.Section labelKey="idProviders.details.groups" count={groupsTotal}>
+          {principalsLoading === true && <DetailsListSkeleton />}
+
+          {groups !== undefined && (
             <DetailsPanel.List items={groups.items} limit={DETAILS_LIST_LIMIT} total={groups.total}>
               {(principal) => (
                 <DetailsPanel.ListItem
@@ -143,11 +148,11 @@ export function IdProviderDetails({
                 />
               )}
             </DetailsPanel.List>
-          </DetailsPanel.Subsection>
-        )}
+          )}
 
-        {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
-      </DetailsPanel.Section>
+          {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
+        </DetailsPanel.Section>
+      )}
     </DetailsPanel>
   );
 }
