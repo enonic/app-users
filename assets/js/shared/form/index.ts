@@ -1,3 +1,4 @@
+export { isEmailAddress } from './email';
 export { diffByKey, mergeByKey, sameKeys } from './key-lists';
 export type { KeyDiff } from './key-lists';
 export { visitedErrors } from './visited-errors';

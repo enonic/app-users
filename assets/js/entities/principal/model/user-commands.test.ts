@@ -2,11 +2,18 @@ import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppError } from '../../../shared/api';
-import { sendUserCreation, sendUserUpdate } from '../api/users.api';
-import type { PrincipalKey, User } from './principal.types';
-import { createUser, updateUser, type UserDraft, type UserEdit } from './user-commands';
+import { requestUserEmailHolder, sendUserCreation, sendUserUpdate } from '../api/users.api';
+import type { PrincipalKey, User, UserKey } from './principal.types';
+import {
+  createUser,
+  isUserEmailTaken,
+  updateUser,
+  type UserDraft,
+  type UserEdit,
+} from './user-commands';
 
 vi.mock('../api/users.api', () => ({
+  requestUserEmailHolder: vi.fn(),
   sendUserCreation: vi.fn(),
   sendUserUpdate: vi.fn(),
 }));
@@ -49,6 +56,33 @@ beforeEach(() => {
   vi.mocked(sendUserCreation).mockReturnValue(okAsync(written));
   vi.mocked(sendUserUpdate).mockReset();
   vi.mocked(sendUserUpdate).mockReturnValue(okAsync(written));
+  vi.mocked(requestUserEmailHolder).mockReset();
+  vi.mocked(requestUserEmailHolder).mockReturnValue(okAsync(undefined));
+});
+
+describe('isUserEmailTaken', () => {
+  it('asks the provider who holds the email, and reads nobody as free', async () => {
+    const result = await isUserEmailTaken('system', 'alice@example.com');
+
+    expect(requestUserEmailHolder).toHaveBeenCalledWith('system', 'alice@example.com', undefined);
+    expect(result._unsafeUnwrap()).toBe(false);
+  });
+
+  it('reads another user holding it as taken', async () => {
+    vi.mocked(requestUserEmailHolder).mockReturnValue(okAsync<UserKey>('user:system:bob'));
+
+    const result = await isUserEmailTaken('system', 'alice@example.com', 'user:system:alice');
+
+    expect(result._unsafeUnwrap()).toBe(true);
+  });
+
+  it('does not count the user being edited against itself', async () => {
+    vi.mocked(requestUserEmailHolder).mockReturnValue(okAsync<UserKey>('user:system:alice'));
+
+    const result = await isUserEmailTaken('system', 'alice@example.com', 'user:system:alice');
+
+    expect(result._unsafeUnwrap()).toBe(false);
+  });
 });
 
 describe('createUser', () => {

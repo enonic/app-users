@@ -110,6 +110,15 @@ const USER_EXISTS_DOCUMENT = `
   }
 `;
 
+/** Who holds an email in a provider, by key alone — asked of an address the user is still typing. */
+const USER_EMAIL_HOLDER_DOCUMENT = `
+  query UserEmailHolder($idProvider: String!, $email: String!) {
+    userByEmail(idProvider: $idProvider, email: $email) {
+      key
+    }
+  }
+`;
+
 type UserDto = {
   key: string;
   displayName: string;
@@ -176,6 +185,22 @@ export function requestUserExists(
     { key },
     signal,
   ).map(({ user }) => user != null);
+}
+
+/**
+ * The key of the user holding the email in the provider, or `undefined` when none does. A caller that
+ * may not read the provider is told the same as an empty one.
+ */
+export function requestUserEmailHolder(
+  idProvider: string,
+  email: string,
+  signal?: AbortSignal,
+): ResultAsync<UserKey | undefined, AppError> {
+  return requestGraphQlDocument<{ userByEmail: { key: UserKey } | null }>(
+    USER_EMAIL_HOLDER_DOCUMENT,
+    { idProvider, email },
+    signal,
+  ).map(({ userByEmail }) => userByEmail?.key);
 }
 
 /**
