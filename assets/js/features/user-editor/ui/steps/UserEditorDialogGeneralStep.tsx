@@ -15,9 +15,10 @@ import {
   closeUserEditor,
   markUserEditorFieldVisited,
   setUserEditorDisplayName,
+  setUserEditorEmail,
   setUserEditorIdProvider,
   setUserEditorName,
-  updateUserEditorForm,
+  userEmailCheck,
   userNameCheck,
 } from '../../model/user-editor.store';
 
@@ -34,6 +35,7 @@ export function UserEditorDialogGeneralStep() {
   const systemUser = useStore($userEditorSystemUser);
   const serviceAccount = useStore($userEditorServiceAccount);
   const nameCheck = useStore(userNameCheck.$state);
+  const emailCheck = useStore(userEmailCheck.$state);
   const providers = useStore($userEditorProviders);
   const { status: providersStatus } = useIdProviderNames();
 
@@ -60,7 +62,9 @@ export function UserEditorDialogGeneralStep() {
   const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
   const nameError =
     nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name, providerName);
-  const emailError = shown.email === undefined ? undefined : i18n(shown.email);
+  const emailErrorKey = emailCheck.status === 'taken' ? errors.email : shown.email;
+  const emailError =
+    emailErrorKey === undefined ? undefined : i18n(emailErrorKey, form.email, providerName);
 
   return (
     <div className="flex flex-col gap-5">
@@ -142,8 +146,11 @@ export function UserEditorDialogGeneralStep() {
             type="email"
             value={form.email}
             error={emailError}
-            onInput={({ currentTarget }) => updateUserEditorForm({ email: currentTarget.value })}
-            onBlur={() => markUserEditorFieldVisited('email')}
+            onInput={({ currentTarget }) => setUserEditorEmail(currentTarget.value)}
+            onBlur={() => {
+              markUserEditorFieldVisited('email');
+              setUserEditorEmail(form.email, { immediate: true });
+            }}
           />
         </div>
       )}

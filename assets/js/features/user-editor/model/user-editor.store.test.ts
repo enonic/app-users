@@ -1,7 +1,8 @@
-import { ok } from 'neverthrow';
-import { afterEach, describe, expect, it } from 'vitest';
+import { ok, okAsync } from 'neverthrow';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { receiveIdProviderNames, type User } from '../../../entities/principal';
+import { requestUserEmailHolder } from '../../../entities/principal/api/users.api';
 import {
   $userEditor,
   $userEditorErrors,
@@ -12,9 +13,18 @@ import {
   openServiceAccountEditorAt,
   openUserEditor,
   openUserEditorAt,
+  setUserEditorEmail,
+  setUserEditorIdProvider,
   updateUserEditorForm,
+  userEmailCheck,
   userNameCheck,
 } from './user-editor.store';
+
+// Only the email question reaches the wire from here; everything else in the module stays real.
+vi.mock('../../../entities/principal/api/users.api', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../../entities/principal/api/users.api')>()),
+  requestUserEmailHolder: vi.fn(),
+}));
 
 const ALICE: User = {
   type: 'user',
@@ -84,6 +94,91 @@ describe('$userEditorErrors', () => {
     userNameCheck.fail('user:system:alice');
 
     expect($userEditorErrors.get().name).toBeUndefined();
+  });
+
+  it('reports an email another user of the provider holds', () => {
+    openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ idProvider: 'system', email: 'alice@example.com' });
+    userEmailCheck.receive('email:system|alice@example.com', true);
+
+    expect($userEditorErrors.get().email).toBe('users.dialog.emailTaken');
+  });
+
+  it('words a clash for the section that opened the dialog', () => {
+    openServiceAccountEditor({ mode: 'create' });
+    updateUserEditorForm({ displayName: 'Deploy bot', email: 'bot@example.com' });
+    userNameCheck.receive('user:system:deploy.bot', true);
+    userEmailCheck.receive('email:system|bot@example.com', true);
+
+    expect($userEditorErrors.get()).toMatchObject({
+      name: 'serviceAccounts.dialog.nameTaken',
+      email: 'serviceAccounts.dialog.emailTaken',
+    });
+  });
+});
+
+describe('setUserEditorEmail', () => {
+  const holder = vi.mocked(requestUserEmailHolder);
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    holder.mockReset();
+    holder.mockReturnValue(okAsync(undefined));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('asks the provider once the address settles, holding the later steps meanwhile', async () => {
+    openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ idProvider: 'ldap' });
+
+    setUserEditorEmail('alice@example.com');
+
+    expect(userEmailCheck.$state.get()).toEqual({
+      status: 'pending',
+      key: 'email:ldap|alice@example.com',
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(holder).toHaveBeenCalledWith('ldap', 'alice@example.com', expect.any(AbortSignal));
+    expect(userEmailCheck.$state.get().status).toBe('available');
+  });
+
+  it('asks in an edit too, and leaves the user its own address', async () => {
+    holder.mockReturnValue(okAsync(ALICE.key));
+    openUserEditorAt(ALICE, 'general');
+
+    setUserEditorEmail('Alice@Example.com', { immediate: true });
+    await vi.runAllTimersAsync();
+
+    expect(userEmailCheck.$state.get()).toEqual({
+      status: 'available',
+      key: 'email:system|alice@example.com',
+    });
+  });
+
+  it('asks nothing for su and anonymous, which have no email', () => {
+    openUserEditorAt({ ...ALICE, key: 'user:system:su' as User['key'], login: 'su' }, 'general');
+
+    setUserEditorEmail('su@example.com', { immediate: true });
+
+    expect(userEmailCheck.$state.get()).toEqual({ status: 'idle' });
+    expect(holder).not.toHaveBeenCalled();
+  });
+
+  it('asks the new provider about an address already typed', async () => {
+    openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ idProvider: 'ldap' });
+    setUserEditorEmail('alice@example.com', { immediate: true });
+    await vi.runAllTimersAsync();
+
+    setUserEditorIdProvider('system');
+    await vi.runAllTimersAsync();
+
+    expect(holder.mock.calls.map(([provider]) => provider)).toEqual(['ldap', 'system']);
   });
 });
 
