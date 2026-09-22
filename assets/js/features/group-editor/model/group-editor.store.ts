@@ -37,6 +37,7 @@ export const groupEditorDialog = createStepDialogStore<
   Group
 >({
   steps: GROUP_EDITOR_STEPS,
+  titleKey: 'groups.dialog.createTitle',
   initialForm: (payload) => initialGroupForm(payload, onlyProvider()),
   validate: (form, { mode }) => validateGroupForm(form, mode),
   same: sameGroupForm,
@@ -49,7 +50,11 @@ export const $groupEditor = groupEditorDialog.$state;
 export const $groupEditorErrors = groupEditorDialog.$errors;
 
 export const openGroupEditor = groupEditorDialog.open;
-export const openGroupEditorAt = groupEditorDialog.openAt;
+
+export function openGroupEditorAt(group: Group, step: GroupEditorStep): void {
+  groupEditorDialog.openAt(group, step, group.displayName);
+}
+
 export const closeGroupEditor = groupEditorDialog.close;
 export const markGroupEditorFieldVisited = groupEditorDialog.markVisited;
 export const updateGroupEditorForm = groupEditorDialog.update;

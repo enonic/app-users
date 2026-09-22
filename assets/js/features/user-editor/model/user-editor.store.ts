@@ -65,6 +65,7 @@ export const userEditorDialog = createStepDialogStore<
   User
 >({
   steps: USER_EDITOR_STEPS,
+  titleKey: 'users.dialog.createTitle',
   initialForm: (payload) => initialUserForm(payload, createProvider()),
   validate: (form, { mode, entity }) =>
     validateUserForm(form, mode, entity !== undefined && isSystemUser(entity.key)),
@@ -90,17 +91,17 @@ export function openUserEditor(payload: UserEditorPayload): void {
 
 export function openUserEditorAt(user: User, step: UserEditorStep): void {
   $userEditorServiceAccount.set(false);
-  userEditorDialog.openAt(user, step);
+  userEditorDialog.openAt(user, step, user.displayName);
 }
 
 export function openServiceAccountEditor(payload: UserEditorPayload): void {
   $userEditorServiceAccount.set(true);
-  userEditorDialog.open(payload);
+  userEditorDialog.open(payload, 'serviceAccounts.dialog.createTitle');
 }
 
 export function openServiceAccountEditorAt(user: User, step: UserEditorStep): void {
   $userEditorServiceAccount.set(true);
-  userEditorDialog.openAt(user, step);
+  userEditorDialog.openAt(user, step, user.displayName);
 }
 
 export const closeUserEditor = userEditorDialog.close;

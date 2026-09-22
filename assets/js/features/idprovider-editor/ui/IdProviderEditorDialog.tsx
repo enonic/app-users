@@ -13,11 +13,6 @@ import { $idProviderEditor, idProviderEditorDialog } from '../model/idprovider-e
 import { useIdProviderEditorPermissions } from '../model/useIdProviderEditorPermissions';
 import { ID_PROVIDER_EDITOR_STEP_PANELS } from './steps';
 
-const TITLES: Record<StepDialogMode, string> = {
-  create: 'idProviders.dialog.createTitle',
-  edit: 'idProviders.dialog.editTitle',
-};
-
 const NOTICES = {
   created: 'idProviders.notify.created',
   updated: 'idProviders.notify.updated',
@@ -65,7 +60,6 @@ export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps)
     <StepDialog
       store={idProviderEditorDialog}
       glyph={<ShieldLock size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
-      titles={TITLES}
       panels={ID_PROVIDER_EDITOR_STEP_PANELS}
       onSave={() => void save()}
     />

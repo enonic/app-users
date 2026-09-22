@@ -19,6 +19,7 @@ const ALICE: Entity = { key: 'alice', displayName: 'Alice' };
 
 const store = createStepDialogStore<'general' | 'summary', Field, Form, Entity>({
   steps: STEPS,
+  titleKey: 'dialog.create',
   initialForm: (payload) =>
     payload.mode === 'create'
       ? { name: '', displayName: '' }

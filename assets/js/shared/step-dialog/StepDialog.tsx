@@ -7,21 +7,20 @@ import type { ReactNode } from 'react';
 import { useI18n } from '../i18n';
 import { ConfirmDialog } from '../ui/dialogs/ConfirmDialog';
 import { useDialogLayer } from '../ui/dialogs/dialog-stack';
-import type { StepDialogMode, StepDialogStore } from './step-dialog.store';
+import type { StepDialogStore } from './step-dialog.store';
 import { StepDialogFooter } from './StepDialogFooter';
 import { StepDialogHeader } from './StepDialogHeader';
 
 export type StepDialogProps<Step extends string, Field extends string, Form, Entity> = {
   store: StepDialogStore<Step, Field, Form, Entity>;
   glyph: ReactNode;
-  titles: Record<StepDialogMode, string>;
   panels: Record<Step, ComponentType>;
   onSave: () => void;
 };
 
 /**
- * The shell of a dialog made of steps. `titles` are the mode headings as phrase keys, with the step
- * title under them; `panels` are pure content, wrapped in `StepContent` and locked here.
+ * The shell of a dialog made of steps. The store's `title` heads it, with the step title under it;
+ * `panels` are pure content, wrapped in `StepContent` and locked here.
  *
  * ! Every way out but a save — overlay, Escape, the header's cross, Cancel — asks first while the form
  * ! is dirty. The confirm is a layer above this one, so the gesture that answers it never reaches here.
@@ -29,7 +28,6 @@ export type StepDialogProps<Step extends string, Field extends string, Form, Ent
 export function StepDialog<Step extends string, Field extends string, Form, Entity>({
   store,
   glyph,
-  titles,
   panels,
   onSave,
 }: StepDialogProps<Step, Field, Form, Entity>) {
@@ -79,7 +77,7 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
               }
             }}
           >
-            <StepDialogHeader store={store} glyph={glyph} titles={titles} />
+            <StepDialogHeader store={store} glyph={glyph} />
 
             <Dialog.Body className="-m-1.5 p-1.5">
               {shown.map((value) => {

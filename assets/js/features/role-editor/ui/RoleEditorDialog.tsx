@@ -13,11 +13,6 @@ import { $roleEditor, roleEditorDialog } from '../model/role-editor.store';
 import { useRoleEditorMembers } from '../model/useRoleEditorMembers';
 import { ROLE_EDITOR_STEP_PANELS } from './steps';
 
-const TITLES: Record<StepDialogMode, string> = {
-  create: 'roles.dialog.createTitle',
-  edit: 'roles.dialog.editTitle',
-};
-
 const NOTICES = {
   created: 'roles.notify.created',
   updated: 'roles.notify.updated',
@@ -59,7 +54,6 @@ export function RoleEditorDialog({ onSaved }: RoleEditorDialogProps) {
     <StepDialog
       store={roleEditorDialog}
       glyph={<UserShield size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
-      titles={TITLES}
       panels={ROLE_EDITOR_STEP_PANELS}
       onSave={() => void save()}
     />
