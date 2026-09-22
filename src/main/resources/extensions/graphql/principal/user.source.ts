@@ -146,6 +146,28 @@ export function getUser(key: string): User | null {
   }
 }
 
+/**
+ * The user holding an email in a provider, or null when none does.
+ *
+ * XP keeps an email unique per provider, not across them, so the provider is part of the question. The
+ * index normalises string values on both sides of `=`, so the match is already trimmed and case-blind.
+ */
+export function findUserByEmail(idProvider: string, email: string): User | null {
+  const address = email.trim();
+
+  if (idProvider.length === 0 || address.length === 0) {
+    return null;
+  }
+
+  const { hits } = findUsers({
+    start: 0,
+    count: 1,
+    query: `userStoreKey="${escapeQueryValue(idProvider)}" AND email="${escapeQueryValue(address)}"`,
+  });
+
+  return hits[0] ?? null;
+}
+
 export type PublicKeyItem = {
   kid: string;
   publicKey?: string;
