@@ -29,6 +29,9 @@ const $idProviderNameExternal = computed(
   }),
 );
 
+// The create heading only: an edit is headed by the name `openAt` is handed.
+const TITLE_KEY = 'idProviders.dialog.createTitle';
+
 export const idProviderEditorDialog = createStepDialogStore<
   IdProviderEditorStep,
   IdProviderFormField,
@@ -36,6 +39,7 @@ export const idProviderEditorDialog = createStepDialogStore<
   IdProvider
 >({
   steps: ID_PROVIDER_EDITOR_STEPS,
+  titleKey: TITLE_KEY,
   initialForm: (payload) => initialIdProviderForm(payload),
   validate: (form, { mode }) => validateIdProviderForm(form, mode),
   same: sameIdProviderForm,
@@ -48,7 +52,11 @@ export const $idProviderEditor = idProviderEditorDialog.$state;
 export const $idProviderEditorErrors = idProviderEditorDialog.$errors;
 
 export const openIdProviderEditor = idProviderEditorDialog.open;
-export const openIdProviderEditorAt = idProviderEditorDialog.openAt;
+
+export function openIdProviderEditorAt(provider: IdProvider, step: IdProviderEditorStep): void {
+  idProviderEditorDialog.openAt(provider, step, provider.displayName);
+}
+
 export const closeIdProviderEditor = idProviderEditorDialog.close;
 export const markIdProviderEditorFieldVisited = idProviderEditorDialog.markVisited;
 export const updateIdProviderEditorForm = idProviderEditorDialog.update;

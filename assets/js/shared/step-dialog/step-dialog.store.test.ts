@@ -29,6 +29,7 @@ let resets = 0;
 
 const store = createStepDialogStore<'general' | 'members' | 'summary', Field, Form, Entity>({
   steps: STEPS,
+  titleKey: 'dialog.create',
   initialForm: (payload) =>
     payload.mode === 'create'
       ? { name: '', displayName: '', email: '', members: [], nameEdited: false }
@@ -105,25 +106,26 @@ describe('open', () => {
 
 describe('openAt', () => {
   it('opens one step of an existing entity alone', () => {
-    store.openAt(ALICE, 'members');
+    store.openAt(ALICE, 'members', ALICE.displayName);
 
-    const { open, mode, view, step, entity } = store.$state.get();
+    const { open, mode, view, step, title, entity } = store.$state.get();
 
-    expect({ open, mode, view, step }).toEqual({
+    expect({ open, mode, view, step, title }).toEqual({
       open: true,
       mode: 'edit',
       view: 'step',
       step: 'members',
+      title: 'Alice',
     });
     expect(entity).toBe(ALICE);
   });
 
-  it('leaves the wizard behind it, so the next open walks every step again', () => {
-    store.openAt(ALICE, 'members');
+  it('leaves the wizard and its heading behind it, so the next open walks every step again', () => {
+    store.openAt(ALICE, 'members', ALICE.displayName);
     store.close();
     store.open({ mode: 'create' });
 
-    expect(store.$state.get().view).toBe('wizard');
+    expect(store.$state.get()).toMatchObject({ view: 'wizard', title: '#dialog.create#' });
   });
 });
 

@@ -58,6 +58,10 @@ export const $userEditorProviders = computed(
  */
 export const $userEditorServiceAccount = atom(false);
 
+// The create heading only: an edit is headed by the name `openAt` is handed.
+const TITLE_KEY = 'users.dialog.createTitle';
+const SERVICE_ACCOUNT_TITLE_KEY = 'serviceAccounts.dialog.createTitle';
+
 export const userEditorDialog = createStepDialogStore<
   UserEditorStep,
   UserFormField,
@@ -65,6 +69,7 @@ export const userEditorDialog = createStepDialogStore<
   User
 >({
   steps: USER_EDITOR_STEPS,
+  titleKey: TITLE_KEY,
   initialForm: (payload) => initialUserForm(payload, createProvider()),
   validate: (form, { mode, entity }) =>
     validateUserForm(form, mode, entity !== undefined && isSystemUser(entity.key)),
@@ -90,17 +95,17 @@ export function openUserEditor(payload: UserEditorPayload): void {
 
 export function openUserEditorAt(user: User, step: UserEditorStep): void {
   $userEditorServiceAccount.set(false);
-  userEditorDialog.openAt(user, step);
+  userEditorDialog.openAt(user, step, user.displayName);
 }
 
 export function openServiceAccountEditor(payload: UserEditorPayload): void {
   $userEditorServiceAccount.set(true);
-  userEditorDialog.open(payload);
+  userEditorDialog.open(payload, SERVICE_ACCOUNT_TITLE_KEY);
 }
 
 export function openServiceAccountEditorAt(user: User, step: UserEditorStep): void {
   $userEditorServiceAccount.set(true);
-  userEditorDialog.openAt(user, step);
+  userEditorDialog.openAt(user, step, user.displayName);
 }
 
 export const closeUserEditor = userEditorDialog.close;

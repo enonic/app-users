@@ -13,11 +13,6 @@ import { $groupEditor, groupEditorDialog } from '../model/group-editor.store';
 import { useGroupEditorLists } from '../model/useGroupEditorLists';
 import { GROUP_EDITOR_STEP_PANELS } from './steps';
 
-const TITLES: Record<StepDialogMode, string> = {
-  create: 'groups.dialog.createTitle',
-  edit: 'groups.dialog.editTitle',
-};
-
 const NOTICES = {
   created: 'groups.notify.created',
   updated: 'groups.notify.updated',
@@ -59,7 +54,6 @@ export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
     <StepDialog
       store={groupEditorDialog}
       glyph={<Users size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
-      titles={TITLES}
       panels={GROUP_EDITOR_STEP_PANELS}
       onSave={() => void save()}
     />

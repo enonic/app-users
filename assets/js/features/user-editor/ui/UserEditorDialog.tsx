@@ -21,32 +21,20 @@ import type { UserForm } from '../model/user-form';
 import { useUserEditorMemberships } from '../model/useUserEditorMemberships';
 import { USER_EDITOR_STEP_PANELS } from './steps';
 
-type Text = {
-  titles: Record<StepDialogMode, string>;
-  notices: Record<'created' | 'updated' | 'createFailed' | 'updateFailed', string>;
+type Notices = Record<'created' | 'updated' | 'createFailed' | 'updateFailed', string>;
+
+const USER_NOTICES: Notices = {
+  created: 'users.notify.created',
+  updated: 'users.notify.updated',
+  createFailed: 'users.notify.createFailed',
+  updateFailed: 'users.notify.updateFailed',
 };
 
-const USER_TEXT: Text = {
-  titles: { create: 'users.dialog.createTitle', edit: 'users.dialog.editTitle' },
-  notices: {
-    created: 'users.notify.created',
-    updated: 'users.notify.updated',
-    createFailed: 'users.notify.createFailed',
-    updateFailed: 'users.notify.updateFailed',
-  },
-};
-
-const SERVICE_ACCOUNT_TEXT: Text = {
-  titles: {
-    create: 'serviceAccounts.dialog.createTitle',
-    edit: 'serviceAccounts.dialog.editTitle',
-  },
-  notices: {
-    created: 'serviceAccounts.notify.created',
-    updated: 'serviceAccounts.notify.updated',
-    createFailed: 'serviceAccounts.notify.createFailed',
-    updateFailed: 'serviceAccounts.notify.updateFailed',
-  },
+const SERVICE_ACCOUNT_NOTICES: Notices = {
+  created: 'serviceAccounts.notify.created',
+  updated: 'serviceAccounts.notify.updated',
+  createFailed: 'serviceAccounts.notify.createFailed',
+  updateFailed: 'serviceAccounts.notify.updateFailed',
 };
 
 export type UserEditorDialogProps = {
@@ -91,7 +79,7 @@ export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
     }
   };
 
-  const text = serviceAccount ? SERVICE_ACCOUNT_TEXT : USER_TEXT;
+  const notices = serviceAccount ? SERVICE_ACCOUNT_NOTICES : USER_NOTICES;
   // The section's own rail icon, so the dialog names the section it was opened from.
   const Glyph = serviceAccount ? UserCog : UserGlyph;
 
@@ -102,7 +90,7 @@ export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
           ? updateUser(edited.key, userEditFrom(form, saved))
           : createUser(userDraftFrom(form)),
       afterWrite: writeStagedPublicKeys,
-      notices: text.notices,
+      notices,
       notify,
       onSaved,
     });
@@ -115,7 +103,6 @@ export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
     <StepDialog
       store={userEditorDialog}
       glyph={<Glyph size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
-      titles={text.titles}
       panels={USER_EDITOR_STEP_PANELS}
       onSave={() => void save()}
     />

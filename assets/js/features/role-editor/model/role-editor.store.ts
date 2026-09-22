@@ -29,6 +29,9 @@ const $roleNameExternal = computed(
   }),
 );
 
+// The create heading only: an edit is headed by the name `openAt` is handed.
+const TITLE_KEY = 'roles.dialog.createTitle';
+
 export const roleEditorDialog = createStepDialogStore<
   RoleEditorStep,
   RoleFormField,
@@ -36,6 +39,7 @@ export const roleEditorDialog = createStepDialogStore<
   Role
 >({
   steps: ROLE_EDITOR_STEPS,
+  titleKey: TITLE_KEY,
   initialForm: (payload) => initialRoleForm(payload),
   validate: (form, { mode }) => validateRoleForm(form, mode),
   same: sameRoleForm,
@@ -48,7 +52,11 @@ export const $roleEditor = roleEditorDialog.$state;
 export const $roleEditorErrors = roleEditorDialog.$errors;
 
 export const openRoleEditor = roleEditorDialog.open;
-export const openRoleEditorAt = roleEditorDialog.openAt;
+
+export function openRoleEditorAt(role: Role, step: RoleEditorStep): void {
+  roleEditorDialog.openAt(role, step, role.displayName);
+}
+
 export const closeRoleEditor = roleEditorDialog.close;
 export const markRoleEditorFieldVisited = roleEditorDialog.markVisited;
 export const updateRoleEditorForm = roleEditorDialog.update;

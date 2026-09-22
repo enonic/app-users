@@ -1,6 +1,7 @@
 import { atom, computed, map, type MapStore, type ReadableAtom } from 'nanostores';
 
 import type { FieldErrors } from '../form';
+import { i18n } from '../i18n';
 import type { Steps } from './steps';
 
 export type StepDialogMode = 'create' | 'edit';
@@ -11,14 +12,16 @@ export type StepDialogView = 'wizard' | 'step';
 export type StepDialogPayload<Entity> = { mode: 'create' } | { mode: 'edit'; entity: Entity };
 
 /**
- * `saved` is the form as the server last answered it, what an edit diffs against. `seeded` says whether
- * the part of the baseline that arrives after the open has, so it is taken once.
+ * `title` is the heading as rendered: the create title resolved at open, or the name an edit was opened
+ * with. `saved` is the form as the server last answered it, what an edit diffs against. `seeded` says
+ * whether the part of the baseline that arrives after the open has, so it is taken once.
  */
 export type StepDialogState<Step extends string, Field extends string, Form, Entity> = {
   open: boolean;
   mode: StepDialogMode;
   view: StepDialogView;
   step: Step;
+  title: string;
   form: Form;
   saved: Form;
   entity?: Entity;
@@ -34,12 +37,14 @@ export type StepDialogExternal<Field extends string> = {
 };
 
 /**
- * The domain, injected. `next` settles a patched form before it is stored — a name derived from the
- * display name is the case. `same` is what makes an edit worth sending. `reset` runs on every open and
- * close, for what the feature keeps beside the form.
+ * The domain, injected. `titleKey` is the create heading — a phrase key, since this runs at module
+ * scope. `next` settles a patched form before it is stored — a name derived from the display name is the
+ * case. `same` is what makes an edit worth sending. `reset` runs on every open and close, for what the
+ * feature keeps beside the form.
  */
 export type StepDialogOptions<Step extends string, Field extends string, Form, Entity> = {
   steps: Steps<Step, Field>;
+  titleKey: string;
   initialForm: (payload: StepDialogPayload<Entity>) => Form;
   validate: (form: Form, context: { mode: StepDialogMode; entity?: Entity }) => FieldErrors<Field>;
   same: (saved: Form, edited: Form) => boolean;
@@ -49,9 +54,10 @@ export type StepDialogOptions<Step extends string, Field extends string, Form, E
 };
 
 /**
- * `openAt` shows one step of an existing entity alone; a create needs every step. `seed` takes the late
- * part of the baseline once, into `saved` as well as `form`; `merge` keeps what the user picked while
- * the read was in flight, otherwise the seed wins.
+ * `open` is headed by the create title unless handed another phrase key. `openAt` shows one step of an
+ * existing entity alone, headed by the text it is handed; a create needs every step. `seed` takes the
+ * late part of the baseline once, into `saved` as well as `form`; `merge` keeps what the user picked
+ * while the read was in flight, otherwise the seed wins.
  */
 export type StepDialogStore<Step extends string, Field extends string, Form, Entity> = {
   steps: Steps<Step, Field>;
@@ -60,8 +66,8 @@ export type StepDialogStore<Step extends string, Field extends string, Form, Ent
   $stepLocks: ReadableAtom<Record<Step, boolean>>;
   $dirty: ReadableAtom<boolean>;
   $changed: ReadableAtom<boolean>;
-  open: (payload: StepDialogPayload<Entity>) => void;
-  openAt: (entity: Entity, step: Step) => void;
+  open: (payload: StepDialogPayload<Entity>, titleKey?: string) => void;
+  openAt: (entity: Entity, step: Step, title: string) => void;
   close: () => void;
   goToStep: (step: Step) => void;
   update: (patch: Partial<Form>) => void;
@@ -79,6 +85,7 @@ const NOTHING_EXTERNAL: StepDialogExternal<never> = { errors: {}, busy: [] };
 /** A feature calls this once at module level and re-exports the pieces under its own names. */
 export function createStepDialogStore<Step extends string, Field extends string, Form, Entity>({
   steps,
+  titleKey,
   initialForm,
   validate,
   same,
@@ -98,6 +105,7 @@ export function createStepDialogStore<Step extends string, Field extends string,
     mode: 'create',
     view: 'wizard',
     step: firstStep,
+    title: '',
     form: initialForm({ mode: 'create' }),
     saved: initialForm({ mode: 'create' }),
     seeded: false,
@@ -136,7 +144,7 @@ export function createStepDialogStore<Step extends string, Field extends string,
     $dirty,
     $changed,
 
-    open(payload) {
+    open(payload, key = titleKey) {
       const form = initialForm(payload);
 
       reset?.();
@@ -145,13 +153,14 @@ export function createStepDialogStore<Step extends string, Field extends string,
         ...initial,
         open: true,
         mode: payload.mode,
+        title: i18n(key),
         entity: payload.mode === 'edit' ? payload.entity : undefined,
         form,
         saved: form,
       });
     },
 
-    openAt(entity, step) {
+    openAt(entity, step, title) {
       const form = initialForm({ mode: 'edit', entity });
 
       reset?.();
@@ -162,6 +171,7 @@ export function createStepDialogStore<Step extends string, Field extends string,
         mode: 'edit',
         view: 'step',
         step,
+        title,
         entity,
         form,
         saved: form,
