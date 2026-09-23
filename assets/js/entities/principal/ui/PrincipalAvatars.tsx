@@ -34,7 +34,7 @@ export function PrincipalAvatars({
     onLoadMore,
   });
 
-  const moreLabel = i18n('principal.avatars.more', nextCount > 0 ? nextCount : hiddenCount);
+  const moreLabel = i18n('principal.avatars.more', nextCount);
 
   const handleMore = (): void => {
     if (loadingMore !== true) {
@@ -63,15 +63,11 @@ export function PrincipalAvatars({
 
       {hiddenCount > 0 && (
         <li className="text-subtle text-sm">
-          {nextCount > 0 ? (
-            <MoreButton
-              label={loadingMore === true ? i18n('browse.list.loadingMore') : moreLabel}
-              busy={loadingMore}
-              onClick={handleMore}
-            />
-          ) : (
-            moreLabel
-          )}
+          <MoreButton
+            label={loadingMore === true ? i18n('browse.list.loadingMore') : moreLabel}
+            busy={loadingMore}
+            onClick={handleMore}
+          />
         </li>
       )}
     </ul>

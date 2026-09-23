@@ -36,10 +36,10 @@ describe('sliceLoadMore', () => {
   });
 
   it('counts the whole set, not the rows loaded, when a total is given', () => {
-    expect(sliceLoadMore(keys(10), { limit: 10, total: 4213 })).toEqual({
+    expect(sliceLoadMore(keys(10), { total: 4213, paged: true })).toEqual({
       visible: keys(10),
       hiddenCount: 4203,
-      nextCount: 0,
+      nextCount: DETAILS_LIST_PAGE_SIZE,
     });
   });
 

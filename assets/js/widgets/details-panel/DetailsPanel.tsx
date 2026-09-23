@@ -140,7 +140,7 @@ export function DetailsList<T>({
     onLoadMore,
   });
 
-  const moreLabel = useI18n('browse.details.more', nextCount > 0 ? nextCount : hiddenCount);
+  const moreLabel = useI18n('browse.details.more', nextCount);
   const loadingMoreLabel = useI18n('browse.list.loadingMore');
 
   const handleMore = (): void => {
@@ -156,16 +156,13 @@ export function DetailsList<T>({
         {visible.map(children)}
       </div>
 
-      {hiddenCount > 0 &&
-        (nextCount > 0 ? (
-          <MoreButton
-            label={loadingMore === true ? loadingMoreLabel : moreLabel}
-            busy={loadingMore}
-            onClick={handleMore}
-          />
-        ) : (
-          <p className="text-subtle text-sm">{moreLabel}</p>
-        ))}
+      {hiddenCount > 0 && (
+        <MoreButton
+          label={loadingMore === true ? loadingMoreLabel : moreLabel}
+          busy={loadingMore}
+          onClick={handleMore}
+        />
+      )}
     </>
   );
 }
