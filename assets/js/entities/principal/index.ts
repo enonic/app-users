@@ -40,6 +40,7 @@ export {
 } from './model/id-provider-permissions.load';
 export {
   forgetIdProviderPrincipalRows,
+  loadMoreIdProviderPrincipals,
   reloadIdProviderPrincipalRows,
 } from './model/id-provider-principals.load';
 export type {

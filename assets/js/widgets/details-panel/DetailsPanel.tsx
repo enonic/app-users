@@ -55,6 +55,10 @@ export type DetailsListProps<T> = {
   limit?: number;
   /** The size of the whole set when `items` is only the page of it that was loaded. */
   total?: number;
+  /** The caller pages: every row in `items` is shown, and `+N more` asks for the next page. */
+  onLoadMore?: () => void;
+  /** A page is on its way: the control says so and ignores a click. */
+  loadingMore?: boolean;
   children: (item: T) => ReactNode;
 };
 
@@ -123,14 +127,30 @@ export function DetailsField({ labelKey, children }: DetailsFieldProps) {
   );
 }
 
-export function DetailsList<T>({ items, limit, total, children }: DetailsListProps<T>) {
+export function DetailsList<T>({
+  items,
+  limit,
+  total,
+  onLoadMore,
+  loadingMore,
+  children,
+}: DetailsListProps<T>) {
   const [visible, setVisible] = useState(limit);
 
-  const { shown, hidden } = sliceList(items, visible, total);
-  // ? Only rows already in `items` can be shown on a click; a set read a page at a time just counts the rest.
-  const loaded = items.length - shown.length;
+  const { shown, hidden } = sliceList(items, onLoadMore === undefined ? visible : undefined, total);
+  // ? What a click can bring: rows already in `items`, or the rest of a set its caller pages.
+  const next = onLoadMore === undefined ? items.length - shown.length : hidden;
 
-  const moreLabel = useI18n('browse.details.more', loaded > 0 ? nextPageSize(loaded) : hidden);
+  const moreLabel = useI18n('browse.details.more', next > 0 ? nextPageSize(next) : hidden);
+  const loadingMoreLabel = useI18n('browse.list.loadingMore');
+
+  const handleMore = (): void => {
+    if (onLoadMore === undefined) {
+      setVisible((count) => (count ?? 0) + DETAILS_LIST_PAGE_SIZE);
+    } else if (loadingMore !== true) {
+      onLoadMore();
+    }
+  };
 
   // ? A sibling of the list rather than a row in it: `role="list"` takes list items and nothing else.
   return (
@@ -140,10 +160,11 @@ export function DetailsList<T>({ items, limit, total, children }: DetailsListPro
       </div>
 
       {hidden > 0 &&
-        (loaded > 0 ? (
+        (next > 0 ? (
           <MoreButton
-            label={moreLabel}
-            onClick={() => setVisible((count) => (count ?? 0) + DETAILS_LIST_PAGE_SIZE)}
+            label={loadingMore === true ? loadingMoreLabel : moreLabel}
+            busy={loadingMore}
+            onClick={handleMore}
           />
         ) : (
           <p className="text-subtle text-sm">{moreLabel}</p>

@@ -14,6 +14,10 @@ export type PrincipalAvatarsProps = {
   total?: number;
   /** Avatars shown before the rest collapse into `+N more`. */
   max?: number;
+  /** The caller pages: every avatar in `principals` is shown, and `+N more` asks for the next page. */
+  onLoadMore?: () => void;
+  /** A page is on its way: the control says so and ignores a click. */
+  loadingMore?: boolean;
 };
 
 const TOOLTIP_DELAY = 300;
@@ -23,14 +27,28 @@ export function PrincipalAvatars({
   principals,
   total,
   max = DETAILS_LIST_PAGE_SIZE,
+  onLoadMore,
+  loadingMore,
 }: PrincipalAvatarsProps) {
   const [visible, setVisible] = useState(max);
 
-  const { shown, hidden } = sliceAvatars(principals, visible, total);
-  // ? Only avatars already in `principals` can be shown on a click; a paged set just counts the rest.
-  const loaded = principals.length - shown.length;
+  const { shown, hidden } = sliceAvatars(
+    principals,
+    onLoadMore === undefined ? visible : principals.length,
+    total,
+  );
+  // ? What a click can bring: avatars already in `principals`, or the rest of a set its caller pages.
+  const next = onLoadMore === undefined ? principals.length - shown.length : hidden;
 
-  const moreLabel = i18n('principal.avatars.more', loaded > 0 ? nextPageSize(loaded) : hidden);
+  const moreLabel = i18n('principal.avatars.more', next > 0 ? nextPageSize(next) : hidden);
+
+  const handleMore = (): void => {
+    if (onLoadMore === undefined) {
+      setVisible((count) => count + DETAILS_LIST_PAGE_SIZE);
+    } else if (loadingMore !== true) {
+      onLoadMore();
+    }
+  };
 
   return (
     <ul className="flex flex-wrap items-center gap-2">
@@ -53,10 +71,11 @@ export function PrincipalAvatars({
 
       {hidden > 0 && (
         <li className="text-subtle text-sm">
-          {loaded > 0 ? (
+          {next > 0 ? (
             <MoreButton
-              label={moreLabel}
-              onClick={() => setVisible((count) => count + DETAILS_LIST_PAGE_SIZE)}
+              label={loadingMore === true ? i18n('browse.list.loadingMore') : moreLabel}
+              busy={loadingMore}
+              onClick={handleMore}
             />
           ) : (
             moreLabel

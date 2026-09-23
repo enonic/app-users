@@ -187,6 +187,9 @@ export type PrincipalPage = {
   items: readonly PrincipalRef[];
 };
 
+/** Which of a provider's two sets a page is read from. */
+export type PrincipalSetType = 'user' | 'group';
+
 /** The principals a provider holds, read by key and only as far as the panel shows them. */
 export type IdProviderPrincipals = {
   key: string;

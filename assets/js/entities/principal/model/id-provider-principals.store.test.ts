@@ -4,8 +4,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { AppError } from '../../../shared/api';
 import {
   $idProviderPrincipals,
+  appendIdProviderPrincipals,
+  beginIdProviderPrincipalsAppend,
   beginIdProviderPrincipalsLoad,
   forgetIdProviderPrincipals,
+  idProviderPrincipalsNextStart,
   receiveIdProviderPrincipals,
 } from './id-provider-principals.store';
 import type { PrincipalKey, PrincipalRef } from './principal.types';
@@ -44,5 +47,73 @@ describe('receiveIdProviderPrincipals', () => {
 
     expect($idProviderPrincipals.get().status).toBe('error');
     expect($idProviderPrincipals.get().users.items).toEqual([]);
+  });
+});
+
+describe('appendIdProviderPrincipals', () => {
+  it('adds the page after the rows already read', () => {
+    read([principal('alice')], 3);
+    beginIdProviderPrincipalsAppend('user');
+    appendIdProviderPrincipals('ldap', 'user', ok({ total: 3, items: [principal('bob')] }));
+
+    const { users } = $idProviderPrincipals.get();
+
+    expect(users.items.map(({ displayName }) => displayName)).toEqual(['alice', 'bob']);
+    expect(users.appending).toBe(false);
+  });
+
+  it('drops a page that answers after the panel moved on', () => {
+    read([principal('alice')], 3);
+    appendIdProviderPrincipals('azure', 'user', ok({ total: 3, items: [principal('bob')] }));
+
+    expect($idProviderPrincipals.get().users.items).toHaveLength(1);
+  });
+
+  it('skips a row already read', () => {
+    read([principal('alice')], 3);
+    appendIdProviderPrincipals(
+      'ldap',
+      'user',
+      ok({ total: 3, items: [principal('alice'), principal('bob')] }),
+    );
+
+    expect($idProviderPrincipals.get().users.items).toHaveLength(2);
+  });
+
+  it('ends the paging on a page that adds nothing', () => {
+    read([principal('alice')], 3);
+    appendIdProviderPrincipals('ldap', 'user', ok({ total: 3, items: [] }));
+
+    expect($idProviderPrincipals.get().users.total).toBe(1);
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
+  });
+
+  it('keeps the rows read when a page fails', () => {
+    read([principal('alice')], 3);
+    beginIdProviderPrincipalsAppend('user');
+    appendIdProviderPrincipals('ldap', 'user', err(new AppError('Offline')));
+
+    const { users } = $idProviderPrincipals.get();
+
+    expect(users.items).toHaveLength(1);
+    expect(users.error).toBe('Offline');
+    expect(users.appending).toBe(false);
+  });
+});
+
+describe('idProviderPrincipalsNextStart', () => {
+  it('starts where the rows read end', () => {
+    read([principal('alice')], 3);
+
+    expect(idProviderPrincipalsNextStart('user')).toBe(1);
+  });
+
+  it('has no page to ask for while one is on its way or the set is read', () => {
+    read([principal('alice')], 1);
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
+
+    read([principal('alice')], 3);
+    beginIdProviderPrincipalsAppend('user');
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
   });
 });
