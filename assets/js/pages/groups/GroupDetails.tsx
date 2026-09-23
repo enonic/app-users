@@ -91,7 +91,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
 
       {groups.length > 0 && (
         <DetailsPanel.Section labelKey="groups.details.memberOf" count={groups.length}>
-          <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE}>
+          <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE} loadMore>
             {(principal) => (
               <DetailsPanel.ListItem
                 key={principal.key}
@@ -119,7 +119,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={roles} limit={DETAILS_LIST_PAGE_SIZE}>
+        <DetailsPanel.List items={roles} limit={DETAILS_LIST_PAGE_SIZE} loadMore>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
@@ -148,13 +148,13 @@ export function GroupDetails({ group }: GroupDetailsProps) {
       >
         {users.length > 0 && (
           <DetailsPanel.Subsection labelKey="groups.details.users" count={users.length}>
-            <PrincipalAvatars principals={users} />
+            <PrincipalAvatars principals={users} loadMore />
           </DetailsPanel.Subsection>
         )}
 
         {memberGroups.length > 0 && (
           <DetailsPanel.Subsection labelKey="groups.details.groups" count={memberGroups.length}>
-            <DetailsPanel.List items={memberGroups} limit={DETAILS_LIST_PAGE_SIZE}>
+            <DetailsPanel.List items={memberGroups} limit={DETAILS_LIST_PAGE_SIZE} loadMore>
               {(member) => (
                 <DetailsPanel.ListItem
                   key={member.key}
