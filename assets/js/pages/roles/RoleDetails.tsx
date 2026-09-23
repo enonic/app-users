@@ -74,13 +74,13 @@ export function RoleDetails({ role }: RoleDetailsProps) {
       >
         {users.length > 0 && (
           <DetailsPanel.Subsection labelKey="roles.details.users" count={users.length}>
-            <PrincipalAvatars principals={users} loadMore />
+            <PrincipalAvatars principals={users} />
           </DetailsPanel.Subsection>
         )}
 
         {groups.length > 0 && (
           <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
-            <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE} loadMore>
+            <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE}>
               {(member) => (
                 <DetailsPanel.ListItem
                   key={member.key}

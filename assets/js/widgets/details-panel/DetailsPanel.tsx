@@ -54,8 +54,6 @@ export type DetailsListProps<T> = {
   limit?: number;
   /** The size of the whole set when `items` is only the page of it that was loaded. */
   total?: number;
-  /** `+N more` is a button that shows the next `DETAILS_LIST_PAGE_SIZE` rows, all of them already in `items`. */
-  loadMore?: boolean;
   children: (item: T) => ReactNode;
 };
 
@@ -124,15 +122,14 @@ export function DetailsField({ labelKey, children }: DetailsFieldProps) {
   );
 }
 
-export function DetailsList<T>({ items, limit, total, loadMore, children }: DetailsListProps<T>) {
+export function DetailsList<T>({ items, limit, total, children }: DetailsListProps<T>) {
   const [visible, setVisible] = useState(limit);
 
   const { shown, hidden } = sliceList(items, visible, total);
+  // ? Only rows already in `items` can be shown on a click; a set read a page at a time just counts the rest.
+  const loaded = items.length - shown.length;
 
-  const moreLabel = useI18n(
-    'browse.details.more',
-    loadMore === true ? nextPageSize(hidden) : hidden,
-  );
+  const moreLabel = useI18n('browse.details.more', loaded > 0 ? nextPageSize(loaded) : hidden);
 
   // ? A sibling of the list rather than a row in it: `role="list"` takes list items and nothing else.
   return (
@@ -142,7 +139,7 @@ export function DetailsList<T>({ items, limit, total, loadMore, children }: Deta
       </div>
 
       {hidden > 0 &&
-        (loadMore === true ? (
+        (loaded > 0 ? (
           <Button
             variant="text"
             size="sm"

@@ -121,7 +121,7 @@ export function UserDetails({ user }: UserDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={roles} limit={DETAILS_LIST_PAGE_SIZE} loadMore>
+        <DetailsPanel.List items={roles} limit={DETAILS_LIST_PAGE_SIZE}>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
@@ -147,7 +147,7 @@ export function UserDetails({ user }: UserDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE} loadMore>
+        <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE}>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}

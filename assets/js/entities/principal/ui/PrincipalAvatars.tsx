@@ -13,8 +13,6 @@ export type PrincipalAvatarsProps = {
   total?: number;
   /** Avatars shown before the rest collapse into `+N more`. */
   max?: number;
-  /** `+N more` is a button that shows the next `DETAILS_LIST_PAGE_SIZE`, all of them already in `principals`. */
-  loadMore?: boolean;
 };
 
 const TOOLTIP_DELAY = 300;
@@ -24,16 +22,14 @@ export function PrincipalAvatars({
   principals,
   total,
   max = DETAILS_LIST_PAGE_SIZE,
-  loadMore,
 }: PrincipalAvatarsProps) {
   const [visible, setVisible] = useState(max);
 
   const { shown, hidden } = sliceAvatars(principals, visible, total);
+  // ? Only avatars already in `principals` can be shown on a click; a paged set just counts the rest.
+  const loaded = principals.length - shown.length;
 
-  const moreLabel = i18n(
-    'principal.avatars.more',
-    loadMore === true ? nextPageSize(hidden) : hidden,
-  );
+  const moreLabel = i18n('principal.avatars.more', loaded > 0 ? nextPageSize(loaded) : hidden);
 
   return (
     <ul className="flex flex-wrap items-center gap-2">
@@ -56,7 +52,7 @@ export function PrincipalAvatars({
 
       {hidden > 0 && (
         <li className="text-sm">
-          {loadMore === true ? (
+          {loaded > 0 ? (
             <Button
               variant="text"
               size="sm"

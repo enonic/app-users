@@ -40,5 +40,5 @@ export function ServiceAccountsItemPage() {
     );
   }
 
-  return <ServiceAccountDetails user={user} />;
+  return <ServiceAccountDetails key={user.key} user={user} />;
 }
