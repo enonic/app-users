@@ -45,6 +45,8 @@ export function IdProviderDetails({
   const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
   const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');
   const listFailedLabel = useI18n('idProviders.details.listFailed');
+  const noDescriptionLabel = useI18n('idProviders.details.noDescription');
+  const applicationNotSetLabel = useI18n('idProviders.details.applicationNotSet');
 
   const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
   const accessLabel = (access: IdProviderAccess): string | undefined =>
@@ -78,16 +80,12 @@ export function IdProviderDetails({
           />
         }
       >
-        {description !== undefined && (
-          <DetailsPanel.Field labelKey="idProviders.details.description">
-            {description}
-          </DetailsPanel.Field>
-        )}
-        {application !== undefined && (
-          <DetailsPanel.Field labelKey="idProviders.details.application">
-            {application.displayName}
-          </DetailsPanel.Field>
-        )}
+        <DetailsPanel.Field labelKey="idProviders.details.description">
+          {description ?? noDescriptionLabel}
+        </DetailsPanel.Field>
+        <DetailsPanel.Field labelKey="idProviders.details.application">
+          {application?.displayName ?? applicationNotSetLabel}
+        </DetailsPanel.Field>
       </DetailsPanel.Section>
 
       {/* Shimmer until the read answers: absent is "not read yet", an empty list is "nobody". */}

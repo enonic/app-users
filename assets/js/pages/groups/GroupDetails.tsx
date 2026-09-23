@@ -27,6 +27,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
   const editMembersLabel = useI18n('groups.details.editMembers');
   const transitiveLabel = useI18n('groups.details.transitive');
   const transitiveFailedLabel = useI18n('groups.details.transitiveFailed');
+  const noDescriptionLabel = useI18n('groups.details.noDescription');
 
   const [transitive, setTransitive] = useState(false);
 
@@ -64,11 +65,9 @@ export function GroupDetails({ group }: GroupDetailsProps) {
           />
         }
       >
-        {description !== undefined && (
-          <DetailsPanel.Field labelKey="groups.details.description">
-            {description}
-          </DetailsPanel.Field>
-        )}
+        <DetailsPanel.Field labelKey="groups.details.description">
+          {description ?? noDescriptionLabel}
+        </DetailsPanel.Field>
         <DetailsPanel.Field labelKey="groups.details.idProvider">
           {providerName(key)}
         </DetailsPanel.Field>
