@@ -8,14 +8,6 @@ export function detailsEmptyLabelKey(status: DetailStatus, failedLabelKey: strin
   return status === 'error' ? failedLabelKey : 'browse.details.empty';
 }
 
-/**
- * Rows a details list shows before the rest collapse into a `+N more` line.
- *
- * The same number as `PrincipalAvatars`: a membership list is unbounded, and the two ways of showing
- * principals have to cut at the same place.
- */
-export const DETAILS_LIST_LIMIT = 10;
-
 export type ListSlice<T> = {
   shown: readonly T[];
   hidden: number;

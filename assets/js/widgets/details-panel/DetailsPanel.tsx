@@ -1,6 +1,8 @@
-import { ListItem, Separator } from '@enonic/ui';
+import { Button, ListItem, Separator } from '@enonic/ui';
+import { useState } from 'preact/hooks';
 import type { ReactNode } from 'react';
 
+import { DETAILS_LIST_PAGE_SIZE, nextPageSize } from '../../shared/detail';
 import { useI18n } from '../../shared/i18n';
 import { ItemLabel } from '../../shared/ui/ItemLabel';
 import { sliceList, withCount } from './details-panel';
@@ -52,6 +54,8 @@ export type DetailsListProps<T> = {
   limit?: number;
   /** The size of the whole set when `items` is only the page of it that was loaded. */
   total?: number;
+  /** `+N more` is a button that shows the next `DETAILS_LIST_PAGE_SIZE` rows, all of them already in `items`. */
+  loadMore?: boolean;
   children: (item: T) => ReactNode;
 };
 
@@ -120,10 +124,15 @@ export function DetailsField({ labelKey, children }: DetailsFieldProps) {
   );
 }
 
-export function DetailsList<T>({ items, limit, total, children }: DetailsListProps<T>) {
-  const { shown, hidden } = sliceList(items, limit, total);
+export function DetailsList<T>({ items, limit, total, loadMore, children }: DetailsListProps<T>) {
+  const [visible, setVisible] = useState(limit);
 
-  const moreLabel = useI18n('browse.details.more', hidden);
+  const { shown, hidden } = sliceList(items, visible, total);
+
+  const moreLabel = useI18n(
+    'browse.details.more',
+    loadMore === true ? nextPageSize(hidden) : hidden,
+  );
 
   // ? A sibling of the list rather than a row in it: `role="list"` takes list items and nothing else.
   return (
@@ -132,7 +141,18 @@ export function DetailsList<T>({ items, limit, total, children }: DetailsListPro
         {shown.map(children)}
       </div>
 
-      {hidden > 0 && <p className="text-subtle text-sm">{moreLabel}</p>}
+      {hidden > 0 &&
+        (loadMore === true ? (
+          <Button
+            variant="text"
+            size="sm"
+            className="self-start"
+            label={moreLabel}
+            onClick={() => setVisible((count) => (count ?? 0) + DETAILS_LIST_PAGE_SIZE)}
+          />
+        ) : (
+          <p className="text-subtle text-sm">{moreLabel}</p>
+        ))}
     </>
   );
 }

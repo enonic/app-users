@@ -16,7 +16,6 @@ import {
 } from '../../features/idprovider-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n, useLabelled } from '../../shared/i18n';
-import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { DetailsListSkeleton } from '../../widgets/details-panel/DetailsSkeleton';
 
@@ -142,7 +141,11 @@ export function IdProviderDetails({
           {principalsLoading === true && <DetailsListSkeleton />}
 
           {groups !== undefined && (
-            <DetailsPanel.List items={groups.items} limit={DETAILS_LIST_LIMIT} total={groups.total}>
+            <DetailsPanel.List
+              items={groups.items}
+              limit={DETAILS_LIST_PAGE_SIZE}
+              total={groups.total}
+            >
               {(principal) => (
                 <DetailsPanel.ListItem
                   key={principal.key}

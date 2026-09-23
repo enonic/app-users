@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { setGraphQlEndpoint } from '../../../shared/api';
+import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/detail';
 import {
   fetchIdProviderPrincipals,
-  ID_PROVIDER_PRINCIPALS_SHOWN,
   requestIdProviderExists,
   sendIdProviderCreation,
   sendIdProviderDeletion,
@@ -156,7 +156,7 @@ describe('fetchIdProviderPrincipals', () => {
 
     expect(sent?.variables).toEqual({
       key: 'ldap',
-      count: ID_PROVIDER_PRINCIPALS_SHOWN,
+      count: DETAILS_LIST_PAGE_SIZE,
     });
     expect(principals?.users.total).toBe(4213);
     expect(principals?.users.items).toHaveLength(1);

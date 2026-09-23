@@ -6,6 +6,7 @@ import {
   requestGraphQlDocument,
   type GraphQlRoot,
 } from '../../../shared/api';
+import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/detail';
 import type {
   IdProvider,
   IdProviderAccess,
@@ -175,9 +176,6 @@ const ID_PROVIDER_PERMISSIONS_DOCUMENT = `query IdProviderPermissions($key: Stri
   }
 }`;
 
-/** What the panel reads of each set: the rows it shows, with `total` beside them for the `+N`. */
-export const ID_PROVIDER_PRINCIPALS_SHOWN = 10;
-
 const PRINCIPAL_SET_FIELDS = `
     total
     items(start: 0, count: $count) {${PRINCIPAL_REF_FIELDS}}
@@ -210,7 +208,7 @@ export function fetchIdProviderPrincipals(
 ): ResultAsync<IdProviderPrincipals | undefined, AppError> {
   return requestGraphQlDocument<{ idProvider: IdProviderPrincipalsDto | null }>(
     ID_PROVIDER_PRINCIPALS_DOCUMENT,
-    { key, count: ID_PROVIDER_PRINCIPALS_SHOWN },
+    { key, count: DETAILS_LIST_PAGE_SIZE },
     signal,
   ).map(({ idProvider }) => idProvider ?? undefined);
 }

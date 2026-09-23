@@ -1,5 +1,7 @@
-import { Tooltip } from '@enonic/ui';
+import { Button, Tooltip } from '@enonic/ui';
+import { useState } from 'preact/hooks';
 
+import { DETAILS_LIST_PAGE_SIZE, nextPageSize } from '../../../shared/detail';
 import { i18n } from '../../../shared/i18n';
 import type { PrincipalRef } from '../model/principal.types';
 import { sliceAvatars } from './principal-avatars';
@@ -9,16 +11,29 @@ export type PrincipalAvatarsProps = {
   principals: readonly PrincipalRef[];
   /** The size of the whole set when `principals` is only the page of it that has been loaded. */
   total?: number;
-  /** Avatars shown before the rest collapse into `+N`. */
+  /** Avatars shown before the rest collapse into `+N more`. */
   max?: number;
+  /** `+N more` is a button that shows the next `DETAILS_LIST_PAGE_SIZE`, all of them already in `principals`. */
+  loadMore?: boolean;
 };
 
-const DEFAULT_MAX = 10;
 const TOOLTIP_DELAY = 300;
 
-/** A wrapping row of avatars, one per principal, with a `+N` for whatever did not fit. */
-export function PrincipalAvatars({ principals, total, max = DEFAULT_MAX }: PrincipalAvatarsProps) {
-  const { shown, hidden } = sliceAvatars(principals, max, total);
+/** A wrapping row of avatars, one per principal, with a `+N more` for whatever did not fit. */
+export function PrincipalAvatars({
+  principals,
+  total,
+  max = DETAILS_LIST_PAGE_SIZE,
+  loadMore,
+}: PrincipalAvatarsProps) {
+  const [visible, setVisible] = useState(max);
+
+  const { shown, hidden } = sliceAvatars(principals, visible, total);
+
+  const moreLabel = i18n(
+    'principal.avatars.more',
+    loadMore === true ? nextPageSize(hidden) : hidden,
+  );
 
   return (
     <ul className="flex flex-wrap items-center gap-2">
@@ -39,7 +54,20 @@ export function PrincipalAvatars({ principals, total, max = DEFAULT_MAX }: Princ
         </Tooltip>
       ))}
 
-      {hidden > 0 && <li className="text-sm">{i18n('principal.avatars.more', hidden)}</li>}
+      {hidden > 0 && (
+        <li className="text-sm">
+          {loadMore === true ? (
+            <Button
+              variant="text"
+              size="sm"
+              label={moreLabel}
+              onClick={() => setVisible((count) => count + DETAILS_LIST_PAGE_SIZE)}
+            />
+          ) : (
+            moreLabel
+          )}
+        </li>
+      )}
     </ul>
   );
 }
