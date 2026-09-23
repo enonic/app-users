@@ -1,12 +1,11 @@
 import { ListItem, Separator } from '@enonic/ui';
-import { useState } from 'preact/hooks';
 import type { ReactNode } from 'react';
 
-import { DETAILS_LIST_PAGE_SIZE, nextPageSize } from '../../shared/detail';
+import { useLoadMore } from '../../shared/detail';
 import { useI18n } from '../../shared/i18n';
 import { ItemLabel } from '../../shared/ui/ItemLabel';
 import { MoreButton } from '../../shared/ui/MoreButton';
-import { sliceList, withCount } from './details-panel';
+import { withCount } from './details-panel';
 import { DetailsEmpty } from './DetailsEmpty';
 import { DetailsSkeleton } from './DetailsSkeleton';
 
@@ -135,20 +134,18 @@ export function DetailsList<T>({
   loadingMore,
   children,
 }: DetailsListProps<T>) {
-  const [visible, setVisible] = useState(limit);
+  const { visible, hiddenCount, nextCount, loadMore } = useLoadMore(items, {
+    limit,
+    total,
+    onLoadMore,
+  });
 
-  const { shown, hidden } = sliceList(items, onLoadMore === undefined ? visible : undefined, total);
-  // ? What a click can bring: rows already in `items`, or the rest of a set its caller pages.
-  const next = onLoadMore === undefined ? items.length - shown.length : hidden;
-
-  const moreLabel = useI18n('browse.details.more', next > 0 ? nextPageSize(next) : hidden);
+  const moreLabel = useI18n('browse.details.more', nextCount > 0 ? nextCount : hiddenCount);
   const loadingMoreLabel = useI18n('browse.list.loadingMore');
 
   const handleMore = (): void => {
-    if (onLoadMore === undefined) {
-      setVisible((count) => (count ?? 0) + DETAILS_LIST_PAGE_SIZE);
-    } else if (loadingMore !== true) {
-      onLoadMore();
+    if (loadingMore !== true) {
+      loadMore();
     }
   };
 
@@ -156,11 +153,11 @@ export function DetailsList<T>({
   return (
     <>
       <div role="list" className="flex flex-col">
-        {shown.map(children)}
+        {visible.map(children)}
       </div>
 
-      {hidden > 0 &&
-        (next > 0 ? (
+      {hiddenCount > 0 &&
+        (nextCount > 0 ? (
           <MoreButton
             label={loadingMore === true ? loadingMoreLabel : moreLabel}
             busy={loadingMore}

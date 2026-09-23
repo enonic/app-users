@@ -1,11 +1,9 @@
 import { Tooltip } from '@enonic/ui';
-import { useState } from 'preact/hooks';
 
-import { DETAILS_LIST_PAGE_SIZE, nextPageSize } from '../../../shared/detail';
+import { DETAILS_LIST_PAGE_SIZE, useLoadMore } from '../../../shared/detail';
 import { i18n } from '../../../shared/i18n';
 import { MoreButton } from '../../../shared/ui/MoreButton';
 import type { PrincipalRef } from '../model/principal.types';
-import { sliceAvatars } from './principal-avatars';
 import { PrincipalIcon } from './PrincipalIcon';
 
 export type PrincipalAvatarsProps = {
@@ -30,29 +28,23 @@ export function PrincipalAvatars({
   onLoadMore,
   loadingMore,
 }: PrincipalAvatarsProps) {
-  const [visible, setVisible] = useState(max);
-
-  const { shown, hidden } = sliceAvatars(
-    principals,
-    onLoadMore === undefined ? visible : principals.length,
+  const { visible, hiddenCount, nextCount, loadMore } = useLoadMore(principals, {
+    limit: max,
     total,
-  );
-  // ? What a click can bring: avatars already in `principals`, or the rest of a set its caller pages.
-  const next = onLoadMore === undefined ? principals.length - shown.length : hidden;
+    onLoadMore,
+  });
 
-  const moreLabel = i18n('principal.avatars.more', next > 0 ? nextPageSize(next) : hidden);
+  const moreLabel = i18n('principal.avatars.more', nextCount > 0 ? nextCount : hiddenCount);
 
   const handleMore = (): void => {
-    if (onLoadMore === undefined) {
-      setVisible((count) => count + DETAILS_LIST_PAGE_SIZE);
-    } else if (loadingMore !== true) {
-      onLoadMore();
+    if (loadingMore !== true) {
+      loadMore();
     }
   };
 
   return (
     <ul className="flex flex-wrap items-center gap-2">
-      {shown.map((principal) => (
+      {visible.map((principal) => (
         // ? The `li` is the trigger: a wrapping one would be ten more tab stops, and `PrincipalIcon`
         // ? is no `forwardRef` to take the ref itself.
         <Tooltip
@@ -69,9 +61,9 @@ export function PrincipalAvatars({
         </Tooltip>
       ))}
 
-      {hidden > 0 && (
+      {hiddenCount > 0 && (
         <li className="text-subtle text-sm">
-          {next > 0 ? (
+          {nextCount > 0 ? (
             <MoreButton
               label={loadingMore === true ? i18n('browse.list.loadingMore') : moreLabel}
               busy={loadingMore}
