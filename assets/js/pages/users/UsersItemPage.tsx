@@ -36,5 +36,5 @@ export function UsersItemPage() {
     return <DetailsPanel.Empty labelKey={detailsEmptyLabelKey(status, 'users.details.failed')} />;
   }
 
-  return <UserDetails user={user} />;
+  return <UserDetails key={user.key} user={user} />;
 }
