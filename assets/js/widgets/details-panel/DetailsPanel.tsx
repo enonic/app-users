@@ -1,10 +1,11 @@
-import { Button, ListItem, Separator } from '@enonic/ui';
+import { ListItem, Separator } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 import type { ReactNode } from 'react';
 
 import { DETAILS_LIST_PAGE_SIZE, nextPageSize } from '../../shared/detail';
 import { useI18n } from '../../shared/i18n';
 import { ItemLabel } from '../../shared/ui/ItemLabel';
+import { MoreButton } from '../../shared/ui/MoreButton';
 import { sliceList, withCount } from './details-panel';
 import { DetailsEmpty } from './DetailsEmpty';
 import { DetailsSkeleton } from './DetailsSkeleton';
@@ -140,10 +141,7 @@ export function DetailsList<T>({ items, limit, total, children }: DetailsListPro
 
       {hidden > 0 &&
         (loaded > 0 ? (
-          <Button
-            variant="text"
-            size="sm"
-            className="self-start"
+          <MoreButton
             label={moreLabel}
             onClick={() => setVisible((count) => (count ?? 0) + DETAILS_LIST_PAGE_SIZE)}
           />

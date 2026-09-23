@@ -1,8 +1,9 @@
-import { Button, Tooltip } from '@enonic/ui';
+import { Tooltip } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import { DETAILS_LIST_PAGE_SIZE, nextPageSize } from '../../../shared/detail';
 import { i18n } from '../../../shared/i18n';
+import { MoreButton } from '../../../shared/ui/MoreButton';
 import type { PrincipalRef } from '../model/principal.types';
 import { sliceAvatars } from './principal-avatars';
 import { PrincipalIcon } from './PrincipalIcon';
@@ -51,11 +52,9 @@ export function PrincipalAvatars({
       ))}
 
       {hidden > 0 && (
-        <li className="text-sm">
+        <li className="text-subtle text-sm">
           {loaded > 0 ? (
-            <Button
-              variant="text"
-              size="sm"
+            <MoreButton
               label={moreLabel}
               onClick={() => setVisible((count) => count + DETAILS_LIST_PAGE_SIZE)}
             />
