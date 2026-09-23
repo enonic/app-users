@@ -4,6 +4,7 @@ import { useMemo } from 'preact/hooks';
 import { useRoles } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { RoleEditorDialog } from '../../features/role-editor/ui/RoleEditorDialog';
+import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
@@ -16,6 +17,7 @@ import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
+import { ReadOnlyBanner } from '../../widgets/browse-toolbar/ReadOnlyBanner';
 import { rolesFilter } from './model/filter.store';
 import { ROLE_ACTIONS } from './model/roles.actions';
 import { filterRolesByBucket, roleBuckets, searchRoles } from './model/roles.filter';
@@ -44,6 +46,8 @@ export function RolesPage() {
   const systemBucketLabel = useI18n('roles.filter.system');
   const customBucketLabel = useI18n('roles.filter.custom');
   const emptyLabel = useI18n('roles.list.empty');
+  const readOnlyTitle = useI18n('readOnly.title');
+  const readOnlyHelp = useI18n('readOnly.help');
 
   const sortOptions = useMemo(
     () => [
@@ -97,6 +101,8 @@ export function RolesPage() {
       <BrowseScreen
         {...section}
         actions={ROLE_ACTIONS}
+        managedMode={isReadOnlyMode()}
+        notice={<ReadOnlyBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
         details={<RolesItemPage />}
         filter={

@@ -29,7 +29,7 @@ export type BrowseScreenProps<T> = {
   details: ReactNode;
   /** Managed mode: no action is offered anywhere — toolbar, row menu or double click. */
   managedMode?: boolean;
-  /** What stands in the action row's place, normally `ManagedModeBanner` with the section's copy. */
+  /** What stands in the action row's place, normally `ReadOnlyBanner`. */
   notice?: ReactNode;
   onQueryChange: (query: string) => void;
   onSelectionChange: (keys: ReadonlySet<string>) => void;

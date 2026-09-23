@@ -8,12 +8,14 @@ import {
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
+import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { DEFAULT_SORT_DIRECTION, type SortDirection } from '../../widgets/browse-list/browse-sort';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
+import { ReadOnlyBanner } from '../../widgets/browse-toolbar/ReadOnlyBanner';
 import {
   $serviceAccountsQuery,
   clearServiceAccountsQuery,
@@ -43,6 +45,8 @@ export function ServiceAccountsPage() {
   const sortAscLabel = useI18n('users.sort.nameAsc');
   const sortDescLabel = useI18n('users.sort.nameDesc');
   const emptyLabel = useI18n('serviceAccounts.list.empty');
+  const readOnlyTitle = useI18n('readOnly.title');
+  const readOnlyHelp = useI18n('readOnly.help');
   const loadMoreFailedNotice = useI18n('browse.list.loadMoreFailed');
 
   const sortOptions = useMemo(
@@ -74,6 +78,8 @@ export function ServiceAccountsPage() {
       <BrowseScreen
         {...section}
         actions={SERVICE_ACCOUNT_ACTIONS}
+        managedMode={isReadOnlyMode()}
+        notice={<ReadOnlyBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
         details={<ServiceAccountsItemPage />}
         hasMore={hasMore}

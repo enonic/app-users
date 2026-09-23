@@ -1,4 +1,4 @@
-import { GraphQLString, nonNull, type GraphQLType } from '/lib/graphql';
+import { GraphQLBoolean, GraphQLString, nonNull, type GraphQLType } from '/lib/graphql';
 
 import { generator } from '../schema/generator';
 
@@ -20,6 +20,11 @@ export const ConfigType: GraphQLType = generator.createObjectType({
     eventsUrl: {
       type: nonNull(GraphQLString),
       description: 'The admin events hub api; `client.js` under it is the client to import.',
+    },
+    readOnlyMode: {
+      type: nonNull(GraphQLBoolean),
+      description:
+        'Whether the caller holds `system.user.app` without `system.user.admin`, so every write would be refused.',
     },
   },
 });

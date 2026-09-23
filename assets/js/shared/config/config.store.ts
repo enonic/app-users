@@ -9,3 +9,8 @@ export const $config = atom<Config | undefined>(undefined);
 export function setConfig(config: Config): void {
   $config.set(config);
 }
+
+// ! Read at render, not subscribed to: `App` renders nothing until the bootstrap filled the store.
+export function isReadOnlyMode(): boolean {
+  return $config.get()?.readOnlyMode === true;
+}

@@ -10,6 +10,7 @@ import {
   useIdProviders,
 } from '../../entities/principal';
 import { IdProviderEditorDialog } from '../../features/idprovider-editor/ui/IdProviderEditorDialog';
+import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
@@ -22,6 +23,7 @@ import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
+import { ReadOnlyBanner } from '../../widgets/browse-toolbar/ReadOnlyBanner';
 import { IdProviderDeleteDialog } from './IdProviderDeleteDialog';
 import { IdProvidersItemPage } from './IdProvidersItemPage';
 import { idProvidersFilter } from './model/filter.store';
@@ -50,6 +52,8 @@ export function IdProvidersPage() {
   const sortDescLabel = useI18n('idProviders.sort.nameDesc');
   const unboundLabel = useI18n('idProviders.filter.unbound');
   const emptyLabel = useI18n('idProviders.list.empty');
+  const readOnlyTitle = useI18n('readOnly.title');
+  const readOnlyHelp = useI18n('readOnly.help');
 
   const sortOptions = useMemo(
     () => [
@@ -101,6 +105,8 @@ export function IdProvidersPage() {
       <BrowseScreen
         {...section}
         actions={ID_PROVIDER_ACTIONS}
+        managedMode={isReadOnlyMode()}
+        notice={<ReadOnlyBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
         details={<IdProvidersItemPage />}
         filter={

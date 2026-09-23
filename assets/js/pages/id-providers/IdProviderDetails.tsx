@@ -14,6 +14,7 @@ import {
   ID_PROVIDER_ACCESS_LEVELS,
   openIdProviderEditorAt,
 } from '../../features/idprovider-editor';
+import { isReadOnlyMode } from '../../shared/config';
 import { useI18n, useLabelled } from '../../shared/i18n';
 import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -41,6 +42,7 @@ export function IdProviderDetails({
   permissionsLoading,
   permissionsFailed,
 }: IdProviderDetailsProps) {
+  const readOnly = isReadOnlyMode();
   const editLabel = useI18n('idProviders.details.edit');
   const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
   const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');
@@ -69,13 +71,15 @@ export function IdProviderDetails({
       <DetailsPanel.Section
         labelKey="idProviders.details.info"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editLabel}
-            disabled={permissionsFailed}
-            onClick={() => openIdProviderEditorAt(provider, 'general')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editLabel}
+              disabled={permissionsFailed}
+              onClick={() => openIdProviderEditorAt(provider, 'general')}
+            />
+          )
         }
       >
         {description !== undefined && (
@@ -95,13 +99,15 @@ export function IdProviderDetails({
         labelKey="idProviders.details.permissions"
         count={permissions?.length}
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editPermissionsLabel}
-            disabled={permissionsFailed}
-            onClick={() => openIdProviderEditorAt(provider, 'permissions')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editPermissionsLabel}
+              disabled={permissionsFailed}
+              onClick={() => openIdProviderEditorAt(provider, 'permissions')}
+            />
+          )
         }
       >
         {permissionsLoading === true && <DetailsListSkeleton />}
