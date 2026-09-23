@@ -1,6 +1,6 @@
 import { Tooltip } from '@enonic/ui';
 
-import { DETAILS_LIST_PAGE_SIZE, useLoadMore } from '../../../shared/detail';
+import { useLoadMore } from '../../../shared/detail';
 import { i18n } from '../../../shared/i18n';
 import { MoreButton } from '../../../shared/ui/MoreButton';
 import type { PrincipalRef } from '../model/principal.types';
@@ -10,8 +10,6 @@ export type PrincipalAvatarsProps = {
   principals: readonly PrincipalRef[];
   /** The size of the whole set when `principals` is only the page of it that has been loaded. */
   total?: number;
-  /** Avatars shown before the rest collapse into `+N more`. */
-  max?: number;
   /** The caller pages: every avatar in `principals` is shown, and `+N more` asks for the next page. */
   onLoadMore?: () => void;
   /** A page is on its way: the control says so and ignores a click. */
@@ -24,12 +22,10 @@ const TOOLTIP_DELAY = 300;
 export function PrincipalAvatars({
   principals,
   total,
-  max = DETAILS_LIST_PAGE_SIZE,
   onLoadMore,
   loadingMore,
 }: PrincipalAvatarsProps) {
   const { visible, hiddenCount, nextCount, loadMore } = useLoadMore(principals, {
-    limit: max,
     total,
     onLoadMore,
   });

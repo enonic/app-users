@@ -3,8 +3,6 @@ import { useState } from 'preact/hooks';
 import { DETAILS_LIST_PAGE_SIZE, sliceLoadMore, type LoadMoreSlice } from './detail';
 
 export type LoadMoreOptions = {
-  /** Rows shown before the first click; `undefined` shows them all. */
-  limit?: number;
   /** The size of the whole set when `items` is only the page of it that was loaded. */
   total?: number;
   /** The caller pages: every row in `items` is visible, and `loadMore` asks for the next page. */
@@ -18,9 +16,9 @@ export type LoadMore<T> = LoadMoreSlice<T> & {
 /** The rows a capped list renders, and a `loadMore` that reveals a page more of them. */
 export function useLoadMore<T>(
   items: readonly T[],
-  { limit, total, onLoadMore }: LoadMoreOptions,
+  { total, onLoadMore }: LoadMoreOptions,
 ): LoadMore<T> {
-  const [visibleLimit, setVisibleLimit] = useState(limit);
+  const [visibleLimit, setVisibleLimit] = useState(DETAILS_LIST_PAGE_SIZE);
 
   const slice = sliceLoadMore(items, {
     limit: visibleLimit,
@@ -29,7 +27,7 @@ export function useLoadMore<T>(
   });
 
   const loadMore =
-    onLoadMore ?? ((): void => setVisibleLimit((count) => (count ?? 0) + DETAILS_LIST_PAGE_SIZE));
+    onLoadMore ?? ((): void => setVisibleLimit((count) => count + DETAILS_LIST_PAGE_SIZE));
 
   return { ...slice, loadMore };
 }

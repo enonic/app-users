@@ -139,7 +139,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={roles} limit={DETAILS_LIST_PAGE_SIZE}>
+        <DetailsPanel.List items={roles}>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
@@ -165,7 +165,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE}>
+        <DetailsPanel.List items={groups}>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}

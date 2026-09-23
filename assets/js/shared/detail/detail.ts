@@ -13,8 +13,8 @@ export type LoadMoreSlice<T> = {
 };
 
 export type LoadMoreSliceOptions = {
-  /** Rows shown; `undefined` shows them all. Ignored when `paged`. */
-  limit?: number;
+  /** Rows shown. Ignored when `paged`. */
+  limit: number;
   /** The size of the whole set; only a paged caller has more than `items`. */
   total?: number;
   /** The caller reads the next page: every row in `items` is visible, and a click brings the rest. */
@@ -25,7 +25,7 @@ export function sliceLoadMore<T>(
   items: readonly T[],
   { limit, total, paged = false }: LoadMoreSliceOptions,
 ): LoadMoreSlice<T> {
-  const visible = paged || limit === undefined ? items : items.slice(0, limit);
+  const visible = paged ? items : items.slice(0, limit);
   const hiddenCount = Math.max(total ?? items.length, items.length) - visible.length;
 
   return { visible, hiddenCount, nextCount: Math.min(hiddenCount, DETAILS_LIST_PAGE_SIZE) };

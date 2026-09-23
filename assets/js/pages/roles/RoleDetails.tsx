@@ -80,7 +80,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
 
         {groups.length > 0 && (
           <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
-            <DetailsPanel.List items={groups} limit={DETAILS_LIST_PAGE_SIZE}>
+            <DetailsPanel.List items={groups}>
               {(member) => (
                 <DetailsPanel.ListItem
                   key={member.key}

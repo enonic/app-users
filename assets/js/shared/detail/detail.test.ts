@@ -15,12 +15,6 @@ describe('sliceLoadMore', () => {
     });
   });
 
-  it('keeps every row when there is no limit', () => {
-    const items = keys(42);
-
-    expect(sliceLoadMore(items, {})).toEqual({ visible: items, hiddenCount: 0, nextCount: 0 });
-  });
-
   it('cuts the list at the limit and counts the rest', () => {
     const items = keys(19);
 
@@ -36,7 +30,7 @@ describe('sliceLoadMore', () => {
   });
 
   it('counts the whole set, not the rows loaded, when a total is given', () => {
-    expect(sliceLoadMore(keys(10), { total: 4213, paged: true })).toEqual({
+    expect(sliceLoadMore(keys(10), { limit: 10, total: 4213, paged: true })).toEqual({
       visible: keys(10),
       hiddenCount: 4203,
       nextCount: DETAILS_LIST_PAGE_SIZE,

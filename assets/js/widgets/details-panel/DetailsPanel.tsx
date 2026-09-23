@@ -50,8 +50,6 @@ export type DetailsFieldProps = {
 
 export type DetailsListProps<T> = {
   items: readonly T[];
-  /** Rows past this many collapse into a `+N more` line. */
-  limit?: number;
   /** The size of the whole set when `items` is only the page of it that was loaded. */
   total?: number;
   /** The caller pages: every row in `items` is shown, and `+N more` asks for the next page. */
@@ -128,17 +126,12 @@ export function DetailsField({ labelKey, children }: DetailsFieldProps) {
 
 export function DetailsList<T>({
   items,
-  limit,
   total,
   onLoadMore,
   loadingMore,
   children,
 }: DetailsListProps<T>) {
-  const { visible, hiddenCount, nextCount, loadMore } = useLoadMore(items, {
-    limit,
-    total,
-    onLoadMore,
-  });
+  const { visible, hiddenCount, nextCount, loadMore } = useLoadMore(items, { total, onLoadMore });
 
   const moreLabel = useI18n('browse.details.more', nextCount);
   const loadingMoreLabel = useI18n('browse.list.loadingMore');
