@@ -69,9 +69,16 @@ export function loadMoreIdProviderPrincipals(type: PrincipalSetType): void {
   pendingPages.set(type, controller);
 
   void fetchIdProviderPrincipalPage(key, type, start, controller.signal).match(
-    (page) => settlePage(type, controller, () => appendIdProviderPrincipals(key, type, ok(page))),
-    (error) =>
-      settlePage(type, controller, () => appendIdProviderPrincipals(key, type, err(error))),
+    (page) => {
+      if (!controller.signal.aborted) {
+        appendIdProviderPrincipals(type, ok(page));
+      }
+    },
+    (error) => {
+      if (!controller.signal.aborted) {
+        appendIdProviderPrincipals(type, err(error));
+      }
+    },
   );
 }
 
@@ -121,15 +128,5 @@ function cancel(): void {
   if (scheduled !== undefined) {
     clearTimeout(scheduled);
     scheduled = undefined;
-  }
-}
-
-function settlePage(type: PrincipalSetType, controller: AbortController, report: () => void): void {
-  if (pendingPages.get(type) === controller) {
-    pendingPages.delete(type);
-  }
-
-  if (!controller.signal.aborted) {
-    report();
   }
 }

@@ -12,7 +12,7 @@ export type PrincipalAvatarsProps = {
   total?: number;
   /** The caller pages: every avatar in `principals` is shown, and `+N more` asks for the next page. */
   onLoadMore?: () => void;
-  /** A page is on its way: the control says so and ignores a click. */
+  /** A page is on its way: the control says so. */
   loadingMore?: boolean;
 };
 
@@ -31,12 +31,6 @@ export function PrincipalAvatars({
   });
 
   const moreLabel = i18n('principal.avatars.more', nextCount);
-
-  const handleMore = (): void => {
-    if (loadingMore !== true) {
-      loadMore();
-    }
-  };
 
   return (
     <ul className="flex flex-wrap items-center gap-2">
@@ -62,7 +56,7 @@ export function PrincipalAvatars({
           <MoreButton
             label={loadingMore === true ? i18n('browse.list.loadingMore') : moreLabel}
             busy={loadingMore}
-            onClick={handleMore}
+            onClick={loadMore}
           />
         </li>
       )}

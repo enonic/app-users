@@ -54,7 +54,7 @@ describe('appendIdProviderPrincipals', () => {
   it('adds the page after the rows already read', () => {
     read([principal('alice')], 3);
     beginIdProviderPrincipalsAppend('user');
-    appendIdProviderPrincipals('ldap', 'user', ok({ total: 3, items: [principal('bob')] }));
+    appendIdProviderPrincipals('user', ok({ total: 3, items: [principal('bob')] }));
 
     const { users } = $idProviderPrincipals.get();
 
@@ -62,17 +62,9 @@ describe('appendIdProviderPrincipals', () => {
     expect(users.appending).toBe(false);
   });
 
-  it('drops a page that answers after the panel moved on', () => {
-    read([principal('alice')], 3);
-    appendIdProviderPrincipals('azure', 'user', ok({ total: 3, items: [principal('bob')] }));
-
-    expect($idProviderPrincipals.get().users.items).toHaveLength(1);
-  });
-
   it('skips a row already read', () => {
     read([principal('alice')], 3);
     appendIdProviderPrincipals(
-      'ldap',
       'user',
       ok({ total: 3, items: [principal('alice'), principal('bob')] }),
     );
@@ -82,7 +74,7 @@ describe('appendIdProviderPrincipals', () => {
 
   it('ends the paging on a page that adds nothing', () => {
     read([principal('alice')], 3);
-    appendIdProviderPrincipals('ldap', 'user', ok({ total: 3, items: [] }));
+    appendIdProviderPrincipals('user', ok({ total: 3, items: [] }));
 
     expect($idProviderPrincipals.get().users.total).toBe(1);
     expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
@@ -91,7 +83,7 @@ describe('appendIdProviderPrincipals', () => {
   it('keeps the rows read when a page fails', () => {
     read([principal('alice')], 3);
     beginIdProviderPrincipalsAppend('user');
-    appendIdProviderPrincipals('ldap', 'user', err(new AppError('Offline')));
+    appendIdProviderPrincipals('user', err(new AppError('Offline')));
 
     const { users } = $idProviderPrincipals.get();
 

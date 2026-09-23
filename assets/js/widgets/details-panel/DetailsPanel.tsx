@@ -54,7 +54,7 @@ export type DetailsListProps<T> = {
   total?: number;
   /** The caller pages: every row in `items` is shown, and `+N more` asks for the next page. */
   onLoadMore?: () => void;
-  /** A page is on its way: the control says so and ignores a click. */
+  /** A page is on its way: the control says so. */
   loadingMore?: boolean;
   children: (item: T) => ReactNode;
 };
@@ -136,12 +136,6 @@ export function DetailsList<T>({
   const moreLabel = useI18n('browse.details.more', nextCount);
   const loadingMoreLabel = useI18n('browse.list.loadingMore');
 
-  const handleMore = (): void => {
-    if (loadingMore !== true) {
-      loadMore();
-    }
-  };
-
   // ? A sibling of the list rather than a row in it: `role="list"` takes list items and nothing else.
   return (
     <>
@@ -153,7 +147,7 @@ export function DetailsList<T>({
         <MoreButton
           label={loadingMore === true ? loadingMoreLabel : moreLabel}
           busy={loadingMore}
-          onClick={handleMore}
+          onClick={loadMore}
         />
       )}
     </>

@@ -72,15 +72,9 @@ export function beginIdProviderPrincipalsAppend(type: PrincipalSetType): void {
 }
 
 export function appendIdProviderPrincipals(
-  key: string,
   type: PrincipalSetType,
   result: Result<PrincipalPage | undefined, AppError>,
 ): void {
-  // ! A page that answers after the panel has moved on holds another provider's principals.
-  if ($idProviderPrincipals.get().key !== key) {
-    return;
-  }
-
   result.match(
     (page) =>
       patch(type, (set) => {
