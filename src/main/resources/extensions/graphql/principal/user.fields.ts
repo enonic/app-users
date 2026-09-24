@@ -10,6 +10,7 @@ import {
 import {
   addPublicKey,
   createUser,
+  findUserByEmail,
   getUser,
   listUsers,
   removePublicKey,
@@ -74,6 +75,17 @@ export const userQueryFields: GraphQLFields = {
       key: nonNull(GraphQLString),
     },
     resolve: (env: { args: { key: string } }) => getUser(env.args.key),
+  },
+  userByEmail: {
+    type: UserType,
+    description:
+      'The user holding an email in an ID provider, or null when none does. An email is unique per provider, so the same one may exist in another.',
+    args: {
+      idProvider: nonNull(GraphQLString),
+      email: nonNull(GraphQLString),
+    },
+    resolve: (env: { args: { idProvider: string; email: string } }) =>
+      findUserByEmail(env.args.idProvider, env.args.email),
   },
 };
 

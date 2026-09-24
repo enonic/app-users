@@ -96,6 +96,7 @@ export type { PrincipalSort } from './model/principal.sort';
 export {
   addPublicKey,
   createUser,
+  isUserEmailTaken,
   isUserNameTaken,
   removePublicKey,
   updateUser,
@@ -119,6 +120,8 @@ export {
   serviceAccountsLoadedKeys,
 } from './model/service-accounts.store';
 export { evictUserDetail, forgetUserDetails, forgetUsers } from './model/user-detail.load';
+export { createUserEmailCheck } from './model/user-email-check.load';
+export type { UserEmailCheck } from './model/user-email-check.load';
 export { loadUser } from './model/users.load';
 export type {
   Group,

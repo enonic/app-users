@@ -22,6 +22,7 @@ import {
   addPublicKey,
   createUser,
   escapeQueryValue,
+  findUserByEmail,
   getUser,
   listUserGroups,
   listUserPublicKeys,
@@ -359,6 +360,39 @@ describe('getUser', () => {
     });
 
     expect(getUser('user:system:al ice')).toBeNull();
+  });
+});
+
+describe('findUserByEmail', () => {
+  it('asks the provider for the one user holding the email', () => {
+    vi.mocked(findUsers).mockReturnValue(found([user('alice', 'Alice Ward')]));
+
+    expect(findUserByEmail('system', 'alice@example.com')).toEqual(user('alice', 'Alice Ward'));
+    expect(calledWith()).toEqual({
+      start: 0,
+      count: 1,
+      query: 'userStoreKey="system" AND email="alice@example.com"',
+    });
+  });
+
+  it('answers null when no user in the provider holds it', () => {
+    vi.mocked(findUsers).mockReturnValue(found([]));
+
+    expect(findUserByEmail('system', 'nobody@example.com')).toBeNull();
+  });
+
+  it('trims the address and escapes what it interpolates', () => {
+    vi.mocked(findUsers).mockReturnValue(found([]));
+
+    findUserByEmail('sto"re', '  a"b@example.com  ');
+
+    expect(calledWith()?.query).toBe('userStoreKey="sto\\"re" AND email="a\\"b@example.com"');
+  });
+
+  it('asks nothing of a blank address or provider', () => {
+    expect(findUserByEmail('system', '   ')).toBeNull();
+    expect(findUserByEmail('', 'alice@example.com')).toBeNull();
+    expect(findUsers).not.toHaveBeenCalled();
   });
 });
 

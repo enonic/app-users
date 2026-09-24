@@ -3,13 +3,14 @@ import { atom, computed } from 'nanostores';
 import {
   $idProviderNames,
   createPrincipalNameCheck,
+  createUserEmailCheck,
   isSystemUser,
   SYSTEM_ID_PROVIDER,
   type IdProviderName,
   type PrincipalRef,
   type User,
 } from '../../../entities/principal';
-import { mergeByKey } from '../../../shared/form';
+import { mergeByKey, type FieldErrors } from '../../../shared/form';
 import {
   createStepDialogStore,
   type StepDialogExternal,
@@ -35,21 +36,7 @@ export type UserEditorState = StepDialogState<UserEditorStep, UserFormField, Use
 
 export const userNameCheck = createPrincipalNameCheck('user');
 
-// The name a provider already holds is an error like any other; while the answer is on its way, the name
-// holds the later steps back without a message.
-const $userNameExternal = computed(
-  userNameCheck.$state,
-  (check): StepDialogExternal<UserFormField> => ({
-    errors: check.status === 'taken' ? { name: 'users.dialog.nameTaken' } : {},
-    busy: check.status === 'pending' ? ['name'] : [],
-  }),
-);
-
-// ! The system store is never offered: a user there is a service account, created in its own section.
-export const $userEditorProviders = computed(
-  $idProviderNames,
-  ({ items }): readonly IdProviderName[] => items.filter(({ key }) => key !== SYSTEM_ID_PROVIDER),
-);
+export const userEmailCheck = createUserEmailCheck();
 
 /**
  * Whether the Service Accounts section opened the dialog. Users and Service Accounts stay mounted side
@@ -57,6 +44,46 @@ export const $userEditorProviders = computed(
  * A service account is a user of the system store: the provider is settled, never offered.
  */
 export const $userEditorServiceAccount = atom(false);
+
+// The section words a clash: a service account's provider goes without saying.
+const TAKEN_KEYS = {
+  users: { name: 'users.dialog.nameTaken', email: 'users.dialog.emailTaken' },
+  serviceAccounts: {
+    name: 'serviceAccounts.dialog.nameTaken',
+    email: 'serviceAccounts.dialog.emailTaken',
+  },
+} satisfies Record<string, Record<'name' | 'email', string>>;
+
+// A name or an email another user holds is an error like any other; while an answer is on its way, its
+// field holds the later steps back without a message.
+const $userEditorExternal = computed(
+  [userNameCheck.$state, userEmailCheck.$state, $userEditorServiceAccount],
+  (name, email, serviceAccount): StepDialogExternal<UserFormField> => {
+    const keys = serviceAccount ? TAKEN_KEYS.serviceAccounts : TAKEN_KEYS.users;
+    const errors: FieldErrors<UserFormField> = {};
+    const busy: UserFormField[] = [];
+
+    if (name.status === 'taken') {
+      errors.name = keys.name;
+    } else if (name.status === 'pending') {
+      busy.push('name');
+    }
+
+    if (email.status === 'taken') {
+      errors.email = keys.email;
+    } else if (email.status === 'pending') {
+      busy.push('email');
+    }
+
+    return { errors, busy };
+  },
+);
+
+// ! The system store is never offered: a user there is a service account, created in its own section.
+export const $userEditorProviders = computed(
+  $idProviderNames,
+  ({ items }): readonly IdProviderName[] => items.filter(({ key }) => key !== SYSTEM_ID_PROVIDER),
+);
 
 export const userEditorDialog = createStepDialogStore<
   UserEditorStep,
@@ -71,8 +98,11 @@ export const userEditorDialog = createStepDialogStore<
     validateUserForm(form, mode, entity !== undefined && isSystemUser(entity.key)),
   same: sameUserForm,
   next: nextUserForm,
-  $external: $userNameExternal,
-  reset: userNameCheck.forget,
+  $external: $userEditorExternal,
+  reset: () => {
+    userNameCheck.forget();
+    userEmailCheck.forget();
+  },
 });
 
 export const $userEditor = userEditorDialog.$state;
@@ -132,10 +162,16 @@ export function setUserEditorName(name: string, { immediate = false } = {}): voi
   askWhetherNameIsFree({ immediate });
 }
 
-/** The provider the name has to be free in, so a name already typed is asked about again at once. */
+/** The provider the name and the email have to be free in, so both are asked about again at once. */
 export function setUserEditorIdProvider(idProvider: string): void {
   updateUserEditorForm({ idProvider });
   askWhetherNameIsFree({ immediate: true });
+  askWhetherEmailIsFree({ immediate: true });
+}
+
+export function setUserEditorEmail(email: string, { immediate = false } = {}): void {
+  updateUserEditorForm({ email });
+  askWhetherEmailIsFree({ immediate });
 }
 
 export function setUserEditorPassword(password: string | undefined): void {
@@ -185,6 +221,18 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
   if (mode === 'create') {
     userNameCheck.ask(form.idProvider, form.name, { immediate });
   }
+}
+
+// Both modes ask — an edit can re-address a user — and the user's own key rides along so its current
+// address is no clash. `su` and `anonymous` have no email and are asked nothing.
+function askWhetherEmailIsFree({ immediate = false } = {}): void {
+  const { form, entity } = $userEditor.get();
+
+  if (entity !== undefined && isSystemUser(entity.key)) {
+    return;
+  }
+
+  userEmailCheck.ask(form.idProvider, form.email, { immediate, except: entity?.key });
 }
 
 // Where a create starts: the system store for a service account, otherwise the one provider there is.

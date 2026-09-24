@@ -6,7 +6,7 @@ import {
   type PrincipalRef,
   type User,
 } from '../../../entities/principal';
-import { sameKeys, type FieldErrors } from '../../../shared/form';
+import { isEmailAddress, sameKeys, type FieldErrors } from '../../../shared/form';
 import type { StepDialogMode, StepDialogPayload } from '../../../shared/step-dialog';
 import { isPasswordAccepted, passwordStrength } from './password-strength';
 
@@ -53,8 +53,6 @@ export const USER_FORM_FIELDS: readonly UserFormField[] = [
   'email',
   'password',
 ];
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function initialUserForm(
   payload: UserEditorPayload,
@@ -143,7 +141,7 @@ export function validateUserForm(
     const email = form.email.trim();
     if (email.length === 0) {
       errors.email = 'users.dialog.emailRequired';
-    } else if (!EMAIL.test(email)) {
+    } else if (!isEmailAddress(email)) {
       errors.email = 'users.dialog.emailInvalid';
     }
   }

@@ -2,6 +2,7 @@ import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
 import {
+  requestUserEmailHolder,
   requestUserExists,
   sendPublicKeyAddition,
   sendPublicKeyRemoval,
@@ -79,6 +80,21 @@ export function isUserNameTaken(
   signal?: AbortSignal,
 ): ResultAsync<boolean, AppError> {
   return requestUserExists(`user:${idProvider}:${name}`, signal);
+}
+
+/**
+ * Whether another user of the provider already holds the email — advisory, as `isUserNameTaken` is.
+ * `except` is the user being edited, whose own address is no clash.
+ */
+export function isUserEmailTaken(
+  idProvider: string,
+  email: string,
+  except?: string,
+  signal?: AbortSignal,
+): ResultAsync<boolean, AppError> {
+  return requestUserEmailHolder(idProvider, email, signal).map(
+    (holder) => holder !== undefined && holder !== except,
+  );
 }
 
 // What an optional text field sends: trimmed, and absent rather than empty. The counterpart of `nonEmpty`

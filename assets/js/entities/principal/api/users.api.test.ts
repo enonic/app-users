@@ -2,7 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { setGraphQlEndpoint } from '../../../shared/api';
 import type { PrincipalKey } from '../model/principal.types';
-import { fetchUserDetail, requestUserExists, sendUserCreation, sendUserUpdate } from './users.api';
+import {
+  fetchUserDetail,
+  requestUserEmailHolder,
+  requestUserExists,
+  sendUserCreation,
+  sendUserUpdate,
+} from './users.api';
 
 let sent: { query?: string; variables?: Record<string, unknown> } | undefined;
 
@@ -196,6 +202,26 @@ describe('requestUserExists', () => {
     const result = await requestUserExists('user:system:alice');
 
     expect(result._unsafeUnwrap()).toBe(true);
+    expect(sent?.query).not.toContain('displayName');
+  });
+});
+
+describe('requestUserEmailHolder', () => {
+  it('reads an email nobody in the provider holds as free', async () => {
+    respondWith({ data: { userByEmail: null } });
+
+    const result = await requestUserEmailHolder('system', 'alice@example.com');
+
+    expect(result._unsafeUnwrap()).toBeUndefined();
+    expect(sent?.variables).toEqual({ idProvider: 'system', email: 'alice@example.com' });
+  });
+
+  it('asks for the holder key alone, and answers it', async () => {
+    respondWith({ data: { userByEmail: { key: 'user:system:alice' } } });
+
+    const result = await requestUserEmailHolder('system', 'alice@example.com');
+
+    expect(result._unsafeUnwrap()).toBe('user:system:alice');
     expect(sent?.query).not.toContain('displayName');
   });
 });
