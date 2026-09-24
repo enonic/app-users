@@ -15,6 +15,7 @@ import {
 import { IdProviderCell } from '../../entities/principal/ui/IdProviderCell';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
+import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
@@ -22,6 +23,7 @@ import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
+import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
 import {
   $usersQuery,
   clearUsersQuery,
@@ -59,6 +61,8 @@ export function UsersPage() {
   const sortProviderAscLabel = useI18n('users.sort.idProviderAsc');
   const sortProviderDescLabel = useI18n('users.sort.idProviderDesc');
   const emptyLabel = useI18n('users.list.empty');
+  const readOnlyTitle = useI18n('readOnly.title');
+  const readOnlyHelp = useI18n('readOnly.help');
   const loadMoreFailedNotice = useI18n('browse.list.loadMoreFailed');
   const providersFailedNotice = useI18n('users.filter.providersFailed');
 
@@ -101,6 +105,8 @@ export function UsersPage() {
       <BrowseScreen
         {...section}
         actions={USER_ACTIONS}
+        managedMode={isReadOnlyMode()}
+        notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
         details={<UsersItemPage />}
         hasMore={hasMore}

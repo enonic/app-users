@@ -1,3 +1,4 @@
+import { hasRole } from '/lib/xp/auth';
 import { apiUrl } from '/lib/xp/portal';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -26,5 +27,24 @@ describe('config', () => {
       eventsUrl: '/_/admin:events',
     });
     expect(vi.mocked(apiUrl)).toHaveBeenCalledWith({ api: 'admin:events' });
+  });
+
+  it.each([
+    { holder: 'the user app role alone', roles: ['role:system.user.app'], readOnlyMode: true },
+    {
+      holder: 'the user app and user admin roles',
+      roles: ['role:system.user.app', 'role:system.user.admin'],
+      readOnlyMode: false,
+    },
+    { holder: 'the system admin role', roles: ['role:system.admin'], readOnlyMode: false },
+    {
+      holder: 'the system admin and user app roles',
+      roles: ['role:system.admin', 'role:system.user.app'],
+      readOnlyMode: false,
+    },
+  ])('answers readOnlyMode $readOnlyMode for $holder', ({ roles, readOnlyMode }) => {
+    vi.mocked(hasRole).mockImplementation((role) => roles.includes(role));
+
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ readOnlyMode });
   });
 });

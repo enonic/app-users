@@ -11,6 +11,7 @@ import {
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openGroupEditorAt } from '../../features/group-editor';
+import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
 import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -20,6 +21,7 @@ export type GroupDetailsProps = {
 };
 
 export function GroupDetails({ group }: GroupDetailsProps) {
+  const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
   const editLabel = useI18n('groups.details.edit');
@@ -56,12 +58,14 @@ export function GroupDetails({ group }: GroupDetailsProps) {
       <DetailsPanel.Section
         labelKey="groups.details.info"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editLabel}
-            onClick={() => openGroupEditorAt(group, 'general')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editLabel}
+              onClick={() => openGroupEditorAt(group, 'general')}
+            />
+          )
         }
       >
         {description !== undefined && (
@@ -107,12 +111,14 @@ export function GroupDetails({ group }: GroupDetailsProps) {
         labelKey="groups.details.roles"
         count={roles.length}
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editRolesLabel}
-            onClick={() => openGroupEditorAt(group, 'roles')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editRolesLabel}
+              onClick={() => openGroupEditorAt(group, 'roles')}
+            />
+          )
         }
       >
         <DetailsPanel.List items={roles} limit={DETAILS_LIST_LIMIT}>
@@ -132,12 +138,14 @@ export function GroupDetails({ group }: GroupDetailsProps) {
         labelKey="groups.details.members"
         count={members.length}
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editMembersLabel}
-            onClick={() => openGroupEditorAt(group, 'members')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editMembersLabel}
+              onClick={() => openGroupEditorAt(group, 'members')}
+            />
+          )
         }
       >
         {users.length > 0 && (

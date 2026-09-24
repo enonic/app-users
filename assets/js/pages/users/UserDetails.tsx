@@ -10,6 +10,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openUserEditorAt } from '../../features/user-editor';
+import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
 import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -19,6 +20,7 @@ export type UserDetailsProps = {
 };
 
 export function UserDetails({ user }: UserDetailsProps) {
+  const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
   const editLabel = useI18n('users.details.edit');
@@ -56,12 +58,14 @@ export function UserDetails({ user }: UserDetailsProps) {
       <DetailsPanel.Section
         labelKey="users.details.user"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editLabel}
-            onClick={() => openUserEditorAt(user, 'general')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editLabel}
+              onClick={() => openUserEditorAt(user, 'general')}
+            />
+          )
         }
       >
         {email !== undefined && (
@@ -76,12 +80,14 @@ export function UserDetails({ user }: UserDetailsProps) {
       <DetailsPanel.Section
         labelKey="users.details.credentials"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editCredentialsLabel}
-            onClick={() => openUserEditorAt(user, 'credentials')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editCredentialsLabel}
+              onClick={() => openUserEditorAt(user, 'credentials')}
+            />
+          )
         }
       >
         <DetailsPanel.Field labelKey="users.details.password">
@@ -106,12 +112,14 @@ export function UserDetails({ user }: UserDetailsProps) {
         labelKey="users.details.roles"
         count={roles.length}
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editRolesLabel}
-            onClick={() => openUserEditorAt(user, 'roles')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editRolesLabel}
+              onClick={() => openUserEditorAt(user, 'roles')}
+            />
+          )
         }
       >
         <DetailsPanel.List items={roles} limit={DETAILS_LIST_LIMIT}>
@@ -130,12 +138,14 @@ export function UserDetails({ user }: UserDetailsProps) {
         labelKey="users.details.groups"
         count={groups.length}
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editGroupsLabel}
-            onClick={() => openUserEditorAt(user, 'groups')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editGroupsLabel}
+              onClick={() => openUserEditorAt(user, 'groups')}
+            />
+          )
         }
       >
         <DetailsPanel.List items={groups} limit={DETAILS_LIST_LIMIT}>

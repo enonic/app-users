@@ -12,6 +12,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openServiceAccountEditorAt } from '../../features/user-editor';
+import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
 import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
@@ -25,6 +26,7 @@ export type ServiceAccountDetailsProps = {
  * platform owns keep their roles and groups too — those steps only say so — so neither offers an Edit.
  */
 export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
+  const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
   const editLabel = useI18n('serviceAccounts.details.edit');
@@ -63,12 +65,14 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
       <DetailsPanel.Section
         labelKey="serviceAccounts.details.serviceAccount"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editLabel}
-            onClick={() => openServiceAccountEditorAt(user, 'general')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editLabel}
+              onClick={() => openServiceAccountEditorAt(user, 'general')}
+            />
+          )
         }
       >
         {email !== undefined && (
@@ -79,12 +83,14 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
       <DetailsPanel.Section
         labelKey="users.details.credentials"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editCredentialsLabel}
-            onClick={() => openServiceAccountEditorAt(user, 'credentials')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editCredentialsLabel}
+              onClick={() => openServiceAccountEditorAt(user, 'credentials')}
+            />
+          )
         }
       >
         <DetailsPanel.Field labelKey="users.details.password">
@@ -121,7 +127,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
         labelKey="users.details.roles"
         count={roles.length}
         action={
-          system ? undefined : (
+          system || readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"
@@ -147,7 +153,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
         labelKey="users.details.groups"
         count={groups.length}
         action={
-          system ? undefined : (
+          system || readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"

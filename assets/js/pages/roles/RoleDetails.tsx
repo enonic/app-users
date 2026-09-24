@@ -4,6 +4,7 @@ import { principalName, useIdProviderName, type RoleDetail } from '../../entitie
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openRoleEditorAt } from '../../features/role-editor';
+import { isReadOnlyMode } from '../../shared/config';
 import { formatDateTime } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
 import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
@@ -14,6 +15,7 @@ export type RoleDetailsProps = {
 };
 
 export function RoleDetails({ role }: RoleDetailsProps) {
+  const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
   const editLabel = useI18n('roles.details.edit');
@@ -37,12 +39,14 @@ export function RoleDetails({ role }: RoleDetailsProps) {
       <DetailsPanel.Section
         labelKey="roles.details.role"
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editLabel}
-            onClick={() => openRoleEditorAt(role, 'general')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editLabel}
+              onClick={() => openRoleEditorAt(role, 'general')}
+            />
+          )
         }
       >
         <DetailsPanel.Field labelKey="roles.details.description">
@@ -59,12 +63,14 @@ export function RoleDetails({ role }: RoleDetailsProps) {
         labelKey="roles.details.members"
         count={members.length}
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            label={editMembersLabel}
-            onClick={() => openRoleEditorAt(role, 'members')}
-          />
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editMembersLabel}
+              onClick={() => openRoleEditorAt(role, 'members')}
+            />
+          )
         }
       >
         {users.length > 0 && (

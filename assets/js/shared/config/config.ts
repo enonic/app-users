@@ -9,4 +9,6 @@ export type Config = {
   appVersion: string;
   /** The admin events hub api; `client.js` under it is the client to import. */
   eventsUrl: string;
+  /** Neither `system.admin` nor `system.user.admin`: XP refuses every write, so none is offered. */
+  readOnlyMode: boolean;
 };
