@@ -37,6 +37,11 @@ describe('config', () => {
       readOnlyMode: false,
     },
     { holder: 'the system admin role', roles: ['role:system.admin'], readOnlyMode: false },
+    {
+      holder: 'the system admin and user app roles',
+      roles: ['role:system.admin', 'role:system.user.app'],
+      readOnlyMode: false,
+    },
   ])('answers readOnlyMode $readOnlyMode for $holder', ({ roles, readOnlyMode }) => {
     vi.mocked(hasRole).mockImplementation((role) => roles.includes(role));
 

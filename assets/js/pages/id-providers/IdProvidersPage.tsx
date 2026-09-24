@@ -23,7 +23,7 @@ import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
-import { ReadOnlyBanner } from '../../widgets/browse-toolbar/ReadOnlyBanner';
+import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
 import { IdProviderDeleteDialog } from './IdProviderDeleteDialog';
 import { IdProvidersItemPage } from './IdProvidersItemPage';
 import { idProvidersFilter } from './model/filter.store';
@@ -106,7 +106,7 @@ export function IdProvidersPage() {
         {...section}
         actions={ID_PROVIDER_ACTIONS}
         managedMode={isReadOnlyMode()}
-        notice={<ReadOnlyBanner title={readOnlyTitle} help={readOnlyHelp} />}
+        notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
         details={<IdProvidersItemPage />}
         filter={

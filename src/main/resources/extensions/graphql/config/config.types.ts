@@ -24,7 +24,7 @@ export const ConfigType: GraphQLType = generator.createObjectType({
     readOnlyMode: {
       type: nonNull(GraphQLBoolean),
       description:
-        'Whether the caller holds `system.user.app` without `system.user.admin`, so every write would be refused.',
+        'Whether the caller holds neither `system.admin` nor `system.user.admin`, so every write would be refused.',
     },
   },
 });

@@ -19,5 +19,5 @@ export const configQueryFields: GraphQLFields = {
 };
 
 function isReadOnlyMode(): boolean {
-  return hasRole('role:system.user.app') && !hasRole('role:system.user.admin');
+  return !hasRole('role:system.admin') && !hasRole('role:system.user.admin');
 }

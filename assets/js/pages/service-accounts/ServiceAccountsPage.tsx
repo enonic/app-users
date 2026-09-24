@@ -15,7 +15,7 @@ import { DEFAULT_SORT_DIRECTION, type SortDirection } from '../../widgets/browse
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
-import { ReadOnlyBanner } from '../../widgets/browse-toolbar/ReadOnlyBanner';
+import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
 import {
   $serviceAccountsQuery,
   clearServiceAccountsQuery,
@@ -79,7 +79,7 @@ export function ServiceAccountsPage() {
         {...section}
         actions={SERVICE_ACCOUNT_ACTIONS}
         managedMode={isReadOnlyMode()}
-        notice={<ReadOnlyBanner title={readOnlyTitle} help={readOnlyHelp} />}
+        notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
         details={<ServiceAccountsItemPage />}
         hasMore={hasMore}

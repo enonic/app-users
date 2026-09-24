@@ -17,7 +17,7 @@ import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
-import { ReadOnlyBanner } from '../../widgets/browse-toolbar/ReadOnlyBanner';
+import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
 import { rolesFilter } from './model/filter.store';
 import { ROLE_ACTIONS } from './model/roles.actions';
 import { filterRolesByBucket, roleBuckets, searchRoles } from './model/roles.filter';
@@ -102,7 +102,7 @@ export function RolesPage() {
         {...section}
         actions={ROLE_ACTIONS}
         managedMode={isReadOnlyMode()}
-        notice={<ReadOnlyBanner title={readOnlyTitle} help={readOnlyHelp} />}
+        notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
         details={<RolesItemPage />}
         filter={
