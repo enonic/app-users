@@ -28,6 +28,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
   const providerName = useIdProviderName();
 
   const editLabel = useI18n('serviceAccounts.details.edit');
+  const emailNotSetLabel = useI18n('users.details.emailNotSet');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -71,8 +72,10 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
           />
         }
       >
-        {email !== undefined && (
-          <DetailsPanel.Field labelKey="users.details.email">{email}</DetailsPanel.Field>
+        {!system && (
+          <DetailsPanel.Field labelKey="users.details.email">
+            {email ?? emailNotSetLabel}
+          </DetailsPanel.Field>
         )}
       </DetailsPanel.Section>
 
