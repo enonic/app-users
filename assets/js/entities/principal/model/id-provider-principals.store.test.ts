@@ -72,9 +72,25 @@ describe('appendIdProviderPrincipals', () => {
     expect($idProviderPrincipals.get().users.items).toHaveLength(2);
   });
 
-  it('ends the paging on a page that adds nothing', () => {
+  it('ends the paging on an empty page', () => {
     read([principal('alice')], 3);
     appendIdProviderPrincipals('user', ok({ total: 3, items: [] }));
+
+    expect($idProviderPrincipals.get().users.total).toBe(1);
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
+  });
+
+  it('reads on past a page of rows already read, keeping the total', () => {
+    read([principal('alice')], 30);
+    appendIdProviderPrincipals('user', ok({ total: 31, items: [principal('alice')] }));
+
+    expect($idProviderPrincipals.get().users.total).toBe(31);
+    expect(idProviderPrincipalsNextStart('user')).toBe(2);
+  });
+
+  it('closes the set at the rows held once a repeating page reads to its end', () => {
+    read([principal('alice')], 2);
+    appendIdProviderPrincipals('user', ok({ total: 2, items: [principal('alice')] }));
 
     expect($idProviderPrincipals.get().users.total).toBe(1);
     expect(idProviderPrincipalsNextStart('user')).toBeUndefined();

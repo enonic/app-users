@@ -1,7 +1,7 @@
 import { Tooltip } from '@enonic/ui';
 
-import { useLoadMore } from '../../../shared/detail';
 import { i18n } from '../../../shared/i18n';
+import { useLoadMore } from '../../../shared/load-more';
 import { MoreButton } from '../../../shared/ui/MoreButton';
 import type { PrincipalRef } from '../model/principal.types';
 import { PrincipalIcon } from './PrincipalIcon';

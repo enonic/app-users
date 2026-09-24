@@ -6,7 +6,7 @@ import {
   requestGraphQlDocument,
   type GraphQlRoot,
 } from '../../../shared/api';
-import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/detail';
+import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/load-more';
 import type {
   IdProvider,
   IdProviderAccess,

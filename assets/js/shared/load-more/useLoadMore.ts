@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 
-import { DETAILS_LIST_PAGE_SIZE, sliceLoadMore, type LoadMoreSlice } from './detail';
+import { DETAILS_LIST_PAGE_SIZE, sliceLoadMore, type LoadMoreSlice } from './load-more';
 
 export type LoadMoreOptions = {
   /** The size of the whole set when `items` is only the page of it that was loaded. */

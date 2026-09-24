@@ -13,6 +13,8 @@ export type PrincipalSetState = {
   items: readonly PrincipalRef[];
   /** How many the provider holds, not how many were read — the difference is what the `+N` stands for. */
   total: number;
+  /** How far into the set the pages have read; ahead of `items` when a page repeated rows already read. */
+  read: number;
   /** A page is on its way while the rows already read stay on screen. */
   appending: boolean;
   /** Why the last page did not arrive; the rows already read still stand. */
@@ -28,7 +30,7 @@ export type IdProviderPrincipalsState = {
   error?: string;
 };
 
-const EMPTY_SET: PrincipalSetState = { items: [], total: 0, appending: false };
+const EMPTY_SET: PrincipalSetState = { items: [], total: 0, read: 0, appending: false };
 
 const EMPTY: IdProviderPrincipalsState = {
   status: 'idle',
@@ -78,13 +80,19 @@ export function appendIdProviderPrincipals(
   result.match(
     (page) =>
       patch(type, (set) => {
-        const added = page === undefined ? [] : withoutLoaded(page.items, set.items);
-        const items = [...set.items, ...added];
+        // ? An empty page means the set shrank under the paging: what is read is all there is.
+        if (page === undefined || page.items.length === 0) {
+          return { ...set, total: set.items.length, appending: false };
+        }
 
-        // ? A page that adds nothing means the set shrank under the paging: what is read is all there is.
+        const items = [...set.items, ...withoutLoaded(page.items, set.items)];
+        const read = set.read + page.items.length;
+
+        // ? Read to the end with repeats on the way: the rows held are the whole set.
         return {
           items,
-          total: added.length === 0 ? items.length : (page?.total ?? set.total),
+          total: read >= page.total ? items.length : page.total,
+          read,
           appending: false,
         };
       }),
@@ -97,9 +105,7 @@ export function idProviderPrincipalsNextStart(type: PrincipalSetType): number | 
   const state = $idProviderPrincipals.get();
   const set = state[setKey(type)];
 
-  return state.status !== 'ready' || set.appending || set.items.length >= set.total
-    ? undefined
-    : set.items.length;
+  return state.status !== 'ready' || set.appending || set.read >= set.total ? undefined : set.read;
 }
 
 //
@@ -107,7 +113,7 @@ export function idProviderPrincipalsNextStart(type: PrincipalSetType): number | 
 //
 
 function toSet({ total, items }: PrincipalPage): PrincipalSetState {
-  return { items, total, appending: false };
+  return { items, total, read: items.length, appending: false };
 }
 
 function setKey(type: PrincipalSetType): 'users' | 'groups' {

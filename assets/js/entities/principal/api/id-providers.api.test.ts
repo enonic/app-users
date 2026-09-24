@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { setGraphQlEndpoint } from '../../../shared/api';
-import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/detail';
+import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/load-more';
 import {
   fetchIdProviderPrincipalPage,
   fetchIdProviderPrincipals,

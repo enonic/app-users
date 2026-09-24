@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DETAILS_LIST_PAGE_SIZE, sliceLoadMore } from './detail';
+import { DETAILS_LIST_PAGE_SIZE, sliceLoadMore } from './load-more';
 
 const keys = (count: number): string[] => Array.from({ length: count }, (_, i) => `key-${i}`);
 

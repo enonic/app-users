@@ -1,8 +1,8 @@
 import { ListItem, Separator } from '@enonic/ui';
 import type { ReactNode } from 'react';
 
-import { useLoadMore } from '../../shared/detail';
 import { useI18n } from '../../shared/i18n';
+import { useLoadMore } from '../../shared/load-more';
 import { ItemLabel } from '../../shared/ui/ItemLabel';
 import { MoreButton } from '../../shared/ui/MoreButton';
 import { withCount } from './details-panel';
