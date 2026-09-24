@@ -2,16 +2,18 @@ import { okAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AppError } from '../../../shared/api';
-import { fetchIdProviderPrincipals } from '../api/id-providers.api';
+import { fetchIdProviderPrincipalPage, fetchIdProviderPrincipals } from '../api/id-providers.api';
 import {
   forgetIdProviderPrincipalRows,
+  loadMoreIdProviderPrincipals,
   reloadIdProviderPrincipalRows,
   showIdProviderPrincipals,
 } from './id-provider-principals.load';
 import { $idProviderPrincipals } from './id-provider-principals.store';
-import type { IdProviderPrincipals, PrincipalRef } from './principal.types';
+import type { IdProviderPrincipals, PrincipalPage, PrincipalRef } from './principal.types';
 
 vi.mock('../api/id-providers.api', () => ({
+  fetchIdProviderPrincipalPage: vi.fn(),
   fetchIdProviderPrincipals: vi.fn(),
 }));
 
@@ -41,6 +43,10 @@ beforeEach(() => {
   vi.useFakeTimers();
   vi.mocked(fetchIdProviderPrincipals).mockReset();
   vi.mocked(fetchIdProviderPrincipals).mockReturnValue(answered('ldap', 'alice'));
+  vi.mocked(fetchIdProviderPrincipalPage).mockReset();
+  vi.mocked(fetchIdProviderPrincipalPage).mockReturnValue(
+    okAsync<PrincipalPage | undefined, AppError>({ total: 100, items: [principal('bob')] }),
+  );
 });
 
 afterEach(() => {
@@ -123,5 +129,50 @@ describe('forgetIdProviderPrincipalRows', () => {
 
     expect(reads()).toBe(0);
     expect($idProviderPrincipals.get().key).toBeUndefined();
+  });
+});
+
+describe('loadMoreIdProviderPrincipals', () => {
+  it('asks for the next page of one set from where its rows end', async () => {
+    showIdProviderPrincipals('ldap');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    loadMoreIdProviderPrincipals('user');
+    await vi.runAllTimersAsync();
+
+    expect(vi.mocked(fetchIdProviderPrincipalPage).mock.calls[0]?.slice(0, 3)).toEqual([
+      'ldap',
+      'user',
+      1,
+    ]);
+    expect(loaded()).toEqual(['alice', 'bob']);
+  });
+
+  it('asks nothing before the first read has answered', () => {
+    showIdProviderPrincipals('ldap');
+    loadMoreIdProviderPrincipals('user');
+
+    expect(fetchIdProviderPrincipalPage).not.toHaveBeenCalled();
+  });
+
+  it('asks nothing while a page of that set is on its way', async () => {
+    showIdProviderPrincipals('ldap');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    loadMoreIdProviderPrincipals('user');
+    loadMoreIdProviderPrincipals('user');
+
+    expect(fetchIdProviderPrincipalPage).toHaveBeenCalledTimes(1);
+  });
+
+  it('aborts a page on its way when the selection moves', async () => {
+    showIdProviderPrincipals('ldap');
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    loadMoreIdProviderPrincipals('user');
+    const signal = vi.mocked(fetchIdProviderPrincipalPage).mock.calls[0]?.[3];
+    showIdProviderPrincipals('azure');
+
+    expect(signal?.aborted).toBe(true);
   });
 });

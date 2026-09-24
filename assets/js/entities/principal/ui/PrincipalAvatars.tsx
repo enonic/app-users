@@ -1,28 +1,40 @@
 import { Tooltip } from '@enonic/ui';
 
 import { i18n } from '../../../shared/i18n';
+import { useLoadMore } from '../../../shared/load-more';
+import { MoreButton } from '../../../shared/ui/MoreButton';
 import type { PrincipalRef } from '../model/principal.types';
-import { sliceAvatars } from './principal-avatars';
 import { PrincipalIcon } from './PrincipalIcon';
 
 export type PrincipalAvatarsProps = {
   principals: readonly PrincipalRef[];
   /** The size of the whole set when `principals` is only the page of it that has been loaded. */
   total?: number;
-  /** Avatars shown before the rest collapse into `+N`. */
-  max?: number;
+  /** The caller pages: every avatar in `principals` is shown, and `+N more` asks for the next page. */
+  onLoadMore?: () => void;
+  /** A page is on its way: the control says so. */
+  loadingMore?: boolean;
 };
 
-const DEFAULT_MAX = 10;
 const TOOLTIP_DELAY = 300;
 
-/** A wrapping row of avatars, one per principal, with a `+N` for whatever did not fit. */
-export function PrincipalAvatars({ principals, total, max = DEFAULT_MAX }: PrincipalAvatarsProps) {
-  const { shown, hidden } = sliceAvatars(principals, max, total);
+/** A wrapping row of avatars, one per principal, with a `+N more` for whatever did not fit. */
+export function PrincipalAvatars({
+  principals,
+  total,
+  onLoadMore,
+  loadingMore,
+}: PrincipalAvatarsProps) {
+  const { visible, hiddenCount, nextCount, loadMore } = useLoadMore(principals, {
+    total,
+    onLoadMore,
+  });
+
+  const moreLabel = i18n('principal.avatars.more', nextCount);
 
   return (
     <ul className="flex flex-wrap items-center gap-2">
-      {shown.map((principal) => (
+      {visible.map((principal) => (
         // ? The `li` is the trigger: a wrapping one would be ten more tab stops, and `PrincipalIcon`
         // ? is no `forwardRef` to take the ref itself.
         <Tooltip
@@ -39,7 +51,15 @@ export function PrincipalAvatars({ principals, total, max = DEFAULT_MAX }: Princ
         </Tooltip>
       ))}
 
-      {hidden > 0 && <li className="text-sm">{i18n('principal.avatars.more', hidden)}</li>}
+      {hiddenCount > 0 && (
+        <li className="text-subtle text-sm">
+          <MoreButton
+            label={loadingMore === true ? i18n('browse.list.loadingMore') : moreLabel}
+            busy={loadingMore}
+            onClick={loadMore}
+          />
+        </li>
+      )}
     </ul>
   );
 }

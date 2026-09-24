@@ -36,5 +36,5 @@ export function GroupsItemPage() {
     return <DetailsPanel.Empty labelKey={detailsEmptyLabelKey(status, 'groups.details.failed')} />;
   }
 
-  return <GroupDetails group={group} />;
+  return <GroupDetails key={group.key} group={group} />;
 }

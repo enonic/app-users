@@ -2,12 +2,23 @@ import { map } from 'nanostores';
 import type { Result } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
-import type { IdProviderPrincipals, PrincipalPage, PrincipalRef } from './principal.types';
+import type {
+  IdProviderPrincipals,
+  PrincipalPage,
+  PrincipalRef,
+  PrincipalSetType,
+} from './principal.types';
 
 export type PrincipalSetState = {
   items: readonly PrincipalRef[];
   /** How many the provider holds, not how many were read — the difference is what the `+N` stands for. */
   total: number;
+  /** How far into the set the pages have read; ahead of `items` when a page repeated rows already read. */
+  read: number;
+  /** A page is on its way while the rows already read stay on screen. */
+  appending: boolean;
+  /** Why the last page did not arrive; the rows already read still stand. */
+  error?: string;
 };
 
 export type IdProviderPrincipalsState = {
@@ -19,7 +30,7 @@ export type IdProviderPrincipalsState = {
   error?: string;
 };
 
-const EMPTY_SET: PrincipalSetState = { items: [], total: 0 };
+const EMPTY_SET: PrincipalSetState = { items: [], total: 0, read: 0, appending: false };
 
 const EMPTY: IdProviderPrincipalsState = {
   status: 'idle',
@@ -58,10 +69,67 @@ export function forgetIdProviderPrincipals(): void {
   $idProviderPrincipals.set(EMPTY);
 }
 
+export function beginIdProviderPrincipalsAppend(type: PrincipalSetType): void {
+  patch(type, (set) => ({ ...set, appending: true, error: undefined }));
+}
+
+export function appendIdProviderPrincipals(
+  type: PrincipalSetType,
+  result: Result<PrincipalPage | undefined, AppError>,
+): void {
+  result.match(
+    (page) =>
+      patch(type, (set) => {
+        // ? An empty page means the set shrank under the paging: what is read is all there is.
+        if (page === undefined || page.items.length === 0) {
+          return { ...set, total: set.items.length, appending: false };
+        }
+
+        const items = [...set.items, ...withoutLoaded(page.items, set.items)];
+        const read = set.read + page.items.length;
+
+        // ? Read to the end with repeats on the way: the rows held are the whole set.
+        return {
+          items,
+          total: read >= page.total ? items.length : page.total,
+          read,
+          appending: false,
+        };
+      }),
+    (error) => patch(type, (set) => ({ ...set, appending: false, error: error.message })),
+  );
+}
+
+/** Where the next page of a set starts, or `undefined` when there is no page to ask for. */
+export function idProviderPrincipalsNextStart(type: PrincipalSetType): number | undefined {
+  const state = $idProviderPrincipals.get();
+  const set = state[setKey(type)];
+
+  return state.status !== 'ready' || set.appending || set.read >= set.total ? undefined : set.read;
+}
+
 //
-// * Helpers
+// * Internal
 //
 
 function toSet({ total, items }: PrincipalPage): PrincipalSetState {
-  return { items, total };
+  return { items, total, read: items.length, appending: false };
+}
+
+function setKey(type: PrincipalSetType): 'users' | 'groups' {
+  return type === 'user' ? 'users' : 'groups';
+}
+
+// ! Offset paging over a set someone else is editing can answer with a row already read.
+function withoutLoaded(
+  page: readonly PrincipalRef[],
+  loaded: readonly PrincipalRef[],
+): PrincipalRef[] {
+  const keys = new Set(loaded.map(({ key }) => key));
+  return page.filter(({ key }) => !keys.has(key));
+}
+
+function patch(type: PrincipalSetType, edit: (set: PrincipalSetState) => PrincipalSetState): void {
+  const key = setKey(type);
+  $idProviderPrincipals.setKey(key, edit($idProviderPrincipals.get()[key]));
 }

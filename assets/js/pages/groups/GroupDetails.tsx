@@ -13,7 +13,6 @@ import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openGroupEditorAt } from '../../features/group-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
-import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type GroupDetailsProps = {
@@ -92,7 +91,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
 
       {groups.length > 0 && (
         <DetailsPanel.Section labelKey="groups.details.memberOf" count={groups.length}>
-          <DetailsPanel.List items={groups} limit={DETAILS_LIST_LIMIT}>
+          <DetailsPanel.List items={groups}>
             {(principal) => (
               <DetailsPanel.ListItem
                 key={principal.key}
@@ -120,7 +119,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={roles} limit={DETAILS_LIST_LIMIT}>
+        <DetailsPanel.List items={roles}>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
@@ -155,7 +154,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
 
         {memberGroups.length > 0 && (
           <DetailsPanel.Subsection labelKey="groups.details.groups" count={memberGroups.length}>
-            <DetailsPanel.List items={memberGroups} limit={DETAILS_LIST_LIMIT}>
+            <DetailsPanel.List items={memberGroups}>
               {(member) => (
                 <DetailsPanel.ListItem
                   key={member.key}

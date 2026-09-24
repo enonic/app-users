@@ -6,6 +6,7 @@ import {
   requestGraphQlDocument,
   type GraphQlRoot,
 } from '../../../shared/api';
+import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/load-more';
 import type {
   IdProvider,
   IdProviderAccess,
@@ -13,7 +14,9 @@ import type {
   IdProviderPermission,
   IdProviderPermissions,
   IdProviderPrincipals,
+  PrincipalPage,
   PrincipalRef,
+  PrincipalSetType,
 } from '../model/principal.types';
 
 /**
@@ -175,9 +178,6 @@ const ID_PROVIDER_PERMISSIONS_DOCUMENT = `query IdProviderPermissions($key: Stri
   }
 }`;
 
-/** What the panel reads of each set: the rows it shows, with `total` beside them for the `+N`. */
-export const ID_PROVIDER_PRINCIPALS_SHOWN = 10;
-
 const PRINCIPAL_SET_FIELDS = `
     total
     items(start: 0, count: $count) {${PRINCIPAL_REF_FIELDS}}
@@ -210,9 +210,44 @@ export function fetchIdProviderPrincipals(
 ): ResultAsync<IdProviderPrincipals | undefined, AppError> {
   return requestGraphQlDocument<{ idProvider: IdProviderPrincipalsDto | null }>(
     ID_PROVIDER_PRINCIPALS_DOCUMENT,
-    { key, count: ID_PROVIDER_PRINCIPALS_SHOWN },
+    { key, count: DETAILS_LIST_PAGE_SIZE },
     signal,
   ).map(({ idProvider }) => idProvider ?? undefined);
+}
+
+const PRINCIPAL_PAGE_FIELDS = `
+    total
+    items(start: $start, count: $count) {${PRINCIPAL_REF_FIELDS}}
+  `;
+
+/** One set, for `+N more`. Two documents because a field cannot be picked by a variable. */
+const PRINCIPAL_PAGE_DOCUMENTS: Record<PrincipalSetType, string> = {
+  user: `query IdProviderUsers($key: String!, $start: Int!, $count: Int!) {
+  idProvider(key: $key) {
+    key
+    users {${PRINCIPAL_PAGE_FIELDS}}
+  }
+}`,
+  group: `query IdProviderGroups($key: String!, $start: Int!, $count: Int!) {
+  idProvider(key: $key) {
+    key
+    groups {${PRINCIPAL_PAGE_FIELDS}}
+  }
+}`,
+};
+
+/** The next page of one set. `undefined` for a key nothing answers to, which ends the paging. */
+export function fetchIdProviderPrincipalPage(
+  key: string,
+  type: PrincipalSetType,
+  start: number,
+  signal?: AbortSignal,
+): ResultAsync<PrincipalPage | undefined, AppError> {
+  return requestGraphQlDocument<{ idProvider: Partial<Record<string, PrincipalSetDto>> | null }>(
+    PRINCIPAL_PAGE_DOCUMENTS[type],
+    { key, start, count: DETAILS_LIST_PAGE_SIZE },
+    signal,
+  ).map(({ idProvider }) => idProvider?.[type === 'user' ? 'users' : 'groups']);
 }
 
 const DEFAULT_ID_PROVIDER_PERMISSIONS_ROOT: GraphQlRoot = {

@@ -12,7 +12,6 @@ import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openUserEditorAt } from '../../features/user-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
-import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type UserDetailsProps = {
@@ -122,7 +121,7 @@ export function UserDetails({ user }: UserDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={roles} limit={DETAILS_LIST_LIMIT}>
+        <DetailsPanel.List items={roles}>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}
@@ -148,7 +147,7 @@ export function UserDetails({ user }: UserDetailsProps) {
           )
         }
       >
-        <DetailsPanel.List items={groups} limit={DETAILS_LIST_LIMIT}>
+        <DetailsPanel.List items={groups}>
           {(principal) => (
             <DetailsPanel.ListItem
               key={principal.key}

@@ -2,6 +2,7 @@ import { Button } from '@enonic/ui';
 import { ShieldLock } from 'lucide-react';
 
 import {
+  loadMoreIdProviderPrincipals,
   principalName,
   type IdProvider,
   type IdProviderAccess,
@@ -16,7 +17,6 @@ import {
 } from '../../features/idprovider-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n, useLabelled } from '../../shared/i18n';
-import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { DetailsListSkeleton } from '../../widgets/details-panel/DetailsSkeleton';
 
@@ -49,6 +49,7 @@ export function IdProviderDetails({
   const listFailedLabel = useI18n('idProviders.details.listFailed');
   const noDescriptionLabel = useI18n('idProviders.details.noDescription');
   const applicationNotSetLabel = useI18n('idProviders.details.applicationNotSet');
+  const loadMoreFailedLabel = useI18n('browse.list.loadMoreFailed');
 
   const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
   const accessLabel = (access: IdProviderAccess): string | undefined =>
@@ -131,7 +132,18 @@ export function IdProviderDetails({
         <DetailsPanel.Section labelKey="idProviders.details.users" count={usersTotal}>
           {principalsLoading === true && <DetailsListSkeleton />}
 
-          {users !== undefined && <PrincipalAvatars principals={users.items} total={users.total} />}
+          {users !== undefined && (
+            <PrincipalAvatars
+              principals={users.items}
+              total={users.total}
+              onLoadMore={() => loadMoreIdProviderPrincipals('user')}
+              loadingMore={users.appending}
+            />
+          )}
+
+          {users?.error !== undefined && (
+            <p className="text-error text-sm">{loadMoreFailedLabel}</p>
+          )}
 
           {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}
         </DetailsPanel.Section>
@@ -142,7 +154,12 @@ export function IdProviderDetails({
           {principalsLoading === true && <DetailsListSkeleton />}
 
           {groups !== undefined && (
-            <DetailsPanel.List items={groups.items} limit={DETAILS_LIST_LIMIT} total={groups.total}>
+            <DetailsPanel.List
+              items={groups.items}
+              total={groups.total}
+              onLoadMore={() => loadMoreIdProviderPrincipals('group')}
+              loadingMore={groups.appending}
+            >
               {(principal) => (
                 <DetailsPanel.ListItem
                   key={principal.key}
@@ -152,6 +169,10 @@ export function IdProviderDetails({
                 />
               )}
             </DetailsPanel.List>
+          )}
+
+          {groups?.error !== undefined && (
+            <p className="text-error text-sm">{loadMoreFailedLabel}</p>
           )}
 
           {principalsFailed && <p className="text-error text-sm">{listFailedLabel}</p>}

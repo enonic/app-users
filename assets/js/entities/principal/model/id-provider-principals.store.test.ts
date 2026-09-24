@@ -4,8 +4,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { AppError } from '../../../shared/api';
 import {
   $idProviderPrincipals,
+  appendIdProviderPrincipals,
+  beginIdProviderPrincipalsAppend,
   beginIdProviderPrincipalsLoad,
   forgetIdProviderPrincipals,
+  idProviderPrincipalsNextStart,
   receiveIdProviderPrincipals,
 } from './id-provider-principals.store';
 import type { PrincipalKey, PrincipalRef } from './principal.types';
@@ -44,5 +47,81 @@ describe('receiveIdProviderPrincipals', () => {
 
     expect($idProviderPrincipals.get().status).toBe('error');
     expect($idProviderPrincipals.get().users.items).toEqual([]);
+  });
+});
+
+describe('appendIdProviderPrincipals', () => {
+  it('adds the page after the rows already read', () => {
+    read([principal('alice')], 3);
+    beginIdProviderPrincipalsAppend('user');
+    appendIdProviderPrincipals('user', ok({ total: 3, items: [principal('bob')] }));
+
+    const { users } = $idProviderPrincipals.get();
+
+    expect(users.items.map(({ displayName }) => displayName)).toEqual(['alice', 'bob']);
+    expect(users.appending).toBe(false);
+  });
+
+  it('skips a row already read', () => {
+    read([principal('alice')], 3);
+    appendIdProviderPrincipals(
+      'user',
+      ok({ total: 3, items: [principal('alice'), principal('bob')] }),
+    );
+
+    expect($idProviderPrincipals.get().users.items).toHaveLength(2);
+  });
+
+  it('ends the paging on an empty page', () => {
+    read([principal('alice')], 3);
+    appendIdProviderPrincipals('user', ok({ total: 3, items: [] }));
+
+    expect($idProviderPrincipals.get().users.total).toBe(1);
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
+  });
+
+  it('reads on past a page of rows already read, keeping the total', () => {
+    read([principal('alice')], 30);
+    appendIdProviderPrincipals('user', ok({ total: 31, items: [principal('alice')] }));
+
+    expect($idProviderPrincipals.get().users.total).toBe(31);
+    expect(idProviderPrincipalsNextStart('user')).toBe(2);
+  });
+
+  it('closes the set at the rows held once a repeating page reads to its end', () => {
+    read([principal('alice')], 2);
+    appendIdProviderPrincipals('user', ok({ total: 2, items: [principal('alice')] }));
+
+    expect($idProviderPrincipals.get().users.total).toBe(1);
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
+  });
+
+  it('keeps the rows read when a page fails', () => {
+    read([principal('alice')], 3);
+    beginIdProviderPrincipalsAppend('user');
+    appendIdProviderPrincipals('user', err(new AppError('Offline')));
+
+    const { users } = $idProviderPrincipals.get();
+
+    expect(users.items).toHaveLength(1);
+    expect(users.error).toBe('Offline');
+    expect(users.appending).toBe(false);
+  });
+});
+
+describe('idProviderPrincipalsNextStart', () => {
+  it('starts where the rows read end', () => {
+    read([principal('alice')], 3);
+
+    expect(idProviderPrincipalsNextStart('user')).toBe(1);
+  });
+
+  it('has no page to ask for while one is on its way or the set is read', () => {
+    read([principal('alice')], 1);
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
+
+    read([principal('alice')], 3);
+    beginIdProviderPrincipalsAppend('user');
+    expect(idProviderPrincipalsNextStart('user')).toBeUndefined();
   });
 });

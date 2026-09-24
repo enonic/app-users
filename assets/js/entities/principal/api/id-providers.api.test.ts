@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { setGraphQlEndpoint } from '../../../shared/api';
+import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/load-more';
 import {
+  fetchIdProviderPrincipalPage,
   fetchIdProviderPrincipals,
-  ID_PROVIDER_PRINCIPALS_SHOWN,
   requestIdProviderExists,
   sendIdProviderCreation,
   sendIdProviderDeletion,
@@ -156,7 +157,7 @@ describe('fetchIdProviderPrincipals', () => {
 
     expect(sent?.variables).toEqual({
       key: 'ldap',
-      count: ID_PROVIDER_PRINCIPALS_SHOWN,
+      count: DETAILS_LIST_PAGE_SIZE,
     });
     expect(principals?.users.total).toBe(4213);
     expect(principals?.users.items).toHaveLength(1);
@@ -166,6 +167,26 @@ describe('fetchIdProviderPrincipals', () => {
     respondWith({ data: { idProvider: null } });
 
     expect((await fetchIdProviderPrincipals('gone'))._unsafeUnwrap()).toBeUndefined();
+  });
+});
+
+describe('fetchIdProviderPrincipalPage', () => {
+  it('asks for one set from where the loaded rows end', async () => {
+    respondWith({ data: { idProvider: { key: 'ldap', groups: { total: 120, items: [] } } } });
+
+    const page = (await fetchIdProviderPrincipalPage('ldap', 'group', 10))._unsafeUnwrap();
+
+    expect(sent?.variables).toEqual({ key: 'ldap', start: 10, count: DETAILS_LIST_PAGE_SIZE });
+    expect(sent?.query).not.toContain('users');
+    expect(page?.total).toBe(120);
+  });
+
+  it('answers nothing for a key no provider answers to, which ends the paging', async () => {
+    respondWith({ data: { idProvider: null } });
+
+    expect(
+      (await fetchIdProviderPrincipalPage('gone', 'user', 10))._unsafeUnwrap(),
+    ).toBeUndefined();
   });
 });
 

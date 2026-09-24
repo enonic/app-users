@@ -7,7 +7,6 @@ import { openRoleEditorAt } from '../../features/role-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { formatDateTime } from '../../shared/format';
 import { useI18n } from '../../shared/i18n';
-import { DETAILS_LIST_LIMIT } from '../../widgets/details-panel/details-panel';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type RoleDetailsProps = {
@@ -81,7 +80,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
 
         {groups.length > 0 && (
           <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
-            <DetailsPanel.List items={groups} limit={DETAILS_LIST_LIMIT}>
+            <DetailsPanel.List items={groups}>
               {(member) => (
                 <DetailsPanel.ListItem
                   key={member.key}

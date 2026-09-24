@@ -36,5 +36,5 @@ export function RolesItemPage() {
     return <DetailsPanel.Empty labelKey={detailsEmptyLabelKey(status, 'roles.details.failed')} />;
   }
 
-  return <RoleDetails role={role} />;
+  return <RoleDetails key={role.key} role={role} />;
 }
