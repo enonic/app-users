@@ -11,7 +11,10 @@ import { DetailsSkeleton } from './DetailsSkeleton';
 
 export type DetailsPanelProps = {
   children: ReactNode;
+  'data-component'?: string;
 };
+
+const DETAILS_PANEL_NAME = 'DetailsPanel';
 
 export type DetailsHeaderProps = {
   title: string;
@@ -67,9 +70,18 @@ export type DetailsListItemProps = {
   meta?: ReactNode;
 };
 
-function DetailsPanelRoot({ children }: DetailsPanelProps) {
-  return <div className="flex min-h-0 flex-col gap-5 overflow-auto p-10">{children}</div>;
+function DetailsPanelRoot({
+  children,
+  'data-component': componentName = DETAILS_PANEL_NAME,
+}: DetailsPanelProps) {
+  return (
+    <div data-component={componentName} className="flex min-h-0 flex-col gap-5 overflow-auto p-10">
+      {children}
+    </div>
+  );
 }
+
+DetailsPanelRoot.displayName = DETAILS_PANEL_NAME;
 
 export function DetailsHeader({ title, subtitle, icon, titleAction, action }: DetailsHeaderProps) {
   return (

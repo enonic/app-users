@@ -39,7 +39,15 @@ import { idProvidersSelection } from './model/selection.store';
 import { $idProvidersSort, setIdProvidersSort } from './model/sort.store';
 import { useIdProvidersScreen } from './model/useIdProvidersScreen';
 
-export function IdProvidersPage() {
+type IdProvidersPageProps = {
+  'data-component'?: string;
+};
+
+const ID_PROVIDERS_PAGE_NAME = 'IdProvidersPage';
+
+export function IdProvidersPage({
+  'data-component': componentName = ID_PROVIDERS_PAGE_NAME,
+}: IdProvidersPageProps) {
   useIdProvidersScreen();
   const { openItem, closeItem } = useHostFrame();
   const activeKey = useItemId();
@@ -101,7 +109,8 @@ export function IdProvidersPage() {
   });
 
   return (
-    <>
+    // The section's root: the host keeps every section mounted, so a test scopes its selectors to this.
+    <div data-component={componentName} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={ID_PROVIDER_ACTIONS}
@@ -132,6 +141,8 @@ export function IdProvidersPage() {
         }}
       />
       <IdProviderDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
-    </>
+    </div>
   );
 }
+
+IdProvidersPage.displayName = ID_PROVIDERS_PAGE_NAME;

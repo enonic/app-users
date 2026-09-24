@@ -30,7 +30,13 @@ import { useRolesScreen } from './model/useRolesScreen';
 import { RoleDeleteDialog } from './RoleDeleteDialog';
 import { RolesItemPage } from './RolesItemPage';
 
-export function RolesPage() {
+type RolesPageProps = {
+  'data-component'?: string;
+};
+
+const ROLES_PAGE_NAME = 'RolesPage';
+
+export function RolesPage({ 'data-component': componentName = ROLES_PAGE_NAME }: RolesPageProps) {
   // One request for the three domains this screen reads — the roles, the providers that name a member's
   // origin.
   useRolesScreen();
@@ -97,7 +103,8 @@ export function RolesPage() {
   });
 
   return (
-    <>
+    // The section's root: the host keeps every section mounted, so a test scopes its selectors to this.
+    <div data-component={componentName} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={ROLE_ACTIONS}
@@ -124,6 +131,8 @@ export function RolesPage() {
 
       <RoleEditorDialog onSaved={() => void loadRolesScreen()} />
       <RoleDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
-    </>
+    </div>
   );
 }
+
+RolesPage.displayName = ROLES_PAGE_NAME;

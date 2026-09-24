@@ -5,12 +5,21 @@ export type MoreButtonProps = {
   /** Something is on its way: no hover, though it stays focusable — `disabled` would blur it. */
   busy?: boolean;
   onClick: () => void;
+  'data-component'?: string;
 };
 
+const MORE_BUTTON_NAME = 'MoreButton';
+
 /** A `+N more` that reads like the text it replaces until hovered: no fill and no padding, so it lines up. */
-export function MoreButton({ label, busy, onClick }: MoreButtonProps) {
+export function MoreButton({
+  label,
+  busy,
+  onClick,
+  'data-component': componentName = MORE_BUTTON_NAME,
+}: MoreButtonProps) {
   return (
     <button
+      data-component={componentName}
       type="button"
       aria-busy={busy}
       className={cn(
@@ -23,3 +32,5 @@ export function MoreButton({ label, busy, onClick }: MoreButtonProps) {
     </button>
   );
 }
+
+MoreButton.displayName = MORE_BUTTON_NAME;

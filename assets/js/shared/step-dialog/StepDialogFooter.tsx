@@ -8,13 +8,17 @@ export type StepDialogFooterProps<Step extends string, Field extends string, For
   store: StepDialogStore<Step, Field, Form, Entity>;
   onSave: () => void;
   onCancel: () => void;
+  'data-component'?: string;
 };
+
+const STEP_DIALOG_FOOTER_NAME = 'StepDialogFooter';
 
 /** The stepper in wizard view; Cancel and Save in step view. */
 export function StepDialogFooter<Step extends string, Field extends string, Form, Entity>({
   store,
   onSave,
   onCancel,
+  'data-component': componentName = STEP_DIALOG_FOOTER_NAME,
 }: StepDialogFooterProps<Step, Field, Form, Entity>) {
   const { view, mode, saving } = useStore(store.$state, { keys: ['view', 'mode', 'saving'] });
   const errors = useStore(store.$errors);
@@ -22,7 +26,7 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
 
   if (view === 'wizard') {
     return (
-      <Dialog.Footer>
+      <Dialog.Footer data-component={componentName}>
         <Dialog.StepIndicator
           previousLabel={i18n('browse.dialog.previous')}
           nextLabel={i18n('browse.dialog.next')}
@@ -38,7 +42,7 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
   const unanswered = Object.keys(errors).length > 0;
 
   return (
-    <Dialog.Footer className="items-center">
+    <Dialog.Footer data-component={componentName} className="items-center">
       <Button
         variant="text"
         label={i18n('browse.dialog.cancel')}
@@ -54,3 +58,5 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
     </Dialog.Footer>
   );
 }
+
+StepDialogFooter.displayName = STEP_DIALOG_FOOTER_NAME;
