@@ -23,9 +23,10 @@ export function GroupDetails({ group }: GroupDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
-  const editLabel = useI18n('groups.details.edit');
+  const editLabel = useI18n('browse.details.edit');
   const editRolesLabel = useI18n('groups.details.editRoles');
-  const editMembersLabel = useI18n('groups.details.editMembers');
+  const editUsersLabel = useI18n('groups.details.editUsers');
+  const editGroupsLabel = useI18n('groups.details.editGroups');
   const transitiveLabel = useI18n('groups.details.transitive');
   const transitiveFailedLabel = useI18n('groups.details.transitiveFailed');
   const noDescriptionLabel = useI18n('groups.details.noDescription');
@@ -133,40 +134,47 @@ export function GroupDetails({ group }: GroupDetailsProps) {
       </DetailsPanel.Section>
 
       <DetailsPanel.Section
-        labelKey="groups.details.members"
-        count={members.length}
+        labelKey="groups.details.users"
+        count={users.length}
         action={
           readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"
-              label={editMembersLabel}
+              label={editUsersLabel}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
         }
       >
-        {users.length > 0 && (
-          <DetailsPanel.Subsection labelKey="groups.details.users" count={users.length}>
-            <PrincipalAvatars principals={users} />
-          </DetailsPanel.Subsection>
-        )}
+        <PrincipalAvatars principals={users} />
+      </DetailsPanel.Section>
 
-        {memberGroups.length > 0 && (
-          <DetailsPanel.Subsection labelKey="groups.details.groups" count={memberGroups.length}>
-            <DetailsPanel.List items={memberGroups}>
-              {(member) => (
-                <DetailsPanel.ListItem
-                  key={member.key}
-                  icon={<PrincipalIcon principal={member} />}
-                  title={member.displayName}
-                  subtitle={principalName(member.key)}
-                  meta={providerName(member.key)}
-                />
-              )}
-            </DetailsPanel.List>
-          </DetailsPanel.Subsection>
-        )}
+      <DetailsPanel.Section
+        labelKey="groups.details.groups"
+        count={memberGroups.length}
+        action={
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editGroupsLabel}
+              onClick={() => openGroupEditorAt(group, 'members')}
+            />
+          )
+        }
+      >
+        <DetailsPanel.List items={memberGroups}>
+          {(member) => (
+            <DetailsPanel.ListItem
+              key={member.key}
+              icon={<PrincipalIcon principal={member} />}
+              title={member.displayName}
+              subtitle={principalName(member.key)}
+              meta={providerName(member.key)}
+            />
+          )}
+        </DetailsPanel.List>
       </DetailsPanel.Section>
     </DetailsPanel>
   );

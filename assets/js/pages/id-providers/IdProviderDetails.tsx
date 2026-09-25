@@ -43,7 +43,7 @@ export function IdProviderDetails({
   permissionsFailed,
 }: IdProviderDetailsProps) {
   const readOnly = isReadOnlyMode();
-  const editLabel = useI18n('idProviders.details.edit');
+  const editLabel = useI18n('browse.details.edit');
   const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
   const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');
   const listFailedLabel = useI18n('idProviders.details.listFailed');

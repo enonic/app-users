@@ -17,8 +17,9 @@ export function RoleDetails({ role }: RoleDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
-  const editLabel = useI18n('roles.details.edit');
-  const editMembersLabel = useI18n('roles.details.editMembers');
+  const editLabel = useI18n('browse.details.edit');
+  const editUsersLabel = useI18n('roles.details.editUsers');
+  const editGroupsLabel = useI18n('roles.details.editGroups');
   const noDescriptionLabel = useI18n('roles.details.noDescription');
 
   const { key, displayName, description, modifiedTime, members } = role;
@@ -59,40 +60,47 @@ export function RoleDetails({ role }: RoleDetailsProps) {
       </DetailsPanel.Section>
 
       <DetailsPanel.Section
-        labelKey="roles.details.members"
-        count={members.length}
+        labelKey="roles.details.users"
+        count={users.length}
         action={
           readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"
-              label={editMembersLabel}
+              label={editUsersLabel}
               onClick={() => openRoleEditorAt(role, 'members')}
             />
           )
         }
       >
-        {users.length > 0 && (
-          <DetailsPanel.Subsection labelKey="roles.details.users" count={users.length}>
-            <PrincipalAvatars principals={users} />
-          </DetailsPanel.Subsection>
-        )}
+        <PrincipalAvatars principals={users} />
+      </DetailsPanel.Section>
 
-        {groups.length > 0 && (
-          <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
-            <DetailsPanel.List items={groups}>
-              {(member) => (
-                <DetailsPanel.ListItem
-                  key={member.key}
-                  icon={<PrincipalIcon principal={member} />}
-                  title={member.displayName}
-                  subtitle={principalName(member.key)}
-                  meta={providerName(member.key)}
-                />
-              )}
-            </DetailsPanel.List>
-          </DetailsPanel.Subsection>
-        )}
+      <DetailsPanel.Section
+        labelKey="roles.details.groups"
+        count={groups.length}
+        action={
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editGroupsLabel}
+              onClick={() => openRoleEditorAt(role, 'members')}
+            />
+          )
+        }
+      >
+        <DetailsPanel.List items={groups}>
+          {(member) => (
+            <DetailsPanel.ListItem
+              key={member.key}
+              icon={<PrincipalIcon principal={member} />}
+              title={member.displayName}
+              subtitle={principalName(member.key)}
+              meta={providerName(member.key)}
+            />
+          )}
+        </DetailsPanel.List>
       </DetailsPanel.Section>
     </DetailsPanel>
   );

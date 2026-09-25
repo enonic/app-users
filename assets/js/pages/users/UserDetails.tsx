@@ -22,7 +22,7 @@ export function UserDetails({ user }: UserDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
-  const editLabel = useI18n('users.details.edit');
+  const editLabel = useI18n('browse.details.edit');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
