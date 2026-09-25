@@ -1,4 +1,4 @@
-import { AppRoot, Skeleton } from '@enonic/ui';
+import { AppRoot, I18nProvider, Skeleton } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import type { FunctionComponent } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
@@ -9,6 +9,7 @@ import { RolesPage } from '../pages/roles/RolesPage';
 import { ServiceAccountsPage } from '../pages/service-accounts/ServiceAccountsPage';
 import { UsersPage } from '../pages/users/UsersPage';
 import { HostFrameProvider, type HostFrame } from '../shared/host';
+import { translate } from '../shared/i18n';
 import { $stylesheets } from '../shared/styles';
 import { $bootstrap } from './bootstrap.store';
 import type { Section } from './section';
@@ -41,11 +42,13 @@ export function App({ frame, section }: AppProps) {
   // ! and portals overlays inside this root. Needs `@enonic/ui` >= 1.2.0.
   return (
     <HostFrameProvider value={frame}>
-      <AppRoot theme={theme} stylesheets={stylesheets} className="flex min-h-0 flex-1 flex-col">
-        {status === 'loading' && <BootstrapSkeleton />}
-        {status === 'error' && <BootstrapFailed error={error} />}
-        {status === 'ready' && <Page />}
-      </AppRoot>
+      <I18nProvider translate={translate}>
+        <AppRoot theme={theme} stylesheets={stylesheets} className="flex min-h-0 flex-1 flex-col">
+          {status === 'loading' && <BootstrapSkeleton />}
+          {status === 'error' && <BootstrapFailed error={error} />}
+          {status === 'ready' && <Page />}
+        </AppRoot>
+      </I18nProvider>
     </HostFrameProvider>
   );
 }

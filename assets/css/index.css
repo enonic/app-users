@@ -4,6 +4,7 @@
 
 /* Tailwind scans for class names; node_modules is not scanned by default. */
 @source '../../node_modules/@enonic/ui/';
+@source '../../node_modules/@enonic/input-types/dist/';
 @source '../js/';
 
 @theme {

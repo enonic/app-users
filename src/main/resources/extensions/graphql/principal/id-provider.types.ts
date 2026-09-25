@@ -1,10 +1,12 @@
-import { GraphQLBoolean, GraphQLString, list, nonNull, type GraphQLType } from '/lib/graphql';
+import { GraphQLBoolean, GraphQLString, Json, list, nonNull, type GraphQLType } from '/lib/graphql';
 
 import { generator } from '../schema/generator';
 import {
   boundApplicationOf,
+  configOf,
   listIdProviderPermissions,
   principalSetOf,
+  type BoundApplication,
   type IdProviderSource,
 } from './id-provider.source';
 import { displayNameOf } from './principal.source';
@@ -21,8 +23,12 @@ const BoundApplicationType: GraphQLType = generator.createObjectType({
       type: nonNull(GraphQLString),
       description: "The application's own title, falling back to its key.",
     },
-    // TODO: [#8] The per-instance `config` tree of the binding is left out until the PropertyTree
-    // wire format is settled — see the open question in `docs/unified-api.md`. Nothing renders it.
+    config: {
+      type: nonNull(Json),
+      description:
+        "The application's configuration of this provider, as XP's typed property tree: `[{ name, type, values: [{ v } | { set }] }]`. One provider read, so it stays off the list query.",
+      resolve: (env: { source: BoundApplication }) => configOf(env.source),
+    },
   },
 });
 

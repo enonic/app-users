@@ -7,12 +7,14 @@ import {
   updateIdProvider as updateProvider,
   type IdProviderAccess,
   type IdProviderConfig as TypedIdProviderConfig,
+  type IdProviderConfigProperty,
   type IdProvider as TypedIdProvider,
   type IdProviderPermission,
 } from '/lib/idprovider';
 import { getDescriptor } from '/lib/xp/app';
 import { findPrincipals, getIdProviders, type IdProvider } from '/lib/xp/auth';
 
+import { isReadOnlyCaller } from '../auth/read-only';
 import {
   byName,
   displayNameOf,
@@ -26,6 +28,8 @@ export type IdProviderSource = IdProvider;
 export type BoundApplication = {
   key: string;
   displayName: string;
+  /** The provider the binding belongs to, which is where its configuration is read from. */
+  idProvider: string;
 };
 
 /** Carries what a count or a listing needs, so the container itself costs nothing to resolve. */
@@ -61,7 +65,26 @@ export function boundApplicationOf(provider: IdProvider): BoundApplication | nul
     return null;
   }
 
-  return { key, displayName: nonEmpty(getDescriptor({ key })?.title ?? undefined) ?? key };
+  return {
+    key,
+    displayName: nonEmpty(getDescriptor({ key })?.title ?? undefined) ?? key,
+    idProvider: provider.key,
+  };
+}
+
+/**
+ * The configuration the binding holds, as typed properties. Empty for a caller that may only read: the
+ * tree carries the login's secrets — a client secret, a bind password — and only a writer edits it.
+ *
+ * Its own read rather than part of the provider: `getIdProviders` hands the config over as a plain object,
+ * which has already lost which values are `Reference`s.
+ */
+export function configOf({ idProvider }: BoundApplication): IdProviderConfigProperty[] {
+  if (isReadOnlyCaller()) {
+    return [];
+  }
+
+  return getProvider({ idProvider })?.idProviderConfig?.config ?? [];
 }
 
 export function principalSetOf(
@@ -122,6 +145,8 @@ export type IdProviderInput = {
   description?: string;
   /** The application serving the login. Absent leaves the provider bound to nothing. */
   application?: string;
+  /** The application's configuration. Absent keeps what the binding holds, if it stays the same binding. */
+  config?: IdProviderConfigProperty[];
   permissions: readonly IdProviderPermissionInput[];
 };
 
@@ -136,7 +161,8 @@ export function createIdProvider(name: string, input: IdProviderInput): IdProvid
     key: name,
     displayName: input.displayName,
     description: input.description,
-    idProviderConfig: input.application == null ? undefined : bindingTo(input.application),
+    idProviderConfig:
+      input.application == null ? undefined : bindingTo(input.application, input.config),
     permissions: [...input.permissions],
   });
 
@@ -153,7 +179,7 @@ export function updateIdProvider(key: string, changes: IdProviderInput): IdProvi
     idProvider: key,
     displayName: changes.displayName,
     description: changes.description,
-    idProviderConfig: bindingFor(key, changes.application),
+    idProviderConfig: bindingFor(key, changes.application, changes.config),
     permissions: [...changes.permissions],
   });
 
@@ -165,12 +191,20 @@ export function deleteIdProviders(keys: readonly string[]): IdProviderDeletion[]
 }
 
 /**
- * ! The same application keeps the configuration already stored: nothing renders it until #64, so the
- * ! empty tree the dialog knows about would throw away whatever configured the login.
+ * ! Without a config the same application keeps the one already stored: an edit that never opened the
+ * ! configuration would otherwise throw away whatever configured the login.
  */
-function bindingFor(key: string, application?: string): TypedIdProviderConfig | null {
+function bindingFor(
+  key: string,
+  application?: string,
+  config?: IdProviderConfigProperty[],
+): TypedIdProviderConfig | null {
   if (application == null || application.length === 0) {
     return null;
+  }
+
+  if (config != null) {
+    return bindingTo(application, config);
   }
 
   const current = getProvider({ idProvider: key })?.idProviderConfig;
@@ -180,11 +214,14 @@ function bindingFor(key: string, application?: string): TypedIdProviderConfig | 
     : bindingTo(application);
 }
 
-function bindingTo(application: string): TypedIdProviderConfig {
-  return { applicationKey: application, config: [] };
+function bindingTo(
+  application: string,
+  config: IdProviderConfigProperty[] = [],
+): TypedIdProviderConfig {
+  return { applicationKey: application, config };
 }
 
-/** The provider as the schema reads it. `config` is dropped: no field exposes it. */
+/** The provider as the schema reads it. `config` is dropped: `configOf` reads it where it is asked for. */
 function toSource(provider: TypedIdProvider): IdProvider {
   return {
     key: provider.key,

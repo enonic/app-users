@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { setGraphQlEndpoint } from '../../../shared/api';
 import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/load-more';
 import {
+  fetchIdProviderConfig,
   fetchIdProviderPrincipalPage,
   fetchIdProviderPrincipals,
   requestIdProviderExists,
@@ -105,10 +106,51 @@ describe('sendIdProviderUpdate', () => {
     });
   });
 
+  it('carries an applied configuration as a variable, as the tree it is', async () => {
+    const config = [{ name: 'clientId', type: 'String' as const, values: [{ v: 'intranet' }] }];
+    respondWith({ data: { updateIdProvider: wireIdProvider() } });
+
+    await sendIdProviderUpdate('ldap', input({ config }));
+
+    expect(sent?.variables).toMatchObject({ key: 'ldap', config });
+  });
+
+  // ! graphql-java names the scalar `JSON`, whatever `lib/graphql` exports it as; `Json` fails validation.
+  it("declares the configuration as the schema's JSON scalar", async () => {
+    respondWith({ data: { updateIdProvider: wireIdProvider() } });
+
+    await sendIdProviderUpdate('ldap', input());
+
+    expect(sent?.query).toContain('$config: JSON');
+  });
+
   it('fails when no provider answered to the key', async () => {
     respondWith({ data: { updateIdProvider: null } });
 
     expect((await sendIdProviderUpdate('gone', input())).isErr()).toBe(true);
+  });
+});
+
+describe('fetchIdProviderConfig', () => {
+  it('answers the binding with the tree it holds', async () => {
+    const config = [{ name: 'clientId', type: 'String', values: [{ v: 'intranet' }] }];
+    respondWith({
+      data: { idProvider: { key: 'ldap', application: { key: 'com.example.ldap', config } } },
+    });
+
+    const result = await fetchIdProviderConfig('ldap');
+
+    expect(result._unsafeUnwrap()).toEqual({ application: 'com.example.ldap', config });
+    expect(sent?.variables).toEqual({ key: 'ldap' });
+  });
+
+  it.each([
+    ['no provider answers to the key', null],
+    ['the provider is bound to nothing', { key: 'ldap', application: null }],
+  ])('answers nothing when %s', async (_, idProvider) => {
+    respondWith({ data: { idProvider } });
+
+    expect((await fetchIdProviderConfig('ldap'))._unsafeUnwrap()).toBeUndefined();
   });
 });
 
