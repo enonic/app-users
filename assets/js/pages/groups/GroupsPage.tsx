@@ -1,16 +1,12 @@
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
-import type { ReactNode } from 'react';
 
 import {
   DEFAULT_PRINCIPAL_SORT,
   useGroups,
-  useIdProviderLabel,
   useIdProviderName,
-  type PrincipalKey,
   type PrincipalSort,
 } from '../../entities/principal';
-import { IdProviderCell } from '../../entities/principal/ui/IdProviderCell';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { GroupEditorDialog } from '../../features/group-editor/ui/GroupEditorDialog';
 import { isReadOnlyMode } from '../../shared/config';
@@ -36,19 +32,12 @@ import { $groupsSort, setGroupsSort } from './model/sort.store';
 import { useGroupsScreen } from './model/useGroupsScreen';
 
 export function GroupsPage() {
-  // One request for both domains: the groups, and the providers whose display names the rows show — a
+  // One request for both domains: the groups, and the providers whose display names the filter shows — a
   // group key carries only the provider's name.
   useGroupsScreen();
   const { openItem, closeItem } = useHostFrame();
   const activeKey = useItemId();
   const { status, items } = useGroups();
-  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
-  // The provenance cell always keeps the provider's display name and name visible.
-  const providerCell = (key: PrincipalKey): ReactNode => {
-    const label = providerLabel(key);
-    return label === undefined ? undefined : <IdProviderCell {...label} />;
-  };
-
   const providerName = useIdProviderName();
   const query = useStore(groupsSearch.$query);
   const selectedProviders = useStore(groupsFilter.$selected);
@@ -99,8 +88,7 @@ export function GroupsPage() {
     resetOnLeave: [groupsFilter],
     visible,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
-    toRow: (group) =>
-      toGroupRow(group, <PrincipalIcon principal={group} />, providerCell(group.key)),
+    toRow: (group) => toGroupRow(group, <PrincipalIcon principal={group} />),
     reload: () => void loadGroupsScreen(),
   });
 

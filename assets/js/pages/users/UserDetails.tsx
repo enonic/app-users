@@ -2,6 +2,7 @@ import { Button, Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
+  idProviderOf,
   principalName,
   useIdProviderName,
   useTransitiveMemberships,
@@ -22,7 +23,7 @@ export function UserDetails({ user }: UserDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
-  const editLabel = useI18n('users.details.edit');
+  const editLabel = useI18n('browse.details.edit');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -154,7 +155,7 @@ export function UserDetails({ user }: UserDetailsProps) {
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
-              meta={providerName(principal.key)}
+              meta={idProviderOf(principal.key)}
             />
           )}
         </DetailsPanel.List>

@@ -1,18 +1,14 @@
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
-import type { ReactNode } from 'react';
 
 import {
   $idProviderUserCounts,
   DEFAULT_PRINCIPAL_SORT,
   forgetUserDetails,
   replaceUser,
-  useIdProviderLabel,
   useUsers,
-  type PrincipalKey,
   type PrincipalSort,
 } from '../../entities/principal';
-import { IdProviderCell } from '../../entities/principal/ui/IdProviderCell';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
 import { isReadOnlyMode } from '../../shared/config';
@@ -47,12 +43,6 @@ export function UsersPage() {
   const activeKey = useItemId();
   const { status, items, appending, error, hasMore } = useUsers();
   const { items: providerCounts, status: providersStatus } = useStore($idProviderUserCounts);
-  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
-  // The provenance cell always keeps the provider's display name and name visible.
-  const providerCell = (key: PrincipalKey): ReactNode => {
-    const label = providerLabel(key);
-    return label === undefined ? undefined : <IdProviderCell {...label} />;
-  };
 
   const { idProviders, sort } = useStore($usersQuery);
 
@@ -96,7 +86,7 @@ export function UsersPage() {
     // The server narrowed and ordered this page; the client adds nothing.
     visible: items,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
-    toRow: (user) => toUserRow(user, <PrincipalIcon principal={user} />, providerCell(user.key)),
+    toRow: (user) => toUserRow(user, <PrincipalIcon principal={user} />),
     reload: () => void reloadUsersScreen(),
   });
 

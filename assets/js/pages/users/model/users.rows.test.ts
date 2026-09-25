@@ -25,12 +25,8 @@ describe('toUserRow', () => {
     expect(subtitle).toBe('alice');
   });
 
-  it('carries the provenance cell the page built', () => {
-    expect(toUserRow(user, undefined, 'Company directory').meta).toEqual(['Company directory']);
-  });
-
-  it('leaves the cell out where the page supplied none', () => {
-    expect(toUserRow(user).meta).toBeUndefined();
+  it('names the provider in the provenance cell', () => {
+    expect(toUserRow(user).meta).toEqual(['ldap']);
   });
 
   it('carries the icon the page hands it', () => {

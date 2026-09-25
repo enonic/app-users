@@ -23,12 +23,8 @@ describe('toGroupRow', () => {
     expect(subtitle).toBe('developers');
   });
 
-  it('carries the provenance cell the page built', () => {
-    expect(toGroupRow(group, undefined, 'Company directory').meta).toEqual(['Company directory']);
-  });
-
-  it('leaves the cell out where the page supplied none', () => {
-    expect(toGroupRow(group).meta).toBeUndefined();
+  it('names the provider in the provenance cell', () => {
+    expect(toGroupRow(group).meta).toEqual(['ldap']);
   });
 
   it('carries the icon the page hands it', () => {

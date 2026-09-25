@@ -4,6 +4,7 @@ import { ShieldLock } from 'lucide-react';
 import {
   loadMoreIdProviderPrincipals,
   principalName,
+  SYSTEM_ID_PROVIDER,
   type IdProvider,
   type IdProviderAccess,
   type IdProviderPermission,
@@ -43,7 +44,7 @@ export function IdProviderDetails({
   permissionsFailed,
 }: IdProviderDetailsProps) {
   const readOnly = isReadOnlyMode();
-  const editLabel = useI18n('idProviders.details.edit');
+  const editLabel = useI18n('browse.details.edit');
   const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
   const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');
   const listFailedLabel = useI18n('idProviders.details.listFailed');
@@ -62,6 +63,7 @@ export function IdProviderDetails({
   const groups = principals?.groups;
   const usersTotal = users?.total ?? provider.users.total;
   const groupsTotal = groups?.total ?? provider.groups.total;
+  const system = key === SYSTEM_ID_PROVIDER;
 
   return (
     <DetailsPanel>
@@ -129,16 +131,37 @@ export function IdProviderDetails({
       </DetailsPanel.Section>
 
       {usersTotal > 0 && (
-        <DetailsPanel.Section labelKey="idProviders.details.users" count={usersTotal}>
+        <DetailsPanel.Section
+          labelKey={system ? 'idProviders.details.serviceAccounts' : 'idProviders.details.users'}
+          count={usersTotal}
+        >
           {principalsLoading === true && <DetailsListSkeleton />}
 
-          {users !== undefined && (
+          {users !== undefined && !system && (
             <PrincipalAvatars
               principals={users.items}
               total={users.total}
               onLoadMore={() => loadMoreIdProviderPrincipals('user')}
               loadingMore={users.appending}
             />
+          )}
+
+          {users !== undefined && system && (
+            <DetailsPanel.List
+              items={users.items}
+              total={users.total}
+              onLoadMore={() => loadMoreIdProviderPrincipals('user')}
+              loadingMore={users.appending}
+            >
+              {(principal) => (
+                <DetailsPanel.ListItem
+                  key={principal.key}
+                  icon={<PrincipalIcon principal={principal} />}
+                  title={principal.displayName}
+                  subtitle={principalName(principal.key)}
+                />
+              )}
+            </DetailsPanel.List>
           )}
 
           {users?.error !== undefined && (

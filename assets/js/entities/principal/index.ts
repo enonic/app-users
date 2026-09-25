@@ -82,6 +82,8 @@ export type {
   PrincipalNameCheckState,
   PrincipalNameCheckStatus,
 } from './model/principal-name-check.store';
+export { splitMembers } from './model/principal-members';
+export type { PrincipalMembers } from './model/principal-members';
 export {
   idProviderOf,
   IMPLICIT_ROLE_KEYS,
@@ -169,7 +171,6 @@ export type { UsersState } from './model/users.store';
 export { useGroup } from './model/useGroup';
 export { useGroups } from './model/useGroups';
 export { useIdProvider } from './model/useIdProvider';
-export { idProviderLabel, useIdProviderLabel } from './model/useIdProviderLabel';
 export { useIdProviderName } from './model/useIdProviderName';
 export { useIdProviderNames } from './model/useIdProviderNames';
 export { useIdProviderPermissions } from './model/useIdProviderPermissions';

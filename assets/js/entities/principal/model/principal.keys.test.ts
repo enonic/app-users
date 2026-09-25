@@ -4,6 +4,7 @@ import {
   idProviderOf,
   isPlatformRole,
   isReservedRole,
+  isServiceAccount,
   isSystemUser,
   principalName,
   projectRoleIdOf,
@@ -74,6 +75,18 @@ describe('isSystemUser', () => {
   it('fails for a user an administrator created, even in the system provider', () => {
     expect(isSystemUser('user:system:jane')).toBe(false);
     expect(isSystemUser('user:ldap:alice')).toBe(false);
+  });
+});
+
+describe('isServiceAccount', () => {
+  it('holds for every user of the system provider', () => {
+    expect(isServiceAccount('user:system:su')).toBe(true);
+    expect(isServiceAccount('user:system:jane')).toBe(true);
+  });
+
+  it('fails for a user of another provider and for a system group', () => {
+    expect(isServiceAccount('user:ldap:alice')).toBe(false);
+    expect(isServiceAccount('group:system:administrators')).toBe(false);
   });
 });
 
