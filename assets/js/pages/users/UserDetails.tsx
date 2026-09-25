@@ -2,6 +2,7 @@ import { Button, Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
+  idProviderOf,
   principalName,
   useIdProviderName,
   useTransitiveMemberships,
@@ -154,7 +155,7 @@ export function UserDetails({ user }: UserDetailsProps) {
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
-              meta={providerName(principal.key)}
+              meta={idProviderOf(principal.key)}
             />
           )}
         </DetailsPanel.List>

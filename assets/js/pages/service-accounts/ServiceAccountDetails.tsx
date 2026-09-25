@@ -3,9 +3,9 @@ import { KeyRound } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
 import {
+  idProviderOf,
   isSystemUser,
   principalName,
-  useIdProviderName,
   useTransitiveMemberships,
   type PrincipalRef,
   type UserDetail,
@@ -26,7 +26,6 @@ export type ServiceAccountDetailsProps = {
  */
 export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
   const readOnly = isReadOnlyMode();
-  const providerName = useIdProviderName();
 
   const editLabel = useI18n('browse.details.edit');
   const emailNotSetLabel = useI18n('users.details.emailNotSet');
@@ -172,7 +171,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
-              meta={providerName(principal.key)}
+              meta={idProviderOf(principal.key)}
             />
           )}
         </DetailsPanel.List>

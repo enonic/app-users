@@ -12,7 +12,6 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { ServiceAccountIcon } from '../../entities/principal/ui/ServiceAccountIcon';
 import {
   ID_PROVIDER_ACCESS_LEVELS,
   openIdProviderEditorAt,
@@ -157,7 +156,7 @@ export function IdProviderDetails({
               {(principal) => (
                 <DetailsPanel.ListItem
                   key={principal.key}
-                  icon={<ServiceAccountIcon />}
+                  icon={<PrincipalIcon principal={principal} />}
                   title={principal.displayName}
                   subtitle={principalName(principal.key)}
                 />
