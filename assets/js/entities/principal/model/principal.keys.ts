@@ -70,6 +70,11 @@ export function isSystemUser(key: PrincipalKey): boolean {
   return SYSTEM_USER_KEYS.includes(key);
 }
 
+/** A user of the system store: what the Service Accounts section lists (#2674). */
+export function isServiceAccount(key: PrincipalKey): boolean {
+  return key.startsWith(`user:${SYSTEM_ID_PROVIDER}:`);
+}
+
 /**
  * The principal's own name, which is what its key ends with: `alice`, `administrators`,
  * `cms.admin`. This is the string the real data carries and the one shown under a display name;
