@@ -5,7 +5,15 @@ import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel'
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { ServiceAccountDetails } from './ServiceAccountDetails';
 
-export function ServiceAccountsItemPage() {
+type ServiceAccountsItemPageProps = {
+  'data-component'?: string;
+};
+
+const SERVICE_ACCOUNTS_ITEM_PAGE_NAME = 'ServiceAccountsItemPage';
+
+export function ServiceAccountsItemPage({
+  'data-component': componentName = SERVICE_ACCOUNTS_ITEM_PAGE_NAME,
+}: ServiceAccountsItemPageProps) {
   const id = useItemId();
   const { status, item: user } = useServiceAccount(id);
   const { items } = useServiceAccounts();
@@ -15,7 +23,7 @@ export function ServiceAccountsItemPage() {
     const row = items.find(({ key }) => key === id);
 
     return (
-      <DetailsPanel>
+      <DetailsPanel data-component={componentName}>
         {row === undefined ? (
           <DetailsPanel.Skeleton header />
         ) : (
@@ -35,6 +43,7 @@ export function ServiceAccountsItemPage() {
   if (user === undefined) {
     return (
       <DetailsPanel.Empty
+        data-component={componentName}
         labelKey={detailsEmptyLabelKey(status, 'serviceAccounts.details.failed')}
       />
     );
@@ -42,3 +51,5 @@ export function ServiceAccountsItemPage() {
 
   return <ServiceAccountDetails key={user.key} user={user} />;
 }
+
+ServiceAccountsItemPage.displayName = SERVICE_ACCOUNTS_ITEM_PAGE_NAME;

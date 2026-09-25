@@ -22,9 +22,15 @@ const NOTICES = {
 
 export type GroupEditorDialogProps = {
   onSaved: (written: Group, mode: StepDialogMode) => void;
+  'data-component'?: string;
 };
 
-export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
+const GROUP_EDITOR_DIALOG_NAME = 'GroupEditorDialog';
+
+export function GroupEditorDialog({
+  onSaved,
+  'data-component': componentName = GROUP_EDITOR_DIALOG_NAME,
+}: GroupEditorDialogProps) {
   const { entity } = useStore($groupEditor, { keys: ['entity'] });
   const { notify } = useHostFrame();
 
@@ -55,7 +61,10 @@ export function GroupEditorDialog({ onSaved }: GroupEditorDialogProps) {
       store={groupEditorDialog}
       glyph={<Users size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       panels={GROUP_EDITOR_STEP_PANELS}
+      data-component={componentName}
       onSave={() => void save()}
     />
   );
 }
+
+GroupEditorDialog.displayName = GROUP_EDITOR_DIALOG_NAME;

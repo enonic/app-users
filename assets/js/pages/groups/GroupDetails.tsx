@@ -17,9 +17,15 @@ import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type GroupDetailsProps = {
   group: GroupDetail;
+  'data-component'?: string;
 };
 
-export function GroupDetails({ group }: GroupDetailsProps) {
+const GROUP_DETAILS_NAME = 'GroupDetails';
+
+export function GroupDetails({
+  group,
+  'data-component': componentName = GROUP_DETAILS_NAME,
+}: GroupDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
@@ -48,7 +54,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
   const memberGroups = members.filter(({ type }) => type === 'group');
 
   return (
-    <DetailsPanel>
+    <DetailsPanel data-component={componentName}>
       <DetailsPanel.Header
         icon={<PrincipalIcon principal={group} size="lg" />}
         title={displayName}
@@ -171,3 +177,5 @@ export function GroupDetails({ group }: GroupDetailsProps) {
     </DetailsPanel>
   );
 }
+
+GroupDetails.displayName = GROUP_DETAILS_NAME;

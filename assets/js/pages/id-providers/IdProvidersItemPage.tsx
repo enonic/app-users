@@ -7,14 +7,22 @@ import { useItemId } from '../../shared/host';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { IdProviderDetails } from './IdProviderDetails';
 
-export function IdProvidersItemPage() {
+type IdProvidersItemPageProps = {
+  'data-component'?: string;
+};
+
+const ID_PROVIDERS_ITEM_PAGE_NAME = 'IdProvidersItemPage';
+
+export function IdProvidersItemPage({
+  'data-component': componentName = ID_PROVIDERS_ITEM_PAGE_NAME,
+}: IdProvidersItemPageProps) {
   const id = useItemId();
   const provider = useIdProvider(id);
   const principals = useIdProviderPrincipals(id);
   const permissions = useIdProviderPermissions(id);
 
   if (!provider) {
-    return <DetailsPanel.Empty labelKey="browse.details.empty" />;
+    return <DetailsPanel.Empty data-component={componentName} labelKey="browse.details.empty" />;
   }
 
   // The rows belong to the provider they were read for, and only once that read has answered: a panel
@@ -36,3 +44,5 @@ export function IdProvidersItemPage() {
     />
   );
 }
+
+IdProvidersItemPage.displayName = ID_PROVIDERS_ITEM_PAGE_NAME;

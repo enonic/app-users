@@ -39,15 +39,9 @@ import { idProvidersSelection } from './model/selection.store';
 import { $idProvidersSort, setIdProvidersSort } from './model/sort.store';
 import { useIdProvidersScreen } from './model/useIdProvidersScreen';
 
-type IdProvidersPageProps = {
-  'data-component'?: string;
-};
-
 const ID_PROVIDERS_PAGE_NAME = 'IdProvidersPage';
 
-export function IdProvidersPage({
-  'data-component': componentName = ID_PROVIDERS_PAGE_NAME,
-}: IdProvidersPageProps) {
+export function IdProvidersPage() {
   useIdProvidersScreen();
   const { openItem, closeItem } = useHostFrame();
   const activeKey = useItemId();
@@ -109,8 +103,7 @@ export function IdProvidersPage({
   });
 
   return (
-    // The section's root: the host keeps every section mounted, so a test scopes its selectors to this.
-    <div data-component={componentName} className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <div data-component={ID_PROVIDERS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={ID_PROVIDER_ACTIONS}

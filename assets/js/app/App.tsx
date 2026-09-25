@@ -19,12 +19,7 @@ export type AppProps = {
   section: Section;
 };
 
-// Every section root takes the Selenium anchor and carries its own name by default.
-type SectionPageProps = {
-  'data-component'?: string;
-};
-
-const PAGES: Record<Section, FunctionComponent<SectionPageProps>> = {
+const PAGES: Record<Section, FunctionComponent> = {
   users: UsersPage,
   groups: GroupsPage,
   roles: RolesPage,

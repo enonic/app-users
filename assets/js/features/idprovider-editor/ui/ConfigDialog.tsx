@@ -5,9 +5,17 @@ export type ConfigDialogProps = {
   open: boolean;
   application: string;
   onClose: () => void;
+  'data-component'?: string;
 };
 
-export function ConfigDialog({ open, application, onClose }: ConfigDialogProps) {
+const CONFIG_DIALOG_NAME = 'ConfigDialog';
+
+export function ConfigDialog({
+  open,
+  application,
+  onClose,
+  'data-component': componentName = CONFIG_DIALOG_NAME,
+}: ConfigDialogProps) {
   const title = useI18n('idProviders.dialog.configTitle', application);
   const pending = useI18n('idProviders.dialog.configPending');
   const closeLabel = useI18n('browse.dialog.close');
@@ -16,6 +24,7 @@ export function ConfigDialog({ open, application, onClose }: ConfigDialogProps) 
 
   return (
     <ModalDialog
+      data-component={componentName}
       open={open}
       title={title}
       primaryLabel={saveLabel}
@@ -30,3 +39,5 @@ export function ConfigDialog({ open, application, onClose }: ConfigDialogProps) 
     </ModalDialog>
   );
 }
+
+ConfigDialog.displayName = CONFIG_DIALOG_NAME;

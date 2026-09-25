@@ -4,7 +4,10 @@ import type { ReactNode } from 'react';
 export type SelectorPopupProps = {
   /** `Selector.Item`s, which the popup scrolls. */
   children: ReactNode;
+  'data-component'?: string;
 };
+
+const SELECTOR_POPUP_NAME = 'SelectorPopup';
 
 /**
  * The list a `Selector.Root` drops down, safe to use inside a dialog.
@@ -15,10 +18,15 @@ export type SelectorPopupProps = {
  * ! the pick reads as a click outside. `Combobox` unmounts its popup, which is why `PrincipalPicker` is
  * ! fine. The selector still dismisses itself: its own test uses its own ref.
  */
-export function SelectorPopup({ children }: SelectorPopupProps) {
+export function SelectorPopup({
+  children,
+  'data-component': componentName = SELECTOR_POPUP_NAME,
+}: SelectorPopupProps) {
   return (
-    <Selector.Content data-click-outside-ignore>
+    <Selector.Content data-component={componentName} data-click-outside-ignore>
       <Selector.Viewport>{children}</Selector.Viewport>
     </Selector.Content>
   );
 }
+
+SelectorPopup.displayName = SELECTOR_POPUP_NAME;

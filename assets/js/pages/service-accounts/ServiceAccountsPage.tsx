@@ -34,15 +34,9 @@ import { useServiceAccountsScreen } from './model/useServiceAccountsScreen';
 import { ServiceAccountDeleteDialog } from './ServiceAccountDeleteDialog';
 import { ServiceAccountsItemPage } from './ServiceAccountsItemPage';
 
-type ServiceAccountsPageProps = {
-  'data-component'?: string;
-};
-
 const SERVICE_ACCOUNTS_PAGE_NAME = 'ServiceAccountsPage';
 
-export function ServiceAccountsPage({
-  'data-component': componentName = SERVICE_ACCOUNTS_PAGE_NAME,
-}: ServiceAccountsPageProps) {
+export function ServiceAccountsPage() {
   // One request for a page of the system store's users.
   useServiceAccountsScreen();
   const { openItem, closeItem } = useHostFrame();
@@ -82,8 +76,10 @@ export function ServiceAccountsPage({
   });
 
   return (
-    // The section's root: the host keeps every section mounted, so a test scopes its selectors to this.
-    <div data-component={componentName} className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <div
+      data-component={SERVICE_ACCOUNTS_PAGE_NAME}
+      className="flex min-h-0 min-w-0 flex-1 flex-col"
+    >
       <BrowseScreen
         {...section}
         actions={SERVICE_ACCOUNT_ACTIONS}

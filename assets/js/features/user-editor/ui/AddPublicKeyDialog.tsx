@@ -13,11 +13,18 @@ export type AddPublicKeyDialogProps = {
   /** Hands the key to the wizard, which writes it when the user is saved. */
   onStage: (pending: Omit<PendingPublicKey, 'id'>) => void;
   onClose: () => void;
+  'data-component'?: string;
 };
 
 const LABEL_ID = 'public-key-label';
+const ADD_PUBLIC_KEY_DIALOG_NAME = 'AddPublicKeyDialog';
 
-export function AddPublicKeyDialog({ open, onStage, onClose }: AddPublicKeyDialogProps) {
+export function AddPublicKeyDialog({
+  open,
+  onStage,
+  onClose,
+  'data-component': componentName = ADD_PUBLIC_KEY_DIALOG_NAME,
+}: AddPublicKeyDialogProps) {
   const title = useI18n('users.dialog.addKeyTitle');
   const labelLabel = useI18n('users.dialog.keyLabel');
   const helpText = useI18n('users.dialog.addKeyHelp');
@@ -82,6 +89,7 @@ export function AddPublicKeyDialog({ open, onStage, onClose }: AddPublicKeyDialo
 
   return (
     <ModalDialog
+      data-component={componentName}
       open={open}
       title={title}
       primaryLabel={generateLabel}
@@ -139,6 +147,8 @@ export function AddPublicKeyDialog({ open, onStage, onClose }: AddPublicKeyDialo
     </ModalDialog>
   );
 }
+
+AddPublicKeyDialog.displayName = ADD_PUBLIC_KEY_DIALOG_NAME;
 
 function messageOf(thrown: unknown, fallback: string): string {
   return thrown instanceof Error && thrown.message.length > 0 ? thrown.message : fallback;

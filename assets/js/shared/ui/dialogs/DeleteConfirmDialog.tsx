@@ -15,7 +15,10 @@ export type DeleteConfirmDialogProps = {
   expected?: string | number;
   onClose: () => void;
   onConfirm?: () => void;
+  'data-component'?: string;
 };
+
+const DELETE_CONFIRM_DIALOG_NAME = 'DeleteConfirmDialog';
 
 export function DeleteConfirmDialog({
   open,
@@ -23,6 +26,7 @@ export function DeleteConfirmDialog({
   expected,
   onClose,
   onConfirm,
+  'data-component': componentName = DELETE_CONFIRM_DIALOG_NAME,
 }: DeleteConfirmDialogProps) {
   const title = useI18n('browse.confirm.title');
   const deleteLabel = useI18n('browse.confirm.delete');
@@ -43,12 +47,19 @@ export function DeleteConfirmDialog({
 
   if (expected === undefined) {
     return (
-      <ConfirmDialog open={open} question={description} onClose={onClose} onConfirm={onConfirm} />
+      <ConfirmDialog
+        data-component={componentName}
+        open={open}
+        question={description}
+        onClose={onClose}
+        onConfirm={onConfirm}
+      />
     );
   }
 
   return (
     <ConfirmValueDialog
+      data-component={componentName}
       open={open}
       title={title}
       description={description}
@@ -59,3 +70,5 @@ export function DeleteConfirmDialog({
     />
   );
 }
+
+DeleteConfirmDialog.displayName = DELETE_CONFIRM_DIALOG_NAME;

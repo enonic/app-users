@@ -22,9 +22,15 @@ const NOTICES = {
 
 export type RoleEditorDialogProps = {
   onSaved: (written: Role, mode: StepDialogMode) => void;
+  'data-component'?: string;
 };
 
-export function RoleEditorDialog({ onSaved }: RoleEditorDialogProps) {
+const ROLE_EDITOR_DIALOG_NAME = 'RoleEditorDialog';
+
+export function RoleEditorDialog({
+  onSaved,
+  'data-component': componentName = ROLE_EDITOR_DIALOG_NAME,
+}: RoleEditorDialogProps) {
   const { entity } = useStore($roleEditor, { keys: ['entity'] });
   const { notify } = useHostFrame();
 
@@ -55,7 +61,10 @@ export function RoleEditorDialog({ onSaved }: RoleEditorDialogProps) {
       store={roleEditorDialog}
       glyph={<UserShield size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       panels={ROLE_EDITOR_STEP_PANELS}
+      data-component={componentName}
       onSave={() => void save()}
     />
   );
 }
+
+RoleEditorDialog.displayName = ROLE_EDITOR_DIALOG_NAME;

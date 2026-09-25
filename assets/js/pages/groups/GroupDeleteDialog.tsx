@@ -11,9 +11,16 @@ import { groupsSelection } from './model/selection.store';
 export type GroupDeleteDialogProps = {
   activeKey?: string;
   onCloseItem: () => void;
+  'data-component'?: string;
 };
 
-export function GroupDeleteDialog({ activeKey, onCloseItem }: GroupDeleteDialogProps) {
+const GROUP_DELETE_DIALOG_NAME = 'GroupDeleteDialog';
+
+export function GroupDeleteDialog({
+  activeKey,
+  onCloseItem,
+  'data-component': componentName = GROUP_DELETE_DIALOG_NAME,
+}: GroupDeleteDialogProps) {
   const targets = useStore(groupsDeletion.$payload);
   const { notify } = useHostFrame();
 
@@ -25,6 +32,7 @@ export function GroupDeleteDialog({ activeKey, onCloseItem }: GroupDeleteDialogP
 
   return (
     <DeleteConfirmDialog
+      data-component={componentName}
       open={targets !== undefined}
       targets={deleteTargets}
       expected={deleteExpectation(deleteTargets)}
@@ -48,3 +56,5 @@ export function GroupDeleteDialog({ activeKey, onCloseItem }: GroupDeleteDialogP
     />
   );
 }
+
+GroupDeleteDialog.displayName = GROUP_DELETE_DIALOG_NAME;

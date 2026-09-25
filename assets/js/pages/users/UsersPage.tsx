@@ -40,13 +40,9 @@ import { useUsersScreen } from './model/useUsersScreen';
 import { UserDeleteDialog } from './UserDeleteDialog';
 import { UsersItemPage } from './UsersItemPage';
 
-type UsersPageProps = {
-  'data-component'?: string;
-};
-
 const USERS_PAGE_NAME = 'UsersPage';
 
-export function UsersPage({ 'data-component': componentName = USERS_PAGE_NAME }: UsersPageProps) {
+export function UsersPage() {
   // One request for a page of users and the providers that name them.
   useUsersScreen();
   const { openItem, closeItem } = useHostFrame();
@@ -107,8 +103,7 @@ export function UsersPage({ 'data-component': componentName = USERS_PAGE_NAME }:
   });
 
   return (
-    // The section's root: the host keeps every section mounted, so a test scopes its selectors to this.
-    <div data-component={componentName} className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <div data-component={USERS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={USER_ACTIONS}

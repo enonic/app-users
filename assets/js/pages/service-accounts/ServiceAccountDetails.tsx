@@ -18,13 +18,19 @@ import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type ServiceAccountDetailsProps = {
   user: UserDetail;
+  'data-component'?: string;
 };
+
+const SERVICE_ACCOUNT_DETAILS_NAME = 'ServiceAccountDetails';
 
 /**
  * `UserDetails` without the ID provider field: every account here is the system store's. The accounts the
  * platform owns keep their roles and groups too — those steps only say so — so neither offers an Edit.
  */
-export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
+export function ServiceAccountDetails({
+  user,
+  'data-component': componentName = SERVICE_ACCOUNT_DETAILS_NAME,
+}: ServiceAccountDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
@@ -55,7 +61,7 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
   const groups: readonly PrincipalRef[] = showInherited ? inherited.groups : user.groups;
 
   return (
-    <DetailsPanel>
+    <DetailsPanel data-component={componentName}>
       <DetailsPanel.Header
         icon={<PrincipalIcon principal={user} size="lg" />}
         title={displayName}
@@ -180,3 +186,5 @@ export function ServiceAccountDetails({ user }: ServiceAccountDetailsProps) {
     </DetailsPanel>
   );
 }
+
+ServiceAccountDetails.displayName = SERVICE_ACCOUNT_DETAILS_NAME;

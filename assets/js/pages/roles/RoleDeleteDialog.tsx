@@ -11,9 +11,16 @@ import { rolesSelection } from './model/selection.store';
 export type RoleDeleteDialogProps = {
   activeKey?: string;
   onCloseItem: () => void;
+  'data-component'?: string;
 };
 
-export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogProps) {
+const ROLE_DELETE_DIALOG_NAME = 'RoleDeleteDialog';
+
+export function RoleDeleteDialog({
+  activeKey,
+  onCloseItem,
+  'data-component': componentName = ROLE_DELETE_DIALOG_NAME,
+}: RoleDeleteDialogProps) {
   const targets = useStore(rolesDeletion.$payload);
   const { notify } = useHostFrame();
 
@@ -25,6 +32,7 @@ export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogPro
 
   return (
     <DeleteConfirmDialog
+      data-component={componentName}
       open={targets !== undefined}
       targets={deleteTargets}
       expected={deleteExpectation(deleteTargets)}
@@ -48,3 +56,5 @@ export function RoleDeleteDialog({ activeKey, onCloseItem }: RoleDeleteDialogPro
     />
   );
 }
+
+RoleDeleteDialog.displayName = ROLE_DELETE_DIALOG_NAME;
