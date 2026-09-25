@@ -1,3 +1,5 @@
+import type { PropertyTreeJson } from '@enonic/ui-types';
+
 import {
   derivePrincipalName,
   isIllegalPrincipalName,
@@ -18,6 +20,11 @@ export type IdProviderForm = {
   description: string;
   /** The application the provider is bound to. Empty means it serves no login yet. */
   application: string;
+  /**
+   * The application's configuration as the configuration dialog last applied it. Absent until then: the
+   * save then writes what is stored, with the form's defaults filled in.
+   */
+  config?: PropertyTreeJson;
   /** Who may reach the provider, and how far. */
   permissions: readonly IdProviderPermission[];
   /** Whether the user has taken the name over; until then a create derives it from the display name. */
@@ -63,9 +70,13 @@ export function initialIdProviderForm(
 
 export function nextIdProviderForm(
   previous: IdProviderForm,
-  next: IdProviderForm,
+  edited: IdProviderForm,
   { mode }: { mode: StepDialogMode },
 ): IdProviderForm {
+  // A configuration is one application's; another binding starts from its own form again.
+  const next =
+    edited.application === previous.application ? edited : { ...edited, config: undefined };
+
   if (next.name !== previous.name) {
     return { ...next, nameEdited: true };
   }
@@ -87,8 +98,14 @@ export function sameIdProviderForm(saved: IdProviderForm, edited: IdProviderForm
     saved.displayName.trim() === edited.displayName.trim() &&
     saved.description.trim() === edited.description.trim() &&
     saved.application === edited.application &&
+    sameConfig(saved.config, edited.config) &&
     samePermissions(saved.permissions, edited.permissions)
   );
+}
+
+// Both sides come out of `PropertyTree.toJson`, which writes a tree the same way every time.
+function sameConfig(saved?: PropertyTreeJson, edited?: PropertyTreeJson): boolean {
+  return JSON.stringify(saved) === JSON.stringify(edited);
 }
 
 function samePermissions(

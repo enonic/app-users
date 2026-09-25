@@ -68,9 +68,24 @@ export default defineConfig(({ mode }) => {
       'src/main/resources/extensions/**/*.{test,spec}.ts',
     ],
     passWithNoTests: true,
+    // ! The React-facing packages are inlined so the `react` → `preact/compat` alias reaches them: an
+    // ! externalized `@enonic/ui` would import the real `react`, which is CommonJS and has no
+    // ! `createPortal`. It is what lets a form-engine helper be tested without a DOM.
+    server: {
+      deps: {
+        inline: [
+          /@enonic\/(ui|input-types)/,
+          /@dnd-kit/,
+          /@radix-ui/,
+          /focus-trap-react/,
+          /lucide-react/,
+        ],
+      },
+    },
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
       '/lib/graphql': join(REPO, 'test/mocks/lib-graphql.ts'),
+      '/lib/icon': join(REPO, 'test/mocks/lib-icon.ts'),
       '/lib/idprovider': join(REPO, 'test/mocks/lib-idprovider.ts'),
       '/lib/publickey': join(REPO, 'test/mocks/lib-publickey.ts'),
       '/lib/xp/app': join(REPO, 'test/mocks/lib-xp-app.ts'),

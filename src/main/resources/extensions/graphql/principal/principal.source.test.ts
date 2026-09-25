@@ -1,6 +1,7 @@
 import {
   deletePrincipal,
   findPrincipals,
+  getPrincipal,
   type FindPrincipalsParams,
   type Group,
   type Role,
@@ -11,6 +12,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   deletePrincipals,
   displayNameOf,
+  getPrincipalsByKeys,
   localNameOf,
   searchPrincipals,
   toPrincipalItem,
@@ -225,6 +227,36 @@ describe('searchPrincipals', () => {
     const [asked] = calls();
     expect(asked?.count).toBe(0);
     expect((asked?.start ?? 0) + (asked?.count ?? 0)).toBeLessThanOrEqual(10_000);
+  });
+});
+
+describe('getPrincipalsByKeys', () => {
+  it('answers the principals in the order asked for, each once', () => {
+    vi.mocked(getPrincipal).mockImplementation((key) =>
+      key === 'role:a' ? role('a') : group('ops'),
+    );
+
+    expect(getPrincipalsByKeys(['group:system:ops', 'role:a', 'group:system:ops'])).toEqual([
+      { key: 'group:system:ops', type: 'group', displayName: 'ops' },
+      { key: 'role:a', type: 'role', displayName: 'a' },
+    ]);
+    expect(vi.mocked(getPrincipal).mock.calls).toEqual([['group:system:ops'], ['role:a']]);
+  });
+
+  it('leaves out a key nothing answers to, and one the platform refuses to parse', () => {
+    vi.mocked(getPrincipal).mockImplementation((key) => {
+      if (key === 'role:a') {
+        return role('a');
+      }
+      if (key === 'role:not valid') {
+        throw new Error('Invalid principal key [role:not valid]');
+      }
+      return null;
+    });
+
+    expect(getPrincipalsByKeys(['role:gone', 'role:not valid', 'role:a'])).toEqual([
+      { key: 'role:a', type: 'role', displayName: 'a' },
+    ]);
   });
 });
 

@@ -1,8 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { IdProvider } from '../../../entities/principal';
 import {
   $idProviderEditor,
+  $idProviderEditorApplication,
   $idProviderEditorErrors,
   closeIdProviderEditor,
   idProviderEditorDialog,
@@ -110,5 +111,30 @@ describe('$idProviderEditorErrors', () => {
     idProviderNameCheck.fail('company.directory');
 
     expect($idProviderEditorErrors.get().name).toBeUndefined();
+  });
+});
+
+describe('$idProviderEditorApplication', () => {
+  it('follows the binding of the open wizard, and is empty once it closes', () => {
+    openIdProviderEditor({ mode: 'create' });
+    updateIdProviderEditorForm({ application: 'com.example.oidc' });
+
+    expect($idProviderEditorApplication.get()).toBe('com.example.oidc');
+
+    closeIdProviderEditor();
+
+    expect($idProviderEditorApplication.get()).toBe('');
+  });
+
+  it('tells nobody about an edit of another field', () => {
+    openIdProviderEditor({ mode: 'create' });
+    updateIdProviderEditorForm({ application: 'com.example.oidc' });
+    const listener = vi.fn();
+    const unsubscribe = $idProviderEditorApplication.listen(listener);
+
+    updateIdProviderEditorForm({ displayName: 'Intranet' });
+    unsubscribe();
+
+    expect(listener).not.toHaveBeenCalled();
   });
 });

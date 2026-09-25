@@ -37,7 +37,10 @@ One contract, so that "where does this list come from" has one answer.
 - **A loader owns the request and the cancelling**, and reports through those two commands. It lives in
   `entities/<domain>/model/<domain>.load.ts` while a section reads that domain alone, and in
   `pages/<section>/model/<section>.screen.ts` once a screen spans several — slices on one layer may not
-  import each other, so the page is the lowest layer where domains meet.
+  import each other, so the page is the lowest layer where a screen's domains meet. A feature that loads
+  for itself across domains — a dialog reading what it edits and the schema it edits it through — keeps
+  its loader in `features/<feature>/model/<name>.load.ts`: a feature may import several entities, and a
+  page loader would have it import `pages/`, against the direction. `idprovider-config.load.ts` is the case.
 - `load<Domain>()` reloads whatever the store holds: the Refresh button, a server event, a reconnect.
   `ensure<Domain>()` is the first visit's load and a no-op on a later one, so caching is a decision at
   one line rather than a side effect of where the load happens to live.

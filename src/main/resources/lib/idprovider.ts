@@ -11,12 +11,14 @@
  * ! declares, so the types have to survive — see `IdProviderConfigMapper`.
  */
 
+import type { FormJson } from '@enonic/ui-types';
+
 import type { ScriptValue } from '/lib/xp/core';
 
 export type IdProviderDescriptor = {
   /** Absent when the descriptor declares no `mode:`. The builder has no default. */
   mode?: string;
-  /** Whether the descriptor declares a config form. The form itself is not carried — see #64. */
+  /** Whether the descriptor declares a config form. The form itself is `getIdProviderForm`'s. */
   hasConfig: boolean;
 };
 
@@ -38,6 +40,31 @@ export function getIdProviderDescriptor(
   );
   bean.setApplication(params.application);
   return __.toNativeObject(bean.execute());
+}
+
+export type GetIdProviderFormParams = {
+  application: string;
+  /** The language to translate labels to, as a BCP 47 tag. Absent leaves them as the descriptor has them. */
+  locale?: string;
+};
+
+type GetIdProviderFormHandler = {
+  setApplication(value: string): void;
+  setLocale(value: string | null): void;
+  execute(): { form: FormJson } | null;
+};
+
+/**
+ * The config form the application declares for its providers, labels translated. Null when the application
+ * ships no descriptor; empty when it declares no form.
+ */
+export function getIdProviderForm(params: GetIdProviderFormParams): FormJson | null {
+  const bean = __.newBean<GetIdProviderFormHandler>(
+    'com.enonic.xp.app.users.lib.idprovider.GetIdProviderFormHandler',
+  );
+  bean.setApplication(params.application);
+  bean.setLocale(__.nullOrValue(params.locale ?? null));
+  return __.toNativeObject(bean.execute())?.form ?? null;
 }
 
 /** A principal that may reach a provider, and how far. XP's `IdProviderAccess`. */

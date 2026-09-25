@@ -7,6 +7,7 @@ import {
 import {
   findPrincipals,
   getIdProviders,
+  hasRole,
   type Group,
   type IdProvider,
   type User,
@@ -14,6 +15,7 @@ import {
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  configOf,
   countPrincipals,
   createIdProvider as createProvider,
   deleteIdProviders as deleteProviders,
@@ -198,6 +200,23 @@ describe('createIdProvider', () => {
     expect(written.idProviderConfig).toEqual({ applicationKey: 'com.enonic.app.oidc' });
   });
 
+  it('binds the provider with the configuration given', () => {
+    const config = [{ name: 'clientId', type: 'String', values: [{ v: 'intranet' }] }];
+    vi.mocked(createIdProvider).mockReturnValue({ key: 'intranet', displayName: 'Intranet' });
+
+    createProvider('intranet', {
+      displayName: 'Intranet',
+      application: 'com.enonic.app.oidc',
+      config,
+      permissions: [],
+    });
+
+    expect(vi.mocked(createIdProvider).mock.calls[0]?.[0].idProviderConfig).toEqual({
+      applicationKey: 'com.enonic.app.oidc',
+      config,
+    });
+  });
+
   it('leaves a provider bound to nothing when no application is named', () => {
     vi.mocked(createIdProvider).mockReturnValue({ key: 'intranet', displayName: 'Intranet' });
 
@@ -225,7 +244,7 @@ describe('updateIdProvider', () => {
     },
   };
 
-  // ! The configuration nothing in this app renders must survive an edit that does not mention it.
+  // ! An edit that never opened the configuration must not throw away what configured the login.
   it('keeps the stored configuration when the application is unchanged', () => {
     vi.mocked(getIdProvider).mockReturnValue(stored);
     vi.mocked(updateIdProvider).mockReturnValue(stored);
@@ -239,6 +258,36 @@ describe('updateIdProvider', () => {
     expect(vi.mocked(updateIdProvider).mock.calls[0]?.[0].idProviderConfig).toEqual(
       stored.idProviderConfig,
     );
+  });
+
+  it('writes the configuration given in place of the stored one, without reading it', () => {
+    const config = [{ name: 'clientId', type: 'String', values: [{ v: 'portal' }] }];
+    vi.mocked(updateIdProvider).mockReturnValue(stored);
+
+    updateProvider('intranet', {
+      displayName: 'Intranet',
+      application: 'com.enonic.app.oidc',
+      config,
+      permissions: [],
+    });
+
+    expect(vi.mocked(updateIdProvider).mock.calls[0]?.[0].idProviderConfig).toEqual({
+      applicationKey: 'com.enonic.app.oidc',
+      config,
+    });
+    expect(vi.mocked(getIdProvider)).not.toHaveBeenCalled();
+  });
+
+  it('drops the configuration given when no application is named', () => {
+    vi.mocked(updateIdProvider).mockReturnValue({ key: 'intranet', displayName: 'Intranet' });
+
+    updateProvider('intranet', {
+      displayName: 'Intranet',
+      config: [{ name: 'clientId', type: 'String', values: [{ v: 'portal' }] }],
+      permissions: [],
+    });
+
+    expect(vi.mocked(updateIdProvider).mock.calls[0]?.[0].idProviderConfig).toBeNull();
   });
 
   it('starts an empty configuration when the provider is bound to another application', () => {
@@ -270,6 +319,55 @@ describe('updateIdProvider', () => {
     vi.mocked(updateIdProvider).mockReturnValue(null);
 
     expect(updateProvider('gone', { displayName: 'Gone', permissions: [] })).toBeNull();
+  });
+});
+
+describe('configOf', () => {
+  const binding = { key: 'com.enonic.app.oidc', displayName: 'OIDC', idProvider: 'intranet' };
+
+  function callerHolds(...roles: string[]): void {
+    vi.mocked(hasRole).mockImplementation((role) => roles.includes(role));
+  }
+
+  it('reads the typed configuration of the provider the binding belongs to', () => {
+    callerHolds('role:system.user.admin');
+    const config = [{ name: 'defaultGroups', type: 'Reference', values: [] }];
+    vi.mocked(getIdProvider).mockReturnValue({
+      key: 'intranet',
+      displayName: 'Intranet',
+      idProviderConfig: { applicationKey: 'com.enonic.app.oidc', config },
+    });
+
+    expect(configOf(binding)).toEqual(config);
+    expect(vi.mocked(getIdProvider)).toHaveBeenCalledWith({ idProvider: 'intranet' });
+  });
+
+  it('reads it for a system administrator too', () => {
+    callerHolds('role:system.admin');
+    vi.mocked(getIdProvider).mockReturnValue({
+      key: 'intranet',
+      displayName: 'Intranet',
+      idProviderConfig: { applicationKey: 'com.enonic.app.oidc', config: [] },
+    });
+
+    configOf(binding);
+
+    expect(vi.mocked(getIdProvider)).toHaveBeenCalled();
+  });
+
+  // ! The tree holds the login's secrets; a caller who may only look never needs them.
+  it('answers an empty tree to a caller that may only read, without reading the provider', () => {
+    callerHolds('role:system.user.app');
+
+    expect(configOf(binding)).toEqual([]);
+    expect(vi.mocked(getIdProvider)).not.toHaveBeenCalled();
+  });
+
+  it('answers an empty tree for a provider that is gone', () => {
+    callerHolds('role:system.user.admin');
+    vi.mocked(getIdProvider).mockReturnValue(null);
+
+    expect(configOf(binding)).toEqual([]);
   });
 });
 

@@ -2,6 +2,7 @@ export { fetchGroupDetail, GROUPS_ROOT, toGroups } from './api/groups.api';
 export type { GroupsData } from './api/groups.api';
 export {
   fetchDefaultIdProviderPermissions,
+  fetchIdProviderConfig,
   fetchIdProviderPermissions,
   ID_PROVIDER_NAMES_ROOT,
   ID_PROVIDER_USER_COUNTS_ROOT,
@@ -130,6 +131,7 @@ export type {
   GroupKey,
   IdProvider,
   IdProviderAccess,
+  IdProviderConfig,
   IdProviderName,
   IdProviderPermission,
   IdProviderPermissions,

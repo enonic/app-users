@@ -6,6 +6,7 @@ import {
   isReservedRole,
   isSystemUser,
   principalName,
+  principalRefOf,
   projectRoleIdOf,
 } from './principal.keys';
 
@@ -97,5 +98,36 @@ describe('idProviderOf', () => {
 
   it('gives a role no provider', () => {
     expect(idProviderOf('role:system.admin')).toBeUndefined();
+  });
+});
+
+describe('principalRefOf', () => {
+  it('names a user or a group by the name its key ends with', () => {
+    expect(principalRefOf('user:ldap:alice')).toEqual({
+      type: 'user',
+      key: 'user:ldap:alice',
+      displayName: 'alice',
+    });
+    expect(principalRefOf('group:system:administrators')).toEqual({
+      type: 'group',
+      key: 'group:system:administrators',
+      displayName: 'administrators',
+    });
+  });
+
+  it('names a role by everything after the prefix, dots and all', () => {
+    expect(principalRefOf('role:cms.project.default.owner')).toEqual({
+      type: 'role',
+      key: 'role:cms.project.default.owner',
+      displayName: 'cms.project.default.owner',
+    });
+  });
+
+  it('answers undefined for a string that is no principal key', () => {
+    expect(principalRefOf('alice')).toBeUndefined();
+    expect(principalRefOf('user:alice')).toBeUndefined();
+    expect(principalRefOf('role:system:admin')).toBeUndefined();
+    expect(principalRefOf('user::alice')).toBeUndefined();
+    expect(principalRefOf('')).toBeUndefined();
   });
 });

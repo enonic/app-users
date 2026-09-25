@@ -48,6 +48,14 @@ export const idProviderEditorDialog = createStepDialogStore<
 export const $idProviderEditor = idProviderEditorDialog.$state;
 export const $idProviderEditorErrors = idProviderEditorDialog.$errors;
 
+/**
+ * The application an open wizard binds, empty while it is closed. A string, so a keystroke anywhere else in
+ * the form notifies nobody who reads only this.
+ */
+export const $idProviderEditorApplication = computed($idProviderEditor, ({ open, form }) =>
+  open ? form.application : '',
+);
+
 export const openIdProviderEditor = idProviderEditorDialog.open;
 
 export function openIdProviderEditorAt(provider: IdProvider, step: IdProviderEditorStep): void {

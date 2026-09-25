@@ -21,6 +21,13 @@ describe('idProviderDraftFrom', () => {
     expect(idProviderDraftFrom(FORM)).toEqual(FORM);
   });
 
+  it('writes the configuration it is handed in place of the one the dialog applied', () => {
+    const applied = [{ name: 'clientId', type: 'String' as const, values: [{ v: 'applied' }] }];
+    const effective = [{ name: 'clientId', type: 'String' as const, values: [{ v: 'effective' }] }];
+
+    expect(idProviderDraftFrom({ ...FORM, config: applied }, effective).config).toBe(effective);
+  });
+
   it('drops the wizard-only field', () => {
     expect('nameEdited' in idProviderDraftFrom({ ...FORM, nameEdited: true })).toBe(false);
   });
