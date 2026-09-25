@@ -1,10 +1,10 @@
 import { Avatar, cn } from '@enonic/ui';
-import { Settings, Users, UserShield, type LucideIcon } from 'lucide-react';
+import { Settings, UserCog, Users, UserShield, type LucideIcon } from 'lucide-react';
 
 import { getInitials } from '../../../shared/format';
 import { i18n } from '../../../shared/i18n';
 import { IconBadge } from '../../../shared/ui/IconBadge';
-import { isPlatformRole, isSystemUser } from '../model/principal.keys';
+import { isPlatformRole, isServiceAccount, isSystemUser } from '../model/principal.keys';
 import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
 
 export type PrincipalIconSize = 'xs' | 'sm' | 'lg';
@@ -44,18 +44,21 @@ const NOTCH: Record<PrincipalIconSize, string> = {
   lg: '[mask-image:radial-gradient(circle_at_42px_6px,transparent_9px,#000_9.5px)]',
 };
 
-/** A user's initials, or the glyph for a group or role, with a cog badge on the ones the platform owns. */
+/**
+ * A user's initials, or the glyph for a service account, group or role, with a cog badge on the ones
+ * the platform owns.
+ */
 export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
-  const { key, type, displayName } = principal;
+  const { key, type } = principal;
 
   const badgeLabelKey = systemBadgeKey(type, key);
   if (badgeLabelKey === undefined) {
-    return icon(type, displayName, size);
+    return icon(principal, size);
   }
 
   return (
     <span className="relative inline-flex shrink-0">
-      {icon(type, displayName, size, NOTCH[size])}
+      {icon(principal, size, NOTCH[size])}
 
       <IconBadge
         icon={Settings}
@@ -68,14 +71,18 @@ export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
 }
 
 function icon(
-  type: PrincipalType,
-  displayName: string,
+  { key, type, displayName }: PrincipalRef,
   size: PrincipalIconSize,
   className?: string,
 ) {
+  // A service account gets its section's glyph, not initials.
+  if (type === 'user' && isServiceAccount(key)) {
+    return glyph(UserCog, size, className);
+  }
+
   return type === 'user'
     ? initialsAvatar(displayName, size, className)
-    : glyph(type, size, className);
+    : glyph(GLYPHS[type], size, className);
 }
 
 function initialsAvatar(displayName: string, size: PrincipalIconSize, className?: string) {
@@ -88,8 +95,7 @@ function initialsAvatar(displayName: string, size: PrincipalIconSize, className?
   );
 }
 
-function glyph(type: Exclude<PrincipalType, 'user'>, size: PrincipalIconSize, className?: string) {
-  const Glyph = GLYPHS[type];
+function glyph(Glyph: LucideIcon, size: PrincipalIconSize, className?: string) {
   return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden className={className} />;
 }
 

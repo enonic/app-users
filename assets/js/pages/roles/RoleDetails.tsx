@@ -1,14 +1,13 @@
 import { Button } from '@enonic/ui';
 
 import {
+  idProviderOf,
   principalName,
   splitMembers,
-  useIdProviderName,
   type RoleDetail,
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { ServiceAccountIcon } from '../../entities/principal/ui/ServiceAccountIcon';
 import { openRoleEditorAt } from '../../features/role-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { formatDateTime } from '../../shared/format';
@@ -27,7 +26,6 @@ export function RoleDetails({
   'data-component': componentName = ROLE_DETAILS_NAME,
 }: RoleDetailsProps) {
   const readOnly = isReadOnlyMode();
-  const providerName = useIdProviderName();
 
   const editLabel = useI18n('browse.details.edit');
   const editUsersLabel = useI18n('roles.details.editUsers');
@@ -105,7 +103,7 @@ export function RoleDetails({
           {(member) => (
             <DetailsPanel.ListItem
               key={member.key}
-              icon={<ServiceAccountIcon />}
+              icon={<PrincipalIcon principal={member} />}
               title={member.displayName}
               subtitle={principalName(member.key)}
             />
@@ -134,7 +132,7 @@ export function RoleDetails({
               icon={<PrincipalIcon principal={member} />}
               title={member.displayName}
               subtitle={principalName(member.key)}
-              meta={providerName(member.key)}
+              meta={idProviderOf(member.key)}
             />
           )}
         </DetailsPanel.List>

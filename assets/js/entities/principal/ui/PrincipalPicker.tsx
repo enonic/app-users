@@ -6,10 +6,9 @@ import type { ReactNode, UIEvent } from 'react';
 import { sameKeys } from '../../../shared/form';
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
+import { idProviderOf } from '../model/principal.keys';
 import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
-import { useIdProviderLabel } from '../model/useIdProviderLabel';
 import { usePrincipalSearch, type PrincipalSearch } from '../model/usePrincipalSearch';
-import { IdProviderCell } from './IdProviderCell';
 import { PrincipalLabel } from './PrincipalLabel';
 
 export type PrincipalPickerProps = {
@@ -65,13 +64,12 @@ export function PrincipalPicker({
 
   const search = usePrincipalSearch(query, open, kinds, idProvider);
 
-  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
   const providerCell = (key: PrincipalKey): ReactNode => {
-    const label = providerLabel(key);
-    return label === undefined ? undefined : (
-      <span className="text-subtle text-sm whitespace-nowrap">
-        <IdProviderCell {...label} />
-      </span>
+    const provider = idProviderOf(key);
+    return (
+      provider !== undefined && (
+        <span className="text-subtle text-sm whitespace-nowrap">{provider}</span>
+      )
     );
   };
 
