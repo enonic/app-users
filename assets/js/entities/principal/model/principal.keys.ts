@@ -1,4 +1,4 @@
-import type { PrincipalKey } from './principal.types';
+import type { PrincipalKey, PrincipalRef } from './principal.types';
 
 const SYSTEM_ROLE_PREFIX = 'role:system.';
 const CMS_ROLE_PREFIX = 'role:cms.';
@@ -86,4 +86,26 @@ export function principalName(key: string): string {
 export function idProviderOf(key: string): string | undefined {
   const [type, provider] = key.split(':');
   return type === 'role' ? undefined : provider;
+}
+
+/**
+ * A principal known by its key alone, shown by its own name until — or unless — the server names it.
+ * Undefined for a string that is no principal key: a stored reference is whatever the config carries.
+ */
+export function principalRefOf(key: string): PrincipalRef | undefined {
+  const [type, ...rest] = key.split(':');
+
+  if (rest.length === 0 || rest.some((part) => part.length === 0)) {
+    return undefined;
+  }
+
+  if (type === 'role' && rest.length === 1) {
+    return { type, key: `role:${rest[0]}`, displayName: rest[0] ?? '' };
+  }
+
+  if ((type === 'user' || type === 'group') && rest.length === 2) {
+    return { type, key: `${type}:${rest[0]}:${rest[1]}`, displayName: rest[1] ?? '' };
+  }
+
+  return undefined;
 }

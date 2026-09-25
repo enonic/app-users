@@ -1,7 +1,15 @@
-import { GridList, IconButton, Input, Selector, TextArea } from '@enonic/ui';
+import {
+  FilledOctagonAlert,
+  GridList,
+  IconButton,
+  Input,
+  Selector,
+  TextArea,
+  Tooltip,
+} from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { Pencil, X } from 'lucide-react';
-import { useState } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 
 import { ApplicationIcon } from '../../../../entities/application';
 import { visitedErrors } from '../../../../shared/form';
@@ -10,6 +18,8 @@ import { FieldLabel } from '../../../../shared/ui/FieldLabel';
 import { ItemLabel } from '../../../../shared/ui/ItemLabel';
 import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import { $idProviderApplications } from '../../model/idprovider-applications';
+import { idProviderConfigIssue } from '../../model/idprovider-config-issue';
+import { $idProviderConfig } from '../../model/idprovider-config.store';
 import {
   $idProviderEditor,
   $idProviderEditorErrors,
@@ -34,12 +44,19 @@ export function IdProviderEditorDialogGeneralStep() {
   const errors = useStore($idProviderEditorErrors);
   const nameCheck = useStore(idProviderNameCheck.$state);
   const applications = useStore($idProviderApplications);
+  const configSession = useStore($idProviderConfig);
 
   const persisted = mode === 'edit';
   // The system provider answers to the platform's own login and may not be bound elsewhere.
   const applicationFixed = persisted && entity !== undefined && isSystemIdProvider(entity.key);
 
   const [configuring, setConfiguring] = useState(false);
+
+  // Told, never enforced: Save stays open, and the dialog is where the inputs themselves say what is missing.
+  const configIssueKey = useMemo(
+    () => idProviderConfigIssue(configSession, form.application, form.config),
+    [configSession, form.application, form.config],
+  );
 
   const selected = applications.find(({ key }) => key === form.application);
 
@@ -119,9 +136,12 @@ export function IdProviderEditorDialogGeneralStep() {
             <Selector.Icon />
           </Selector.Trigger>
           <SelectorPopup>
-            {applications.map(({ key, displayName }) => (
+            {applications.map(({ key, displayName, icon }) => (
               <Selector.Item key={key} value={key} textValue={displayName}>
-                <Selector.ItemText>{displayName}</Selector.ItemText>
+                <span className="flex items-center gap-2.5">
+                  <ApplicationIcon icon={icon} />
+                  <Selector.ItemText>{displayName}</Selector.ItemText>
+                </span>
               </Selector.Item>
             ))}
           </SelectorPopup>
@@ -136,8 +156,17 @@ export function IdProviderEditorDialogGeneralStep() {
               <GridList.Cell interactive={false} className="flex-1 self-stretch">
                 <ItemLabel
                   className="min-w-0 flex-1"
-                  icon={<ApplicationIcon />}
-                  primary={selected?.displayName ?? form.application}
+                  icon={<ApplicationIcon icon={selected?.icon} />}
+                  primary={
+                    <span className="inline-flex max-w-full items-center gap-1.5 align-top">
+                      <span className="min-w-0 truncate">
+                        {selected?.displayName ?? form.application}
+                      </span>
+                      {configIssueKey !== undefined && (
+                        <ConfigIssueIcon label={i18n(configIssueKey)} />
+                      )}
+                    </span>
+                  }
                   secondary={selected === undefined ? undefined : form.application}
                 />
               </GridList.Cell>
@@ -173,9 +202,28 @@ export function IdProviderEditorDialogGeneralStep() {
 
       <ConfigDialog
         open={configuring}
-        application={selected?.displayName ?? form.application}
+        application={form.application}
+        applicationName={selected?.displayName ?? form.application}
         onClose={() => setConfiguring(false)}
       />
     </div>
+  );
+}
+
+//
+// * Internal
+//
+
+const TOOLTIP_DELAY = 300;
+
+// ! `asChild`, as `IconBadge` has it: without it the trigger is a `div` with a tab stop of its own inside
+// ! a grid-list cell.
+function ConfigIssueIcon({ label }: { label: string }) {
+  return (
+    <Tooltip value={label} side="top" delay={TOOLTIP_DELAY} asChild>
+      <span role="img" aria-label={label} className="text-error inline-flex shrink-0">
+        <FilledOctagonAlert size={16} aria-hidden />
+      </span>
+    </Tooltip>
   );
 }

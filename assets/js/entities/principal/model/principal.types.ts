@@ -5,6 +5,7 @@ import type {
   Role as XpRole,
   User as XpUser,
 } from '@enonic-types/core';
+import type { PropertyTreeJson } from '@enonic/ui-types';
 
 /**
  * The principal shapes come from the platform's own types, so nothing here can drift from what
@@ -151,6 +152,12 @@ export type IdProvider = IdProviderName & {
   application?: BoundApplication;
   users: PrincipalSet;
   groups: PrincipalSet;
+};
+
+/** What the provider's binding holds: the application serving its login, and its configuration of it. */
+export type IdProviderConfig = {
+  application: string;
+  config: PropertyTreeJson;
 };
 
 /**

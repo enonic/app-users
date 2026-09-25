@@ -1,3 +1,4 @@
+import type { PropertyTreeJson } from '@enonic/ui-types';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 import {
@@ -10,6 +11,7 @@ import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/load-more';
 import type {
   IdProvider,
   IdProviderAccess,
+  IdProviderConfig,
   IdProviderName,
   IdProviderPermission,
   IdProviderPermissions,
@@ -284,18 +286,54 @@ export function fetchIdProviderPermissions(
   );
 }
 
+const ID_PROVIDER_CONFIG_DOCUMENT = `query IdProviderConfig($key: String!) {
+  idProvider(key: $key) {
+    key
+    application {
+      key
+      config
+    }
+  }
+}`;
+
+type IdProviderConfigDto = {
+  key: string;
+  application: { key: string; config: PropertyTreeJson } | null;
+};
+
+/**
+ * The configuration the provider's binding holds. `undefined` when no provider answers to the key or it is
+ * bound to nothing, either of which leaves a configuration dialog starting from the form's defaults.
+ */
+export function fetchIdProviderConfig(
+  key: string,
+  signal?: AbortSignal,
+): ResultAsync<IdProviderConfig | undefined, AppError> {
+  return requestGraphQlDocument<{ idProvider: IdProviderConfigDto | null }>(
+    ID_PROVIDER_CONFIG_DOCUMENT,
+    { key },
+    signal,
+  ).map(({ idProvider }) =>
+    idProvider?.application == null
+      ? undefined
+      : { application: idProvider.application.key, config: idProvider.application.config },
+  );
+}
+
 /** What a provider is to hold. Not a change list: it has one of each, so there is nothing to diff. */
 export type IdProviderInput = {
   displayName: string;
   description?: string;
   /** Absent unbinds the provider from the application serving its login. */
   application?: string;
+  /** Absent keeps the configuration the binding holds, as long as `application` does not change. */
+  config?: PropertyTreeJson;
   permissions: readonly { principal: string; access: IdProviderAccess }[];
 };
 
-const WRITE_ARGS = `$displayName: String!, $description: String, $application: String, $permissions: [IdProviderPermissionInput!]`;
+const WRITE_ARGS = `$displayName: String!, $description: String, $application: String, $config: JSON, $permissions: [IdProviderPermissionInput!]`;
 
-const WRITE_VALUES = `displayName: $displayName, description: $description, application: $application, permissions: $permissions`;
+const WRITE_VALUES = `displayName: $displayName, description: $description, application: $application, config: $config, permissions: $permissions`;
 
 const CREATE_ID_PROVIDER_DOCUMENT = `
   mutation CreateIdProvider($name: String!, ${WRITE_ARGS}) {

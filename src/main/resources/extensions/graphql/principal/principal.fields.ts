@@ -1,8 +1,13 @@
 import { GraphQLInt, GraphQLString, list, nonNull, type GraphQLFields } from '/lib/graphql';
 import type { PrincipalType } from '/lib/xp/auth';
 
-import { deletePrincipals, searchPrincipals } from './principal.source';
-import { PrincipalDeletionType, PrincipalPageType, PrincipalTypeEnum } from './principal.types';
+import { deletePrincipals, getPrincipalsByKeys, searchPrincipals } from './principal.source';
+import {
+  PrincipalDeletionType,
+  PrincipalPageType,
+  PrincipalType as PrincipalObjectType,
+  PrincipalTypeEnum,
+} from './principal.types';
 
 type SearchArgs = {
   types?: PrincipalType[];
@@ -26,6 +31,15 @@ export const principalQueryFields: GraphQLFields = {
     },
     resolve: (env: { args: SearchArgs }) =>
       searchPrincipals({ ...env.args, types: env.args.types ?? [] }),
+  },
+  principalsByKeys: {
+    type: nonNull(list(nonNull(PrincipalObjectType))),
+    description:
+      'The principals the keys name, in that order. A key nothing answers to is left out rather than failing the rest.',
+    args: {
+      keys: nonNull(list(nonNull(GraphQLString))),
+    },
+    resolve: (env: { args: { keys: string[] } }) => getPrincipalsByKeys(env.args.keys),
   },
 };
 

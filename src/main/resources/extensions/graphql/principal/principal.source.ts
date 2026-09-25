@@ -2,6 +2,8 @@ import {
   deletePrincipal,
   findPrincipals,
   getIdProviders,
+  getPrincipal,
+  type Principal,
   type PrincipalKey,
   type PrincipalType,
 } from '/lib/xp/auth';
@@ -113,6 +115,27 @@ export function requireIdProvider(key: string): void {
 
 export function localNameOf(key: string): string {
   return key.slice(key.lastIndexOf(':') + 1);
+}
+
+/**
+ * The principals the keys name, in the keys' order and without the keys nothing answers to: a stored
+ * reference can outlive the principal it points at.
+ */
+export function getPrincipalsByKeys(keys: readonly string[]): PrincipalItem[] {
+  return [...new Set(keys)].flatMap((key) => {
+    const principal = getPrincipalOrNull(key);
+    return principal == null ? [] : [toPrincipalItem(principal)];
+  });
+}
+
+// ! `getPrincipal` throws on a key `PrincipalKey.from` rejects rather than answering nothing, and a
+// ! stored reference is whatever the config carries.
+function getPrincipalOrNull(key: string): Principal | null {
+  try {
+    return getPrincipal(key as PrincipalKey);
+  } catch {
+    return null;
+  }
 }
 
 /** Takes an id provider as readily as a principal: both are a key and a display name that may be absent. */

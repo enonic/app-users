@@ -1,3 +1,4 @@
+import type { PropertyTreeJson } from '@enonic/ui-types';
 import type { ResultAsync } from 'neverthrow';
 
 import type { AppError } from '../../../shared/api';
@@ -26,6 +27,8 @@ export type IdProviderDraft = {
   displayName: string;
   description: string;
   application: string;
+  /** The application's configuration as edited. Absent when nobody opened it, which keeps what is stored. */
+  config?: PropertyTreeJson;
   permissions: readonly IdProviderPermission[];
 };
 
@@ -131,6 +134,7 @@ function toInput(draft: IdProviderDraft): IdProviderInput {
     displayName: draft.displayName.trim(),
     description: description.length > 0 ? description : undefined,
     application: application.length > 0 ? application : undefined,
+    config: application.length > 0 ? draft.config : undefined,
     permissions: draft.permissions.map(({ principal, access }) => ({
       principal: principal.key,
       access,

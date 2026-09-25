@@ -44,6 +44,9 @@ type DeleteIdProviderResult = {
 export const getIdProviderDescriptor =
   vi.fn<(params: { application: string }) => IdProviderDescriptor | null>();
 
+export const getIdProviderForm =
+  vi.fn<(params: { application: string; locale?: string }) => unknown[] | null>();
+
 export const getIdProviderPermissions =
   vi.fn<(params: { idProvider: string }) => IdProviderPermission[] | null>();
 
