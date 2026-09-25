@@ -30,6 +30,8 @@ import { useRolesScreen } from './model/useRolesScreen';
 import { RoleDeleteDialog } from './RoleDeleteDialog';
 import { RolesItemPage } from './RolesItemPage';
 
+const ROLES_PAGE_NAME = 'RolesPage';
+
 export function RolesPage() {
   // One request for the three domains this screen reads — the roles, the providers that name a member's
   // origin.
@@ -97,7 +99,7 @@ export function RolesPage() {
   });
 
   return (
-    <>
+    <div data-component={ROLES_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={ROLE_ACTIONS}
@@ -124,6 +126,8 @@ export function RolesPage() {
 
       <RoleEditorDialog onSaved={() => void loadRolesScreen()} />
       <RoleDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
-    </>
+    </div>
   );
 }
+
+RolesPage.displayName = ROLES_PAGE_NAME;

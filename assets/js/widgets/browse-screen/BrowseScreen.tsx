@@ -41,7 +41,11 @@ export type BrowseScreenProps<T> = {
   onLoadMore?: () => void;
   loadingMore?: boolean;
   loadMoreError?: string;
+  /** Lands on the layout root: the screen has no element of its own. */
+  'data-component'?: string;
 };
+
+const BROWSE_SCREEN_NAME = 'BrowseScreen';
 
 /**
  * The whole browse screen, so a section states its data and actions and nothing else. Every section
@@ -70,6 +74,7 @@ export function BrowseScreen<T>({
   onLoadMore,
   loadingMore,
   loadMoreError,
+  'data-component': componentName = BROWSE_SCREEN_NAME,
 }: BrowseScreenProps<T>) {
   const noMatchesLabel = useI18n('browse.list.noMatches');
   const labelledActions = useLabelled(actions);
@@ -80,6 +85,7 @@ export function BrowseScreen<T>({
 
   return (
     <BrowseLayout
+      data-component={componentName}
       toolbar={managedMode ? notice : <BrowseToolbar actions={labelledActions} context={context} />}
       // The active row is what the shell's url resolved to, so it is also what says whether the
       // details column has anything to show.
@@ -119,3 +125,5 @@ export function BrowseScreen<T>({
     />
   );
 }
+
+BrowseScreen.displayName = BROWSE_SCREEN_NAME;

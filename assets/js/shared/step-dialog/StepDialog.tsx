@@ -16,7 +16,11 @@ export type StepDialogProps<Step extends string, Field extends string, Form, Ent
   glyph: ReactNode;
   panels: Record<Step, ComponentType>;
   onSave: () => void;
+  /** The caller's name, so a test tells `UserEditorDialog` from `GroupEditorDialog`. */
+  'data-component'?: string;
 };
+
+const STEP_DIALOG_NAME = 'StepDialog';
 
 /**
  * The shell of a dialog made of steps. The store's `title` heads it, with the step title under it;
@@ -30,6 +34,7 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
   glyph,
   panels,
   onSave,
+  'data-component': componentName = STEP_DIALOG_NAME,
 }: StepDialogProps<Step, Field, Form, Entity>) {
   const { open, view, step, saving } = useStore(store.$state, {
     keys: ['open', 'view', 'step', 'saving'],
@@ -70,6 +75,7 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
         <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content
+            data-component={componentName}
             className="gap-10 p-5 md:max-w-184 md:min-w-180 md:p-10"
             onEscapeKeyDown={(event) => {
               if (blocked) {
@@ -107,3 +113,5 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
     </>
   );
 }
+
+StepDialog.displayName = STEP_DIALOG_NAME;

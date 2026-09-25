@@ -16,9 +16,15 @@ import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type UserDetailsProps = {
   user: UserDetail;
+  'data-component'?: string;
 };
 
-export function UserDetails({ user }: UserDetailsProps) {
+const USER_DETAILS_NAME = 'UserDetails';
+
+export function UserDetails({
+  user,
+  'data-component': componentName = USER_DETAILS_NAME,
+}: UserDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
@@ -47,7 +53,7 @@ export function UserDetails({ user }: UserDetailsProps) {
   // ! No description and no created/modified pair, though the mockups draw both: XP stores neither for a
   // ! user — see the `disabled` and `modifiedTime` entries in `docs/platform-facts.md`.
   return (
-    <DetailsPanel>
+    <DetailsPanel data-component={componentName}>
       <DetailsPanel.Header
         icon={<PrincipalIcon principal={user} size="lg" />}
         title={displayName}
@@ -162,3 +168,5 @@ export function UserDetails({ user }: UserDetailsProps) {
     </DetailsPanel>
   );
 }
+
+UserDetails.displayName = USER_DETAILS_NAME;

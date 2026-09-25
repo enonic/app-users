@@ -45,9 +45,16 @@ export type UserEditorDialogProps = {
    * copy knows whether that is itself.
    */
   section: 'users' | 'service-accounts';
+  'data-component'?: string;
 };
 
-export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
+const USER_EDITOR_DIALOG_NAME = 'UserEditorDialog';
+
+export function UserEditorDialog({
+  onSaved,
+  section,
+  'data-component': componentName = USER_EDITOR_DIALOG_NAME,
+}: UserEditorDialogProps) {
   const { entity } = useStore($userEditor, { keys: ['entity'] });
   const openedAsServiceAccount = useStore($userEditorServiceAccount);
   const { notify } = useHostFrame();
@@ -104,7 +111,10 @@ export function UserEditorDialog({ onSaved, section }: UserEditorDialogProps) {
       store={userEditorDialog}
       glyph={<Glyph size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       panels={USER_EDITOR_STEP_PANELS}
+      data-component={componentName}
       onSave={() => void save()}
     />
   );
 }
+
+UserEditorDialog.displayName = USER_EDITOR_DIALOG_NAME;

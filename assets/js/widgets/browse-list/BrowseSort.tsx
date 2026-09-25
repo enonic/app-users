@@ -18,7 +18,11 @@ export type BrowseSortProps<Id extends string = string> = {
    * user has reordered says so with the menu closed. Omitted, it never lights.
    */
   defaultValue?: Id;
+  /** On the trigger; the open menu is `<name>.Menu`, as in `BrowseFilter`. */
+  'data-component'?: string;
 };
+
+const BROWSE_SORT_NAME = 'BrowseSort';
 
 /**
  * The `Sort by` control: one order out of the few a section offers. Section-agnostic — an option
@@ -30,6 +34,7 @@ export function BrowseSort<Id extends string = string>({
   value,
   onChange,
   defaultValue,
+  'data-component': componentName = BROWSE_SORT_NAME,
 }: BrowseSortProps<Id>) {
   const sortLabel = useI18n('browse.sort');
 
@@ -40,6 +45,7 @@ export function BrowseSort<Id extends string = string>({
     <Menu>
       <Menu.Trigger asChild>
         <Button
+          data-component={componentName}
           variant="text"
           startIcon={ArrowDownUp}
           title={sortLabel}
@@ -51,7 +57,7 @@ export function BrowseSort<Id extends string = string>({
         </Button>
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Content align="end" className="min-w-56">
+        <Menu.Content data-component={`${componentName}.Menu`} align="end" className="min-w-56">
           {/* Picking an order is terminal, so the menu closes — unlike the multi-select filter. */}
           <Menu.RadioGroup
             value={value}
@@ -76,3 +82,5 @@ export function BrowseSort<Id extends string = string>({
     </Menu>
   );
 }
+
+BrowseSort.displayName = BROWSE_SORT_NAME;

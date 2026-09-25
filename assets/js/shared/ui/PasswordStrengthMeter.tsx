@@ -1,15 +1,23 @@
 export type PasswordStrengthMeterProps = {
   score: 0 | 1 | 2 | 3 | 4;
   label: string;
+  'data-component'?: string;
 };
+
+const PASSWORD_STRENGTH_METER_NAME = 'PasswordStrengthMeter';
 
 const SEGMENTS = [1, 2, 3, 4] as const;
 
 const FILL = ['bg-error', 'bg-error', 'bg-warn', 'bg-success', 'bg-success'] as const;
 
-export function PasswordStrengthMeter({ score, label }: PasswordStrengthMeterProps) {
+export function PasswordStrengthMeter({
+  score,
+  label,
+  'data-component': componentName = PASSWORD_STRENGTH_METER_NAME,
+}: PasswordStrengthMeterProps) {
   return (
     <div
+      data-component={componentName}
       className="flex w-full flex-col gap-1"
       role="meter"
       aria-valuemin={0}
@@ -32,3 +40,5 @@ export function PasswordStrengthMeter({ score, label }: PasswordStrengthMeterPro
     </div>
   );
 }
+
+PasswordStrengthMeter.displayName = PASSWORD_STRENGTH_METER_NAME;

@@ -11,9 +11,15 @@ import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 
 export type RoleDetailsProps = {
   role: RoleDetail;
+  'data-component'?: string;
 };
 
-export function RoleDetails({ role }: RoleDetailsProps) {
+const ROLE_DETAILS_NAME = 'RoleDetails';
+
+export function RoleDetails({
+  role,
+  'data-component': componentName = ROLE_DETAILS_NAME,
+}: RoleDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
@@ -28,7 +34,7 @@ export function RoleDetails({ role }: RoleDetailsProps) {
   const groups = members.filter(({ type }) => type === 'group');
 
   return (
-    <DetailsPanel>
+    <DetailsPanel data-component={componentName}>
       <DetailsPanel.Header
         icon={<PrincipalIcon principal={role} size="lg" />}
         title={displayName}
@@ -97,3 +103,5 @@ export function RoleDetails({ role }: RoleDetailsProps) {
     </DetailsPanel>
   );
 }
+
+RoleDetails.displayName = ROLE_DETAILS_NAME;

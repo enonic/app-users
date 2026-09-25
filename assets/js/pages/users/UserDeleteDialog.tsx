@@ -11,9 +11,16 @@ import { reloadUsersScreen } from './model/users.screen';
 export type UserDeleteDialogProps = {
   activeKey?: string;
   onCloseItem: () => void;
+  'data-component'?: string;
 };
 
-export function UserDeleteDialog({ activeKey, onCloseItem }: UserDeleteDialogProps) {
+const USER_DELETE_DIALOG_NAME = 'UserDeleteDialog';
+
+export function UserDeleteDialog({
+  activeKey,
+  onCloseItem,
+  'data-component': componentName = USER_DELETE_DIALOG_NAME,
+}: UserDeleteDialogProps) {
   const targets = useStore(usersDeletion.$payload);
   const { notify } = useHostFrame();
 
@@ -25,6 +32,7 @@ export function UserDeleteDialog({ activeKey, onCloseItem }: UserDeleteDialogPro
 
   return (
     <DeleteConfirmDialog
+      data-component={componentName}
       open={targets !== undefined}
       targets={deleteTargets}
       expected={deleteExpectation(deleteTargets)}
@@ -48,3 +56,5 @@ export function UserDeleteDialog({ activeKey, onCloseItem }: UserDeleteDialogPro
     />
   );
 }
+
+UserDeleteDialog.displayName = USER_DELETE_DIALOG_NAME;

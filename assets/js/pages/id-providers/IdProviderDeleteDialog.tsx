@@ -10,9 +10,16 @@ import { idProvidersSelection } from './model/selection.store';
 export type IdProviderDeleteDialogProps = {
   activeKey?: string;
   onCloseItem: () => void;
+  'data-component'?: string;
 };
 
-export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDeleteDialogProps) {
+const ID_PROVIDER_DELETE_DIALOG_NAME = 'IdProviderDeleteDialog';
+
+export function IdProviderDeleteDialog({
+  activeKey,
+  onCloseItem,
+  'data-component': componentName = ID_PROVIDER_DELETE_DIALOG_NAME,
+}: IdProviderDeleteDialogProps) {
   const targets = useStore(idProvidersDeletion.$payload);
   const { notify } = useHostFrame();
 
@@ -24,6 +31,7 @@ export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDel
 
   return (
     <DeleteConfirmDialog
+      data-component={componentName}
       open={targets !== undefined}
       targets={deleteTargets}
       expected={deleteExpectation(deleteTargets)}
@@ -47,3 +55,5 @@ export function IdProviderDeleteDialog({ activeKey, onCloseItem }: IdProviderDel
     />
   );
 }
+
+IdProviderDeleteDialog.displayName = ID_PROVIDER_DELETE_DIALOG_NAME;

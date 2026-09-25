@@ -40,6 +40,8 @@ import { useUsersScreen } from './model/useUsersScreen';
 import { UserDeleteDialog } from './UserDeleteDialog';
 import { UsersItemPage } from './UsersItemPage';
 
+const USERS_PAGE_NAME = 'UsersPage';
+
 export function UsersPage() {
   // One request for a page of users and the providers that name them.
   useUsersScreen();
@@ -101,7 +103,7 @@ export function UsersPage() {
   });
 
   return (
-    <>
+    <div data-component={USERS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={USER_ACTIONS}
@@ -148,6 +150,8 @@ export function UsersPage() {
         }}
       />
       <UserDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
-    </>
+    </div>
   );
 }
+
+UsersPage.displayName = USERS_PAGE_NAME;

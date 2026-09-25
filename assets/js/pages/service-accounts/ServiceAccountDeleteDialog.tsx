@@ -11,11 +11,15 @@ import { reloadServiceAccountsScreen } from './model/service-accounts.screen';
 export type ServiceAccountDeleteDialogProps = {
   activeKey?: string;
   onCloseItem: () => void;
+  'data-component'?: string;
 };
+
+const SERVICE_ACCOUNT_DELETE_DIALOG_NAME = 'ServiceAccountDeleteDialog';
 
 export function ServiceAccountDeleteDialog({
   activeKey,
   onCloseItem,
+  'data-component': componentName = SERVICE_ACCOUNT_DELETE_DIALOG_NAME,
 }: ServiceAccountDeleteDialogProps) {
   const targets = useStore(serviceAccountsDeletion.$payload);
   const { notify } = useHostFrame();
@@ -28,6 +32,7 @@ export function ServiceAccountDeleteDialog({
 
   return (
     <DeleteConfirmDialog
+      data-component={componentName}
       open={targets !== undefined}
       targets={deleteTargets}
       expected={deleteExpectation(deleteTargets)}
@@ -51,3 +56,5 @@ export function ServiceAccountDeleteDialog({
     />
   );
 }
+
+ServiceAccountDeleteDialog.displayName = SERVICE_ACCOUNT_DELETE_DIALOG_NAME;

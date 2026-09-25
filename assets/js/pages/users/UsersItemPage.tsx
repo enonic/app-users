@@ -5,7 +5,15 @@ import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel'
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { UserDetails } from './UserDetails';
 
-export function UsersItemPage() {
+type UsersItemPageProps = {
+  'data-component'?: string;
+};
+
+const USERS_ITEM_PAGE_NAME = 'UsersItemPage';
+
+export function UsersItemPage({
+  'data-component': componentName = USERS_ITEM_PAGE_NAME,
+}: UsersItemPageProps) {
   const id = useItemId();
   const { status, item: user } = useUser(id);
   const { items } = useUsers();
@@ -15,7 +23,7 @@ export function UsersItemPage() {
     const row = items.find(({ key }) => key === id);
 
     return (
-      <DetailsPanel>
+      <DetailsPanel data-component={componentName}>
         {row === undefined ? (
           <DetailsPanel.Skeleton header />
         ) : (
@@ -33,8 +41,15 @@ export function UsersItemPage() {
   }
 
   if (user === undefined) {
-    return <DetailsPanel.Empty labelKey={detailsEmptyLabelKey(status, 'users.details.failed')} />;
+    return (
+      <DetailsPanel.Empty
+        data-component={componentName}
+        labelKey={detailsEmptyLabelKey(status, 'users.details.failed')}
+      />
+    );
   }
 
   return <UserDetails key={user.key} user={user} />;
 }
+
+UsersItemPage.displayName = USERS_ITEM_PAGE_NAME;

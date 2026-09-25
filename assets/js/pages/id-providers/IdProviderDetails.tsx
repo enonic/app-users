@@ -31,7 +31,10 @@ export type IdProviderDetailsProps = {
   permissions?: readonly IdProviderPermission[];
   permissionsLoading?: boolean;
   permissionsFailed?: boolean;
+  'data-component'?: string;
 };
+
+const ID_PROVIDER_DETAILS_NAME = 'IdProviderDetails';
 
 export function IdProviderDetails({
   provider,
@@ -41,6 +44,7 @@ export function IdProviderDetails({
   permissions,
   permissionsLoading,
   permissionsFailed,
+  'data-component': componentName = ID_PROVIDER_DETAILS_NAME,
 }: IdProviderDetailsProps) {
   const readOnly = isReadOnlyMode();
   const editLabel = useI18n('idProviders.details.edit');
@@ -64,7 +68,7 @@ export function IdProviderDetails({
   const groupsTotal = groups?.total ?? provider.groups.total;
 
   return (
-    <DetailsPanel>
+    <DetailsPanel data-component={componentName}>
       <DetailsPanel.Header
         icon={<ShieldLock size={48} strokeWidth={1.5} aria-hidden />}
         title={displayName}
@@ -181,3 +185,5 @@ export function IdProviderDetails({
     </DetailsPanel>
   );
 }
+
+IdProviderDetails.displayName = ID_PROVIDER_DETAILS_NAME;

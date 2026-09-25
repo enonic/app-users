@@ -39,6 +39,8 @@ import { idProvidersSelection } from './model/selection.store';
 import { $idProvidersSort, setIdProvidersSort } from './model/sort.store';
 import { useIdProvidersScreen } from './model/useIdProvidersScreen';
 
+const ID_PROVIDERS_PAGE_NAME = 'IdProvidersPage';
+
 export function IdProvidersPage() {
   useIdProvidersScreen();
   const { openItem, closeItem } = useHostFrame();
@@ -101,7 +103,7 @@ export function IdProvidersPage() {
   });
 
   return (
-    <>
+    <div data-component={ID_PROVIDERS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={ID_PROVIDER_ACTIONS}
@@ -132,6 +134,8 @@ export function IdProvidersPage() {
         }}
       />
       <IdProviderDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
-    </>
+    </div>
   );
 }
+
+IdProvidersPage.displayName = ID_PROVIDERS_PAGE_NAME;

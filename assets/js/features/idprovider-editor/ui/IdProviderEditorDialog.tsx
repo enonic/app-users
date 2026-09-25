@@ -23,9 +23,15 @@ const NOTICES = {
 export type IdProviderEditorDialogProps = {
   /** The written provider rather than a reload, for the reason `receiveIdProvider` gives. */
   onSaved: (written: IdProvider, mode: StepDialogMode) => void;
+  'data-component'?: string;
 };
 
-export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps) {
+const ID_PROVIDER_EDITOR_DIALOG_NAME = 'IdProviderEditorDialog';
+
+export function IdProviderEditorDialog({
+  onSaved,
+  'data-component': componentName = ID_PROVIDER_EDITOR_DIALOG_NAME,
+}: IdProviderEditorDialogProps) {
   const { open } = useStore($idProviderEditor, { keys: ['open'] });
   const { notify } = useHostFrame();
 
@@ -61,7 +67,10 @@ export function IdProviderEditorDialog({ onSaved }: IdProviderEditorDialogProps)
       store={idProviderEditorDialog}
       glyph={<ShieldLock size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       panels={ID_PROVIDER_EDITOR_STEP_PANELS}
+      data-component={componentName}
       onSave={() => void save()}
     />
   );
 }
+
+IdProviderEditorDialog.displayName = ID_PROVIDER_EDITOR_DIALOG_NAME;

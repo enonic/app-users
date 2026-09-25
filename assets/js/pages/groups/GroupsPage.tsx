@@ -35,6 +35,8 @@ import { groupsSelection } from './model/selection.store';
 import { $groupsSort, setGroupsSort } from './model/sort.store';
 import { useGroupsScreen } from './model/useGroupsScreen';
 
+const GROUPS_PAGE_NAME = 'GroupsPage';
+
 export function GroupsPage() {
   // One request for both domains: the groups, and the providers whose display names the rows show — a
   // group key carries only the provider's name.
@@ -105,7 +107,7 @@ export function GroupsPage() {
   });
 
   return (
-    <>
+    <div data-component={GROUPS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
         actions={GROUP_ACTIONS}
@@ -132,6 +134,8 @@ export function GroupsPage() {
 
       <GroupEditorDialog onSaved={() => void loadGroupsScreen()} />
       <GroupDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
-    </>
+    </div>
   );
 }
+
+GroupsPage.displayName = GROUPS_PAGE_NAME;

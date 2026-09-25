@@ -34,6 +34,8 @@ import { useServiceAccountsScreen } from './model/useServiceAccountsScreen';
 import { ServiceAccountDeleteDialog } from './ServiceAccountDeleteDialog';
 import { ServiceAccountsItemPage } from './ServiceAccountsItemPage';
 
+const SERVICE_ACCOUNTS_PAGE_NAME = 'ServiceAccountsPage';
+
 export function ServiceAccountsPage() {
   // One request for a page of the system store's users.
   useServiceAccountsScreen();
@@ -74,7 +76,10 @@ export function ServiceAccountsPage() {
   });
 
   return (
-    <>
+    <div
+      data-component={SERVICE_ACCOUNTS_PAGE_NAME}
+      className="flex min-h-0 min-w-0 flex-1 flex-col"
+    >
       <BrowseScreen
         {...section}
         actions={SERVICE_ACCOUNT_ACTIONS}
@@ -111,6 +116,8 @@ export function ServiceAccountsPage() {
         }}
       />
       <ServiceAccountDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
-    </>
+    </div>
   );
 }
+
+ServiceAccountsPage.displayName = SERVICE_ACCOUNTS_PAGE_NAME;
