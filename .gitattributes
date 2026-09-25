@@ -1,3 +1,5 @@
-gradlew eol=lf
-*.sh eol=lf
-*.bat -text
+# Normalise to LF in the repo and on checkout; oxfmt writes LF and CI runs on Linux.
+* text=auto eol=lf
+
+# cmd.exe mishandles goto labels in LF-only batch files.
+*.bat text eol=crlf

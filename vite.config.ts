@@ -36,15 +36,17 @@ export default defineConfig(({ mode }) => {
   // `vp pack` (tsdown) compiles the server-side .ts to per-file CommonJS, mirroring the tree into
   // build/ so XP runs each file in place.
   const pack = {
+    // ! Relative, forward-slash patterns, as in app-applications: tsdown globs from the repo root,
+    // ! and a `join`ed path carries backslashes on Windows, which the glob matches nothing with.
     entry: [
-      join(REPO, 'src/main/resources/extensions/**/*.ts'),
-      join(REPO, 'src/main/resources/admin/extensions/**/*.ts'),
-      join(REPO, 'src/main/resources/lib/**/*.ts'),
-      `!${join(REPO, 'src/main/resources/**/*.d.ts')}`,
-      `!${join(REPO, 'src/main/resources/**/*.test.ts')}`,
+      'src/main/resources/extensions/**/*.ts',
+      'src/main/resources/admin/extensions/**/*.ts',
+      'src/main/resources/lib/**/*.ts',
+      '!src/main/resources/**/*.d.ts',
+      '!src/main/resources/**/*.test.ts',
     ],
-    root: join(REPO, 'src/main/resources'),
-    outDir: join(REPO, 'build/resources/main'),
+    root: 'src/main/resources',
+    outDir: 'build/resources/main',
     format: 'cjs' as const,
     platform: 'node' as const,
     unbundle: true, // per-file output, not one bundle
