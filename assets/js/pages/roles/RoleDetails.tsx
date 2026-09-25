@@ -1,8 +1,14 @@
 import { Button } from '@enonic/ui';
 
-import { principalName, useIdProviderName, type RoleDetail } from '../../entities/principal';
+import {
+  principalName,
+  splitMembers,
+  useIdProviderName,
+  type RoleDetail,
+} from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { ServiceAccountIcon } from '../../entities/principal/ui/ServiceAccountIcon';
 import { openRoleEditorAt } from '../../features/role-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { formatDateTime } from '../../shared/format';
@@ -17,15 +23,15 @@ export function RoleDetails({ role }: RoleDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
 
-  const editLabel = useI18n('roles.details.edit');
-  const editMembersLabel = useI18n('roles.details.editMembers');
+  const editLabel = useI18n('browse.details.edit');
+  const editUsersLabel = useI18n('roles.details.editUsers');
+  const editServiceAccountsLabel = useI18n('roles.details.editServiceAccounts');
+  const editGroupsLabel = useI18n('roles.details.editGroups');
   const noDescriptionLabel = useI18n('roles.details.noDescription');
 
   const { key, displayName, description, modifiedTime, members } = role;
 
-  // Users first as a row of avatars, groups last as rows: a group in a role is a row, not a branch.
-  const users = members.filter(({ type }) => type === 'user');
-  const groups = members.filter(({ type }) => type === 'group');
+  const { users, serviceAccounts, groups } = splitMembers(members);
 
   return (
     <DetailsPanel>
@@ -59,40 +65,75 @@ export function RoleDetails({ role }: RoleDetailsProps) {
       </DetailsPanel.Section>
 
       <DetailsPanel.Section
-        labelKey="roles.details.members"
-        count={members.length}
+        labelKey="roles.details.users"
+        count={users.length}
         action={
           readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"
-              label={editMembersLabel}
+              label={editUsersLabel}
               onClick={() => openRoleEditorAt(role, 'members')}
             />
           )
         }
       >
-        {users.length > 0 && (
-          <DetailsPanel.Subsection labelKey="roles.details.users" count={users.length}>
-            <PrincipalAvatars principals={users} />
-          </DetailsPanel.Subsection>
-        )}
+        <PrincipalAvatars principals={users} />
+      </DetailsPanel.Section>
 
-        {groups.length > 0 && (
-          <DetailsPanel.Subsection labelKey="roles.details.groups" count={groups.length}>
-            <DetailsPanel.List items={groups}>
-              {(member) => (
-                <DetailsPanel.ListItem
-                  key={member.key}
-                  icon={<PrincipalIcon principal={member} />}
-                  title={member.displayName}
-                  subtitle={principalName(member.key)}
-                  meta={providerName(member.key)}
-                />
-              )}
-            </DetailsPanel.List>
-          </DetailsPanel.Subsection>
-        )}
+      {serviceAccounts.length > 0 && (
+        <DetailsPanel.Section
+          labelKey="roles.details.serviceAccounts"
+          count={serviceAccounts.length}
+          action={
+            readOnly ? undefined : (
+              <Button
+                variant="outline"
+                size="sm"
+                label={editServiceAccountsLabel}
+                onClick={() => openRoleEditorAt(role, 'members')}
+              />
+            )
+          }
+        >
+          <DetailsPanel.List items={serviceAccounts}>
+            {(member) => (
+              <DetailsPanel.ListItem
+                key={member.key}
+                icon={<ServiceAccountIcon />}
+                title={member.displayName}
+                subtitle={principalName(member.key)}
+              />
+            )}
+          </DetailsPanel.List>
+        </DetailsPanel.Section>
+      )}
+
+      <DetailsPanel.Section
+        labelKey="roles.details.groups"
+        count={groups.length}
+        action={
+          readOnly ? undefined : (
+            <Button
+              variant="outline"
+              size="sm"
+              label={editGroupsLabel}
+              onClick={() => openRoleEditorAt(role, 'members')}
+            />
+          )
+        }
+      >
+        <DetailsPanel.List items={groups}>
+          {(member) => (
+            <DetailsPanel.ListItem
+              key={member.key}
+              icon={<PrincipalIcon principal={member} />}
+              title={member.displayName}
+              subtitle={principalName(member.key)}
+              meta={providerName(member.key)}
+            />
+          )}
+        </DetailsPanel.List>
       </DetailsPanel.Section>
     </DetailsPanel>
   );
