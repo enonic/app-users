@@ -3,6 +3,7 @@ import { useState } from 'preact/hooks';
 
 import {
   principalName,
+  splitMembers,
   useIdProviderName,
   useTransitiveMemberships,
   type GroupDetail,
@@ -10,6 +11,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { ServiceAccountIcon } from '../../entities/principal/ui/ServiceAccountIcon';
 import { openGroupEditorAt } from '../../features/group-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
@@ -26,6 +28,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
   const editLabel = useI18n('browse.details.edit');
   const editRolesLabel = useI18n('groups.details.editRoles');
   const editUsersLabel = useI18n('groups.details.editUsers');
+  const editServiceAccountsLabel = useI18n('groups.details.editServiceAccounts');
   const editGroupsLabel = useI18n('groups.details.editGroups');
   const transitiveLabel = useI18n('groups.details.transitive');
   const transitiveFailedLabel = useI18n('groups.details.transitiveFailed');
@@ -44,9 +47,7 @@ export function GroupDetails({ group }: GroupDetailsProps) {
   const roles: readonly PrincipalRef[] = showInherited ? inherited.roles : group.roles;
   const groups: readonly PrincipalRef[] = showInherited ? inherited.groups : group.groups;
 
-  // Users first as a row of avatars, groups last as rows: a group inside a group is a row, not a branch.
-  const users = members.filter(({ type }) => type === 'user');
-  const memberGroups = members.filter(({ type }) => type === 'group');
+  const { users, serviceAccounts, groups: memberGroups } = splitMembers(members);
 
   return (
     <DetailsPanel>
@@ -149,6 +150,34 @@ export function GroupDetails({ group }: GroupDetailsProps) {
       >
         <PrincipalAvatars principals={users} />
       </DetailsPanel.Section>
+
+      {serviceAccounts.length > 0 && (
+        <DetailsPanel.Section
+          labelKey="groups.details.serviceAccounts"
+          count={serviceAccounts.length}
+          action={
+            readOnly ? undefined : (
+              <Button
+                variant="outline"
+                size="sm"
+                label={editServiceAccountsLabel}
+                onClick={() => openGroupEditorAt(group, 'members')}
+              />
+            )
+          }
+        >
+          <DetailsPanel.List items={serviceAccounts}>
+            {(member) => (
+              <DetailsPanel.ListItem
+                key={member.key}
+                icon={<ServiceAccountIcon />}
+                title={member.displayName}
+                subtitle={principalName(member.key)}
+              />
+            )}
+          </DetailsPanel.List>
+        </DetailsPanel.Section>
+      )}
 
       <DetailsPanel.Section
         labelKey="groups.details.groups"

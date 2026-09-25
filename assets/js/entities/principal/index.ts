@@ -82,6 +82,8 @@ export type {
   PrincipalNameCheckState,
   PrincipalNameCheckStatus,
 } from './model/principal-name-check.store';
+export { splitMembers } from './model/principal-members';
+export type { PrincipalMembers } from './model/principal-members';
 export {
   idProviderOf,
   IMPLICIT_ROLE_KEYS,
