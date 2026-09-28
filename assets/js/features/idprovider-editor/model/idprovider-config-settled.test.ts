@@ -1,12 +1,17 @@
 import { Form } from '@enonic/input-types/schema';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { whenIdProviderConfigSettled } from './idprovider-config-settled';
 import {
+  whenIdProviderConfigSettled,
+  whenIdProviderConfigSettledForSave,
+} from './idprovider-config-settled';
+import {
+  $idProviderConfigAttempt,
   beginIdProviderConfigLoad,
   clearIdProviderConfig,
   failIdProviderConfigLoad,
   receiveIdProviderConfig,
+  retryIdProviderConfigLoad,
 } from './idprovider-config.store';
 
 const APP = 'com.example.oidc';
@@ -69,5 +74,53 @@ describe('whenIdProviderConfigSettled', () => {
     await vi.advanceTimersByTimeAsync(1_000);
 
     await expect(settled).resolves.toEqual({ status: 'loading', application: APP });
+  });
+});
+
+describe('retryIdProviderConfigLoad', () => {
+  it('asks for the binding again after a failed load', () => {
+    failIdProviderConfigLoad(APP);
+    const before = $idProviderConfigAttempt.get();
+
+    retryIdProviderConfigLoad(APP);
+
+    expect($idProviderConfigAttempt.get()).toBe(before + 1);
+  });
+
+  it('leaves a load that answered, or another application’s failure, alone', () => {
+    const before = $idProviderConfigAttempt.get();
+
+    receiveIdProviderConfig(APP, FORM, []);
+    retryIdProviderConfigLoad(APP);
+    failIdProviderConfigLoad('com.example.ldap');
+    retryIdProviderConfigLoad(APP);
+
+    expect($idProviderConfigAttempt.get()).toBe(before);
+  });
+});
+
+describe('whenIdProviderConfigSettledForSave', () => {
+  it('asks once more after a failed load, and answers with what the retry brings', async () => {
+    failIdProviderConfigLoad(APP);
+    // What the wizard's load does when the attempt moves on.
+    const unsubscribe = $idProviderConfigAttempt.listen(() => {
+      beginIdProviderConfigLoad(APP);
+      queueMicrotask(() => receiveIdProviderConfig(APP, FORM, []));
+    });
+
+    const settled = await whenIdProviderConfigSettledForSave(APP);
+    unsubscribe();
+
+    expect(settled).toMatchObject({ status: 'ready', application: APP });
+  });
+
+  it('answers a load that did not fail without asking again', async () => {
+    receiveIdProviderConfig(APP, FORM, []);
+    const before = $idProviderConfigAttempt.get();
+
+    await expect(whenIdProviderConfigSettledForSave(APP)).resolves.toMatchObject({
+      status: 'ready',
+    });
+    expect($idProviderConfigAttempt.get()).toBe(before);
   });
 });

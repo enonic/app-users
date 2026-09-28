@@ -26,6 +26,14 @@ export function writesIdProviderConfig({
 }
 
 /**
+ * Whether the configuration dialog opens on what the provider already holds: an edit that keeps its
+ * binding. A create, or an edit that picked another application, starts from the form's defaults instead.
+ */
+export function editsStoredIdProviderConfig({ application, bound }: IdProviderBinding): boolean {
+  return application.length > 0 && application === bound;
+}
+
+/**
  * The configuration a save writes: what the dialog applied, or else what is stored, with the form's
  * defaults where neither has a value. Undefined keeps the stored tree: a save that writes none, or an
  * application with no form to read it through.

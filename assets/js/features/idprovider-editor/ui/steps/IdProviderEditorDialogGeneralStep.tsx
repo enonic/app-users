@@ -52,12 +52,6 @@ export function IdProviderEditorDialogGeneralStep() {
 
   const [configuring, setConfiguring] = useState(false);
 
-  // Told, never enforced: Save stays open, and the dialog is where the inputs themselves say what is missing.
-  const configIssueKey = useMemo(
-    () => idProviderConfigIssue(configSession, form.application, form.config),
-    [configSession, form.application, form.config],
-  );
-
   const selected = applications.find(({ key }) => key === form.application);
 
   // Labels
@@ -68,6 +62,12 @@ export function IdProviderEditorDialogGeneralStep() {
   const applicationPlaceholder = useI18n('idProviders.dialog.applicationPlaceholder');
   const configLabel = useI18n('idProviders.dialog.editConfig');
   const clearApplicationLabel = useI18n('idProviders.dialog.clearApplication');
+
+  // Told, never enforced: Save stays open, and the dialog is where the inputs themselves say what is missing.
+  const configIssueKey = useMemo(
+    () => idProviderConfigIssue(configSession, form.application, form.config),
+    [configSession, form.application, form.config],
+  );
 
   // Errors
   const shown = visitedErrors(errors, visited);

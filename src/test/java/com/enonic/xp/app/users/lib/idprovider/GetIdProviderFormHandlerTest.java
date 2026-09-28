@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.form.FieldSet;
 import com.enonic.xp.form.Form;
+import com.enonic.xp.form.FormFragment;
 import com.enonic.xp.form.FormItemSet;
 import com.enonic.xp.form.FormOptionSet;
 import com.enonic.xp.form.FormOptionSetOption;
@@ -72,6 +73,14 @@ public class GetIdProviderFormHandlerTest
     }
 
     @Test
+    public void testNoBundle()
+    {
+        Mockito.when( descriptorService.getDescriptor( APP ) ).thenReturn( descriptor( form() ) );
+
+        runFunction( SCRIPT, "getUntranslatedForm" );
+    }
+
+    @Test
     public void testNoForm()
     {
         Mockito.when( descriptorService.getDescriptor( APP ) ).thenReturn( descriptor( Form.empty() ) );
@@ -114,12 +123,13 @@ public class GetIdProviderFormHandlerTest
                           .put( "label", GenericValue.newObject().put( "text", "OpenID only" ).put( "i18n", "scope.openid" ).build() )
                           .build() )
                 .add( GenericValue.newObject().put( "value", "email" ).put( "label", "Email" ).build() )
+                .add( GenericValue.stringValue( "profile" ) )
                 .build() )
             .build();
 
         final FieldSet claims = FieldSet.create()
             .label( "Claims" )
-            .addFormItem( Input.create().name( "claim" ).label( "Claim" ).inputType( InputTypeName.TEXT_LINE ).build() )
+            .addFormItem( Input.create().name( "claim" ).label( "Claim" ).labelI18nKey( "" ).inputType( InputTypeName.TEXT_LINE ).build() )
             .build();
 
         final FormItemSet endpoints = FormItemSet.create()
@@ -144,14 +154,24 @@ public class GetIdProviderFormHandlerTest
                                      .build() )
             .build();
 
-        return Form.create().addFormItem( clientId ).addFormItem( scope ).addFormItem( claims ).addFormItem( endpoints ).addFormItem(
-            mode ).build();
+        // The descriptor service refuses a provider form with a fragment; one that gets through is left out.
+        final FormFragment fragment = FormFragment.create().formFragment( "com.enonic.app.oidc:shared" ).build();
+
+        return Form.create()
+            .addFormItem( clientId )
+            .addFormItem( scope )
+            .addFormItem( claims )
+            .addFormItem( endpoints )
+            .addFormItem( mode )
+            .addFormItem( fragment )
+            .build();
     }
 
     private static MessageBundle bundle( final Map<String, String> phrases )
     {
         final MessageBundle bundle = Mockito.mock( MessageBundle.class );
-        Mockito.when( bundle.localize( ArgumentMatchers.anyString() ) ).thenAnswer( call -> phrases.get( call.getArgument( 0, String.class ) ) );
+        Mockito.when( bundle.localize( ArgumentMatchers.anyString() ) )
+            .thenAnswer( call -> phrases.get( call.getArgument( 0, String.class ) ) );
         return bundle;
     }
 }

@@ -10,6 +10,7 @@ import { useHostFrame } from '../../../shared/host';
 import { useI18n } from '../../../shared/i18n';
 import { ConfirmDialog } from '../../../shared/ui/dialogs/ConfirmDialog';
 import { ModalDialog } from '../../../shared/ui/dialogs/ModalDialog';
+import { editsStoredIdProviderConfig } from '../model/idprovider-config-effective';
 import {
   isConfigChanged,
   isConfigValid,
@@ -17,7 +18,7 @@ import {
   savedConfigOf,
 } from '../model/idprovider-config-tree';
 import { CONFIG_INPUT_TYPES } from '../model/idprovider-config-types';
-import { $idProviderConfig } from '../model/idprovider-config.store';
+import { $idProviderConfig, retryIdProviderConfigLoad } from '../model/idprovider-config.store';
 import { $idProviderEditor, updateIdProviderEditorForm } from '../model/idprovider-editor.store';
 
 export type ConfigDialogProps = {
@@ -49,15 +50,12 @@ export function ConfigDialog({
   const title = useI18n('idProviders.dialog.configTitle', applicationName);
   const loadingLabel = useI18n('idProviders.dialog.configLoading');
   const failedLabel = useI18n('idProviders.dialog.configFailed');
-  const incompleteLabel = useI18n('idProviders.dialog.configIncomplete');
   const closeLabel = useI18n('browse.dialog.close');
   const cancelLabel = useI18n('browse.dialog.cancel');
   const applyLabel = useI18n('idProviders.dialog.configApply');
 
   const closeQuestion = useI18n('browse.dialog.closeQuestion');
 
-  const [visibility, setVisibility] = useState<ValidationVisibility>('interactive');
-  const [refused, setRefused] = useState(false);
   const [changed, setChanged] = useState(false);
   const [closing, setClosing] = useState(false);
 
@@ -67,26 +65,40 @@ export function ConfigDialog({
     if (!open || session.status !== 'ready' || session.application !== application) {
       return undefined;
     }
-    const { config } = $idProviderEditor.get().form;
-    const tree = openConfigTree(session.form, config ?? session.stored);
-    return { form: session.form, tree, opened: savedConfigOf(tree) };
+    const { form, mode, entity } = $idProviderEditor.get();
+    const tree = openConfigTree(session.form, form.config ?? session.stored);
+    const bound = mode === 'edit' ? (entity?.application?.key ?? '') : '';
+    // A configuration applied or stored before, and already breaking the form, shows what is wrong at once;
+    // one being started from the defaults waits for the user, as any fresh form does.
+    const filled =
+      form.config !== undefined ||
+      editsStoredIdProviderConfig({ application, applied: form.config, bound });
+    const broken = filled && !isConfigValid(session.form, tree);
+    return { form: session.form, tree, opened: savedConfigOf(tree), broken };
   }, [open, session, application]);
 
+  // ! Derived, not stored: a broken configuration has to show its errors on the very first frame.
+  const visibility: ValidationVisibility = editing?.broken === true ? 'all' : 'interactive';
+
   useEffect(() => {
-    setVisibility('interactive');
-    setRefused(false);
     setChanged(false);
     setClosing(false);
   }, [editing]);
 
-  // What closing would lose, and whether a refusal still stands: both follow the tree the form edits.
+  // Opening on a failed load reads the binding again, so one failed request does not lock the dialog.
+  useEffect(() => {
+    if (open) {
+      retryIdProviderConfigLoad(application);
+    }
+  }, [open, application]);
+
+  // What closing would lose follows the tree the form edits.
   useEffect(() => {
     if (editing === undefined) {
       return;
     }
     const recheck = (): void => {
       setChanged(isConfigChanged(editing.tree, editing.opened));
-      setRefused((was) => was && !isConfigValid(editing.form, editing.tree));
     };
     editing.tree.onChanged(recheck);
     return () => editing.tree.unChanged(recheck);
@@ -103,12 +115,6 @@ export function ConfigDialog({
 
   const apply = (): void => {
     if (editing === undefined) {
-      return;
-    }
-
-    if (!isConfigValid(editing.form, editing.tree)) {
-      setVisibility('all');
-      setRefused(true);
       return;
     }
 
@@ -131,7 +137,6 @@ export function ConfigDialog({
         primaryDisabled={editing === undefined}
         cancelLabel={cancelLabel}
         closeLabel={closeLabel}
-        error={refused ? incompleteLabel : undefined}
         onClose={requestClose}
         onPrimary={apply}
       >
@@ -150,8 +155,6 @@ export function ConfigDialog({
               registry={CONFIG_INPUT_TYPES}
               enabled
               notify={(message) => notify('warning', message)}
-              // Apply refuses an invalid tree, so the refusal has to show inside a fresh occurrence too.
-              revealFreshOccurrences
             />
           </ValidationVisibilityProvider>
         )}

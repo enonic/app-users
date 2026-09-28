@@ -16,6 +16,9 @@ export type IdProviderConfigState =
 
 export const $idProviderConfig = atom<IdProviderConfigState>({ status: 'idle' });
 
+/** Bumped to read the binding again after a failed load; the wizard's load keys on it. */
+export const $idProviderConfigAttempt = atom(0);
+
 export function beginIdProviderConfigLoad(application: string): void {
   $idProviderConfig.set({ status: 'loading', application });
 }
@@ -38,4 +41,12 @@ export function failIdProviderConfigLoad(application: string): void {
 
 export function clearIdProviderConfig(): void {
   $idProviderConfig.set({ status: 'idle' });
+}
+
+/** Reads the binding again when its last load failed; a load that answered is left alone. */
+export function retryIdProviderConfigLoad(application: string): void {
+  const state = $idProviderConfig.get();
+  if (state.status === 'error' && state.application === application) {
+    $idProviderConfigAttempt.set($idProviderConfigAttempt.get() + 1);
+  }
 }

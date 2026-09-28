@@ -12,7 +12,7 @@ import {
   effectiveIdProviderConfig,
   writesIdProviderConfig,
 } from '../model/idprovider-config-effective';
-import { whenIdProviderConfigSettled } from '../model/idprovider-config-settled';
+import { whenIdProviderConfigSettledForSave } from '../model/idprovider-config-settled';
 import { $idProviderConfig } from '../model/idprovider-config.store';
 import { loadIdProviderDefaultPermissions } from '../model/idprovider-defaults';
 import { idProviderDraftFrom } from '../model/idprovider-draft';
@@ -72,7 +72,7 @@ export function IdProviderEditorDialog({
           bound: mode === 'edit' ? (entity?.application?.key ?? '') : '',
         };
         const settled = writesIdProviderConfig(binding)
-          ? whenIdProviderConfigSettled(form.application)
+          ? whenIdProviderConfigSettledForSave(form.application)
           : Promise.resolve($idProviderConfig.get());
 
         return ResultAsync.fromSafePromise(settled).andThen((state) => {

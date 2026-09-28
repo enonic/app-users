@@ -3,6 +3,7 @@ import type { FormJson, PropertyTreeJson } from '@enonic/ui-types';
 import { describe, expect, it } from 'vitest';
 
 import {
+  editsStoredIdProviderConfig,
   effectiveIdProviderConfig,
   writesIdProviderConfig,
   type IdProviderBinding,
@@ -101,5 +102,25 @@ describe('writesIdProviderConfig', () => {
     ['a provider bound to nothing', { application: '', applied: undefined, bound: '' }, false],
   ])('answers for %s', (_, binding, writes) => {
     expect(writesIdProviderConfig(binding)).toBe(writes);
+  });
+});
+
+describe('editsStoredIdProviderConfig', () => {
+  it.each<[string, IdProviderBinding, boolean]>([
+    ['an edit that keeps its binding', { application: APP, applied: undefined, bound: APP }, true],
+    [
+      'an edit that keeps its binding and applied a tree',
+      { application: APP, applied: FILLED, bound: APP },
+      true,
+    ],
+    ['a create that binds an application', created(), false],
+    [
+      'an edit that binds another application',
+      { application: APP, applied: undefined, bound: 'com.example.ldap' },
+      false,
+    ],
+    ['a provider bound to nothing', { application: '', applied: undefined, bound: '' }, false],
+  ])('answers for %s', (_, binding, stored) => {
+    expect(editsStoredIdProviderConfig(binding)).toBe(stored);
   });
 });

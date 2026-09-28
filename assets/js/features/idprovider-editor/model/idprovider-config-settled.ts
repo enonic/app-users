@@ -1,4 +1,8 @@
-import { $idProviderConfig, type IdProviderConfigState } from './idprovider-config.store';
+import {
+  $idProviderConfig,
+  retryIdProviderConfigLoad,
+  type IdProviderConfigState,
+} from './idprovider-config.store';
 
 /** How long a save waits for the form before it writes without one, as it would before any load. */
 export const CONFIG_SETTLE_TIMEOUT_MS = 10_000;
@@ -30,6 +34,23 @@ export function whenIdProviderConfigSettled(
       }
     });
   });
+}
+
+/**
+ * As `whenIdProviderConfigSettled`, but a load that failed is asked for once more before the answer is
+ * taken: a save would otherwise write the binding without its form over one failed request.
+ */
+export async function whenIdProviderConfigSettledForSave(
+  application: string,
+  timeoutMs = CONFIG_SETTLE_TIMEOUT_MS,
+): Promise<IdProviderConfigState> {
+  const settled = await whenIdProviderConfigSettled(application, timeoutMs);
+  if (settled.status !== 'error') {
+    return settled;
+  }
+
+  retryIdProviderConfigLoad(application);
+  return whenIdProviderConfigSettled(application, timeoutMs);
 }
 
 function isSettled(state: IdProviderConfigState, application: string): boolean {

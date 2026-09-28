@@ -2,7 +2,7 @@ import { useStore } from '@nanostores/preact';
 import { useEffect } from 'preact/hooks';
 
 import { loadIdProviderConfig } from './idprovider-config.load';
-import { clearIdProviderConfig } from './idprovider-config.store';
+import { $idProviderConfigAttempt, clearIdProviderConfig } from './idprovider-config.store';
 import { $idProviderEditor, $idProviderEditorApplication } from './idprovider-editor.store';
 
 /**
@@ -14,6 +14,7 @@ import { $idProviderEditor, $idProviderEditorApplication } from './idprovider-ed
 export function useIdProviderEditorConfig(): void {
   const { mode, entity } = useStore($idProviderEditor, { keys: ['mode', 'entity'] });
   const application = useStore($idProviderEditorApplication);
+  const attempt = useStore($idProviderConfigAttempt);
 
   const idProvider = mode === 'edit' ? entity?.key : undefined;
 
@@ -30,5 +31,6 @@ export function useIdProviderEditorConfig(): void {
       controller.abort();
       clearIdProviderConfig();
     };
-  }, [application, idProvider]);
+    // `attempt` is only a trigger: a retry of a failed load reads the same binding again.
+  }, [application, idProvider, attempt]);
 }

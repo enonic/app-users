@@ -23,6 +23,8 @@ function form(translated) {
           // `{ text, i18n }` is flattened to the text in the admin's language.
           { value: 'openid', label: translated ? 'Kun OpenID' : 'OpenID only' },
           { value: 'email', label: 'Email' },
+          // An option that is no object passes through as it is.
+          'profile',
         ],
       },
     },
