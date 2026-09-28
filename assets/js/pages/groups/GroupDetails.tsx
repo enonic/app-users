@@ -2,6 +2,7 @@ import { Button, Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
+  idProviderOf,
   principalName,
   splitMembers,
   useIdProviderName,
@@ -11,7 +12,6 @@ import {
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { ServiceAccountIcon } from '../../entities/principal/ui/ServiceAccountIcon';
 import { openGroupEditorAt } from '../../features/group-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
@@ -106,7 +106,7 @@ export function GroupDetails({
                 icon={<PrincipalIcon principal={principal} />}
                 title={principal.displayName}
                 subtitle={principalName(principal.key)}
-                meta={providerName(principal.key)}
+                meta={idProviderOf(principal.key)}
               />
             )}
           </DetailsPanel.List>
@@ -134,7 +134,7 @@ export function GroupDetails({
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
-              meta={providerName(principal.key)}
+              meta={idProviderOf(principal.key)}
             />
           )}
         </DetailsPanel.List>
@@ -175,7 +175,7 @@ export function GroupDetails({
           {(member) => (
             <DetailsPanel.ListItem
               key={member.key}
-              icon={<ServiceAccountIcon />}
+              icon={<PrincipalIcon principal={member} />}
               title={member.displayName}
               subtitle={principalName(member.key)}
             />
@@ -204,7 +204,7 @@ export function GroupDetails({
               icon={<PrincipalIcon principal={member} />}
               title={member.displayName}
               subtitle={principalName(member.key)}
-              meta={providerName(member.key)}
+              meta={idProviderOf(member.key)}
             />
           )}
         </DetailsPanel.List>

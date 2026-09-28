@@ -1,11 +1,9 @@
-import { Avatar, cn } from '@enonic/ui';
-import { Settings, Users, UserShield, type LucideIcon } from 'lucide-react';
+import { Avatar } from '@enonic/ui';
+import { UserCog, Users, UserShield, type LucideIcon } from 'lucide-react';
 
 import { getInitials } from '../../../shared/format';
-import { i18n } from '../../../shared/i18n';
-import { IconBadge } from '../../../shared/ui/IconBadge';
-import { isPlatformRole, isSystemUser } from '../model/principal.keys';
-import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
+import { isServiceAccount } from '../model/principal.keys';
+import type { PrincipalRef, PrincipalType } from '../model/principal.types';
 
 export type PrincipalIconSize = 'xs' | 'sm' | 'lg';
 
@@ -30,80 +28,28 @@ const AVATAR: Record<PrincipalIconSize, { size: 'sm' | 'md' | 'lg'; className?: 
   lg: { size: 'lg' },
 };
 
-/**
- * ! The cog carries no disc — it is drawn in `currentColor`, same as the glyph, so both follow the row's
- * ! text color together (`text-alt` on the inverse selected row included). What keeps the icon from
- * ! crossing it is this notch, cut out of the icon alone: a hole centred where the badge sits — badge
- * ! box offset -3px into the corner, so sm (14px box on a 28px icon) centres at 24,4 and lg (18px box
- * ! on 48px) at 42,6 — with the radius leaving ~2px of clear ground around the cog on any background.
- * ! The avatar and the glyph share a box per size, so one notch fits both.
- */
-const NOTCH: Record<PrincipalIconSize, string> = {
-  xs: '[mask-image:radial-gradient(circle_at_14px_4px,transparent_7px,#000_7.5px)]',
-  sm: '[mask-image:radial-gradient(circle_at_24px_4px,transparent_7px,#000_7.5px)]',
-  lg: '[mask-image:radial-gradient(circle_at_42px_6px,transparent_9px,#000_9.5px)]',
-};
-
-/** A user's initials, or the glyph for a group or role, with a cog badge on the ones the platform owns. */
+/** A user's initials, or the glyph for a service account, group or role. */
 export function PrincipalIcon({ principal, size = 'sm' }: PrincipalIconProps) {
   const { key, type, displayName } = principal;
 
-  const badgeLabelKey = systemBadgeKey(type, key);
-  if (badgeLabelKey === undefined) {
-    return icon(type, displayName, size);
+  // A service account gets its section's glyph, not initials.
+  if (type === 'user' && isServiceAccount(key)) {
+    return glyph(UserCog, size);
   }
 
-  return (
-    <span className="relative inline-flex shrink-0">
-      {icon(type, displayName, size, NOTCH[size])}
-
-      <IconBadge
-        icon={Settings}
-        size={size === 'lg' ? 'md' : 'sm'}
-        label={i18n(badgeLabelKey)}
-        className="absolute -top-0.75 -right-0.75 text-current"
-      />
-    </span>
-  );
+  return type === 'user' ? initialsAvatar(displayName, size) : glyph(GLYPHS[type], size);
 }
 
-function icon(
-  type: PrincipalType,
-  displayName: string,
-  size: PrincipalIconSize,
-  className?: string,
-) {
-  return type === 'user'
-    ? initialsAvatar(displayName, size, className)
-    : glyph(type, size, className);
-}
-
-function initialsAvatar(displayName: string, size: PrincipalIconSize, className?: string) {
+function initialsAvatar(displayName: string, size: PrincipalIconSize) {
   const { size: avatarSize, className: box } = AVATAR[size];
   return (
-    <Avatar size={avatarSize} className={cn(box, className)} aria-hidden>
+    <Avatar size={avatarSize} className={box} aria-hidden>
       {/* The fallback hardcodes `cursor-default`, an arrow over the avatar alone in a clickable row. */}
       <Avatar.Fallback className="cursor-[inherit]">{getInitials(displayName)}</Avatar.Fallback>
     </Avatar>
   );
 }
 
-function glyph(type: Exclude<PrincipalType, 'user'>, size: PrincipalIconSize, className?: string) {
-  const Glyph = GLYPHS[type];
-  return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden className={className} />;
-}
-
-/**
- * The principals the platform owns rather than an administrator: `su` and `anonymous`, and the roles
- * that ship with it. A group has no such reading — every group is created, none is shipped.
- *
- * ? Platform roles rather than the `role:system.` prefix alone, so the badge and the roles section's
- * ? own System filter answer the same question: `cms.admin` is as much the platform's as `system.admin`.
- */
-function systemBadgeKey(type: PrincipalType, key: PrincipalKey): string | undefined {
-  if (type === 'user' && isSystemUser(key)) {
-    return 'principal.badge.systemUser';
-  }
-
-  return type === 'role' && isPlatformRole(key) ? 'principal.badge.systemRole' : undefined;
+function glyph(Glyph: LucideIcon, size: PrincipalIconSize) {
+  return <Glyph size={PIXELS[size]} strokeWidth={1.5} aria-hidden />;
 }

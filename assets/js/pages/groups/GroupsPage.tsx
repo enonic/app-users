@@ -1,16 +1,12 @@
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
-import type { ReactNode } from 'react';
 
 import {
   DEFAULT_PRINCIPAL_SORT,
   useGroups,
-  useIdProviderLabel,
   useIdProviderName,
-  type PrincipalKey,
   type PrincipalSort,
 } from '../../entities/principal';
-import { IdProviderCell } from '../../entities/principal/ui/IdProviderCell';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { GroupEditorDialog } from '../../features/group-editor/ui/GroupEditorDialog';
 import { isReadOnlyMode } from '../../shared/config';
@@ -18,7 +14,7 @@ import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
-import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
+import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
@@ -38,26 +34,21 @@ import { useGroupsScreen } from './model/useGroupsScreen';
 const GROUPS_PAGE_NAME = 'GroupsPage';
 
 export function GroupsPage() {
-  // One request for both domains: the groups, and the providers whose display names the rows show — a
+  // One request for both domains: the groups, and the providers whose display names the filter shows — a
   // group key carries only the provider's name.
   useGroupsScreen();
   const { openItem, closeItem } = useHostFrame();
   const activeKey = useItemId();
   const { status, items } = useGroups();
-  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
-  // The provenance cell always keeps the provider's display name and name visible.
-  const providerCell = (key: PrincipalKey): ReactNode => {
-    const label = providerLabel(key);
-    return label === undefined ? undefined : <IdProviderCell {...label} />;
-  };
-
   const providerName = useIdProviderName();
   const query = useStore(groupsSearch.$query);
   const selectedProviders = useStore(groupsFilter.$selected);
   const sort = useStore($groupsSort);
 
+  const sortNameLabel = useI18n('groups.sort.name');
   const sortNameAscLabel = useI18n('groups.sort.nameAsc');
   const sortNameDescLabel = useI18n('groups.sort.nameDesc');
+  const sortProviderLabel = useI18n('groups.sort.idProvider');
   const sortProviderAscLabel = useI18n('groups.sort.idProviderAsc');
   const sortProviderDescLabel = useI18n('groups.sort.idProviderDesc');
   const emptyLabel = useI18n('groups.list.empty');
@@ -66,13 +57,23 @@ export function GroupsPage() {
 
   const sortOptions = useMemo(
     () => [
-      { id: 'displayNameAsc', label: sortNameAscLabel },
-      { id: 'displayNameDesc', label: sortNameDescLabel },
-      { id: 'idProviderAsc', label: sortProviderAscLabel },
-      { id: 'idProviderDesc', label: sortProviderDescLabel },
+      { id: 'displayNameAsc', label: sortNameAscLabel, field: sortNameLabel, direction: 'asc' },
+      { id: 'displayNameDesc', label: sortNameDescLabel, field: sortNameLabel, direction: 'desc' },
+      {
+        id: 'idProviderAsc',
+        label: sortProviderAscLabel,
+        field: sortProviderLabel,
+        direction: 'asc',
+      },
+      {
+        id: 'idProviderDesc',
+        label: sortProviderDescLabel,
+        field: sortProviderLabel,
+        direction: 'desc',
+      },
     ],
     [],
-  ) satisfies readonly { id: PrincipalSort; label: string }[];
+  ) satisfies readonly BrowseSortOption<PrincipalSort>[];
 
   // Shared with the filter entries below, so the query runs once per render rather than twice.
   const searched = useMemo(() => searchGroups(items, query), [items, query]);
@@ -101,8 +102,7 @@ export function GroupsPage() {
     resetOnLeave: [groupsFilter],
     visible,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
-    toRow: (group) =>
-      toGroupRow(group, <PrincipalIcon principal={group} />, providerCell(group.key)),
+    toRow: (group) => toGroupRow(group, <PrincipalIcon principal={group} />),
     reload: () => void loadGroupsScreen(),
   });
 

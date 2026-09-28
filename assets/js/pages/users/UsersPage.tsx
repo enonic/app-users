@@ -1,18 +1,14 @@
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
-import type { ReactNode } from 'react';
 
 import {
   $idProviderUserCounts,
   DEFAULT_PRINCIPAL_SORT,
   forgetUserDetails,
   replaceUser,
-  useIdProviderLabel,
   useUsers,
-  type PrincipalKey,
   type PrincipalSort,
 } from '../../entities/principal';
-import { IdProviderCell } from '../../entities/principal/ui/IdProviderCell';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
 import { isReadOnlyMode } from '../../shared/config';
@@ -20,7 +16,7 @@ import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
-import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
+import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
@@ -49,17 +45,13 @@ export function UsersPage() {
   const activeKey = useItemId();
   const { status, items, appending, error, hasMore } = useUsers();
   const { items: providerCounts, status: providersStatus } = useStore($idProviderUserCounts);
-  const providerLabel = useIdProviderLabel({ alwaysShowName: true });
-  // The provenance cell always keeps the provider's display name and name visible.
-  const providerCell = (key: PrincipalKey): ReactNode => {
-    const label = providerLabel(key);
-    return label === undefined ? undefined : <IdProviderCell {...label} />;
-  };
 
   const { idProviders, sort } = useStore($usersQuery);
 
+  const sortNameLabel = useI18n('users.sort.name');
   const sortNameAscLabel = useI18n('users.sort.nameAsc');
   const sortNameDescLabel = useI18n('users.sort.nameDesc');
+  const sortProviderLabel = useI18n('users.sort.idProvider');
   const sortProviderAscLabel = useI18n('users.sort.idProviderAsc');
   const sortProviderDescLabel = useI18n('users.sort.idProviderDesc');
   const emptyLabel = useI18n('users.list.empty');
@@ -70,13 +62,23 @@ export function UsersPage() {
 
   const sortOptions = useMemo(
     () => [
-      { id: 'displayNameAsc', label: sortNameAscLabel },
-      { id: 'displayNameDesc', label: sortNameDescLabel },
-      { id: 'idProviderAsc', label: sortProviderAscLabel },
-      { id: 'idProviderDesc', label: sortProviderDescLabel },
+      { id: 'displayNameAsc', label: sortNameAscLabel, field: sortNameLabel, direction: 'asc' },
+      { id: 'displayNameDesc', label: sortNameDescLabel, field: sortNameLabel, direction: 'desc' },
+      {
+        id: 'idProviderAsc',
+        label: sortProviderAscLabel,
+        field: sortProviderLabel,
+        direction: 'asc',
+      },
+      {
+        id: 'idProviderDesc',
+        label: sortProviderDescLabel,
+        field: sortProviderLabel,
+        direction: 'desc',
+      },
     ],
     [],
-  ) satisfies readonly { id: PrincipalSort; label: string }[];
+  ) satisfies readonly BrowseSortOption<PrincipalSort>[];
 
   // ! Entries come from the provider list, never from the rows: the rows are one page, so a provider the
   // ! page happens not to contain would disappear from the menu while still narrowing the query. They
@@ -98,7 +100,7 @@ export function UsersPage() {
     // The server narrowed and ordered this page; the client adds nothing.
     visible: items,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
-    toRow: (user) => toUserRow(user, <PrincipalIcon principal={user} />, providerCell(user.key)),
+    toRow: (user) => toUserRow(user, <PrincipalIcon principal={user} />),
     reload: () => void reloadUsersScreen(),
   });
 

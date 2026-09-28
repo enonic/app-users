@@ -3,9 +3,9 @@ import { KeyRound } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
 import {
+  idProviderOf,
   isSystemUser,
   principalName,
-  useIdProviderName,
   useTransitiveMemberships,
   type PrincipalRef,
   type UserDetail,
@@ -32,10 +32,10 @@ export function ServiceAccountDetails({
   'data-component': componentName = SERVICE_ACCOUNT_DETAILS_NAME,
 }: ServiceAccountDetailsProps) {
   const readOnly = isReadOnlyMode();
-  const providerName = useIdProviderName();
 
   const editLabel = useI18n('browse.details.edit');
   const emailNotSetLabel = useI18n('users.details.emailNotSet');
+  const systemLabel = useI18n('principal.type.system');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -81,7 +81,11 @@ export function ServiceAccountDetails({
           )
         }
       >
-        {!system && (
+        {system ? (
+          <DetailsPanel.Field labelKey="serviceAccounts.details.type">
+            {systemLabel}
+          </DetailsPanel.Field>
+        ) : (
           <DetailsPanel.Field labelKey="users.details.email">
             {email ?? emailNotSetLabel}
           </DetailsPanel.Field>
@@ -178,7 +182,7 @@ export function ServiceAccountDetails({
               icon={<PrincipalIcon principal={principal} />}
               title={principal.displayName}
               subtitle={principalName(principal.key)}
-              meta={providerName(principal.key)}
+              meta={idProviderOf(principal.key)}
             />
           )}
         </DetailsPanel.List>

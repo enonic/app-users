@@ -28,6 +28,14 @@ describe('toServiceAccountRow', () => {
     expect(toServiceAccountRow(account).meta).toBeUndefined();
   });
 
+  it('keeps the platform users out of the selection', () => {
+    expect(toServiceAccountRow(account).selectable).toBe(true);
+    expect(toServiceAccountRow({ ...account, key: 'user:system:su' }).selectable).toBe(false);
+    expect(toServiceAccountRow({ ...account, key: 'user:system:anonymous' }).selectable).toBe(
+      false,
+    );
+  });
+
   it('carries the icon the page hands it', () => {
     expect(toServiceAccountRow(account, 'icon').icon).toBe('icon');
   });

@@ -1,9 +1,8 @@
 import { Button, Checkbox } from '@enonic/ui';
-import { ArrowDownUp, Filter, RefreshCw } from 'lucide-react';
+import { ArrowDownUp, RefreshCw } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import { useI18n } from '../../shared/i18n';
-import { HEADER_CONTROL_CLASS, HEADER_CONTROL_LABEL_CLASS } from './header-controls';
 import { InertHeaderControl } from './InertHeaderControl';
 
 export type BrowseListHeaderProps = {
@@ -23,13 +22,11 @@ export function BrowseListHeader({
   allSelected,
   onSelectAllChange,
   onRefresh,
-  filter,
   sort,
   'data-component': componentName = BROWSE_LIST_HEADER_NAME,
 }: BrowseListHeaderProps) {
   const selectAllLabel = useI18n('browse.selectAll');
   const refreshLabel = useI18n('browse.refresh');
-  const filterLabel = useI18n('browse.filter');
   const sortLabel = useI18n('browse.sort');
 
   return (
@@ -51,17 +48,17 @@ export function BrowseListHeader({
       )}
 
       <div className="ml-auto flex flex-wrap items-center gap-2.5">
+        {/* TODO: remove it and its functionality when filter component lands */}
+        {/* {filter ?? <InertHeaderControl icon={Filter} label={filterLabel} />} */}
+        {sort ?? <InertHeaderControl icon={ArrowDownUp} label={sortLabel} />}
         <Button
           variant="text"
           startIcon={RefreshCw}
           title={refreshLabel}
+          aria-label={refreshLabel}
           onClick={onRefresh}
-          className={HEADER_CONTROL_CLASS}
-        >
-          <span className={HEADER_CONTROL_LABEL_CLASS}>{refreshLabel}</span>
-        </Button>
-        {filter ?? <InertHeaderControl icon={Filter} label={filterLabel} />}
-        {sort ?? <InertHeaderControl icon={ArrowDownUp} label={sortLabel} />}
+          className="px-2.5"
+        />
       </div>
     </div>
   );

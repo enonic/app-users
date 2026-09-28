@@ -1,14 +1,14 @@
 import { Button } from '@enonic/ui';
 
 import {
+  idProviderOf,
+  isPlatformRole,
   principalName,
   splitMembers,
-  useIdProviderName,
   type RoleDetail,
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
-import { ServiceAccountIcon } from '../../entities/principal/ui/ServiceAccountIcon';
 import { openRoleEditorAt } from '../../features/role-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { formatDateTime } from '../../shared/format';
@@ -27,13 +27,13 @@ export function RoleDetails({
   'data-component': componentName = ROLE_DETAILS_NAME,
 }: RoleDetailsProps) {
   const readOnly = isReadOnlyMode();
-  const providerName = useIdProviderName();
 
   const editLabel = useI18n('browse.details.edit');
   const editUsersLabel = useI18n('roles.details.editUsers');
   const editServiceAccountsLabel = useI18n('roles.details.editServiceAccounts');
   const editGroupsLabel = useI18n('roles.details.editGroups');
   const noDescriptionLabel = useI18n('roles.details.noDescription');
+  const systemLabel = useI18n('principal.type.system');
 
   const { key, displayName, description, modifiedTime, members } = role;
 
@@ -60,6 +60,9 @@ export function RoleDetails({
           )
         }
       >
+        {isPlatformRole(key) && (
+          <DetailsPanel.Field labelKey="roles.details.type">{systemLabel}</DetailsPanel.Field>
+        )}
         <DetailsPanel.Field labelKey="roles.details.description">
           {description ?? noDescriptionLabel}
         </DetailsPanel.Field>
@@ -105,7 +108,7 @@ export function RoleDetails({
           {(member) => (
             <DetailsPanel.ListItem
               key={member.key}
-              icon={<ServiceAccountIcon />}
+              icon={<PrincipalIcon principal={member} />}
               title={member.displayName}
               subtitle={principalName(member.key)}
             />
@@ -134,7 +137,7 @@ export function RoleDetails({
               icon={<PrincipalIcon principal={member} />}
               title={member.displayName}
               subtitle={principalName(member.key)}
-              meta={providerName(member.key)}
+              meta={idProviderOf(member.key)}
             />
           )}
         </DetailsPanel.List>

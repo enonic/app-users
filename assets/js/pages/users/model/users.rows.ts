@@ -3,13 +3,7 @@ import type { ReactNode } from 'react';
 import type { User } from '../../../entities/principal';
 import type { BrowseRow } from '../../../widgets/browse-list/browse-list';
 
-export function toUserRow(
-  user: User,
-  icon?: ReactNode,
-  // Built by the page from the loaded providers: the list is ordered by the provider's name, so the
-  // cell shows it under the name an administrator recognises.
-  provider?: ReactNode,
-): BrowseRow {
+export function toUserRow(user: User, icon?: ReactNode): BrowseRow {
   return {
     key: user.key,
     title: user.displayName,
@@ -18,6 +12,7 @@ export function toUserRow(
     // one the key is built from.
     subtitle: user.login,
     icon,
-    meta: provider === undefined ? undefined : [provider],
+    // Provenance: the provider's name, which the list is ordered by.
+    meta: [user.idProvider],
   };
 }
