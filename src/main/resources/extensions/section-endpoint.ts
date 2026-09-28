@@ -6,6 +6,8 @@ import { handleGraphQlRequest, type GraphQlRequest } from './graphql/request';
 /** The two names that locate a call below this extension's prefix. */
 type PrefixRequest = Pick<Request, 'rawPath' | 'contextPath'>;
 
+type PostRequest = PrefixRequest & Pick<Request, 'getHeader'> & GraphQlRequest;
+
 const STATIC_BASE = '/_static';
 const ASSET_ROOT = '/assets';
 const GRAPHQL_PATH = '/graphql';
@@ -20,8 +22,18 @@ export function get(request: PrefixRequest): Response {
   return { status: 404 };
 }
 
-export function post(request: PrefixRequest & GraphQlRequest): Response {
-  return extensionPath(request) === GRAPHQL_PATH ? handleGraphQlRequest(request) : { status: 404 };
+export function post(request: PostRequest): Response {
+  if (extensionPath(request) !== GRAPHQL_PATH) {
+    return { status: 404 };
+  }
+  if (request.getHeader('Sec-Fetch-Site') !== 'same-origin') {
+    return { status: 403 };
+  }
+  if (!isJson(request.getHeader('Content-Type'))) {
+    return { status: 415 };
+  }
+
+  return handleGraphQlRequest(request);
 }
 
 //
@@ -30,6 +42,11 @@ export function post(request: PrefixRequest & GraphQlRequest): Response {
 
 function extensionPath(request: PrefixRequest): string {
   return request.rawPath.slice((request.contextPath ?? '').length);
+}
+
+function isJson(contentType: string | null): boolean {
+  const mediaType = contentType?.split(';', 1)[0].trim().toLowerCase();
+  return mediaType === 'application/json';
 }
 
 // ! lib-static cannot serve anything from this app: it answers with a `ByteSource` body, and GraalJS
