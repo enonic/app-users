@@ -68,7 +68,9 @@ export function PrincipalPicker({
     const provider = idProviderOf(key);
     return (
       provider !== undefined && (
-        <span className="text-subtle text-sm whitespace-nowrap">{provider}</span>
+        <span className="text-subtle group-data-[tone=inverse]:text-alt text-sm whitespace-nowrap">
+          {provider}
+        </span>
       )
     );
   };
