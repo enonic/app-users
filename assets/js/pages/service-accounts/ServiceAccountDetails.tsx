@@ -35,6 +35,7 @@ export function ServiceAccountDetails({
 
   const editLabel = useI18n('browse.details.edit');
   const emailNotSetLabel = useI18n('users.details.emailNotSet');
+  const systemLabel = useI18n('principal.type.system');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -80,7 +81,11 @@ export function ServiceAccountDetails({
           )
         }
       >
-        {!system && (
+        {system ? (
+          <DetailsPanel.Field labelKey="serviceAccounts.details.type">
+            {systemLabel}
+          </DetailsPanel.Field>
+        ) : (
           <DetailsPanel.Field labelKey="users.details.email">
             {email ?? emailNotSetLabel}
           </DetailsPanel.Field>

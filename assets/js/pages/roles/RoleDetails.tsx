@@ -2,6 +2,7 @@ import { Button } from '@enonic/ui';
 
 import {
   idProviderOf,
+  isPlatformRole,
   principalName,
   splitMembers,
   type RoleDetail,
@@ -32,6 +33,7 @@ export function RoleDetails({
   const editServiceAccountsLabel = useI18n('roles.details.editServiceAccounts');
   const editGroupsLabel = useI18n('roles.details.editGroups');
   const noDescriptionLabel = useI18n('roles.details.noDescription');
+  const systemLabel = useI18n('principal.type.system');
 
   const { key, displayName, description, modifiedTime, members } = role;
 
@@ -58,6 +60,9 @@ export function RoleDetails({
           )
         }
       >
+        {isPlatformRole(key) && (
+          <DetailsPanel.Field labelKey="roles.details.type">{systemLabel}</DetailsPanel.Field>
+        )}
         <DetailsPanel.Field labelKey="roles.details.description">
           {description ?? noDescriptionLabel}
         </DetailsPanel.Field>
