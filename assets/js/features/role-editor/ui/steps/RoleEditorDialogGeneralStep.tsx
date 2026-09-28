@@ -15,27 +15,28 @@ import {
 } from '../../model/role-editor.store';
 
 const DISPLAY_NAME_ID = 'role-editor-display-name';
-const NAME_ID = 'role-editor-name';
+const ID_FIELD_ID = 'role-editor-id';
 const DESCRIPTION_ID = 'role-editor-description';
 
 export function RoleEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($roleEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($roleEditorErrors);
-  const nameCheck = useStore(roleNameCheck.$state);
+  const idCheck = useStore(roleNameCheck.$state);
 
   const persisted = mode === 'edit';
 
   // Labels
   const displayNameLabel = useI18n('roles.dialog.displayName');
-  const nameLabel = useI18n('roles.dialog.name');
+  const idLabel = useI18n('roles.dialog.id');
+  const idHelp = useI18n('roles.dialog.idHelp');
   const descriptionLabel = useI18n('roles.dialog.description');
 
   // Errors
   const shown = visitedErrors(errors, visited);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
-  // A taken name is told at once: the answer arrives after the field was typed in, visited or not.
-  const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
-  const nameError = nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name);
+  // A taken ID is told at once: the answer arrives after the field was typed in, visited or not.
+  const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name);
 
   return (
     <div className="flex flex-col gap-5">
@@ -51,14 +52,15 @@ export function RoleEditorDialogGeneralStep() {
         />
       </div>
 
-      {/* Name */}
+      {/* ID */}
       <div className="flex flex-col gap-1.5">
-        <FieldLabel text={nameLabel} required={!persisted} htmlFor={NAME_ID} />
+        <FieldLabel text={idLabel} required={!persisted} htmlFor={ID_FIELD_ID} />
         <Input
-          id={NAME_ID}
+          id={ID_FIELD_ID}
           disabled={persisted}
           value={form.name}
-          error={nameError}
+          description={persisted ? undefined : idHelp}
+          error={idError}
           onInput={({ currentTarget }) => setRoleEditorName(currentTarget.value)}
           onBlur={() => {
             markRoleEditorFieldVisited('name');

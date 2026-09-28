@@ -24,7 +24,7 @@ export const roleNameCheck = createPrincipalNameCheck('role');
 const $roleNameExternal = computed(
   roleNameCheck.$state,
   (check): StepDialogExternal<RoleFormField> => ({
-    errors: check.status === 'taken' ? { name: 'roles.dialog.nameTaken' } : {},
+    errors: check.status === 'taken' ? { name: 'roles.dialog.idTaken' } : {},
     busy: check.status === 'pending' ? ['name'] : [],
   }),
 );

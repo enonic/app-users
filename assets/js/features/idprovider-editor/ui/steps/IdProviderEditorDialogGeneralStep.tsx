@@ -23,7 +23,7 @@ import { isSystemIdProvider } from '../../model/idprovider-form';
 import { ConfigDialog } from '../ConfigDialog';
 
 const DISPLAY_NAME_ID = 'id-provider-editor-display-name';
-const NAME_ID = 'id-provider-editor-name';
+const ID_FIELD_ID = 'id-provider-editor-id';
 const DESCRIPTION_ID = 'id-provider-editor-description';
 const APPLICATION_LABEL_ID = 'id-provider-editor-application-label';
 
@@ -32,7 +32,7 @@ export function IdProviderEditorDialogGeneralStep() {
     keys: ['form', 'visited', 'mode', 'entity'],
   });
   const errors = useStore($idProviderEditorErrors);
-  const nameCheck = useStore(idProviderNameCheck.$state);
+  const idCheck = useStore(idProviderNameCheck.$state);
   const applications = useStore($idProviderApplications);
 
   const persisted = mode === 'edit';
@@ -45,7 +45,8 @@ export function IdProviderEditorDialogGeneralStep() {
 
   // Labels
   const displayNameLabel = useI18n('idProviders.dialog.displayName');
-  const nameLabel = useI18n('idProviders.dialog.name');
+  const idLabel = useI18n('idProviders.dialog.id');
+  const idHelp = useI18n('idProviders.dialog.idHelp');
   const descriptionLabel = useI18n('idProviders.dialog.description');
   const applicationLabel = useI18n('idProviders.dialog.application');
   const applicationPlaceholder = useI18n('idProviders.dialog.applicationPlaceholder');
@@ -55,9 +56,9 @@ export function IdProviderEditorDialogGeneralStep() {
   // Errors
   const shown = visitedErrors(errors, visited);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
-  // A taken name is told at once: the answer arrives after the field was typed in, visited or not.
-  const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
-  const nameError = nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name);
+  // A taken ID is told at once: the answer arrives after the field was typed in, visited or not.
+  const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name);
 
   return (
     <div className="flex flex-col gap-5">
@@ -73,14 +74,15 @@ export function IdProviderEditorDialogGeneralStep() {
         />
       </div>
 
-      {/* Name */}
+      {/* ID */}
       <div className="flex flex-col gap-1.5">
-        <FieldLabel text={nameLabel} required={!persisted} htmlFor={NAME_ID} />
+        <FieldLabel text={idLabel} required={!persisted} htmlFor={ID_FIELD_ID} />
         <Input
-          id={NAME_ID}
+          id={ID_FIELD_ID}
           disabled={persisted}
           value={form.name}
-          error={nameError}
+          description={persisted ? undefined : idHelp}
+          error={idError}
           onInput={({ currentTarget }) => setIdProviderEditorName(currentTarget.value)}
           onBlur={() => {
             markIdProviderEditorFieldVisited('name');

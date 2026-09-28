@@ -85,11 +85,11 @@ describe('$groupEditorErrors', () => {
     updateGroupEditorForm({ idProvider: 'store', displayName: 'Managers' });
     groupNameCheck.receive('group:store:managers', true);
 
-    expect($groupEditorErrors.get().name).toBe('groups.dialog.nameTaken');
+    expect($groupEditorErrors.get().name).toBe('groups.dialog.idTaken');
 
     updateGroupEditorForm({ name: '' });
 
-    expect($groupEditorErrors.get().name).toBe('groups.dialog.nameRequired');
+    expect($groupEditorErrors.get().name).toBe('groups.dialog.idRequired');
   });
 
   it('says nothing about a check that failed', () => {

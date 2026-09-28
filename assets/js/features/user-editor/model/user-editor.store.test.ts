@@ -81,11 +81,11 @@ describe('$userEditorErrors', () => {
     updateUserEditorForm({ idProvider: 'system', displayName: 'Alice' });
     userNameCheck.receive('user:system:alice', true);
 
-    expect($userEditorErrors.get().name).toBe('users.dialog.nameTaken');
+    expect($userEditorErrors.get().name).toBe('users.dialog.idTaken');
 
     updateUserEditorForm({ name: '' });
 
-    expect($userEditorErrors.get().name).toBe('users.dialog.nameRequired');
+    expect($userEditorErrors.get().name).toBe('users.dialog.idRequired');
   });
 
   it('says nothing about a check that failed', () => {
@@ -111,7 +111,7 @@ describe('$userEditorErrors', () => {
     userEmailCheck.receive('email:system|bot@example.com', true);
 
     expect($userEditorErrors.get()).toMatchObject({
-      name: 'serviceAccounts.dialog.nameTaken',
+      name: 'serviceAccounts.dialog.idTaken',
       email: 'serviceAccounts.dialog.emailTaken',
     });
   });

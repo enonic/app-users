@@ -80,11 +80,11 @@ describe('$roleEditorErrors', () => {
     updateRoleEditorForm({ displayName: 'Store Manager' });
     roleNameCheck.receive('role:store.manager', true);
 
-    expect($roleEditorErrors.get().name).toBe('roles.dialog.nameTaken');
+    expect($roleEditorErrors.get().name).toBe('roles.dialog.idTaken');
 
     updateRoleEditorForm({ name: '' });
 
-    expect($roleEditorErrors.get().name).toBe('roles.dialog.nameRequired');
+    expect($roleEditorErrors.get().name).toBe('roles.dialog.idRequired');
   });
 
   it('says nothing about a check that failed', () => {

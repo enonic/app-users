@@ -25,7 +25,7 @@ export const groupNameCheck = createPrincipalNameCheck('group');
 const $groupNameExternal = computed(
   groupNameCheck.$state,
   (check): StepDialogExternal<GroupFormField> => ({
-    errors: check.status === 'taken' ? { name: 'groups.dialog.nameTaken' } : {},
+    errors: check.status === 'taken' ? { name: 'groups.dialog.idTaken' } : {},
     busy: check.status === 'pending' ? ['name'] : [],
   }),
 );

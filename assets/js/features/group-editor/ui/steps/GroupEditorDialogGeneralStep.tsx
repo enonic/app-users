@@ -19,13 +19,13 @@ import {
 
 const PROVIDER_LABEL_ID = 'group-editor-id-provider-label';
 const DISPLAY_NAME_ID = 'group-editor-display-name';
-const NAME_ID = 'group-editor-name';
+const ID_FIELD_ID = 'group-editor-id';
 const DESCRIPTION_ID = 'group-editor-description';
 
 export function GroupEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($groupEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($groupEditorErrors);
-  const nameCheck = useStore(groupNameCheck.$state);
+  const idCheck = useStore(groupNameCheck.$state);
   const { items: providers } = useIdProviderNames();
 
   const persisted = mode === 'edit';
@@ -37,16 +37,16 @@ export function GroupEditorDialogGeneralStep() {
   const providerLabel = useI18n('groups.dialog.idProvider');
   const providerPlaceholder = useI18n('groups.dialog.idProviderPlaceholder');
   const displayNameLabel = useI18n('groups.dialog.displayName');
-  const nameLabel = useI18n('groups.dialog.name');
+  const idLabel = useI18n('groups.dialog.id');
+  const idHelp = useI18n('groups.dialog.idHelp');
   const descriptionLabel = useI18n('groups.dialog.description');
 
   // Errors
   const shown = visitedErrors(errors, visited);
   const providerError = shown.idProvider === undefined ? undefined : i18n(shown.idProvider);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
-  const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
-  const nameError =
-    nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name, providerName);
+  const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name, providerName);
 
   return (
     <div className="flex flex-col gap-5">
@@ -91,14 +91,15 @@ export function GroupEditorDialogGeneralStep() {
         />
       </div>
 
-      {/* Name */}
+      {/* ID */}
       <div className="flex flex-col gap-1.5">
-        <FieldLabel text={nameLabel} required={!persisted} htmlFor={NAME_ID} />
+        <FieldLabel text={idLabel} required={!persisted} htmlFor={ID_FIELD_ID} />
         <Input
-          id={NAME_ID}
+          id={ID_FIELD_ID}
           disabled={persisted}
           value={form.name}
-          error={nameError}
+          description={persisted ? undefined : idHelp}
+          error={idError}
           onInput={({ currentTarget }) => setGroupEditorName(currentTarget.value)}
           onBlur={() => {
             markGroupEditorFieldVisited('name');

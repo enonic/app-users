@@ -85,9 +85,9 @@ export function validateRoleForm(form: RoleForm, mode: StepDialogMode): RoleForm
   if (mode === 'create') {
     const name = form.name.trim();
     if (name.length === 0) {
-      errors.name = 'roles.dialog.nameRequired';
+      errors.name = 'roles.dialog.idRequired';
     } else if (isIllegalPrincipalName(name)) {
-      errors.name = 'roles.dialog.nameInvalid';
+      errors.name = 'roles.dialog.idInvalid';
     }
   }
 

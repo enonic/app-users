@@ -24,7 +24,7 @@ import {
 
 const PROVIDER_LABEL_ID = 'user-editor-id-provider-label';
 const DISPLAY_NAME_ID = 'user-editor-display-name';
-const NAME_ID = 'user-editor-name';
+const ID_FIELD_ID = 'user-editor-id';
 const EMAIL_ID = 'user-editor-email';
 
 const ID_PROVIDERS_HREF = '#/id-providers';
@@ -34,7 +34,7 @@ export function UserEditorDialogGeneralStep() {
   const errors = useStore($userEditorErrors);
   const systemUser = useStore($userEditorSystemUser);
   const serviceAccount = useStore($userEditorServiceAccount);
-  const nameCheck = useStore(userNameCheck.$state);
+  const idCheck = useStore(userNameCheck.$state);
   const emailCheck = useStore(userEmailCheck.$state);
   const providers = useStore($userEditorProviders);
   const { status: providersStatus } = useIdProviderNames();
@@ -52,16 +52,16 @@ export function UserEditorDialogGeneralStep() {
   const noProvidersLabel = useI18n('users.dialog.noIdProviders');
   const openProvidersLabel = useI18n('users.dialog.openIdProviders');
   const displayNameLabel = useI18n('users.dialog.displayName');
-  const nameLabel = useI18n('users.dialog.name');
+  const idLabel = useI18n('users.dialog.id');
+  const idHelp = useI18n('users.dialog.idHelp');
   const emailLabel = useI18n('users.dialog.email');
 
   // Errors
   const shown = visitedErrors(errors, visited);
   const providerError = shown.idProvider === undefined ? undefined : i18n(shown.idProvider);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
-  const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
-  const nameError =
-    nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name, providerName);
+  const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name, providerName);
   const emailErrorKey = emailCheck.status === 'taken' ? errors.email : shown.email;
   const emailError =
     emailErrorKey === undefined ? undefined : i18n(emailErrorKey, form.email, providerName);
@@ -121,14 +121,15 @@ export function UserEditorDialogGeneralStep() {
         />
       </div>
 
-      {/* Name input */}
+      {/* ID input */}
       <div className="flex flex-col gap-1.5">
-        <FieldLabel text={nameLabel} required={!persisted} htmlFor={NAME_ID} />
+        <FieldLabel text={idLabel} required={!persisted} htmlFor={ID_FIELD_ID} />
         <Input
-          id={NAME_ID}
+          id={ID_FIELD_ID}
           disabled={persisted}
           value={form.name}
-          error={nameError}
+          description={persisted ? undefined : idHelp}
+          error={idError}
           onInput={({ currentTarget }) => setUserEditorName(currentTarget.value)}
           onBlur={() => {
             markUserEditorFieldVisited('name');

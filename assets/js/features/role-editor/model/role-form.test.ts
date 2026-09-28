@@ -148,16 +148,16 @@ describe('validateRoleForm', () => {
 
   it('requires a name while creating', () => {
     expect(validateRoleForm(form({ name: '' }), 'create')).toEqual({
-      name: 'roles.dialog.nameRequired',
+      name: 'roles.dialog.idRequired',
     });
   });
 
   it('refuses a name carrying a character XP rejects', () => {
     expect(validateRoleForm(form({ name: 'store manager' }), 'create').name).toBe(
-      'roles.dialog.nameInvalid',
+      'roles.dialog.idInvalid',
     );
     expect(validateRoleForm(form({ name: 'store:manager' }), 'create').name).toBe(
-      'roles.dialog.nameInvalid',
+      'roles.dialog.idInvalid',
     );
   });
 
@@ -168,7 +168,7 @@ describe('validateRoleForm', () => {
 
   it('reports both fields at once rather than one at a time', () => {
     expect(validateRoleForm(form({ name: '', displayName: '' }), 'create')).toEqual({
-      name: 'roles.dialog.nameRequired',
+      name: 'roles.dialog.idRequired',
       displayName: 'roles.dialog.displayNameRequired',
     });
   });

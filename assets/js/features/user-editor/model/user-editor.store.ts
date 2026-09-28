@@ -47,9 +47,9 @@ export const $userEditorServiceAccount = atom(false);
 
 // The section words a clash: a service account's provider goes without saying.
 const TAKEN_KEYS = {
-  users: { name: 'users.dialog.nameTaken', email: 'users.dialog.emailTaken' },
+  users: { name: 'users.dialog.idTaken', email: 'users.dialog.emailTaken' },
   serviceAccounts: {
-    name: 'serviceAccounts.dialog.nameTaken',
+    name: 'serviceAccounts.dialog.idTaken',
     email: 'serviceAccounts.dialog.emailTaken',
   },
 } satisfies Record<string, Record<'name' | 'email', string>>;
