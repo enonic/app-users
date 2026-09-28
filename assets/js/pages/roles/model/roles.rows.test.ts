@@ -27,6 +27,13 @@ describe('toRoleRow', () => {
     expect(toRoleRow(role).meta).toBeUndefined();
   });
 
+  it('keeps the platform roles out of the selection', () => {
+    expect(toRoleRow(role).selectable).toBe(true);
+    expect(toRoleRow({ ...role, key: 'role:system.admin' }).selectable).toBe(false);
+    expect(toRoleRow({ ...role, key: 'role:cms.admin' }).selectable).toBe(false);
+    expect(toRoleRow({ ...role, key: 'role:cms.project.intranet.owner' }).selectable).toBe(true);
+  });
+
   it('carries the icon the page hands it', () => {
     expect(toRoleRow(role).icon).toBeUndefined();
     expect(toRoleRow(role, 'icon').icon).toBe('icon');
