@@ -15,6 +15,8 @@ export type StepDialogProps<Step extends string, Field extends string, Form, Ent
   store: StepDialogStore<Step, Field, Form, Entity>;
   glyph: ReactNode;
   panels: Record<Step, ComponentType>;
+  /** Steps this open does not walk; a step that is never rendered is never in the stepper. */
+  omit?: readonly Step[];
   onSave: () => void;
   /** The caller's name, so a test tells `UserEditorDialog` from `GroupEditorDialog`. */
   'data-component'?: string;
@@ -33,6 +35,7 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
   store,
   glyph,
   panels,
+  omit,
   onSave,
   'data-component': componentName = STEP_DIALOG_NAME,
 }: StepDialogProps<Step, Field, Form, Entity>) {
@@ -46,7 +49,10 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
 
   const closeQuestion = useI18n('browse.dialog.closeQuestion');
 
-  const shown = view === 'wizard' ? store.steps.order : [step];
+  const shown =
+    view === 'wizard'
+      ? store.steps.order.filter((value) => omit?.includes(value) !== true)
+      : [step];
 
   const requestClose = (): void => {
     if (saving || blocked) {

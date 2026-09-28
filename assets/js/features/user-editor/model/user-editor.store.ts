@@ -127,6 +127,8 @@ export function openUserEditorAt(user: User, step: UserEditorStep): void {
 export function openServiceAccountEditor(payload: UserEditorPayload): void {
   $userEditorServiceAccount.set(true);
   userEditorDialog.open(payload, 'serviceAccounts.dialog.createTitle');
+  // The system store is a given, so the ID provider step is not shown.
+  userEditorDialog.goToStep(USER_EDITOR_STEPS.ids.general);
 }
 
 export function openServiceAccountEditorAt(user: User, step: UserEditorStep): void {

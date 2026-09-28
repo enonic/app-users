@@ -46,7 +46,7 @@ describe('openUserEditor', () => {
 
     const { open, view, step } = $userEditor.get();
 
-    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'general' });
+    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'idProvider' });
   });
 
   it('derives the name from the display name until it is typed', () => {
@@ -190,6 +190,7 @@ describe('openServiceAccountEditor', () => {
 
     expect($userEditorServiceAccount.get()).toBe(true);
     expect($userEditor.get().form.idProvider).toBe('system');
+    expect($userEditor.get().step).toBe('general');
   });
 
   it('hands the dialog back to the Users section on its next open', () => {

@@ -30,7 +30,7 @@ describe('openGroupEditor', () => {
 
     const { open, view, step } = $groupEditor.get();
 
-    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'general' });
+    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'idProvider' });
   });
 
   it('derives the name from the display name until it is typed', () => {

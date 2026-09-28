@@ -12,6 +12,7 @@ import { applyPublicKeyChanges } from '../model/public-key-writes';
 import { userDraftFrom } from '../model/user-draft';
 import { userEditFrom } from '../model/user-edit';
 import { forgetUserEditDetail, showUserForEdit } from '../model/user-edit-detail';
+import type { UserEditorStep } from '../model/user-editor-steps';
 import {
   $userEditor,
   $userEditorServiceAccount,
@@ -49,6 +50,9 @@ export type UserEditorDialogProps = {
 };
 
 const USER_EDITOR_DIALOG_NAME = 'UserEditorDialog';
+
+// A service account's provider is the system store: nothing to choose.
+const SERVICE_ACCOUNT_OMITTED: readonly UserEditorStep[] = ['idProvider'];
 
 export function UserEditorDialog({
   onSaved,
@@ -111,6 +115,7 @@ export function UserEditorDialog({
       store={userEditorDialog}
       glyph={<Glyph size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       panels={USER_EDITOR_STEP_PANELS}
+      omit={serviceAccount ? SERVICE_ACCOUNT_OMITTED : undefined}
       data-component={componentName}
       onSave={() => void save()}
     />
