@@ -3,8 +3,18 @@ var endpoint = require('/extensions/section-endpoint');
 
 var CONTEXT = '/admin/com.enonic.xp.app.settings/main/_/admin:extension/com.enonic.xp.app.users:users';
 
-function request(path, body) {
-    return {rawPath: CONTEXT + path, contextPath: CONTEXT, body: body};
+var SAME_ORIGIN_JSON = {'sec-fetch-site': 'same-origin', 'content-type': 'application/json'};
+
+function request(path, body, headers) {
+    var sent = headers || SAME_ORIGIN_JSON;
+    return {
+        rawPath: CONTEXT + path,
+        contextPath: CONTEXT,
+        body: body,
+        getHeader: function (name) {
+            return sent[name.toLowerCase()] || null;
+        }
+    };
 }
 
 function graphql(query) {
@@ -89,4 +99,10 @@ exports.reportsAnUnknownFieldAsAGraphQlError = function () {
 
 exports.rejectsABodyThatIsNotAQuery = function () {
     t.assertEquals(400, endpoint.post(request('/graphql', '{"nope":1}')).status);
+};
+
+exports.rejectsACrossSiteRequest = function () {
+    var headers = {'sec-fetch-site': 'cross-site', 'content-type': 'application/json'};
+
+    t.assertEquals(403, endpoint.post(request('/graphql', '{"query":"{ config { appId } }"}', headers)).status);
 };
