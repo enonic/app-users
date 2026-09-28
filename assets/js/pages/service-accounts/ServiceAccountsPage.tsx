@@ -12,7 +12,7 @@ import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { DEFAULT_SORT_DIRECTION, type SortDirection } from '../../widgets/browse-list/browse-sort';
-import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
+import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
@@ -44,6 +44,7 @@ export function ServiceAccountsPage() {
   const { status, items, appending, error, hasMore } = useServiceAccounts();
   const query = useStore($serviceAccountsQuery);
 
+  const sortNameLabel = useI18n('users.sort.name');
   const sortAscLabel = useI18n('users.sort.nameAsc');
   const sortDescLabel = useI18n('users.sort.nameDesc');
   const emptyLabel = useI18n('serviceAccounts.list.empty');
@@ -53,11 +54,11 @@ export function ServiceAccountsPage() {
 
   const sortOptions = useMemo(
     () => [
-      { id: 'asc', label: sortAscLabel },
-      { id: 'desc', label: sortDescLabel },
+      { id: 'asc', label: sortAscLabel, field: sortNameLabel, direction: 'asc' },
+      { id: 'desc', label: sortDescLabel, field: sortNameLabel, direction: 'desc' },
     ],
     [],
-  ) satisfies readonly { id: SortDirection; label: string }[];
+  ) satisfies readonly BrowseSortOption<SortDirection>[];
 
   const section = useBrowseSection({
     activeKey,

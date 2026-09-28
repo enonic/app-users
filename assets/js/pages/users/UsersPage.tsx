@@ -16,7 +16,7 @@ import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
-import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
+import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
@@ -48,8 +48,10 @@ export function UsersPage() {
 
   const { idProviders, sort } = useStore($usersQuery);
 
+  const sortNameLabel = useI18n('users.sort.name');
   const sortNameAscLabel = useI18n('users.sort.nameAsc');
   const sortNameDescLabel = useI18n('users.sort.nameDesc');
+  const sortProviderLabel = useI18n('users.sort.idProvider');
   const sortProviderAscLabel = useI18n('users.sort.idProviderAsc');
   const sortProviderDescLabel = useI18n('users.sort.idProviderDesc');
   const emptyLabel = useI18n('users.list.empty');
@@ -60,13 +62,23 @@ export function UsersPage() {
 
   const sortOptions = useMemo(
     () => [
-      { id: 'displayNameAsc', label: sortNameAscLabel },
-      { id: 'displayNameDesc', label: sortNameDescLabel },
-      { id: 'idProviderAsc', label: sortProviderAscLabel },
-      { id: 'idProviderDesc', label: sortProviderDescLabel },
+      { id: 'displayNameAsc', label: sortNameAscLabel, field: sortNameLabel, direction: 'asc' },
+      { id: 'displayNameDesc', label: sortNameDescLabel, field: sortNameLabel, direction: 'desc' },
+      {
+        id: 'idProviderAsc',
+        label: sortProviderAscLabel,
+        field: sortProviderLabel,
+        direction: 'asc',
+      },
+      {
+        id: 'idProviderDesc',
+        label: sortProviderDescLabel,
+        field: sortProviderLabel,
+        direction: 'desc',
+      },
     ],
     [],
-  ) satisfies readonly { id: PrincipalSort; label: string }[];
+  ) satisfies readonly BrowseSortOption<PrincipalSort>[];
 
   // ! Entries come from the provider list, never from the rows: the rows are one page, so a provider the
   // ! page happens not to contain would disappear from the menu while still narrowing the query. They

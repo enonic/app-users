@@ -14,7 +14,7 @@ import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
-import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
+import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
@@ -45,8 +45,10 @@ export function GroupsPage() {
   const selectedProviders = useStore(groupsFilter.$selected);
   const sort = useStore($groupsSort);
 
+  const sortNameLabel = useI18n('groups.sort.name');
   const sortNameAscLabel = useI18n('groups.sort.nameAsc');
   const sortNameDescLabel = useI18n('groups.sort.nameDesc');
+  const sortProviderLabel = useI18n('groups.sort.idProvider');
   const sortProviderAscLabel = useI18n('groups.sort.idProviderAsc');
   const sortProviderDescLabel = useI18n('groups.sort.idProviderDesc');
   const emptyLabel = useI18n('groups.list.empty');
@@ -55,13 +57,23 @@ export function GroupsPage() {
 
   const sortOptions = useMemo(
     () => [
-      { id: 'displayNameAsc', label: sortNameAscLabel },
-      { id: 'displayNameDesc', label: sortNameDescLabel },
-      { id: 'idProviderAsc', label: sortProviderAscLabel },
-      { id: 'idProviderDesc', label: sortProviderDescLabel },
+      { id: 'displayNameAsc', label: sortNameAscLabel, field: sortNameLabel, direction: 'asc' },
+      { id: 'displayNameDesc', label: sortNameDescLabel, field: sortNameLabel, direction: 'desc' },
+      {
+        id: 'idProviderAsc',
+        label: sortProviderAscLabel,
+        field: sortProviderLabel,
+        direction: 'asc',
+      },
+      {
+        id: 'idProviderDesc',
+        label: sortProviderDescLabel,
+        field: sortProviderLabel,
+        direction: 'desc',
+      },
     ],
     [],
-  ) satisfies readonly { id: PrincipalSort; label: string }[];
+  ) satisfies readonly BrowseSortOption<PrincipalSort>[];
 
   // Shared with the filter entries below, so the query runs once per render rather than twice.
   const searched = useMemo(() => searchGroups(items, query), [items, query]);

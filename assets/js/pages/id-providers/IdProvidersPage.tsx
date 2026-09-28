@@ -20,7 +20,7 @@ import {
   type SortDirection,
 } from '../../widgets/browse-list/browse-sort';
 import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
-import { BrowseSort } from '../../widgets/browse-list/BrowseSort';
+import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
@@ -50,6 +50,7 @@ export function IdProvidersPage() {
   const selectedApplications = useStore(idProvidersFilter.$selected);
   const sort = useStore($idProvidersSort);
 
+  const sortNameLabel = useI18n('idProviders.sort.name');
   const sortAscLabel = useI18n('idProviders.sort.nameAsc');
   const sortDescLabel = useI18n('idProviders.sort.nameDesc');
   const unboundLabel = useI18n('idProviders.filter.unbound');
@@ -59,11 +60,11 @@ export function IdProvidersPage() {
 
   const sortOptions = useMemo(
     () => [
-      { id: 'asc', label: sortAscLabel },
-      { id: 'desc', label: sortDescLabel },
+      { id: 'asc', label: sortAscLabel, field: sortNameLabel, direction: 'asc' },
+      { id: 'desc', label: sortDescLabel, field: sortNameLabel, direction: 'desc' },
     ],
     [],
-  ) satisfies readonly { id: SortDirection; label: string }[];
+  ) satisfies readonly BrowseSortOption<SortDirection>[];
 
   // Shared with the filter entries below, so the query runs once per render rather than twice.
   const searched = useMemo(() => searchIdProviders(items, query), [items, query]);
