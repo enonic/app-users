@@ -1,5 +1,6 @@
 export {
   fetchIdProviderApplications,
+  fetchIdProviderForm,
   ID_PROVIDER_APPLICATIONS_ROOT,
 } from './api/id-provider-applications.api';
 export type { IdProviderApplication } from './model/application.types';

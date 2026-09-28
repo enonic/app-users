@@ -1,5 +1,6 @@
-import { GraphQLString, list, nonNull, type GraphQLFields } from '/lib/graphql';
+import { GraphQLString, Json, list, nonNull, type GraphQLFields } from '/lib/graphql';
 
+import { parseIdProviderConfig } from './id-provider-config';
 import {
   createIdProvider,
   deleteIdProviders,
@@ -21,6 +22,7 @@ type WriteArgs = {
   displayName: string;
   description?: string;
   application?: string;
+  config?: unknown;
   permissions?: IdProviderPermissionInput[];
 };
 
@@ -56,12 +58,13 @@ export const idProviderMutationFields: GraphQLFields = {
   createIdProvider: {
     type: IdProviderType,
     description:
-      'Creates an id provider. `name` becomes its key and is fixed for its lifetime; `application` binds it to the login it serves, and a provider without one serves none.',
+      "Creates an id provider. `name` becomes its key and is fixed for its lifetime; `application` binds it to the login it serves, and a provider without one serves none. `config` is that application's configuration of it, a typed property tree as `BoundApplication.config` reads it; empty when omitted.",
     args: {
       name: nonNull(GraphQLString),
       displayName: nonNull(GraphQLString),
       description: GraphQLString,
       application: GraphQLString,
+      config: Json,
       permissions,
     },
     resolve: (env: { args: CreateArgs }) => createIdProvider(env.args.name, toInput(env.args)),
@@ -69,12 +72,13 @@ export const idProviderMutationFields: GraphQLFields = {
   updateIdProvider: {
     type: IdProviderType,
     description:
-      'Rewrites a provider to what the arguments name. Unlike the group and role mutations this is not a change list — a provider holds one of each — so an omitted `application` unbinds it and an omitted `description` clears it. The configuration the binding carries is left alone.',
+      'Rewrites a provider to what the arguments name. Unlike the group and role mutations this is not a change list — a provider holds one of each — so an omitted `application` unbinds it and an omitted `description` clears it. An omitted `config` is the exception: the binding keeps the configuration it carries, unless `application` names another one.',
     args: {
       key: nonNull(GraphQLString),
       displayName: nonNull(GraphQLString),
       description: GraphQLString,
       application: GraphQLString,
+      config: Json,
       permissions,
     },
     resolve: (env: { args: UpdateArgs }) => updateIdProvider(env.args.key, toInput(env.args)),
@@ -100,7 +104,14 @@ function toInput({
   displayName,
   description,
   application,
+  config: tree,
   permissions: entries,
 }: WriteArgs): IdProviderInput {
-  return { displayName, description, application, permissions: entries ?? [] };
+  return {
+    displayName,
+    description,
+    application,
+    config: tree == null ? undefined : parseIdProviderConfig(tree),
+    permissions: entries ?? [],
+  };
 }

@@ -14,7 +14,11 @@ export const IdProviderApplicationType: GraphQLType = generator.createObjectType
     },
     hasConfig: {
       type: nonNull(GraphQLBoolean),
-      description: 'Whether the descriptor declares a config form. Rendering it is #64.',
+      description: 'Whether the descriptor declares a config form, which `idProviderForm` reads.',
+    },
+    icon: {
+      type: GraphQLString,
+      description: "The application's icon as a `data:` uri. Absent when it ships none.",
     },
   },
 });

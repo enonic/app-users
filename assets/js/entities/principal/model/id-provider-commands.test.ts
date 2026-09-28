@@ -100,6 +100,26 @@ describe('createIdProvider', () => {
   });
 });
 
+describe('createIdProvider and the configuration', () => {
+  const config = [{ name: 'clientId', type: 'String' as const, values: [{ v: 'intranet' }] }];
+
+  it('sends the configuration applied with the binding it belongs to', () => {
+    vi.mocked(sendIdProviderCreation).mockReturnValue(okAsync(written('Company directory')));
+
+    void createIdProvider(draft({ config }));
+
+    expect(vi.mocked(sendIdProviderCreation).mock.calls[0]?.[1].config).toBe(config);
+  });
+
+  it('drops a configuration when there is no binding left to hold it', () => {
+    vi.mocked(sendIdProviderCreation).mockReturnValue(okAsync(written('Company directory')));
+
+    void createIdProvider(draft({ application: '', config }));
+
+    expect(vi.mocked(sendIdProviderCreation).mock.calls[0]?.[1].config).toBeUndefined();
+  });
+});
+
 describe('updateIdProvider', () => {
   it('writes what the form holds against the key it was opened on', () => {
     vi.mocked(sendIdProviderUpdate).mockReturnValue(okAsync(written('Renamed')));

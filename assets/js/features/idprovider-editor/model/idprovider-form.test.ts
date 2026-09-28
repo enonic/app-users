@@ -104,6 +104,23 @@ describe('nextIdProviderForm', () => {
     expect(nextIdProviderForm(taken, next, { mode: 'create' }).name).toBe('ldap');
   });
 
+  it('forgets the configuration applied for another application once the binding changes', () => {
+    const configured = {
+      ...previous,
+      config: [{ name: 'a', type: 'String' as const, values: [] }],
+    };
+    const next = { ...configured, application: 'com.example.oidc' };
+
+    expect(nextIdProviderForm(configured, next, { mode: 'edit' }).config).toBeUndefined();
+  });
+
+  it('keeps the configuration while the binding stays', () => {
+    const config = [{ name: 'a', type: 'String' as const, values: [] }];
+    const next = { ...previous, displayName: 'Renamed', config };
+
+    expect(nextIdProviderForm(previous, next, { mode: 'edit' }).config).toBe(config);
+  });
+
   it('never derives while editing, where the field is locked', () => {
     const next = { ...previous, displayName: 'Renamed' };
 
@@ -271,6 +288,13 @@ describe('sameIdProviderForm', () => {
   it('sees the binding change, including one removed', () => {
     expect(sameIdProviderForm(form(), form({ application: 'com.example.oidc' }))).toBe(false);
     expect(sameIdProviderForm(form(), form({ application: '' }))).toBe(false);
+  });
+
+  it('sees a configuration applied, and one applied again unchanged as the same', () => {
+    const config = [{ name: 'clientId', type: 'String' as const, values: [{ v: 'x' }] }];
+
+    expect(sameIdProviderForm(form(), form({ config }))).toBe(false);
+    expect(sameIdProviderForm(form({ config }), form({ config: [...config] }))).toBe(true);
   });
 
   it('sees a principal added and a principal removed', () => {
