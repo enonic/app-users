@@ -4,6 +4,7 @@ import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPick
 import { useI18n } from '../../../../shared/i18n';
 import { $roleEditDetail } from '../../model/role-edit-detail';
 import { $roleEditor, updateRoleEditorForm } from '../../model/role-editor.store';
+import { roleMembersOf, withRoleMembersOf } from '../../model/role-form';
 
 export function RoleEditorDialogGroupsStep() {
   const { form } = useStore($roleEditor, { keys: ['form'] });
@@ -11,10 +12,6 @@ export function RoleEditorDialogGroupsStep() {
 
   const placeholder = useI18n('roles.dialog.groupsPlaceholder');
   const failedNotice = useI18n('roles.dialog.membersFailed');
-
-  // One members list behind both steps: this one picks its own kind and keeps the other's.
-  const picked = form.members.filter(({ type }) => type === 'group');
-  const others = form.members.filter(({ type }) => type !== 'group');
 
   return (
     <>
@@ -24,8 +21,10 @@ export function RoleEditorDialogGroupsStep() {
         kinds={['group']}
         showIdProvider
         placeholder={placeholder}
-        selected={picked}
-        onChange={(next) => updateRoleEditorForm({ members: [...others, ...next] })}
+        selected={roleMembersOf(form.members, 'group')}
+        onChange={(next) =>
+          updateRoleEditorForm({ members: withRoleMembersOf(form.members, 'group', next) })
+        }
       />
     </>
   );

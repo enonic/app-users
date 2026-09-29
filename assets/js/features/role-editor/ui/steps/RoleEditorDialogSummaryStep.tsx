@@ -7,6 +7,7 @@ import {
   StepDialogSummaryRow,
 } from '../../../../shared/step-dialog/StepDialogSummary';
 import { $roleEditor } from '../../model/role-editor.store';
+import { roleMembersOf } from '../../model/role-form';
 import { roleSummaryRows } from '../../model/role-summary';
 
 export function RoleEditorDialogSummaryStep() {
@@ -23,14 +24,8 @@ export function RoleEditorDialogSummaryStep() {
         </StepDialogSummaryRow>
       ))}
 
-      <PrincipalsSummaryRow
-        label={usersLabel}
-        principals={form.members.filter(({ type }) => type === 'user')}
-      />
-      <PrincipalsSummaryRow
-        label={groupsLabel}
-        principals={form.members.filter(({ type }) => type === 'group')}
-      />
+      <PrincipalsSummaryRow label={usersLabel} principals={roleMembersOf(form.members, 'user')} />
+      <PrincipalsSummaryRow label={groupsLabel} principals={roleMembersOf(form.members, 'group')} />
     </StepDialogSummary>
   );
 }

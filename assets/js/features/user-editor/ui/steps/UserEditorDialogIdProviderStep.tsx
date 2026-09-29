@@ -21,14 +21,13 @@ const ID_PROVIDERS_HREF = '#/id-providers';
 
 /** A create's first step; a service account's provider is the system store, so it never shows this one. */
 export function UserEditorDialogIdProviderStep() {
-  const { form, visited, mode } = useStore($userEditor, { keys: ['form', 'visited', 'mode'] });
+  const { form, visited } = useStore($userEditor, { keys: ['form', 'visited'] });
   const errors = useStore($userEditorErrors);
   const providers = useStore($userEditorProviders);
   const { status: providersStatus } = useIdProviderNames();
 
-  const persisted = mode === 'edit';
   // Only a settled answer says there is none to choose; a failed read keeps the selector.
-  const noProviders = !persisted && providersStatus === 'ready' && providers.length === 0;
+  const noProviders = providersStatus === 'ready' && providers.length === 0;
 
   const providerName =
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
@@ -57,9 +56,8 @@ export function UserEditorDialogIdProviderStep() {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
+      <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required />
       <Selector.Root
-        disabled={persisted}
         value={form.idProvider}
         error={providerError !== undefined}
         onValueChange={(next) => {

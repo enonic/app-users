@@ -3,6 +3,7 @@ import {
   isIllegalPrincipalName,
   principalName,
   type PrincipalRef,
+  type PrincipalType,
   type Role,
 } from '../../../entities/principal';
 import { sameKeys, type FieldErrors } from '../../../shared/form';
@@ -24,6 +25,23 @@ export type RoleFormField = 'name' | 'displayName';
 export type RoleFormErrors = FieldErrors<RoleFormField>;
 
 export const ROLE_FORM_FIELDS: readonly RoleFormField[] = ['name', 'displayName'];
+
+/** The members of one kind, as the Users and Groups steps each pick them. */
+export function roleMembersOf(
+  members: readonly PrincipalRef[],
+  type: PrincipalType,
+): readonly PrincipalRef[] {
+  return members.filter((member) => member.type === type);
+}
+
+/** One members list behind both steps: `picked` replaces its own kind and keeps the other's. */
+export function withRoleMembersOf(
+  members: readonly PrincipalRef[],
+  type: PrincipalType,
+  picked: readonly PrincipalRef[],
+): readonly PrincipalRef[] {
+  return [...members.filter((member) => member.type !== type), ...picked];
+}
 
 export function initialRoleForm(
   payload: RoleEditorPayload,

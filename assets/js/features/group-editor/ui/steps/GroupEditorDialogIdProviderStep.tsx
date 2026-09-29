@@ -16,11 +16,9 @@ import {
 const PROVIDER_LABEL_ID = 'group-editor-id-provider-label';
 
 export function GroupEditorDialogIdProviderStep() {
-  const { form, visited, mode } = useStore($groupEditor, { keys: ['form', 'visited', 'mode'] });
+  const { form, visited } = useStore($groupEditor, { keys: ['form', 'visited'] });
   const errors = useStore($groupEditorErrors);
   const { items: providers } = useIdProviderNames();
-
-  const persisted = mode === 'edit';
 
   const providerName =
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
@@ -35,9 +33,8 @@ export function GroupEditorDialogIdProviderStep() {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
+      <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required />
       <Selector.Root
-        disabled={persisted}
         value={form.idProvider}
         error={providerError !== undefined}
         onValueChange={(next) => {

@@ -15,6 +15,7 @@ import {
   updateGroupEditorForm,
 } from '../../model/group-editor.store';
 
+const PROVIDER_ID = 'group-editor-id-provider';
 const DISPLAY_NAME_ID = 'group-editor-display-name';
 const ID_FIELD_ID = 'group-editor-id';
 const DESCRIPTION_ID = 'group-editor-description';
@@ -31,6 +32,7 @@ export function GroupEditorDialogGeneralStep() {
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
 
   // Labels
+  const providerLabel = useI18n('groups.dialog.idProvider');
   const displayNameLabel = useI18n('groups.dialog.displayName');
   const idLabel = useI18n('groups.dialog.id');
   const idHelp = useI18n('groups.dialog.idHelp');
@@ -44,6 +46,14 @@ export function GroupEditorDialogGeneralStep() {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* ID provider — chosen on create's own step. */}
+      {persisted && (
+        <div className="flex flex-col gap-1.5">
+          <FieldLabel text={providerLabel} htmlFor={PROVIDER_ID} />
+          <Input id={PROVIDER_ID} disabled value={providerName} />
+        </div>
+      )}
+
       {/* Display name */}
       <div className="flex flex-col gap-1.5">
         <FieldLabel text={displayNameLabel} required htmlFor={DISPLAY_NAME_ID} />

@@ -8,6 +8,7 @@ import {
   $userEditor,
   $userEditorErrors,
   $userEditorProviders,
+  $userEditorServiceAccount,
   $userEditorSystemUser,
   markUserEditorFieldVisited,
   setUserEditorDisplayName,
@@ -17,6 +18,7 @@ import {
   userNameCheck,
 } from '../../model/user-editor.store';
 
+const PROVIDER_ID = 'user-editor-id-provider';
 const DISPLAY_NAME_ID = 'user-editor-display-name';
 const ID_FIELD_ID = 'user-editor-id';
 const EMAIL_ID = 'user-editor-email';
@@ -25,6 +27,7 @@ export function UserEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($userEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($userEditorErrors);
   const systemUser = useStore($userEditorSystemUser);
+  const serviceAccount = useStore($userEditorServiceAccount);
   const idCheck = useStore(userNameCheck.$state);
   const emailCheck = useStore(userEmailCheck.$state);
   const providers = useStore($userEditorProviders);
@@ -35,6 +38,7 @@ export function UserEditorDialogGeneralStep() {
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
 
   // Labels
+  const providerLabel = useI18n('users.dialog.idProvider');
   const displayNameLabel = useI18n('users.dialog.displayName');
   const idLabel = useI18n('users.dialog.id');
   const idHelp = useI18n('users.dialog.idHelp');
@@ -51,6 +55,14 @@ export function UserEditorDialogGeneralStep() {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* ID provider — chosen on create's own step; a service account's goes without saying. */}
+      {persisted && !serviceAccount && (
+        <div className="flex flex-col gap-1.5">
+          <FieldLabel text={providerLabel} htmlFor={PROVIDER_ID} />
+          <Input id={PROVIDER_ID} disabled value={providerName} />
+        </div>
+      )}
+
       {/* Display Name input */}
       <div className="flex flex-col gap-1.5">
         <FieldLabel text={displayNameLabel} required htmlFor={DISPLAY_NAME_ID} />
