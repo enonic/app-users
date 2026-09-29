@@ -89,4 +89,10 @@ public class SectionEndpointTest
     {
         runFunction( TEST_SCRIPT, "rejectsABodyThatIsNotAQuery" );
     }
+
+    @Test
+    public void testRejectsACrossSiteRequest()
+    {
+        runFunction( TEST_SCRIPT, "rejectsACrossSiteRequest" );
+    }
 }
