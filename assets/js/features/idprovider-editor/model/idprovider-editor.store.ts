@@ -24,7 +24,7 @@ export const idProviderNameCheck = createPrincipalNameCheck('idProvider');
 const $idProviderNameExternal = computed(
   idProviderNameCheck.$state,
   (check): StepDialogExternal<IdProviderFormField> => ({
-    errors: check.status === 'taken' ? { name: 'idProviders.dialog.nameTaken' } : {},
+    errors: check.status === 'taken' ? { name: 'idProviders.dialog.idTaken' } : {},
     busy: check.status === 'pending' ? ['name'] : [],
   }),
 );

@@ -1,31 +1,29 @@
-import { Input, Selector, TextArea } from '@enonic/ui';
+import { Input, TextArea } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
 import { useIdProviderNames } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
-import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import {
   $groupEditor,
   $groupEditorErrors,
   groupNameCheck,
   markGroupEditorFieldVisited,
   setGroupEditorDisplayName,
-  setGroupEditorIdProvider,
   setGroupEditorName,
   updateGroupEditorForm,
 } from '../../model/group-editor.store';
 
-const PROVIDER_LABEL_ID = 'group-editor-id-provider-label';
+const PROVIDER_ID = 'group-editor-id-provider';
 const DISPLAY_NAME_ID = 'group-editor-display-name';
-const NAME_ID = 'group-editor-name';
+const ID_FIELD_ID = 'group-editor-id';
 const DESCRIPTION_ID = 'group-editor-description';
 
 export function GroupEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($groupEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($groupEditorErrors);
-  const nameCheck = useStore(groupNameCheck.$state);
+  const idCheck = useStore(groupNameCheck.$state);
   const { items: providers } = useIdProviderNames();
 
   const persisted = mode === 'edit';
@@ -35,49 +33,26 @@ export function GroupEditorDialogGeneralStep() {
 
   // Labels
   const providerLabel = useI18n('groups.dialog.idProvider');
-  const providerPlaceholder = useI18n('groups.dialog.idProviderPlaceholder');
   const displayNameLabel = useI18n('groups.dialog.displayName');
-  const nameLabel = useI18n('groups.dialog.name');
+  const idLabel = useI18n('groups.dialog.id');
+  const idHelp = useI18n('groups.dialog.idHelp');
   const descriptionLabel = useI18n('groups.dialog.description');
 
   // Errors
   const shown = visitedErrors(errors, visited);
-  const providerError = shown.idProvider === undefined ? undefined : i18n(shown.idProvider);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
-  const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
-  const nameError =
-    nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name, providerName);
+  const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name, providerName);
 
   return (
     <div className="flex flex-col gap-5">
-      {/* ID provider */}
-      <div className="flex flex-col gap-1.5">
-        <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
-        <Selector.Root
-          disabled={persisted}
-          value={form.idProvider}
-          error={providerError !== undefined}
-          onValueChange={(next) => {
-            markGroupEditorFieldVisited('idProvider');
-            setGroupEditorIdProvider(next);
-          }}
-        >
-          <Selector.Trigger aria-labelledby={PROVIDER_LABEL_ID}>
-            <Selector.Value placeholder={providerPlaceholder}>
-              {form.idProvider.length > 0 ? providerName : undefined}
-            </Selector.Value>
-            <Selector.Icon />
-          </Selector.Trigger>
-          <SelectorPopup>
-            {providers.map(({ key, displayName }) => (
-              <Selector.Item key={key} value={key} textValue={displayName}>
-                <Selector.ItemText>{displayName}</Selector.ItemText>
-              </Selector.Item>
-            ))}
-          </SelectorPopup>
-        </Selector.Root>
-        {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
-      </div>
+      {/* ID provider — chosen on create's own step. */}
+      {persisted && (
+        <div className="flex flex-col gap-1.5">
+          <FieldLabel text={providerLabel} htmlFor={PROVIDER_ID} />
+          <Input id={PROVIDER_ID} disabled value={providerName} />
+        </div>
+      )}
 
       {/* Display name */}
       <div className="flex flex-col gap-1.5">
@@ -91,14 +66,15 @@ export function GroupEditorDialogGeneralStep() {
         />
       </div>
 
-      {/* Name */}
+      {/* ID */}
       <div className="flex flex-col gap-1.5">
-        <FieldLabel text={nameLabel} required={!persisted} htmlFor={NAME_ID} />
+        <FieldLabel text={idLabel} required={!persisted} htmlFor={ID_FIELD_ID} />
         <Input
-          id={NAME_ID}
+          id={ID_FIELD_ID}
           disabled={persisted}
           value={form.name}
-          error={nameError}
+          description={persisted ? undefined : idHelp}
+          error={idError}
           onInput={({ currentTarget }) => setGroupEditorName(currentTarget.value)}
           onBlur={() => {
             markGroupEditorFieldVisited('name');

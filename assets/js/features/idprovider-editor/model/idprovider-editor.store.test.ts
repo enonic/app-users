@@ -98,11 +98,11 @@ describe('$idProviderEditorErrors', () => {
     updateIdProviderEditorForm({ displayName: 'Company directory' });
     idProviderNameCheck.receive('company.directory', true);
 
-    expect($idProviderEditorErrors.get().name).toBe('idProviders.dialog.nameTaken');
+    expect($idProviderEditorErrors.get().name).toBe('idProviders.dialog.idTaken');
 
     updateIdProviderEditorForm({ name: '' });
 
-    expect($idProviderEditorErrors.get().name).toBe('idProviders.dialog.nameRequired');
+    expect($idProviderEditorErrors.get().name).toBe('idProviders.dialog.idRequired');
   });
 
   it('says nothing about a check that failed', () => {

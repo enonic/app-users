@@ -136,9 +136,9 @@ export function validateIdProviderForm(
   if (mode === 'create') {
     const name = form.name.trim();
     if (name.length === 0) {
-      errors.name = 'idProviders.dialog.nameRequired';
+      errors.name = 'idProviders.dialog.idRequired';
     } else if (isIllegalPrincipalName(name)) {
-      errors.name = 'idProviders.dialog.nameInvalid';
+      errors.name = 'idProviders.dialog.idInvalid';
     }
   }
 

@@ -82,7 +82,7 @@ export function RoleDetails({
               variant="outline"
               size="sm"
               label={editUsersLabel}
-              onClick={() => openRoleEditorAt(role, 'members')}
+              onClick={() => openRoleEditorAt(role, 'users')}
             />
           )
         }
@@ -99,7 +99,7 @@ export function RoleDetails({
               variant="outline"
               size="sm"
               label={editServiceAccountsLabel}
-              onClick={() => openRoleEditorAt(role, 'members')}
+              onClick={() => openRoleEditorAt(role, 'users')}
             />
           )
         }
@@ -125,7 +125,7 @@ export function RoleDetails({
               variant="outline"
               size="sm"
               label={editGroupsLabel}
-              onClick={() => openRoleEditorAt(role, 'members')}
+              onClick={() => openRoleEditorAt(role, 'groups')}
             />
           )
         }

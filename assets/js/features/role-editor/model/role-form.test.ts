@@ -5,8 +5,10 @@ import {
   ROLE_FORM_FIELDS,
   initialRoleForm,
   nextRoleForm,
+  roleMembersOf,
   sameRoleForm,
   validateRoleForm,
+  withRoleMembersOf,
   type RoleForm,
 } from './role-form';
 
@@ -148,16 +150,16 @@ describe('validateRoleForm', () => {
 
   it('requires a name while creating', () => {
     expect(validateRoleForm(form({ name: '' }), 'create')).toEqual({
-      name: 'roles.dialog.nameRequired',
+      name: 'roles.dialog.idRequired',
     });
   });
 
   it('refuses a name carrying a character XP rejects', () => {
     expect(validateRoleForm(form({ name: 'store manager' }), 'create').name).toBe(
-      'roles.dialog.nameInvalid',
+      'roles.dialog.idInvalid',
     );
     expect(validateRoleForm(form({ name: 'store:manager' }), 'create').name).toBe(
-      'roles.dialog.nameInvalid',
+      'roles.dialog.idInvalid',
     );
   });
 
@@ -168,9 +170,34 @@ describe('validateRoleForm', () => {
 
   it('reports both fields at once rather than one at a time', () => {
     expect(validateRoleForm(form({ name: '', displayName: '' }), 'create')).toEqual({
-      name: 'roles.dialog.nameRequired',
+      name: 'roles.dialog.idRequired',
       displayName: 'roles.dialog.displayNameRequired',
     });
+  });
+});
+
+describe('roleMembersOf', () => {
+  const mixed: PrincipalRef[] = [
+    { key: 'user:system:alice', type: 'user', displayName: 'Alice' },
+    { key: 'group:system:staff', type: 'group', displayName: 'Staff' },
+  ];
+
+  it('keeps the members of one kind', () => {
+    expect(roleMembersOf(mixed, 'group')).toEqual([mixed[1]]);
+  });
+});
+
+describe('withRoleMembersOf', () => {
+  const alice: PrincipalRef = { key: 'user:system:alice', type: 'user', displayName: 'Alice' };
+  const bob: PrincipalRef = { key: 'user:system:bob', type: 'user', displayName: 'Bob' };
+  const staff: PrincipalRef = { key: 'group:system:staff', type: 'group', displayName: 'Staff' };
+
+  it('replaces its own kind and keeps the other', () => {
+    expect(withRoleMembersOf([alice, staff], 'user', [bob])).toEqual([staff, bob]);
+  });
+
+  it('drops its own kind when nothing is picked', () => {
+    expect(withRoleMembersOf([alice, staff], 'user', [])).toEqual([staff]);
   });
 });
 

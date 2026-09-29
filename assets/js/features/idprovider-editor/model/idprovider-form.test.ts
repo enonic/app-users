@@ -141,13 +141,13 @@ describe('validateIdProviderForm', () => {
 
   it('requires a name while creating', () => {
     expect(validateIdProviderForm(form({ name: '' }), 'create').name).toBe(
-      'idProviders.dialog.nameRequired',
+      'idProviders.dialog.idRequired',
     );
   });
 
   it('refuses a name carrying a character XP rejects', () => {
     expect(validateIdProviderForm(form({ name: 'company directory' }), 'create').name).toBe(
-      'idProviders.dialog.nameInvalid',
+      'idProviders.dialog.idInvalid',
     );
   });
 

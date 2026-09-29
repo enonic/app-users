@@ -38,7 +38,7 @@ export function RoleEditorDialog({
 
   const editedKey = entity?.key;
 
-  // The list row carries no members; the Members step seeds from a read of the role.
+  // The list row carries no members; the Users and Groups steps seed from a read of the role.
   useEffect(() => {
     showRoleForEdit(editedKey);
 

@@ -30,7 +30,7 @@ describe('openGroupEditor', () => {
 
     const { open, view, step } = $groupEditor.get();
 
-    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'general' });
+    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'idProvider' });
   });
 
   it('derives the name from the display name until it is typed', () => {
@@ -85,11 +85,11 @@ describe('$groupEditorErrors', () => {
     updateGroupEditorForm({ idProvider: 'store', displayName: 'Managers' });
     groupNameCheck.receive('group:store:managers', true);
 
-    expect($groupEditorErrors.get().name).toBe('groups.dialog.nameTaken');
+    expect($groupEditorErrors.get().name).toBe('groups.dialog.idTaken');
 
     updateGroupEditorForm({ name: '' });
 
-    expect($groupEditorErrors.get().name).toBe('groups.dialog.nameRequired');
+    expect($groupEditorErrors.get().name).toBe('groups.dialog.idRequired');
   });
 
   it('says nothing about a check that failed', () => {

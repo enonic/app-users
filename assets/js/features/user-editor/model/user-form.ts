@@ -131,9 +131,9 @@ export function validateUserForm(
   if (mode === 'create') {
     const name = form.name.trim();
     if (name.length === 0) {
-      errors.name = 'users.dialog.nameRequired';
+      errors.name = 'users.dialog.idRequired';
     } else if (isIllegalPrincipalName(name)) {
-      errors.name = 'users.dialog.nameInvalid';
+      errors.name = 'users.dialog.idInvalid';
     }
   }
 

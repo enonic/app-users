@@ -76,11 +76,11 @@ export function GroupDetails({
           )
         }
       >
-        <DetailsPanel.Field labelKey="groups.details.description">
-          {description ?? noDescriptionLabel}
-        </DetailsPanel.Field>
         <DetailsPanel.Field labelKey="groups.details.idProvider">
           {providerName(key)}
+        </DetailsPanel.Field>
+        <DetailsPanel.Field labelKey="groups.details.description">
+          {description ?? noDescriptionLabel}
         </DetailsPanel.Field>
       </DetailsPanel.Section>
 

@@ -42,7 +42,7 @@ describe('openRoleEditor', () => {
 
 describe('openRoleEditorAt', () => {
   it('opens one step of an existing role, with the form seeded from it', () => {
-    openRoleEditorAt(MANAGER, 'members');
+    openRoleEditorAt(MANAGER, 'users');
 
     const { open, mode, view, step, form, saved, entity } = $roleEditor.get();
 
@@ -50,7 +50,7 @@ describe('openRoleEditorAt', () => {
       open: true,
       mode: 'edit',
       view: 'step',
-      step: 'members',
+      step: 'users',
     });
     expect(entity).toBe(MANAGER);
     expect(form).toMatchObject({ name: 'store.manager', description: 'Runs the shop' });
@@ -80,11 +80,11 @@ describe('$roleEditorErrors', () => {
     updateRoleEditorForm({ displayName: 'Store Manager' });
     roleNameCheck.receive('role:store.manager', true);
 
-    expect($roleEditorErrors.get().name).toBe('roles.dialog.nameTaken');
+    expect($roleEditorErrors.get().name).toBe('roles.dialog.idTaken');
 
     updateRoleEditorForm({ name: '' });
 
-    expect($roleEditorErrors.get().name).toBe('roles.dialog.nameRequired');
+    expect($roleEditorErrors.get().name).toBe('roles.dialog.idRequired');
   });
 
   it('says nothing about a check that failed', () => {

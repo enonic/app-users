@@ -1,111 +1,65 @@
-import { Input, Link, Selector } from '@enonic/ui';
+import { Input } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
-import { useIdProviderNames } from '../../../../entities/principal';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
-import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import {
   $userEditor,
   $userEditorErrors,
   $userEditorProviders,
   $userEditorServiceAccount,
   $userEditorSystemUser,
-  closeUserEditor,
   markUserEditorFieldVisited,
   setUserEditorDisplayName,
   setUserEditorEmail,
-  setUserEditorIdProvider,
   setUserEditorName,
   userEmailCheck,
   userNameCheck,
 } from '../../model/user-editor.store';
 
-const PROVIDER_LABEL_ID = 'user-editor-id-provider-label';
+const PROVIDER_ID = 'user-editor-id-provider';
 const DISPLAY_NAME_ID = 'user-editor-display-name';
-const NAME_ID = 'user-editor-name';
+const ID_FIELD_ID = 'user-editor-id';
 const EMAIL_ID = 'user-editor-email';
-
-const ID_PROVIDERS_HREF = '#/id-providers';
 
 export function UserEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($userEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($userEditorErrors);
   const systemUser = useStore($userEditorSystemUser);
   const serviceAccount = useStore($userEditorServiceAccount);
-  const nameCheck = useStore(userNameCheck.$state);
+  const idCheck = useStore(userNameCheck.$state);
   const emailCheck = useStore(userEmailCheck.$state);
   const providers = useStore($userEditorProviders);
-  const { status: providersStatus } = useIdProviderNames();
 
   const persisted = mode === 'edit';
-  // Only a settled answer says there is none to choose; a failed read keeps the selector.
-  const noProviders = !persisted && providersStatus === 'ready' && providers.length === 0;
 
   const providerName =
     providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
 
   // Labels
   const providerLabel = useI18n('users.dialog.idProvider');
-  const providerPlaceholder = useI18n('users.dialog.idProviderPlaceholder');
-  const noProvidersLabel = useI18n('users.dialog.noIdProviders');
-  const openProvidersLabel = useI18n('users.dialog.openIdProviders');
   const displayNameLabel = useI18n('users.dialog.displayName');
-  const nameLabel = useI18n('users.dialog.name');
+  const idLabel = useI18n('users.dialog.id');
+  const idHelp = useI18n('users.dialog.idHelp');
   const emailLabel = useI18n('users.dialog.email');
 
   // Errors
   const shown = visitedErrors(errors, visited);
-  const providerError = shown.idProvider === undefined ? undefined : i18n(shown.idProvider);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
-  const nameErrorKey = nameCheck.status === 'taken' ? errors.name : shown.name;
-  const nameError =
-    nameErrorKey === undefined ? undefined : i18n(nameErrorKey, form.name, providerName);
+  const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name, providerName);
   const emailErrorKey = emailCheck.status === 'taken' ? errors.email : shown.email;
   const emailError =
     emailErrorKey === undefined ? undefined : i18n(emailErrorKey, form.email, providerName);
 
   return (
     <div className="flex flex-col gap-5">
-      {/* No provider to create in: the ID Providers section is where one comes from. */}
-      {!serviceAccount && noProviders && (
-        <p className="border-bdr-soft text-subtle rounded-md border p-4 text-sm">
-          {noProvidersLabel}{' '}
-          <Link href={ID_PROVIDERS_HREF} onClick={closeUserEditor}>
-            {openProvidersLabel}
-          </Link>
-        </p>
-      )}
-
-      {/* IdProvider Selector — a service account's is the system store, so there is nothing to choose. */}
-      {!serviceAccount && !noProviders && (
+      {/* ID provider — chosen on create's own step; a service account's goes without saying. */}
+      {persisted && !serviceAccount && (
         <div className="flex flex-col gap-1.5">
-          <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required={!persisted} />
-          <Selector.Root
-            disabled={persisted}
-            value={form.idProvider}
-            error={providerError !== undefined}
-            onValueChange={(next) => {
-              markUserEditorFieldVisited('idProvider');
-              setUserEditorIdProvider(next);
-            }}
-          >
-            <Selector.Trigger aria-labelledby={PROVIDER_LABEL_ID}>
-              <Selector.Value placeholder={providerPlaceholder}>
-                {form.idProvider.length > 0 ? providerName : undefined}
-              </Selector.Value>
-              <Selector.Icon />
-            </Selector.Trigger>
-            <SelectorPopup>
-              {providers.map(({ key, displayName }) => (
-                <Selector.Item key={key} value={key} textValue={displayName}>
-                  <Selector.ItemText>{displayName}</Selector.ItemText>
-                </Selector.Item>
-              ))}
-            </SelectorPopup>
-          </Selector.Root>
-          {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
+          <FieldLabel text={providerLabel} htmlFor={PROVIDER_ID} />
+          <Input id={PROVIDER_ID} disabled value={providerName} />
         </div>
       )}
 
@@ -121,14 +75,15 @@ export function UserEditorDialogGeneralStep() {
         />
       </div>
 
-      {/* Name input */}
+      {/* ID input */}
       <div className="flex flex-col gap-1.5">
-        <FieldLabel text={nameLabel} required={!persisted} htmlFor={NAME_ID} />
+        <FieldLabel text={idLabel} required={!persisted} htmlFor={ID_FIELD_ID} />
         <Input
-          id={NAME_ID}
+          id={ID_FIELD_ID}
           disabled={persisted}
           value={form.name}
-          error={nameError}
+          description={persisted ? undefined : idHelp}
+          error={idError}
           onInput={({ currentTarget }) => setUserEditorName(currentTarget.value)}
           onBlur={() => {
             markUserEditorFieldVisited('name');

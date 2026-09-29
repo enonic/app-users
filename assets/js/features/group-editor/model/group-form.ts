@@ -104,9 +104,9 @@ export function validateGroupForm(form: GroupForm, mode: StepDialogMode): GroupF
 
     const name = form.name.trim();
     if (name.length === 0) {
-      errors.name = 'groups.dialog.nameRequired';
+      errors.name = 'groups.dialog.idRequired';
     } else if (isIllegalPrincipalName(name)) {
-      errors.name = 'groups.dialog.nameInvalid';
+      errors.name = 'groups.dialog.idInvalid';
     }
   }
 

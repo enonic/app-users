@@ -178,12 +178,12 @@ describe('validateGroupForm', () => {
   });
 
   it('requires a name while creating', () => {
-    expect(validateGroupForm(form({ name: '' }), 'create').name).toBe('groups.dialog.nameRequired');
+    expect(validateGroupForm(form({ name: '' }), 'create').name).toBe('groups.dialog.idRequired');
   });
 
   it('refuses a name carrying a character XP rejects', () => {
     expect(validateGroupForm(form({ name: 'store managers' }), 'create').name).toBe(
-      'groups.dialog.nameInvalid',
+      'groups.dialog.idInvalid',
     );
   });
 

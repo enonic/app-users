@@ -113,7 +113,7 @@ describe('validateUserForm', () => {
 
     expect(errors).toEqual({
       displayName: 'users.dialog.displayNameRequired',
-      name: 'users.dialog.nameRequired',
+      name: 'users.dialog.idRequired',
       email: 'users.dialog.emailRequired',
       idProvider: undefined,
     });
@@ -121,7 +121,7 @@ describe('validateUserForm', () => {
 
   it('refuses a login carrying a character XP rejects', () => {
     expect(validateUserForm(form({ name: 'alice anderson' }), 'create', false).name).toBe(
-      'users.dialog.nameInvalid',
+      'users.dialog.idInvalid',
     );
   });
 

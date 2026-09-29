@@ -45,11 +45,14 @@ export const userEmailCheck = createUserEmailCheck();
  */
 export const $userEditorServiceAccount = atom(false);
 
+/** The steps a service account's wizard skips: its provider is the system store, nothing to choose. */
+export const SERVICE_ACCOUNT_OMITTED_STEPS: readonly UserEditorStep[] = ['idProvider'];
+
 // The section words a clash: a service account's provider goes without saying.
 const TAKEN_KEYS = {
-  users: { name: 'users.dialog.nameTaken', email: 'users.dialog.emailTaken' },
+  users: { name: 'users.dialog.idTaken', email: 'users.dialog.emailTaken' },
   serviceAccounts: {
-    name: 'serviceAccounts.dialog.nameTaken',
+    name: 'serviceAccounts.dialog.idTaken',
     email: 'serviceAccounts.dialog.emailTaken',
   },
 } satisfies Record<string, Record<'name' | 'email', string>>;
@@ -127,6 +130,12 @@ export function openUserEditorAt(user: User, step: UserEditorStep): void {
 export function openServiceAccountEditor(payload: UserEditorPayload): void {
   $userEditorServiceAccount.set(true);
   userEditorDialog.open(payload, 'serviceAccounts.dialog.createTitle');
+  const first = USER_EDITOR_STEPS.order.find(
+    (step) => !SERVICE_ACCOUNT_OMITTED_STEPS.includes(step),
+  );
+  if (first !== undefined) {
+    userEditorDialog.goToStep(first);
+  }
 }
 
 export function openServiceAccountEditorAt(user: User, step: UserEditorStep): void {

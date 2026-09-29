@@ -46,7 +46,7 @@ describe('openUserEditor', () => {
 
     const { open, view, step } = $userEditor.get();
 
-    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'general' });
+    expect({ open, view, step }).toEqual({ open: true, view: 'wizard', step: 'idProvider' });
   });
 
   it('derives the name from the display name until it is typed', () => {
@@ -81,11 +81,11 @@ describe('$userEditorErrors', () => {
     updateUserEditorForm({ idProvider: 'system', displayName: 'Alice' });
     userNameCheck.receive('user:system:alice', true);
 
-    expect($userEditorErrors.get().name).toBe('users.dialog.nameTaken');
+    expect($userEditorErrors.get().name).toBe('users.dialog.idTaken');
 
     updateUserEditorForm({ name: '' });
 
-    expect($userEditorErrors.get().name).toBe('users.dialog.nameRequired');
+    expect($userEditorErrors.get().name).toBe('users.dialog.idRequired');
   });
 
   it('says nothing about a check that failed', () => {
@@ -111,7 +111,7 @@ describe('$userEditorErrors', () => {
     userEmailCheck.receive('email:system|bot@example.com', true);
 
     expect($userEditorErrors.get()).toMatchObject({
-      name: 'serviceAccounts.dialog.nameTaken',
+      name: 'serviceAccounts.dialog.idTaken',
       email: 'serviceAccounts.dialog.emailTaken',
     });
   });
@@ -190,6 +190,7 @@ describe('openServiceAccountEditor', () => {
 
     expect($userEditorServiceAccount.get()).toBe(true);
     expect($userEditor.get().form.idProvider).toBe('system');
+    expect($userEditor.get().step).toBe('general');
   });
 
   it('hands the dialog back to the Users section on its next open', () => {

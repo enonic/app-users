@@ -74,12 +74,12 @@ export function UserDetails({
           )
         }
       >
-        {email !== undefined && (
-          <DetailsPanel.Field labelKey="users.details.email">{email}</DetailsPanel.Field>
-        )}
         <DetailsPanel.Field labelKey="users.details.idProvider">
           {providerName(key)}
         </DetailsPanel.Field>
+        {email !== undefined && (
+          <DetailsPanel.Field labelKey="users.details.email">{email}</DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
       {/* The password alone: public keys belong to the system store's accounts, as in the editor. */}

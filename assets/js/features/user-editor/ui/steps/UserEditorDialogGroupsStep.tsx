@@ -1,4 +1,4 @@
-import { Checkbox } from '@enonic/ui';
+import { Toggle } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { useState } from 'preact/hooks';
 
@@ -19,7 +19,7 @@ export function UserEditorDialogGroupsStep() {
   const [showAll, setShowAll] = useState(false);
 
   const groupsPlaceholder = useI18n('users.dialog.groupsPlaceholder');
-  const showAllLabel = useI18n('users.dialog.showAllGroups');
+  const showAllLabel = useI18n('users.dialog.showAllProviders');
   const failedNotice = useI18n('users.dialog.membershipsFailed');
 
   if (systemUser) {
@@ -30,11 +30,15 @@ export function UserEditorDialogGroupsStep() {
     <div className="flex flex-col gap-3">
       {status === 'error' && <p className="text-error text-sm">{failedNotice}</p>}
 
-      <Checkbox
-        label={showAllLabel}
-        checked={showAll}
-        onCheckedChange={(checked) => setShowAll(checked === true)}
-      />
+      <div className="flex justify-end">
+        <Toggle
+          size="sm"
+          className="-my-1 h-8 px-1.5 focus-visible:ring-offset-0"
+          label={showAllLabel}
+          pressed={showAll}
+          onPressedChange={setShowAll}
+        />
+      </div>
 
       <PrincipalPicker
         kinds={['group']}
