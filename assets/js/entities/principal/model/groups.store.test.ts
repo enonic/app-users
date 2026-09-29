@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok } from 'neverthrow';
 import { describe, expect, it } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { $groups, beginGroupsLoad, receiveGroup, receiveGroups, removeGroup } from './groups.store';
 import type { Group } from './principal.types';
 

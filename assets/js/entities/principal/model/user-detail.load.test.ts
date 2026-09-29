@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { fetchUserDetail, fetchUserMemberships } from '../api/users.api';
 import type { PrincipalRef, User, UserDetail } from './principal.types';
 import {

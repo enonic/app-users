@@ -13,7 +13,7 @@ java layer is covered instead by JUnit through `ScriptTestSupport`, under `src/t
 
 **The environment is `node`, and no DOM library is installed — by decision, not by omission.**
 Component rendering is not tested. Keep the testable part of a widget in a pure helper next to it (as
-`shared/i18n/i18n.store.ts` keeps `localize`): row mapping, action `enabled` predicates, overflow and
+`widgets/browse-list/browse-list.ts` keeps the selection rules): row mapping, action `enabled` predicates, overflow and
 sort computations all belong outside the component, where they can be asserted directly. Adding
 `happy-dom` and a Preact testing library would be its own issue, never a line in a feature PR.
 

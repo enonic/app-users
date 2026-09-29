@@ -1,9 +1,9 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { $idProviderNames } from '../../../entities/principal/model/id-providers.store';
 import { $roles } from '../../../entities/principal/model/roles.store';
-import { AppError } from '../../../shared/api';
 import { fetchRolesScreen } from '../api/roles-screen.api';
 import { loadRolesScreen } from './roles.screen';
 

@@ -3,10 +3,10 @@
 ## Client side
 
 A section's data plane is its own extension prefix: `host.baseUrl` + `/graphql`, served by this
-app's `/extensions/section-endpoint`. The transport is the `shared/api` module copied from the host
-(app-settings) — `ResultAsync<T, AppError>`, errors as values, one request at a time — with its
-endpoint set once at mount from `host.baseUrl`. Do not add a second http helper, and do not call
-`fetch` outside `shared/api`.
+app's `/extensions/section-endpoint`. The transport is `requestJson` from `@enonic/ui-utils/request`,
+with `AppError` from `@enonic/ui-utils` — `ResultAsync<T, AppError>`, errors as values — and
+`shared/api` builds the GraphQL layer on it: one request at a time, its endpoint set once at mount from
+`host.baseUrl`. Do not add a second http helper, and do not call `fetch` outside `shared/api`.
 
 - An `api/` segment is the only place that talks to the server: `entities/principal/api/*.api.ts`,
   one file per subdomain (users, groups, roles, id-providers).

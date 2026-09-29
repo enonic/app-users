@@ -1,7 +1,7 @@
+import type { AppError } from '@enonic/ui-utils';
 import type { ReadableAtom } from 'nanostores';
 import type { ResultAsync } from 'neverthrow';
 
-import type { AppError } from '../../../shared/api';
 import {
   createPrincipalNameCheckStore,
   type PrincipalNameCheckState,

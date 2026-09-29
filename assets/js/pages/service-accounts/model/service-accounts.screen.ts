@@ -1,3 +1,4 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok, type Result } from 'neverthrow';
 
 import {
@@ -15,7 +16,6 @@ import {
   toUsersPage,
   type UsersPage,
 } from '../../../entities/principal';
-import { AppError } from '../../../shared/api';
 import {
   fetchServiceAccountsScreen,
   type ServiceAccountsScreenData,

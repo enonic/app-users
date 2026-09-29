@@ -57,7 +57,9 @@ discovered, mounted, routed and revoked; its `docs/platform-facts.md` is what XP
 its types mislead. `../app-applications` (branch `extensions`) is the **other provider**: `widgets/`,
 `shared/ui` and most of `shared/` are kept byte-identical between the two (`cmp` is the drift check)
 until `@enonic/ui-kit` and `@enonic/ui-utils` in `../npm-enonic-ui-toolkit` extract them; the browse
-screen they make up is specified in that repository's `docs/browse-framework.md`. `../npm-enonic-ui`
+screen they make up is specified in that repository's `docs/browse-framework.md`. The request
+transport, `AppError` and the i18n core (`localize`, `fromPhrases`) have already moved and are imported
+from `@enonic/ui-utils` directly. `../npm-enonic-ui`
 is the source of `@enonic/ui` — read a component before composing it.
 
 `docs/unified-api.md` is the design of the GraphQL layer under `extensions/graphql/`, written while

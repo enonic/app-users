@@ -1,7 +1,7 @@
+import type { AppError } from '@enonic/ui-utils';
 import { computed, map, type ReadableAtom } from 'nanostores';
 import type { Result } from 'neverthrow';
 
-import type { AppError } from '../../../shared/api';
 import type { IdProviderUserCount } from '../api/id-providers.api';
 import type { IdProvider, IdProviderName } from './principal.types';
 import { upsert } from './upsert';

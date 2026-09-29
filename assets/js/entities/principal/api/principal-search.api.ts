@@ -1,6 +1,7 @@
+import { type AppError } from '@enonic/ui-utils';
 import { okAsync, type ResultAsync } from 'neverthrow';
 
-import { requestGraphQlDocument, type AppError } from '../../../shared/api';
+import { requestGraphQlDocument } from '../../../shared/api';
 import type { PrincipalPage, PrincipalRef, PrincipalType } from '../model/principal.types';
 
 const PRINCIPALS_BY_KEYS_DOCUMENT = `

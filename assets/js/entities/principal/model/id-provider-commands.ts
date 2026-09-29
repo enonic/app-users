@@ -1,7 +1,7 @@
 import type { PropertyTreeJson } from '@enonic/ui-types';
+import type { AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
-import type { AppError } from '../../../shared/api';
 import { i18n } from '../../../shared/i18n';
 import type { SelectionStore } from '../../../shared/selection';
 import {

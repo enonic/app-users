@@ -1,6 +1,6 @@
+import type { AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
-import type { AppError } from '../../../shared/api';
 import {
   requestRoleExists,
   sendRoleCreation,

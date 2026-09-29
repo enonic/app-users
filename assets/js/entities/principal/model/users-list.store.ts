@@ -1,7 +1,7 @@
+import type { AppError } from '@enonic/ui-utils';
 import { computed, map, type MapStore, type ReadableAtom } from 'nanostores';
 import type { Result } from 'neverthrow';
 
-import type { AppError } from '../../../shared/api';
 import type { UsersPage } from '../api/users.api';
 import type { User } from './principal.types';
 

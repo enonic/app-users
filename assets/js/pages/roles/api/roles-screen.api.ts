@@ -1,3 +1,4 @@
+import { type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
@@ -6,7 +7,7 @@ import {
   type IdProviderNamesData,
   type RolesData,
 } from '../../../entities/principal';
-import { requestGraphQlRoots, type AppError, type GraphQlRootsAnswer } from '../../../shared/api';
+import { requestGraphQlRoots, type GraphQlRootsAnswer } from '../../../shared/api';
 
 /**
  * Everything the Roles screen reads, in one request.

@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok } from 'neverthrow';
 import { describe, expect, it } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import type { User } from './principal.types';
 import {
   $users,

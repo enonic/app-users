@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { requestRoleExists, sendRoleCreation, sendRoleUpdate } from '../api/roles.api';
 import type { PrincipalKey, Role } from './principal.types';
 import {

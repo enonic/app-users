@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, errAsync, ok, okAsync, ResultAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { fetchIdProviders } from '../api/id-providers.api';
 import { loadIdProviders } from './id-providers.load';
 import {

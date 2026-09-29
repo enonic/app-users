@@ -1,3 +1,4 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok, type Result } from 'neverthrow';
 
 import {
@@ -18,7 +19,6 @@ import {
   usersLoadedKeys,
   type UsersPage,
 } from '../../../entities/principal';
-import { AppError } from '../../../shared/api';
 import { fetchUsersScreen, type UsersScreenData } from '../api/users-screen.api';
 import { $usersQuery, PAGE_SIZE } from './query.store';
 import { usersSelection } from './selection.store';
