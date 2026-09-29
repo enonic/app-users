@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync } from 'neverthrow';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { setPhrases } from '../../../shared/i18n';
 import { createSelectionStore, type SelectionStore } from '../../../shared/selection';
 import {

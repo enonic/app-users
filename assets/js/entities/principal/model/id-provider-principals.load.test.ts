@@ -1,7 +1,7 @@
+import type { AppError } from '@enonic/ui-utils';
 import { okAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AppError } from '../../../shared/api';
 import { fetchIdProviderPrincipalPage, fetchIdProviderPrincipals } from '../api/id-providers.api';
 import {
   forgetIdProviderPrincipalRows,

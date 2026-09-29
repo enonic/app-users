@@ -1,9 +1,9 @@
 import type { PropertyTreeJson } from '@enonic/ui-types';
+import type { AppError } from '@enonic/ui-utils';
 import { okAsync, type ResultAsync } from 'neverthrow';
 
 import { fetchIdProviderForm } from '../../../entities/application';
 import { fetchIdProviderConfig } from '../../../entities/principal';
-import type { AppError } from '../../../shared/api';
 import { $locale } from '../../../shared/i18n';
 import {
   beginIdProviderConfigLoad,

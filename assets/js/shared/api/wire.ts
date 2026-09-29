@@ -1,6 +1,5 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok, type Result } from 'neverthrow';
-
-import { AppError } from './errors';
 
 /**
  * An empty string on the wire is absence, not a value.

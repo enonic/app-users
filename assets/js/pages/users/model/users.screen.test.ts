@@ -1,3 +1,4 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -5,7 +6,7 @@ import { $idProviderNames } from '../../../entities/principal/model/id-providers
 import { showUser } from '../../../entities/principal/model/user-detail.load';
 import { $userDetail } from '../../../entities/principal/model/user-detail.load';
 import { $users } from '../../../entities/principal/model/users.store';
-import { AppError, requestGraphQlDocument } from '../../../shared/api';
+import { requestGraphQlDocument } from '../../../shared/api';
 import { fetchUsersScreen } from '../api/users-screen.api';
 import { $usersQuery, setUsersSearch, toggleUsersIdProvider } from './query.store';
 import { usersSelection } from './selection.store';
@@ -15,8 +16,7 @@ import { loadMoreUsers, refreshUsersScreen, reloadUsersScreen } from './users.sc
 // it and lets a test hold one answer back.
 vi.mock('../api/users-screen.api', () => ({ fetchUsersScreen: vi.fn() }));
 
-// The details panel has a transport of its own, and one test below reaches through it. `AppError` stays
-// real, since the stores report its message.
+// The details panel has a transport of its own, and one test below reaches through it.
 vi.mock('../../../shared/api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../../shared/api')>()),
   requestGraphQlDocument: vi.fn(),

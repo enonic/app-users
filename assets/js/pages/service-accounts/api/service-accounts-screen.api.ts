@@ -1,3 +1,4 @@
+import { type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
@@ -9,7 +10,6 @@ import {
 } from '../../../entities/principal';
 import {
   requestGraphQlRoots,
-  type AppError,
   type GraphQlRootsAnswer,
   type GraphQlVariables,
 } from '../../../shared/api';

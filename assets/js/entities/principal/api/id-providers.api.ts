@@ -1,12 +1,8 @@
 import type { PropertyTreeJson } from '@enonic/ui-types';
+import { AppError } from '@enonic/ui-utils';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
-import {
-  AppError,
-  requestGraphQl,
-  requestGraphQlDocument,
-  type GraphQlRoot,
-} from '../../../shared/api';
+import { requestGraphQl, requestGraphQlDocument, type GraphQlRoot } from '../../../shared/api';
 import { DETAILS_LIST_PAGE_SIZE } from '../../../shared/load-more';
 import type {
   IdProvider,

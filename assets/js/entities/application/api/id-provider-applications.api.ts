@@ -1,13 +1,9 @@
 import { Form } from '@enonic/input-types/schema';
 import type { FormJson } from '@enonic/ui-types';
+import { AppError } from '@enonic/ui-utils';
 import { ok, Result, type ResultAsync } from 'neverthrow';
 
-import {
-  AppError,
-  requestGraphQl,
-  requestGraphQlDocument,
-  type GraphQlRoot,
-} from '../../../shared/api';
+import { requestGraphQl, requestGraphQlDocument, type GraphQlRoot } from '../../../shared/api';
 import type { IdProviderApplication } from '../model/application.types';
 
 const ID_PROVIDER_APPLICATIONS_SELECTION = `{

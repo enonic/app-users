@@ -1,3 +1,4 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok, type Result } from 'neverthrow';
 
 import {
@@ -9,7 +10,6 @@ import {
   toGroups,
   toIdProviderNames,
 } from '../../../entities/principal';
-import { AppError } from '../../../shared/api';
 import { fetchGroupsScreen, type GroupsScreenData } from '../api/groups-screen.api';
 
 /**

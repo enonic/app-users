@@ -1,3 +1,4 @@
+import { type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
@@ -6,7 +7,7 @@ import {
   type GroupsData,
   type IdProviderNamesData,
 } from '../../../entities/principal';
-import { requestGraphQlRoots, type AppError, type GraphQlRootsAnswer } from '../../../shared/api';
+import { requestGraphQlRoots, type GraphQlRootsAnswer } from '../../../shared/api';
 
 /**
  * Everything the Groups screen reads, in one request: the groups, and the id providers whose display

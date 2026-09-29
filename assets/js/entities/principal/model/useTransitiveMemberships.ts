@@ -1,7 +1,7 @@
+import type { AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 import { useEffect, useState } from 'preact/hooks';
 
-import type { AppError } from '../../../shared/api';
 import { fetchGroupMemberships } from '../api/groups.api';
 import { fetchUserDetail } from '../api/users.api';
 import type { Memberships, PrincipalRef } from './principal.types';

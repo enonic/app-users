@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../../../shared/api';
 import { isGroupNameTaken } from './group-commands';
 import { isIdProviderNameTaken } from './id-provider-commands';
 import { createPrincipalNameCheck, type PrincipalNameCheck } from './principal-name-check.load';

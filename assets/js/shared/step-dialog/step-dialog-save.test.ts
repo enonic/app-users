@@ -1,7 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync } from 'neverthrow';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { AppError } from '../api';
 import { runStepDialogSave, type StepDialogSaveOptions } from './step-dialog-save';
 import { createStepDialogStore } from './step-dialog.store';
 import { defineSteps } from './steps';

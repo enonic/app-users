@@ -1,12 +1,7 @@
+import { type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
-import {
-  nonEmpty,
-  requestGraphQlDocument,
-  written,
-  type AppError,
-  type GraphQlRoot,
-} from '../../../shared/api';
+import { nonEmpty, requestGraphQlDocument, written, type GraphQlRoot } from '../../../shared/api';
 import type {
   Group,
   GroupDetail,

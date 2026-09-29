@@ -1,3 +1,4 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok, type Result } from 'neverthrow';
 
 import {
@@ -9,7 +10,6 @@ import {
   toIdProviderNames,
   toRoles,
 } from '../../../entities/principal';
-import { AppError } from '../../../shared/api';
 import { fetchRolesScreen, type RolesScreenData } from '../api/roles-screen.api';
 
 /**

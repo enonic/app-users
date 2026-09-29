@@ -1,6 +1,7 @@
+import { AppError } from '@enonic/ui-utils';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
-import { AppError, requestGraphQlDocument } from '../../../shared/api';
+import { requestGraphQlDocument } from '../../../shared/api';
 import type { PrincipalKey } from '../model/principal.types';
 
 const DELETE_PRINCIPALS_DOCUMENT = `
