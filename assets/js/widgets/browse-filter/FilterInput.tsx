@@ -8,7 +8,7 @@ import {
   useCombobox,
   usePhrases,
 } from '@enonic/ui';
-import { Check, Filter, X } from 'lucide-react';
+import { Check, ListFilter, X } from 'lucide-react';
 import { Fragment } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import type { KeyboardEvent, RefObject } from 'react';
@@ -221,7 +221,7 @@ export function FilterInput({
         <Button
           variant="text"
           size="sm"
-          startIcon={Filter}
+          startIcon={ListFilter}
           label={filterLabel}
           onClick={focusInput}
           className="shrink-0"
@@ -399,6 +399,8 @@ function FilterTextInput({
   return (
     <Combobox.Input
       ref={inputRef}
+      // The library's input names itself `Search` in English; the section's own prompt is the name here.
+      aria-label={placeholder}
       placeholder={placeholder}
       className="bg-transparent"
       onFocus={onOpen}
