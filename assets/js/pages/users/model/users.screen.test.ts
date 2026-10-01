@@ -8,7 +8,7 @@ import { $userDetail } from '../../../entities/principal/model/user-detail.load'
 import { $users } from '../../../entities/principal/model/users.store';
 import { requestGraphQlDocument } from '../../../shared/api';
 import { fetchUsersScreen } from '../api/users-screen.api';
-import { $usersQuery, setUsersSearch, toggleUsersIdProvider } from './query.store';
+import { $usersQuery, setUsersIdProviders, setUsersSearch } from './query.store';
 import { usersSelection } from './selection.store';
 import { loadMoreUsers, refreshUsersScreen, reloadUsersScreen } from './users.screen';
 
@@ -77,7 +77,7 @@ describe('reloadUsersScreen', () => {
 
   it('carries the search, the provider and the order the query store holds', async () => {
     setUsersSearch('  alice  ');
-    toggleUsersIdProvider('ldap');
+    setUsersIdProviders(['ldap']);
 
     await reloadUsersScreen();
 

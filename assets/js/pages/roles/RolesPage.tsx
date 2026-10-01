@@ -5,25 +5,23 @@ import { useRoles } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { RoleEditorDialog } from '../../features/role-editor/ui/RoleEditorDialog';
 import { isReadOnlyMode } from '../../shared/config';
+import { textOf, valuesOf } from '../../shared/filter';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
-import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import {
   DEFAULT_SORT_DIRECTION,
   sortByDisplayName,
   type SortDirection,
 } from '../../widgets/browse-list/browse-sort';
-import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
 import { rolesFilter } from './model/filter.store';
 import { ROLE_ACTIONS } from './model/roles.actions';
-import { filterRolesByBucket, roleBuckets, searchRoles } from './model/roles.filter';
+import { filterRolesByBucket, SCOPE_FIELD, scopeField, searchRoles } from './model/roles.filter';
 import { toRoleRow } from './model/roles.rows';
 import { loadRolesScreen } from './model/roles.screen';
-import { rolesSearch } from './model/search.store';
 import { rolesSelection } from './model/selection.store';
 import { $rolesSort, setRolesSort } from './model/sort.store';
 import { useRolesScreen } from './model/useRolesScreen';
@@ -39,16 +37,18 @@ export function RolesPage() {
   const { openItem, closeItem } = useHostFrame();
   const activeKey = useItemId();
   const { status, items } = useRoles();
-  const query = useStore(rolesSearch.$query);
-  const selectedBuckets = useStore(rolesFilter.$selected);
+  const query = useStore(rolesFilter.$query);
   const sort = useStore($rolesSort);
 
   const sortNameLabel = useI18n('roles.sort.name');
   const sortAscLabel = useI18n('roles.sort.nameAsc');
   const sortDescLabel = useI18n('roles.sort.nameDesc');
+  const scopeFieldLabel = useI18n('roles.filter.scope');
   const systemBucketLabel = useI18n('roles.filter.system');
   const customBucketLabel = useI18n('roles.filter.custom');
+  const projectsGroupLabel = useI18n('roles.filter.projects');
   const emptyLabel = useI18n('roles.list.empty');
+  const filterPlaceholder = useI18n('roles.filter.placeholder');
   const readOnlyTitle = useI18n('readOnly.title');
   const readOnlyHelp = useI18n('readOnly.help');
 
@@ -60,28 +60,28 @@ export function RolesPage() {
     [],
   ) satisfies readonly BrowseSortOption<SortDirection>[];
 
-  // Shared with the bucket counts below, so the query runs once per render rather than twice.
-  const searched = useMemo(() => searchRoles(items, query), [items, query]);
+  // Shared with the bucket counts below, so the text runs once per render rather than twice.
+  const searched = useMemo(() => searchRoles(items, textOf(query)), [items, query]);
 
   // Narrow first, order last: sorting only what survived is the cheaper half, and the order the rows
   // appear in has to be the final word.
   const visible = useMemo(
-    () => sortByDisplayName(filterRolesByBucket(searched, selectedBuckets), sort),
-    [searched, selectedBuckets, sort],
+    () => sortByDisplayName(filterRolesByBucket(searched, valuesOf(query, SCOPE_FIELD)), sort),
+    [searched, query, sort],
   );
 
-  // Counts follow the query but not the ticked buckets, so they answer "where did the search find
+  // Counts follow the text but not the picked buckets, so they answer "where did the search find
   // anything" rather than restating the current narrowing.
-  const buckets = useMemo(
-    () =>
-      visibleEntries(
-        roleBuckets(items, searched, {
-          system: systemBucketLabel,
-          custom: customBucketLabel,
-        }),
-        selectedBuckets,
-      ),
-    [items, searched, selectedBuckets],
+  const fields = useMemo(
+    () => [
+      scopeField(items, searched, {
+        field: scopeFieldLabel,
+        system: systemBucketLabel,
+        custom: customBucketLabel,
+        projects: projectsGroupLabel,
+      }),
+    ],
+    [items, searched, scopeFieldLabel, systemBucketLabel, customBucketLabel, projectsGroupLabel],
   );
 
   const section = useBrowseSection({
@@ -91,8 +91,7 @@ export function RolesPage() {
     items,
     status,
     selection: rolesSelection,
-    search: rolesSearch,
-    resetOnLeave: [rolesFilter],
+    filter: rolesFilter,
     visible,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
     toRow: (role) => toRoleRow(role, <PrincipalIcon principal={role} />),
@@ -107,14 +106,9 @@ export function RolesPage() {
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
+        filterPlaceholder={filterPlaceholder}
         details={<RolesItemPage />}
-        filter={
-          <BrowseFilter
-            entries={buckets}
-            selected={selectedBuckets}
-            onToggle={(id) => rolesFilter.toggle(id)}
-          />
-        }
+        fields={fields}
         sort={
           <BrowseSort
             options={sortOptions}

@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Group } from '../../../entities/principal';
-import { visibleEntries } from '../../../widgets/browse-list/browse-filter';
-import { filterByIdProvider, idProviderEntries, searchGroups } from './groups.filter';
+import { isOffered } from '../../../widgets/browse-filter/browse-filter';
+import {
+  filterByIdProvider,
+  ID_PROVIDER_FIELD,
+  idProviderField,
+  searchGroups,
+} from './groups.filter';
 
 function group(key: string, displayName: string, description?: string, provider = 'system'): Group {
   return {
@@ -35,6 +40,12 @@ describe('searchGroups', () => {
 
   it('survives a group without a description', () => {
     expect(searchGroups(groups, 'sup')).toEqual([support]);
+  });
+
+  // Several text tags join into one query, so every word has to count on its own.
+  it('needs every word, in any order and across fields', () => {
+    expect(searchGroups(groups, 'publishes editors')).toEqual([editors]);
+    expect(searchGroups(groups, 'editors nobody')).toEqual([]);
   });
 
   it('ignores the group key', () => {
@@ -74,7 +85,7 @@ describe('filterByIdProvider', () => {
   });
 });
 
-describe('idProviderEntries', () => {
+describe('idProviderField', () => {
   // What the page hands in: the loaded providers, named as an administrator recognises them.
   const named = (key: Group['key']) =>
     ({ system: 'System', ldap: 'Company directory' })[key.split(':')[1] ?? ''];
@@ -82,22 +93,28 @@ describe('idProviderEntries', () => {
   // What it hands in before the providers have arrived.
   const unnamed = () => undefined;
 
-  it('offers one entry per provider, keyed by name and labelled by display name', () => {
-    expect(idProviderEntries(all, all, named)).toEqual([
+  it('is the ID provider field, named as the page says', () => {
+    const field = idProviderField(all, all, named, 'ID provider');
+
+    expect(field.id).toBe(ID_PROVIDER_FIELD);
+    expect(field.label).toBe('ID provider');
+  });
+
+  it('offers one value per provider, keyed by name and labelled by display name', () => {
+    expect(idProviderField(all, all, named, 'ID provider').values).toEqual([
       { id: 'ldap', label: 'Company directory', count: 1 },
       { id: 'system', label: 'System', count: 2 },
     ]);
   });
 
   it('sorts by the label, so the order follows the names on screen', () => {
-    expect(idProviderEntries(all, all, named).map(({ label }) => label)).toEqual([
-      'Company directory',
-      'System',
-    ]);
+    expect(
+      idProviderField(all, all, named, 'ID provider').values.map(({ label }) => label),
+    ).toEqual(['Company directory', 'System']);
   });
 
   it('falls back to the provider name while the providers are still loading', () => {
-    expect(idProviderEntries(all, all, unnamed)).toEqual([
+    expect(idProviderField(all, all, unnamed, 'ID provider').values).toEqual([
       { id: 'ldap', label: 'ldap', count: 1 },
       { id: 'system', label: 'system', count: 2 },
     ]);
@@ -106,23 +123,23 @@ describe('idProviderEntries', () => {
   it('counts the matched groups, so the counts follow the query', () => {
     const searched = searchGroups(all, 'support');
 
-    expect(idProviderEntries(all, searched, named)).toEqual([
+    expect(idProviderField(all, searched, named, 'ID provider').values).toEqual([
       { id: 'ldap', label: 'Company directory', count: 0 },
       { id: 'system', label: 'System', count: 1 },
     ]);
   });
 
-  // ! The entry a search emptied still has to be offered, or a ticked one disappears from the menu while
-  // ! it goes on narrowing the list — and with nothing matching there is no way left to untick it.
-  it('keeps offering a provider the query matched nothing from', () => {
+  // ! A value the search emptied is still there, or a term holding it would go on narrowing the list
+  // ! with nothing in the filter to say so; it just cannot be picked.
+  it('keeps a provider the query matched nothing from, as a value that cannot be picked', () => {
     const searched = searchGroups(all, 'nothing matches this');
 
-    const offered = idProviderEntries(all, searched, named);
-    expect(offered.map(({ id }) => id)).toEqual(['ldap', 'system']);
-    expect(visibleEntries(offered, new Set(['ldap'])).map(({ id }) => id)).toEqual(['ldap']);
+    const { values } = idProviderField(all, searched, named, 'ID provider');
+    expect(values.map(({ id }) => id)).toEqual(['ldap', 'system']);
+    expect(values.map(isOffered)).toEqual([false, false]);
   });
 
-  it('offers nothing on an instance with no groups', () => {
-    expect(idProviderEntries([], [], named)).toEqual([]);
+  it('offers no value on an instance with no groups', () => {
+    expect(idProviderField([], [], named, 'ID provider').values).toEqual([]);
   });
 });
