@@ -14,7 +14,6 @@ export type TagProps = {
 
 const TAG_NAME = 'Tag';
 
-// TODO: replace with the `Tag` of `@enonic/ui` once the library ships one; this carries the same API.
 export function Tag({
   label,
   prefix,
