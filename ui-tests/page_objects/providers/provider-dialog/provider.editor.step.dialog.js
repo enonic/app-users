@@ -32,6 +32,12 @@ const css = {
   closeButton: `${DIALOG} [data-component='Dialog.DefaultClose']`,
   // Footer (wizard view)
   nextButton: `${DIALOG} [data-component='Stepper.Next']`,
+  // The footer's primary button on any step: Stepper.Next on the way through, and on the last
+  // step a plain Button labelled 'Create' or 'Save' that Dialog.StepIndicator renders instead.
+  footerPrimaryButton:
+    `${DIALOG} [data-component='Dialog.StepIndicator'] [data-component='Stepper.Next'], ` +
+    `${DIALOG} [data-component='Dialog.StepIndicator'] button[aria-label='Create'], ` +
+    `${DIALOG} [data-component='Dialog.StepIndicator'] button[aria-label='Save']`,
   previousButton: `${DIALOG} [data-component='Stepper.Previous']`,
   // A dot is a tab that controls its step's panel ('...-panel-<step>'); located by the step, as in
   // the other editors, rather than by its 'Go to step N' label.
@@ -242,8 +248,9 @@ class IdProviderEditorStepDialog extends SectionPage {
   }
 
   // 'Next' on the way through; 'Create' (new provider) or 'Save' (existing provider) on the last step.
-  getNextButtonLabel() {
-    return this.getAttribute(css.nextButton, 'aria-label');
+  async getNextButtonLabel() {
+    await this.waitForElementDisplayed(css.footerPrimaryButton);
+    return await this.getAttribute(css.footerPrimaryButton, 'aria-label');
   }
 
   // Dots in the footer, one per step; `step` is one of STEP.*.

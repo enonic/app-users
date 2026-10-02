@@ -43,9 +43,6 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
     let isHeadless = properties.get('is.headless');
     let width = ww === undefined ? properties.get('browser.width') : w;
     let height = hh === undefined ? properties.get('browser.height') : h;
-    console.log('is Headless ##################### ' + isHeadless);
-    console.log('browser name ##################### ' + browser_name);
-    console.log('browser width ##################### ' + width);
     let options = {
       logLevel: 'error',
       automationProtocol: 'webdriver',
@@ -57,16 +54,11 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
     };
     _this.browser = await webdriverio.remote(options);
     await _this.browser.url(baseUrl);
-    console.log('webdriverio #####################  ' + 'is  initialized!');
     console.log('BiDi ##################### ' + _this.browser.isBidi);
     return _this.browser;
   });
   after(async function () {
     await _this.browser.deleteSession();
-  });
-  afterEach(function () {
-    let state = this.currentTest.state ? this.currentTest.state.toString().toUpperCase() : 'FAILED';
-    return console.log('Test:', this.currentTest.title, ' is  ' + state);
   });
 };
 module.exports = new WebDriverHelper();

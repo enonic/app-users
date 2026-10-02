@@ -10,6 +10,17 @@ const MenuSectionsRail = require('../page_objects/menu.sections.rail');
 const fs = require('fs');
 const path = require('path');
 
+// The one place the XP admin address is set: 'base.url' in browser.properties, which both runners
+// (wdio.chrome.conf.js and WebDriverHelper) open the browser at. Normalised to a trailing slash so
+// paths can be appended to it.
+const propertiesReaderModule = require('properties-reader');
+const propertiesReader =
+  propertiesReaderModule.propertiesReader ||
+  propertiesReaderModule.default ||
+  propertiesReaderModule;
+const properties = propertiesReader({ sourceFile: path.join(__dirname, '../browser.properties') });
+const BASE_URL = String(properties.get('base.url')).replace(/[/]+$/, '') + '/';
+
 module.exports = {
   getBrowser() {
     if (typeof browser !== 'undefined') {
@@ -22,10 +33,10 @@ module.exports = {
     let element = await this.getBrowser().$(selector);
     return await element.waitForDisplayed(ms);
   },
-  async waitForElementNotDisplayed(selector, ms) {
-    let element = await this.getBrowser().$(selector);
-    return await element.waitForDisplayed(ms);
-  },
+  // async waitForElementNotDisplayed(selector, ms) {
+  //   let element = await this.getBrowser().$(selector);
+  //   return await element.waitForDisplayed(ms);
+  // },
   async clickOnElement(selector) {
     let el = await this.getBrowser().$(selector);
     await el.waitForDisplayed({ timeout: 2000 });
@@ -186,8 +197,12 @@ module.exports = {
     await this.doCloseAllWindowTabs();
     await this.navigateToHomePage();
   },
+  // 'base.url' from browser.properties, with a trailing slash, e.g. 'http://localhost:8080/admin/'.
+  getBaseUrl() {
+    return BASE_URL;
+  },
   async navigateToHomePage() {
-    await this.getBrowser().url('http://localhost:8080/admin/');
+    await this.getBrowser().url(this.getBaseUrl());
     await this.getBrowser().pause(500);
   },
   async doCloseAllWindowTabs(keepTitle1 = 'Enonic XP Admin', keepTitle2 = 'Settings') {
@@ -266,8 +281,8 @@ module.exports = {
       let menuSectionsRail = new MenuSectionsRail();
       await menuSectionsRail.waitForLoaded();
       await menuSectionsRail.clickOnSectionButton(section);
-      //await this.waitForSectionScreenLoaded(section);
-      //return menuSectionsRail;
+      await this.waitForSectionScreenLoaded(section);
+      return menuSectionsRail;
     } catch (err) {
       let screenshot = await this.saveScreenshotUniqueName('err_navigate_extension');
       throw new Error(`'${section}' section was not opened, screenshot: ${screenshot} ` + err);
@@ -275,13 +290,50 @@ module.exports = {
   },
   // Section-agnostic 'loaded' check for the browse screen: every section renders the same app bar
   // and toolbar, so this does not depend on a section-specific page object.
+  //
+  // The app bar is light DOM, so XPath serves it. The toolbar is inside the section's shadow root,
+  // where Chrome cannot evaluate XPath ("#document-fragment is not a valid context node type"), so it
+  // is located with CSS through webdriverio's deep selector from the section's shadow host - the
+  // same way SectionPage scopes every lookup (see page_objects/section.page.js).
   async waitForSectionScreenLoaded(section, ms = appConst.TIMEOUT.MEDIUM) {
     const appBarTitle = `//header//h2[text()='${section}']`;
+    await this.waitForElementDisplayed(appBarTitle, ms);
+
+    // Light DOM: the shadow host of the section's mount. Inactive sections stay mounted with the
+    // class 'hidden', hence the scoping by section id and the ':not(.hidden)'.
+    const shadowHost =
+      `div[data-component='SectionMount'][data-section='${this.getSectionId(section)}']:not(.hidden)` +
+      " div[data-component='SectionMountHost']";
     // 'BrowseToolbar' once a section carries its own data-component (app-users#2764),
     // 'Toolbar.Container' until then (app-applications).
+    // One '>>>' for the whole list: webdriverio strips only the leading one and hands the rest to
+    // querySelectorAll, which takes a selector list.
     const toolbar =
-      "//div[(@data-component='BrowseToolbar' or @data-component='Toolbar.Container') and @aria-label='Actions']";
-    await this.waitForElementDisplayed(appBarTitle, ms);
-    await this.waitForElementDisplayed(toolbar, ms);
+      ">>> [data-component='BrowseToolbar'][aria-label='Actions'], " +
+      "[data-component='Toolbar.Container'][aria-label='Actions']";
+    await this.getBrowser().waitUntil(
+      async () => {
+        const host = await this.getBrowser().$(shadowHost);
+        if (!(await host.isExisting())) {
+          return false;
+        }
+        return await host.$(toolbar).isDisplayed();
+      },
+      {
+        timeout: ms,
+        timeoutMsg: `'${section}' section - the 'Actions' toolbar is still not displayed in: ${ms}`,
+      },
+    );
+  },
+  // The 'data-section' of a section's mount (appConst.SECTION_ID.*) from its title
+  // (appConst.EXTENSIONS.*, what MenuSectionsRail.SECTION.* and the app bar show).
+  getSectionId(section) {
+    const key = Object.keys(appConst.EXTENSIONS).find(
+      (name) => appConst.EXTENSIONS[name] === section,
+    );
+    if (key === undefined) {
+      throw new Error(`Unknown section '${section}': not one of appConst.EXTENSIONS`);
+    }
+    return appConst.SECTION_ID[key];
   },
 };

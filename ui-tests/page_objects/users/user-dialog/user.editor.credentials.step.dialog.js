@@ -40,7 +40,7 @@ const css = {
 const NO_PUBLIC_KEYS = 'No public keys';
 const KEY_PENDING = 'Will be added when you save';
 
-class NewUserCredentialStepDialog extends UserEditorStepDialog {
+class UserEditorCredentialStepDialog extends UserEditorStepDialog {
   get step() {
     return UserEditorStepDialog.STEP.CREDENTIALS;
   }
@@ -381,4 +381,4 @@ class NewUserCredentialStepDialog extends UserEditorStepDialog {
   }
 }
 
-module.exports = NewUserCredentialStepDialog;
+module.exports = UserEditorCredentialStepDialog;

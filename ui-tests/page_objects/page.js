@@ -377,11 +377,14 @@ class Page {
     );
   }
 
+  // Notifications are the host's toasts, rendered in the light DOM outside every section's shadow
+  // root, so they are looked up in the document directly - not through findElement, which a
+  // SectionPage scopes to its shadow host.
   async removeNotificationMessage() {
     try {
-      let selector =
-        "//div[@class='notification-wrapper']//button[@aria-label='Close notification']";
-      await this.clickOnElement(selector);
+      const button = await this.getBrowser().$(COMMON.NOTIFICATION_CLOSE_BUTTON);
+      await button.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
+      await button.click();
       return await this.pause(300);
     } catch (err) {
       await this.handleError(
@@ -393,29 +396,42 @@ class Page {
   }
 
   async isNotificationMessageDisplayed() {
-    return await this.isElementDisplayed(COMMON.NOTIFICATION_TEXT);
+    const message = await this.getBrowser().$(COMMON.NOTIFICATION_TEXT);
+    return await message.isDisplayed();
   }
 
+  // Waits for a toast and returns its text.
   async waitForNotificationMessage() {
     try {
-      let notificationXpath = COMMON.NOTIFICATION_TEXT;
-      await this.getBrowser().waitUntil(
-        async () => {
-          return await this.isElementDisplayed(notificationXpath);
-        },
-        { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: 'The notification message was not shown' },
-      );
+      const message = await this.getBrowser().$(COMMON.NOTIFICATION_TEXT);
+      await message.waitForDisplayed({
+        timeout: appConst.TIMEOUT.MEDIUM,
+        timeoutMsg: 'The notification message was not shown',
+      });
       await this.pause(100);
-      return await this.getText(notificationXpath);
+      return await message.getText();
     } catch (err) {
       await this.handleError('Waited for the notification message', 'err_notif_msg', err);
     }
   }
 
+  // Texts of every toast currently shown.
+  async getNotificationMessages() {
+    const messages = await this.getBrowser().$(COMMON.NOTIFICATION_TEXT);
+    const texts = [];
+    for (const message of messages) {
+      if (await message.isDisplayed()) {
+        texts.push(await message.getText());
+      }
+    }
+    return texts;
+  }
+
   async waitForExpectedNotificationMessage(expectedMessage) {
     try {
-      let selector = `//div[contains(@id,'NotificationMessage')]//p[contains(.,'${expectedMessage}')]`;
-      await this.waitForElementDisplayed(selector, appConst.TIMEOUT.MEDIUM);
+      const selector = `${COMMON.NOTIFICATION_TEXT}[contains(.,'${expectedMessage}')]`;
+      const message = await this.getBrowser().$(selector);
+      await message.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
     } catch (err) {
       await this.handleError(
         `Wait for expected notification message: ${expectedMessage} - `,

@@ -17,6 +17,17 @@ const css = {
   // The rows live in a TreeList: role 'tree', not 'listbox'.
   list: "[data-component='UsersPage'] [data-component='BrowseList'] [role='tree']",
   listRows: "[data-component='UsersPage'] [data-component='BrowseListRow']",
+  // A row's id ends with '-item-<key>', the key being the user's principal key ('user:system:bob').
+  rowByKey: (key) =>
+    `[data-component='UsersPage'] [data-component='BrowseListRow'][id$='-item-${key}']`,
+  rowCheckboxLabel: (key) =>
+    `[data-component='UsersPage'] [data-component='BrowseListRow'][id$='-item-${key}'] [data-component='Checkbox'] label`,
+  rowCheckbox: (key) =>
+    `[data-component='UsersPage'] [data-component='BrowseListRow'][id$='-item-${key}'] [data-component='Checkbox'] input`,
+  rowDisplayName: "[data-component='ItemLabel'] span.font-semibold",
+  rowName: "[data-component='ItemLabel'] small",
+  rowIdProvider: "[data-component='TreeList.RowRight'] span",
+  listMessage: "[data-component='UsersPage'] [data-component='BrowseListMessage']",
   // The search field (BrowseScreen) and the list header controls (BrowseListHeader).
   searchInput:
     "[data-component='UsersPage'] [data-component='BrowseSearch'] " +
@@ -36,9 +47,20 @@ const css = {
   sortMenuItems: "[data-component='BrowseSort.Menu'][role='menu'] [role='menuitemradio']",
 };
 
+// A user's principal key, the way the rows are identified; `idProvider` defaults to 'system'.
+const userKey = (name, idProvider = 'system') => `user:${idProvider}:${name}`;
+
 class UsersPage extends SectionPage {
   constructor() {
     super(appConst.SECTION_ID.USERS);
+  }
+
+  static get css() {
+    return css;
+  }
+
+  static userKey(name, idProvider) {
+    return userKey(name, idProvider);
   }
 
   get newButton() {
@@ -401,6 +423,260 @@ class UsersPage extends SectionPage {
     }
   }
 
+  // 'No users' - shown instead of the list while it is empty - or undefined.
+  async getListMessage() {
+    const messages = await this.getDisplayedElements(css.listMessage);
+    return messages.length === 0 ? undefined : await messages[0].getText();
+  }
+
+  // Display names of the users listed, in display order.
+  async getUserDisplayNames() {
+    const rows = await this.getDisplayedElements(css.listRows);
+    const names = [];
+    for (const row of rows) {
+      names.push(await row.$(css.rowDisplayName).getText());
+    }
+    return names;
+  }
+
+  // Names (the line under the display name) of the users listed, in display order.
+  async getUserNames() {
+    const rows = await this.getDisplayedElements(css.listRows);
+    const names = [];
+    for (const row of rows) {
+      names.push(await row.$(css.rowName).getText());
+    }
+    return names;
+  }
+
+  // The ID provider shown on the right of the row, e.g. 'System Id Provider' - or undefined.
+  async getUserIdProvider(key) {
+    await this.waitForRowDisplayed(key);
+    const row = await this.findElement(css.rowByKey(key));
+    return await this.getRowIdProvider(row);
+  }
+
+  async getRowIdProvider(row) {
+    const cells = await row.$(css.rowIdProvider);
+    return cells.length === 0 ? undefined : await cells[0].getText();
+  }
+
+  // Rows by what they show. CSS cannot match text, so the rows are scanned: `text` is compared with
+  // the display name (the bold line) or the name (the small line under it).
+
+  async findRowByText(selector, text) {
+    const rows = await this.getDisplayedElements(css.listRows);
+    for (const row of rows) {
+      if ((await row.$(selector).getText()) === text) {
+        return row;
+      }
+    }
+    return undefined;
+  }
+
+  findRowByDisplayName(displayName) {
+    return this.findRowByText(css.rowDisplayName, displayName);
+  }
+
+  findRowByName(name) {
+    return this.findRowByText(css.rowName, name);
+  }
+
+  // Waits until a row with the display name is listed and returns it.
+  async waitForRowByDisplayNameDisplayed(displayName, ms = appConst.TIMEOUT.MEDIUM) {
+    let row;
+    try {
+      await this.getBrowser().waitUntil(
+        async () => {
+          row = await this.findRowByDisplayName(displayName);
+          return row !== undefined;
+        },
+        { timeout: ms, timeoutMsg: `no row with the display name '${displayName}'` },
+      );
+      return row;
+    } catch (err) {
+      await this.handleError(
+        `Users page - the row '${displayName}' should be displayed`,
+        'err_find_user',
+        err,
+      );
+    }
+  }
+
+  // Waits until a row with the name (the line under the display name) is listed and returns it.
+  async waitForRowByNameDisplayed(name, ms = appConst.TIMEOUT.MEDIUM) {
+    let row;
+    try {
+      await this.getBrowser().waitUntil(
+        async () => {
+          row = await this.findRowByName(name);
+          return row !== undefined;
+        },
+        { timeout: ms, timeoutMsg: `no row with the name '${name}'` },
+      );
+      return row;
+    } catch (err) {
+      await this.handleError(
+        `Users page - the row '${name}' should be displayed`,
+        'err_find_user',
+        err,
+      );
+    }
+  }
+
+  async waitForRowByDisplayNameNotDisplayed(displayName, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.findRowByDisplayName(displayName)) === undefined,
+        { timeout: ms, timeoutMsg: `the row '${displayName}' is still displayed` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `Users page - the row '${displayName}' should not be displayed`,
+        'err_find_user',
+        err,
+      );
+    }
+  }
+
+  async isRowByDisplayNameDisplayed(displayName) {
+    return (await this.findRowByDisplayName(displayName)) !== undefined;
+  }
+
+  // Clicks on the row: the user is selected and its details open on the right.
+  async clickOnRowByDisplayName(displayName) {
+    try {
+      const row = await this.waitForRowByDisplayNameDisplayed(displayName);
+      await row.click();
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `Users page - error after clicking on the row '${displayName}'`,
+        'err_user_row',
+        err,
+      );
+    }
+  }
+
+  // Ticks the row's checkbox: the user joins the selection, the toolbar follows.
+  async clickOnCheckboxByDisplayName(displayName) {
+    try {
+      const row = await this.waitForRowByDisplayNameDisplayed(displayName);
+      await row.$("[data-component='Checkbox'] label").click();
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `Users page - checkbox of the row '${displayName}'`,
+        'err_user_checkbox',
+        err,
+      );
+    }
+  }
+
+  // The name shown under the display name, e.g. 'user654480'.
+  async getUserNameByDisplayName(displayName) {
+    const row = await this.waitForRowByDisplayNameDisplayed(displayName);
+    return await row.$(css.rowName).getText();
+  }
+
+  // The ID provider shown on the right of the row - or undefined.
+  async getUserIdProviderByDisplayName(displayName) {
+    const row = await this.waitForRowByDisplayNameDisplayed(displayName);
+    return await this.getRowIdProvider(row);
+  }
+
+  // The row's id, '...-item-<key>': what the rows are keyed by, for UsersPage.userKey to be checked
+  // against a real one.
+  async getRowIdByDisplayName(displayName) {
+    const row = await this.waitForRowByDisplayNameDisplayed(displayName);
+    return await row.getAttribute('id');
+  }
+
+  // Rows are addressed by the user's principal key: UsersPage.userKey(name[, idProvider]).
+  async waitForRowDisplayed(key, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisplayed(css.rowByKey(key), ms);
+    } catch (err) {
+      await this.handleError(
+        `Users page - the row '${key}' should be displayed`,
+        'err_user_row',
+        err,
+      );
+    }
+  }
+
+  async waitForRowNotDisplayed(key, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementNotDisplayed(css.rowByKey(key), ms);
+    } catch (err) {
+      await this.handleError(
+        `Users page - the row '${key}' should not be displayed`,
+        'err_user_row',
+        err,
+      );
+    }
+  }
+
+  isRowDisplayed(key) {
+    return this.isElementDisplayed(css.rowByKey(key));
+  }
+
+  // Clicks on the row: the user is selected and its details open on the right.
+  async clickOnRowByKey(key) {
+    try {
+      await this.waitForRowDisplayed(key);
+      await this.clickOnElement(css.rowByKey(key));
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `Users page - error after clicking on the row '${key}'`,
+        'err_user_row',
+        err,
+      );
+    }
+  }
+
+  // Ticks the row's checkbox: the user joins the selection, the toolbar follows.
+  async clickOnCheckboxByKey(key) {
+    try {
+      await this.waitForElementDisplayed(css.rowCheckboxLabel(key));
+      await this.clickOnElement(css.rowCheckboxLabel(key));
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(`Users page - checkbox of the row '${key}'`, 'err_user_checkbox', err);
+    }
+  }
+
+  async isRowChecked(key) {
+    const checked = await this.getAttribute(css.rowCheckbox(key), 'aria-checked');
+    return checked === 'true';
+  }
+
+  // The row the user clicked on (aria-selected), not a ticked checkbox.
+  async isRowSelected(key) {
+    const selected = await this.getAttribute(css.rowByKey(key), 'aria-selected');
+    return selected === 'true';
+  }
+
+  async waitForRowSelected(key, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForAttributeValue(css.rowByKey(key), 'aria-selected', 'true');
+    } catch (err) {
+      await this.handleError(
+        `Users page - the row '${key}' should be selected`,
+        'err_user_row',
+        err,
+      );
+    }
+  }
+
+  // Ticks the user and clicks on Delete; the confirmation dialog opens.
+  async selectAndClickOnDelete(key) {
+    await this.clickOnCheckboxByKey(key);
+    await this.waitForDeleteButtonEnabled();
+    return await this.clickOnDeleteButton();
+  }
+
   // ---------------------------------------------------------------------------------------------
   // TODO: methods below are carried over from app-users (lib-admin-ui) and are not adapted yet:
   // their locators and helpers (lib, xpath.rowByName, PrincipalFilterPanel, ...) do not exist here.
@@ -441,16 +717,6 @@ class UsersPage extends SectionPage {
 
   waitForEditButtonDisabled() {
     return this.waitForElementDisabled(this.editButton, appConst.mediumTimeout);
-  }
-
-  async waitForRowByNameVisible(name) {
-    try {
-      let nameXpath = xpath.rowByName(name);
-      await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
-    } catch (err) {
-      let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-      throw Error('Row was not found: screenshot' + screenshot + '  ' + err);
-    }
   }
 
   hotKeyNew() {
