@@ -1,6 +1,3 @@
-/**
- * Created on 12/2/2017.
- */
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 const appConst = require('./app_const');
@@ -33,10 +30,6 @@ module.exports = {
     let element = await this.getBrowser().$(selector);
     return await element.waitForDisplayed(ms);
   },
-  // async waitForElementNotDisplayed(selector, ms) {
-  //   let element = await this.getBrowser().$(selector);
-  //   return await element.waitForDisplayed(ms);
-  // },
   async clickOnElement(selector) {
     let el = await this.getBrowser().$(selector);
     await el.waitForDisplayed({ timeout: 2000 });

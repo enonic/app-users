@@ -7,7 +7,7 @@ const appConst = require('../libs/app_const');
 const assert = require('node:assert');
 const UsersPage = require('../page_objects/users/users.page');
 
-describe('users.page.toolbar.sorting.spec - ui-tests to verify state of buttons in the toolbar', function () {
+describe('users.page.toolbar.sorting.spec - ui-tests to verify state of buttons in the users page toolbar', function () {
   this.timeout(appConst.SUITE_TIMEOUT);
   if (typeof browser === 'undefined') {
     webDriverHelper.setupBrowser();

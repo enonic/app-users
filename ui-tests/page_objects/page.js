@@ -417,7 +417,7 @@ class Page {
 
   // Texts of every toast currently shown.
   async getNotificationMessages() {
-    const messages = await this.getBrowser().$(COMMON.NOTIFICATION_TEXT);
+    const messages = await this.getBrowser().$$(COMMON.NOTIFICATION_TEXT);
     const texts = [];
     for (const message of messages) {
       if (await message.isDisplayed()) {

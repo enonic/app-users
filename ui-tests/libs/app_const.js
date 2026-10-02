@@ -1,6 +1,3 @@
-/**
- * Created  on 23.09.2026
- */
 module.exports = Object.freeze({
   SUITE_TIMEOUT: 180000,
   generateRandomName(part) {
@@ -12,7 +9,6 @@ module.exports = Object.freeze({
   },
 
   BROWSER_XP_TITLES: {
-    CONTENT_STUDIO: 'Content Studio - Enonic XP Admin',
     XP_HOME: 'Enonic XP Home',
   },
   NOTIFICATION_MESSAGES: {},
@@ -20,10 +16,6 @@ module.exports = Object.freeze({
     MEDIUM: 3000,
     LONG: 5000,
     SHORT: 2000,
-  },
-  TEST_APPS_NAME: {
-    APP_CONTENT_TYPES: 'All Content Types App',
-    TEST_ADFS_PROVIDER_APP: 'Test ADFS ID Provider',
   },
 
   PASSWORD: {
@@ -34,25 +26,9 @@ module.exports = Object.freeze({
 
   BROWSER_WIDTH: 1950,
   BROWSER_HEIGHT: 1050,
-  permissions: {
-    FULL_ACCESS: 'Full Access',
-    CUSTOM: 'Custom...',
-    CAN_PUBLISH: 'Can Publish',
-    CAN_READ: 'Can Read',
-    CAN_WRITE: 'Can Write',
-  },
-  permissionOperation: {
-    READ: 'Read',
-    CREATE: 'Create',
-    MODIFY: 'Modify',
-    DELETE: 'Delete',
-    PUBLISH: 'Publish',
-    READ_PERMISSIONS: 'Read Permissions',
-    WRITE_PERMISSIONS: 'Write Permissions',
-  },
+
   roleName: {
     ADMINISTRATOR: 'system.admin',
-    CM_ADMIN: 'cms.admin',
   },
   roleDisplayName: {
     CONTENT_MANAGER_APP: 'Content Manager App',

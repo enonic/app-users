@@ -69,7 +69,6 @@ class MenuSectionsRail extends Page {
       await this.waitForElementDisplayed(selector);
       await this.clickOnElement(selector);
       await this.waitForSectionActive(label);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `Sections rail - failed to open the '${label}' section`,

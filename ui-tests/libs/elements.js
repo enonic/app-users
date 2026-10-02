@@ -1,12 +1,10 @@
 const COMMON = {
   SHADOW_SELECTORS: {
     XP_MENU_BUTTON: `button#menu-button`,
-    PAGE_EDITOR_OVERLAY_HOST: `#pe-overlay-host`,
     CONTEXT_MENU_ITEM: `[data-component="ContextMenu.Item"]`,
   },
   DISPLAY_NAME_INPUT: "//input[@name='displayName']",
   FOOTER_ELEMENT: `//footer`,
-  CSS_POINTER_EVENTS: 'pointer-events-none',
   // The host's toasts (app-settings NotificationList → @enonic/ui Toast), light DOM.
   NOTIFICATION_TEXT: "//*[@data-component='Toast']//*[@data-component='Toast.Description']",
   NOTIFICATION_CLOSE_BUTTON: "//*[@data-component='Toast']//*[@data-component='Toast.Close']",
@@ -15,9 +13,6 @@ const COMMON = {
     "//label[descendant::input[@type='checkbox' and @aria-label='Select all']]",
   CLEAR_SELECTION_CHECKBOX_LABEL:
     "//label[descendant::input[@type='checkbox' and contains(@aria-label,'Clear selection')]]",
-  WIDGET_SIDEBAR: {
-    CONTAINER: "//nav[@aria-label='Sidebar']",
-  },
 
   INPUTS: {
     CHECKBOX_INPUT: "//input[@type='checkbox']",
@@ -33,11 +28,7 @@ const COMMON = {
 const BUTTONS = {
   BUTTON_REMOVE_ICON: "//button[@aria-label='Remove']",
   BUTTON_EDIT_ICON: "//button[@aria-label='Edit']",
-  REFRESH_BUTTON: "//button[contains(@class,'icon-loop')]",
-  SELECTION_PANEL_TOGGLER: `//button[contains(@id,'SelectionPanelToggler')]`,
-  SELECTOR_MODE_TOGGLER: "//button[contains(@id,'ModeTogglerButton')]",
   buttonByLabel: (label) => `//button[@type='button' and contains(.,'${label}')]`,
-  submitButtonByLabel: (label) => `//button[@type='submit' and contains(.,'${label}')]`,
   radioButtonByLabel: (label) => `//button[@role='radio' and contains(.,'${label}')]`,
   BUTTON_MENU_POPUP: "//button[@aria-haspopup='menu']",
   buttonAriaLabel: (ariaLabel) =>
