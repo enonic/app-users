@@ -112,7 +112,11 @@ export const IdProviderType: GraphQLType = generator.createObjectType({
     },
     users: {
       type: nonNull(PrincipalSetType),
-      resolve: (env: { source: IdProviderSource }) => principalSetOf(env.source.key, 'user'),
+      description:
+        'The users the provider holds, narrowed by `search` where one is given — the same matching `users` applies, so a count here agrees with that list.',
+      args: { search: GraphQLString },
+      resolve: (env: { source: IdProviderSource; args: { search?: string } }) =>
+        principalSetOf(env.source.key, 'user', env.args.search),
     },
     groups: {
       type: nonNull(PrincipalSetType),

@@ -37,12 +37,14 @@ export const ID_PROVIDER_NAMES_ROOT: GraphQlRoot = {
 
 export type IdProviderNamesData = { idProviders: IdProviderNameDto[] | null };
 
-// One `count: 0` search per provider, which is what lets the Users filter hide a provider holding none
-// and show the rest with a number, as the client-side filters of the other sections do.
+// One `count: 0` search per provider, under the same text as the page of users, which is what lets the
+// Users filter say how many of a provider's users a value would reveal, as the client-side filters of
+// the other sections do. `$search` is the variable the users root declares too; the document carries
+// it once.
 const ID_PROVIDER_USER_COUNTS_SELECTION = `{
   key
   displayName
-  users {
+  users(search: $search) {
     total
   }
 }`;
@@ -50,6 +52,7 @@ const ID_PROVIDER_USER_COUNTS_SELECTION = `{
 export const ID_PROVIDER_USER_COUNTS_ROOT: GraphQlRoot = {
   field: 'idProviders',
   selection: ID_PROVIDER_USER_COUNTS_SELECTION,
+  variables: { search: 'String' },
 };
 
 type IdProviderUserCountDto = IdProviderNameDto & { users: { total: number } };

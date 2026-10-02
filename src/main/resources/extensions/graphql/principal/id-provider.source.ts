@@ -36,6 +36,8 @@ export type BoundApplication = {
 export type PrincipalSetSource = {
   idProvider: string;
   type: 'user' | 'group';
+  /** Free text narrowing the set, matched the way `findUsers` matches — XP builds the same expression for both. */
+  search?: string;
 };
 
 export function listIdProviders(): IdProvider[] {
@@ -90,8 +92,12 @@ export function configOf({ idProvider }: BoundApplication): IdProviderConfigProp
 export function principalSetOf(
   idProvider: string,
   type: PrincipalSetSource['type'],
+  search?: string,
 ): PrincipalSetSource {
-  return { idProvider, type };
+  const needle = search?.trim();
+  return needle == null || needle.length === 0
+    ? { idProvider, type }
+    : { idProvider, type, search: needle };
 }
 
 /**
@@ -101,8 +107,8 @@ export function principalSetOf(
  * provider can hold a whole corporate directory, so the count must never be the length of a list
  * somebody fetched.
  */
-export function countPrincipals({ idProvider, type }: PrincipalSetSource): number {
-  return findPrincipals({ type, idProvider, count: 0 }).total;
+export function countPrincipals({ idProvider, type, search }: PrincipalSetSource): number {
+  return findPrincipals({ type, idProvider, count: 0, ...searchOf(search) }).total;
 }
 
 /**
@@ -110,11 +116,18 @@ export function countPrincipals({ idProvider, type }: PrincipalSetSource): numbe
  * ! would order that page alone and the next would restart below it. `-1` is the whole directory.
  */
 export function listPrincipals(
-  { idProvider, type }: PrincipalSetSource,
+  { idProvider, type, search }: PrincipalSetSource,
   start: number,
   count: number,
 ): PrincipalItem[] {
-  return findPrincipals({ type, idProvider, start, count }).hits.map(toPrincipalItem);
+  return findPrincipals({ type, idProvider, start, count, ...searchOf(search) }).hits.map(
+    toPrincipalItem,
+  );
+}
+
+// Absent rather than undefined, so a set without a search asks exactly what it always asked.
+function searchOf(search: string | undefined): { searchText?: string } {
+  return search === undefined ? {} : { searchText: search };
 }
 
 export type IdProviderPermissionSource = IdProviderPermission;

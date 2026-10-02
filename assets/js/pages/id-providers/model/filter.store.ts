@@ -1,7 +1,3 @@
-import { createSelectionStore } from '../../../shared/selection';
+import { createFilterStore } from '../../../shared/filter';
 
-/**
- * Which providers the filter has ticked. A multi-select over provider keys is the same shape as a
- * row selection, so it reuses that store; nothing selected means no narrowing.
- */
-export const idProvidersFilter = createSelectionStore();
+export const idProvidersFilter = createFilterStore();

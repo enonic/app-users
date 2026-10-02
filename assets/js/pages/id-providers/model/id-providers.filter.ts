@@ -1,18 +1,18 @@
+import { Package } from 'lucide-react';
+
 import type { IdProvider } from '../../../entities/principal';
-import type { BrowseFilterEntry } from '../../../widgets/browse-list/browse-filter';
+import { matchesEveryWord } from '../../../shared/filter';
+import type { FilterField, FilterValue } from '../../../widgets/browse-filter/browse-filter';
+
+export const APPLICATION_FIELD = 'application';
 
 /**
  * Display name, key and description, case-insensitive, over the providers already loaded. The key
  * is searched here, unlike in the principal sections: for a provider it is the name.
  */
 export function searchIdProviders(providers: readonly IdProvider[], query: string): IdProvider[] {
-  const needle = query.trim().toLowerCase();
-  if (needle.length === 0) {
-    return [...providers];
-  }
-
   return providers.filter(({ displayName, key, description }) =>
-    [displayName, key, description].some((field) => field?.toLowerCase().includes(needle) ?? false),
+    matchesEveryWord(query, [displayName, key, description]),
   );
 }
 
@@ -36,21 +36,36 @@ export function filterByApplication(
 }
 
 /**
- * One entry per bound application, by display name, with the unbound providers last.
+ * The one field this section filters by: the application a provider is bound to.
  *
  * The application rather than the provider is what earns a filter: several providers can share one,
- * so an entry narrows to something the rows do not already say.
- *
- * ! Which entries exist comes from every provider; only the counts come from `matched`. Taking both
- * ! from the search would drop the entry a user has ticked as soon as the query stops matching it —
- * ! leaving the list narrowed by something absent from the menu, and with an empty result there is
- * ! nothing left to untick it with. `visibleEntries` then hides the ones at zero, but keeps a ticked one.
+ * so a value narrows to something the rows do not already say.
  */
-export function applicationEntries(
+export function applicationField(
+  providers: readonly IdProvider[],
+  matched: readonly IdProvider[],
+  labels: { field: string; unbound: string },
+): FilterField {
+  return {
+    id: APPLICATION_FIELD,
+    label: labels.field,
+    icon: Package,
+    values: applicationValues(providers, matched, labels.unbound),
+  };
+}
+
+/**
+ * One value per bound application, by display name, with the unbound providers last.
+ *
+ * ! Which values exist comes from every provider; only the counts come from `matched`. Taking both
+ * ! from the search would drop a value the moment the query stops matching it, while a term holding it
+ * ! goes on narrowing the list; a value at zero is offered but cannot be picked.
+ */
+export function applicationValues(
   providers: readonly IdProvider[],
   matched: readonly IdProvider[],
   unboundLabel: string,
-): BrowseFilterEntry[] {
+): FilterValue[] {
   const labels = new Map<string, string>();
   const counts = new Map<string, number>();
 

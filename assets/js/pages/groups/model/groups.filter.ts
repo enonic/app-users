@@ -1,5 +1,10 @@
+import { ShieldLock } from 'lucide-react';
+
 import { idProviderOf, type Group } from '../../../entities/principal';
-import type { BrowseFilterEntry } from '../../../widgets/browse-list/browse-filter';
+import { matchesEveryWord } from '../../../shared/filter';
+import type { FilterField, FilterValue } from '../../../widgets/browse-filter/browse-filter';
+
+export const ID_PROVIDER_FIELD = 'idProvider';
 
 /**
  * Display name and description, case-insensitive, over the groups already loaded — the same fields
@@ -7,15 +12,8 @@ import type { BrowseFilterEntry } from '../../../widgets/browse-list/browse-filt
  * repeats the display name closely enough that matching it only widens the result set.
  */
 export function searchGroups(groups: readonly Group[], query: string): Group[] {
-  const needle = query.trim().toLowerCase();
-  if (needle.length === 0) {
-    return [...groups];
-  }
-
-  return groups.filter(
-    ({ displayName, description }) =>
-      displayName.toLowerCase().includes(needle) ||
-      (description?.toLowerCase().includes(needle) ?? false),
+  return groups.filter(({ displayName, description }) =>
+    matchesEveryWord(query, [displayName, description]),
   );
 }
 
@@ -35,21 +33,35 @@ export function filterByIdProvider(
 }
 
 /**
- * One entry per ID provider the groups come from, labelled the way the rows label it.
+ * The one field this section filters by: the ID provider, one value per provider the groups come from,
+ * labelled the way the rows label it.
  *
  * The providers are read off the keys rather than fetched — a group key carries its provider
  * (`group:<provider>:<name>`) — while the label comes from the page, which has the loaded providers.
  *
- * ! Which entries exist comes from every group; only the counts come from `matched`. Taking both from
- * ! the search would drop the entry a user has ticked as soon as the query stops matching it — leaving
- * ! the list narrowed by something absent from the menu, and with an empty result there is nothing left
- * ! to untick it with. `visibleEntries` then hides the ones at zero, but keeps a ticked one.
+ * ! Which values exist comes from every group; only the counts come from `matched`. Taking both from
+ * ! the search would drop a value the moment the query stops matching it, while a term holding it goes
+ * ! on narrowing the list; a value at zero is offered but cannot be picked.
  */
-export function idProviderEntries(
+export function idProviderField(
   groups: readonly Group[],
   matched: readonly Group[],
   providerName: (key: Group['key']) => string | undefined,
-): BrowseFilterEntry[] {
+  label: string,
+): FilterField {
+  return {
+    id: ID_PROVIDER_FIELD,
+    label,
+    icon: ShieldLock,
+    values: idProviderValues(groups, matched, providerName),
+  };
+}
+
+function idProviderValues(
+  groups: readonly Group[],
+  matched: readonly Group[],
+  providerName: (key: Group['key']) => string | undefined,
+): FilterValue[] {
   const labels = new Map<string, string>();
   const counts = new Map<string, number>();
 

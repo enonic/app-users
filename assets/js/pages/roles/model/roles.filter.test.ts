@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Role } from '../../../entities/principal';
-import { visibleEntries } from '../../../widgets/browse-list/browse-filter';
+import { isOffered } from '../../../widgets/browse-filter/browse-filter';
 import {
   bucketOf,
   CUSTOM_BUCKET,
   filterRolesByBucket,
   projectBucketId,
   roleBuckets,
+  SCOPE_FIELD,
+  scopeField,
   searchRoles,
   SYSTEM_BUCKET,
 } from './roles.filter';
@@ -30,7 +32,7 @@ const intranetOwner = role('role:cms.project.intranet.owner', 'Company intranet 
 
 const roles = [admin, store, expert];
 
-const labels = { system: 'System', custom: 'Custom' };
+const labels = { system: 'System', custom: 'Custom', projects: 'Project roles' };
 
 describe('searchRoles', () => {
   it('returns every role for an empty or blank query', () => {
@@ -61,6 +63,11 @@ describe('searchRoles', () => {
 
   it('finds a project role by the project id, which differs from its display name', () => {
     expect(searchRoles([intranetEditor, store], 'intranet')).toEqual([intranetEditor]);
+  });
+
+  it('needs every word, in any order and across fields', () => {
+    expect(searchRoles(roles, 'orders store')).toEqual([store]);
+    expect(searchRoles(roles, 'store nobody')).toEqual([]);
   });
 
   it('returns nothing when nothing matches', () => {
@@ -164,18 +171,28 @@ describe('roleBuckets', () => {
     expect(roleBuckets(all, searched, labels).map(({ count }) => count)).toEqual([0, 0, 2]);
   });
 
-  // ! The bucket comes from the role keys alone, so a ticked one cannot vanish from the menu while it
+  // ! The bucket comes from the role keys alone, so a picked one cannot vanish from the filter while it
   // ! goes on narrowing the list.
-  it('offers a project bucket the roles name, and keeps it visible when ticked', () => {
-    const offered = roleBuckets(all, all, labels);
+  it('offers a project bucket the roles name, even once a search leaves it empty', () => {
+    const searched = searchRoles(all, 'administrator');
 
+    const offered = roleBuckets(all, searched, labels);
     expect(offered.at(-1)).toEqual({
       id: projectBucketId('intranet'),
       label: 'intranet',
-      count: 2,
+      count: 0,
+      group: 'Project roles',
     });
-    expect(
-      visibleEntries(offered, new Set([projectBucketId('intranet')])).map(({ id }) => id),
-    ).toContain(projectBucketId('intranet'));
+    expect(offered.map(isOffered)).toEqual([true, false, false]);
+  });
+});
+
+describe('scopeField', () => {
+  it('offers the buckets as the values of one field, named as the page says', () => {
+    const field = scopeField([admin, store], [admin, store], { field: 'Scope', ...labels });
+
+    expect(field.id).toBe(SCOPE_FIELD);
+    expect(field.label).toBe('Scope');
+    expect(field.values).toEqual(roleBuckets([admin, store], [admin, store], labels));
   });
 });

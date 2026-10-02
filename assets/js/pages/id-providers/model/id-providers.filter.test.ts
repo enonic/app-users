@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import type { IdProvider } from '../../../entities/principal';
-import { visibleEntries } from '../../../widgets/browse-list/browse-filter';
+import { isOffered } from '../../../widgets/browse-filter/browse-filter';
 import {
-  applicationEntries,
+  APPLICATION_FIELD,
+  applicationField,
+  applicationValues,
   filterByApplication,
   searchIdProviders,
   UNBOUND_ENTRY,
@@ -67,6 +69,11 @@ describe('searchIdProviders', () => {
     expect(searchIdProviders(providers, 'installation')).toEqual([system]);
   });
 
+  it('needs every word, in any order and across fields', () => {
+    expect(searchIdProviders(providers, 'installation system')).toEqual([system]);
+    expect(searchIdProviders(providers, 'system nobody')).toEqual([]);
+  });
+
   it('survives a provider without a description', () => {
     expect(searchIdProviders(providers, 'partn')).toEqual([partners]);
   });
@@ -104,9 +111,9 @@ describe('filterByApplication', () => {
   });
 });
 
-describe('applicationEntries', () => {
+describe('applicationValues', () => {
   it('offers one entry per application, by display name, with the unbound last', () => {
-    expect(applicationEntries(all, all, 'No application').map(({ id }) => id)).toEqual([
+    expect(applicationValues(all, all, 'No application').map(({ id }) => id)).toEqual([
       OIDC.key,
       STANDARD.key,
       UNBOUND_ENTRY,
@@ -114,7 +121,7 @@ describe('applicationEntries', () => {
   });
 
   it('names an entry after the application, not its key', () => {
-    expect(applicationEntries(all, all, 'No application').map(({ label }) => label)).toEqual([
+    expect(applicationValues(all, all, 'No application').map(({ label }) => label)).toEqual([
       'OIDC ID Provider',
       'Standard ID Provider',
       'No application',
@@ -122,38 +129,48 @@ describe('applicationEntries', () => {
   });
 
   it('counts the providers on each application', () => {
-    expect(applicationEntries(all, all, 'No application').map(({ count }) => count)).toEqual([
+    expect(applicationValues(all, all, 'No application').map(({ count }) => count)).toEqual([
       1, 2, 1,
     ]);
   });
 
   it('leaves the unbound entry out when every provider is bound', () => {
     expect(
-      applicationEntries([system, entra], [system, entra], 'No application').map(({ id }) => id),
+      applicationValues([system, entra], [system, entra], 'No application').map(({ id }) => id),
     ).toEqual([OIDC.key, STANDARD.key]);
   });
 
   it('counts the matched providers, so the counts follow the query', () => {
     const searched = searchIdProviders(all, 'staff');
 
-    expect(applicationEntries(all, searched, 'No application')).toEqual([
+    expect(applicationValues(all, searched, 'No application')).toEqual([
       { id: OIDC.key, label: 'OIDC ID Provider', count: 0 },
       { id: STANDARD.key, label: 'Standard ID Provider', count: 1 },
       { id: UNBOUND_ENTRY, label: 'No application', count: 0 },
     ]);
   });
 
-  // ! The entry a search emptied still has to be offered, or a ticked one disappears from the menu while
-  // ! it goes on narrowing the list — and with nothing matching there is no way left to untick it.
-  it('keeps offering an application the query matched nothing from', () => {
+  // ! A value the search emptied is still there, or a term holding it would go on narrowing the list
+  // ! with nothing in the filter to say so; it just cannot be picked.
+  it('keeps an application the query matched nothing from, as a value that cannot be picked', () => {
     const searched = searchIdProviders(all, 'nothing matches this');
 
-    const offered = applicationEntries(all, searched, 'No application');
+    const offered = applicationValues(all, searched, 'No application');
     expect(offered.map(({ count }) => count)).toEqual([0, 0, 0]);
-    expect(visibleEntries(offered, new Set([OIDC.key])).map(({ id }) => id)).toEqual([OIDC.key]);
+    expect(offered.map(isOffered)).toEqual([false, false, false]);
   });
 
   it('offers nothing on an instance with no providers', () => {
-    expect(applicationEntries([], [], 'No application')).toEqual([]);
+    expect(applicationValues([], [], 'No application')).toEqual([]);
+  });
+});
+
+describe('applicationField', () => {
+  it('offers the applications as the values of one field, named as the page says', () => {
+    const field = applicationField(all, all, { field: 'Application', unbound: 'No application' });
+
+    expect(field.id).toBe(APPLICATION_FIELD);
+    expect(field.label).toBe('Application');
+    expect(field.values).toEqual(applicationValues(all, all, 'No application'));
   });
 });

@@ -1,6 +1,8 @@
 import { map } from 'nanostores';
 
 import { DEFAULT_PRINCIPAL_SORT, type PrincipalSort } from '../../../entities/principal';
+import { textOf, valuesOf, type FilterQuery } from '../../../shared/filter';
+import { ID_PROVIDER_FIELD } from './users.filter';
 
 /** One request's worth of users. Fifty is what a screen shows without asking for a second page. */
 export const PAGE_SIZE = 50;
@@ -26,18 +28,29 @@ export const $usersQuery = map<UsersQueryState>({
 
 export function setUsersSearch(search: string): void {
   const needle = search.trim();
-  $usersQuery.setKey('search', needle.length === 0 ? undefined : needle);
+  const next = needle.length === 0 ? undefined : needle;
+  if (next !== $usersQuery.get().search) {
+    $usersQuery.setKey('search', next);
+  }
 }
 
-export function toggleUsersIdProvider(idProvider: string): void {
+/** Only on a change: the effect that reloads the screen keys on the array, and a fresh equal one would reload. */
+export function setUsersIdProviders(idProviders: readonly string[]): void {
   const current = $usersQuery.get().idProviders;
+  if (
+    current.length === idProviders.length &&
+    current.every((key, at) => key === idProviders[at])
+  ) {
+    return;
+  }
 
-  $usersQuery.setKey(
-    'idProviders',
-    current.includes(idProvider)
-      ? current.filter((candidate) => candidate !== idProvider)
-      : [...current, idProvider],
-  );
+  $usersQuery.setKey('idProviders', [...idProviders]);
+}
+
+/** What the filter holds, as the two things the server is asked to narrow by. */
+export function applyUsersFilter(query: FilterQuery): void {
+  setUsersSearch(textOf(query));
+  setUsersIdProviders([...valuesOf(query, ID_PROVIDER_FIELD)]);
 }
 
 export function setUsersSort(sort: PrincipalSort): void {

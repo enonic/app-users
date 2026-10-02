@@ -1,3 +1,5 @@
+import { Layers } from 'lucide-react';
+
 import {
   isPlatformRole,
   principalName,
@@ -5,8 +7,10 @@ import {
   type PrincipalKey,
   type Role,
 } from '../../../entities/principal';
-import type { BrowseFilterEntry } from '../../../widgets/browse-list/browse-filter';
+import { matchesEveryWord } from '../../../shared/filter';
+import type { FilterField, FilterValue } from '../../../widgets/browse-filter/browse-filter';
 
+export const SCOPE_FIELD = 'scope';
 export const SYSTEM_BUCKET = 'system';
 export const CUSTOM_BUCKET = 'custom';
 
@@ -14,7 +18,21 @@ export const CUSTOM_BUCKET = 'custom';
 export type RoleBucketId = string;
 
 /** Resolved label: a phrase for the fixed buckets, the project id otherwise. */
-export type RoleBucket = BrowseFilterEntry;
+export type RoleBucket = FilterValue;
+
+/** The one field this section filters by: which bucket a role falls in — system, custom, or a project's. */
+export function scopeField(
+  roles: readonly Role[],
+  matched: readonly Role[],
+  labels: { field: string; system: string; custom: string; projects: string },
+): FilterField {
+  return {
+    id: SCOPE_FIELD,
+    label: labels.field,
+    icon: Layers,
+    values: roleBuckets(roles, matched, labels),
+  };
+}
 
 export function projectBucketId(projectId: string): RoleBucketId {
   return `project:${projectId}`;
@@ -48,16 +66,8 @@ export function bucketOf(key: PrincipalKey): RoleBucketId {
  * project id is on screen and typing it has to find something.
  */
 export function searchRoles(roles: readonly Role[], query: string): Role[] {
-  const needle = query.trim().toLowerCase();
-  if (needle.length === 0) {
-    return [...roles];
-  }
-
-  return roles.filter(
-    ({ key, displayName, description }) =>
-      displayName.toLowerCase().includes(needle) ||
-      principalName(key).toLowerCase().includes(needle) ||
-      (description?.toLowerCase().includes(needle) ?? false),
+  return roles.filter(({ key, displayName, description }) =>
+    matchesEveryWord(query, [displayName, principalName(key), description]),
   );
 }
 
@@ -74,9 +84,9 @@ export function filterRolesByBucket(
 }
 
 /**
- * The entries the filter offers: system first, custom second, then one per project by label.
+ * The values the field offers: system first, custom second, then one per project by label.
  *
- * ! Which entries exist comes from every role, not from `matched`: only the counts come from there, so a
+ * ! Which values exist comes from every role, not from `matched`: only the counts come from there, so a
  * ! bucket survives a search that excludes it rather than vanishing while it goes on narrowing.
  *
  * ? A project bucket is labelled by its id. app-settings resolves display names from its projects list;
@@ -86,7 +96,7 @@ export function filterRolesByBucket(
 export function roleBuckets(
   roles: readonly Role[],
   matched: readonly Role[],
-  labels: { system: string; custom: string },
+  labels: { system: string; custom: string; projects: string },
 ): RoleBucket[] {
   const counts = new Map<RoleBucketId, number>();
   for (const { key } of matched) {
@@ -107,6 +117,7 @@ export function roleBuckets(
       id: projectBucketId(id),
       label: id,
       count: counts.get(projectBucketId(id)) ?? 0,
+      group: labels.projects,
     }))
     .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
 

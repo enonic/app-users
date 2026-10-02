@@ -20,7 +20,10 @@ export const $serviceAccountsQuery = map<ServiceAccountsQueryState>({ sort: 'dis
 
 export function setServiceAccountsSearch(search: string): void {
   const needle = search.trim();
-  $serviceAccountsQuery.setKey('search', needle.length === 0 ? undefined : needle);
+  const next = needle.length === 0 ? undefined : needle;
+  if (next !== $serviceAccountsQuery.get().search) {
+    $serviceAccountsQuery.setKey('search', next);
+  }
 }
 
 export function setServiceAccountsSort(direction: SortDirection): void {
