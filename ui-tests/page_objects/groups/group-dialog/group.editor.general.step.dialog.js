@@ -56,12 +56,23 @@ class GroupEditorGeneralStepDialog extends GroupEditorStepDialog {
     }
   }
 
+  // The ID is derived from the display name as it is typed. The derived value is cleared through
+  // the keyboard first (Ctrl+A, Delete): setValue's own clear does not reach the component's state,
+  // and the new text would be appended to the old one.
   async typeInIdInput(id) {
     try {
       await this.waitForElementDisplayed(css.idInput);
+      await this.clearInputText(css.idInput);
       await this.typeTextInInput(css.idInput, id);
     } catch (err) {
       await this.handleError('New group dialog - ID input', 'err_id_input', err);
+    }
+  }
+
+  // Types the ID only when it differs from the one derived from the display name.
+  async setIdIfDiffers(id) {
+    if ((await this.getTextInIdInput()) !== id) {
+      await this.typeInIdInput(id);
     }
   }
 
@@ -138,7 +149,7 @@ class GroupEditorGeneralStepDialog extends GroupEditorStepDialog {
   async typeData(group) {
     await this.typeInDisplayNameInput(group.displayName);
     if (group.id !== undefined) {
-      await this.typeInIdInput(group.id);
+      await this.setIdIfDiffers(group.id);
     }
     if (group.description !== undefined) {
       await this.typeInDescriptionTextArea(group.description);

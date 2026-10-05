@@ -4,6 +4,17 @@ const appConst = require('./app_const');
 const webDriverHelper = require('./WebDriverHelper');
 const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 const MenuSectionsRail = require('../page_objects/menu.sections.rail');
+const UsersPage = require('../page_objects/users/users.page');
+const UserEditorIdProviderStepDialog = require('../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
+const UserEditorGeneralStepDialog = require('../page_objects/users/user-dialog/user.editor.general.step.dialog');
+const UserEditorCredentialsStepDialog = require('../page_objects/users/user-dialog/user.editor.credentials.step.dialog');
+const UserEditorRolesStepDialog = require('../page_objects/users/user-dialog/user.editor.roles.step.dialog');
+const UserEditorGroupsStepDialog = require('../page_objects/users/user-dialog/user.editor.groups.step.dialog');
+const UserEditorSummaryStepDialog = require('../page_objects/users/user-dialog/user.editor.summary.step.dialog');
+const IdProvidersPage = require('../page_objects/providers/id.providers.page');
+const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
+const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
+const IdProviderEditorSummaryStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.summary.step.dialog');
 const fs = require('fs');
 const path = require('path');
 
@@ -281,6 +292,108 @@ module.exports = {
       throw new Error(`'${section}' section was not opened, screenshot: ${screenshot} ` + err);
     }
   },
+  // Creates a user through the user editor and returns when it is listed. For the tests that need a
+  // user to exist, not for the ones that test the editor itself - those walk the steps themselves.
+  //
+  // `user` is what users.items.builder.buildUser() returns: { idProvider, displayName, id, email,
+  // password?, roles?, groups? }. `idProvider` is a display name; when it is the one the step opens
+  // with, nothing is picked. An empty or missing `password`, `roles` or `groups` skips that step.
+  //
+  // Precondition: the Settings app is open (navigateToSettingsApp). The Users section is opened here.
+  async createUser(user) {
+    const usersPage = new UsersPage();
+    const idProviderStep = new UserEditorIdProviderStepDialog();
+    const generalStep = new UserEditorGeneralStepDialog();
+    const credentialsStep = new UserEditorCredentialsStepDialog();
+    const rolesStep = new UserEditorRolesStepDialog();
+    const groupsStep = new UserEditorGroupsStepDialog();
+    const summaryStep = new UserEditorSummaryStepDialog();
+    try {
+      await this.navigateToExtension(appConst.EXTENSIONS.USERS);
+      await usersPage.clickOnNewButton();
+      // 1. ID provider: picked only when the one shown is not the one asked for.
+      await idProviderStep.waitForLoaded();
+      if (user.idProvider && (await idProviderStep.getSelectedIdProvider()) !== user.idProvider) {
+        await idProviderStep.selectIdProvider(user.idProvider);
+      }
+      await idProviderStep.clickOnNextAndWaitForGeneralStep();
+      // 2. General: display name, id, email.
+      await generalStep.typeDataAndClickOnNext(user);
+      // 3. Credentials: a password, when there is one.
+      await credentialsStep.waitForLoaded();
+      if (user.password) {
+        await credentialsStep.setPassword(user.password);
+      }
+      await credentialsStep.clickOnNextButton();
+      // 4. Roles
+      await rolesStep.waitForLoaded();
+      if (user.roles && user.roles.length > 0) {
+        await rolesStep.addRoles(user.roles);
+      }
+      await rolesStep.clickOnNextButton();
+      // 5. Groups
+      await groupsStep.waitForLoaded();
+      if (user.groups && user.groups.length > 0) {
+        await groupsStep.addGroups(user.groups);
+      }
+      await groupsStep.clickOnNextButton();
+      // 6. Summary → Create; the toast confirms and the row appears.
+      await summaryStep.waitForLoaded();
+      await summaryStep.clickOnCreateButtonAndWaitForClosed();
+      await usersPage.waitForExpectedNotificationMessage(
+        appConst.userCreatedMessage(user.displayName),
+      );
+      await usersPage.waitForRowByDisplayNameDisplayed(user.displayName);
+      return user;
+    } catch (err) {
+      const screenshot = await this.saveScreenshotUniqueName('err_create_user');
+      throw new Error(
+        `User '${user.displayName}' was not created, screenshot: ${screenshot} ` + err,
+      );
+    }
+  },
+  // Creates an ID provider through its editor and returns when it is listed. For the tests that
+  // need a provider to exist, not for the ones that test the editor itself.
+  //
+  // `idProvider` is what users.items.builder.buildIdProvider() returns: { displayName, id,
+  // description?, application?, permissions? }. `application` is the display name offered in the
+  // General step's selector; absent, no application is bound. `permissions` is
+  // { '<principal display name>': '<appConst.ID_PROVIDER_ACCESS.*>' } added to the default ones
+  // (Administrator, Users Administrator, Authenticated), which stay as they are.
+  //
+  // Precondition: the Settings app is open (navigateToSettingsApp). The ID Providers section is
+  // opened here.
+  async createIdProvider(idProvider) {
+    const idProvidersPage = new IdProvidersPage();
+    const generalStep = new IdProviderEditorGeneralStepDialog();
+    const permissionsStep = new IdProviderEditorPermissionsStepDialog();
+    const summaryStep = new IdProviderEditorSummaryStepDialog();
+    try {
+      await this.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
+      await idProvidersPage.clickOnNewButton();
+      // 1. General: display name, id, description and, when given, the application.
+      await generalStep.waitForLoaded();
+      await generalStep.typeDataAndClickOnNext(idProvider);
+      // 2. Permissions: the defaults are in place; the given principals are added with their access.
+      await permissionsStep.waitForLoaded();
+      for (const [displayName, access] of Object.entries(idProvider.permissions ?? {})) {
+        await permissionsStep.addPrincipalWithAccess(displayName, access);
+      }
+      await permissionsStep.clickOnNextAndWaitForSummaryStep();
+      // 3. Summary → Create; the toast confirms and the row appears.
+      await summaryStep.clickOnCreateButtonAndWaitForClosed();
+      await idProvidersPage.waitForExpectedNotificationMessage(
+        appConst.idProviderCreatedMessage(idProvider.displayName),
+      );
+      await idProvidersPage.waitForRowByDisplayNameDisplayed(idProvider.displayName);
+      return idProvider;
+    } catch (err) {
+      const screenshot = await this.saveScreenshotUniqueName('err_create_id_provider');
+      throw new Error(
+        `ID provider '${idProvider.displayName}' was not created, screenshot: ${screenshot} ` + err,
+      );
+    }
+  },
   // Section-agnostic 'loaded' check for the browse screen: every section renders the same app bar
   // and toolbar, so this does not depend on a section-specific page object.
   //
@@ -298,19 +411,25 @@ module.exports = {
       `div[data-component='SectionMount'][data-section='${this.getSectionId(section)}']:not(.hidden)` +
       " div[data-component='SectionMountHost']";
     // 'BrowseToolbar' once a section carries its own data-component (app-users#2764),
-    // 'Toolbar.Container' until then (app-applications).
-    // One '>>>' for the whole list: webdriverio strips only the leading one and hands the rest to
-    // querySelectorAll, which takes a selector list.
-    const toolbar =
-      ">>> [data-component='BrowseToolbar'][aria-label='Actions'], " +
-      "[data-component='Toolbar.Container'][aria-label='Actions']";
+    // 'Toolbar.Container' until then (app-applications). One selector each: a deep selector must
+    // not be a comma-separated list, webdriverio splits it on the commas when it re-matches the
+    // element.
+    const toolbars = [
+      ">>> [data-component='BrowseToolbar'][aria-label='Actions']",
+      ">>> [data-component='Toolbar.Container'][aria-label='Actions']",
+    ];
     await this.getBrowser().waitUntil(
       async () => {
         const host = await this.getBrowser().$(shadowHost);
         if (!(await host.isExisting())) {
           return false;
         }
-        return await host.$(toolbar).isDisplayed();
+        for (const toolbar of toolbars) {
+          if (await host.$(toolbar).isDisplayed()) {
+            return true;
+          }
+        }
+        return false;
       },
       {
         timeout: ms,

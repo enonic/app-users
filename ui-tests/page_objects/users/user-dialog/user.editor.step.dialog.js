@@ -35,10 +35,12 @@ const css = {
   nextButton: `${DIALOG} [data-component='Stepper.Next']`,
   // The footer's primary button on any step: Stepper.Next on the way through, and on the last
   // step a plain Button labelled 'Create' or 'Save' that Dialog.StepIndicator renders instead.
-  footerPrimaryButton:
-    `${DIALOG} [data-component='Dialog.StepIndicator'] [data-component='Stepper.Next'], ` +
-    `${DIALOG} [data-component='Dialog.StepIndicator'] button[aria-label='Create'], ` +
+  // One selector per shape: a deep selector must not be a comma-separated list.
+  footerPrimaryButtons: [
+    `${DIALOG} [data-component='Dialog.StepIndicator'] [data-component='Stepper.Next']`,
+    `${DIALOG} [data-component='Dialog.StepIndicator'] button[aria-label='Create']`,
     `${DIALOG} [data-component='Dialog.StepIndicator'] button[aria-label='Save']`,
+  ],
   previousButton: `${DIALOG} [data-component='Stepper.Previous']`,
   // A dot is a tab that controls its step's panel ('...-panel-<step>'); located by the step rather
   // than by its 'Go to step N' label, which shifts when the ID provider step is skipped.
@@ -230,8 +232,12 @@ class UserEditorStepDialog extends SectionPage {
 
   // 'Next' on the way through; 'Create' (new user) or 'Save' (existing user) on the last step.
   async getNextButtonLabel() {
-    await this.waitForElementDisplayed(css.footerPrimaryButton);
-    return await this.getAttribute(css.footerPrimaryButton, 'aria-label');
+    for (const selector of css.footerPrimaryButtons) {
+      if (await this.isElementDisplayed(selector)) {
+        return await this.getAttribute(selector, 'aria-label');
+      }
+    }
+    throw new Error('the footer has no Next, Create or Save button');
   }
 
   // Dots in the footer, one per step; `step` is one of STEP.*.

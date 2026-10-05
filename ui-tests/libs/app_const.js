@@ -79,6 +79,10 @@ module.exports = Object.freeze({
   roleCreatedMessage: (displayName) => `Role "${displayName}" created`,
   idProviderCreatedMessage: (displayName) => `ID provider "${displayName}" created`,
   serviceAccountCreatedMessage: (displayName) => `Service account "${displayName}" created`,
+  // One deleted principal (user, service account, group, role) and several (phrases: principal.notify.*).
+  principalDeletedMessage: (displayName) => `"${displayName}" deleted`,
+  principalsDeletedMessage: (count) => `${count} items deleted`,
+  idProviderDeletedMessage: (displayName) => `"${displayName}" deleted`,
   // Access levels of the ID provider editor's Permissions step, widening (phrases:
   // idProviders.dialog.access.*).
   ID_PROVIDER_ACCESS: {
