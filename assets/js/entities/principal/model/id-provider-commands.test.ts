@@ -45,7 +45,7 @@ function draft(overrides: Partial<IdProviderDraft> = {}): IdProviderDraft {
 }
 
 function written(displayName: string): IdProvider {
-  return { key: 'ldap', displayName, users: { total: 0 }, groups: { total: 0 } };
+  return { key: 'ldap', displayName, mode: 'LOCAL', users: { total: 0 }, groups: { total: 0 } };
 }
 
 let resync: () => void;
@@ -136,8 +136,8 @@ describe('updateIdProvider', () => {
 });
 
 describe('deleteIdProviders', () => {
-  const ldap = { key: 'ldap', displayName: 'Company directory' };
-  const system = { key: 'system', displayName: 'System' };
+  const ldap = { key: 'ldap', displayName: 'Company directory', mode: 'LOCAL' };
+  const system = { key: 'system', displayName: 'System', mode: 'LOCAL' };
 
   it('asks for nothing when there is nothing to delete', async () => {
     await deleteIdProviders([], scope());

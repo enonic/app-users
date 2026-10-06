@@ -16,6 +16,7 @@ export function GroupEditorDialogMembersStep() {
   const failedNotice = useI18n('groups.dialog.listsFailed');
 
   const [showAll, setShowAll] = useState(false);
+  const [open, setOpen] = useState(false);
 
   // The platform refuses a relationship whose two ends are the same principal.
   const notItself = useMemo(
@@ -33,7 +34,10 @@ export function GroupEditorDialogMembersStep() {
           className="-my-1 h-8 px-1.5 focus-visible:ring-offset-0"
           label={showAllLabel}
           pressed={showAll}
-          onPressedChange={setShowAll}
+          onPressedChange={(next) => {
+            setShowAll(next);
+            setOpen(true);
+          }}
         />
       </div>
 
@@ -41,6 +45,8 @@ export function GroupEditorDialogMembersStep() {
         kinds={['user', 'group']}
         idProvider={showAll ? undefined : form.idProvider}
         showIdProvider
+        open={open}
+        onOpenChange={setOpen}
         placeholder={membersPlaceholder}
         selected={form.members}
         excluded={notItself}

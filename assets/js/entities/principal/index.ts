@@ -48,8 +48,12 @@ export type {
   IdProviderPrincipalsState,
   PrincipalSetState,
 } from './model/id-provider-principals.store';
+export { allowsWrite, ID_PROVIDER_MODE_KEYS } from './model/id-provider-mode';
+export { createIdProviderModeReaction } from './model/id-provider-mode-reaction';
+export type { PrincipalWrite } from './model/id-provider-mode';
 export { loadIdProvider, loadIdProviders } from './model/id-providers.load';
 export {
+  $idProviderModeByKey,
   $idProviderNames,
   $idProviderUserCounts,
   beginIdProviderNamesLoad,
@@ -90,6 +94,7 @@ export {
   IMPLICIT_ROLE_KEYS,
   isPlatformRole,
   isReservedRole,
+  isPinnedMembership,
   isSystemUser,
   principalName,
   projectRoleIdOf,
@@ -134,6 +139,7 @@ export type {
   IdProvider,
   IdProviderAccess,
   IdProviderConfig,
+  IdProviderMode,
   IdProviderName,
   IdProviderPermission,
   IdProviderPermissions,
@@ -173,6 +179,7 @@ export type { UsersState } from './model/users.store';
 export { useGroup } from './model/useGroup';
 export { useGroups } from './model/useGroups';
 export { useIdProvider } from './model/useIdProvider';
+export { useIdProviderMode } from './model/useIdProviderMode';
 export { useIdProviderName } from './model/useIdProviderName';
 export { useIdProviderNames } from './model/useIdProviderNames';
 export { useIdProviderPermissions } from './model/useIdProviderPermissions';

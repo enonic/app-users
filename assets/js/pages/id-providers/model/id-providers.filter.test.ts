@@ -15,6 +15,7 @@ const OIDC = { key: 'com.enonic.app.oidcidprovider', displayName: 'OIDC ID Provi
 const system: IdProvider = {
   key: 'system',
   displayName: 'System',
+  mode: 'LOCAL',
   description: 'The users the installation was set up with',
   application: STANDARD,
   users: { total: 0 },
@@ -25,6 +26,7 @@ const system: IdProvider = {
 const staff: IdProvider = {
   key: 'staff',
   displayName: 'Staff',
+  mode: 'LOCAL',
   application: STANDARD,
   users: { total: 0 },
   groups: { total: 0 },
@@ -33,6 +35,7 @@ const staff: IdProvider = {
 const entra: IdProvider = {
   key: 'entraid',
   displayName: 'EntraID',
+  mode: 'LOCAL',
   application: OIDC,
   users: { total: 0 },
   groups: { total: 0 },
@@ -42,6 +45,7 @@ const entra: IdProvider = {
 const partners: IdProvider = {
   key: 'partners',
   displayName: 'Partners',
+  mode: 'LOCAL',
   users: { total: 0 },
   groups: { total: 0 },
 };

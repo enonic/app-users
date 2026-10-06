@@ -2,6 +2,8 @@ export { USER_EDITOR_STEPS, type UserEditorStep } from './model/user-editor-step
 export {
   $userEditor,
   $userEditorErrors,
+  $userEditorProviders,
+  $userEditorRemoteUser,
   $userEditorServiceAccount,
   $userEditorStepLocks,
   $userEditorSystemUser,

@@ -6,6 +6,8 @@
 export const HUB_TOPICS = {
   /** Principal changes, `{operation, changes: [{kind, key}]}`, kinds user/group/role/idProvider. */
   principals: 'com.enonic.xp.app.settings:principals',
+  /** Application lifecycle, `{eventType, key, systemApplication}`. Admitted to `system.admin` alone. */
+  applications: 'com.enonic.xp.app.settings:applications',
 } as const;
 
 /** Ids only, never data: a subscriber re-reads through its gateway. `idProvider` keys are the bare provider name. */
@@ -65,4 +67,37 @@ function isOperation(value: unknown): value is PrincipalOperation {
 
 function isKind(value: unknown): value is PrincipalKind {
   return typeof value === 'string' && KINDS.includes(value);
+}
+
+/** Core's lifecycle event types; `PROGRESS` has a topic of its own. */
+export type ApplicationEventType = 'INSTALLED' | 'STARTED' | 'STOPPED' | 'UNINSTALLED';
+
+export type ApplicationsMessage = {
+  eventType: ApplicationEventType;
+  key: string;
+};
+
+const APPLICATION_EVENT_TYPES: readonly string[] = [
+  'INSTALLED',
+  'STARTED',
+  'STOPPED',
+  'UNINSTALLED',
+];
+
+/** The wire boundary: checked, never cast. A type core may add later is dropped rather than guessed at. */
+export function toApplicationsMessage(data: unknown): ApplicationsMessage | undefined {
+  if (data == null || typeof data !== 'object') {
+    return undefined;
+  }
+
+  const { eventType, key } = data as { eventType?: unknown; key?: unknown };
+  if (!isApplicationEventType(eventType) || typeof key !== 'string' || key === '') {
+    return undefined;
+  }
+
+  return { eventType, key };
+}
+
+function isApplicationEventType(value: unknown): value is ApplicationEventType {
+  return typeof value === 'string' && APPLICATION_EVENT_TYPES.includes(value);
 }

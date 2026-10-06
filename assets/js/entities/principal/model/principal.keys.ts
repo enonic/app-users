@@ -70,6 +70,18 @@ export function isSystemUser(key: PrincipalKey): boolean {
   return SYSTEM_USER_KEYS.includes(key);
 }
 
+export const SUPER_USER_KEY = 'user:system:su';
+
+export const ADMIN_ROLE_KEY = 'role:system.admin';
+
+/**
+ * Whether a membership is one the platform refuses to end: `su` leaving Administrators would lock the
+ * last way back into the tool, and `SecurityServiceImpl` throws on it.
+ */
+export function isPinnedMembership(member: PrincipalKey, holder: PrincipalKey): boolean {
+  return member === SUPER_USER_KEY && holder === ADMIN_ROLE_KEY;
+}
+
 /** A user of the system store: what the Service Accounts section lists (#2674). */
 export function isServiceAccount(key: PrincipalKey): boolean {
   return key.startsWith(`user:${SYSTEM_ID_PROVIDER}:`);

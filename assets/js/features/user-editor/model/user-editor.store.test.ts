@@ -7,6 +7,7 @@ import {
   $userEditor,
   $userEditorErrors,
   $userEditorProviders,
+  $userEditorRemoteUser,
   $userEditorServiceAccount,
   closeUserEditor,
   openServiceAccountEditor,
@@ -184,7 +185,7 @@ describe('setUserEditorEmail', () => {
 
 describe('openServiceAccountEditor', () => {
   it('starts a create in the system store, and says the Service Accounts section opened it', () => {
-    receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP' }]));
+    receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP', mode: 'LOCAL' }]));
 
     openServiceAccountEditor({ mode: 'create' });
 
@@ -209,8 +210,8 @@ describe('$userEditorProviders', () => {
   it('leaves the system store out, and defaults the form to the one provider left', () => {
     receiveIdProviderNames(
       ok([
-        { key: 'system', displayName: 'System' },
-        { key: 'ldap', displayName: 'Corporate LDAP' },
+        { key: 'system', displayName: 'System', mode: 'LOCAL' },
+        { key: 'ldap', displayName: 'Corporate LDAP', mode: 'LOCAL' },
       ]),
     );
 
@@ -219,5 +220,71 @@ describe('$userEditorProviders', () => {
     openUserEditor({ mode: 'create' });
 
     expect($userEditor.get().form.idProvider).toBe('ldap');
+  });
+
+  it('offers only a provider whose users XP owns, and defaults to it', () => {
+    receiveIdProviderNames(
+      ok([
+        { key: 'ldap', displayName: 'Corporate LDAP', mode: 'LOCAL' },
+        { key: 'oidc', displayName: 'Single sign-on', mode: 'MIXED' },
+        { key: 'adfs', displayName: 'Federation', mode: 'EXTERNAL' },
+        { key: 'gone', displayName: 'Uninstalled', mode: 'UNAVAILABLE' },
+      ]),
+    );
+
+    expect($userEditorProviders.get().map(({ key }) => key)).toEqual(['ldap']);
+
+    openUserEditor({ mode: 'create' });
+
+    expect($userEditor.get().form.idProvider).toBe('ldap');
+  });
+});
+
+describe('$userEditorRemoteUser', () => {
+  afterEach(() => {
+    receiveIdProviderNames(ok([]));
+  });
+
+  it('is off for a user whose provider keeps its users in XP', () => {
+    receiveIdProviderNames(ok([{ key: 'system', displayName: 'System', mode: 'LOCAL' }]));
+
+    openUserEditorAt(ALICE, 'roles');
+
+    expect($userEditorRemoteUser.get()).toBe(false);
+  });
+
+  it('is on for a user a remote system owns, and while the providers are unknown', () => {
+    openUserEditorAt({ ...ALICE, key: 'user:ldap:alice' as User['key'] }, 'roles');
+
+    expect($userEditorRemoteUser.get()).toBe(true);
+
+    receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP', mode: 'MIXED' }]));
+
+    expect($userEditorRemoteUser.get()).toBe(true);
+  });
+
+  it('is off while nothing is being edited', () => {
+    expect($userEditorRemoteUser.get()).toBe(false);
+  });
+
+  it('leaves a remote user with no email free of errors, so a membership edit can save', () => {
+    receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP', mode: 'EXTERNAL' }]));
+
+    openUserEditorAt(
+      { ...ALICE, key: 'user:ldap:alice' as User['key'], email: undefined },
+      'roles',
+    );
+
+    expect($userEditorErrors.get()).toEqual({});
+  });
+
+  it('validates the fields again once the providers say the user is local', () => {
+    openUserEditorAt({ ...ALICE, email: undefined }, 'roles');
+
+    expect($userEditorErrors.get()).toEqual({});
+
+    receiveIdProviderNames(ok([{ key: 'system', displayName: 'System', mode: 'LOCAL' }]));
+
+    expect($userEditorErrors.get().email).toBe('users.dialog.emailRequired');
   });
 });

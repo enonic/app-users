@@ -8,6 +8,7 @@ import {
   type PrincipalSort,
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { $groupEditorProviders } from '../../features/group-editor';
 import { GroupEditorDialog } from '../../features/group-editor/ui/GroupEditorDialog';
 import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
@@ -21,7 +22,7 @@ import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanne
 import { GroupDeleteDialog } from './GroupDeleteDialog';
 import { GroupsItemPage } from './GroupsItemPage';
 import { groupsFilter } from './model/filter.store';
-import { GROUP_ACTIONS } from './model/groups.actions';
+import { createGroupActions } from './model/groups.actions';
 import { filterByIdProvider, idProviderEntries, searchGroups } from './model/groups.filter';
 import { toGroupRow } from './model/groups.rows';
 import { loadGroupsScreen } from './model/groups.screen';
@@ -44,6 +45,7 @@ export function GroupsPage() {
   const query = useStore(groupsSearch.$query);
   const selectedProviders = useStore(groupsFilter.$selected);
   const sort = useStore($groupsSort);
+  const creatable = useStore($groupEditorProviders);
 
   const sortNameLabel = useI18n('groups.sort.name');
   const sortNameAscLabel = useI18n('groups.sort.nameAsc');
@@ -74,6 +76,9 @@ export function GroupsPage() {
     ],
     [],
   ) satisfies readonly BrowseSortOption<PrincipalSort>[];
+
+  const canCreate = creatable.length > 0;
+  const actions = useMemo(() => createGroupActions(canCreate), [canCreate]);
 
   // Shared with the filter entries below, so the query runs once per render rather than twice.
   const searched = useMemo(() => searchGroups(items, query), [items, query]);
@@ -110,7 +115,7 @@ export function GroupsPage() {
     <div data-component={GROUPS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
-        actions={GROUP_ACTIONS}
+        actions={actions}
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}

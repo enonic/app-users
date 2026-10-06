@@ -10,6 +10,7 @@ import {
   type PrincipalSort,
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { $userEditorProviders } from '../../features/user-editor';
 import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
 import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
@@ -28,7 +29,7 @@ import {
 } from './model/query.store';
 import { usersSearch } from './model/search.store';
 import { usersSelection } from './model/selection.store';
-import { USER_ACTIONS } from './model/users.actions';
+import { createUserActions } from './model/users.actions';
 import { providerEntries } from './model/users.filter';
 import { toUserRow } from './model/users.rows';
 import { loadMoreUsers, reloadUsersScreen } from './model/users.screen';
@@ -47,6 +48,7 @@ export function UsersPage() {
   const { items: providerCounts, status: providersStatus } = useStore($idProviderUserCounts);
 
   const { idProviders, sort } = useStore($usersQuery);
+  const creatable = useStore($userEditorProviders);
 
   const sortNameLabel = useI18n('users.sort.name');
   const sortNameAscLabel = useI18n('users.sort.nameAsc');
@@ -80,6 +82,9 @@ export function UsersPage() {
     [],
   ) satisfies readonly BrowseSortOption<PrincipalSort>[];
 
+  const canCreate = creatable.length > 0;
+  const actions = useMemo(() => createUserActions(canCreate), [canCreate]);
+
   // ! Entries come from the provider list, never from the rows: the rows are one page, so a provider the
   // ! page happens not to contain would disappear from the menu while still narrowing the query. They
   // ! carry no count either — `findUsers` reports one total for the whole query and nothing per provider.
@@ -108,7 +113,7 @@ export function UsersPage() {
     <div data-component={USERS_PAGE_NAME} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <BrowseScreen
         {...section}
-        actions={USER_ACTIONS}
+        actions={actions}
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}

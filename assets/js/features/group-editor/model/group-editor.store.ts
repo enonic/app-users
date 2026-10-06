@@ -1,9 +1,13 @@
 import { computed } from 'nanostores';
 
 import {
+  $idProviderModeByKey,
   $idProviderNames,
+  allowsWrite,
+  idProviderOf,
   createPrincipalNameCheck,
   type Group,
+  type IdProviderName,
   type PrincipalRef,
 } from '../../../entities/principal';
 import { mergeByKey } from '../../../shared/form';
@@ -19,6 +23,12 @@ import {
 } from './group-form';
 
 export const groupNameCheck = createPrincipalNameCheck('group');
+
+// ! A provider whose groups a remote system owns is not offered — the server would refuse the create.
+export const $groupEditorProviders = computed(
+  $idProviderNames,
+  ({ items }): readonly IdProviderName[] => items.filter(({ mode }) => allowsWrite(mode, 'group')),
+);
 
 // The name a provider already holds is an error like any other; while the answer is on its way, the name
 // holds the later steps back without a message.
@@ -50,6 +60,18 @@ export const $groupEditor = groupEditorDialog.$state;
 export const $groupEditorErrors = groupEditorDialog.$errors;
 
 export const openGroupEditor = groupEditorDialog.open;
+
+/**
+ * The steps a remote group's wizard skips: its fields and members are the remote system's. The roles
+ * stay — they live on the role, which the Roles section writes too.
+ */
+export const REMOTE_GROUP_OMITTED_STEPS: readonly GroupEditorStep[] = ['general', 'members'];
+
+export const $groupEditorRemoteGroup = computed(
+  [$groupEditor, $idProviderModeByKey],
+  ({ entity }, modes) =>
+    entity !== undefined && !allowsWrite(modes.get(idProviderOf(entity.key) ?? ''), 'group'),
+);
 
 export function openGroupEditorAt(group: Group, step: GroupEditorStep): void {
   groupEditorDialog.openAt(group, step, group.displayName);
@@ -101,9 +123,9 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
   }
 }
 
-// Where a create starts: the one provider there is, otherwise none.
+// Where a create starts: the one provider it may create in, otherwise none.
 function onlyProvider(): string {
-  const { items } = $idProviderNames.get();
+  const providers = $groupEditorProviders.get();
 
-  return items.length === 1 ? (items[0]?.key ?? '') : '';
+  return providers.length === 1 ? (providers[0]?.key ?? '') : '';
 }

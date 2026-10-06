@@ -137,7 +137,15 @@ export type PublicKey = {
 export type IdProviderName = {
   key: string;
   displayName: string;
+  mode: IdProviderMode;
 };
+
+/**
+ * Who owns a provider's accounts, as the server resolves it from the bound application's descriptor.
+ * `UNAVAILABLE` means the application ships no descriptor right now — not installed or not running —
+ * and is treated as `EXTERNAL`.
+ */
+export type IdProviderMode = 'LOCAL' | 'MIXED' | 'EXTERNAL' | 'UNAVAILABLE';
 
 export type IdProvider = IdProviderName & {
   description?: string;

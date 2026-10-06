@@ -1,4 +1,5 @@
 import {
+  createIdProviderModeReaction,
   createPrincipalReaction,
   evictUserDetail,
   forgetUserDetails,
@@ -11,6 +12,7 @@ import { usersSelection } from './selection.store';
 import { refreshUsersScreen } from './users.screen';
 
 let running: TopicReaction | undefined;
+let modes: TopicReaction | undefined;
 
 /**
  * A provider change re-reads the screen: its names and counts ride the same document. A group or role
@@ -49,9 +51,14 @@ export function startUsersEvents(frame: HostFrame): void {
   });
 
   running.start();
+
+  modes = createIdProviderModeReaction(frame.$visible, refresh);
+  modes.start();
 }
 
 export function stopUsersEvents(): void {
   running?.stop();
   running = undefined;
+  modes?.stop();
+  modes = undefined;
 }

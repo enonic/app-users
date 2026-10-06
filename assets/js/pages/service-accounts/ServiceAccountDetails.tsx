@@ -139,7 +139,7 @@ export function ServiceAccountDetails({
         labelKey="users.details.roles"
         count={roles.length}
         action={
-          system || readOnly ? undefined : (
+          readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"
@@ -165,7 +165,7 @@ export function ServiceAccountDetails({
         labelKey="users.details.groups"
         count={groups.length}
         action={
-          system || readOnly ? undefined : (
+          readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"

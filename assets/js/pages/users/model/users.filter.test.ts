@@ -5,7 +5,7 @@ import { visibleEntries } from '../../../widgets/browse-list/browse-filter';
 import { providerEntries } from './users.filter';
 
 function provider(key: string, displayName: string, users: number): IdProviderUserCount {
-  return { key, displayName, users };
+  return { key, displayName, mode: 'LOCAL', users };
 }
 
 const providers = [

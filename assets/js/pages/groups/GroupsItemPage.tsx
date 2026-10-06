@@ -1,4 +1,4 @@
-import { principalName, useGroup, useGroups } from '../../entities/principal';
+import { principalName, useGroup, useGroups, useIdProviderNames } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { useItemId } from '../../shared/host';
 import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel';
@@ -17,9 +17,14 @@ export function GroupsItemPage({
   const id = useItemId();
   const { status, item: group } = useGroup(id);
   const { items } = useGroups();
+  const providers = useIdProviderNames();
+
+  // The panel's edit buttons follow the providers' modes, so a group shown before the providers are known
+  // would flash locked; a re-read of the list keeps what it has and does not count.
+  const providersPending = providers.status === 'loading' && providers.items.length === 0;
 
   // Loading with a group on screen is a re-read of that group: it stays.
-  if (status === 'loading' && group === undefined) {
+  if ((status === 'loading' && group === undefined) || providersPending) {
     const row = items.find(({ key }) => key === id);
 
     return (

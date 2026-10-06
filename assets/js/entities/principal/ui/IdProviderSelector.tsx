@@ -123,7 +123,7 @@ IdProviderSelector.displayName = ID_PROVIDER_SELECTOR_NAME;
 //
 
 type IdProviderLabelProps = {
-  provider: IdProviderName;
+  provider: Pick<IdProviderName, 'key' | 'displayName'>;
   className?: string;
 };
 

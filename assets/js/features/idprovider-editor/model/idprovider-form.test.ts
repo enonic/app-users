@@ -17,6 +17,7 @@ import {
 const provider: IdProvider = {
   key: 'ldap',
   displayName: 'Company directory',
+  mode: 'LOCAL',
   description: 'Everyone on staff',
   application: { key: 'com.example.ldap', displayName: 'LDAP login' },
   users: { total: 12 },

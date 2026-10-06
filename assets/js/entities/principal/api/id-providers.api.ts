@@ -8,6 +8,7 @@ import type {
   IdProvider,
   IdProviderAccess,
   IdProviderConfig,
+  IdProviderMode,
   IdProviderName,
   IdProviderPermission,
   IdProviderPermissions,
@@ -23,10 +24,14 @@ import type {
  * ! `findPrincipals` search per provider — three server operations each, for a list Users, Groups and
  * ! Roles read only to name where a principal comes from. Users re-runs its whole screen query on every
  * ! debounced keystroke, so the full selection there is that cost per keystroke.
+ *
+ * ! `mode` is the exception, and it is in for what it gates: Users and Groups cannot offer New or Edit
+ * ! without it. It is an in-memory descriptor lookup, nothing searched.
  */
 const ID_PROVIDER_NAMES_SELECTION = `{
   key
   displayName
+  mode
 }`;
 
 /** For any screen naming a principal's origin: Users, Groups, Roles. */
@@ -42,6 +47,7 @@ export type IdProviderNamesData = { idProviders: IdProviderNameDto[] | null };
 const ID_PROVIDER_USER_COUNTS_SELECTION = `{
   key
   displayName
+  mode
   users {
     total
   }
@@ -61,7 +67,12 @@ export type IdProviderUserCount = IdProviderName & { users: number };
 export function toIdProviderUserCounts(
   dtos: readonly IdProviderUserCountDto[],
 ): IdProviderUserCount[] {
-  return dtos.map(({ key, displayName, users }) => ({ key, displayName, users: users.total }));
+  return dtos.map(({ key, displayName, mode, users }) => ({
+    key,
+    displayName,
+    mode,
+    users: users.total,
+  }));
 }
 
 // Counts only: `items` on either set is every principal the provider holds, which on a
@@ -70,6 +81,7 @@ const ID_PROVIDERS_SELECTION = `{
   key
   displayName
   description
+  mode
   application {
     key
     displayName
@@ -94,6 +106,7 @@ type IdProviderDto = {
   key: string;
   displayName: string;
   description: string | null;
+  mode: IdProviderMode;
   application: { key: string; displayName: string } | null;
   users: { total: number };
   groups: { total: number };
@@ -106,7 +119,7 @@ export function toIdProviders(dtos: readonly IdProviderDto[]): IdProvider[] {
 }
 
 export function toIdProviderNames(dtos: readonly IdProviderNameDto[]): IdProviderName[] {
-  return dtos.map(({ key, displayName }) => ({ key, displayName }));
+  return dtos.map(({ key, displayName, mode }) => ({ key, displayName, mode }));
 }
 
 const ID_PROVIDER_ROW_DOCUMENT = `
@@ -435,6 +448,7 @@ function toIdProvider(dto: IdProviderDto): IdProvider {
     key: dto.key,
     displayName: dto.displayName,
     description: dto.description ?? undefined,
+    mode: dto.mode,
     application: dto.application ?? undefined,
     users: { total: dto.users.total },
     groups: { total: dto.groups.total },

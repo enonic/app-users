@@ -15,12 +15,11 @@ import {
 } from '/lib/xp/auth';
 
 import {
-  byName,
-  displayNameOf,
-  requireIdProvider,
-  toPrincipalItem,
-  type PrincipalItem,
-} from './principal.source';
+  isWritablePrincipal,
+  requireWritable,
+  requireWritablePrincipals,
+} from './id-provider-mode';
+import { byName, displayNameOf, toPrincipalItem, type PrincipalItem } from './principal.source';
 
 export type GroupSource = Group;
 
@@ -88,7 +87,7 @@ export function listGroupGroups(key: GroupKey, transitive: boolean): PrincipalIt
 }
 
 export function createGroup(idProvider: string, name: string, input: GroupInput): Group {
-  requireIdProvider(idProvider);
+  requireWritable(idProvider, 'group');
 
   const group = createGroupPrincipal({
     idProvider,
@@ -104,6 +103,29 @@ export function createGroup(idProvider: string, name: string, input: GroupInput)
 }
 
 export function updateGroup(key: string, changes: GroupChanges): Group {
+  // ! A remote group's roles are still XP's — they live on the role, where the Roles section writes them
+  // ! too — so a locked provider refuses the group's own fields and its members, and nothing else.
+  const locked = !isWritablePrincipal(key, 'group');
+  if (locked) {
+    const current = getGroup(key);
+    if (current == null) {
+      throw new Error(`No group answers to [${key}]`);
+    }
+
+    if (
+      changes.displayName.trim() !== current.displayName.trim() ||
+      (changes.description ?? '').trim() !== (current.description ?? '').trim() ||
+      changes.addMembers.length > 0 ||
+      changes.removeMembers.length > 0
+    ) {
+      requireWritablePrincipals([key], 'group');
+    }
+
+    applyRoles(current.key, changes.addRoles, changes.removeRoles);
+
+    return getGroup(key) ?? current;
+  }
+
   const group = modifyGroup({
     key: key as GroupKey,
     // ! `ModifyGroupHandler` assigns a field only when the editor returned a non-null value, so the

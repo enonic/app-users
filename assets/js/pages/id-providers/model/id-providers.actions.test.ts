@@ -8,24 +8,28 @@ import { ID_PROVIDER_ACTIONS } from './id-providers.actions';
 const system: IdProvider = {
   key: 'system',
   displayName: 'System',
+  mode: 'LOCAL',
   users: { total: 0 },
   groups: { total: 0 },
 };
 const empty: IdProvider = {
   key: 'partners',
   displayName: 'Partners',
+  mode: 'LOCAL',
   users: { total: 0 },
   groups: { total: 0 },
 };
 const populated: IdProvider = {
   key: 'ldap',
   displayName: 'Company directory',
+  mode: 'LOCAL',
   users: { total: 1 },
   groups: { total: 0 },
 };
 const grouped: IdProvider = {
   key: 'partners-old',
   displayName: 'Partners (old)',
+  mode: 'LOCAL',
   users: { total: 0 },
   groups: { total: 2 },
 };

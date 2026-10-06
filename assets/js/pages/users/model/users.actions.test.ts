@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { User } from '../../../entities/principal';
 import type { ActionContext, SectionAction } from '../../../widgets/browse-toolbar/actions';
-import { USER_ACTIONS } from './users.actions';
+import { createUserActions } from './users.actions';
 
 function user(idProvider: string, login: string): User {
   return {
@@ -25,7 +25,7 @@ function context(overrides: Partial<ActionContext<User>> = {}): ActionContext<Us
 }
 
 function action(id: string): SectionAction<User> {
-  const found = USER_ACTIONS.find((candidate) => candidate.id === id);
+  const found = createUserActions(true).find((candidate) => candidate.id === id);
   if (!found) {
     throw new Error(`No user action with id ${id}`);
   }
@@ -34,13 +34,19 @@ function action(id: string): SectionAction<User> {
 
 describe('user actions', () => {
   it('offers new and delete in that order', () => {
-    expect(USER_ACTIONS.map(({ id }) => id)).toEqual(['new', 'delete']);
+    expect(createUserActions(true).map(({ id }) => id)).toEqual(['new', 'delete']);
   });
 });
 
 describe('new user', () => {
   it('needs no target', () => {
     expect(action('new').enabled(context())).toBe(true);
+  });
+
+  it('is off when no provider takes a new user', () => {
+    const create = createUserActions(false).find(({ id }) => id === 'new');
+
+    expect(create?.enabled(context())).toBe(false);
   });
 });
 

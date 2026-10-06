@@ -6,6 +6,7 @@ import { toIdProviderRow } from './id-providers.rows';
 const provider: IdProvider = {
   key: 'ldap',
   displayName: 'Company directory',
+  mode: 'LOCAL',
   description: 'Everyone with a company account',
   application: { key: 'com.enonic.app.ldapidprovider', displayName: 'LDAP ID Provider' },
   users: { total: 0 },
@@ -32,6 +33,7 @@ describe('toIdProviderRow', () => {
     const unbound: IdProvider = {
       key: 'partners',
       displayName: 'Partners',
+      mode: 'LOCAL',
       users: { total: 0 },
       groups: { total: 0 },
     };

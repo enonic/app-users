@@ -1,19 +1,18 @@
+import { getIdProvider, getIdProviderDescriptor } from '/lib/idprovider';
 import {
   addMembers,
   createGroup as createGroupPrincipal,
   findPrincipals,
-  getIdProviders,
   getMembers,
   getMemberships,
   getPrincipal,
   modifyGroup,
   removeMembers,
   type Group,
-  type IdProvider,
   type Role,
   type User,
 } from '/lib/xp/auth';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   createGroup,
@@ -53,6 +52,27 @@ function role(key: string, displayName: string): Role {
     key: key as Role['key'],
     displayName,
     modifiedTime: '2026-08-01T10:00:00Z',
+  };
+}
+
+type LibIdProvider = NonNullable<ReturnType<typeof getIdProvider>>;
+
+// The guards read one provider at a time, so the store is a lookup rather than a list.
+function providerStore(providers: readonly LibIdProvider[]): void {
+  vi.mocked(getIdProvider).mockImplementation(
+    ({ idProvider }) => providers.find(({ key }) => key === idProvider) ?? null,
+  );
+}
+
+function localProvider(key: string): LibIdProvider {
+  return { key, displayName: key };
+}
+
+function remoteProvider(key: string): LibIdProvider {
+  return {
+    key,
+    displayName: key,
+    idProviderConfig: { applicationKey: 'com.example.remote', config: [] },
   };
 }
 
@@ -222,9 +242,7 @@ describe('createGroup', () => {
   }
 
   function providers(...keys: string[]): void {
-    vi.mocked(getIdProviders).mockReturnValue(
-      keys.map((key) => ({ key, displayName: key }) as IdProvider),
-    );
+    providerStore(keys.map(localProvider));
   }
 
   it('creates the group in the provider named, from the scalars given', () => {
@@ -286,6 +304,11 @@ describe('createGroup', () => {
 });
 
 describe('updateGroup', () => {
+  beforeEach(() => {
+    providerStore([localProvider('store'), remoteProvider('remote')]);
+    vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
+  });
+
   function changes(overrides: Partial<GroupChanges> = {}): GroupChanges {
     return {
       displayName: 'Managers',
@@ -375,5 +398,88 @@ describe('updateGroup', () => {
       'No group answers to [group:store:gone]',
     );
     expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+  });
+});
+
+describe('writes a remote system owns', () => {
+  beforeEach(() => {
+    providerStore([remoteProvider('remote')]);
+  });
+
+  const noChanges = {
+    displayName: 'Staff',
+    addMembers: [],
+    removeMembers: [],
+    addRoles: [],
+    removeRoles: [],
+  };
+
+  it('refuses to create a group in an EXTERNAL provider, before any write', () => {
+    vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
+
+    expect(() =>
+      createGroup('remote', 'staff', { displayName: 'Staff', members: [], roles: [] }),
+    ).toThrow(/remote/);
+
+    expect(vi.mocked(createGroupPrincipal)).not.toHaveBeenCalled();
+  });
+
+  it('refuses the fields and the members of a group of an EXTERNAL provider, before any write', () => {
+    vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
+    vi.mocked(getPrincipal).mockReturnValue(group('group:remote:staff', 'Staff'));
+
+    expect(() =>
+      updateGroup('group:remote:staff', { ...noChanges, addMembers: ['user:system:alice'] }),
+    ).toThrow(/remote/);
+    expect(() =>
+      updateGroup('group:remote:staff', { ...noChanges, displayName: 'Remote staff' }),
+    ).toThrow(/remote/);
+
+    expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+  });
+
+  // Roles live on the role, where the Roles section writes them as well.
+  it('reads whitespace around a stored value as no change, since the client trims what it sends', () => {
+    vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
+    vi.mocked(getPrincipal).mockReturnValue({
+      ...group('group:remote:staff', 'Staff '),
+      description: 'Remote staff\n',
+    });
+
+    updateGroup('group:remote:staff', {
+      ...noChanges,
+      description: 'Remote staff',
+      addRoles: ['role:cms.admin'],
+    });
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:cms.admin', ['group:remote:staff']);
+    expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
+  });
+
+  it('lets a group of an EXTERNAL provider join and leave roles', () => {
+    vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
+    vi.mocked(getPrincipal).mockReturnValue(group('group:remote:staff', 'Staff'));
+
+    updateGroup('group:remote:staff', {
+      ...noChanges,
+      addRoles: ['role:cms.admin'],
+      removeRoles: ['role:cms.expert'],
+    });
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:cms.admin', ['group:remote:staff']);
+    expect(vi.mocked(removeMembers)).toHaveBeenCalledWith('role:cms.expert', [
+      'group:remote:staff',
+    ]);
+    expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
+  });
+
+  it('lets a MIXED provider keep its groups local', () => {
+    vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'MIXED', hasConfig: false });
+    vi.mocked(createGroupPrincipal).mockReturnValue(group('group:remote:staff', 'Staff'));
+
+    createGroup('remote', 'staff', { displayName: 'Staff', members: [], roles: [] });
+
+    expect(vi.mocked(createGroupPrincipal)).toHaveBeenCalled();
   });
 });

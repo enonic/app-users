@@ -9,7 +9,12 @@ import { StepDialog } from '../../../shared/step-dialog/StepDialog';
 import { groupDraftFrom } from '../model/group-draft';
 import { groupEditFrom } from '../model/group-edit';
 import { forgetGroupEditDetail, showGroupForEdit } from '../model/group-edit-detail';
-import { $groupEditor, groupEditorDialog } from '../model/group-editor.store';
+import {
+  $groupEditor,
+  $groupEditorRemoteGroup,
+  groupEditorDialog,
+  REMOTE_GROUP_OMITTED_STEPS,
+} from '../model/group-editor.store';
 import { useGroupEditorLists } from '../model/useGroupEditorLists';
 import { GROUP_EDITOR_STEP_PANELS } from './steps';
 
@@ -32,6 +37,7 @@ export function GroupEditorDialog({
   'data-component': componentName = GROUP_EDITOR_DIALOG_NAME,
 }: GroupEditorDialogProps) {
   const { entity } = useStore($groupEditor, { keys: ['entity'] });
+  const remoteGroup = useStore($groupEditorRemoteGroup);
   const { notify } = useHostFrame();
 
   useGroupEditorLists();
@@ -61,6 +67,7 @@ export function GroupEditorDialog({
       store={groupEditorDialog}
       glyph={<Users size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       panels={GROUP_EDITOR_STEP_PANELS}
+      omit={remoteGroup ? REMOTE_GROUP_OMITTED_STEPS : undefined}
       data-component={componentName}
       onSave={() => void save()}
     />

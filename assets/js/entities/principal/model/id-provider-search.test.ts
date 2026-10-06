@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { searchIdProviderNames } from './id-provider-search';
+import type { IdProviderName } from './principal.types';
 
-const PROVIDERS = [
-  { key: 'system', displayName: 'System ID Provider' },
-  { key: 'ldap', displayName: 'Corporate directory' },
+const PROVIDERS: IdProviderName[] = [
+  { key: 'system', displayName: 'System ID Provider', mode: 'LOCAL' },
+  { key: 'ldap', displayName: 'Corporate directory', mode: 'LOCAL' },
 ];
 
 describe('searchIdProviderNames', () => {

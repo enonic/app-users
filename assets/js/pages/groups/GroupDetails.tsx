@@ -1,16 +1,19 @@
-import { Button, Checkbox } from '@enonic/ui';
+import { Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
+  allowsWrite,
   idProviderOf,
   principalName,
   splitMembers,
+  useIdProviderMode,
   useIdProviderName,
   useTransitiveMemberships,
   type GroupDetail,
   type PrincipalRef,
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
+import { PrincipalEditButton } from '../../entities/principal/ui/PrincipalEditButton';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openGroupEditorAt } from '../../features/group-editor';
 import { isReadOnlyMode } from '../../shared/config';
@@ -30,8 +33,15 @@ export function GroupDetails({
 }: GroupDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
+  const providerMode = useIdProviderMode();
+  const mode = providerMode(group.key);
 
   const editLabel = useI18n('browse.details.edit');
+  const lockedLabel = useI18n(
+    mode === 'UNAVAILABLE'
+      ? 'principal.details.lockedUnavailable'
+      : 'principal.details.lockedExternal',
+  );
   const editRolesLabel = useI18n('groups.details.editRoles');
   const editUsersLabel = useI18n('groups.details.editUsers');
   const editServiceAccountsLabel = useI18n('groups.details.editServiceAccounts');
@@ -43,6 +53,10 @@ export function GroupDetails({
   const [transitive, setTransitive] = useState(false);
 
   const { key, displayName, description, members } = group;
+
+  // ! Fail-closed: a provider not loaded yet, or whose application is gone, locks the edit as well. The
+  // ! roles stay open — they live on the role, which the Roles section writes too.
+  const locked = !allowsWrite(mode, 'group');
 
   // ? Without a parent group to inherit through, the toggle has nothing to add.
   const inheritable = group.groups.length > 0;
@@ -67,10 +81,9 @@ export function GroupDetails({
         labelKey="groups.details.info"
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editLabel}
+              locked={locked}
               onClick={() => openGroupEditorAt(group, 'general')}
             />
           )
@@ -82,6 +95,11 @@ export function GroupDetails({
         <DetailsPanel.Field labelKey="groups.details.description">
           {description ?? noDescriptionLabel}
         </DetailsPanel.Field>
+        {mode !== undefined && locked && (
+          <DetailsPanel.Field labelKey="principal.details.editing">
+            {lockedLabel}
+          </DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
       {inheritable && (
@@ -118,10 +136,9 @@ export function GroupDetails({
         count={roles.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editRolesLabel}
+              locked={false}
               onClick={() => openGroupEditorAt(group, 'roles')}
             />
           )
@@ -145,10 +162,9 @@ export function GroupDetails({
         count={users.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editUsersLabel}
+              locked={locked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
@@ -162,10 +178,9 @@ export function GroupDetails({
         count={serviceAccounts.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editServiceAccountsLabel}
+              locked={locked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
@@ -188,10 +203,9 @@ export function GroupDetails({
         count={memberGroups.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editGroupsLabel}
+              locked={locked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )

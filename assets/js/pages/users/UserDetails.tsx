@@ -1,14 +1,17 @@
-import { Button, Checkbox } from '@enonic/ui';
+import { Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
+  allowsWrite,
   idProviderOf,
   principalName,
+  useIdProviderMode,
   useIdProviderName,
   useTransitiveMemberships,
   type PrincipalRef,
   type UserDetail,
 } from '../../entities/principal';
+import { PrincipalEditButton } from '../../entities/principal/ui/PrincipalEditButton';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openUserEditorAt } from '../../features/user-editor';
 import { isReadOnlyMode } from '../../shared/config';
@@ -28,8 +31,15 @@ export function UserDetails({
 }: UserDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
+  const providerMode = useIdProviderMode();
+  const mode = providerMode(user.key);
 
   const editLabel = useI18n('browse.details.edit');
+  const lockedLabel = useI18n(
+    mode === 'UNAVAILABLE'
+      ? 'principal.details.lockedUnavailable'
+      : 'principal.details.lockedExternal',
+  );
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -41,6 +51,10 @@ export function UserDetails({
   const [transitive, setTransitive] = useState(false);
 
   const { key, displayName, login, email, hasPassword } = user;
+
+  // ! Fail-closed: a provider not loaded yet, or whose application is gone, locks the edit as well. The
+  // ! memberships stay open — they live on the role and the group, which the Roles section writes too.
+  const locked = !allowsWrite(mode, 'user');
 
   // ? Without a group to inherit through, the toggle has nothing to add — and no request to find out.
   const inheritable = user.groups.length > 0;
@@ -65,10 +79,9 @@ export function UserDetails({
         labelKey="users.details.user"
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editLabel}
+              locked={locked}
               onClick={() => openUserEditorAt(user, 'general')}
             />
           )
@@ -80,6 +93,11 @@ export function UserDetails({
         {email !== undefined && (
           <DetailsPanel.Field labelKey="users.details.email">{email}</DetailsPanel.Field>
         )}
+        {mode !== undefined && locked && (
+          <DetailsPanel.Field labelKey="principal.details.editing">
+            {lockedLabel}
+          </DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
       {/* The password alone: public keys belong to the system store's accounts, as in the editor. */}
@@ -87,10 +105,9 @@ export function UserDetails({
         labelKey="users.details.credentials"
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editCredentialsLabel}
+              locked={locked}
               onClick={() => openUserEditorAt(user, 'credentials')}
             />
           )
@@ -119,10 +136,9 @@ export function UserDetails({
         count={roles.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editRolesLabel}
+              locked={false}
               onClick={() => openUserEditorAt(user, 'roles')}
             />
           )
@@ -145,10 +161,9 @@ export function UserDetails({
         count={groups.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editGroupsLabel}
+              locked={false}
               onClick={() => openUserEditorAt(user, 'groups')}
             />
           )

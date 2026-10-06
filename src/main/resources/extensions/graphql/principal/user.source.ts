@@ -17,10 +17,14 @@ import {
 } from '/lib/xp/auth';
 
 import {
+  isWritablePrincipal,
+  requireWritable,
+  requireWritablePrincipals,
+} from './id-provider-mode';
+import {
   byName,
   clampCount,
   clampStart,
-  requireIdProvider,
   toPrincipalItem,
   type PrincipalItem,
 } from './principal.source';
@@ -200,6 +204,8 @@ export function listUserGroups(key: UserKey, transitive: boolean): PrincipalItem
 }
 
 export function addPublicKey(key: string, publicKey: string, label?: string): PublicKeyItem {
+  requireWritablePrincipals([key], 'user');
+
   const kid = generateKid(publicKey);
 
   const profile = modifyProfile<PublicKeyProfile>({
@@ -228,6 +234,8 @@ export function addPublicKey(key: string, publicKey: string, label?: string): Pu
 }
 
 export function removePublicKey(key: string, kid: string): boolean {
+  requireWritablePrincipals([key], 'user');
+
   const profile = modifyProfile<PublicKeyProfile>({
     key: key as UserKey,
     editor: (current) => ({
@@ -244,7 +252,8 @@ export function removePublicKey(key: string, kid: string): boolean {
 }
 
 export function createUser(idProvider: string, name: string, input: UserInput): User {
-  requireIdProvider(idProvider);
+  requireWritable(idProvider, 'user');
+  requireWritablePrincipals(input.groups, 'group');
 
   // ! Every refusal this function owns comes before the first write. There is no transaction around the
   // ! principal, the password and the memberships, so a password refused after `createUserPrincipal` would
@@ -271,8 +280,24 @@ export function createUser(idProvider: string, name: string, input: UserInput): 
 }
 
 export function updateUser(key: string, changes: UserChanges): User {
-  if (getUser(key) == null) {
+  const current = getUser(key);
+  if (current == null) {
     throw new Error(`No user answers to [${key}]`);
+  }
+
+  // ! A remote user's memberships are still XP's: they live on the role and on the group, where the Roles
+  // ! section and the Group dialog write them too. Only the user's own fields and credentials are the
+  // ! remote system's, so those are what a locked provider refuses.
+  const locked = !isWritablePrincipal(key, 'user');
+  if (locked && (changes.password != null || scalarsMoved(current, changes))) {
+    requireWritablePrincipals([key], 'user');
+  }
+  requireWritablePrincipals([...changes.addGroups, ...changes.removeGroups], 'group');
+
+  // ! The platform refuses this one mid-write, in `removeRelationship`; refusing it here first keeps the
+  // ! password and the other memberships from applying before it does. `role.source` does the same.
+  if (key === SUPER_USER && changes.removeRoles.includes(ADMIN_ROLE)) {
+    throw new Error(`Cannot remove [${SUPER_USER}] from [${ADMIN_ROLE}]`);
   }
 
   if (changes.password != null) {
@@ -291,6 +316,10 @@ export function updateUser(key: string, changes: UserChanges): User {
     changes.addGroups,
     changes.removeGroups,
   );
+
+  if (locked) {
+    return getUser(key) ?? current;
+  }
 
   const user = modifyUser({
     key: key as UserKey,
@@ -365,6 +394,17 @@ function queryExpression(
 
 function named(providers?: readonly string[]): readonly string[] {
   return (providers ?? []).filter((provider) => provider.length > 0);
+}
+
+const ADMIN_ROLE = 'role:system.admin';
+const SUPER_USER = 'user:system:su';
+
+// Both sides trimmed: the client trims what it sends, and a value a remote system stored may not be.
+function scalarsMoved(current: User, changes: UserChanges): boolean {
+  return (
+    changes.displayName.trim() !== current.displayName.trim() ||
+    (changes.email ?? '').trim() !== (current.email ?? '').trim()
+  );
 }
 
 function requirePassword(password: string): void {

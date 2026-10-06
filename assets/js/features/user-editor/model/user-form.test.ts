@@ -119,6 +119,14 @@ describe('validateUserForm', () => {
     });
   });
 
+  // The fields a remote system owns have no step in the dialog, so an error on one could never be fixed.
+  it('asks nothing of the fields a remote user cannot edit', () => {
+    expect(validateUserForm(form({ displayName: ' ', email: '' }), 'edit', false, true)).toEqual(
+      {},
+    );
+    expect(validateUserForm(form({ email: 'not-an-address' }), 'edit', false, true)).toEqual({});
+  });
+
   it('refuses a login carrying a character XP rejects', () => {
     expect(validateUserForm(form({ name: 'alice anderson' }), 'create', false).name).toBe(
       'users.dialog.idInvalid',

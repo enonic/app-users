@@ -1,6 +1,7 @@
 import { GraphQLBoolean, GraphQLString, Json, list, nonNull, type GraphQLType } from '/lib/graphql';
 
 import { generator } from '../schema/generator';
+import { idProviderModeOf } from './id-provider-mode';
 import {
   boundApplicationOf,
   configOf,
@@ -30,6 +31,13 @@ const BoundApplicationType: GraphQLType = generator.createObjectType({
       resolve: (env: { source: BoundApplication }) => configOf(env.source),
     },
   },
+});
+
+const IdProviderModeType: GraphQLType = generator.createEnumType({
+  name: 'IdProviderMode',
+  description:
+    "Who owns the provider's accounts: the descriptor's `mode`, `LOCAL` when it declares none or the provider is bound to nothing, and `UNAVAILABLE` when the bound application ships no descriptor right now — treated as `EXTERNAL`.",
+  values: ['LOCAL', 'MIXED', 'EXTERNAL', 'UNAVAILABLE'],
 });
 
 const IdProviderAccessType: GraphQLType = generator.createEnumType({
@@ -102,6 +110,12 @@ export const IdProviderType: GraphQLType = generator.createObjectType({
     application: {
       type: BoundApplicationType,
       resolve: (env: { source: IdProviderSource }) => boundApplicationOf(env.source),
+    },
+    // ? On the provider rather than on `application`: an unbound provider has a mode too, and the
+    // ? sections that only name providers ask for it without the application's title.
+    mode: {
+      type: nonNull(IdProviderModeType),
+      resolve: (env: { source: IdProviderSource }) => idProviderModeOf(env.source),
     },
     // Both containers resolve for free — nothing is counted or fetched until a leaf below is asked.
     permissions: {

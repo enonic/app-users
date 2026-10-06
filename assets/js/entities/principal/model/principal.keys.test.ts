@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   idProviderOf,
+  isPinnedMembership,
   isPlatformRole,
   isReservedRole,
   isServiceAccount,
@@ -142,5 +143,14 @@ describe('principalRefOf', () => {
     expect(principalRefOf('role:system:admin')).toBeUndefined();
     expect(principalRefOf('user::alice')).toBeUndefined();
     expect(principalRefOf('')).toBeUndefined();
+  });
+});
+
+describe('isPinnedMembership', () => {
+  it('pins the super user to the administrators role alone', () => {
+    expect(isPinnedMembership('user:system:su', 'role:system.admin')).toBe(true);
+    expect(isPinnedMembership('user:system:su', 'role:cms.admin')).toBe(false);
+    expect(isPinnedMembership('user:system:anonymous', 'role:system.admin')).toBe(false);
+    expect(isPinnedMembership('user:ldap:alice', 'role:system.admin')).toBe(false);
   });
 });

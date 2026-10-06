@@ -14,7 +14,9 @@ import { userEditFrom } from '../model/user-edit';
 import { forgetUserEditDetail, showUserForEdit } from '../model/user-edit-detail';
 import {
   $userEditor,
+  $userEditorRemoteUser,
   $userEditorServiceAccount,
+  REMOTE_USER_OMITTED_STEPS,
   SERVICE_ACCOUNT_OMITTED_STEPS,
   userEditorDialog,
 } from '../model/user-editor.store';
@@ -58,6 +60,7 @@ export function UserEditorDialog({
 }: UserEditorDialogProps) {
   const { entity } = useStore($userEditor, { keys: ['entity'] });
   const openedAsServiceAccount = useStore($userEditorServiceAccount);
+  const remoteUser = useStore($userEditorRemoteUser);
   const { notify } = useHostFrame();
 
   const serviceAccount = section === 'service-accounts';
@@ -112,7 +115,7 @@ export function UserEditorDialog({
       store={userEditorDialog}
       glyph={<Glyph size={40} strokeWidth={1.5} className="text-main" aria-hidden />}
       panels={USER_EDITOR_STEP_PANELS}
-      omit={serviceAccount ? SERVICE_ACCOUNT_OMITTED_STEPS : undefined}
+      omit={omittedSteps(serviceAccount, remoteUser)}
       data-component={componentName}
       onSave={() => void save()}
     />
@@ -120,3 +123,11 @@ export function UserEditorDialog({
 }
 
 UserEditorDialog.displayName = USER_EDITOR_DIALOG_NAME;
+
+function omittedSteps(serviceAccount: boolean, remoteUser: boolean) {
+  if (serviceAccount) {
+    return SERVICE_ACCOUNT_OMITTED_STEPS;
+  }
+
+  return remoteUser ? REMOTE_USER_OMITTED_STEPS : undefined;
+}

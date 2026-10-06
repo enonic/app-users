@@ -8,6 +8,7 @@ import { FieldLabel } from '../../../../shared/ui/FieldLabel';
 import {
   $groupEditor,
   $groupEditorErrors,
+  $groupEditorProviders,
   markGroupEditorFieldVisited,
   setGroupEditorIdProvider,
 } from '../../model/group-editor.store';
@@ -17,7 +18,8 @@ const PROVIDER_LABEL_ID = 'group-editor-id-provider-label';
 export function GroupEditorDialogIdProviderStep() {
   const { form, visited } = useStore($groupEditor, { keys: ['form', 'visited'] });
   const errors = useStore($groupEditorErrors);
-  const { status: providersStatus, items: providers } = useIdProviderNames();
+  const providers = useStore($groupEditorProviders);
+  const { status: providersStatus } = useIdProviderNames();
 
   // Labels
   const providerLabel = useI18n('groups.dialog.idProvider');

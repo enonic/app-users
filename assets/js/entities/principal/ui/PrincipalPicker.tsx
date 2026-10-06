@@ -31,10 +31,15 @@ export type PrincipalPickerProps = {
   locked?: ReadonlySet<string>;
   /** Principals kept out of the offer altogether, unlike `locked`, which shows them inert. */
   excluded?: ReadonlySet<string>;
+  /** ID providers whose principals are kept out of the offer, as `excluded` keeps single ones. */
+  excludedIdProviders?: ReadonlySet<string>;
   /** Offers only principals from this ID provider. */
   idProvider?: string;
   /** Names each row's provider, for a picker whose offer can widen past the form's own. */
   showIdProvider?: boolean;
+  /** The popup, controlled: a step that widens the offer opens it so the wider list is seen at once. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const LOAD_MORE_MARGIN = 48;
@@ -48,11 +53,19 @@ export function PrincipalPicker({
   rowTrailing,
   locked,
   excluded,
+  excludedIdProviders,
   idProvider,
   showIdProvider = false,
+  open: controlledOpen,
+  onOpenChange,
 }: PrincipalPickerProps) {
   const [query, setQuery] = useState('');
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = controlledOpen ?? ownOpen;
+  const setOpen = (next: boolean): void => {
+    setOwnOpen(next);
+    onOpenChange?.(next);
+  };
   const labelId = useId();
 
   const searchingLabel = useI18n('principal.picker.searching');
@@ -77,7 +90,10 @@ export function PrincipalPicker({
 
   // ? The exclusion sits on the offer alone: a principal already picked stays in the list below even when
   // ? a later change would no longer offer it, rather than disappearing from under the user.
-  const offered = search.principals.filter(({ key }) => excluded?.has(key) !== true);
+  const offered = search.principals.filter(
+    ({ key }) =>
+      excluded?.has(key) !== true && excludedIdProviders?.has(idProviderOf(key) ?? '') !== true,
+  );
 
   const pickedKeys = useStableKeys(selected);
 

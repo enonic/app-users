@@ -117,14 +117,19 @@ export function sameUserForm(saved: UserForm, edited: UserForm): boolean {
   );
 }
 
+/**
+ * `remoteUser` is a user whose fields a remote system owns: the dialog shows no step for them, so an
+ * error on one could never be seen or fixed — and a membership edit must still save.
+ */
 export function validateUserForm(
   form: UserForm,
   mode: StepDialogMode,
   systemUser: boolean,
+  remoteUser = false,
 ): UserFormErrors {
   const errors: UserFormErrors = {};
 
-  if (form.displayName.trim().length === 0) {
+  if (!remoteUser && form.displayName.trim().length === 0) {
     errors.displayName = 'users.dialog.displayNameRequired';
   }
 
@@ -137,7 +142,7 @@ export function validateUserForm(
     }
   }
 
-  if (!systemUser) {
+  if (!systemUser && !remoteUser) {
     const email = form.email.trim();
     if (email.length === 0) {
       errors.email = 'users.dialog.emailRequired';
