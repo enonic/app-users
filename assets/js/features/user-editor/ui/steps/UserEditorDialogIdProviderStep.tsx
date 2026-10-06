@@ -64,6 +64,7 @@ export function UserEditorDialogIdProviderStep() {
         labelledBy={PROVIDER_LABEL_ID}
         placeholder={providerPlaceholder}
         error={providerError !== undefined}
+        loading={providersStatus === 'loading'}
       />
       {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
     </div>

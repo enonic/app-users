@@ -17,7 +17,7 @@ const PROVIDER_LABEL_ID = 'group-editor-id-provider-label';
 export function GroupEditorDialogIdProviderStep() {
   const { form, visited } = useStore($groupEditor, { keys: ['form', 'visited'] });
   const errors = useStore($groupEditorErrors);
-  const { items: providers } = useIdProviderNames();
+  const { status: providersStatus, items: providers } = useIdProviderNames();
 
   // Labels
   const providerLabel = useI18n('groups.dialog.idProvider');
@@ -40,6 +40,7 @@ export function GroupEditorDialogIdProviderStep() {
         labelledBy={PROVIDER_LABEL_ID}
         placeholder={providerPlaceholder}
         error={providerError !== undefined}
+        loading={providersStatus === 'loading'}
       />
       {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
     </div>

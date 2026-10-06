@@ -14,6 +14,8 @@ export type IdProviderSelectorProps = {
   labelledBy: string;
   placeholder: string;
   error?: boolean;
+  /** The providers are still being read, so an empty list says nothing yet. */
+  loading?: boolean;
 };
 
 const ID_PROVIDER_SELECTOR_NAME = 'IdProviderSelector';
@@ -26,9 +28,11 @@ export function IdProviderSelector({
   labelledBy,
   placeholder,
   error = false,
+  loading = false,
 }: IdProviderSelectorProps) {
   const valueId = useId();
 
+  const searchingLabel = useI18n('principal.picker.searching');
   const noMatchesLabel = useI18n('principal.picker.noMatches');
 
   const [query, setQuery] = useState('');
@@ -71,7 +75,11 @@ export function IdProviderSelector({
           <Combobox.Control>
             <Combobox.Search>
               <Combobox.SearchIcon />
-              <Combobox.Value id={valueId} aria-labelledby={`${labelledBy} ${valueId}`}>
+              <Combobox.Value
+                id={valueId}
+                aria-labelledby={`${labelledBy} ${valueId}`}
+                aria-invalid={error || undefined}
+              >
                 {value.length > 0 ? (
                   <span className="truncate">{pickedName}</span>
                 ) : (
@@ -86,7 +94,11 @@ export function IdProviderSelector({
           <Combobox.Portal>
             <Combobox.Popup>
               <Combobox.ListContent className="max-h-60 overflow-y-auto">
-                {offered.length === 0 && query.trim().length > 0 && (
+                {loading && offered.length === 0 && (
+                  <p className="text-subtle px-2.5 py-1 text-sm">{searchingLabel}</p>
+                )}
+
+                {!loading && offered.length === 0 && query.trim().length > 0 && (
                   <p className="text-subtle px-2.5 py-1 text-sm">{noMatchesLabel}</p>
                 )}
 
