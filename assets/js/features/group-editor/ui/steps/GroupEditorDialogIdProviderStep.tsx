@@ -1,11 +1,10 @@
-import { Selector } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 
 import { useIdProviderNames } from '../../../../entities/principal';
+import { IdProviderSelector } from '../../../../entities/principal/ui/IdProviderSelector';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
-import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import {
   $groupEditor,
   $groupEditorErrors,
@@ -20,9 +19,6 @@ export function GroupEditorDialogIdProviderStep() {
   const errors = useStore($groupEditorErrors);
   const { items: providers } = useIdProviderNames();
 
-  const providerName =
-    providers.find(({ key }) => key === form.idProvider)?.displayName ?? form.idProvider;
-
   // Labels
   const providerLabel = useI18n('groups.dialog.idProvider');
   const providerPlaceholder = useI18n('groups.dialog.idProviderPlaceholder');
@@ -34,28 +30,17 @@ export function GroupEditorDialogIdProviderStep() {
   return (
     <div className="flex flex-col gap-1.5">
       <FieldLabel id={PROVIDER_LABEL_ID} text={providerLabel} required />
-      <Selector.Root
+      <IdProviderSelector
+        providers={providers}
         value={form.idProvider}
-        error={providerError !== undefined}
-        onValueChange={(next) => {
+        onChange={(next) => {
           markGroupEditorFieldVisited('idProvider');
           setGroupEditorIdProvider(next);
         }}
-      >
-        <Selector.Trigger aria-labelledby={PROVIDER_LABEL_ID}>
-          <Selector.Value placeholder={providerPlaceholder}>
-            {form.idProvider.length > 0 ? providerName : undefined}
-          </Selector.Value>
-          <Selector.Icon />
-        </Selector.Trigger>
-        <SelectorPopup>
-          {providers.map(({ key, displayName }) => (
-            <Selector.Item key={key} value={key} textValue={displayName}>
-              <Selector.ItemText>{displayName}</Selector.ItemText>
-            </Selector.Item>
-          ))}
-        </SelectorPopup>
-      </Selector.Root>
+        labelledBy={PROVIDER_LABEL_ID}
+        placeholder={providerPlaceholder}
+        error={providerError !== undefined}
+      />
       {providerError !== undefined && <p className="text-error text-sm">{providerError}</p>}
     </div>
   );

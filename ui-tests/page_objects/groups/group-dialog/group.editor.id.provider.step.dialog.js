@@ -10,17 +10,17 @@ const GroupEditorStepDialog = require('./group.editor.step.dialog');
 const appConst = require('../../../libs/app_const');
 
 const DIALOG = GroupEditorStepDialog.css.container;
-const TRIGGER =
-  `${DIALOG} [data-component='Selector.Trigger']` +
-  "[aria-labelledby='group-editor-id-provider-label']";
+const SELECTOR = `${DIALOG} [data-component='IdProviderSelector']`;
 
 const css = {
-  selectorTrigger: TRIGGER,
-  selectorValue: `${TRIGGER} [data-component='Selector.Value']`,
+  // The closed selector: a button with the picked provider, swapped for the search input on open.
+  selectorTrigger: `${SELECTOR} [data-component='Combobox.Value']`,
+  selectorValue: `${SELECTOR} [data-component='Combobox.Value']`,
+  searchInput: `${SELECTOR} [data-component='Combobox.Input']`,
   // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
-  options: "[data-component='SelectorPopup'] [data-component='Selector.Item']",
+  options: "[data-component='Combobox.Popup'] [data-component='Listbox.Item']",
   optionByKey: (key) =>
-    `[data-component='SelectorPopup'] [data-component='Selector.Item'][data-value='${key}']`,
+    `[data-component='Combobox.Popup'] [data-component='Listbox.Item'][data-value='${key}']`,
   validationMessages: `${DIALOG} [data-registry-id='idProvider'] p.text-error`,
   noProvidersNotice: `${DIALOG} [data-registry-id='idProvider'] p a`,
 };
@@ -59,6 +59,22 @@ class GroupEditorIdProviderStepDialog extends GroupEditorStepDialog {
       await this.handleError(
         'New group dialog - ID provider selector',
         'err_id_provider_selector',
+        err,
+      );
+    }
+  }
+
+  // Opens the selector and types into its search, narrowing the options by display name or key.
+  async typeInIdProviderSearch(text) {
+    try {
+      await this.clickOnIdProviderSelector();
+      await this.waitForElementDisplayed(css.searchInput);
+      await this.typeTextInInput(css.searchInput, text);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        'New group dialog - ID provider search',
+        'err_id_provider_search',
         err,
       );
     }
