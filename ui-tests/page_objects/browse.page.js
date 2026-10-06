@@ -222,15 +222,15 @@ class BrowsePage extends SectionPage {
     return this.clickOnButton(this.deleteButton, 'Delete', 'err_delete_btn');
   }
 
-  waitForDeleteButtonDisplayed(ms = appConst.TIMEOUT.MEDIUM) {
+  waitForDeleteButtonDisplayed(ms = appConst.TIMEOUT.SHORT) {
     return this.waitForButtonDisplayed(this.deleteButton, 'Delete', 'err_delete_btn', ms);
   }
 
-  waitForDeleteButtonEnabled(ms = appConst.TIMEOUT.MEDIUM) {
+  waitForDeleteButtonEnabled(ms = appConst.TIMEOUT.SHORT) {
     return this.waitForButtonEnabled(this.deleteButton, 'Delete', 'err_delete_btn', ms);
   }
 
-  waitForDeleteButtonDisabled(ms = appConst.TIMEOUT.MEDIUM) {
+  waitForDeleteButtonDisabled(ms = appConst.TIMEOUT.SHORT) {
     return this.waitForButtonDisabled(this.deleteButton, 'Delete', 'err_delete_btn', ms);
   }
 
@@ -248,15 +248,15 @@ class BrowsePage extends SectionPage {
     return this.clickOnButton(this.refreshButton, 'Refresh', 'err_refresh_btn');
   }
 
-  waitForRefreshButtonDisplayed(ms = appConst.TIMEOUT.MEDIUM) {
+  waitForRefreshButtonDisplayed(ms = appConst.TIMEOUT.SHORT) {
     return this.waitForButtonDisplayed(this.refreshButton, 'Refresh', 'err_refresh_btn', ms);
   }
 
-  waitForRefreshButtonEnabled(ms = appConst.TIMEOUT.MEDIUM) {
+  waitForRefreshButtonEnabled(ms = appConst.TIMEOUT.SHORT) {
     return this.waitForButtonEnabled(this.refreshButton, 'Refresh', 'err_refresh_btn', ms);
   }
 
-  waitForRefreshButtonDisabled(ms = appConst.TIMEOUT.MEDIUM) {
+  waitForRefreshButtonDisabled(ms = appConst.TIMEOUT.SHORT) {
     return this.waitForButtonDisabled(this.refreshButton, 'Refresh', 'err_refresh_btn', ms);
   }
 
@@ -591,7 +591,7 @@ class BrowsePage extends SectionPage {
 
   async waitForRowSelected(key, ms = appConst.TIMEOUT.MEDIUM) {
     try {
-      await this.waitForAttributeValue(this.css.rowByKey(key), 'aria-selected', 'true');
+      await this.waitForAttributeValue(this.css.rowByKey(key), 'aria-selected', 'true', ms);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - the row '${key}' should be selected`,

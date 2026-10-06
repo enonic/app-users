@@ -4,23 +4,10 @@
 const Page = require('./page');
 const appConst = require('../libs/app_const');
 
-// Every Settings section (extension) is rendered inside its own shadow root:
-//
-//   div[data-component='SectionMount'][data-section='<app>:<section>'] (class 'hidden' when inactive)
-//     div[data-component='SectionMountHost']   <- the shadow host
-//       #shadow-root
-//         div[data-component='AppRoot'] > div[data-component='<Section>Page'] ...
-//
-// Chrome cannot evaluate XPath with a shadow root as the context node ("#document-fragment is not a
-// valid context node type"), over WebDriver Classic and BiDi alike. So everything below the shadow
-// root is located with CSS, and this class scopes every lookup to the active section's shadow host
-// with webdriverio's deep selector (`>>>`), which pierces shadow roots in both protocols. Inactive
-// sections stay mounted with class 'hidden', hence the scoping: a page-wide lookup could otherwise
-// hit a button in a section that was opened earlier.
-//
-// `findElement`/`findElements` are overridden, and every helper inherited from Page
-// (waitForElementDisplayed, waitForElementEnabled, clickOnElement, getText, ...) goes through them,
-// so section page objects just pass CSS selectors to the usual helpers.
+// A section is rendered inside its own shadow root (SectionMount > SectionMountHost > #shadow-root).
+// Chrome cannot evaluate XPath below a shadow root, so every lookup here is CSS, scoped to the
+// active section's host through webdriverio's deep selector. Inactive sections stay mounted with
+// the class 'hidden'.
 const DEEP = '>>> ';
 
 class SectionPage extends Page {
@@ -29,7 +16,6 @@ class SectionPage extends Page {
     this.sectionId = sectionId;
   }
 
-  // CSS (light DOM) of the shadow host of this section, excluding hidden (inactive) mounts.
   get shadowHostLocator() {
     return (
       `div[data-component='SectionMount'][data-section='${this.sectionId}']:not(.hidden)` +
@@ -51,7 +37,6 @@ class SectionPage extends Page {
     }
   }
 
-  // Scoped to the section: `cssSelector` is resolved from the shadow host, through its shadow root.
   async findElement(cssSelector) {
     const host = await this.getShadowHost();
     return await host.$(DEEP + cssSelector);
@@ -62,8 +47,7 @@ class SectionPage extends Page {
     return await host.$$(DEEP + cssSelector);
   }
 
-  // Page-wide lookup for the rare element that is rendered outside the section's shadow root
-  // (app shell, notifications). Takes any selector Page accepts, XPath included.
+  // Light DOM, outside every section (the app shell, the toasts); XPath works here.
   findElementInDocument(selector) {
     return this.browser.$(selector);
   }

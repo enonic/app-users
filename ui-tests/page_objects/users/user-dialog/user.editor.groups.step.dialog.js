@@ -111,7 +111,7 @@ class UserEditorGroupsStepDialog extends UserEditorStepDialog {
 
   async waitForShowAllGroupsTogglePressed(ms = appConst.TIMEOUT.MEDIUM) {
     try {
-      await this.waitForAttributeValue(css.showAllGroupsToggle, 'aria-pressed', 'true');
+      await this.waitForAttributeValue(css.showAllGroupsToggle, 'aria-pressed', 'true', ms);
     } catch (err) {
       await this.handleError(
         "Groups step - 'Show groups from all ID providers' toggle should be pressed",

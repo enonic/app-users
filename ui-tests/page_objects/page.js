@@ -817,14 +817,14 @@ class Page {
   }
 
   // checks the attribute value (actual value === expected value)
-  async waitForAttributeValue(locator, attrName, expectedValue) {
+  async waitForAttributeValue(locator, attrName, expectedValue, ms = appConst.TIMEOUT.MEDIUM) {
     await this.getBrowser().waitUntil(
       async () => {
         let text = await this.getAttribute(locator, attrName);
         return text === expectedValue;
       },
       {
-        timeout: appConst.TIMEOUT.MEDIUM,
+        timeout: ms,
         timeoutMsg: `Expected attribute ${attrName} is not set in the element ${locator}`,
       },
     );

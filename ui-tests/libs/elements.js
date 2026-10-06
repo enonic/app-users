@@ -45,8 +45,6 @@ const TREE_GRID = {
   TREE_ITEM_DIV: "//div[contains(@role,'treeitem') and descendant::small]",
   TREE_LIST_ITEM_CHECKBOX_LABEL: "//div[@role='checkbox']",
   TREE_LIST_ITEM_CHECKBOX_CHECKED: "//div[@role='checkbox' and @aria-checked='true']",
-  SORT_DIALOG_TOGGLE: "//div[contains(@class,'sort-dialog-trigger')]",
-  EXPANDER_ICON_DIV: "//div[contains(@class,'toggle icon-arrow_drop_up')]",
   GRID_LIST_ROW: `//div[@data-component='GridList']//div[@data-component='GridList.Row']`,
 };
 

@@ -1,8 +1,10 @@
+/**
+ * Created on 24.09.2026
+ */
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 const appConst = require('./app_const');
 const webDriverHelper = require('./WebDriverHelper');
-const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 const MenuSectionsRail = require('../page_objects/menu.sections.rail');
 const UsersPage = require('../page_objects/users/users.page');
 const UserEditorIdProviderStepDialog = require('../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
@@ -18,9 +20,7 @@ const IdProviderEditorSummaryStepDialog = require('../page_objects/providers/pro
 const fs = require('fs');
 const path = require('path');
 
-// The one place the XP admin address is set: 'base.url' in browser.properties, which both runners
-// (wdio.chrome.conf.js and WebDriverHelper) open the browser at. Normalised to a trailing slash so
-// paths can be appended to it.
+// 'base.url' from browser.properties, the address the runner opens the browser at.
 const propertiesReaderModule = require('properties-reader');
 const propertiesReader =
   propertiesReaderModule.propertiesReader ||

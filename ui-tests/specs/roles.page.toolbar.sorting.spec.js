@@ -7,7 +7,7 @@ const appConst = require('../libs/app_const');
 const assert = require('node:assert');
 const RolesPage = require('../page_objects/roles/roles.page');
 
-describe('roles.browse.panel.toolbar.spec - ui-tests to verify state of buttons in the roles page toolbar', function () {
+describe('roles.page.toolbar.sorting.spec - Roles page: New is enabled and Delete disabled with nothing selected, and the Sort by menu sets the order', function () {
   this.timeout(appConst.SUITE_TIMEOUT);
   if (typeof browser === 'undefined') {
     webDriverHelper.setupBrowser();
