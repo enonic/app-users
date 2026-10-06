@@ -1,7 +1,9 @@
 import { Combobox, Listbox } from '@enonic/ui';
-import { useId, useMemo, useState } from 'preact/hooks';
+import { ShieldLock } from 'lucide-react';
+import { useMemo, useState } from 'preact/hooks';
 
 import { useI18n } from '../../../shared/i18n';
+import { ItemLabel } from '../../../shared/ui/ItemLabel';
 import { searchIdProviderNames } from '../model/id-provider-search';
 import type { IdProviderName } from '../model/principal.types';
 
@@ -20,7 +22,10 @@ export type IdProviderSelectorProps = {
 
 const ID_PROVIDER_SELECTOR_NAME = 'IdProviderSelector';
 
-/** Picks one provider from the ones already loaded, narrowing the list as the user types. */
+/**
+ * Picks one provider from the ones already loaded, narrowing the list as the user types. Laid out as
+ * `PrincipalPicker` is — the search above, the pick in a row below it — so the dialogs read alike.
+ */
 export function IdProviderSelector({
   providers,
   value,
@@ -30,8 +35,6 @@ export function IdProviderSelector({
   error = false,
   loading = false,
 }: IdProviderSelectorProps) {
-  const valueId = useId();
-
   const searchingLabel = useI18n('principal.picker.searching');
   const noMatchesLabel = useI18n('principal.picker.noMatches');
 
@@ -39,8 +42,10 @@ export function IdProviderSelector({
   const [open, setOpen] = useState(false);
   const selection = useMemo(() => (value.length > 0 ? [value] : []), [value]);
 
-  const picked = providers.find(({ key }) => key === value);
-  const pickedName = picked?.displayName ?? value;
+  const picked =
+    value.length > 0
+      ? (providers.find(({ key }) => key === value) ?? { key: value, displayName: value })
+      : undefined;
   const offered = searchIdProviderNames(providers, query);
 
   const handleOpenChange = (next: boolean): void => {
@@ -59,7 +64,7 @@ export function IdProviderSelector({
   };
 
   return (
-    <div data-component={ID_PROVIDER_SELECTOR_NAME}>
+    <div data-component={ID_PROVIDER_SELECTOR_NAME} className="flex flex-col gap-1.5">
       <Combobox
         open={open}
         onOpenChange={handleOpenChange}
@@ -75,17 +80,6 @@ export function IdProviderSelector({
           <Combobox.Control>
             <Combobox.Search>
               <Combobox.SearchIcon />
-              <Combobox.Value
-                id={valueId}
-                aria-labelledby={`${labelledBy} ${valueId}`}
-                aria-invalid={error || undefined}
-              >
-                {value.length > 0 ? (
-                  <span className="truncate">{pickedName}</span>
-                ) : (
-                  <span className="text-subtle truncate">{placeholder}</span>
-                )}
-              </Combobox.Value>
               <Combobox.Input aria-labelledby={labelledBy} placeholder={placeholder} />
               <Combobox.Toggle />
             </Combobox.Search>
@@ -102,9 +96,9 @@ export function IdProviderSelector({
                   <p className="text-subtle px-2.5 py-1 text-sm">{noMatchesLabel}</p>
                 )}
 
-                {offered.map(({ key, displayName }) => (
-                  <Listbox.Item key={key} value={key} className="px-2.5 py-1.5">
-                    <span className="truncate">{displayName}</span>
+                {offered.map((provider) => (
+                  <Listbox.Item key={provider.key} value={provider.key} className="px-2.5 py-1.5">
+                    <IdProviderLabel className="flex-1" provider={provider} />
                   </Listbox.Item>
                 ))}
               </Combobox.ListContent>
@@ -112,8 +106,34 @@ export function IdProviderSelector({
           </Combobox.Portal>
         </Combobox.Content>
       </Combobox>
+
+      {picked !== undefined && (
+        <div data-component="IdProviderSelector.Picked" className="px-2 py-2.5">
+          <IdProviderLabel provider={picked} />
+        </div>
+      )}
     </div>
   );
 }
 
 IdProviderSelector.displayName = ID_PROVIDER_SELECTOR_NAME;
+
+//
+// * Internal
+//
+
+type IdProviderLabelProps = {
+  provider: IdProviderName;
+  className?: string;
+};
+
+function IdProviderLabel({ provider, className }: IdProviderLabelProps) {
+  return (
+    <ItemLabel
+      className={className}
+      icon={<ShieldLock size={28} strokeWidth={1.5} aria-hidden />}
+      primary={provider.displayName}
+      secondary={provider.key}
+    />
+  );
+}

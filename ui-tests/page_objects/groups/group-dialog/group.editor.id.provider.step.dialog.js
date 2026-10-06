@@ -13,14 +13,16 @@ const DIALOG = GroupEditorStepDialog.css.container;
 const SELECTOR = `${DIALOG} [data-component='IdProviderSelector']`;
 
 const css = {
-  // The closed selector: a button with the picked provider, swapped for the search input on open.
-  selectorTrigger: `${SELECTOR} [data-component='Combobox.Value']`,
-  selectorValue: `${SELECTOR} [data-component='Combobox.Value']`,
+  // A search field above the picked provider's row, laid out as the principal pickers are.
   searchInput: `${SELECTOR} [data-component='Combobox.Input']`,
+  toggle: `${SELECTOR} [data-component='Combobox.Toggle']`,
+  pickedName: `${SELECTOR} [data-component='IdProviderSelector.Picked'] [data-component='ItemLabel'] span.font-semibold`,
   // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
   options: "[data-component='Combobox.Popup'] [data-component='Listbox.Item']",
   optionByKey: (key) =>
     `[data-component='Combobox.Popup'] [data-component='Listbox.Item'][data-value='${key}']`,
+  // The display name inside an option: the key is shown under it.
+  optionName: "[data-component='ItemLabel'] span.font-semibold",
   validationMessages: `${DIALOG} [data-registry-id='idProvider'] p.text-error`,
   noProvidersNotice: `${DIALOG} [data-registry-id='idProvider'] p a`,
 };
@@ -31,28 +33,28 @@ class GroupEditorIdProviderStepDialog extends GroupEditorStepDialog {
   }
 
   get selectorTrigger() {
-    return css.selectorTrigger;
+    return css.searchInput;
   }
 
-  // The provider shown in the closed selector, e.g. 'System Id Provider', or the placeholder
-  // 'Select an ID provider' while none is picked.
+  // Display name of the picked provider, e.g. 'System Id Provider', or undefined while none is.
   async getSelectedIdProvider() {
-    await this.waitForElementDisplayed(css.selectorValue);
-    return await this.getText(css.selectorValue);
+    const picked = await this.getDisplayedElements(css.pickedName);
+    return picked.length === 0 ? undefined : await picked[0].getText();
   }
 
   isIdProviderSelectorDisplayed() {
-    return this.isElementDisplayed(css.selectorTrigger);
+    return this.isElementDisplayed(css.searchInput);
   }
 
   isIdProviderSelectorEnabled() {
-    return this.isElementEnabled(css.selectorTrigger);
+    return this.isElementEnabled(css.searchInput);
   }
 
+  // Opens the popup with the toggle: a click on the input alone does not open it.
   async clickOnIdProviderSelector() {
     try {
-      await this.waitForElementDisplayed(css.selectorTrigger);
-      await this.clickOnElement(css.selectorTrigger);
+      await this.waitForElementDisplayed(css.toggle);
+      await this.clickOnElement(css.toggle);
       await this.waitForElementDisplayed(css.options);
       return await this.pause(200);
     } catch (err) {
@@ -64,10 +66,9 @@ class GroupEditorIdProviderStepDialog extends GroupEditorStepDialog {
     }
   }
 
-  // Opens the selector and types into its search, narrowing the options by display name or key.
+  // Types into the search, which opens the popup and narrows it by display name or key.
   async typeInIdProviderSearch(text) {
     try {
-      await this.clickOnIdProviderSelector();
       await this.waitForElementDisplayed(css.searchInput);
       await this.typeTextInInput(css.searchInput, text);
       return await this.pause(300);
@@ -83,17 +84,17 @@ class GroupEditorIdProviderStepDialog extends GroupEditorStepDialog {
   // Display names of the providers offered in the opened selector.
   async getIdProviderOptions() {
     await this.waitForElementDisplayed(css.options);
-    return await this.getTextInDisplayedElements(css.options);
+    return await this.getTextInDisplayedElements(`${css.options} ${css.optionName}`);
   }
 
   // Opens the selector and picks the provider by its display name. An option carries only the
-  // provider's key (`data-value`), so the text of each option is compared.
+  // provider's key (`data-value`), so the display name of each option is compared.
   async selectIdProvider(displayName) {
     try {
       await this.clickOnIdProviderSelector();
       const options = await this.getDisplayedElements(css.options);
       for (const option of options) {
-        if ((await option.getText()) === displayName) {
+        if ((await option.$(css.optionName).getText()) === displayName) {
           await option.click();
           return await this.pause(300);
         }
