@@ -463,17 +463,17 @@ module.exports = {
     );
   },
 
-  // The key of an ID provider application from its display name ('Standard ID Provider'); a key
-  // ('com.enonic.xp.app.standardidprovider') is returned as is.
+  // The key of an ID provider application from its display name ('Standard ID Provider') or its
+  // key ('com.enonic.xp.app.standardidprovider'): the installed applications are read and the text
+  // is matched against both, since a display name may well contain a period.
   async resolveIdProviderApplicationKey(application) {
-    if (application.includes('.')) {
-      return application;
-    }
     const data = await this.sendGraphQlRequest(
       '{ idProviderApplications { key displayName } }',
       {},
     );
-    const found = data.idProviderApplications.find((app) => app.displayName === application);
+    const found =
+      data.idProviderApplications.find((app) => app.key === application) ??
+      data.idProviderApplications.find((app) => app.displayName === application);
     if (found === undefined) {
       throw new Error(
         `Unknown ID provider application '${application}'. Installed: ` +
