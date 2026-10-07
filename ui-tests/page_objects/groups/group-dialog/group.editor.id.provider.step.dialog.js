@@ -1,126 +1,90 @@
 /**
  * Created on 01.10.2026.
  *
- * 'ID provider' step of the group editor: the first step of a new group, one selector with the
- * providers to create the group in. Not shown when an existing group is edited (the provider is then
- * read-only on the General step). With no provider to choose, the step shows a notice with a link to
- * the ID Providers section instead.
+ * 'ID provider' step of the group editor: the first step of a new group, the ID provider combobox
+ * (idprovider.combobox.js) with the providers to create the group in. Not shown when an existing
+ * group is edited (the provider is then read-only on the General step).
  */
 const GroupEditorStepDialog = require('./group.editor.step.dialog');
+const IdProviderCombobox = require('../../idprovider.combobox');
 const appConst = require('../../../libs/app_const');
 
 const DIALOG = GroupEditorStepDialog.css.container;
-const TRIGGER =
-  `${DIALOG} [data-component='Selector.Trigger']` +
-  "[aria-labelledby='group-editor-id-provider-label']";
-
-const css = {
-  selectorTrigger: TRIGGER,
-  selectorValue: `${TRIGGER} [data-component='Selector.Value']`,
-  // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
-  options: "[data-component='SelectorPopup'] [data-component='Selector.Item']",
-  optionByKey: (key) =>
-    `[data-component='SelectorPopup'] [data-component='Selector.Item'][data-value='${key}']`,
-  validationMessages: `${DIALOG} [data-registry-id='idProvider'] p.text-error`,
-  noProvidersNotice: `${DIALOG} [data-registry-id='idProvider'] p a`,
-};
 
 class GroupEditorIdProviderStepDialog extends GroupEditorStepDialog {
+  constructor(sectionId = appConst.SECTION_ID.GROUPS) {
+    super(sectionId);
+    this.combobox = new IdProviderCombobox({ sectionId, container: DIALOG });
+  }
+
   get step() {
     return GroupEditorStepDialog.STEP.ID_PROVIDER;
   }
 
-  get selectorTrigger() {
-    return css.selectorTrigger;
+  // The combobox
+
+  // The provider picked, e.g. 'System Id Provider' - or undefined while none is.
+  getSelectedIdProvider() {
+    return this.combobox.getSelectedOption();
   }
 
-  // The provider shown in the closed selector, e.g. 'System Id Provider', or the placeholder
-  // 'Select an ID provider' while none is picked.
-  async getSelectedIdProvider() {
-    await this.waitForElementDisplayed(css.selectorValue);
-    return await this.getText(css.selectorValue);
+  waitForSelectedIdProvider(displayName) {
+    return this.combobox.waitForSelectedOption(displayName);
   }
 
   isIdProviderSelectorDisplayed() {
-    return this.isElementDisplayed(css.selectorTrigger);
+    return this.combobox.isDisplayed();
   }
 
   isIdProviderSelectorEnabled() {
-    return this.isElementEnabled(css.selectorTrigger);
+    return this.combobox.isEnabled();
   }
 
-  async clickOnIdProviderSelector() {
-    try {
-      await this.waitForElementDisplayed(css.selectorTrigger);
-      await this.clickOnElement(css.selectorTrigger);
-      await this.waitForElementDisplayed(css.options);
-      return await this.pause(200);
-    } catch (err) {
-      await this.handleError(
-        'New group dialog - ID provider selector',
-        'err_id_provider_selector',
-        err,
-      );
-    }
+  // Drops the list of providers down.
+  clickOnIdProviderSelector() {
+    return this.combobox.openDropdown();
   }
 
-  // Display names of the providers offered in the opened selector.
-  async getIdProviderOptions() {
-    await this.waitForElementDisplayed(css.options);
-    return await this.getTextInDisplayedElements(css.options);
+  // Display names of the providers offered in the opened list.
+  getIdProviderOptions() {
+    return this.combobox.getOptionDisplayNames();
   }
 
-  // Opens the selector and picks the provider by its display name. An option carries only the
-  // provider's key (`data-value`), so the text of each option is compared.
-  async selectIdProvider(displayName) {
-    try {
-      await this.clickOnIdProviderSelector();
-      const options = await this.getDisplayedElements(css.options);
-      for (const option of options) {
-        if ((await option.getText()) === displayName) {
-          await option.click();
-          return await this.pause(300);
-        }
-      }
-      throw new Error(`no option with the display name '${displayName}'`);
-    } catch (err) {
-      await this.handleError(
-        `New group dialog - ID provider '${displayName}' was not selected`,
-        'err_select_id_provider',
-        err,
-      );
-    }
+  typeInIdProviderFilterInput(text) {
+    return this.combobox.typeTextInFilterInput(text);
   }
 
-  // Opens the selector and picks the provider by its key, e.g. 'system'.
-  async selectIdProviderByKey(key) {
-    try {
-      await this.clickOnIdProviderSelector();
-      await this.waitForElementDisplayed(css.optionByKey(key));
-      await this.clickOnElement(css.optionByKey(key));
-      return await this.pause(300);
-    } catch (err) {
-      await this.handleError(
-        `New group dialog - ID provider '${key}' was not selected`,
-        'err_select_id_provider',
-        err,
-      );
-    }
+  clickOnIdProviderOption(displayName) {
+    return this.combobox.clickOnOption(displayName);
   }
 
-  // Texts of the validation messages shown under the selector, e.g. 'Select an ID provider'.
+  // Way 1: drops the list down and clicks the provider.
+  selectIdProvider(displayName) {
+    return this.combobox.selectOption(displayName);
+  }
+
+  // Way 2: filters by the display name and clicks the match.
+  doFilterAndSelectIdProviderByDisplayName(displayName) {
+    return this.combobox.filterAndSelectOption(displayName);
+  }
+
+  // By the provider's key, e.g. 'system'.
+  selectIdProviderByKey(key) {
+    return this.combobox.selectOptionByKey(key);
+  }
+
+  clickOnRemoveIdProviderButton() {
+    return this.combobox.clickOnRemoveButton();
+  }
+
+  // Texts of the validation messages shown under the combobox, e.g. 'Select an ID provider'.
   getValidationMessages() {
-    return this.getTextInDisplayedElements(css.validationMessages);
-  }
-
-  // The 'no ID providers' notice replaces the selector when there is none to choose from.
-  isNoProvidersNoticeDisplayed() {
-    return this.isElementDisplayed(css.noProvidersNotice);
+    return this.combobox.getValidationMessages();
   }
 
   // Flows
 
-  // Moves on to General, keeping the provider already shown in the selector.
+  // Moves on to General, keeping the provider already picked.
   async clickOnNextAndWaitForGeneralStep() {
     await this.clickOnNextButton();
     await this.waitForElementDisplayed(

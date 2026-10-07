@@ -13,14 +13,14 @@
  */
 const SectionPage = require('./section.page');
 const appConst = require('../libs/app_const');
+const { COMBOBOX, ITEM_LABEL } = require('../libs/elements');
 
 // The locators of a dialog, from the data-component of its content.
 function buildStepDialogCss(dialogComponent) {
   const DIALOG = `[data-component='${dialogComponent}'][data-state='open']`;
   const INDICATOR = `${DIALOG} [data-component='Dialog.StepIndicator']`;
   // The picker is told apart by the placeholder of its search input.
-  const PICKER = (placeholder) =>
-    `${DIALOG} [data-component='Combobox.Search']:has(input[placeholder='${placeholder}'])`;
+  const PICKER = (placeholder) => `${DIALOG} ${COMBOBOX.searchByPlaceholder(placeholder)}`;
   return {
     container: DIALOG,
     title: `${DIALOG} [data-component='Dialog.Title']`,
@@ -46,18 +46,16 @@ function buildStepDialogCss(dialogComponent) {
     stepPanel: (step) =>
       `${DIALOG} [data-component='Dialog.StepContent'][data-registry-id='${step}']:not([hidden])`,
     // Principal picker: a combobox above a list of the picked principals.
-    pickerInput: (placeholder) =>
-      `${DIALOG} [data-component='Combobox.Input'][placeholder='${placeholder}']`,
-    pickerToggle: (placeholder) => `${PICKER(placeholder)} [data-component='Combobox.Toggle']`,
-    pickerApply: (placeholder) => `${PICKER(placeholder)} [data-component='Combobox.Apply']`,
+    pickerInput: (placeholder) => `${DIALOG} ${COMBOBOX.inputByPlaceholder(placeholder)}`,
+    pickerToggle: (placeholder) => `${PICKER(placeholder)} ${COMBOBOX.TOGGLE}`,
+    pickerApply: (placeholder) => `${PICKER(placeholder)} ${COMBOBOX.APPLY}`,
     // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
-    pickerPopup: "[data-component='Combobox.Popup']",
-    pickerOptions: "[data-component='Combobox.Popup'] [data-component='Listbox.Item']",
-    pickerOptionByKey: (key) =>
-      `[data-component='Combobox.Popup'] [data-component='Listbox.Item'][data-value='${key}']`,
-    pickerEmptyMessage: "[data-component='Combobox.Popup'] p",
+    pickerPopup: COMBOBOX.POPUP,
+    pickerOptions: COMBOBOX.OPTIONS,
+    pickerOptionByKey: COMBOBOX.optionByValue,
+    pickerEmptyMessage: COMBOBOX.POPUP_MESSAGE,
     // The display name inside an option or a picked row
-    principalDisplayName: "[data-component='ItemLabel'] span.font-semibold",
+    principalDisplayName: ITEM_LABEL.DISPLAY_NAME,
     pickedRows: (step) => `${DIALOG} [data-registry-id='${step}'] [data-component='GridList.Row']`,
     pickedRemoveButton: (step, displayName) =>
       `${DIALOG} [data-registry-id='${step}'] [data-component='GridList.Row'] ` +

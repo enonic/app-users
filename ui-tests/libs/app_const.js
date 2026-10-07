@@ -79,6 +79,14 @@ module.exports = Object.freeze({
   idProviderDeletedMessage: (displayName) => `"${displayName}" deleted`,
   // Access levels of the ID provider editor's Permissions step, widening (phrases:
   // idProviders.dialog.access.*).
+  // The GraphQL endpoint of a section (extensions/section-endpoint), relative to the admin origin.
+  // One schema serves every section, so any of them takes any query; the gate differs per section.
+  GRAPHQL_API: {
+    USERS:
+      '/admin/com.enonic.xp.app.settings/main/_/admin:extension/com.enonic.xp.app.users:users/graphql',
+    ID_PROVIDERS:
+      '/admin/com.enonic.xp.app.settings/main/_/admin:extension/com.enonic.xp.app.users:id-providers/graphql',
+  },
   ID_PROVIDER_ACCESS: {
     READ: 'Read',
     CREATE_USERS: 'Create users',

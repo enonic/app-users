@@ -74,12 +74,14 @@ module.exports = {
   nameOf,
 
   // { idProvider, displayName, id, email, password, roles, groups }
-  // `idProvider` is the display name shown in the ID provider step's selector.
+  // `idProvider` is the display name shown in the ID provider step's combobox. It has no default:
+  // the system ID provider takes service accounts only (buildServiceAccount), so a user needs one
+  // the test made or knows.
   buildUser(...args) {
     const overrides = overridesFrom(args, ['displayName', 'password', 'email', 'roles']);
     const { displayName, id } = named('User', overrides);
     return {
-      idProvider: overrides.idProvider ?? SYSTEM_ID_PROVIDER_DISPLAY_NAME,
+      idProvider: overrides.idProvider,
       displayName,
       id,
       // `name` is what the old wizard called the id; kept so either reads.

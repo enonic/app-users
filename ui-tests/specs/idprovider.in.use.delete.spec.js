@@ -18,8 +18,20 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
 
   let ID_PROVIDER;
   const PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
-  const PROVIDER_ID = userItemsBuilder.generateRandomName('id');
   let USER_NAME = userItemsBuilder.generateRandomName('user');
+
+  it('WHEN Users page is loaded THEN New button should be enabled AND Delete is disabled', async () => {
+    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
+    let usersPage = new UsersPage();
+    // 1. Verify that New button is enabled.
+    await usersPage.waitForNewButtonEnabled();
+    // 2. Verify that Delete button is disabled.
+    await usersPage.waitForDeleteButtonDisabled();
+    await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
+    //await usersPage.waitForSelectedSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
+    let actual = await usersPage.getSelectedSortOrder();
+    assert.equal(actual, appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
+  });
 
   it('WHEN new created idProvider has been selected THEN Delete button should be enabled', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
@@ -29,10 +41,13 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
       description: 'description',
       application: 'Standard ID Provider',
     });
+    // 1. Create a new ID provider in the editor (not via the API).
     await settingsUtils.createIdProvider(ID_PROVIDER);
     let idProvidersPage = new IdProvidersPage();
+    // 2. Select the new ID provider: Delete gets enabled.
     await idProvidersPage.clickOnRowByDisplayName(ID_PROVIDER.displayName);
     await idProvidersPage.waitForDeleteButtonEnabled();
+    // 3. Verify that New button is enabled.
     await idProvidersPage.waitForNewButtonEnabled();
   });
 
@@ -43,11 +58,15 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
       idProvider: ID_PROVIDER.displayName,
       email: userItemsBuilder.generateEmail(USER_NAME),
     });
+    // 1. Create a new user in the editor (not via the API).
     await settingsUtils.createUser(user);
     let usersPage = new UsersPage();
+    // 2. Select the new user
     await usersPage.clickOnRowByDisplayName(user.displayName);
+    // 3. Verify that Delete button is enabled.
     await usersPage.waitForDeleteButtonEnabled();
     await usersPage.waitForNewButtonEnabled();
+    // 4. Verify that the ID provider of the user is correct in the row.
     let userIdProvider = await usersPage.getUserIdProviderByDisplayName(user.displayName);
     assert.equal(userIdProvider, ID_PROVIDER.displayName);
   });
@@ -120,19 +139,6 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
     await idProvidersPage.waitForRowByDisplayNameNotDisplayed(ID_PROVIDER.displayName);
     // TODO bug
     //await idProvidersPage.waitForDeleteButtonDisabled();
-  });
-
-  it('WHEN Users page is loaded THEN New button should be enabled AND Delete is disabled', async () => {
-    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    // 1. Verify that New button is enabled.
-    await usersPage.waitForNewButtonEnabled();
-    // 2. Verify that Delete button is disabled.
-    await usersPage.waitForDeleteButtonDisabled();
-    await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
-    //await usersPage.waitForSelectedSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
-    let actual = await usersPage.getSelectedSortOrder();
-    assert.equal(actual, appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
   });
 
   beforeEach(async () => {

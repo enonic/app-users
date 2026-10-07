@@ -296,8 +296,10 @@ module.exports = {
   // user to exist, not for the ones that test the editor itself - those walk the steps themselves.
   //
   // `user` is what users.items.builder.buildUser() returns: { idProvider, displayName, id, email,
-  // password?, roles?, groups? }. `idProvider` is a display name; when it is the one the step opens
-  // with, nothing is picked. An empty or missing `password`, `roles` or `groups` skips that step.
+  // password?, roles?, groups? }. `idProvider` is the display name of a provider the user may live
+  // in - required, the system ID provider takes service accounts only; when it is the one the step
+  // opens with, nothing is picked. An empty or missing `password`, `roles` or `groups` skips
+  // that step.
   //
   // Precondition: the Settings app is open (navigateToSettingsApp). The Users section is opened here.
   async createUser(user) {
@@ -308,13 +310,20 @@ module.exports = {
     const rolesStep = new UserEditorRolesStepDialog();
     const groupsStep = new UserEditorGroupsStepDialog();
     const summaryStep = new UserEditorSummaryStepDialog();
+    if (!user.idProvider) {
+      throw new Error(
+        `createUser: '${user.displayName}' names no ID provider. A user needs one (the system ID provider takes service accounts only): buildUser({ displayName, idProvider: <display name> })`,
+      );
+    }
     try {
       await this.navigateToExtension(appConst.EXTENSIONS.USERS);
       await usersPage.clickOnNewButton();
-      // 1. ID provider: picked only when the one shown is not the one asked for.
+      // 1. ID provider: picked only when the one shown is not the one asked for. Picked by filtering,
+      // the one way that does not depend on how long the list is - a test of the combobox itself
+      // walks the step on its own and picks the way it checks.
       await idProviderStep.waitForLoaded();
-      if (user.idProvider && (await idProviderStep.getSelectedIdProvider()) !== user.idProvider) {
-        await idProviderStep.selectIdProvider(user.idProvider);
+      if ((await idProviderStep.getSelectedIdProvider()) !== user.idProvider) {
+        await idProviderStep.doFilterAndSelectIdProviderByDisplayName(user.idProvider);
       }
       await idProviderStep.clickOnNextAndWaitForGeneralStep();
       // 2. General: display name, id, email.
@@ -394,6 +403,147 @@ module.exports = {
       );
     }
   },
+  // GraphQL API - the sections' own endpoint, called from the page the browser is on with its session
+  // cookie. The browser must be logged in (doLogin) and stay on the XP admin origin.
+
+  // Posts a GraphQL request from the current page and returns { status, text } without interpreting it.
+  async postGraphQl(url, query, variables) {
+    return await this.getBrowser().executeAsync(
+      function (url, query, variables, done) {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ query: query, variables: variables }),
+        })
+          .then(function (response) {
+            return response.text().then(function (text) {
+              done({ status: response.status, text: text });
+            });
+          })
+          .catch(function (err) {
+            done({ status: 0, text: String(err) });
+          });
+      },
+      url,
+      query,
+      variables,
+    );
+  },
+
+  // Sends a GraphQL request to the app's API and returns its 'data'. Throws on HTTP or GraphQL errors.
+  async sendGraphQlRequest(query, variables, url = appConst.GRAPHQL_API.ID_PROVIDERS) {
+    const result = await this.postGraphQl(url, query, variables);
+    let body;
+    try {
+      body = JSON.parse(result.text);
+    } catch {
+      throw new Error(`GraphQL: unexpected response (${result.status}): ${result.text}`);
+    }
+    if (result.status !== 200 || body.errors || body.error) {
+      throw new Error(`GraphQL request failed (${result.status}): ${result.text}`);
+    }
+    return body.data;
+  },
+
+  // The access enum the API takes ('WRITE_USERS') from the label the editor shows ('Write users',
+  // appConst.ID_PROVIDER_ACCESS.*); an enum value is returned as is.
+  resolveIdProviderAccess(access) {
+    const byLabel = Object.keys(appConst.ID_PROVIDER_ACCESS).find(
+      (name) => appConst.ID_PROVIDER_ACCESS[name] === access,
+    );
+    if (byLabel !== undefined) {
+      return byLabel;
+    }
+    if (Object.keys(appConst.ID_PROVIDER_ACCESS).includes(access)) {
+      return access;
+    }
+    throw new Error(
+      `Unknown access '${access}': use a label from appConst.ID_PROVIDER_ACCESS or its name`,
+    );
+  },
+
+  // The key of an ID provider application from its display name ('Standard ID Provider'); a key
+  // ('com.enonic.xp.app.standardidprovider') is returned as is.
+  async resolveIdProviderApplicationKey(application) {
+    if (application.includes('.')) {
+      return application;
+    }
+    const data = await this.sendGraphQlRequest(
+      '{ idProviderApplications { key displayName } }',
+      {},
+    );
+    const found = data.idProviderApplications.find((app) => app.displayName === application);
+    if (found === undefined) {
+      throw new Error(
+        `Unknown ID provider application '${application}'. Installed: ` +
+          data.idProviderApplications.map((app) => `${app.displayName} (${app.key})`).join(', '),
+      );
+    }
+    return found.key;
+  },
+
+  // Creates an ID provider through the GraphQL API instead of the editor. `idProvider` is what
+  // users.items.builder.buildIdProvider() returns: { displayName, id, description?, application?,
+  // permissions? }. `application` is a display name or a key. `permissions` is
+  // { '<principal key>': '<access>' } - keys, since the API grants to a key - added to the defaults a
+  // new provider starts from (the three the editor seeds); access is a label or an enum value.
+  // Returns the provider with its 'key'.
+  async createIdProviderViaApi(idProvider) {
+    const name = idProvider.id ?? idProvider.name ?? idProvider.displayName;
+    const application =
+      idProvider.application === undefined
+        ? undefined
+        : await this.resolveIdProviderApplicationKey(idProvider.application);
+    const defaults = await this.sendGraphQlRequest(
+      '{ defaultIdProviderPermissions { principal { key } access } }',
+      {},
+    );
+    const permissions = defaults.defaultIdProviderPermissions.map(({ principal, access }) => ({
+      principal: principal.key,
+      access,
+    }));
+    for (const [principal, access] of Object.entries(idProvider.permissions ?? {})) {
+      if (!/^(user|group|role):/.test(principal)) {
+        throw new Error(`A permission names a principal by key, got '${principal}'`);
+      }
+      permissions.push({ principal, access: this.resolveIdProviderAccess(access) });
+    }
+    const query = `mutation ($name: String!, $displayName: String!, $description: String, $application: String, $permissions: [IdProviderPermissionInput!]) {
+      createIdProvider(name: $name, displayName: $displayName, description: $description, application: $application, permissions: $permissions) {
+        key displayName
+      }
+    }`;
+    const data = await this.sendGraphQlRequest(query, {
+      name,
+      displayName: idProvider.displayName,
+      description: idProvider.description,
+      application,
+      permissions,
+    });
+    console.log('ID provider created via API: ' + data.createIdProvider.key);
+    return Object.assign({}, idProvider, { key: data.createIdProvider.key });
+  },
+
+  // Deletes ID providers through the GraphQL API. `keys` is a key ('myprovider'), a list of keys,
+  // or what createIdProviderViaApi() / buildIdProvider() returned (its 'key' or 'id' is taken).
+  // Throws when any was not deleted - a provider that still holds users or groups is refused.
+  async deleteIdProviderViaApi(keys) {
+    const list = []
+      .concat(keys)
+      .map((item) => (typeof item === 'string' ? item : (item.key ?? item.id)));
+    const query = `mutation ($keys: [String!]!) {
+      deleteIdProviders(keys: $keys) { key deleted reason }
+    }`;
+    const data = await this.sendGraphQlRequest(query, { keys: list });
+    const failed = data.deleteIdProviders.filter((item) => !item.deleted);
+    if (failed.length > 0) {
+      throw new Error('ID providers were not deleted: ' + JSON.stringify(failed));
+    }
+    console.log('ID providers deleted via API: ' + list.join(', '));
+    return data.deleteIdProviders;
+  },
+
   // Section-agnostic 'loaded' check for the browse screen: every section renders the same app bar
   // and toolbar, so this does not depend on a section-specific page object.
   //
