@@ -73,6 +73,7 @@ module.exports = Object.freeze({
   roleCreatedMessage: (displayName) => `Role "${displayName}" created`,
   idProviderCreatedMessage: (displayName) => `ID provider "${displayName}" created`,
   serviceAccountCreatedMessage: (displayName) => `Service account "${displayName}" created`,
+  serviceAccountUpdatedMessage: (displayName) => `Service account "${displayName}" updated`,
   // One deleted principal (user, service account, group, role) and several (phrases: principal.notify.*).
   principalDeletedMessage: (displayName) => `"${displayName}" deleted`,
   principalsDeletedMessage: (count) => `${count} items deleted`,

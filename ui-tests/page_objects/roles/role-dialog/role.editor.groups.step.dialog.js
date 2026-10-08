@@ -15,6 +15,11 @@ class RoleEditorGroupsStepDialog extends RoleEditorStepDialog {
     return RoleEditorStepDialog.STEP.GROUPS;
   }
 
+  // The picker of this step (principal.combobox.js), for what the methods here do not cover.
+  get combobox() {
+    return this.principalCombobox(GROUPS_PLACEHOLDER);
+  }
+
   get groupsFilterInput() {
     return RoleEditorStepDialog.css.pickerInput(GROUPS_PLACEHOLDER);
   }

@@ -37,6 +37,11 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
     return IdProviderEditorStepDialog.STEP.PERMISSIONS;
   }
 
+  // The picker of this step (principal.combobox.js), for what the methods here do not cover.
+  get combobox() {
+    return this.principalCombobox(PERMISSIONS_PLACEHOLDER);
+  }
+
   get permissionsFilterInput() {
     return IdProviderEditorStepDialog.css.pickerInput(PERMISSIONS_PLACEHOLDER);
   }

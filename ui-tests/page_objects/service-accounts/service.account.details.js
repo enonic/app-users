@@ -4,12 +4,13 @@
  * The details panel of a service account (pages/service-accounts/ServiceAccountDetails): the
  * header with the display name and the login, then the sections
  *
- *   Service account  - Type ('System'), Email ('Not set' when absent); Edit
+ *   Service account  - Email ('Not set' when absent), or Type ('System') in its place for the
+ *                      built-in accounts su and anonymous; Edit
  *   Credentials      - Password ('Set' / 'Not set'), the 'Public keys (N)' subsection with a row per
  *                      key (its label, its kid under it); Edit credentials
  *   Memberships      - the 'Transitive memberships' checkbox (only when the account may inherit any)
  *   Roles (N)        - the roles, one row each; Edit roles
- *   Groups (N)       - the groups with their ID provider on the right; Edit groups
+ *   Groups (N)       - the groups with the key of their ID provider on the right; Edit groups
  *
  * Everything generic is in DetailsPanel (details.panel.js); this class names the sections, the
  * fields and the buttons.
@@ -81,12 +82,12 @@ class ServiceAccountDetails extends DetailsPanel {
 
   // Service account
 
-  // 'System'
+  // 'System' - shown for the built-in accounts (su, anonymous) only; undefined for any other.
   getType() {
     return this.getFieldValue(SECTION.SERVICE_ACCOUNT, FIELD.TYPE);
   }
 
-  // The email, or 'Not set'
+  // The email, or 'Not set'; undefined for a built-in account, which shows its Type instead.
   getEmail() {
     return this.getFieldValue(SECTION.SERVICE_ACCOUNT, FIELD.EMAIL);
   }
@@ -108,6 +109,11 @@ class ServiceAccountDetails extends DetailsPanel {
 
   async isPasswordSet() {
     return (await this.getPassword()) === PASSWORD.SET;
+  }
+
+  // Waits for the Password field to read 'Set' or 'Not set' (ServiceAccountDetails.PASSWORD.*).
+  waitForPassword(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    return this.waitForFieldValue(SECTION.CREDENTIALS, FIELD.PASSWORD, expected, ms);
   }
 
   // The public keys as [{ title, subtitle }]: the key's label ('Unlabelled key' when it has none)
@@ -183,7 +189,7 @@ class ServiceAccountDetails extends DetailsPanel {
     return this.getListItemTitles(SECTION.GROUPS);
   }
 
-  // The groups as [{ title, subtitle, meta }], meta being the group's ID provider
+  // The groups as [{ title, subtitle, meta }], meta being the key of the group's ID provider
   getGroupItems() {
     return this.getListItems(SECTION.GROUPS);
   }

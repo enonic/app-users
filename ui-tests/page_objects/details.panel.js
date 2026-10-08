@@ -227,10 +227,27 @@ class DetailsPanel extends SectionPage {
     return fields[fieldLabel];
   }
 
+  // Waits for the field to read as expected - the panel re-reads the item after a save, so a check
+  // right after one has to wait.
+  async waitForFieldValue(sectionLabel, fieldLabel, expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.getFieldValue(sectionLabel, fieldLabel)) === expected,
+        { timeout: ms, timeoutMsg: `the ${fieldLabel} field should read '${expected}'` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `${this.panelName} - the ${fieldLabel} field should read '${expected}'`,
+        'err_details_field',
+        err,
+      );
+    }
+  }
+
   // Lists
 
   // The rows of the section's list as [{ title, subtitle, meta }] - a principal's display name, its
-  // name and the ID provider on the right (undefined when the row has none).
+  // name and the key of its ID provider ('system') on the right (undefined when the row has none).
   async getListItems(sectionLabel) {
     const section = await this.getSection(sectionLabel);
     const items = await section.$$(IN_SECTION.listItems);

@@ -26,6 +26,11 @@ class UserEditorGroupsStepDialog extends UserEditorStepDialog {
     return UserEditorStepDialog.STEP.GROUPS;
   }
 
+  // The picker of this step (principal.combobox.js), for what the methods here do not cover.
+  get combobox() {
+    return this.principalCombobox(GROUPS_PLACEHOLDER);
+  }
+
   get groupsFilterInput() {
     return UserEditorStepDialog.css.pickerInput(GROUPS_PLACEHOLDER);
   }
@@ -69,6 +74,11 @@ class UserEditorGroupsStepDialog extends UserEditorStepDialog {
   // Display names of the picked groups.
   getSelectedGroups() {
     return this.getPickedPrincipals();
+  }
+
+  // The ID provider shown beside the picked group - its key ('system'), not its display name.
+  getSelectedGroupIdProvider(displayName) {
+    return this.combobox.getSelectedOptionIdProvider(displayName);
   }
 
   waitForGroupSelected(displayName) {

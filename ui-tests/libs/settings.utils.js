@@ -13,6 +13,12 @@ const UserEditorCredentialsStepDialog = require('../page_objects/users/user-dial
 const UserEditorRolesStepDialog = require('../page_objects/users/user-dialog/user.editor.roles.step.dialog');
 const UserEditorGroupsStepDialog = require('../page_objects/users/user-dialog/user.editor.groups.step.dialog');
 const UserEditorSummaryStepDialog = require('../page_objects/users/user-dialog/user.editor.summary.step.dialog');
+const ServiceAccountsPage = require('../page_objects/service-accounts/service.accounts.page');
+const ServiceAccountEditorGeneralStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.general.step.dialog');
+const ServiceAccountEditorCredentialsStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.credentials.step.dialog');
+const ServiceAccountEditorRolesStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.roles.step.dialog');
+const ServiceAccountEditorGroupsStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.groups.step.dialog');
+const ServiceAccountEditorSummaryStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.summary.step.dialog');
 const IdProvidersPage = require('../page_objects/providers/id.providers.page');
 const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
 const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
@@ -361,6 +367,63 @@ module.exports = {
       );
     }
   },
+  // Creates a service account through its editor and returns when it is listed. For the tests that
+  // need an account to exist, not for the ones that test the editor itself.
+  //
+  // `serviceAccount` is what users.items.builder.buildServiceAccount() returns: { displayName, id,
+  // email?, password?, roles?, groups? }. A service account lives in the system ID provider, so
+  // there is no ID provider step: the editor opens on General. An empty or missing `password`,
+  // `roles` or `groups` skips that step.
+  //
+  // Precondition: the Settings app is open (navigateToSettingsApp). The Service Accounts section is
+  // opened here.
+  async createServiceAccount(serviceAccount) {
+    const serviceAccountsPage = new ServiceAccountsPage();
+    const generalStep = new ServiceAccountEditorGeneralStepDialog();
+    const credentialsStep = new ServiceAccountEditorCredentialsStepDialog();
+    const rolesStep = new ServiceAccountEditorRolesStepDialog();
+    const groupsStep = new ServiceAccountEditorGroupsStepDialog();
+    const summaryStep = new ServiceAccountEditorSummaryStepDialog();
+    try {
+      await this.navigateToExtension(appConst.EXTENSIONS.SERVICE_ACCOUNTS);
+      await serviceAccountsPage.clickOnNewButton();
+      // 1. General: display name, id, email - the first step, no ID provider to pick.
+      await generalStep.waitForLoaded();
+      await generalStep.typeDataAndClickOnNext(serviceAccount);
+      // 2. Credentials: a password, when there is one.
+      await credentialsStep.waitForLoaded();
+      if (serviceAccount.password) {
+        await credentialsStep.setPassword(serviceAccount.password);
+      }
+      await credentialsStep.clickOnNextButton();
+      // 3. Roles
+      await rolesStep.waitForLoaded();
+      if (serviceAccount.roles && serviceAccount.roles.length > 0) {
+        await rolesStep.addRoles(serviceAccount.roles);
+      }
+      await rolesStep.clickOnNextButton();
+      // 4. Groups
+      await groupsStep.waitForLoaded();
+      if (serviceAccount.groups && serviceAccount.groups.length > 0) {
+        await groupsStep.addGroups(serviceAccount.groups);
+      }
+      await groupsStep.clickOnNextButton();
+      // 5. Summary → Create; the toast confirms and the row appears.
+      await summaryStep.waitForLoaded();
+      await summaryStep.clickOnCreateButtonAndWaitForClosed();
+      await serviceAccountsPage.waitForExpectedNotificationMessage(
+        appConst.serviceAccountCreatedMessage(serviceAccount.displayName),
+      );
+      await serviceAccountsPage.waitForRowByDisplayNameDisplayed(serviceAccount.displayName);
+      return serviceAccount;
+    } catch (err) {
+      const screenshot = await this.saveScreenshotUniqueName('err_create_service_account');
+      throw new Error(
+        `Service account '${serviceAccount.displayName}' was not created, screenshot: ${screenshot} ` +
+          err,
+      );
+    }
+  },
   // Creates an ID provider through its editor and returns when it is listed. For the tests that
   // need a provider to exist, not for the ones that test the editor itself.
   //
@@ -522,7 +585,26 @@ module.exports = {
       permissions,
     });
     console.log('ID provider created via API: ' + data.createIdProvider.key);
+    await this.waitForIdProviderListed(data.createIdProvider.key);
     return Object.assign({}, idProvider, { key: data.createIdProvider.key });
+  },
+
+  // Waits until the list of ID providers (the search index) holds the key. A create leaves the index
+  // stale for a moment, and `createUser` / `createGroup` check the provider against that list
+  // (`requireIdProvider`), so a group or user made in a provider right after it was created is
+  // refused with 'No ID provider answers to [key]' until the index has caught up.
+  async waitForIdProviderListed(key, ms = appConst.TIMEOUT.LONG) {
+    const deadline = Date.now() + ms;
+    for (;;) {
+      const data = await this.sendGraphQlRequest('{ idProviders { key } }', {});
+      if (data.idProviders.some((provider) => provider.key === key)) {
+        return;
+      }
+      if (Date.now() >= deadline) {
+        throw new Error(`The ID provider '${key}' is still not listed after ${ms} ms`);
+      }
+      await this.getBrowser().pause(300);
+    }
   },
 
   // Deletes ID providers through the GraphQL API. `keys` is a key ('myprovider'), a list of keys,
@@ -542,6 +624,116 @@ module.exports = {
     }
     console.log('ID providers deleted via API: ' + list.join(', '));
     return data.deleteIdProviders;
+  },
+
+  // The key of an ID provider from its key ('system') or its display name ('System Id Provider').
+  // A key is read directly (`idProvider(key)`, a get), which sees a provider the moment it is
+  // created; the list (`idProviders`) comes from the search index, which a create leaves stale for
+  // a moment, so a display name is looked up with a few retries. The get is only tried for a text
+  // that can be a key: the server rejects one with a space ("IdProviderKey must not contain ' '")
+  // instead of answering null, and a display name like 'System Id Provider' has them.
+  async resolveIdProviderKey(idProvider) {
+    if (!/\s/.test(idProvider)) {
+      const byKey = await this.sendGraphQlRequest(
+        'query ($key: String!) { idProvider(key: $key) { key } }',
+        {
+          key: idProvider,
+        },
+      );
+      if (byKey.idProvider !== null && byKey.idProvider !== undefined) {
+        return byKey.idProvider.key;
+      }
+    }
+    let providers = [];
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const data = await this.sendGraphQlRequest('{ idProviders { key displayName } }', {});
+      providers = data.idProviders;
+      const found = providers.find((provider) => provider.displayName === idProvider);
+      if (found !== undefined) {
+        return found.key;
+      }
+      await this.getBrowser().pause(300);
+    }
+    throw new Error(
+      `Unknown ID provider '${idProvider}'. Existing: ` +
+        providers.map((provider) => `${provider.displayName} (${provider.key})`).join(', '),
+    );
+  },
+
+  // The keys of roles from their display names ('Users App') - a principal key ('role:...') is
+  // taken as is. Read once for the whole list.
+  async resolveRoleKeys(roles) {
+    const names = roles.filter((role) => !role.startsWith('role:'));
+    if (names.length === 0) {
+      return [...roles];
+    }
+    const data = await this.sendGraphQlRequest('{ roles { key displayName } }', {});
+    return roles.map((role) => {
+      if (role.startsWith('role:')) {
+        return role;
+      }
+      const found = data.roles.find((item) => item.displayName === role);
+      if (found === undefined) {
+        throw new Error(
+          `Unknown role '${role}': use a display name from appConst.SYSTEM_ROLES or a key 'role:...'`,
+        );
+      }
+      return found.key;
+    });
+  },
+
+  // Creates a group through the GraphQL API instead of the editor. `group` is what
+  // users.items.builder.buildGroup() returns: { idProvider, displayName, id, description?, members?,
+  // roles? }. `idProvider` is a display name or a key; `roles` are display names or 'role:' keys;
+  // `members` are principal keys ('user:system:bob', 'group:system:editors') - the API grants
+  // membership to a key, and a display name is not one. Returns the group with its 'key'.
+  async createGroupViaApi(group) {
+    if (!group.idProvider) {
+      throw new Error(`createGroupViaApi: '${group.displayName}' names no ID provider`);
+    }
+    const members = group.members ?? [];
+    const notKeys = members.filter((member) => !/^(user|group):/.test(member));
+    if (notKeys.length > 0) {
+      throw new Error(
+        `createGroupViaApi: members are principal keys ('user:<provider>:<name>'), got '${notKeys.join("', '")}'`,
+      );
+    }
+    const query = `mutation ($idProvider: String!, $name: String!, $displayName: String!, $description: String, $members: [String!], $roles: [String!]) {
+      createGroup(idProvider: $idProvider, name: $name, displayName: $displayName, description: $description, members: $members, roles: $roles) {
+        key displayName
+      }
+    }`;
+    const data = await this.sendGraphQlRequest(query, {
+      idProvider: await this.resolveIdProviderKey(group.idProvider),
+      name: group.id ?? group.name ?? group.displayName,
+      displayName: group.displayName,
+      description: group.description,
+      members,
+      roles: await this.resolveRoleKeys(group.roles ?? []),
+    });
+    console.log('Group created via API: ' + data.createGroup.key);
+    return Object.assign({}, group, { key: data.createGroup.key });
+  },
+
+  // Deletes principals (users, groups, roles) through the GraphQL API. `keys` is a principal key, a
+  // list of them, or what a create*ViaApi() returned (its 'key' is taken). Throws when any was not
+  // deleted.
+  async deletePrincipalsViaApi(keys) {
+    const list = [].concat(keys).map((item) => (typeof item === 'string' ? item : item.key));
+    const query = `mutation ($keys: [String!]!) {
+      deletePrincipals(keys: $keys) { key deleted reason }
+    }`;
+    const data = await this.sendGraphQlRequest(query, { keys: list });
+    const failed = data.deletePrincipals.filter((item) => !item.deleted);
+    if (failed.length > 0) {
+      throw new Error('Principals were not deleted: ' + JSON.stringify(failed));
+    }
+    console.log('Principals deleted via API: ' + list.join(', '));
+    return data.deletePrincipals;
+  },
+
+  deleteGroupViaApi(keys) {
+    return this.deletePrincipalsViaApi(keys);
   },
 
   // Section-agnostic 'loaded' check for the browse screen: every section renders the same app bar

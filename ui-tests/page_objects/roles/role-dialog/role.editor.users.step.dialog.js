@@ -15,6 +15,11 @@ class RoleEditorUsersStepDialog extends RoleEditorStepDialog {
     return RoleEditorStepDialog.STEP.USERS;
   }
 
+  // The picker of this step (principal.combobox.js), for what the methods here do not cover.
+  get combobox() {
+    return this.principalCombobox(USERS_PLACEHOLDER);
+  }
+
   get usersFilterInput() {
     return RoleEditorStepDialog.css.pickerInput(USERS_PLACEHOLDER);
   }

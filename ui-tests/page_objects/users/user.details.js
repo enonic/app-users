@@ -100,6 +100,11 @@ class UserDetails extends DetailsPanel {
     return (await this.getPassword()) === PASSWORD.SET;
   }
 
+  // Waits for the Password field to read 'Set' or 'Not set' (UserDetails.PASSWORD.*).
+  waitForPassword(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    return this.waitForFieldValue(SECTION.CREDENTIALS, FIELD.PASSWORD, expected, ms);
+  }
+
   clickOnEditCredentialsButton() {
     return super.clickOnEditButton(BUTTON.EDIT_CREDENTIALS, SECTION.CREDENTIALS);
   }
@@ -162,7 +167,7 @@ class UserDetails extends DetailsPanel {
     return this.getListItemTitles(SECTION.GROUPS);
   }
 
-  // The groups as [{ title, subtitle, meta }], meta being the group's ID provider
+  // The groups as [{ title, subtitle, meta }], meta being the key of the group's ID provider
   getGroupItems() {
     return this.getListItems(SECTION.GROUPS);
   }
