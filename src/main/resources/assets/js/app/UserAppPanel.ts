@@ -85,7 +85,6 @@ export class UserAppPanel
             }
             break;
         case 'view':
-            id = path.getElement(1);
             break;
         default:
             new ShowBrowsePanelEvent().fire();
