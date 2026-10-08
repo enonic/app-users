@@ -47,6 +47,8 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
         console.log('browser width ##################### ' + width);
         let options = {
             logLevel: "error",
+            // wdio v10: `$` throws when a selector matches several elements; keep v9 first-match behaviour
+            strictSelectors: false,
             automationProtocol: "webdriver",
             "wdio:enforceWebDriverClassic": true,
             capabilities: {
