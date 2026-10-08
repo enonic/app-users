@@ -14,6 +14,10 @@ exports.config = {
 
     maxInstances: 1,
 
+    // wdio v10: `$` throws when a selector matches several elements.
+    // Page objects rely on v9 behaviour (first match), so keep it non-strict.
+    strictSelectors: false,
+
     capabilities: [{
         browserName: 'chrome',
         browserVersion: browser_version,
