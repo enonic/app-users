@@ -5,7 +5,7 @@ import { $idProviderNames } from '../../../entities/principal/model/id-providers
 import { $serviceAccounts } from '../../../entities/principal/model/service-accounts.store';
 import { $users } from '../../../entities/principal/model/users.store';
 import { fetchServiceAccountsScreen } from '../api/service-accounts-screen.api';
-import { $serviceAccountsQuery, setServiceAccountsSearch } from './query.store';
+import { serviceAccountsFilter } from './filter.store';
 import { serviceAccountsSelection } from './selection.store';
 import {
   loadMoreServiceAccounts,
@@ -59,7 +59,7 @@ afterEach(() => {
   $serviceAccounts.set({ ...EMPTY });
   $users.set({ ...EMPTY });
   $idProviderNames.set({ status: 'loading', items: [] });
-  $serviceAccountsQuery.set({ sort: 'displayNameAsc' });
+  serviceAccountsFilter.clear();
   serviceAccountsSelection.clear();
 });
 
@@ -77,7 +77,7 @@ describe('reloadServiceAccountsScreen', () => {
   });
 
   it('carries the search and the order the query store holds', async () => {
-    setServiceAccountsSearch('  reporting  ');
+    serviceAccountsFilter.set([{ kind: 'text', text: 'reporting' }]);
 
     await reloadServiceAccountsScreen();
 
@@ -100,7 +100,7 @@ describe('reloadServiceAccountsScreen', () => {
 
 describe('loadMoreServiceAccounts', () => {
   it('asks for the next page from where the loaded rows end, with the same query', async () => {
-    setServiceAccountsSearch('ing');
+    serviceAccountsFilter.set([{ kind: 'text', text: 'ing' }]);
     await reloadServiceAccountsScreen();
     vi.mocked(fetchServiceAccountsScreen).mockReturnValue(answered(['exporter'], 7));
 

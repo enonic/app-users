@@ -32,6 +32,11 @@ byte-identical where the code is the same — `cmp` against `../app-applications
 and a widget takes what it needs as props (`activeKey`, `detailsShown`) rather than reaching into
 `shared/host`, which is what keeps it portable.
 
+The filter is the exception for now: this app takes `FilterInput` from `@enonic/ui-kit`, while
+app-applications keeps its own `BrowseFilter`, `widgets/browse-search` and `shared/search` until it moves
+to the kit, so `widgets/browse-list` differs there too. They converge through that move — do not fix one
+side only.
+
 `shared/step-dialog/` is the base of every dialog made of steps, as `shared/ui/dialogs/ModalDialog` is of
 the single-page ones. It is `@enonic/ui-kit` material like `widgets/`, so it imports nothing from
 `entities/**`: a feature hands it the domain — `defineSteps` table, `initialForm`, `validate`, `same`,

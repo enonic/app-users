@@ -1,6 +1,8 @@
-import { map } from 'nanostores';
+import { textOf } from '@enonic/ui-kit';
+import { atom, computed, type ReadableAtom } from 'nanostores';
 
 import type { SortDirection } from '../../../widgets/browse-list/browse-sort';
+import { serviceAccountsFilter } from './filter.store';
 
 /** One request's worth of service accounts. Fifty is what a screen shows without asking for a second page. */
 export const PAGE_SIZE = 50;
@@ -16,21 +18,25 @@ export type ServiceAccountsQueryState = {
   sort: ServiceAccountsSort;
 };
 
-export const $serviceAccountsQuery = map<ServiceAccountsQueryState>({ sort: 'displayNameAsc' });
+export const $serviceAccountsSort = atom<ServiceAccountsSort>('displayNameAsc');
 
-export function setServiceAccountsSearch(search: string): void {
-  const needle = search.trim();
-  $serviceAccountsQuery.setKey('search', needle.length === 0 ? undefined : needle);
-}
+export const $serviceAccountsQuery: ReadableAtom<ServiceAccountsQueryState> = computed(
+  [serviceAccountsFilter.$query, $serviceAccountsSort],
+  (query, sort) => {
+    const search = textOf(query);
+    return { search: search.length === 0 ? undefined : search, sort };
+  },
+);
 
 export function setServiceAccountsSort(direction: SortDirection): void {
-  $serviceAccountsQuery.setKey('sort', direction === 'desc' ? 'displayNameDesc' : 'displayNameAsc');
+  $serviceAccountsSort.set(direction === 'desc' ? 'displayNameDesc' : 'displayNameAsc');
 }
 
-export function sortDirectionOf({ sort }: ServiceAccountsQueryState): SortDirection {
+export function sortDirectionOf(sort: ServiceAccountsSort): SortDirection {
   return sort === 'displayNameDesc' ? 'desc' : 'asc';
 }
 
+/** The filter is cleared on leaving by `useBrowseSection`; the order is this section's own. */
 export function clearServiceAccountsQuery(): void {
-  $serviceAccountsQuery.set({ sort: 'displayNameAsc' });
+  $serviceAccountsSort.set('displayNameAsc');
 }

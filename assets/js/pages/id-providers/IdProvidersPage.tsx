@@ -1,3 +1,4 @@
+import { textOf, valuesOf } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { ShieldLock } from 'lucide-react';
 import { useMemo } from 'preact/hooks';
@@ -13,13 +14,11 @@ import { IdProviderEditorDialog } from '../../features/idprovider-editor/ui/IdPr
 import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
-import { visibleEntries } from '../../widgets/browse-list/browse-filter';
 import {
   DEFAULT_SORT_DIRECTION,
   sortByDisplayName,
   type SortDirection,
 } from '../../widgets/browse-list/browse-sort';
-import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
@@ -29,12 +28,12 @@ import { IdProvidersItemPage } from './IdProvidersItemPage';
 import { idProvidersFilter } from './model/filter.store';
 import { ID_PROVIDER_ACTIONS } from './model/id-providers.actions';
 import {
-  applicationEntries,
+  APPLICATION_FIELD,
+  applicationField,
   filterByApplication,
   searchIdProviders,
 } from './model/id-providers.filter';
 import { toIdProviderRow } from './model/id-providers.rows';
-import { idProvidersSearch } from './model/search.store';
 import { idProvidersSelection } from './model/selection.store';
 import { $idProvidersSort, setIdProvidersSort } from './model/sort.store';
 import { useIdProvidersScreen } from './model/useIdProvidersScreen';
@@ -46,15 +45,16 @@ export function IdProvidersPage() {
   const { openItem, closeItem } = useHostFrame();
   const activeKey = useItemId();
   const { status, items } = useIdProviders();
-  const query = useStore(idProvidersSearch.$query);
-  const selectedApplications = useStore(idProvidersFilter.$selected);
+  const query = useStore(idProvidersFilter.$query);
   const sort = useStore($idProvidersSort);
 
   const sortNameLabel = useI18n('idProviders.sort.name');
   const sortAscLabel = useI18n('idProviders.sort.nameAsc');
   const sortDescLabel = useI18n('idProviders.sort.nameDesc');
+  const applicationFieldLabel = useI18n('idProviders.filter.application');
   const unboundLabel = useI18n('idProviders.filter.unbound');
   const emptyLabel = useI18n('idProviders.list.empty');
+  const filterPlaceholder = useI18n('idProviders.filter.placeholder');
   const readOnlyTitle = useI18n('readOnly.title');
   const readOnlyHelp = useI18n('readOnly.help');
 
@@ -66,20 +66,21 @@ export function IdProvidersPage() {
     [],
   ) satisfies readonly BrowseSortOption<SortDirection>[];
 
-  // Shared with the filter entries below, so the query runs once per render rather than twice.
-  const searched = useMemo(() => searchIdProviders(items, query), [items, query]);
+  // Shared with the field's counts below, so the text runs once per render rather than twice.
+  const searched = useMemo(() => searchIdProviders(items, textOf(query)), [items, query]);
 
   // Narrow first, order last.
   const visible = useMemo(
-    () => sortByDisplayName(filterByApplication(searched, selectedApplications), sort),
-    [searched, selectedApplications, sort],
+    () =>
+      sortByDisplayName(filterByApplication(searched, valuesOf(query, APPLICATION_FIELD)), sort),
+    [searched, query, sort],
   );
 
-  // Entries follow the query but not the ticked applications, so the filter shrinks with the
-  // search rather than restating the current narrowing.
-  const entries = useMemo(
-    () => visibleEntries(applicationEntries(items, searched, unboundLabel), selectedApplications),
-    [items, searched, selectedApplications],
+  const fields = useMemo(
+    () => [
+      applicationField(items, searched, { field: applicationFieldLabel, unbound: unboundLabel }),
+    ],
+    [items, searched, applicationFieldLabel, unboundLabel],
   );
 
   const section = useBrowseSection({
@@ -89,8 +90,7 @@ export function IdProvidersPage() {
     items,
     status,
     selection: idProvidersSelection,
-    search: idProvidersSearch,
-    resetOnLeave: [idProvidersFilter],
+    filter: idProvidersFilter,
     visible,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
     toRow: (provider) =>
@@ -111,14 +111,9 @@ export function IdProvidersPage() {
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
+        filterPlaceholder={filterPlaceholder}
         details={<IdProvidersItemPage />}
-        filter={
-          <BrowseFilter
-            entries={entries}
-            selected={selectedApplications}
-            onToggle={(id) => idProvidersFilter.toggle(id)}
-          />
-        }
+        fields={fields}
         sort={
           <BrowseSort
             options={sortOptions}

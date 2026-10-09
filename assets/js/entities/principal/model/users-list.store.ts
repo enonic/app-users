@@ -66,8 +66,8 @@ export function createUsersList(): UsersList {
 
   /**
    * ! `beginLoad` keeps the rows on screen. Clearing them would replace the list with a skeleton on every
-   * ! debounced keystroke — the search runs on the server here — losing the scroll position and any focus
-   * ! inside the list several times a second. The rows are replaced when the answer lands, which is the
+   * ! change of the filter or the sort — the search runs on the server here — losing the scroll position
+   * ! and any focus inside the list. The rows are replaced when the answer lands, which is the
    * ! only moment the new query is actually known.
    */
   function beginLoad(): void {

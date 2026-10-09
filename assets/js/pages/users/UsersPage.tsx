@@ -15,22 +15,15 @@ import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog
 import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
-import { visibleEntries } from '../../widgets/browse-list/browse-filter';
-import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
-import {
-  $usersQuery,
-  clearUsersQuery,
-  setUsersSort,
-  toggleUsersIdProvider,
-} from './model/query.store';
-import { usersSearch } from './model/search.store';
+import { usersFilter } from './model/filter.store';
+import { $usersSort, clearUsersQuery, setUsersSort } from './model/query.store';
 import { usersSelection } from './model/selection.store';
 import { createUserActions } from './model/users.actions';
-import { providerEntries } from './model/users.filter';
+import { providerField } from './model/users.filter';
 import { toUserRow } from './model/users.rows';
 import { loadMoreUsers, reloadUsersScreen } from './model/users.screen';
 import { useUsersScreen } from './model/useUsersScreen';
@@ -47,7 +40,7 @@ export function UsersPage() {
   const { status, items, appending, error, hasMore } = useUsers();
   const { items: providerCounts, status: providersStatus } = useStore($idProviderUserCounts);
 
-  const { idProviders, sort } = useStore($usersQuery);
+  const sort = useStore($usersSort);
   const creatable = useStore($userEditorProviders);
 
   const sortNameLabel = useI18n('users.sort.name');
@@ -57,9 +50,11 @@ export function UsersPage() {
   const sortProviderAscLabel = useI18n('users.sort.idProviderAsc');
   const sortProviderDescLabel = useI18n('users.sort.idProviderDesc');
   const emptyLabel = useI18n('users.list.empty');
+  const filterPlaceholder = useI18n('users.filter.placeholder');
   const readOnlyTitle = useI18n('readOnly.title');
   const readOnlyHelp = useI18n('readOnly.help');
   const loadMoreFailedNotice = useI18n('browse.list.loadMoreFailed');
+  const providerFieldLabel = useI18n('users.filter.idProvider');
   const providersFailedNotice = useI18n('users.filter.providersFailed');
 
   const sortOptions = useMemo(
@@ -85,12 +80,18 @@ export function UsersPage() {
   const canCreate = creatable.length > 0;
   const actions = useMemo(() => createUserActions(canCreate), [canCreate]);
 
-  // ! Entries come from the provider list, never from the rows: the rows are one page, so a provider the
-  // ! page happens not to contain would disappear from the menu while still narrowing the query. They
-  // ! carry no count either — `findUsers` reports one total for the whole query and nothing per provider.
-  const entries = useMemo(
-    () => visibleEntries(providerEntries(providerCounts), new Set(idProviders)),
-    [providerCounts, idProviders],
+  // ! The values come from the provider list, never from the rows: the rows are one page, so a provider
+  // ! the page happens not to contain would disappear from the filter while still narrowing the query.
+  // ! A provider list that failed to load leaves the values short or stale while a picked provider goes on
+  // ! narrowing the query; the field says so above its values rather than looking complete.
+  const fields = useMemo(
+    () => [
+      providerField(providerCounts, providerFieldLabel, {
+        notice: providersStatus === 'error' ? providersFailedNotice : undefined,
+        loading: providersStatus === 'loading',
+      }),
+    ],
+    [providerCounts, providerFieldLabel, providersStatus, providersFailedNotice],
   );
 
   const section = useBrowseSection({
@@ -100,7 +101,7 @@ export function UsersPage() {
     items,
     status,
     selection: usersSelection,
-    search: usersSearch,
+    filter: usersFilter,
     resetOnLeave: [{ clear: clearUsersQuery }],
     // The server narrowed and ordered this page; the client adds nothing.
     visible: items,
@@ -117,6 +118,7 @@ export function UsersPage() {
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
+        filterPlaceholder={filterPlaceholder}
         details={<UsersItemPage />}
         hasMore={hasMore}
         onLoadMore={() => void loadMoreUsers()}
@@ -124,16 +126,7 @@ export function UsersPage() {
         // A page that did not arrive leaves the rows valid, so it is reported beside the control rather
         // than as a list error. Only a first page can put the list itself into an error state.
         loadMoreError={status === 'ready' && error !== undefined ? loadMoreFailedNotice : undefined}
-        filter={
-          <BrowseFilter
-            entries={entries}
-            selected={new Set(idProviders)}
-            onToggle={toggleUsersIdProvider}
-            // A provider list that failed to load leaves the menu short while the ticked provider goes on
-            // narrowing the query; saying so beats a menu that looks complete.
-            notice={providersStatus === 'error' ? providersFailedNotice : undefined}
-          />
-        }
+        fields={fields}
         sort={
           <BrowseSort
             options={sortOptions}

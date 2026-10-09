@@ -16,13 +16,13 @@ import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/Bro
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
 import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
+import { serviceAccountsFilter } from './model/filter.store';
 import {
-  $serviceAccountsQuery,
+  $serviceAccountsSort,
   clearServiceAccountsQuery,
   setServiceAccountsSort,
   sortDirectionOf,
 } from './model/query.store';
-import { serviceAccountsSearch } from './model/search.store';
 import { serviceAccountsSelection } from './model/selection.store';
 import { SERVICE_ACCOUNT_ACTIONS } from './model/service-accounts.actions';
 import { toServiceAccountRow } from './model/service-accounts.rows';
@@ -42,12 +42,13 @@ export function ServiceAccountsPage() {
   const { openItem, closeItem } = useHostFrame();
   const activeKey = useItemId();
   const { status, items, appending, error, hasMore } = useServiceAccounts();
-  const query = useStore($serviceAccountsQuery);
+  const sort = useStore($serviceAccountsSort);
 
   const sortNameLabel = useI18n('users.sort.name');
   const sortAscLabel = useI18n('users.sort.nameAsc');
   const sortDescLabel = useI18n('users.sort.nameDesc');
   const emptyLabel = useI18n('serviceAccounts.list.empty');
+  const filterPlaceholder = useI18n('serviceAccounts.filter.placeholder');
   const readOnlyTitle = useI18n('readOnly.title');
   const readOnlyHelp = useI18n('readOnly.help');
   const loadMoreFailedNotice = useI18n('browse.list.loadMoreFailed');
@@ -67,7 +68,7 @@ export function ServiceAccountsPage() {
     items,
     status,
     selection: serviceAccountsSelection,
-    search: serviceAccountsSearch,
+    filter: serviceAccountsFilter,
     resetOnLeave: [{ clear: clearServiceAccountsQuery }],
     // The server narrowed and ordered this page; the client adds nothing.
     visible: items,
@@ -87,6 +88,7 @@ export function ServiceAccountsPage() {
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
+        filterPlaceholder={filterPlaceholder}
         details={<ServiceAccountsItemPage />}
         hasMore={hasMore}
         onLoadMore={() => void loadMoreServiceAccounts()}
@@ -97,7 +99,7 @@ export function ServiceAccountsPage() {
         sort={
           <BrowseSort
             options={sortOptions}
-            value={sortDirectionOf(query)}
+            value={sortDirectionOf(sort)}
             onChange={setServiceAccountsSort}
             defaultValue={DEFAULT_SORT_DIRECTION}
           />
