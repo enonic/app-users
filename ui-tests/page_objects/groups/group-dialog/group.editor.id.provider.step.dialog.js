@@ -3,13 +3,18 @@
  *
  * 'ID provider' step of the group editor: the first step of a new group, the ID provider combobox
  * (idprovider.combobox.js) with the providers to create the group in. Not shown when an existing
- * group is edited (the provider is then read-only on the General step).
+ * group is edited (the provider is then read-only on the General step). With no provider to choose,
+ * the step shows a notice with a link to the ID Providers section instead.
  */
 const GroupEditorStepDialog = require('./group.editor.step.dialog');
 const IdProviderCombobox = require('../../idprovider.combobox');
 const appConst = require('../../../libs/app_const');
 
 const DIALOG = GroupEditorStepDialog.css.container;
+
+const css = {
+  noProvidersNotice: `${DIALOG} [data-registry-id='idProvider'] p a`,
+};
 
 class GroupEditorIdProviderStepDialog extends GroupEditorStepDialog {
   constructor(sectionId = appConst.SECTION_ID.GROUPS) {
@@ -80,6 +85,11 @@ class GroupEditorIdProviderStepDialog extends GroupEditorStepDialog {
   // Texts of the validation messages shown under the combobox, e.g. 'Select an ID provider'.
   getValidationMessages() {
     return this.combobox.getValidationMessages();
+  }
+
+  // The 'no ID providers' notice replaces the selector when there is none to choose from.
+  isNoProvidersNoticeDisplayed() {
+    return this.isElementDisplayed(css.noProvidersNotice);
   }
 
   // Flows
