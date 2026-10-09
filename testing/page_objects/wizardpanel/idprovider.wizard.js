@@ -179,13 +179,9 @@ class IdProviderWizard extends WizardPanel {
 
     //gets ACE -operations in expanded menu
     async getAceMenuOperations() {
-        let result = [];
         let selector = XPATH.aceAccessSelector + "//ul[@class='menu']//li";
-        let elems = await this.getDisplayedElements(selector);
-        elems.forEach(el => {
-            result.push(el.getText());
-        });
-        return Promise.all(result);
+        // wdio v10: ElementArray.forEach is async, so collect texts with a for...of loop
+        return await this.getTextInDisplayedElements(selector);
     }
 
     async clickOnPermissionsTabItem() {
