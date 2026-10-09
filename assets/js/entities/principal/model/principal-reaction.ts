@@ -3,6 +3,7 @@ import type { ReadableAtom } from 'nanostores';
 import { HUB_TOPICS } from '../../../shared/admin-events';
 import {
   createTopicReaction,
+  subscribeTopic,
   toPrincipalsMessage,
   type PrincipalKind,
   type TopicReaction,
@@ -72,9 +73,10 @@ export function createPrincipalReaction({
   }
 
   return createTopicReaction({
+    events: { subscribeTopic },
     topic: HUB_TOPICS.principals,
     parse: toPrincipalsMessage,
-    $visible: scope.$visible,
+    visible: scope.$visible,
     refresh,
     apply: (messages) => {
       const events = collapsePrincipalChanges(messages);
