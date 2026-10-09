@@ -5,12 +5,12 @@
  * rest is derived from it unless given: `id` from the display name, `email` from the id.
  *
  *   const name = userItemsBuilder.generateRandomName('user');
- *   const user = userItemsBuilder.buildUser(name, PASSWORD, userItemsBuilder.generateEmail(name));
- *   const user = userItemsBuilder.buildUser({ displayName: name, roles: ['Administrator'] });
+ *   const user = userItemsBuilder.buildUser(name, PASSWORD, userItemsBuilder.generateEmail(name), [], PROVIDER);
+ *   const user = userItemsBuilder.buildUser({ displayName: name, idProvider: PROVIDER, roles: ['Administrator'] });
  *
- * Positional: buildUser(displayName, password, email, roles), buildGroup(displayName, description,
- * members, roles), buildRole(displayName, description, members), buildIdProvider(displayName,
- * description, application, permissions).
+ * Positional: buildUser(displayName, password, email, roles, idProvider), buildGroup(displayName,
+ * description, members, roles), buildRole(displayName, description, members),
+ * buildIdProvider(displayName, description, application, permissions).
  */
 const appConst = require('./app_const');
 
@@ -74,12 +74,20 @@ module.exports = {
   nameOf,
 
   // { idProvider, displayName, id, email, password, roles, groups }
-  // `idProvider` is the display name shown in the ID provider step's selector.
+  // `idProvider` is the display name shown in the ID provider step's combobox. It has no default:
+  // the system ID provider takes service accounts only (buildServiceAccount), so a user needs one
+  // the test made or knows.
   buildUser(...args) {
-    const overrides = overridesFrom(args, ['displayName', 'password', 'email', 'roles']);
+    const overrides = overridesFrom(args, [
+      'displayName',
+      'password',
+      'email',
+      'roles',
+      'idProvider',
+    ]);
     const { displayName, id } = named('User', overrides);
     return {
-      idProvider: overrides.idProvider ?? SYSTEM_ID_PROVIDER_DISPLAY_NAME,
+      idProvider: overrides.idProvider,
       displayName,
       id,
       // `name` is what the old wizard called the id; kept so either reads.

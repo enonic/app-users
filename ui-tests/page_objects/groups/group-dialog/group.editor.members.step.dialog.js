@@ -25,6 +25,11 @@ class GroupEditorMembersStepDialog extends GroupEditorStepDialog {
     return GroupEditorStepDialog.STEP.MEMBERS;
   }
 
+  // The picker of this step (principal.combobox.js), for what the methods here do not cover.
+  get combobox() {
+    return this.principalCombobox(MEMBERS_PLACEHOLDER);
+  }
+
   get membersFilterInput() {
     return GroupEditorStepDialog.css.pickerInput(MEMBERS_PLACEHOLDER);
   }

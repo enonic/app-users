@@ -48,8 +48,44 @@ const TREE_GRID = {
   GRID_LIST_ROW: `//div[@data-component='GridList']//div[@data-component='GridList.Row']`,
 };
 
+// CSS of the @enonic/ui parts inside a section's shadow root (page objects compose their
+// locators from these; XPath cannot cross a shadow root). A Combobox: a search input with a toggle
+// (and an Apply button when it is a multi-select) over a popup that is portalled beside the dialog,
+// listing Listbox.Items that carry the item's key as 'data-value'.
+const COMBOBOX_POPUP = "[data-component='Combobox.Popup']";
+const COMBOBOX = {
+  CONTENT: "[data-component='Combobox.Content']",
+  SEARCH: "[data-component='Combobox.Search']",
+  INPUT: "[data-component='Combobox.Input']",
+  TOGGLE: "[data-component='Combobox.Toggle']",
+  APPLY: "[data-component='Combobox.Apply']",
+  // The combobox whose search input has the placeholder, when a step holds several.
+  searchByPlaceholder: (placeholder) =>
+    `[data-component='Combobox.Search']:has(input[placeholder='${placeholder}'])`,
+  inputByPlaceholder: (placeholder) =>
+    `[data-component='Combobox.Input'][placeholder='${placeholder}']`,
+  POPUP: COMBOBOX_POPUP,
+  LIST: `${COMBOBOX_POPUP} [data-component='Combobox.ListContent']`,
+  OPTIONS: `${COMBOBOX_POPUP} [data-component='Listbox.Item']`,
+  SELECTED_OPTION: `${COMBOBOX_POPUP} [data-component='Listbox.Item'][aria-selected='true']`,
+  optionByValue: (value) =>
+    `${COMBOBOX_POPUP} [data-component='Listbox.Item'][data-value='${value}']`,
+  // 'Searching…', 'Nothing matches the search', 'The search could not be run'
+  POPUP_MESSAGE: `${COMBOBOX_POPUP} p`,
+};
+
+// An ItemLabel: an icon, the display name in bold and the name (a key, a login) under it. Inside a
+// combobox option, a picked row, a list row, a details list item.
+const ITEM_LABEL = {
+  ROOT: "[data-component='ItemLabel']",
+  DISPLAY_NAME: "[data-component='ItemLabel'] span.font-semibold",
+  NAME: "[data-component='ItemLabel'] small",
+};
+
 module.exports = Object.freeze({
   COMMON,
   BUTTONS,
   TREE_GRID,
+  COMBOBOX,
+  ITEM_LABEL,
 });

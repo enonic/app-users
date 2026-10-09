@@ -18,7 +18,8 @@ const css = {
   setPasswordButton: `${DIALOG} button[data-component='Button'][aria-label='Set password']`,
   changePasswordButton: `${DIALOG} button[data-component='Button'][aria-label='Change password']`,
   clearPasswordButton: `${DIALOG} button[data-component='Button'][aria-label='Clear password']`,
-  keepPasswordButton: `${DIALOG} button[data-component='Button'][aria-label='Keep password']`,
+  // Shown in place of Change/Clear once the clearing is staged; undoes it.
+  keepPasswordButton: `${DIALOG} button[data-component='Button'][aria-label='Keep it']`,
   generatePasswordButton: `${DIALOG} button[data-component='Button'][aria-label='Generate']`,
   showPasswordButton: `${DIALOG} button[aria-label='Show']`,
   hidePasswordButton: `${DIALOG} button[aria-label='Hide']`,
@@ -37,12 +38,23 @@ const css = {
   keepPublicKeyButton: `${DIALOG} [data-registry-id='credentials'] button[data-component='Button'][aria-label='Keep']`,
 };
 
+// The line under the Password label (getPasswordNotice), by state.
+const PASSWORD_NOTICE = Object.freeze({
+  OPTIONAL: 'Optional. Without one the user cannot sign in with a password.',
+  ALREADY_SET: 'Password already set',
+  WILL_CLEAR: 'The password will be cleared when you save',
+});
+
 const NO_PUBLIC_KEYS = 'No public keys';
 const KEY_PENDING = 'Will be added when you save';
 
 class UserEditorCredentialStepDialog extends UserEditorStepDialog {
   get step() {
     return UserEditorStepDialog.STEP.CREDENTIALS;
+  }
+
+  static get PASSWORD_NOTICE() {
+    return PASSWORD_NOTICE;
   }
 
   get passwordInput() {
@@ -135,7 +147,35 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     }
   }
 
-  // The line under the label: 'Optional. Without one…', 'A password is set…', 'The password will be cleared…'
+  isKeepPasswordButtonDisplayed() {
+    return this.isElementDisplayed(css.keepPasswordButton);
+  }
+
+  async waitForKeepPasswordButtonDisplayed(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisplayed(css.keepPasswordButton, ms);
+    } catch (err) {
+      await this.handleError(
+        "Credentials step - 'Keep it' button should be displayed",
+        'err_keep_password_btn',
+        err,
+      );
+    }
+  }
+
+  // Waits for the line under the Password label to read as expected (PASSWORD_NOTICE.*).
+  async waitForPasswordNotice(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(async () => (await this.getPasswordNotice()) === expected, {
+        timeout: ms,
+        timeoutMsg: `the password notice should read '${expected}'`,
+      });
+    } catch (err) {
+      await this.handleError('Credentials step - the password notice', 'err_password_notice', err);
+    }
+  }
+
+  // The line under the label: one of PASSWORD_NOTICE.* - or undefined.
   async getPasswordNotice() {
     const notices = await this.getDisplayedElements(css.passwordNotice);
     return notices.length === 0 ? undefined : await notices[0].getText();

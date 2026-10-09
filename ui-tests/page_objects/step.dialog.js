@@ -13,14 +13,15 @@
  */
 const SectionPage = require('./section.page');
 const appConst = require('../libs/app_const');
+const { COMBOBOX, ITEM_LABEL } = require('../libs/elements');
+const PrincipalCombobox = require('./principal.combobox');
 
 // The locators of a dialog, from the data-component of its content.
 function buildStepDialogCss(dialogComponent) {
   const DIALOG = `[data-component='${dialogComponent}'][data-state='open']`;
   const INDICATOR = `${DIALOG} [data-component='Dialog.StepIndicator']`;
   // The picker is told apart by the placeholder of its search input.
-  const PICKER = (placeholder) =>
-    `${DIALOG} [data-component='Combobox.Search']:has(input[placeholder='${placeholder}'])`;
+  const PICKER = (placeholder) => `${DIALOG} ${COMBOBOX.searchByPlaceholder(placeholder)}`;
   return {
     container: DIALOG,
     title: `${DIALOG} [data-component='Dialog.Title']`,
@@ -29,6 +30,11 @@ function buildStepDialogCss(dialogComponent) {
     // Footer (wizard view)
     nextButton: `${DIALOG} [data-component='Stepper.Next']`,
     previousButton: `${DIALOG} [data-component='Stepper.Previous']`,
+    // Step view - the editor opened on one step from a details panel's Edit button: no stepper,
+    // Cancel and Save in the footer, Save disabled until something changed.
+    stepperDots: `${DIALOG} [data-component='Stepper.Dots']`,
+    cancelButton: `${DIALOG} [data-component='StepDialogFooter'] button[aria-label='Cancel']`,
+    saveButton: `${DIALOG} [data-component='StepDialogFooter'] button[aria-label='Save']`,
     // One selector per shape of the footer's primary button: Stepper.Next on the way through, a plain
     // Button labelled 'Create' or 'Save' on the last step. Never a comma-separated list - webdriverio
     // splits a deep selector on the commas when it re-matches the element.
@@ -46,18 +52,16 @@ function buildStepDialogCss(dialogComponent) {
     stepPanel: (step) =>
       `${DIALOG} [data-component='Dialog.StepContent'][data-registry-id='${step}']:not([hidden])`,
     // Principal picker: a combobox above a list of the picked principals.
-    pickerInput: (placeholder) =>
-      `${DIALOG} [data-component='Combobox.Input'][placeholder='${placeholder}']`,
-    pickerToggle: (placeholder) => `${PICKER(placeholder)} [data-component='Combobox.Toggle']`,
-    pickerApply: (placeholder) => `${PICKER(placeholder)} [data-component='Combobox.Apply']`,
+    pickerInput: (placeholder) => `${DIALOG} ${COMBOBOX.inputByPlaceholder(placeholder)}`,
+    pickerToggle: (placeholder) => `${PICKER(placeholder)} ${COMBOBOX.TOGGLE}`,
+    pickerApply: (placeholder) => `${PICKER(placeholder)} ${COMBOBOX.APPLY}`,
     // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
-    pickerPopup: "[data-component='Combobox.Popup']",
-    pickerOptions: "[data-component='Combobox.Popup'] [data-component='Listbox.Item']",
-    pickerOptionByKey: (key) =>
-      `[data-component='Combobox.Popup'] [data-component='Listbox.Item'][data-value='${key}']`,
-    pickerEmptyMessage: "[data-component='Combobox.Popup'] p",
+    pickerPopup: COMBOBOX.POPUP,
+    pickerOptions: COMBOBOX.OPTIONS,
+    pickerOptionByKey: COMBOBOX.optionByValue,
+    pickerEmptyMessage: COMBOBOX.POPUP_MESSAGE,
     // The display name inside an option or a picked row
-    principalDisplayName: "[data-component='ItemLabel'] span.font-semibold",
+    principalDisplayName: ITEM_LABEL.DISPLAY_NAME,
     pickedRows: (step) => `${DIALOG} [data-registry-id='${step}'] [data-component='GridList.Row']`,
     pickedRemoveButton: (step, displayName) =>
       `${DIALOG} [data-registry-id='${step}'] [data-component='GridList.Row'] ` +
@@ -236,6 +240,93 @@ class StepDialog extends SectionPage {
     throw new Error('the footer has no Next, Create or Save button');
   }
 
+  // Step view (Cancel / Save)
+
+  // True while the dialog shows one step with Cancel and Save, false in the wizard with its dots.
+  async isStepView() {
+    return !(await this.isElementDisplayed(this.css.stepperDots));
+  }
+
+  async clickOnSaveButton() {
+    try {
+      await this.waitForSaveButtonEnabled();
+      await this.clickOnElement(this.css.saveButton);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(`${this.dialogName} - Save button`, 'err_editor_save_btn', err);
+    }
+  }
+
+  async waitForSaveButtonDisplayed(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisplayed(this.css.saveButton, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - Save button should be displayed`,
+        'err_editor_save_btn',
+        err,
+      );
+    }
+  }
+
+  async waitForSaveButtonEnabled(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementEnabled(this.css.saveButton, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - Save button should be enabled`,
+        'err_editor_save_btn',
+        err,
+      );
+    }
+  }
+
+  async waitForSaveButtonDisabled(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisabled(this.css.saveButton, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - Save button should be disabled`,
+        'err_editor_save_btn',
+        err,
+      );
+    }
+  }
+
+  isSaveButtonEnabled() {
+    return this.isElementEnabled(this.css.saveButton);
+  }
+
+  isSaveButtonDisplayed() {
+    return this.isElementDisplayed(this.css.saveButton);
+  }
+
+  async clickOnCancelButton() {
+    try {
+      await this.waitForElementDisplayed(this.css.cancelButton);
+      await this.clickOnElement(this.css.cancelButton);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(`${this.dialogName} - Cancel button`, 'err_editor_cancel_btn', err);
+    }
+  }
+
+  isCancelButtonDisplayed() {
+    return this.isElementDisplayed(this.css.cancelButton);
+  }
+
+  // Save, then the dialog goes away.
+  async clickOnSaveButtonAndWaitForClosed() {
+    await this.clickOnSaveButton();
+    await this.waitForClosed();
+  }
+
+  // Cancel, then the dialog goes away (a dirty step asks to confirm first - ConfirmationDialog).
+  async clickOnCancelButtonAndWaitForClosed() {
+    await this.clickOnCancelButton();
+    await this.waitForClosed();
+  }
+
   // Dots in the footer, one per step; `step` is one of the editor's STEP.*.
   async clickOnStepDot(step) {
     try {
@@ -258,156 +349,73 @@ class StepDialog extends SectionPage {
     return controls.slice(controls.lastIndexOf('-panel-') + '-panel-'.length);
   }
 
-  // Principal picker
+  // Principal picker - the multi-select combobox of the membership steps (principal.combobox.js).
+  // The methods here keep the names the step classes were written against and hand the work to a
+  // PrincipalCombobox of this dialog, this step and the given placeholder.
 
-  // Types in the picker's search input; the popup opens with the matching principals.
-  async filterPrincipals(placeholder, text) {
-    try {
-      await this.waitForElementDisplayed(this.css.pickerInput(placeholder));
-      await this.typeTextInInput(this.css.pickerInput(placeholder), text);
-      await this.waitForElementDisplayed(this.css.pickerPopup);
-      return await this.pause(300);
-    } catch (err) {
-      await this.handleError(
-        `${this.dialogName} - '${placeholder}' picker, filtering by '${text}'`,
-        'err_principal_picker_filter',
-        err,
-      );
-    }
+  principalCombobox(placeholder) {
+    return new PrincipalCombobox({
+      sectionId: this.sectionId,
+      container: this.css.container,
+      step: this.step,
+      placeholder,
+    });
   }
 
-  async clickOnPickerToggle(placeholder) {
-    try {
-      await this.waitForElementDisplayed(this.css.pickerToggle(placeholder));
-      await this.clickOnElement(this.css.pickerToggle(placeholder));
-      return await this.pause(300);
-    } catch (err) {
-      await this.handleError(
-        `${this.dialogName} - '${placeholder}' picker toggle`,
-        'err_principal_picker_toggle',
-        err,
-      );
-    }
+  filterPrincipals(placeholder, text) {
+    return this.principalCombobox(placeholder).typeTextInFilterInput(text);
+  }
+
+  clickOnPickerToggle(placeholder) {
+    return this.principalCombobox(placeholder).clickOnDropdownHandle();
   }
 
   // Display names of the options in the opened popup.
-  async getPickerOptions() {
-    await this.waitForElementDisplayed(this.css.pickerPopup);
-    const options = await this.getDisplayedElements(this.css.pickerOptions);
-    const names = [];
-    for (const option of options) {
-      names.push(await option.$(this.css.principalDisplayName).getText());
-    }
-    return names;
+  getPickerOptions() {
+    return this.principalCombobox('').getOptionsDisplayName();
   }
 
   // 'Searching…', 'Nothing matches the search', 'The search could not be run' - or undefined.
-  async getPickerMessage() {
-    const messages = await this.getDisplayedElements(this.css.pickerEmptyMessage);
-    return messages.length === 0 ? undefined : await messages[0].getText();
+  getPickerMessage() {
+    return this.principalCombobox('').getPopupMessage();
   }
 
   // Ticks the option with the display name in the opened popup (staged until Apply is clicked).
-  async clickOnPickerOption(displayName) {
-    try {
-      await this.waitForElementDisplayed(this.css.pickerOptions);
-      const options = await this.getDisplayedElements(this.css.pickerOptions);
-      for (const option of options) {
-        const name = await option.$(this.css.principalDisplayName).getText();
-        if (name === displayName) {
-          await option.click();
-          return await this.pause(200);
-        }
-      }
-      throw new Error(`no option with the display name '${displayName}'`);
-    } catch (err) {
-      await this.handleError(
-        `${this.dialogName} - picker option '${displayName}'`,
-        'err_principal_picker_option',
-        err,
-      );
-    }
+  clickOnPickerOption(displayName) {
+    return this.principalCombobox('').clickOnOptionByDisplayName(displayName);
   }
 
-  async clickOnPickerOptionByKey(key) {
-    try {
-      await this.waitForElementDisplayed(this.css.pickerOptionByKey(key));
-      await this.clickOnElement(this.css.pickerOptionByKey(key));
-      return await this.pause(200);
-    } catch (err) {
-      await this.handleError(
-        `${this.dialogName} - picker option '${key}'`,
-        'err_principal_picker_option',
-        err,
-      );
-    }
+  clickOnPickerOptionByKey(key) {
+    return this.principalCombobox('').clickOnOptionByKey(key);
   }
 
-  // Applies the staged ticks: the picked principals appear in the list under the picker.
-  async clickOnPickerApply(placeholder) {
-    try {
-      await this.waitForElementDisplayed(this.css.pickerApply(placeholder));
-      await this.clickOnElement(this.css.pickerApply(placeholder));
-      return await this.pause(300);
-    } catch (err) {
-      await this.handleError(
-        `${this.dialogName} - '${placeholder}' picker Apply button`,
-        'err_principal_picker_apply',
-        err,
-      );
-    }
+  clickOnPickerApply(placeholder) {
+    return this.principalCombobox(placeholder).clickOnApplyButton();
   }
 
   // Filter → tick the option → Apply.
-  async addPrincipal(placeholder, displayName) {
-    await this.filterPrincipals(placeholder, displayName);
-    await this.clickOnPickerOption(displayName);
-    await this.clickOnPickerApply(placeholder);
+  addPrincipal(placeholder, displayName) {
+    return this.principalCombobox(placeholder).doFilterOptionsAndClickApply(displayName);
   }
 
   // Display names of the principals picked in this step.
-  async getPickedPrincipals() {
-    const rows = await this.getDisplayedElements(this.css.pickedRows(this.step));
-    const names = [];
-    for (const row of rows) {
-      names.push(await row.$(this.css.principalDisplayName).getText());
-    }
-    return names;
+  getPickedPrincipals() {
+    return this.principalCombobox('').getSelectedOptionsDisplayName();
   }
 
-  async waitForPrincipalPicked(displayName, ms = appConst.TIMEOUT.MEDIUM) {
-    try {
-      await this.waitForElementDisplayed(this.css.pickedRemoveButton(this.step, displayName), ms);
-    } catch (err) {
-      await this.handleError(
-        `${this.dialogName} - '${displayName}' should be picked`,
-        'err_principal_picked',
-        err,
-      );
-    }
+  waitForPrincipalPicked(displayName, ms = appConst.TIMEOUT.MEDIUM) {
+    return this.principalCombobox('').waitForOptionSelected(displayName, ms);
   }
 
   // Clicks on the Remove icon of the picked principal.
-  async removePickedPrincipal(displayName) {
-    try {
-      const button = this.css.pickedRemoveButton(this.step, displayName);
-      await this.waitForElementDisplayed(button);
-      await this.clickOnElement(button);
-      return await this.pause(300);
-    } catch (err) {
-      await this.handleError(
-        `${this.dialogName} - removing the picked '${displayName}'`,
-        'err_principal_remove',
-        err,
-      );
-    }
+  removePickedPrincipal(displayName) {
+    return this.principalCombobox('').removeSelectedOption(displayName);
   }
 
   // The step's red notice, e.g. 'The members could not be loaded and are not shown here' - or
   // undefined.
-  async getFailedNotice() {
-    const notices = await this.getDisplayedElements(this.css.failedNotice(this.step));
-    return notices.length === 0 ? undefined : await notices[0].getText();
+  getFailedNotice() {
+    return this.principalCombobox('').getFailedNotice();
   }
 }
 
