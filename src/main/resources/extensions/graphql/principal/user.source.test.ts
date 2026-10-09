@@ -54,9 +54,18 @@ function remoteProvider(key: string): LibIdProvider {
   };
 }
 
-// The system store is bound to nothing, so it is LOCAL; `remote` is bound to an EXTERNAL application.
+// As XP binds it: to the standard ID provider, whose descriptor the resolution never asks for.
+function systemProvider(): LibIdProvider {
+  return {
+    key: 'system',
+    displayName: 'System',
+    idProviderConfig: { applicationKey: 'com.enonic.xp.app.standardidprovider', config: [] },
+  };
+}
+
+// Every descriptor reads EXTERNAL, so the system store is LOCAL by its exemption alone.
 function boundProviders(): void {
-  providerStore([localProvider('system'), remoteProvider('remote')]);
+  providerStore([systemProvider(), remoteProvider('remote')]);
   vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
 }
 

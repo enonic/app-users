@@ -21,6 +21,7 @@ import {
   requireWritable,
   requireWritablePrincipals,
 } from './id-provider-mode';
+import { ADMIN_ROLE, SUPER_USER, USER_KEY } from './principal.keys';
 import {
   byName,
   clampCount,
@@ -31,22 +32,23 @@ import {
 
 export type UserSource = User;
 
+/** The lists are typed keys because `user.fields` parses them: a group in a roles list never gets here. */
 export type UserInput = {
   displayName: string;
   email?: string;
   password?: string;
-  roles: readonly string[];
-  groups: readonly string[];
+  roles: readonly RoleKey[];
+  groups: readonly GroupKey[];
 };
 
 export type UserChanges = {
   displayName: string;
   email?: string;
   password?: string;
-  addRoles: readonly string[];
-  removeRoles: readonly string[];
-  addGroups: readonly string[];
-  removeGroups: readonly string[];
+  addRoles: readonly RoleKey[];
+  removeRoles: readonly RoleKey[];
+  addGroups: readonly GroupKey[];
+  removeGroups: readonly GroupKey[];
 };
 
 /** One page of users, and how many the search matched in total. */
@@ -136,8 +138,6 @@ export function listUsers({
  * ! second copy to keep in step, so the throw is caught instead — a key the platform will not parse names
  * ! no user, which is exactly what null says.
  */
-const USER_KEY = /^user:[^:]+:[^:]+$/;
-
 export function getUser(key: string): User | null {
   if (!USER_KEY.test(key)) {
     return null;
@@ -287,7 +287,7 @@ export function updateUser(key: string, changes: UserChanges): User {
 
   // ! A remote user's memberships are still XP's: they live on the role and on the group, where the Roles
   // ! section and the Group dialog write them too. Only the user's own fields and credentials are the
-  // ! remote system's, so those are what a locked provider refuses.
+  // ! remote system's, so those are what a locked provider refuses. `updateGroup` reasons the same way.
   const locked = !isWritablePrincipal(key, 'user');
   if (locked && (changes.password != null || scalarsMoved(current, changes))) {
     requireWritablePrincipals([key], 'user');
@@ -396,9 +396,6 @@ function named(providers?: readonly string[]): readonly string[] {
   return (providers ?? []).filter((provider) => provider.length > 0);
 }
 
-const ADMIN_ROLE = 'role:system.admin';
-const SUPER_USER = 'user:system:su';
-
 // Both sides trimmed: the client trims what it sends, and a value a remote system stored may not be.
 function scalarsMoved(current: User, changes: UserChanges): boolean {
   return (
@@ -415,15 +412,15 @@ function requirePassword(password: string): void {
 
 function applyMemberships(
   key: UserKey,
-  addRoles: readonly string[],
-  removeRoles: readonly string[],
-  addGroups: readonly string[],
-  removeGroups: readonly string[],
+  addRoles: readonly RoleKey[],
+  removeRoles: readonly RoleKey[],
+  addGroups: readonly GroupKey[],
+  removeGroups: readonly GroupKey[],
 ): void {
-  addRoles.forEach((role) => addMembers(role as RoleKey, [key]));
-  removeRoles.forEach((role) => removeMembers(role as RoleKey, [key]));
-  addGroups.forEach((group) => addMembers(group as GroupKey, [key]));
-  removeGroups.forEach((group) => removeMembers(group as GroupKey, [key]));
+  addRoles.forEach((role) => addMembers(role, [key]));
+  removeRoles.forEach((role) => removeMembers(role, [key]));
+  addGroups.forEach((group) => addMembers(group, [key]));
+  removeGroups.forEach((group) => removeMembers(group, [key]));
 }
 
 function membershipsOf(key: UserKey, type: 'role' | 'group', transitive: boolean): PrincipalItem[] {

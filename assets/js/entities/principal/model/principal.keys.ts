@@ -62,15 +62,22 @@ export const IMPLICIT_ROLE_KEYS: ReadonlySet<string> = new Set([
 /** The built-in store whose users are service accounts. It cannot be created, renamed or deleted. */
 export const SYSTEM_ID_PROVIDER = 'system';
 
+export const SUPER_USER_KEY = 'user:system:su';
+
+/** The guest: it never signs in, so it has no credentials to edit. */
+export const ANONYMOUS_USER_KEY = 'user:system:anonymous';
+
 // The two users the platform owns and lib-admin-ui's `isSystem()` refuses to delete.
-const SYSTEM_USER_KEYS = ['user:system:su', 'user:system:anonymous'];
+const SYSTEM_USER_KEYS = [SUPER_USER_KEY, ANONYMOUS_USER_KEY];
 
 /** Users the platform owns: `su` and `anonymous`, which may not be deleted. */
 export function isSystemUser(key: PrincipalKey): boolean {
   return SYSTEM_USER_KEYS.includes(key);
 }
 
-export const SUPER_USER_KEY = 'user:system:su';
+export function isAnonymousUser(key: PrincipalKey): boolean {
+  return key === ANONYMOUS_USER_KEY;
+}
 
 export const ADMIN_ROLE_KEY = 'role:system.admin';
 

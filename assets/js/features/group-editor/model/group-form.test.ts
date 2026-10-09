@@ -171,6 +171,13 @@ describe('validateGroupForm', () => {
     );
   });
 
+  // The fields a remote system owns have no step in the dialog, so an error on one could never be fixed.
+  it('asks nothing of the fields a remote group cannot edit', () => {
+    expect(validateGroupForm(form({ displayName: ' ' }), 'edit', { remoteGroup: true })).toEqual(
+      {},
+    );
+  });
+
   it('requires a provider while creating, because the key carries it', () => {
     expect(validateGroupForm(form({ idProvider: '' }), 'create').idProvider).toBe(
       'groups.dialog.idProviderRequired',

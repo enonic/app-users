@@ -1,4 +1,9 @@
-import { useIdProviderNames, useUser, useUsers } from '../../entities/principal';
+import {
+  principalLockPending,
+  useIdProviderNames,
+  useUser,
+  useUsers,
+} from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { useItemId } from '../../shared/host';
 import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel';
@@ -19,12 +24,8 @@ export function UsersItemPage({
   const { items } = useUsers();
   const providers = useIdProviderNames();
 
-  // The panel's edit buttons follow the providers' modes, so a user shown before the providers are known
-  // would flash locked; a re-read of the list keeps what it has and does not count.
-  const providersPending = providers.status === 'loading' && providers.items.length === 0;
-
   // Loading with a user on screen is a re-read of that user: it stays.
-  if ((status === 'loading' && user === undefined) || providersPending) {
+  if ((status === 'loading' && user === undefined) || principalLockPending(providers)) {
     const row = items.find(({ key }) => key === id);
 
     return (

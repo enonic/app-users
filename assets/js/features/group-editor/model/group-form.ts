@@ -90,10 +90,22 @@ export function sameGroupForm(saved: GroupForm, edited: GroupForm): boolean {
   );
 }
 
-export function validateGroupForm(form: GroupForm, mode: StepDialogMode): GroupFormErrors {
+export type GroupFormContext = {
+  /**
+   * A group whose fields a remote system owns: the dialog shows no step for them, so an error on one
+   * could never be seen or fixed — and a roles edit must still save.
+   */
+  remoteGroup?: boolean;
+};
+
+export function validateGroupForm(
+  form: GroupForm,
+  mode: StepDialogMode,
+  { remoteGroup = false }: GroupFormContext = {},
+): GroupFormErrors {
   const errors: GroupFormErrors = {};
 
-  if (form.displayName.trim().length === 0) {
+  if (!remoteGroup && form.displayName.trim().length === 0) {
     errors.displayName = 'groups.dialog.displayNameRequired';
   }
 

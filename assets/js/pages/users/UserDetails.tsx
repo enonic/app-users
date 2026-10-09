@@ -2,11 +2,10 @@ import { Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
-  allowsWrite,
   idProviderOf,
   principalName,
-  useIdProviderMode,
   useIdProviderName,
+  usePrincipalLock,
   useTransitiveMemberships,
   type PrincipalRef,
   type UserDetail,
@@ -31,15 +30,10 @@ export function UserDetails({
 }: UserDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
-  const providerMode = useIdProviderMode();
-  const mode = providerMode(user.key);
+  const { locked, reasonKey } = usePrincipalLock(user.key, 'user');
 
   const editLabel = useI18n('browse.details.edit');
-  const lockedLabel = useI18n(
-    mode === 'UNAVAILABLE'
-      ? 'principal.details.lockedUnavailable'
-      : 'principal.details.lockedExternal',
-  );
+  const lockedLabel = useI18n(reasonKey ?? 'principal.details.lockedExternal');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -51,10 +45,6 @@ export function UserDetails({
   const [transitive, setTransitive] = useState(false);
 
   const { key, displayName, login, email, hasPassword } = user;
-
-  // ! Fail-closed: a provider not loaded yet, or whose application is gone, locks the edit as well. The
-  // ! memberships stay open — they live on the role and the group, which the Roles section writes too.
-  const locked = !allowsWrite(mode, 'user');
 
   // ? Without a group to inherit through, the toggle has nothing to add — and no request to find out.
   const inheritable = user.groups.length > 0;
@@ -93,7 +83,7 @@ export function UserDetails({
         {email !== undefined && (
           <DetailsPanel.Field labelKey="users.details.email">{email}</DetailsPanel.Field>
         )}
-        {mode !== undefined && locked && (
+        {reasonKey !== undefined && (
           <DetailsPanel.Field labelKey="principal.details.editing">
             {lockedLabel}
           </DetailsPanel.Field>
@@ -138,7 +128,6 @@ export function UserDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editRolesLabel}
-              locked={false}
               onClick={() => openUserEditorAt(user, 'roles')}
             />
           )
@@ -163,7 +152,6 @@ export function UserDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editGroupsLabel}
-              locked={false}
               onClick={() => openUserEditorAt(user, 'groups')}
             />
           )

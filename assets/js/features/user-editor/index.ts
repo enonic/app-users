@@ -3,7 +3,6 @@ export {
   $userEditor,
   $userEditorErrors,
   $userEditorProviders,
-  $userEditorRemoteUser,
   $userEditorServiceAccount,
   $userEditorStepLocks,
   $userEditorSystemUser,

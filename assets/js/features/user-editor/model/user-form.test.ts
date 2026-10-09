@@ -101,15 +101,11 @@ describe('nextUserForm', () => {
 
 describe('validateUserForm', () => {
   it('passes a filled form', () => {
-    expect(validateUserForm(form(), 'create', false)).toEqual({});
+    expect(validateUserForm(form(), 'create')).toEqual({});
   });
 
   it('requires a display name, a login and an email', () => {
-    const errors = validateUserForm(
-      form({ displayName: ' ', name: '', email: '' }),
-      'create',
-      false,
-    );
+    const errors = validateUserForm(form({ displayName: ' ', name: '', email: '' }), 'create');
 
     expect(errors).toEqual({
       displayName: 'users.dialog.displayNameRequired',
@@ -121,37 +117,39 @@ describe('validateUserForm', () => {
 
   // The fields a remote system owns have no step in the dialog, so an error on one could never be fixed.
   it('asks nothing of the fields a remote user cannot edit', () => {
-    expect(validateUserForm(form({ displayName: ' ', email: '' }), 'edit', false, true)).toEqual(
-      {},
-    );
-    expect(validateUserForm(form({ email: 'not-an-address' }), 'edit', false, true)).toEqual({});
+    expect(
+      validateUserForm(form({ displayName: ' ', email: '' }), 'edit', { remoteUser: true }),
+    ).toEqual({});
+    expect(
+      validateUserForm(form({ email: 'not-an-address' }), 'edit', { remoteUser: true }),
+    ).toEqual({});
   });
 
   it('refuses a login carrying a character XP rejects', () => {
-    expect(validateUserForm(form({ name: 'alice anderson' }), 'create', false).name).toBe(
+    expect(validateUserForm(form({ name: 'alice anderson' }), 'create').name).toBe(
       'users.dialog.idInvalid',
     );
   });
 
   it('refuses an address that is not one', () => {
-    expect(validateUserForm(form({ email: 'alice@' }), 'create', false).email).toBe(
+    expect(validateUserForm(form({ email: 'alice@' }), 'create').email).toBe(
       'users.dialog.emailInvalid',
     );
   });
 
   it('asks a system user for no email', () => {
-    expect(validateUserForm(form({ email: '' }), 'edit', true)).toEqual({});
+    expect(validateUserForm(form({ email: '' }), 'edit', { systemUser: true })).toEqual({});
   });
 
   it('requires a provider only while creating, because the key carries it', () => {
-    expect(validateUserForm(form({ idProvider: '' }), 'create', false).idProvider).toBe(
+    expect(validateUserForm(form({ idProvider: '' }), 'create').idProvider).toBe(
       'users.dialog.idProviderRequired',
     );
-    expect(validateUserForm(form({ idProvider: '' }), 'edit', false).idProvider).toBeUndefined();
+    expect(validateUserForm(form({ idProvider: '' }), 'edit').idProvider).toBeUndefined();
   });
 
   it('says nothing about the login while editing, where it is locked', () => {
-    expect(validateUserForm(form({ name: '' }), 'edit', false).name).toBeUndefined();
+    expect(validateUserForm(form({ name: '' }), 'edit').name).toBeUndefined();
   });
 });
 
@@ -175,28 +173,24 @@ describe('passwordActions', () => {
 
 describe('validateUserForm on the password', () => {
   it('says nothing while the field is not on offer', () => {
-    expect(validateUserForm(form(), 'create', false).password).toBeUndefined();
+    expect(validateUserForm(form(), 'create').password).toBeUndefined();
   });
 
   it('requires one once the field is offered', () => {
-    expect(validateUserForm(form({ password: '' }), 'create', false).password).toBe(
+    expect(validateUserForm(form({ password: '' }), 'create').password).toBe(
       'users.dialog.passwordRequired',
     );
   });
 
   it('refuses one below medium', () => {
-    expect(validateUserForm(form({ password: 'abcdefg1' }), 'create', false).password).toBe(
+    expect(validateUserForm(form({ password: 'abcdefg1' }), 'create').password).toBe(
       'users.dialog.passwordTooWeak',
     );
   });
 
   it('accepts one at medium or above', () => {
-    expect(
-      validateUserForm(form({ password: 'Abcdefg1!!' }), 'create', false).password,
-    ).toBeUndefined();
-    expect(
-      validateUserForm(form({ password: 'Abcdefg1!!!!' }), 'edit', false).password,
-    ).toBeUndefined();
+    expect(validateUserForm(form({ password: 'Abcdefg1!!' }), 'create').password).toBeUndefined();
+    expect(validateUserForm(form({ password: 'Abcdefg1!!!!' }), 'edit').password).toBeUndefined();
   });
 });
 
@@ -246,31 +240,31 @@ describe('sameUserForm', () => {
 
 describe('validateUserForm password rules', () => {
   it('requires a password once the field has been opened', () => {
-    expect(validateUserForm(form({ password: '' }), 'edit', false).password).toBe(
+    expect(validateUserForm(form({ password: '' }), 'edit').password).toBe(
       'users.dialog.passwordRequired',
     );
   });
 
   it('refuses a password carrying a space, before judging its strength', () => {
-    expect(validateUserForm(form({ password: 'Str0ng! Passw0rd' }), 'edit', false).password).toBe(
+    expect(validateUserForm(form({ password: 'Str0ng! Passw0rd' }), 'edit').password).toBe(
       'users.dialog.passwordSpaces',
     );
   });
 
   it('refuses a weak password', () => {
-    expect(validateUserForm(form({ password: 'aaaa' }), 'edit', false).password).toBe(
+    expect(validateUserForm(form({ password: 'aaaa' }), 'edit').password).toBe(
       'users.dialog.passwordTooWeak',
     );
   });
 
   it('accepts a strong one', () => {
     expect(
-      validateUserForm(form({ password: 'Str0ng!Passw0rd' }), 'edit', false).password,
+      validateUserForm(form({ password: 'Str0ng!Passw0rd' }), 'edit').password,
     ).toBeUndefined();
   });
 
   it('says nothing about a password the user never opened', () => {
-    expect(validateUserForm(form(), 'edit', false).password).toBeUndefined();
+    expect(validateUserForm(form(), 'edit').password).toBeUndefined();
   });
 });
 
@@ -279,7 +273,6 @@ describe('USER_FORM_FIELDS', () => {
     const invalid = validateUserForm(
       form({ idProvider: '', name: '', displayName: '', email: '', password: 'x' }),
       'create',
-      false,
     );
 
     expect(Object.keys(invalid).length).toBeGreaterThan(0);

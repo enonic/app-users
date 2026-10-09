@@ -6,6 +6,7 @@ import {
   isPlatformRole,
   isReservedRole,
   isServiceAccount,
+  isAnonymousUser,
   isSystemUser,
   principalName,
   principalRefOf,
@@ -152,5 +153,13 @@ describe('isPinnedMembership', () => {
     expect(isPinnedMembership('user:system:su', 'role:cms.admin')).toBe(false);
     expect(isPinnedMembership('user:system:anonymous', 'role:system.admin')).toBe(false);
     expect(isPinnedMembership('user:ldap:alice', 'role:system.admin')).toBe(false);
+  });
+});
+
+describe('isAnonymousUser', () => {
+  it('knows the guest alone', () => {
+    expect(isAnonymousUser('user:system:anonymous')).toBe(true);
+    expect(isAnonymousUser('user:system:su')).toBe(false);
+    expect(isAnonymousUser('user:ldap:anonymous')).toBe(false);
   });
 });

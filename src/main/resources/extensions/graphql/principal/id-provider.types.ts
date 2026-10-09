@@ -1,7 +1,7 @@
 import { GraphQLBoolean, GraphQLString, Json, list, nonNull, type GraphQLType } from '/lib/graphql';
 
 import { generator } from '../schema/generator';
-import { idProviderModeOf } from './id-provider-mode';
+import { ID_PROVIDER_MODES, idProviderModeOf } from './id-provider-mode';
 import {
   boundApplicationOf,
   configOf,
@@ -37,7 +37,7 @@ const IdProviderModeType: GraphQLType = generator.createEnumType({
   name: 'IdProviderMode',
   description:
     "Who owns the provider's accounts: the descriptor's `mode`, `LOCAL` when it declares none or the provider is bound to nothing, and `UNAVAILABLE` when the bound application ships no descriptor right now — treated as `EXTERNAL`.",
-  values: ['LOCAL', 'MIXED', 'EXTERNAL', 'UNAVAILABLE'],
+  values: [...ID_PROVIDER_MODES],
 });
 
 const IdProviderAccessType: GraphQLType = generator.createEnumType({

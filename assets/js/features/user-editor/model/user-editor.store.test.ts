@@ -7,7 +7,6 @@ import {
   $userEditor,
   $userEditorErrors,
   $userEditorProviders,
-  $userEditorRemoteUser,
   $userEditorServiceAccount,
   closeUserEditor,
   openServiceAccountEditor,
@@ -240,31 +239,27 @@ describe('$userEditorProviders', () => {
   });
 });
 
-describe('$userEditorRemoteUser', () => {
+describe('the fields of a user a remote system owns', () => {
   afterEach(() => {
     receiveIdProviderNames(ok([]));
   });
 
-  it('is off for a user whose provider keeps its users in XP', () => {
+  it('are validated for a user whose provider keeps its users in XP', () => {
     receiveIdProviderNames(ok([{ key: 'system', displayName: 'System', mode: 'LOCAL' }]));
 
-    openUserEditorAt(ALICE, 'roles');
+    openUserEditorAt({ ...ALICE, email: undefined }, 'roles');
 
-    expect($userEditorRemoteUser.get()).toBe(false);
+    expect($userEditorErrors.get().email).toBe('users.dialog.emailRequired');
   });
 
-  it('is on for a user a remote system owns, and while the providers are unknown', () => {
-    openUserEditorAt({ ...ALICE, key: 'user:ldap:alice' as User['key'] }, 'roles');
-
-    expect($userEditorRemoteUser.get()).toBe(true);
-
+  it('are left alone under MIXED too, where the users are the remote system’s', () => {
+    openUserEditorAt(
+      { ...ALICE, key: 'user:ldap:alice' as User['key'], email: undefined },
+      'roles',
+    );
     receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP', mode: 'MIXED' }]));
 
-    expect($userEditorRemoteUser.get()).toBe(true);
-  });
-
-  it('is off while nothing is being edited', () => {
-    expect($userEditorRemoteUser.get()).toBe(false);
+    expect($userEditorErrors.get()).toEqual({});
   });
 
   it('leaves a remote user with no email free of errors, so a membership edit can save', () => {

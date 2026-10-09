@@ -1,31 +1,26 @@
 import { useStore } from '@nanostores/preact';
-import { useMemo } from 'preact/hooks';
 
-import { IMPLICIT_ROLE_KEYS, isPinnedMembership } from '../../../../entities/principal';
+import { IMPLICIT_ROLE_KEYS } from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
-import { useI18n } from '../../../../shared/i18n';
+import { i18n, useI18n } from '../../../../shared/i18n';
 import { $userEditDetail } from '../../model/user-edit-detail';
-import { $userEditor, updateUserEditorForm } from '../../model/user-editor.store';
+import {
+  $userEditor,
+  $userEditorSystemUser,
+  updateUserEditorForm,
+} from '../../model/user-editor.store';
 
 export function UserEditorDialogRoleStep() {
-  const { form, entity } = useStore($userEditor, { keys: ['form', 'entity'] });
+  const { form } = useStore($userEditor, { keys: ['form'] });
+  const systemUser = useStore($userEditorSystemUser);
   const { status } = useStore($userEditDetail);
 
   const rolesPlaceholder = useI18n('users.dialog.rolesPlaceholder');
   const failedNotice = useI18n('users.dialog.membershipsFailed');
 
-  // The platform refuses to part `su` and Administrators, so the row cannot be removed here either.
-  const pinned = useMemo(
-    () =>
-      new Set(
-        entity === undefined
-          ? []
-          : form.roles
-              .filter(({ key }) => isPinnedMembership(entity.key, key))
-              .map(({ key }) => key),
-      ),
-    [entity, form.roles],
-  );
+  if (systemUser) {
+    return <p className="text-subtle text-sm">{i18n('users.dialog.platformOwnedRoles')}</p>;
+  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -34,7 +29,6 @@ export function UserEditorDialogRoleStep() {
       <PrincipalPicker
         kinds={['role']}
         excluded={IMPLICIT_ROLE_KEYS}
-        locked={pinned}
         placeholder={rolesPlaceholder}
         selected={form.roles}
         onChange={(roles) => updateUserEditorForm({ roles })}

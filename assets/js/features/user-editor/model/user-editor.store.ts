@@ -52,12 +52,6 @@ export const $userEditorServiceAccount = atom(false);
 /** The steps a service account's wizard skips: its provider is the system store, nothing to choose. */
 export const SERVICE_ACCOUNT_OMITTED_STEPS: readonly UserEditorStep[] = ['idProvider'];
 
-/**
- * The steps a remote user's wizard skips: its fields and credentials are the remote system's. The
- * memberships stay — they live on the role and the group, which the Roles section writes too.
- */
-export const REMOTE_USER_OMITTED_STEPS: readonly UserEditorStep[] = ['general', 'credentials'];
-
 // The section words a clash: a service account's provider goes without saying.
 const TAKEN_KEYS = {
   users: { name: 'users.dialog.idTaken', email: 'users.dialog.emailTaken' },
@@ -113,12 +107,10 @@ export const userEditorDialog = createStepDialogStore<
   titleKey: 'users.dialog.createTitle',
   initialForm: (payload) => initialUserForm(payload, createProvider()),
   validate: (form, { mode, entity }) =>
-    validateUserForm(
-      form,
-      mode,
-      entity !== undefined && isSystemUser(entity.key),
-      isRemoteUser(entity, $idProviderModeByKey.get()),
-    ),
+    validateUserForm(form, mode, {
+      systemUser: entity !== undefined && isSystemUser(entity.key),
+      remoteUser: isRemoteUser(entity, $idProviderModeByKey.get()),
+    }),
   same: sameUserForm,
   next: nextUserForm,
   $external: $userEditorExternal,
@@ -131,11 +123,6 @@ export const userEditorDialog = createStepDialogStore<
 export const $userEditor = userEditorDialog.$state;
 export const $userEditorErrors = userEditorDialog.$errors;
 export const $userEditorStepLocks = userEditorDialog.$stepLocks;
-
-export const $userEditorRemoteUser = computed(
-  [$userEditor, $idProviderModeByKey],
-  ({ entity }, modes) => isRemoteUser(entity, modes),
-);
 
 /** A user whose fields a remote system owns — or whose provider is not known yet, which locks the same. */
 function isRemoteUser(

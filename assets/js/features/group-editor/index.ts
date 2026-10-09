@@ -1,7 +1,6 @@
 export { GROUP_EDITOR_STEPS, type GroupEditorStep } from './model/group-editor-steps';
 export {
   $groupEditorProviders,
-  $groupEditorRemoteGroup,
   closeGroupEditor,
   openGroupEditor,
   openGroupEditorAt,

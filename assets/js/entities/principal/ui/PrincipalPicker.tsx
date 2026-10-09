@@ -31,8 +31,12 @@ export type PrincipalPickerProps = {
   locked?: ReadonlySet<string>;
   /** Principals kept out of the offer altogether, unlike `locked`, which shows them inert. */
   excluded?: ReadonlySet<string>;
-  /** ID providers whose principals are kept out of the offer, as `excluded` keeps single ones. */
-  excludedIdProviders?: ReadonlySet<string>;
+  /**
+   * Keeps whole providers out of the offer, as `excluded` keeps single principals: a principal is offered
+   * only when its provider answers true. A predicate rather than a set, so a provider the caller does
+   * not know can be kept out too.
+   */
+  offersIdProvider?: (idProvider: string) => boolean;
   /** Offers only principals from this ID provider. */
   idProvider?: string;
   /** Names each row's provider, for a picker whose offer can widen past the form's own. */
@@ -53,7 +57,7 @@ export function PrincipalPicker({
   rowTrailing,
   locked,
   excluded,
-  excludedIdProviders,
+  offersIdProvider,
   idProvider,
   showIdProvider = false,
   open: controlledOpen,
@@ -92,7 +96,7 @@ export function PrincipalPicker({
   // ? a later change would no longer offer it, rather than disappearing from under the user.
   const offered = search.principals.filter(
     ({ key }) =>
-      excluded?.has(key) !== true && excludedIdProviders?.has(idProviderOf(key) ?? '') !== true,
+      excluded?.has(key) !== true && offersIdProvider?.(idProviderOf(key) ?? '') !== false,
   );
 
   const pickedKeys = useStableKeys(selected);

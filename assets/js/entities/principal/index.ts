@@ -87,11 +87,14 @@ export type {
   PrincipalNameCheckState,
   PrincipalNameCheckStatus,
 } from './model/principal-name-check.store';
+export { principalLockPending } from './model/principal-lock';
+export type { PrincipalLock } from './model/principal-lock';
 export { splitMembers } from './model/principal-members';
 export type { PrincipalMembers } from './model/principal-members';
 export {
   idProviderOf,
   IMPLICIT_ROLE_KEYS,
+  isAnonymousUser,
   isPlatformRole,
   isReservedRole,
   isPinnedMembership,
@@ -179,12 +182,12 @@ export type { UsersState } from './model/users.store';
 export { useGroup } from './model/useGroup';
 export { useGroups } from './model/useGroups';
 export { useIdProvider } from './model/useIdProvider';
-export { useIdProviderMode } from './model/useIdProviderMode';
 export { useIdProviderName } from './model/useIdProviderName';
 export { useIdProviderNames } from './model/useIdProviderNames';
 export { useIdProviderPermissions } from './model/useIdProviderPermissions';
 export { useIdProviderPrincipals } from './model/useIdProviderPrincipals';
 export { useIdProviders } from './model/useIdProviders';
+export { usePrincipalLock } from './model/usePrincipalLock';
 export { useRole } from './model/useRole';
 export { useRoles } from './model/useRoles';
 export { useTransitiveMemberships } from './model/useTransitiveMemberships';

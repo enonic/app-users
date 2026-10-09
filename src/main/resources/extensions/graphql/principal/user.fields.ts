@@ -7,6 +7,7 @@ import {
   type GraphQLFields,
 } from '/lib/graphql';
 
+import { toGroupKeys, toRoleKeys } from './principal.keys';
 import {
   addPublicKey,
   createUser,
@@ -108,8 +109,8 @@ export const userMutationFields: GraphQLFields = {
         displayName: env.args.displayName,
         email: env.args.email,
         password: env.args.password,
-        roles: env.args.roles ?? [],
-        groups: env.args.groups ?? [],
+        roles: toRoleKeys(env.args.roles ?? []),
+        groups: toGroupKeys(env.args.groups ?? []),
       } satisfies UserInput),
   },
   addPublicKey: {
@@ -152,14 +153,16 @@ export const userMutationFields: GraphQLFields = {
   },
 };
 
+// ! Defaulted, because an empty list can arrive as no argument at all: `DataFetchingEnvironmentMapper`
+// ! hands arguments to JS through the same `MapGenerator` that drops an empty `interfaces` list.
 function toUserChanges(args: UpdateArgs): UserChanges {
   return {
     displayName: args.displayName,
     email: args.email,
     password: args.password,
-    addRoles: args.addRoles ?? [],
-    removeRoles: args.removeRoles ?? [],
-    addGroups: args.addGroups ?? [],
-    removeGroups: args.removeGroups ?? [],
+    addRoles: toRoleKeys(args.addRoles ?? []),
+    removeRoles: toRoleKeys(args.removeRoles ?? []),
+    addGroups: toGroupKeys(args.addGroups ?? []),
+    removeGroups: toGroupKeys(args.removeGroups ?? []),
   };
 }

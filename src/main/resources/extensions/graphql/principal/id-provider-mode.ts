@@ -1,11 +1,16 @@
-import { getIdProvider, getIdProviderDescriptor } from '/lib/idprovider';
+import { getIdProviderDescriptor } from '/lib/idprovider';
+
+import { getIdProvider } from './id-provider.source';
+import { SYSTEM_ID_PROVIDER } from './principal.keys';
 
 /**
  * Who owns a provider's accounts, from its application's descriptor. `UNAVAILABLE` is ours, not the
  * platform's: the provider is bound to an application that ships no descriptor right now — not
  * installed, or not running — so nothing says who owns them, and it is treated as `EXTERNAL`.
  */
-export type IdProviderMode = 'LOCAL' | 'MIXED' | 'EXTERNAL' | 'UNAVAILABLE';
+export const ID_PROVIDER_MODES = ['LOCAL', 'MIXED', 'EXTERNAL', 'UNAVAILABLE'] as const;
+
+export type IdProviderMode = (typeof ID_PROVIDER_MODES)[number];
 
 export type PrincipalWrite = 'user' | 'group';
 
@@ -16,16 +21,23 @@ const WRITABLE: Record<PrincipalWrite, readonly IdProviderMode[]> = {
   group: ['LOCAL', 'MIXED'],
 };
 
+/** What the resolution needs of a provider, which both `lib/xp/auth`'s and `lib/idprovider`'s carry. */
+export type BoundProvider = { key: string; idProviderConfig?: { applicationKey: string } };
+
 /**
+ * ! The system store is `LOCAL` whatever its binding: XP binds it to the standard ID provider, and
+ * ! stopping that application must not lock `su`, the service accounts and their public keys.
+ *
  * ! A descriptor without `mode:` reads as `LOCAL`, and so does an unbound provider: `mode` is optional
  * ! in the descriptor schema and the builder has no default, so neither declares that a remote system
  * ! owns anything. A value XP does not know yet is not one this app can vouch for, so it reads as
  * ! `EXTERNAL`.
  */
-/** What the resolution needs of a provider, which both `lib/xp/auth`'s and `lib/idprovider`'s carry. */
-export type BoundProvider = { idProviderConfig?: { applicationKey: string } };
-
 export function idProviderModeOf(provider: BoundProvider): IdProviderMode {
+  if (provider.key === SYSTEM_ID_PROVIDER) {
+    return 'LOCAL';
+  }
+
   const application = provider.idProviderConfig?.applicationKey;
   if (application == null) {
     return 'LOCAL';
@@ -57,7 +69,7 @@ export function requireWritable(idProvider: string, write: PrincipalWrite): void
 
 /** Whether a principal's own fields are XP's to write; its memberships always are, see `updateUser`. */
 export function isWritablePrincipal(key: string, write: PrincipalWrite): boolean {
-  const provider = getIdProvider({ idProvider: idProviderOfKey(key) });
+  const provider = getIdProvider(idProviderOfKey(key));
 
   return provider != null && allowsWrite(idProviderModeOf(provider), write);
 }
@@ -74,7 +86,7 @@ export function requireWritablePrincipals(keys: readonly string[], write: Princi
 // ! provider made moments ago would fail its first write for not being there.
 function requireWritableIn(idProviders: readonly string[], write: PrincipalWrite): void {
   for (const idProvider of new Set(idProviders)) {
-    const provider = getIdProvider({ idProvider });
+    const provider = getIdProvider(idProvider);
     if (provider == null) {
       throw new Error(`No ID provider answers to [${idProvider}]`);
     }

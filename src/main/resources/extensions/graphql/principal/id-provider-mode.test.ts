@@ -16,7 +16,22 @@ afterEach(() => {
 
 describe('idProviderModeOf', () => {
   it('reads a provider bound to nothing as LOCAL, without asking for a descriptor', () => {
-    expect(idProviderModeOf({ key: 'system', displayName: 'System' } as IdProvider)).toBe('LOCAL');
+    expect(idProviderModeOf({ key: 'local', displayName: 'Local' } as IdProvider)).toBe('LOCAL');
+
+    expect(vi.mocked(getIdProviderDescriptor)).not.toHaveBeenCalled();
+  });
+
+  // The system store is bound to the standard ID provider; stopping that application must not lock `su`.
+  it('reads the system store as LOCAL whatever it is bound to, without asking for a descriptor', () => {
+    vi.mocked(getIdProviderDescriptor).mockReturnValue(null);
+
+    expect(
+      idProviderModeOf({
+        key: 'system',
+        displayName: 'System',
+        idProviderConfig: { applicationKey: 'com.enonic.xp.app.standardidprovider', config: {} },
+      } as IdProvider),
+    ).toBe('LOCAL');
 
     expect(vi.mocked(getIdProviderDescriptor)).not.toHaveBeenCalled();
   });
