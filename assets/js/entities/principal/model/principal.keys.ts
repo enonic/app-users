@@ -62,12 +62,35 @@ export const IMPLICIT_ROLE_KEYS: ReadonlySet<string> = new Set([
 /** The built-in store whose users are service accounts. It cannot be created, renamed or deleted. */
 export const SYSTEM_ID_PROVIDER = 'system';
 
-// The two users the platform owns and lib-admin-ui's `isSystem()` refuses to delete.
-const SYSTEM_USER_KEYS = ['user:system:su', 'user:system:anonymous'];
+export const SUPER_USER_KEY = 'user:system:su';
+
+/** The guest: it never signs in, so it has no credentials to edit. */
+export const ANONYMOUS_USER_KEY = 'user:system:anonymous';
+
+/**
+ * The two users the platform owns and lib-admin-ui's `isSystem()` refuses to delete. Their memberships
+ * are the platform's too: no picker offers them, since a membership stored on either is one XP never
+ * resolves (enonic/xp#12443).
+ */
+export const SYSTEM_USER_KEYS: ReadonlySet<string> = new Set([SUPER_USER_KEY, ANONYMOUS_USER_KEY]);
 
 /** Users the platform owns: `su` and `anonymous`, which may not be deleted. */
 export function isSystemUser(key: PrincipalKey): boolean {
-  return SYSTEM_USER_KEYS.includes(key);
+  return SYSTEM_USER_KEYS.has(key);
+}
+
+export function isAnonymousUser(key: PrincipalKey): boolean {
+  return key === ANONYMOUS_USER_KEY;
+}
+
+export const ADMIN_ROLE_KEY = 'role:system.admin';
+
+/**
+ * Whether a membership is one the platform refuses to end: `su` leaving Administrators would lock the
+ * last way back into the tool, and `SecurityServiceImpl` throws on it.
+ */
+export function isPinnedMembership(member: PrincipalKey, holder: PrincipalKey): boolean {
+  return member === SUPER_USER_KEY && holder === ADMIN_ROLE_KEY;
 }
 
 /** A user of the system store: what the Service Accounts section lists (#2674). */

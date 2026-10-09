@@ -1,4 +1,5 @@
 import {
+  createIdProviderModeReaction,
   createPrincipalReaction,
   evictGroupDetail,
   forgetGroupDetails,
@@ -11,6 +12,7 @@ import { loadGroupsScreen } from './groups.screen';
 import { groupsSelection } from './selection.store';
 
 let running: TopicReaction | undefined;
+let modes: TopicReaction | undefined;
 
 /**
  * A provider change re-reads the screen: its names ride the same document. A user or role change re-reads
@@ -49,9 +51,14 @@ export function startGroupsEvents(frame: HostFrame): void {
   });
 
   running.start();
+
+  modes = createIdProviderModeReaction(frame.$visible, refresh);
+  modes.start();
 }
 
 export function stopGroupsEvents(): void {
   running?.stop();
   running = undefined;
+  modes?.stop();
+  modes = undefined;
 }

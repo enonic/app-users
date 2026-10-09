@@ -17,32 +17,38 @@ import {
 } from '/lib/xp/auth';
 
 import {
+  isWritablePrincipal,
+  requireWritable,
+  requireWritablePrincipals,
+} from './id-provider-mode';
+import { ADMIN_ROLE, SUPER_USER, USER_KEY } from './principal.keys';
+import {
   byName,
   clampCount,
   clampStart,
-  requireIdProvider,
   toPrincipalItem,
   type PrincipalItem,
 } from './principal.source';
 
 export type UserSource = User;
 
+/** The lists are typed keys because `user.fields` parses them: a group in a roles list never gets here. */
 export type UserInput = {
   displayName: string;
   email?: string;
   password?: string;
-  roles: readonly string[];
-  groups: readonly string[];
+  roles: readonly RoleKey[];
+  groups: readonly GroupKey[];
 };
 
 export type UserChanges = {
   displayName: string;
   email?: string;
   password?: string;
-  addRoles: readonly string[];
-  removeRoles: readonly string[];
-  addGroups: readonly string[];
-  removeGroups: readonly string[];
+  addRoles: readonly RoleKey[];
+  removeRoles: readonly RoleKey[];
+  addGroups: readonly GroupKey[];
+  removeGroups: readonly GroupKey[];
 };
 
 /** One page of users, and how many the search matched in total. */
@@ -132,8 +138,6 @@ export function listUsers({
  * ! second copy to keep in step, so the throw is caught instead — a key the platform will not parse names
  * ! no user, which is exactly what null says.
  */
-const USER_KEY = /^user:[^:]+:[^:]+$/;
-
 export function getUser(key: string): User | null {
   if (!USER_KEY.test(key)) {
     return null;
@@ -200,6 +204,8 @@ export function listUserGroups(key: UserKey, transitive: boolean): PrincipalItem
 }
 
 export function addPublicKey(key: string, publicKey: string, label?: string): PublicKeyItem {
+  requireWritablePrincipals([key], 'user');
+
   const kid = generateKid(publicKey);
 
   const profile = modifyProfile<PublicKeyProfile>({
@@ -228,6 +234,8 @@ export function addPublicKey(key: string, publicKey: string, label?: string): Pu
 }
 
 export function removePublicKey(key: string, kid: string): boolean {
+  requireWritablePrincipals([key], 'user');
+
   const profile = modifyProfile<PublicKeyProfile>({
     key: key as UserKey,
     editor: (current) => ({
@@ -244,7 +252,8 @@ export function removePublicKey(key: string, kid: string): boolean {
 }
 
 export function createUser(idProvider: string, name: string, input: UserInput): User {
-  requireIdProvider(idProvider);
+  requireWritable(idProvider, 'user');
+  requireWritablePrincipals(input.groups, 'group');
 
   // ! Every refusal this function owns comes before the first write. There is no transaction around the
   // ! principal, the password and the memberships, so a password refused after `createUserPrincipal` would
@@ -271,8 +280,24 @@ export function createUser(idProvider: string, name: string, input: UserInput): 
 }
 
 export function updateUser(key: string, changes: UserChanges): User {
-  if (getUser(key) == null) {
+  const current = getUser(key);
+  if (current == null) {
     throw new Error(`No user answers to [${key}]`);
+  }
+
+  // ! A remote user's memberships are still XP's: they live on the role and on the group, where the Roles
+  // ! section and the Group dialog write them too. Only the user's own fields and credentials are the
+  // ! remote system's, so those are what a locked provider refuses. `updateGroup` reasons the same way.
+  const locked = !isWritablePrincipal(key, 'user');
+  if (locked && (changes.password != null || scalarsMoved(current, changes))) {
+    requireWritablePrincipals([key], 'user');
+  }
+  requireWritablePrincipals([...changes.addGroups, ...changes.removeGroups], 'group');
+
+  // ! The platform refuses this one mid-write, in `removeRelationship`; refusing it here first keeps the
+  // ! password and the other memberships from applying before it does. `role.source` does the same.
+  if (key === SUPER_USER && changes.removeRoles.includes(ADMIN_ROLE)) {
+    throw new Error(`Cannot remove [${SUPER_USER}] from [${ADMIN_ROLE}]`);
   }
 
   if (changes.password != null) {
@@ -291,6 +316,10 @@ export function updateUser(key: string, changes: UserChanges): User {
     changes.addGroups,
     changes.removeGroups,
   );
+
+  if (locked) {
+    return getUser(key) ?? current;
+  }
 
   const user = modifyUser({
     key: key as UserKey,
@@ -367,6 +396,14 @@ function named(providers?: readonly string[]): readonly string[] {
   return (providers ?? []).filter((provider) => provider.length > 0);
 }
 
+// Both sides trimmed: the client trims what it sends, and a value a remote system stored may not be.
+function scalarsMoved(current: User, changes: UserChanges): boolean {
+  return (
+    changes.displayName.trim() !== current.displayName.trim() ||
+    (changes.email ?? '').trim() !== (current.email ?? '').trim()
+  );
+}
+
 function requirePassword(password: string): void {
   if (/\s/.test(password)) {
     throw new Error('A password cannot contain whitespace');
@@ -375,15 +412,15 @@ function requirePassword(password: string): void {
 
 function applyMemberships(
   key: UserKey,
-  addRoles: readonly string[],
-  removeRoles: readonly string[],
-  addGroups: readonly string[],
-  removeGroups: readonly string[],
+  addRoles: readonly RoleKey[],
+  removeRoles: readonly RoleKey[],
+  addGroups: readonly GroupKey[],
+  removeGroups: readonly GroupKey[],
 ): void {
-  addRoles.forEach((role) => addMembers(role as RoleKey, [key]));
-  removeRoles.forEach((role) => removeMembers(role as RoleKey, [key]));
-  addGroups.forEach((group) => addMembers(group as GroupKey, [key]));
-  removeGroups.forEach((group) => removeMembers(group as GroupKey, [key]));
+  addRoles.forEach((role) => addMembers(role, [key]));
+  removeRoles.forEach((role) => removeMembers(role, [key]));
+  addGroups.forEach((group) => addMembers(group, [key]));
+  removeGroups.forEach((group) => removeMembers(group, [key]));
 }
 
 function membershipsOf(key: UserKey, type: 'role' | 'group', transitive: boolean): PrincipalItem[] {

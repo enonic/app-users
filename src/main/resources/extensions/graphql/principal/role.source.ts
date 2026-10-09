@@ -6,30 +6,32 @@ import {
   getPrincipal,
   modifyRole,
   removeMembers,
-  type GroupKey,
   type Principal,
   type Role,
   type RoleKey,
-  type UserKey,
 } from '/lib/xp/auth';
 
+import { ADMIN_ROLE, ROLE_KEY, SUPER_USER, type MemberKey } from './principal.keys';
 import { byName, displayNameOf, toPrincipalItem, type PrincipalItem } from './principal.source';
 
 export type RoleSource = Role;
 
-/** What a new role is created with. `members` is additions: a role starts out held by nobody. */
+/**
+ * What a new role is created with. `members` is additions: a role starts out held by nobody. Typed keys
+ * because `role.fields` parses them: a role never holds another role.
+ */
 export type RoleInput = {
   displayName: string;
   description?: string;
-  members: readonly string[];
+  members: readonly MemberKey[];
 };
 
 /** What an edit changes about a role: the scalars, and only the membership that moved. */
 export type RoleChanges = {
   displayName: string;
   description?: string;
-  addMembers: readonly string[];
-  removeMembers: readonly string[];
+  addMembers: readonly MemberKey[];
+  removeMembers: readonly MemberKey[];
 };
 
 export function listRoles(): Role[] {
@@ -40,9 +42,6 @@ export function listRoles(): Role[] {
 
   return hits.filter(isRole).sort((a, b) => byName(displayNameOf(a), displayNameOf(b)));
 }
-
-/** A superset of what XP accepts — see the `catch` in `getRole` for why it cannot be the whole check. */
-const ROLE_KEY = /^role:[^:]+$/;
 
 /**
  * Null for a key no role answers to, which is a legitimate answer rather than a failure.
@@ -115,11 +114,12 @@ export function updateRole(key: string, changes: RoleChanges): Role {
 // * Helpers
 // *
 
-const ADMIN_ROLE = 'role:system.admin';
-const SUPER_USER = 'user:system:su';
-
 // Nothing is read first: both writes are idempotent at the node level, see `docs/platform-facts.md`.
-function applyMembers(key: RoleKey, added: readonly string[], removed: readonly string[]): void {
+function applyMembers(
+  key: RoleKey,
+  added: readonly MemberKey[],
+  removed: readonly MemberKey[],
+): void {
   // ! Losing `su` from Administrators locks the last way back into the tool. `removeRelationship`
   // ! refuses it too; refusing here first keeps an edit that also gained members from half-applying.
   if (key === ADMIN_ROLE && removed.includes(SUPER_USER)) {
@@ -127,10 +127,10 @@ function applyMembers(key: RoleKey, added: readonly string[], removed: readonly 
   }
 
   if (added.length > 0) {
-    addMembers(key, added as (UserKey | GroupKey)[]);
+    addMembers(key, [...added]);
   }
   if (removed.length > 0) {
-    removeMembers(key, removed as (UserKey | GroupKey)[]);
+    removeMembers(key, [...removed]);
   }
 }
 

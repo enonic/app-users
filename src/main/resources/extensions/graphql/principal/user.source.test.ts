@@ -1,10 +1,10 @@
+import { getIdProvider, getIdProviderDescriptor } from '/lib/idprovider';
 import { generateKid } from '/lib/publickey';
 import {
   addMembers,
   changePassword,
   createUser as createUserPrincipal,
   findUsers,
-  getIdProviders,
   getMemberships,
   getPrincipal,
   getProfile,
@@ -12,11 +12,10 @@ import {
   modifyUser,
   removeMembers,
   type Group,
-  type IdProvider,
   type Role,
   type User,
 } from '/lib/xp/auth';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   addPublicKey,
@@ -33,6 +32,42 @@ import {
   type UserChanges,
   type UserInput,
 } from './user.source';
+
+type LibIdProvider = NonNullable<ReturnType<typeof getIdProvider>>;
+
+// The guards read one provider at a time, so the store is a lookup rather than a list.
+function providerStore(providers: readonly LibIdProvider[]): void {
+  vi.mocked(getIdProvider).mockImplementation(
+    ({ idProvider }) => providers.find(({ key }) => key === idProvider) ?? null,
+  );
+}
+
+function localProvider(key: string): LibIdProvider {
+  return { key, displayName: key };
+}
+
+function remoteProvider(key: string): LibIdProvider {
+  return {
+    key,
+    displayName: key,
+    idProviderConfig: { applicationKey: 'com.example.remote', config: [] },
+  };
+}
+
+// As XP binds it: to the standard ID provider, whose descriptor the resolution never asks for.
+function systemProvider(): LibIdProvider {
+  return {
+    key: 'system',
+    displayName: 'System',
+    idProviderConfig: { applicationKey: 'com.enonic.xp.app.standardidprovider', config: [] },
+  };
+}
+
+// Every descriptor reads EXTERNAL, so the system store is LOCAL by its exemption alone.
+function boundProviders(): void {
+  providerStore([systemProvider(), remoteProvider('remote')]);
+  vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
+}
 
 function user(name: string, displayName: string): User {
   return {
@@ -465,9 +500,7 @@ describe('createUser', () => {
   }
 
   function providers(...keys: string[]): void {
-    vi.mocked(getIdProviders).mockReturnValue(
-      keys.map((key) => ({ key, displayName: key }) as IdProvider),
-    );
+    providerStore(keys.map(localProvider));
   }
 
   it('creates the user in the provider named, from the scalars given', () => {
@@ -538,6 +571,29 @@ describe('createUser', () => {
 });
 
 describe('updateUser', () => {
+  it('refuses to take the super user out of the administrators role, before any write', () => {
+    boundProviders();
+    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+
+    expect(() =>
+      updateUser('user:system:su', {
+        displayName: 'Super User',
+        password: 'secret',
+        addRoles: ['role:cms.admin'],
+        removeRoles: ['role:system.admin'],
+        addGroups: [],
+        removeGroups: [],
+      }),
+    ).toThrow('Cannot remove [user:system:su] from [role:system.admin]');
+
+    expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(removeMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  beforeEach(boundProviders);
+
   function changes(overrides: Partial<UserChanges> = {}): UserChanges {
     return {
       displayName: 'Alice',
@@ -673,6 +729,8 @@ describe('updateUser', () => {
 });
 
 describe('addPublicKey', () => {
+  beforeEach(boundProviders);
+
   function stored(...keys: { kid: string }[]) {
     vi.mocked(generateKid).mockReturnValue('abc123');
     vi.mocked(modifyProfile).mockImplementation(({ editor }) =>
@@ -726,6 +784,8 @@ describe('addPublicKey', () => {
 });
 
 describe('removePublicKey', () => {
+  beforeEach(boundProviders);
+
   it('drops the key the id names and answers true', () => {
     vi.mocked(modifyProfile).mockImplementation(({ editor }) =>
       editor({ publicKeys: [{ kid: 'gone' }, { kid: 'kept' }] } as never),
@@ -750,9 +810,7 @@ describe('removePublicKey', () => {
 
 describe('password arguments', () => {
   function providers(): void {
-    vi.mocked(getIdProviders).mockReturnValue([
-      { key: 'system', displayName: 'system' } as IdProvider,
-    ]);
+    providerStore([localProvider('system')]);
   }
 
   it('reads an explicit null as "leave the password alone", not as a value', () => {
@@ -817,5 +875,119 @@ describe('password arguments', () => {
     expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
     expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
     expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+  });
+});
+
+describe('writes a remote system owns', () => {
+  beforeEach(boundProviders);
+
+  const nothing = { displayName: 'Alice', roles: [], groups: [] };
+  const noChanges = {
+    displayName: 'Alice',
+    addRoles: [],
+    removeRoles: [],
+    addGroups: [],
+    removeGroups: [],
+  };
+
+  it('refuses to create a user in an EXTERNAL provider, before any write', () => {
+    expect(() => createUser('remote', 'alice', nothing)).toThrow(/remote/);
+
+    expect(vi.mocked(createUserPrincipal)).not.toHaveBeenCalled();
+  });
+
+  it('refuses a new user whose groups a remote system owns, before any write', () => {
+    expect(() =>
+      createUser('system', 'alice', { ...nothing, groups: ['group:remote:staff'] }),
+    ).toThrow(/remote/);
+
+    expect(vi.mocked(createUserPrincipal)).not.toHaveBeenCalled();
+  });
+
+  it('refuses to edit a user of an EXTERNAL provider, before any write', () => {
+    vi.mocked(getPrincipal).mockReturnValue({
+      ...user('alice', 'Alice'),
+      key: 'user:remote:alice',
+    });
+
+    expect(() => updateUser('user:remote:alice', { ...noChanges, password: 'secret' })).toThrow(
+      /remote/,
+    );
+
+    expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('refuses to rename or re-address a user of an EXTERNAL provider', () => {
+    vi.mocked(getPrincipal).mockReturnValue({
+      ...user('alice', 'Alice'),
+      key: 'user:remote:alice',
+    });
+
+    expect(() =>
+      updateUser('user:remote:alice', { ...noChanges, displayName: 'Alice Remote' }),
+    ).toThrow(/remote/);
+    expect(() =>
+      updateUser('user:remote:alice', { ...noChanges, email: 'alice@example.com' }),
+    ).toThrow(/remote/);
+
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  // Memberships live on the role and on the group, where the Roles section writes them as well.
+  it('lets a user of an EXTERNAL provider join and leave roles and local groups', () => {
+    vi.mocked(getPrincipal).mockReturnValue({
+      ...user('alice', 'Alice'),
+      key: 'user:remote:alice',
+    });
+
+    updateUser('user:remote:alice', {
+      ...noChanges,
+      addRoles: ['role:cms.admin'],
+      removeGroups: ['group:system:staff'],
+    });
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:cms.admin', ['user:remote:alice']);
+    expect(vi.mocked(removeMembers)).toHaveBeenCalledWith('group:system:staff', [
+      'user:remote:alice',
+    ]);
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('reads whitespace around a stored value as no change, since the client trims what it sends', () => {
+    vi.mocked(getPrincipal).mockReturnValue({
+      ...user('alice', 'Alice '),
+      key: 'user:remote:alice',
+      email: ' alice@example.com',
+    });
+
+    updateUser('user:remote:alice', {
+      ...noChanges,
+      email: 'alice@example.com',
+      addRoles: ['role:cms.admin'],
+    });
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:cms.admin', ['user:remote:alice']);
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('refuses to move a local user in or out of a group a remote system owns', () => {
+    vi.mocked(getPrincipal).mockReturnValue(user('alice', 'Alice'));
+
+    expect(() =>
+      updateUser('user:system:alice', { ...noChanges, removeGroups: ['group:remote:staff'] }),
+    ).toThrow(/remote/);
+
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('refuses a public key on a user of an EXTERNAL provider, either way', () => {
+    expect(() => addPublicKey('user:remote:alice', '-----BEGIN PUBLIC KEY-----abc')).toThrow(
+      /remote/,
+    );
+    expect(() => removePublicKey('user:remote:alice', 'abc123')).toThrow(/remote/);
+
+    expect(vi.mocked(modifyProfile)).not.toHaveBeenCalled();
   });
 });

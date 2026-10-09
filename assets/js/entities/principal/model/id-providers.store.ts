@@ -3,7 +3,7 @@ import { computed, map, type ReadableAtom } from 'nanostores';
 import type { Result } from 'neverthrow';
 
 import type { IdProviderUserCount } from '../api/id-providers.api';
-import type { IdProvider, IdProviderName } from './principal.types';
+import type { IdProvider, IdProviderMode, IdProviderName } from './principal.types';
 import { upsert } from './upsert';
 
 export type IdProvidersState = {
@@ -53,6 +53,12 @@ export const $idProviderUserCounts = map<IdProviderUserCountsState>({
 export const $idProviderNameByKey: ReadableAtom<ReadonlyMap<string, string>> = computed(
   $idProviderNames,
   ({ items }) => new Map(items.map(({ key, displayName }) => [key, displayName])),
+);
+
+/** Provider name to mode, for the sections that decide what may be created or edited where. */
+export const $idProviderModeByKey: ReadableAtom<ReadonlyMap<string, IdProviderMode>> = computed(
+  $idProviderNames,
+  ({ items }) => new Map(items.map(({ key, mode }) => [key, mode])),
 );
 
 export function beginIdProvidersLoad(): void {

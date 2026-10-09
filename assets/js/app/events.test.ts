@@ -28,14 +28,24 @@ describe('startSectionEvents', () => {
     vi.clearAllMocks();
   });
 
-  it('connects to the hub and subscribes the principals topic once', () => {
+  it('connects to the hub and subscribes each topic once', () => {
     startSectionEvents('users', frame);
     startSectionEvents('users', frame);
 
     expect(connectAdminEvents).toHaveBeenCalledWith('/_/admin:events');
-    expect(subscribeTopic).toHaveBeenCalledExactlyOnceWith(
+    expect(subscribeTopic.mock.calls.map(([topic]) => topic)).toEqual([
       'com.enonic.xp.app.settings:principals',
-      expect.anything(),
+      'com.enonic.xp.app.settings:applications',
+    ]);
+  });
+
+  // A provider's mode is its application's, so a section gating on it follows the lifecycle too.
+  it('leaves the applications topic to the sections that gate on a mode', () => {
+    startSectionEvents('roles', frame);
+    startSectionEvents('service-accounts', frame);
+
+    expect(subscribeTopic.mock.calls.map(([topic]) => topic)).not.toContain(
+      'com.enonic.xp.app.settings:applications',
     );
   });
 
@@ -49,7 +59,7 @@ describe('startSectionEvents', () => {
     expect(unsubscribe).toHaveBeenCalled();
 
     startSectionEvents('users', frame);
-    expect(subscribeTopic).toHaveBeenCalledTimes(2);
+    expect(subscribeTopic).toHaveBeenCalledTimes(4);
   });
 
   // ! One module instance can serve several mounted sections: each holds its own subscription, and
@@ -57,12 +67,15 @@ describe('startSectionEvents', () => {
   it('keeps each mounted section on its own subscription', () => {
     const dropUsers = vi.fn();
     const dropRoles = vi.fn();
-    subscribeTopic.mockReturnValueOnce(dropUsers).mockReturnValueOnce(dropRoles);
+    subscribeTopic
+      .mockReturnValueOnce(dropUsers)
+      .mockReturnValueOnce(dropUsers)
+      .mockReturnValueOnce(dropRoles);
 
     startSectionEvents('users', frame);
     startSectionEvents('roles', frame);
 
-    expect(subscribeTopic).toHaveBeenCalledTimes(2);
+    expect(subscribeTopic).toHaveBeenCalledTimes(3);
 
     stopSectionEvents('users');
 

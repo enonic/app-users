@@ -21,6 +21,7 @@ function provider(key: string, users = 0, bound = true): IdProvider {
   return {
     key,
     displayName: key,
+    mode: 'LOCAL',
     users: { total: users },
     groups: { total: 0 },
     ...(bound
@@ -105,19 +106,19 @@ describe('the provider names the other sections read', () => {
   });
 
   it('carries a name per key, and nothing a screen would not show', () => {
-    receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP' }]));
+    receiveIdProviderNames(ok([{ key: 'ldap', displayName: 'Corporate LDAP', mode: 'LOCAL' }]));
 
     expect($idProviderNames.get()).toEqual({
       status: 'ready',
-      items: [{ key: 'ldap', displayName: 'Corporate LDAP' }],
+      items: [{ key: 'ldap', displayName: 'Corporate LDAP', mode: 'LOCAL' }],
     });
   });
 
   it('projects the names to a lookup by key', () => {
     receiveIdProviderNames(
       ok([
-        { key: 'system', displayName: 'System' },
-        { key: 'ldap', displayName: 'Corporate LDAP' },
+        { key: 'system', displayName: 'System', mode: 'LOCAL' },
+        { key: 'ldap', displayName: 'Corporate LDAP', mode: 'LOCAL' },
       ]),
     );
 
@@ -128,11 +129,13 @@ describe('the provider names the other sections read', () => {
   // The filter menu is built from this list while a ticked provider narrows the query: emptying it
   // would leave a narrowing with no entry left to untick.
   it('keeps the names it has when a read fails, and still reports the failure', () => {
-    receiveIdProviderNames(ok([{ key: 'system', displayName: 'System' }]));
+    receiveIdProviderNames(ok([{ key: 'system', displayName: 'System', mode: 'LOCAL' }]));
 
     receiveIdProviderNames(err(new AppError('Providers are unreachable')));
 
-    expect($idProviderNames.get().items).toEqual([{ key: 'system', displayName: 'System' }]);
+    expect($idProviderNames.get().items).toEqual([
+      { key: 'system', displayName: 'System', mode: 'LOCAL' },
+    ]);
     expect($idProviderNames.get().status).toBe('error');
     expect($idProviderNames.get().error).toBe('Providers are unreachable');
   });
@@ -149,7 +152,7 @@ describe('the provider names the other sections read', () => {
   });
 
   it("is left alone when that section's load fails, so a screen that filled it keeps saying so", async () => {
-    receiveIdProviderNames(ok([{ key: 'system', displayName: 'System' }]));
+    receiveIdProviderNames(ok([{ key: 'system', displayName: 'System', mode: 'LOCAL' }]));
     vi.mocked(fetchIdProviders).mockReturnValue(
       errAsync(new AppError('Providers are unreachable')),
     );
@@ -158,7 +161,7 @@ describe('the provider names the other sections read', () => {
 
     expect($idProviderNames.get()).toEqual({
       status: 'ready',
-      items: [{ key: 'system', displayName: 'System' }],
+      items: [{ key: 'system', displayName: 'System', mode: 'LOCAL' }],
     });
   });
 });

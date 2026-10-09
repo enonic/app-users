@@ -4,6 +4,7 @@ import { useState } from 'preact/hooks';
 
 import {
   idProviderOf,
+  isAnonymousUser,
   isSystemUser,
   principalName,
   useTransitiveMemberships,
@@ -25,7 +26,8 @@ const SERVICE_ACCOUNT_DETAILS_NAME = 'ServiceAccountDetails';
 
 /**
  * `UserDetails` without the ID provider field: every account here is the system store's. The accounts the
- * platform owns keep their roles and groups too — those steps only say so — so neither offers an Edit.
+ * platform owns keep their roles and groups too — those steps only say so — so neither offers an Edit,
+ * and the guest, which never signs in, offers none for its credentials either.
  */
 export function ServiceAccountDetails({
   user,
@@ -50,6 +52,8 @@ export function ServiceAccountDetails({
   const { key, displayName, login, email, hasPassword, publicKeys } = user;
 
   const system = isSystemUser(key);
+  // The guest never signs in: no password, no public keys, nothing to edit.
+  const anonymous = isAnonymousUser(key);
 
   // ? Without a group to inherit through, the toggle has nothing to add — and no request to find out.
   const inheritable = user.groups.length > 0;
@@ -95,7 +99,7 @@ export function ServiceAccountDetails({
       <DetailsPanel.Section
         labelKey="users.details.credentials"
         action={
-          readOnly ? undefined : (
+          anonymous || readOnly ? undefined : (
             <Button
               variant="outline"
               size="sm"

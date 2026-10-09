@@ -1,4 +1,10 @@
-import { principalName, useGroup, useGroups } from '../../entities/principal';
+import {
+  principalLockPending,
+  principalName,
+  useGroup,
+  useGroups,
+  useIdProviderNames,
+} from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { useItemId } from '../../shared/host';
 import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel';
@@ -17,9 +23,10 @@ export function GroupsItemPage({
   const id = useItemId();
   const { status, item: group } = useGroup(id);
   const { items } = useGroups();
+  const providers = useIdProviderNames();
 
   // Loading with a group on screen is a re-read of that group: it stays.
-  if (status === 'loading' && group === undefined) {
+  if ((status === 'loading' && group === undefined) || principalLockPending(providers)) {
     const row = items.find(({ key }) => key === id);
 
     return (

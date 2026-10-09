@@ -1,7 +1,6 @@
 import {
   deletePrincipal,
   findPrincipals,
-  getIdProviders,
   getPrincipal,
   type Principal,
   type PrincipalKey,
@@ -105,12 +104,6 @@ export function clampStart(start?: number): number {
 
 export function deletePrincipals(keys: readonly string[]): PrincipalDeletion[] {
   return keys.map(deleteOne);
-}
-
-export function requireIdProvider(key: string): void {
-  if (!getIdProviders().some((provider) => provider.key === key)) {
-    throw new Error(`No ID provider answers to [${key}]`);
-  }
 }
 
 export function localNameOf(key: string): string {

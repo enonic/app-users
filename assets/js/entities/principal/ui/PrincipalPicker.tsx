@@ -31,10 +31,19 @@ export type PrincipalPickerProps = {
   locked?: ReadonlySet<string>;
   /** Principals kept out of the offer altogether, unlike `locked`, which shows them inert. */
   excluded?: ReadonlySet<string>;
+  /**
+   * Keeps whole providers out of the offer, as `excluded` keeps single principals: a principal is offered
+   * only when its provider answers true. A predicate rather than a set, so a provider the caller does
+   * not know can be kept out too.
+   */
+  offersIdProvider?: (idProvider: string) => boolean;
   /** Offers only principals from this ID provider. */
   idProvider?: string;
   /** Names each row's provider, for a picker whose offer can widen past the form's own. */
   showIdProvider?: boolean;
+  /** The popup, controlled: a step that widens the offer opens it so the wider list is seen at once. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const LOAD_MORE_MARGIN = 48;
@@ -48,11 +57,19 @@ export function PrincipalPicker({
   rowTrailing,
   locked,
   excluded,
+  offersIdProvider,
   idProvider,
   showIdProvider = false,
+  open: controlledOpen,
+  onOpenChange,
 }: PrincipalPickerProps) {
   const [query, setQuery] = useState('');
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = controlledOpen ?? ownOpen;
+  const setOpen = (next: boolean): void => {
+    setOwnOpen(next);
+    onOpenChange?.(next);
+  };
   const labelId = useId();
 
   const searchingLabel = useI18n('principal.picker.searching');
@@ -77,7 +94,10 @@ export function PrincipalPicker({
 
   // ? The exclusion sits on the offer alone: a principal already picked stays in the list below even when
   // ? a later change would no longer offer it, rather than disappearing from under the user.
-  const offered = search.principals.filter(({ key }) => excluded?.has(key) !== true);
+  const offered = search.principals.filter(
+    ({ key }) =>
+      excluded?.has(key) !== true && offersIdProvider?.(idProviderOf(key) ?? '') !== false,
+  );
 
   const pickedKeys = useStableKeys(selected);
 

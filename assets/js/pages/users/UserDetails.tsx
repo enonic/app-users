@@ -1,14 +1,16 @@
-import { Button, Checkbox } from '@enonic/ui';
+import { Checkbox } from '@enonic/ui';
 import { useState } from 'preact/hooks';
 
 import {
   idProviderOf,
   principalName,
   useIdProviderName,
+  usePrincipalLock,
   useTransitiveMemberships,
   type PrincipalRef,
   type UserDetail,
 } from '../../entities/principal';
+import { PrincipalEditButton } from '../../entities/principal/ui/PrincipalEditButton';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openUserEditorAt } from '../../features/user-editor';
 import { isReadOnlyMode } from '../../shared/config';
@@ -28,8 +30,10 @@ export function UserDetails({
 }: UserDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
+  const { locked, reasonKey } = usePrincipalLock(user.key, 'user');
 
   const editLabel = useI18n('browse.details.edit');
+  const lockedLabel = useI18n(reasonKey ?? 'principal.details.lockedExternal');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -65,10 +69,9 @@ export function UserDetails({
         labelKey="users.details.user"
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editLabel}
+              locked={locked}
               onClick={() => openUserEditorAt(user, 'general')}
             />
           )
@@ -80,6 +83,11 @@ export function UserDetails({
         {email !== undefined && (
           <DetailsPanel.Field labelKey="users.details.email">{email}</DetailsPanel.Field>
         )}
+        {reasonKey !== undefined && (
+          <DetailsPanel.Field labelKey="principal.details.editing">
+            {lockedLabel}
+          </DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
       {/* The password alone: public keys belong to the system store's accounts, as in the editor. */}
@@ -87,10 +95,9 @@ export function UserDetails({
         labelKey="users.details.credentials"
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editCredentialsLabel}
+              locked={locked}
               onClick={() => openUserEditorAt(user, 'credentials')}
             />
           )
@@ -119,9 +126,7 @@ export function UserDetails({
         count={roles.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editRolesLabel}
               onClick={() => openUserEditorAt(user, 'roles')}
             />
@@ -145,9 +150,7 @@ export function UserDetails({
         count={groups.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editGroupsLabel}
               onClick={() => openUserEditorAt(user, 'groups')}
             />

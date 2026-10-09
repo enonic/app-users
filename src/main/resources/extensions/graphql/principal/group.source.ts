@@ -11,35 +11,37 @@ import {
   type GroupKey,
   type Principal,
   type RoleKey,
-  type UserKey,
 } from '/lib/xp/auth';
 
 import {
-  byName,
-  displayNameOf,
-  requireIdProvider,
-  toPrincipalItem,
-  type PrincipalItem,
-} from './principal.source';
+  isWritablePrincipal,
+  requireWritable,
+  requireWritablePrincipals,
+} from './id-provider-mode';
+import { GROUP_KEY, type MemberKey } from './principal.keys';
+import { byName, displayNameOf, toPrincipalItem, type PrincipalItem } from './principal.source';
 
 export type GroupSource = Group;
 
-/** What a new group is created with. Both lists are additions: a group starts out holding nobody. */
+/**
+ * What a new group is created with. Both lists are additions: a group starts out holding nobody. The
+ * lists are typed keys because `group.fields` parses them: a group in a roles list never gets here.
+ */
 export type GroupInput = {
   displayName: string;
   description?: string;
-  members: readonly string[];
-  roles: readonly string[];
+  members: readonly MemberKey[];
+  roles: readonly RoleKey[];
 };
 
 /** What an edit changes about a group: the scalars, and only the membership that moved. */
 export type GroupChanges = {
   displayName: string;
   description?: string;
-  addMembers: readonly string[];
-  removeMembers: readonly string[];
-  addRoles: readonly string[];
-  removeRoles: readonly string[];
+  addMembers: readonly MemberKey[];
+  removeMembers: readonly MemberKey[];
+  addRoles: readonly RoleKey[];
+  removeRoles: readonly RoleKey[];
 };
 
 export function listGroups(): Group[] {
@@ -50,9 +52,6 @@ export function listGroups(): Group[] {
 
   return hits.filter(isGroup).sort((a, b) => byName(displayNameOf(a), displayNameOf(b)));
 }
-
-/** A group key carries its provider, so the two-segment form a role uses is not one. */
-const GROUP_KEY = /^group:[^:]+:[^:]+$/;
 
 /**
  * Null for a key no group answers to, which is a legitimate answer rather than a failure. The three
@@ -88,7 +87,7 @@ export function listGroupGroups(key: GroupKey, transitive: boolean): PrincipalIt
 }
 
 export function createGroup(idProvider: string, name: string, input: GroupInput): Group {
-  requireIdProvider(idProvider);
+  requireWritable(idProvider, 'group');
 
   const group = createGroupPrincipal({
     idProvider,
@@ -104,6 +103,29 @@ export function createGroup(idProvider: string, name: string, input: GroupInput)
 }
 
 export function updateGroup(key: string, changes: GroupChanges): Group {
+  // ! The roles stay open for the reason `updateUser` gives; the group's own fields and its members are
+  // ! what a locked provider refuses.
+  const locked = !isWritablePrincipal(key, 'group');
+  if (locked) {
+    const current = getGroup(key);
+    if (current == null) {
+      throw new Error(`No group answers to [${key}]`);
+    }
+
+    if (
+      changes.displayName.trim() !== current.displayName.trim() ||
+      (changes.description ?? '').trim() !== (current.description ?? '').trim() ||
+      changes.addMembers.length > 0 ||
+      changes.removeMembers.length > 0
+    ) {
+      requireWritablePrincipals([key], 'group');
+    }
+
+    applyRoles(current.key, changes.addRoles, changes.removeRoles);
+
+    return getGroup(key) ?? current;
+  }
+
   const group = modifyGroup({
     key: key as GroupKey,
     // ! `ModifyGroupHandler` assigns a field only when the editor returned a non-null value, so the
@@ -130,20 +152,24 @@ export function updateGroup(key: string, changes: GroupChanges): Group {
 // *
 
 // Nothing is read first: both writes are idempotent at the node level, see `docs/platform-facts.md`.
-function applyMembers(key: GroupKey, added: readonly string[], removed: readonly string[]): void {
+function applyMembers(
+  key: GroupKey,
+  added: readonly MemberKey[],
+  removed: readonly MemberKey[],
+): void {
   if (added.length > 0) {
-    addMembers(key, added as (UserKey | GroupKey)[]);
+    addMembers(key, [...added]);
   }
   if (removed.length > 0) {
-    removeMembers(key, removed as (UserKey | GroupKey)[]);
+    removeMembers(key, [...removed]);
   }
 }
 
 // ! A membership is a relationship the *role* holds, and the platform has no `addMemberships` — so this
 // ! is one call against each role, never one against the group.
-function applyRoles(key: GroupKey, added: readonly string[], removed: readonly string[]): void {
-  added.forEach((role) => addMembers(role as RoleKey, [key]));
-  removed.forEach((role) => removeMembers(role as RoleKey, [key]));
+function applyRoles(key: GroupKey, added: readonly RoleKey[], removed: readonly RoleKey[]): void {
+  added.forEach((role) => addMembers(role, [key]));
+  removed.forEach((role) => removeMembers(role, [key]));
 }
 
 function isGroup(principal: Principal): principal is Group {

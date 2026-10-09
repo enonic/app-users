@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { toPrincipalsMessage } from './topics';
+import { toApplicationsMessage, toPrincipalsMessage } from './topics';
 
 describe('toPrincipalsMessage', () => {
   it('accepts what the hub publishes', () => {
@@ -41,5 +41,25 @@ describe('toPrincipalsMessage', () => {
     expect(
       toPrincipalsMessage({ operation: 'created', changes: [{ kind: 'user', key: '' }] }),
     ).toBeUndefined();
+  });
+});
+
+describe('toApplicationsMessage', () => {
+  it('reads a lifecycle event to its type and key', () => {
+    expect(
+      toApplicationsMessage({
+        eventType: 'STOPPED',
+        key: 'com.example.app',
+        systemApplication: false,
+      }),
+    ).toEqual({ eventType: 'STOPPED', key: 'com.example.app' });
+  });
+
+  it('drops a type it does not know, and a message without a key', () => {
+    expect(
+      toApplicationsMessage({ eventType: 'RESOLVED', key: 'com.example.app' }),
+    ).toBeUndefined();
+    expect(toApplicationsMessage({ eventType: 'STARTED' })).toBeUndefined();
+    expect(toApplicationsMessage(null)).toBeUndefined();
   });
 });

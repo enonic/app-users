@@ -1,9 +1,14 @@
 import { computed } from 'nanostores';
 
 import {
+  $idProviderModeByKey,
   $idProviderNames,
+  allowsWrite,
+  idProviderOf,
   createPrincipalNameCheck,
   type Group,
+  type IdProviderMode,
+  type IdProviderName,
   type PrincipalRef,
 } from '../../../entities/principal';
 import { mergeByKey } from '../../../shared/form';
@@ -20,10 +25,19 @@ import {
 
 export const groupNameCheck = createPrincipalNameCheck('group');
 
+// ! A provider whose groups a remote system owns is not offered — the server would refuse the create.
+export const $groupEditorProviders = computed(
+  $idProviderNames,
+  ({ items }): readonly IdProviderName[] => items.filter(({ mode }) => allowsWrite(mode, 'group')),
+);
+
 // The name a provider already holds is an error like any other; while the answer is on its way, the name
 // holds the later steps back without a message.
+// ? `$idProviderModeByKey` is a dependency so that `$errors` re-runs `validate` when the providers
+// ? arrive: whether a group's fields are validated at all depends on its provider's mode, which the
+// ? dialog's own state does not carry.
 const $groupNameExternal = computed(
-  groupNameCheck.$state,
+  [groupNameCheck.$state, $idProviderModeByKey],
   (check): StepDialogExternal<GroupFormField> => ({
     errors: check.status === 'taken' ? { name: 'groups.dialog.idTaken' } : {},
     busy: check.status === 'pending' ? ['name'] : [],
@@ -39,7 +53,10 @@ export const groupEditorDialog = createStepDialogStore<
   steps: GROUP_EDITOR_STEPS,
   titleKey: 'groups.dialog.createTitle',
   initialForm: (payload) => initialGroupForm(payload, onlyProvider()),
-  validate: (form, { mode }) => validateGroupForm(form, mode),
+  validate: (form, { mode, entity }) =>
+    validateGroupForm(form, mode, {
+      remoteGroup: isRemoteGroup(entity, $idProviderModeByKey.get()),
+    }),
   same: sameGroupForm,
   next: nextGroupForm,
   $external: $groupNameExternal,
@@ -50,6 +67,14 @@ export const $groupEditor = groupEditorDialog.$state;
 export const $groupEditorErrors = groupEditorDialog.$errors;
 
 export const openGroupEditor = groupEditorDialog.open;
+
+/** A group whose fields a remote system owns — or whose provider is not known yet, which locks the same. */
+function isRemoteGroup(
+  entity: Group | undefined,
+  modes: ReadonlyMap<string, IdProviderMode>,
+): boolean {
+  return entity !== undefined && !allowsWrite(modes.get(idProviderOf(entity.key) ?? ''), 'group');
+}
 
 export function openGroupEditorAt(group: Group, step: GroupEditorStep): void {
   groupEditorDialog.openAt(group, step, group.displayName);
@@ -101,9 +126,9 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
   }
 }
 
-// Where a create starts: the one provider there is, otherwise none.
+// Where a create starts: the one provider it may create in, otherwise none.
 function onlyProvider(): string {
-  const { items } = $idProviderNames.get();
+  const providers = $groupEditorProviders.get();
 
-  return items.length === 1 ? (items[0]?.key ?? '') : '';
+  return providers.length === 1 ? (providers[0]?.key ?? '') : '';
 }

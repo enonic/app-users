@@ -1,4 +1,9 @@
-import { useUser, useUsers } from '../../entities/principal';
+import {
+  principalLockPending,
+  useIdProviderNames,
+  useUser,
+  useUsers,
+} from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { useItemId } from '../../shared/host';
 import { detailsEmptyLabelKey } from '../../widgets/details-panel/details-panel';
@@ -17,9 +22,10 @@ export function UsersItemPage({
   const id = useItemId();
   const { status, item: user } = useUser(id);
   const { items } = useUsers();
+  const providers = useIdProviderNames();
 
   // Loading with a user on screen is a re-read of that user: it stays.
-  if (status === 'loading' && user === undefined) {
+  if ((status === 'loading' && user === undefined) || principalLockPending(providers)) {
     const row = items.find(({ key }) => key === id);
 
     return (

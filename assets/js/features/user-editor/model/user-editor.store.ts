@@ -1,11 +1,15 @@
 import { atom, computed } from 'nanostores';
 
 import {
+  $idProviderModeByKey,
   $idProviderNames,
+  allowsWrite,
+  idProviderOf,
   createPrincipalNameCheck,
   createUserEmailCheck,
   isSystemUser,
   SYSTEM_ID_PROVIDER,
+  type IdProviderMode,
   type IdProviderName,
   type PrincipalRef,
   type User,
@@ -59,8 +63,11 @@ const TAKEN_KEYS = {
 
 // A name or an email another user holds is an error like any other; while an answer is on its way, its
 // field holds the later steps back without a message.
+// ? `$idProviderModeByKey` is a dependency so that `$errors` re-runs `validate` when the providers
+// ? arrive: whether a user's fields are validated at all depends on its provider's mode, which the
+// ? dialog's own state does not carry.
 const $userEditorExternal = computed(
-  [userNameCheck.$state, userEmailCheck.$state, $userEditorServiceAccount],
+  [userNameCheck.$state, userEmailCheck.$state, $userEditorServiceAccount, $idProviderModeByKey],
   (name, email, serviceAccount): StepDialogExternal<UserFormField> => {
     const keys = serviceAccount ? TAKEN_KEYS.serviceAccounts : TAKEN_KEYS.users;
     const errors: FieldErrors<UserFormField> = {};
@@ -83,9 +90,11 @@ const $userEditorExternal = computed(
 );
 
 // ! The system store is never offered: a user there is a service account, created in its own section.
+// ! Nor is a provider whose users a remote system owns — the server would refuse the create.
 export const $userEditorProviders = computed(
   $idProviderNames,
-  ({ items }): readonly IdProviderName[] => items.filter(({ key }) => key !== SYSTEM_ID_PROVIDER),
+  ({ items }): readonly IdProviderName[] =>
+    items.filter(({ key, mode }) => key !== SYSTEM_ID_PROVIDER && allowsWrite(mode, 'user')),
 );
 
 export const userEditorDialog = createStepDialogStore<
@@ -98,7 +107,10 @@ export const userEditorDialog = createStepDialogStore<
   titleKey: 'users.dialog.createTitle',
   initialForm: (payload) => initialUserForm(payload, createProvider()),
   validate: (form, { mode, entity }) =>
-    validateUserForm(form, mode, entity !== undefined && isSystemUser(entity.key)),
+    validateUserForm(form, mode, {
+      systemUser: entity !== undefined && isSystemUser(entity.key),
+      remoteUser: isRemoteUser(entity, $idProviderModeByKey.get()),
+    }),
   same: sameUserForm,
   next: nextUserForm,
   $external: $userEditorExternal,
@@ -111,6 +123,14 @@ export const userEditorDialog = createStepDialogStore<
 export const $userEditor = userEditorDialog.$state;
 export const $userEditorErrors = userEditorDialog.$errors;
 export const $userEditorStepLocks = userEditorDialog.$stepLocks;
+
+/** A user whose fields a remote system owns — or whose provider is not known yet, which locks the same. */
+function isRemoteUser(
+  entity: User | undefined,
+  modes: ReadonlyMap<string, IdProviderMode>,
+): boolean {
+  return entity !== undefined && !allowsWrite(modes.get(idProviderOf(entity.key) ?? ''), 'user');
+}
 
 export const $userEditorSystemUser = computed(
   $userEditor,

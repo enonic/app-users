@@ -1,4 +1,5 @@
 import {
+  createIdProviderModeReaction,
   createPrincipalReaction,
   evictIdProviderPermissions,
   idProviderOf,
@@ -13,6 +14,7 @@ import type { HostFrame } from '../../../shared/host';
 import { idProvidersSelection } from './selection.store';
 
 let running: TopicReaction | undefined;
+let modes: TopicReaction | undefined;
 
 // A user or group change moves its provider's counts, so that row is re-read; the open panel's principals too.
 // A provider change re-reads its row, and the panel's permissions with it.
@@ -61,9 +63,14 @@ export function startIdProvidersEvents(frame: HostFrame): void {
   });
 
   running.start();
+
+  modes = createIdProviderModeReaction(frame.$visible, () => void loadIdProviders());
+  modes.start();
 }
 
 export function stopIdProvidersEvents(): void {
   running?.stop();
   running = undefined;
+  modes?.stop();
+  modes = undefined;
 }

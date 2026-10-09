@@ -9,6 +9,7 @@ import {
   type GroupInput,
 } from './group.source';
 import { GroupDetailType, GroupType } from './group.types';
+import { toMemberKeys, toRoleKeys } from './principal.keys';
 
 type CreateArgs = {
   idProvider: string;
@@ -87,16 +88,21 @@ export const groupMutationFields: GraphQLFields = {
 // ! Defaulted, because an empty list can arrive as no argument at all: `DataFetchingEnvironmentMapper`
 // ! hands arguments to JS through the same `MapGenerator` that drops an empty `interfaces` list.
 function toGroupInput({ displayName, description, members, roles }: CreateArgs): GroupInput {
-  return { displayName, description, members: members ?? [], roles: roles ?? [] };
+  return {
+    displayName,
+    description,
+    members: toMemberKeys(members ?? []),
+    roles: toRoleKeys(roles ?? []),
+  };
 }
 
 function toGroupChanges(args: UpdateArgs): GroupChanges {
   return {
     displayName: args.displayName,
     description: args.description,
-    addMembers: args.addMembers ?? [],
-    removeMembers: args.removeMembers ?? [],
-    addRoles: args.addRoles ?? [],
-    removeRoles: args.removeRoles ?? [],
+    addMembers: toMemberKeys(args.addMembers ?? []),
+    removeMembers: toMemberKeys(args.removeMembers ?? []),
+    addRoles: toRoleKeys(args.addRoles ?? []),
+    removeRoles: toRoleKeys(args.removeRoles ?? []),
   };
 }

@@ -2,6 +2,7 @@ import { Button } from '@enonic/ui';
 import { ShieldLock } from 'lucide-react';
 
 import {
+  ID_PROVIDER_MODE_KEYS,
   loadMoreIdProviderPrincipals,
   principalName,
   SYSTEM_ID_PROVIDER,
@@ -55,12 +56,13 @@ export function IdProviderDetails({
   const noDescriptionLabel = useI18n('idProviders.details.noDescription');
   const applicationNotSetLabel = useI18n('idProviders.details.applicationNotSet');
   const loadMoreFailedLabel = useI18n('browse.list.loadMoreFailed');
+  const modeLabel = useI18n(ID_PROVIDER_MODE_KEYS[provider.mode]);
 
   const levels = useLabelled(ID_PROVIDER_ACCESS_LEVELS);
   const accessLabel = (access: IdProviderAccess): string | undefined =>
     levels.find((level) => level.value === access)?.label;
 
-  const { key, displayName, description, application } = provider;
+  const { key, displayName, description, application, mode } = provider;
 
   // The row's totals until the panel's own read answers, so a count appears before the rows do.
   const users = principals?.users;
@@ -96,6 +98,9 @@ export function IdProviderDetails({
         </DetailsPanel.Field>
         <DetailsPanel.Field labelKey="idProviders.details.application">
           {application?.displayName ?? applicationNotSetLabel}
+        </DetailsPanel.Field>
+        <DetailsPanel.Field labelKey="idProviders.details.mode">
+          <span className={mode === 'UNAVAILABLE' ? 'text-warn' : undefined}>{modeLabel}</span>
         </DetailsPanel.Field>
       </DetailsPanel.Section>
 

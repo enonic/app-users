@@ -5,8 +5,10 @@ export type {
   TopicReactionOptions,
 } from '@enonic/ui-utils/admin-events';
 export { connectAdminEvents, subscribeTopic } from './admin-events';
-export { HUB_TOPICS, toPrincipalsMessage } from './topics';
+export { HUB_TOPICS, toApplicationsMessage, toPrincipalsMessage } from './topics';
 export type {
+  ApplicationEventType,
+  ApplicationsMessage,
   PrincipalChange,
   PrincipalKind,
   PrincipalOperation,

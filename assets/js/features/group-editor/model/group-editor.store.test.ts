@@ -5,6 +5,7 @@ import { receiveIdProviderNames, type Group } from '../../../entities/principal'
 import {
   $groupEditor,
   $groupEditorErrors,
+  $groupEditorProviders,
   closeGroupEditor,
   groupNameCheck,
   openGroupEditor,
@@ -107,7 +108,7 @@ describe('the provider a create starts on', () => {
   });
 
   it('is the only one there is', () => {
-    receiveIdProviderNames(ok([{ key: 'store', displayName: 'Store' }]));
+    receiveIdProviderNames(ok([{ key: 'store', displayName: 'Store', mode: 'LOCAL' }]));
 
     openGroupEditor({ mode: 'create' });
 
@@ -118,13 +119,53 @@ describe('the provider a create starts on', () => {
   it('is none while there are several to choose from', () => {
     receiveIdProviderNames(
       ok([
-        { key: 'system', displayName: 'System' },
-        { key: 'store', displayName: 'Store' },
+        { key: 'system', displayName: 'System', mode: 'LOCAL' },
+        { key: 'store', displayName: 'Store', mode: 'LOCAL' },
       ]),
     );
 
     openGroupEditor({ mode: 'create' });
 
     expect($groupEditor.get().form.idProvider).toBe('');
+  });
+
+  it('is the only one that keeps its groups in XP', () => {
+    receiveIdProviderNames(
+      ok([
+        { key: 'oidc', displayName: 'Single sign-on', mode: 'MIXED' },
+        { key: 'adfs', displayName: 'Federation', mode: 'EXTERNAL' },
+        { key: 'gone', displayName: 'Uninstalled', mode: 'UNAVAILABLE' },
+      ]),
+    );
+
+    expect($groupEditorProviders.get().map(({ key }) => key)).toEqual(['oidc']);
+
+    openGroupEditor({ mode: 'create' });
+
+    expect($groupEditor.get().form.idProvider).toBe('oidc');
+  });
+});
+
+describe('the fields of a group a remote system owns', () => {
+  afterEach(() => {
+    receiveIdProviderNames(ok([]));
+  });
+
+  it('leave a remote group with a blank stored name free of errors, so a roles edit can save', () => {
+    receiveIdProviderNames(ok([{ key: 'adfs', displayName: 'Federation', mode: 'EXTERNAL' }]));
+
+    openGroupEditorAt({ ...MANAGERS, key: 'group:adfs:managers', displayName: ' ' }, 'roles');
+
+    expect($groupEditorErrors.get()).toEqual({});
+  });
+
+  it('are validated again once the providers say the group is local', () => {
+    openGroupEditorAt({ ...MANAGERS, displayName: ' ' }, 'roles');
+
+    expect($groupEditorErrors.get()).toEqual({});
+
+    receiveIdProviderNames(ok([{ key: 'store', displayName: 'Store', mode: 'LOCAL' }]));
+
+    expect($groupEditorErrors.get().displayName).toBe('groups.dialog.displayNameRequired');
   });
 });

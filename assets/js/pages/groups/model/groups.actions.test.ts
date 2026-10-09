@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Group } from '../../../entities/principal';
 import type { ActionContext, SectionAction } from '../../../widgets/browse-toolbar/actions';
-import { GROUP_ACTIONS } from './groups.actions';
+import { createGroupActions } from './groups.actions';
 
 function group(key: string): Group {
   return {
@@ -21,7 +21,7 @@ function context(overrides: Partial<ActionContext<Group>> = {}): ActionContext<G
 }
 
 function action(id: string): SectionAction<Group> {
-  const found = GROUP_ACTIONS.find((candidate) => candidate.id === id);
+  const found = createGroupActions(true).find((candidate) => candidate.id === id);
   if (!found) {
     throw new Error(`No group action with id ${id}`);
   }
@@ -30,13 +30,19 @@ function action(id: string): SectionAction<Group> {
 
 describe('group actions', () => {
   it('offers new and delete in that order', () => {
-    expect(GROUP_ACTIONS.map(({ id }) => id)).toEqual(['new', 'delete']);
+    expect(createGroupActions(true).map(({ id }) => id)).toEqual(['new', 'delete']);
   });
 });
 
 describe('new group', () => {
   it('needs no target', () => {
     expect(action('new').enabled(context())).toBe(true);
+  });
+
+  it('is off when no provider takes a new group', () => {
+    const create = createGroupActions(false).find(({ id }) => id === 'new');
+
+    expect(create?.enabled(context())).toBe(false);
   });
 });
 

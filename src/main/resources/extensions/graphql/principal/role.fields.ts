@@ -1,5 +1,6 @@
 import { GraphQLString, list, nonNull, type GraphQLFields } from '/lib/graphql';
 
+import { toMemberKeys } from './principal.keys';
 import { createRole, getRole, listRoles, updateRole, type RoleChanges } from './role.source';
 import { RoleDetailType, RoleType } from './role.types';
 
@@ -50,7 +51,7 @@ export const roleMutationFields: GraphQLFields = {
       createRole(env.args.name, {
         displayName: env.args.displayName,
         description: env.args.description,
-        members: env.args.members ?? [],
+        members: toMemberKeys(env.args.members ?? []),
       }),
   },
   updateRole: {
@@ -74,7 +75,7 @@ function toRoleChanges(args: UpdateArgs): RoleChanges {
   return {
     displayName: args.displayName,
     description: args.description,
-    addMembers: args.addMembers ?? [],
-    removeMembers: args.removeMembers ?? [],
+    addMembers: toMemberKeys(args.addMembers ?? []),
+    removeMembers: toMemberKeys(args.removeMembers ?? []),
   };
 }
