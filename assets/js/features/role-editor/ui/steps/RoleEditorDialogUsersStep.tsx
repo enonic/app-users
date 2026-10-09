@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
 
-import { isPinnedMembership } from '../../../../entities/principal';
+import { isPinnedMembership, SYSTEM_USER_KEYS } from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
 import { useI18n } from '../../../../shared/i18n';
 import { $roleEditDetail } from '../../model/role-edit-detail';
@@ -35,6 +35,7 @@ export function RoleEditorDialogUsersStep() {
       <PrincipalPicker
         kinds={['user']}
         showIdProvider
+        excluded={SYSTEM_USER_KEYS}
         locked={pinned}
         placeholder={placeholder}
         selected={users}

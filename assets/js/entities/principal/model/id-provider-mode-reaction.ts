@@ -3,6 +3,7 @@ import type { ReadableAtom } from 'nanostores';
 import {
   createTopicReaction,
   HUB_TOPICS,
+  subscribeTopic,
   toApplicationsMessage,
   type TopicReaction,
 } from '../../../shared/admin-events';
@@ -21,9 +22,10 @@ export function createIdProviderModeReaction(
   refresh: () => void,
 ): TopicReaction {
   return createTopicReaction({
+    events: { subscribeTopic },
     topic: HUB_TOPICS.applications,
     parse: toApplicationsMessage,
-    $visible,
+    visible: $visible,
     apply: refresh,
     refresh,
   });

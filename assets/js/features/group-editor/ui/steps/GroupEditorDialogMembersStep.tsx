@@ -2,6 +2,7 @@ import { Toggle } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { useMemo, useState } from 'preact/hooks';
 
+import { SYSTEM_USER_KEYS } from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
 import { useI18n } from '../../../../shared/i18n';
 import { $groupEditDetail } from '../../model/group-edit-detail';
@@ -18,9 +19,10 @@ export function GroupEditorDialogMembersStep() {
   const [showAll, setShowAll] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // The platform refuses a relationship whose two ends are the same principal.
-  const notItself = useMemo(
-    () => (entity === undefined ? undefined : new Set([entity.key])),
+  // The platform refuses a relationship whose two ends are the same principal; the users it owns are
+  // kept out for the reason `SYSTEM_USER_KEYS` gives.
+  const excluded = useMemo(
+    () => new Set(entity === undefined ? SYSTEM_USER_KEYS : [...SYSTEM_USER_KEYS, entity.key]),
     [entity],
   );
 
@@ -49,7 +51,7 @@ export function GroupEditorDialogMembersStep() {
         onOpenChange={setOpen}
         placeholder={membersPlaceholder}
         selected={form.members}
-        excluded={notItself}
+        excluded={excluded}
         onChange={(members) => updateGroupEditorForm({ members })}
       />
     </div>

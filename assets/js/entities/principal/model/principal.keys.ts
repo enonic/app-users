@@ -67,12 +67,16 @@ export const SUPER_USER_KEY = 'user:system:su';
 /** The guest: it never signs in, so it has no credentials to edit. */
 export const ANONYMOUS_USER_KEY = 'user:system:anonymous';
 
-// The two users the platform owns and lib-admin-ui's `isSystem()` refuses to delete.
-const SYSTEM_USER_KEYS = [SUPER_USER_KEY, ANONYMOUS_USER_KEY];
+/**
+ * The two users the platform owns and lib-admin-ui's `isSystem()` refuses to delete. Their memberships
+ * are the platform's too: no picker offers them, since a membership stored on either is one XP never
+ * resolves (enonic/xp#12443).
+ */
+export const SYSTEM_USER_KEYS: ReadonlySet<string> = new Set([SUPER_USER_KEY, ANONYMOUS_USER_KEY]);
 
 /** Users the platform owns: `su` and `anonymous`, which may not be deleted. */
 export function isSystemUser(key: PrincipalKey): boolean {
-  return SYSTEM_USER_KEYS.includes(key);
+  return SYSTEM_USER_KEYS.has(key);
 }
 
 export function isAnonymousUser(key: PrincipalKey): boolean {
