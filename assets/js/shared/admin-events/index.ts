@@ -1,7 +1,10 @@
-export { connectAdminEvents, createAdminEvents, subscribeTopic } from './admin-events';
-export type { AdminEvents, TopicHandlers } from './admin-events';
-export { createTopicReaction } from './topic-reaction';
-export type { TopicReaction, TopicReactionOptions } from './topic-reaction';
+export { createTopicReaction } from '@enonic/ui-utils/admin-events';
+export type {
+  TopicHandlers,
+  TopicReaction,
+  TopicReactionOptions,
+} from '@enonic/ui-utils/admin-events';
+export { connectAdminEvents, subscribeTopic } from './admin-events';
 export { HUB_TOPICS, toPrincipalsMessage } from './topics';
 export type {
   PrincipalChange,
