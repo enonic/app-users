@@ -78,9 +78,9 @@ describe('users.store', () => {
     expect($users.get().total).toBe(9);
   });
 
-  // ! Keeps the rows, and that is the point: the search runs on the server here, so a debounced keystroke
-  // ! reloads — clearing the rows each time would swap the list for a skeleton several times a second and
-  // ! lose the scroll position with it. The rows are replaced when the answer lands.
+  // ! Keeps the rows, and that is the point: the search runs on the server here, so every filter change
+  // ! reloads — clearing the rows each time would swap the list for a skeleton and lose the scroll position
+  // ! with it. The rows are replaced when the answer lands.
   it('keeps the rows on a first load, and replaces them when the answer lands', () => {
     receiveUsers(page(['alice', 'bob'], 137));
     beginUsersLoad();

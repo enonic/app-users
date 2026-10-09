@@ -1,3 +1,4 @@
+import { fieldTerm } from '@enonic/ui-kit';
 import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -8,8 +9,9 @@ import { $userDetail } from '../../../entities/principal/model/user-detail.load'
 import { $users } from '../../../entities/principal/model/users.store';
 import { requestGraphQlDocument } from '../../../shared/api';
 import { fetchUsersScreen } from '../api/users-screen.api';
-import { $usersQuery, setUsersSearch, toggleUsersIdProvider } from './query.store';
+import { usersFilter } from './filter.store';
 import { usersSelection } from './selection.store';
+import { ID_PROVIDER_FIELD } from './users.filter';
 import { loadMoreUsers, refreshUsersScreen, reloadUsersScreen } from './users.screen';
 
 // The screen owns the query, the paging and the cancelling; stubbing the api keeps the transport out of
@@ -59,7 +61,7 @@ beforeEach(() => {
 afterEach(() => {
   $users.set({ status: 'loading', items: [], total: 0, appending: false, exhausted: false });
   $idProviderNames.set({ status: 'loading', items: [] });
-  $usersQuery.set({ idProviders: [], sort: 'displayNameAsc' });
+  usersFilter.clear();
   usersSelection.clear();
 });
 
@@ -76,8 +78,7 @@ describe('reloadUsersScreen', () => {
   });
 
   it('carries the search, the provider and the order the query store holds', async () => {
-    setUsersSearch('  alice  ');
-    toggleUsersIdProvider('ldap');
+    usersFilter.set([{ kind: 'text', text: 'alice' }, fieldTerm(ID_PROVIDER_FIELD, 'ldap')]);
 
     await reloadUsersScreen();
 
@@ -160,7 +161,7 @@ describe('loadMoreUsers', () => {
   });
 
   it('carries the same query as the page before it', async () => {
-    setUsersSearch('alice');
+    usersFilter.set([{ kind: 'text', text: 'alice' }]);
     await reloadUsersScreen();
     vi.mocked(fetchUsersScreen).mockReturnValue(answered(['carol'], 137));
 
@@ -191,7 +192,7 @@ describe('loadMoreUsers', () => {
       .mockReturnValueOnce(answered(['zoe'], 1));
 
     const stale = loadMoreUsers();
-    setUsersSearch('zoe');
+    usersFilter.set([{ kind: 'text', text: 'zoe' }]);
     await reloadUsersScreen();
     answerSlowly?.({
       data: { users: { total: 137, hits: [wireUser('carol')] }, idProviders: [PROVIDER] },

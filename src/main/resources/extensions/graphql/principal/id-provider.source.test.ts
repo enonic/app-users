@@ -114,8 +114,22 @@ describe('getIdProvider', () => {
 });
 
 describe('principalSetOf', () => {
-  it('carries the provider and the kind, resolving nothing on its own', () => {
+  it('carries the provider and the kind, so the container costs nothing to resolve', () => {
     expect(principalSetOf('system', 'user')).toEqual({ idProvider: 'system', type: 'user' });
+  });
+
+  it('carries a search trimmed, and no search at all for a blank', () => {
+    expect(principalSetOf('system', 'user', '  alice ')).toEqual({
+      idProvider: 'system',
+      type: 'user',
+      search: 'alice',
+    });
+    expect(principalSetOf('system', 'user', '  ')).toEqual({ idProvider: 'system', type: 'user' });
+  });
+
+  it('runs no search of its own', () => {
+    principalSetOf('system', 'user');
+
     expect(vi.mocked(findPrincipals)).not.toHaveBeenCalled();
   });
 });
@@ -136,6 +150,20 @@ describe('countPrincipals', () => {
     vi.mocked(findPrincipals).mockReturnValue(found([], 0));
 
     expect(countPrincipals({ idProvider: 'partners', type: 'group' })).toBe(0);
+  });
+
+  // The Users filter shows how many of a provider's users a search would reveal, so the count has to be
+  // narrowed by the same text as the list.
+  it('narrows the count by the search the set carries', () => {
+    vi.mocked(findPrincipals).mockReturnValue(found([], 12));
+
+    expect(countPrincipals({ idProvider: 'ldap', type: 'user', search: 'alice' })).toBe(12);
+    expect(vi.mocked(findPrincipals)).toHaveBeenCalledWith({
+      type: 'user',
+      idProvider: 'ldap',
+      count: 0,
+      searchText: 'alice',
+    });
   });
 });
 

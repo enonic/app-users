@@ -1,3 +1,4 @@
+import { textOf, valuesOf } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
 
@@ -13,8 +14,6 @@ import { GroupEditorDialog } from '../../features/group-editor/ui/GroupEditorDia
 import { isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
-import { visibleEntries } from '../../widgets/browse-list/browse-filter';
-import { BrowseFilter } from '../../widgets/browse-list/BrowseFilter';
 import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
 import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
 import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
@@ -23,11 +22,15 @@ import { GroupDeleteDialog } from './GroupDeleteDialog';
 import { GroupsItemPage } from './GroupsItemPage';
 import { groupsFilter } from './model/filter.store';
 import { createGroupActions } from './model/groups.actions';
-import { filterByIdProvider, idProviderEntries, searchGroups } from './model/groups.filter';
+import {
+  filterByIdProvider,
+  ID_PROVIDER_FIELD,
+  idProviderField,
+  searchGroups,
+} from './model/groups.filter';
 import { toGroupRow } from './model/groups.rows';
 import { loadGroupsScreen } from './model/groups.screen';
 import { sortGroups } from './model/groups.sort';
-import { groupsSearch } from './model/search.store';
 import { groupsSelection } from './model/selection.store';
 import { $groupsSort, setGroupsSort } from './model/sort.store';
 import { useGroupsScreen } from './model/useGroupsScreen';
@@ -42,8 +45,7 @@ export function GroupsPage() {
   const activeKey = useItemId();
   const { status, items } = useGroups();
   const providerName = useIdProviderName();
-  const query = useStore(groupsSearch.$query);
-  const selectedProviders = useStore(groupsFilter.$selected);
+  const query = useStore(groupsFilter.$query);
   const sort = useStore($groupsSort);
   const creatable = useStore($groupEditorProviders);
 
@@ -53,7 +55,9 @@ export function GroupsPage() {
   const sortProviderLabel = useI18n('groups.sort.idProvider');
   const sortProviderAscLabel = useI18n('groups.sort.idProviderAsc');
   const sortProviderDescLabel = useI18n('groups.sort.idProviderDesc');
+  const providerFieldLabel = useI18n('groups.filter.idProvider');
   const emptyLabel = useI18n('groups.list.empty');
+  const filterPlaceholder = useI18n('groups.filter.placeholder');
   const readOnlyTitle = useI18n('readOnly.title');
   const readOnlyHelp = useI18n('readOnly.help');
 
@@ -80,20 +84,18 @@ export function GroupsPage() {
   const canCreate = creatable.length > 0;
   const actions = useMemo(() => createGroupActions(canCreate), [canCreate]);
 
-  // Shared with the filter entries below, so the query runs once per render rather than twice.
-  const searched = useMemo(() => searchGroups(items, query), [items, query]);
+  // Shared with the field's counts below, so the text runs once per render rather than twice.
+  const searched = useMemo(() => searchGroups(items, textOf(query)), [items, query]);
 
   // Narrow first, order last.
   const visible = useMemo(
-    () => sortGroups(filterByIdProvider(searched, selectedProviders), sort),
-    [searched, selectedProviders, sort],
+    () => sortGroups(filterByIdProvider(searched, valuesOf(query, ID_PROVIDER_FIELD)), sort),
+    [searched, query, sort],
   );
 
-  // Entries follow the query but not the ticked providers, so the filter shrinks with the search
-  // rather than restating the current narrowing.
-  const entries = useMemo(
-    () => visibleEntries(idProviderEntries(items, searched, providerName), selectedProviders),
-    [items, searched, selectedProviders, providerName],
+  const fields = useMemo(
+    () => [idProviderField(items, searched, providerName, providerFieldLabel)],
+    [items, searched, providerName, providerFieldLabel],
   );
 
   const section = useBrowseSection({
@@ -103,8 +105,7 @@ export function GroupsPage() {
     items,
     status,
     selection: groupsSelection,
-    search: groupsSearch,
-    resetOnLeave: [groupsFilter],
+    filter: groupsFilter,
     visible,
     // A fresh icon element per row: Preact writes into a vnode as it renders it.
     toRow: (group) => toGroupRow(group, <PrincipalIcon principal={group} />),
@@ -119,14 +120,9 @@ export function GroupsPage() {
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}
+        filterPlaceholder={filterPlaceholder}
         details={<GroupsItemPage />}
-        filter={
-          <BrowseFilter
-            entries={entries}
-            selected={selectedProviders}
-            onToggle={(id) => groupsFilter.toggle(id)}
-          />
-        }
+        fields={fields}
         sort={
           <BrowseSort
             options={sortOptions}
