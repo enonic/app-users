@@ -6,9 +6,7 @@ enonicDefaults = "2.1.7"
 nodeGradle = "7.1.0"
 
 # App
-libAsset = "2.0.1"
 libGraphql = "3.0.0"
-libMustache = "3.0.0"
 
 [libraries]
 
@@ -19,9 +17,7 @@ mockito-bom = { module = "org.mockito:mockito-bom", version.ref = "mockito" }
 mockito-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 
 # App
-lib-asset = { module = "com.enonic.lib:lib-asset", version.ref = "libAsset" }
 lib-graphql = { module = "com.enonic.lib:lib-graphql", version.ref = "libGraphql" }
-lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "libMustache" }
 
 [plugins]
 enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonicDefaults" }

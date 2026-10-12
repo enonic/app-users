@@ -19,7 +19,7 @@ updates:
     reviewers:
       - "alansemenov"
   - package-ecosystem: "npm"
-    directory: "/testing"
+    directory: "/ui-tests"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
