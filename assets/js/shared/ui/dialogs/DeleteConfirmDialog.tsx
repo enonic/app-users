@@ -1,73 +1,54 @@
+import { ActionDialog, DeleteConfirm, type DeleteTarget } from '@enonic/ui-kit';
+
 import { useI18n } from '../../i18n';
-import { ConfirmDialog } from './ConfirmDialog';
-import { ConfirmValueDialog } from './ConfirmValueDialog';
-import type { DeleteTarget } from './delete-confirm';
 
 export type { DeleteTarget };
 
 export type DeleteConfirmDialogProps = {
   open: boolean;
   targets: readonly DeleteTarget[];
-  /**
-   * What the operator types back before the button enables — `deleteExpectation(targets)` for the
-   * usual name-or-count. Absent, the dialog confirms on a click alone.
-   */
-  expected?: string | number;
   onClose: () => void;
-  onConfirm?: () => void;
+  onConfirm: () => void;
   'data-component'?: string;
 };
 
 const DELETE_CONFIRM_DIALOG_NAME = 'DeleteConfirmDialog';
 
+/** The kit's delete view under its own root, worded by this app: the one name or the count is typed back. */
 export function DeleteConfirmDialog({
   open,
   targets,
-  expected,
   onClose,
   onConfirm,
   'data-component': componentName = DELETE_CONFIRM_DIALOG_NAME,
 }: DeleteConfirmDialogProps) {
   const title = useI18n('browse.confirm.title');
-  const deleteLabel = useI18n('browse.confirm.delete');
   const question = useI18n(
     targets.length === 1
       ? 'browse.confirm.deleteQuestion'
       : 'browse.confirm.deleteQuestionMultiple',
   );
-  const [only] = targets;
-  const description =
-    targets.length === 1 && only !== undefined ? (
-      <>
-        {question} <strong>{only.displayName}</strong>?
-      </>
-    ) : (
-      question
-    );
-
-  if (expected === undefined) {
-    return (
-      <ConfirmDialog
-        data-component={componentName}
-        open={open}
-        question={description}
-        onClose={onClose}
-        onConfirm={onConfirm}
-      />
-    );
-  }
 
   return (
-    <ConfirmValueDialog
-      data-component={componentName}
+    <ActionDialog.Root
       open={open}
-      title={title}
-      description={description}
-      expected={expected}
-      confirmLabel={deleteLabel}
-      onClose={onClose}
-      onConfirm={onConfirm}
-    />
+      onOpenChange={(next) => {
+        if (!next) {
+          onClose();
+        }
+      }}
+    >
+      <ActionDialog.Portal>
+        <ActionDialog.Overlay />
+        <DeleteConfirm
+          data-component={componentName}
+          title={title}
+          question={question}
+          targets={targets}
+          onConfirm={onConfirm}
+        />
+      </ActionDialog.Portal>
+    </ActionDialog.Root>
   );
 }
 

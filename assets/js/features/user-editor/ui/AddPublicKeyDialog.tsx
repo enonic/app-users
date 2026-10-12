@@ -1,9 +1,14 @@
 import { Button, Input } from '@enonic/ui';
+import { ActionDialog } from '@enonic/ui-kit';
 import { Upload } from 'lucide-react';
 import { useRef, useState } from 'preact/hooks';
 
 import { useI18n } from '../../../shared/i18n';
-import { ModalDialog } from '../../../shared/ui/dialogs/ModalDialog';
+import {
+  contentLayerProps,
+  overlayLayerProps,
+  useDialogLayer,
+} from '../../../shared/ui/dialogs/dialog-stack';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
 import { generateKeyPair, readPublicKeyPem } from '../model/key-pair';
 import type { PendingPublicKey } from '../model/user-form';
@@ -25,6 +30,8 @@ export function AddPublicKeyDialog({
   onClose,
   'data-component': componentName = ADD_PUBLIC_KEY_DIALOG_NAME,
 }: AddPublicKeyDialogProps) {
+  const layer = useDialogLayer(open);
+
   const title = useI18n('users.dialog.addKeyTitle');
   const labelLabel = useI18n('users.dialog.keyLabel');
   const helpText = useI18n('users.dialog.addKeyHelp');
@@ -34,7 +41,6 @@ export function AddPublicKeyDialog({
   const generateFailedLabel = useI18n('users.dialog.keyGenerateFailed');
   const uploadFailedLabel = useI18n('users.dialog.keyReadFailed');
   const cancelLabel = useI18n('browse.dialog.cancel');
-  const closeLabel = useI18n('browse.dialog.close');
 
   const [label, setLabel] = useState('');
   const [busy, setBusy] = useState(false);
@@ -43,6 +49,16 @@ export function AddPublicKeyDialog({
 
   const named = label.trim().length > 0 ? label.trim() : undefined;
   const unnamed = named === undefined;
+
+  const close = (): void => {
+    if (busy) {
+      return;
+    }
+
+    setLabel('');
+    setFailure(undefined);
+    onClose();
+  };
 
   const finish = (error: string | undefined): void => {
     setBusy(false);
@@ -88,63 +104,70 @@ export function AddPublicKeyDialog({
   };
 
   return (
-    <ModalDialog
-      data-component={componentName}
+    <ActionDialog.Root
       open={open}
-      title={title}
-      primaryLabel={generateLabel}
-      primaryDisabled={busy || unnamed}
-      cancelLabel={cancelLabel}
-      closeLabel={closeLabel}
-      error={failure}
-      onPrimary={() => void handleGenerate()}
-      onClose={() => {
-        if (busy) {
-          return;
+      onOpenChange={(next) => {
+        if (!next) {
+          close();
         }
-
-        setLabel('');
-        setFailure(undefined);
-        onClose();
       }}
     >
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1.5">
-          <FieldLabel text={labelLabel} required htmlFor={LABEL_ID} />
-          <Input
-            id={LABEL_ID}
-            value={label}
-            onInput={({ currentTarget }) => setLabel(currentTarget.value)}
-          />
-        </div>
+      <ActionDialog.Portal>
+        <ActionDialog.Overlay {...overlayLayerProps(layer)} />
+        <ActionDialog.Content data-component={componentName} {...contentLayerProps(layer)}>
+          <ActionDialog.DefaultHeader title={title} withClose />
 
-        <p className="text-subtle text-sm">{helpText}</p>
+          <ActionDialog.Body>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <FieldLabel text={labelLabel} required htmlFor={LABEL_ID} />
+                <Input
+                  id={LABEL_ID}
+                  value={label}
+                  onInput={({ currentTarget }) => setLabel(currentTarget.value)}
+                />
+              </div>
 
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".pem,application/x-pem-file"
-          className="hidden"
-          onChange={({ currentTarget }) => {
-            const [file] = currentTarget.files ?? [];
-            currentTarget.value = '';
-            if (file !== undefined) {
-              void handleUpload(file);
-            }
-          }}
-        />
+              <p className="text-subtle text-sm">{helpText}</p>
 
-        <Button
-          className="self-start"
-          variant="outline"
-          size="sm"
-          endIcon={Upload}
-          label={uploadLabel}
-          disabled={busy || unnamed}
-          onClick={() => fileRef.current?.click()}
-        />
-      </div>
-    </ModalDialog>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".pem,application/x-pem-file"
+                className="hidden"
+                onChange={({ currentTarget }) => {
+                  const [file] = currentTarget.files ?? [];
+                  currentTarget.value = '';
+                  if (file !== undefined) {
+                    void handleUpload(file);
+                  }
+                }}
+              />
+
+              <Button
+                className="self-start"
+                variant="outline"
+                size="sm"
+                endIcon={Upload}
+                label={uploadLabel}
+                disabled={busy || unnamed}
+                onClick={() => fileRef.current?.click()}
+              />
+            </div>
+          </ActionDialog.Body>
+
+          <ActionDialog.Footer error={failure}>
+            <Button variant="text" size="lg" label={cancelLabel} onClick={close} />
+            <ActionDialog.Action
+              label={generateLabel}
+              disabled={busy || unnamed}
+              closeOnClick={false}
+              onClick={() => void handleGenerate()}
+            />
+          </ActionDialog.Footer>
+        </ActionDialog.Content>
+      </ActionDialog.Portal>
+    </ActionDialog.Root>
   );
 }
 

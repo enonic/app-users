@@ -16,13 +16,13 @@ const css = {
   container: DIALOG,
   title: `${DIALOG} [data-component='Dialog.Title']`,
   labelInput: `${DIALOG} input#public-key-label`,
-  helpText: `${DIALOG} [data-component='Dialog.Body'] p.text-subtle`,
+  helpText: `${DIALOG} [data-component='ActionDialog.Body'] p.text-subtle`,
   fileInput: `${DIALOG} input[type='file']`,
   uploadButton: `${DIALOG} button[data-component='Button'][aria-label='Upload']`,
-  generateButton: `${DIALOG} [data-component='Dialog.Footer'] button[aria-label='Generate']`,
-  cancelButton: `${DIALOG} [data-component='Dialog.Footer'] button[aria-label='Cancel']`,
+  generateButton: `${DIALOG} [data-component='ActionDialog.Footer'] button[aria-label='Generate']`,
+  cancelButton: `${DIALOG} [data-component='ActionDialog.Footer'] button[aria-label='Cancel']`,
   closeButton: `${DIALOG} button[aria-label='Close']`,
-  errorMessage: `${DIALOG} [data-component='Dialog.Footer'] p[role='alert']`,
+  errorMessage: `${DIALOG} [data-component='ActionDialog.Footer'] p[role='alert']`,
 };
 
 class AddPublicKeyDialog extends SectionPage {

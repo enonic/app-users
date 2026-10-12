@@ -2,7 +2,6 @@ import { useStore } from '@nanostores/preact';
 
 import { deleteIdProviders, loadIdProviders } from '../../entities/principal';
 import { useHostFrame } from '../../shared/host';
-import { deleteExpectation } from '../../shared/ui/dialogs/delete-confirm';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { idProvidersDeletion } from './model/deletion.store';
 import { idProvidersSelection } from './model/selection.store';
@@ -26,7 +25,7 @@ export function IdProviderDeleteDialog({
   const deleteTargets = (targets ?? []).map(({ key, displayName }) => ({
     key,
     name: key,
-    displayName,
+    label: displayName,
   }));
 
   return (
@@ -34,7 +33,6 @@ export function IdProviderDeleteDialog({
       data-component={componentName}
       open={targets !== undefined}
       targets={deleteTargets}
-      expected={deleteExpectation(deleteTargets)}
       onClose={idProvidersDeletion.close}
       onConfirm={() => {
         const confirmed = targets ?? [];

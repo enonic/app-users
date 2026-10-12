@@ -1,62 +1,67 @@
 /**
  * Created  on 04.10.2026.
  *
- * The confirmation dialog, titled 'Confirmation', in its two shapes:
+ * The confirmations of @enonic/ui-kit's ActionDialog, in their two shapes:
  *
- * - A plain question with Confirm and Cancel (shared/ui/dialogs/ConfirmDialog): 'Do you want to
- *   close the dialog? Changes will be lost.' when a dirty editor is closed, say.
- * - A delete confirmation (DeleteConfirmDialog over ConfirmValueDialog): the question names the item
- *   ('Are you sure you want to delete <display name>?'), and the Delete button stays disabled until
- *   the expected value is typed back in the gate - the item's name for one item, the count for
- *   several ('Enter 3 in the field and click Delete:'). Each section renders it under its own
- *   data-component: UserDeleteDialog, ServiceAccountDeleteDialog, GroupDeleteDialog,
- *   RoleDeleteDialog, IdProviderDeleteDialog.
+ * - The footer question (ActionDialog.Footer `question`, fed by useCloseGuard): 'Do you want to
+ *   close the dialog? Changes will be lost.' asked in place of the footer's controls when a dirty
+ *   editor is closed, with 'Keep editing' and 'Confirm'. Not a dialog of its own: it sits inside
+ *   the open editor, whose body is inert while it is asked.
+ * - A delete confirmation (DeleteConfirm): the question, the targets listed under it, and the
+ *   Delete button that stays disabled until the expected value is typed back in the gate - the
+ *   item's name for one item, the count for several ('Type 3 to confirm'). Each section renders
+ *   it under its own data-component: UserDeleteDialog, ServiceAccountDeleteDialog,
+ *   GroupDeleteDialog, RoleDeleteDialog, IdProviderDeleteDialog.
  *
- * Both are modals portalled inside the section's shadow root, so every locator is CSS resolved
- * through SectionPage; pass the SECTION_ID of the section the dialog belongs to.
+ * Both are portalled inside the section's shadow root, so every locator is CSS resolved through
+ * SectionPage; pass the SECTION_ID of the section the dialog belongs to.
  */
 const SectionPage = require('./section.page');
 const appConst = require('./../libs/app_const');
 
-// The shapes of the dialog, by the data-component of their content. A deep selector must not be a
-// comma-separated list (webdriverio splits it on the commas when it re-matches the element), so
-// the shape is picked in the constructor rather than matched all at once.
+// The shapes, by data-component. A deep selector must not be a comma-separated list (webdriverio
+// splits it on the commas when it re-matches the element), so the shape is picked in the
+// constructor rather than matched all at once.
 const KIND = Object.freeze({
   // The delete confirmation of every section: '<Section>DeleteDialog'.
   DELETE: 'delete',
-  // The plain question: ConfirmDialog.
+  // The footer question of the open dialog: ActionDialog.Question.
   CONFIRM: 'confirm',
 });
 
 function buildCss(kind) {
-  const DIALOG =
-    kind === KIND.CONFIRM
-      ? "[data-component='ConfirmDialog'][data-state='open']"
-      : "[data-component$='DeleteDialog'][data-state='open']";
-  const FOOTER = `${DIALOG} [data-component='Dialog.Footer']`;
-  const GATE = `${DIALOG} [data-component='ConfirmGate']`;
+  if (kind === KIND.CONFIRM) {
+    const QUESTION = "[data-component='ActionDialog.Question']";
+    return {
+      container: QUESTION,
+      question: `${QUESTION} [role='alert']`,
+      confirmButton: `${QUESTION} button[aria-label='Confirm']`,
+      primaryButton: `${QUESTION} button[aria-label='Confirm']`,
+      // The way back: 'Keep editing'.
+      cancelButton: `${QUESTION} button[aria-label='Keep editing']`,
+    };
+  }
+
+  const DIALOG = "[data-component$='DeleteDialog'][data-state='open']";
+  const BODY = `${DIALOG} [data-component='ActionDialog.Body']`;
+  const FOOTER = `${DIALOG} [data-component='ActionDialog.Footer']`;
+  const GATE = `${DIALOG} [data-component='Gate.Root']`;
   return {
     container: DIALOG,
     title: `${DIALOG} [data-component='Dialog.Title']`,
-    // The question: Dialog.Description in the delete dialog, the body's paragraph in the plain one.
-    question:
-      kind === KIND.CONFIRM
-        ? `${DIALOG} [data-component='Dialog.Body'] > div > p`
-        : `${DIALOG} [data-component='Dialog.Description']`,
-    targetDisplayName: `${DIALOG} [data-component='Dialog.Description'] strong`,
-    // The gate (delete): 'Enter <expected> in the field and click Delete:' and the input under it.
+    // The question, with the targets listed under it.
+    question: `${BODY} > div:first-child > div:first-child`,
+    targetDisplayName: `${BODY} li`,
+    // The gate: 'Type <expected> to confirm' and the input under it.
     gate: GATE,
-    gateText: `${GATE} > p`,
-    expectedValue: `${GATE} > p strong`,
+    gateText: `${GATE} [data-component='Gate.Hint']`,
+    expectedValue: `${GATE} [data-component='Gate.Hint'] strong`,
     confirmInput: `${GATE} input`,
     mismatchMessage: `${GATE} p.text-error`,
-    // Footer: Cancel and the primary button - 'Delete' in the delete dialog, 'Confirm' otherwise.
+    // Footer: Cancel and Delete.
     deleteButton: `${FOOTER} button[aria-label='Delete']`,
     confirmButton: `${FOOTER} button[aria-label='Confirm']`,
-    primaryButton:
-      kind === KIND.CONFIRM
-        ? `${FOOTER} button[aria-label='Confirm']`
-        : `${FOOTER} button[aria-label='Delete']`,
+    primaryButton: `${FOOTER} button[aria-label='Delete']`,
     cancelButton: `${FOOTER} button[aria-label='Cancel']`,
     closeButton: `${DIALOG} button[aria-label='Close']`,
     errorMessage: `${FOOTER} p[role='alert']`,
@@ -136,7 +141,7 @@ class ConfirmationDialog extends SectionPage {
     return await this.getText(this.css.question);
   }
 
-  // The display name the delete question names - or undefined for several items / a plain question.
+  // The first target listed under the delete question - or undefined when none is listed.
   async getTargetDisplayName() {
     const names = await this.getDisplayedElements(this.css.targetDisplayName);
     return names.length === 0 ? undefined : await names[0].getText();
@@ -148,7 +153,7 @@ class ConfirmationDialog extends SectionPage {
     return this.isElementDisplayed(this.css.confirmInput);
   }
 
-  // 'Enter <expected> in the field and click Delete:'
+  // 'Type <expected> to confirm'
   async getGateText() {
     await this.waitForElementDisplayed(this.css.gateText);
     return await this.getText(this.css.gateText);
@@ -178,7 +183,7 @@ class ConfirmationDialog extends SectionPage {
     return this.clearInputText(this.css.confirmInput);
   }
 
-  // 'Type <expected> to confirm, you typed <typed>' - shown half a second after a wrong entry - or
+  // '<typed> does not match <expected>' - shown half a second after a wrong entry - or
   // undefined.
   async getMismatchMessage() {
     const messages = await this.getDisplayedElements(this.css.mismatchMessage);
@@ -341,7 +346,7 @@ class ConfirmationDialog extends SectionPage {
 
   // Delete confirmation: types the expected value, then Delete; the dialog goes away.
   // `expected` is the item's name for one item, the count for several; omitted, it is read from the
-  // gate itself ('Enter <expected> in the field…').
+  // gate itself ('Type <expected> to confirm').
   async confirmDelete(expected) {
     await this.waitForDialogOpened();
     const value = expected === undefined ? await this.getExpectedValue() : expected;

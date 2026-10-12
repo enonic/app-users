@@ -1,4 +1,5 @@
-import { Button, Dialog } from '@enonic/ui';
+import { Button } from '@enonic/ui';
+import { ActionDialog, type FooterQuestion } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 
 import { i18n } from '../i18n';
@@ -6,6 +7,8 @@ import type { StepDialogStore } from './step-dialog.store';
 
 export type StepDialogFooterProps<Step extends string, Field extends string, Form, Entity> = {
   store: StepDialogStore<Step, Field, Form, Entity>;
+  /** The dirty-close question, asked in place of the controls while set. */
+  question?: FooterQuestion;
   onSave: () => void;
   onCancel: () => void;
   'data-component'?: string;
@@ -16,6 +19,7 @@ const STEP_DIALOG_FOOTER_NAME = 'StepDialogFooter';
 /** The stepper in wizard view; Cancel and Save in step view. */
 export function StepDialogFooter<Step extends string, Field extends string, Form, Entity>({
   store,
+  question,
   onSave,
   onCancel,
   'data-component': componentName = STEP_DIALOG_FOOTER_NAME,
@@ -26,8 +30,8 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
 
   if (view === 'wizard') {
     return (
-      <Dialog.Footer data-component={componentName}>
-        <Dialog.StepIndicator
+      <ActionDialog.Footer data-component={componentName} question={question}>
+        <ActionDialog.StepIndicator
           previousLabel={i18n('browse.dialog.previous')}
           nextLabel={i18n('browse.dialog.next')}
           lastStepLabel={i18n(mode === 'edit' ? 'browse.dialog.save' : 'browse.dialog.create')}
@@ -35,27 +39,28 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
           pending={saving}
           dots
         />
-      </Dialog.Footer>
+      </ActionDialog.Footer>
     );
   }
 
   const unanswered = Object.keys(errors).length > 0;
 
   return (
-    <Dialog.Footer data-component={componentName} className="items-center">
+    <ActionDialog.Footer data-component={componentName} question={question}>
       <Button
         variant="text"
+        size="lg"
         label={i18n('browse.dialog.cancel')}
         disabled={saving}
         onClick={onCancel}
       />
-      <Button
-        variant="solid"
+      <ActionDialog.Action
         label={i18n('browse.dialog.save')}
         disabled={saving || unanswered || !changed}
+        closeOnClick={false}
         onClick={onSave}
       />
-    </Dialog.Footer>
+    </ActionDialog.Footer>
   );
 }
 
