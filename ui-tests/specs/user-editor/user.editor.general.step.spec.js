@@ -119,6 +119,7 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
   it('GIVEN the suite is done THEN its ID provider should be deleted via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     await settingsUtils.deleteIdProviderViaApi(ID_PROVIDER);
+    ID_PROVIDER = undefined;
   });
 
   beforeEach(async () => {
@@ -132,5 +133,13 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
         .setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
     }
     return console.log('specification starting: ' + this.title);
+  });
+  // The provider is deleted by the last test; this is for a run that stopped before it.
+  after(async () => {
+    if (ID_PROVIDER !== undefined) {
+      await settingsUtils.deleteIdProviderViaApi(ID_PROVIDER).catch((err) => {
+        console.log('The ID provider was not cleaned up: ' + err);
+      });
+    }
   });
 });

@@ -20,6 +20,8 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
   }
   const PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
   const USER_NAME = userItemsBuilder.generateRandomName('user');
+  // What createIdProviderViaApi() returns, with the key the delete at the end needs.
+  let ID_PROVIDER;
 
   // The ID provider and General steps come before Credentials: a provider to pick on the first, and
   // the display name the second requires.
@@ -33,7 +35,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
         'role:system.user.admin': appConst.ID_PROVIDER_ACCESS.WRITE_USERS,
       },
     );
-    await settingsUtils.createIdProviderViaApi(idProvider);
+    ID_PROVIDER = await settingsUtils.createIdProviderViaApi(idProvider);
   });
 
   // 'Set password' opens an empty input, which the step rejects until something is typed; a password
@@ -290,5 +292,14 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
         .setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
     }
     return console.log('specification starting: ' + this.title);
+  });
+  // No user was created in the provider - every editor here was closed without Create - so the
+  // provider is free to go.
+  after(async () => {
+    if (ID_PROVIDER !== undefined) {
+      await settingsUtils.deleteIdProviderViaApi(ID_PROVIDER).catch((err) => {
+        console.log('The ID provider was not cleaned up: ' + err);
+      });
+    }
   });
 });
