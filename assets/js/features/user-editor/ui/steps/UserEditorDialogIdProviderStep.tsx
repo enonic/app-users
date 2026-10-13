@@ -11,7 +11,6 @@ import {
   $userEditorErrors,
   $userEditorProviders,
   closeUserEditor,
-  markUserEditorFieldVisited,
   setUserEditorIdProvider,
 } from '../../model/user-editor.store';
 
@@ -57,10 +56,7 @@ export function UserEditorDialogIdProviderStep() {
       <IdProviderSelector
         providers={providers}
         value={form.idProvider}
-        onChange={(next) => {
-          markUserEditorFieldVisited('idProvider');
-          setUserEditorIdProvider(next);
-        }}
+        onChange={setUserEditorIdProvider}
         labelledBy={PROVIDER_LABEL_ID}
         placeholder={providerPlaceholder}
         error={providerError !== undefined}

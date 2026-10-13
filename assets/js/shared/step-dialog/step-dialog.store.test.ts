@@ -238,6 +238,26 @@ describe('$errors and $stepLocks', () => {
   });
 });
 
+describe('$unanswered', () => {
+  it('names the first step with an error in the wizard', () => {
+    store.open({ mode: 'create' });
+    store.goToStep('summary');
+
+    expect(store.$unanswered.get()).toBe('general');
+  });
+
+  it('looks only at the step on screen when one step is shown alone', () => {
+    store.openAt({ ...ALICE, displayName: '' }, 'members', 'Alice');
+
+    expect(store.$errors.get()).toEqual({ displayName: 'dialog.displayNameRequired' });
+    expect(store.$unanswered.get()).toBeUndefined();
+
+    store.openAt({ ...ALICE, displayName: '' }, 'general', 'Alice');
+
+    expect(store.$unanswered.get()).toBe('general');
+  });
+});
+
 describe('markVisited', () => {
   it('collects the fields the user has been through', () => {
     store.open({ mode: 'create' });

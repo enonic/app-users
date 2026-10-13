@@ -13,6 +13,7 @@ import {
   openServiceAccountEditorAt,
   openUserEditor,
   openUserEditorAt,
+  setUserEditorDisplayName,
   setUserEditorEmail,
   setUserEditorIdProvider,
   updateUserEditorForm,
@@ -114,6 +115,26 @@ describe('$userEditorErrors', () => {
       name: 'serviceAccounts.dialog.idTaken',
       email: 'serviceAccounts.dialog.emailTaken',
     });
+  });
+});
+
+describe('the field setters', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('mark the field typed in visited, but not the name derived from it', () => {
+    openUserEditor({ mode: 'create' });
+
+    setUserEditorDisplayName('Alice Anderson');
+
+    const { form, visited } = $userEditor.get();
+    expect(form.name).toBe('alice.anderson');
+    expect([...visited]).toEqual(['displayName']);
   });
 });
 

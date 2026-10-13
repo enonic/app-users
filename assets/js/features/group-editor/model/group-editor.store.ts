@@ -99,17 +99,20 @@ export function seedGroupEditorLists(lists: {
 /** In the create wizard the display name is also where the name comes from, so it asks the same question. */
 export function setGroupEditorDisplayName(displayName: string): void {
   updateGroupEditorForm({ displayName });
+  groupEditorDialog.markVisited('displayName');
   askWhetherNameIsFree();
 }
 
 export function setGroupEditorName(name: string, { immediate = false } = {}): void {
   updateGroupEditorForm({ name });
+  groupEditorDialog.markVisited('name');
   askWhetherNameIsFree({ immediate });
 }
 
 /** The provider the name has to be free in, so a name already typed is asked about again at once. */
 export function setGroupEditorIdProvider(idProvider: string): void {
   updateGroupEditorForm({ idProvider });
+  groupEditorDialog.markVisited('idProvider');
   askWhetherNameIsFree({ immediate: true });
 }
 

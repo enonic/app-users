@@ -7,25 +7,27 @@ import { createStepDialogStore } from './step-dialog.store';
 import { defineSteps } from './steps';
 
 type Field = 'name' | 'displayName';
-type Form = { name: string; displayName: string };
+type Form = { name: string; displayName: string; members: readonly string[] };
 type Entity = { key: string; displayName: string };
 
-const STEPS = defineSteps<'general' | 'summary', Field>({
+const STEPS = defineSteps<'general' | 'members' | 'summary', Field>({
   general: { title: 'dialog.general', fields: ['name', 'displayName'] },
+  members: { title: 'dialog.members', fields: [] },
   summary: { title: 'dialog.summary', fields: [] },
 });
 
 const ALICE: Entity = { key: 'alice', displayName: 'Alice' };
 
-const store = createStepDialogStore<'general' | 'summary', Field, Form, Entity>({
+const store = createStepDialogStore<'general' | 'members' | 'summary', Field, Form, Entity>({
   steps: STEPS,
   titleKey: 'dialog.create',
   initialForm: (payload) =>
     payload.mode === 'create'
-      ? { name: '', displayName: '' }
-      : { name: payload.entity.key, displayName: payload.entity.displayName },
+      ? { name: '', displayName: '', members: [] }
+      : { name: payload.entity.key, displayName: payload.entity.displayName, members: [] },
   validate: (form) => (form.displayName.length === 0 ? { displayName: 'dialog.required' } : {}),
-  same: (saved, edited) => saved.displayName === edited.displayName,
+  same: (saved, edited) =>
+    saved.displayName === edited.displayName && saved.members.join() === edited.members.join(),
 });
 
 const NOTICES = {
@@ -67,6 +69,17 @@ describe('runStepDialogSave', () => {
     expect(opts.onSaved).not.toHaveBeenCalled();
   });
 
+  it('writes a step shown alone past an error on a step that is not', async () => {
+    store.openAt({ key: 'alice', displayName: '' }, 'members', 'alice');
+    store.update({ members: ['bob'] });
+    const write = vi.fn().mockReturnValue(okAsync({ key: 'alice', displayName: '' }));
+
+    await runStepDialogSave(store, options({ write }));
+
+    expect(write).toHaveBeenCalledOnce();
+    expect(store.$state.get().open).toBe(false);
+  });
+
   it('closes an edit with nothing to send without writing', async () => {
     store.open({ mode: 'edit', entity: ALICE });
     const write = vi.fn();
@@ -88,7 +101,11 @@ describe('runStepDialogSave', () => {
     await runStepDialogSave(store, opts);
 
     const written = { key: '', displayName: 'Alice' };
-    expect(afterWrite).toHaveBeenCalledWith(written, { name: '', displayName: 'Alice' });
+    expect(afterWrite).toHaveBeenCalledWith(written, {
+      name: '',
+      displayName: 'Alice',
+      members: [],
+    });
     expect(opts.notify).toHaveBeenCalledWith('success', '#notify.created#');
     expect(store.$state.get().open).toBe(false);
     expect(opts.onSaved).toHaveBeenCalledWith(written, 'create');
@@ -103,8 +120,8 @@ describe('runStepDialogSave', () => {
     await runStepDialogSave(store, opts);
 
     expect(write).toHaveBeenCalledWith(
-      { name: 'alice', displayName: 'Alice Cooper' },
-      { saved: { name: 'alice', displayName: 'Alice' }, mode: 'edit', entity: ALICE },
+      { name: 'alice', displayName: 'Alice Cooper', members: [] },
+      { saved: { name: 'alice', displayName: 'Alice', members: [] }, mode: 'edit', entity: ALICE },
     );
     expect(opts.notify).toHaveBeenCalledWith('success', '#notify.updated#');
     expect(opts.onSaved).toHaveBeenCalledWith(

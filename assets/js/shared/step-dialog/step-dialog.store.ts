@@ -64,6 +64,7 @@ export type StepDialogStore<Step extends string, Field extends string, Form, Ent
   $state: MapStore<StepDialogState<Step, Field, Form, Entity>>;
   $errors: ReadableAtom<FieldErrors<Field>>;
   $stepLocks: ReadableAtom<Record<Step, boolean>>;
+  $unanswered: ReadableAtom<Step | undefined>;
   $dirty: ReadableAtom<boolean>;
   $changed: ReadableAtom<boolean>;
   open: (payload: StepDialogPayload<Entity>, titleKey?: string) => void;
@@ -132,6 +133,16 @@ export function createStepDialogStore<Step extends string, Field extends string,
     steps.locked(errors, external.busy),
   );
 
+  // ! In `'step'` view only the step on screen gates: a field on another is out of the user's reach, and
+  // ! an edit sends it back as the entity holds it.
+  const $unanswered = computed([$state, $errors], ({ view, step }, errors) => {
+    if (view === 'wizard') {
+      return steps.firstWithError(errors);
+    }
+
+    return steps.hasError(errors, step) ? step : undefined;
+  });
+
   // Dirty is what closing would lose; changed is what a save would write, which a create always has.
   const $dirty = computed($state, ({ saved, form }) => !same(saved, form));
   const $changed = computed([$state, $dirty], ({ mode }, dirty) => mode === 'create' || dirty);
@@ -141,6 +152,7 @@ export function createStepDialogStore<Step extends string, Field extends string,
     $state,
     $errors,
     $stepLocks,
+    $unanswered,
     $dirty,
     $changed,
 

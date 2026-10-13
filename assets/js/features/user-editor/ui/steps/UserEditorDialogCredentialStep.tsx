@@ -120,7 +120,10 @@ export function UserEditorDialogCredentialStep() {
                     onClick={() => setShown((current) => !current)}
                   />
                 }
-                onInput={({ currentTarget }) => setUserEditorPassword(currentTarget.value)}
+                onInput={({ currentTarget }) => {
+                  markUserEditorFieldVisited('password');
+                  setUserEditorPassword(currentTarget.value);
+                }}
                 onBlur={() => markUserEditorFieldVisited('password')}
               />
 

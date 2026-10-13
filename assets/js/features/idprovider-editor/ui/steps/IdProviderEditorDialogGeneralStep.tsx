@@ -101,10 +101,7 @@ export function IdProviderEditorDialogGeneralStep() {
           description={persisted ? undefined : idHelp}
           error={idError}
           onInput={({ currentTarget }) => setIdProviderEditorName(currentTarget.value)}
-          onBlur={() => {
-            markIdProviderEditorFieldVisited('name');
-            setIdProviderEditorName(form.name, { immediate: true });
-          }}
+          onBlur={() => setIdProviderEditorName(form.name, { immediate: true })}
         />
       </div>
 

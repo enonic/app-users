@@ -183,23 +183,27 @@ export function seedUserEditorMemberships(memberships: {
 /** In the create wizard the display name is also where the name comes from, so it asks the same question. */
 export function setUserEditorDisplayName(displayName: string): void {
   updateUserEditorForm({ displayName });
+  userEditorDialog.markVisited('displayName');
   askWhetherNameIsFree();
 }
 
 export function setUserEditorName(name: string, { immediate = false } = {}): void {
   updateUserEditorForm({ name });
+  userEditorDialog.markVisited('name');
   askWhetherNameIsFree({ immediate });
 }
 
 /** The provider the name and the email have to be free in, so both are asked about again at once. */
 export function setUserEditorIdProvider(idProvider: string): void {
   updateUserEditorForm({ idProvider });
+  userEditorDialog.markVisited('idProvider');
   askWhetherNameIsFree({ immediate: true });
   askWhetherEmailIsFree({ immediate: true });
 }
 
 export function setUserEditorEmail(email: string, { immediate = false } = {}): void {
   updateUserEditorForm({ email });
+  userEditorDialog.markVisited('email');
   askWhetherEmailIsFree({ immediate });
 }
 

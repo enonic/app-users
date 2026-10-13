@@ -62,10 +62,7 @@ export function RoleEditorDialogGeneralStep() {
           description={persisted ? undefined : idHelp}
           error={idError}
           onInput={({ currentTarget }) => setRoleEditorName(currentTarget.value)}
-          onBlur={() => {
-            markRoleEditorFieldVisited('name');
-            setRoleEditorName(form.name, { immediate: true });
-          }}
+          onBlur={() => setRoleEditorName(form.name, { immediate: true })}
         />
       </div>
 

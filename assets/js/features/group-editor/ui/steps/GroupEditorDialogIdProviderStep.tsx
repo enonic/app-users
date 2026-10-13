@@ -9,7 +9,6 @@ import {
   $groupEditor,
   $groupEditorErrors,
   $groupEditorProviders,
-  markGroupEditorFieldVisited,
   setGroupEditorIdProvider,
 } from '../../model/group-editor.store';
 
@@ -35,10 +34,7 @@ export function GroupEditorDialogIdProviderStep() {
       <IdProviderSelector
         providers={providers}
         value={form.idProvider}
-        onChange={(next) => {
-          markGroupEditorFieldVisited('idProvider');
-          setGroupEditorIdProvider(next);
-        }}
+        onChange={setGroupEditorIdProvider}
         labelledBy={PROVIDER_LABEL_ID}
         placeholder={providerPlaceholder}
         error={providerError !== undefined}

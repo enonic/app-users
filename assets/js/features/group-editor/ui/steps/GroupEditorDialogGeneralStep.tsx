@@ -76,10 +76,7 @@ export function GroupEditorDialogGeneralStep() {
           description={persisted ? undefined : idHelp}
           error={idError}
           onInput={({ currentTarget }) => setGroupEditorName(currentTarget.value)}
-          onBlur={() => {
-            markGroupEditorFieldVisited('name');
-            setGroupEditorName(form.name, { immediate: true });
-          }}
+          onBlur={() => setGroupEditorName(form.name, { immediate: true })}
         />
       </div>
 
