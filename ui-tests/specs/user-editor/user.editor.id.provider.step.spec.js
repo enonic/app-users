@@ -1,14 +1,14 @@
 /**
  * Created on 07.10.2026
  */
-const webDriverHelper = require('../libs/WebDriverHelper');
-const settingsUtils = require('../libs/settings.utils');
-const appConst = require('../libs/app_const');
+const webDriverHelper = require('../../libs/WebDriverHelper');
+const settingsUtils = require('../../libs/settings.utils');
+const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const UsersPage = require('../page_objects/users/users.page');
-const UserEditorIdProviderStepDialog = require('../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
-const UserEditorGeneralStepDialog = require('../page_objects/users/user-dialog/user.editor.general.step.dialog');
-const userItemsBuilder = require('../libs/users.items.builder');
+const UsersPage = require('../../page_objects/users/users.page');
+const UserEditorIdProviderStepDialog = require('../../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
+const UserEditorGeneralStepDialog = require('../../page_objects/users/user-dialog/user.editor.general.step.dialog');
+const userItemsBuilder = require('../../libs/users.items.builder');
 
 describe("user.editor.id.provider.step.spec - the user editor's ID provider step: a provider is picked by filtering the combobox or by dropping its list down, and the pick survives a step back", function () {
   this.timeout(appConst.SUITE_TIMEOUT);

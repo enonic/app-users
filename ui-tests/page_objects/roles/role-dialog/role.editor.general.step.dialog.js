@@ -14,7 +14,7 @@ const css = {
   displayNameInput: `${DIALOG} input#role-editor-display-name`,
   idInput: `${DIALOG} input#role-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#role-editor-description`,
-  validationMessages: `${DIALOG} [data-registry-id='general'] p.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='general'] div.text-error`,
 };
 
 class RoleEditorGeneralStepDialog extends RoleEditorStepDialog {
@@ -117,6 +117,39 @@ class RoleEditorGeneralStepDialog extends RoleEditorStepDialog {
   // Texts of the validation messages shown under the fields, e.g. 'ID is required'.
   getValidationMessages() {
     return this.getTextInDisplayedElements(css.validationMessages);
+  }
+
+  // Waits for the message to be shown under its field. A message appears once the input has been
+  // left, a moment after the blur: a read right after it finds none.
+  async waitForValidationMessage(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.getValidationMessages()).includes(expected),
+        { timeout: ms, timeoutMsg: `the validation message '${expected}' should be shown` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `New role dialog - the validation message '${expected}'`,
+        'err_validation_message',
+        err,
+      );
+    }
+  }
+
+  // Waits for the message to be gone, e.g. once the field is filled again.
+  async waitForValidationMessageGone(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => !(await this.getValidationMessages()).includes(expected),
+        { timeout: ms, timeoutMsg: `the validation message '${expected}' should be gone` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `New role dialog - the validation message '${expected}' should be gone`,
+        'err_validation_message',
+        err,
+      );
+    }
   }
 
   // Flows
