@@ -2,7 +2,6 @@ import { useStore } from '@nanostores/preact';
 
 import { deletePrincipals, principalName } from '../../entities/principal';
 import { useHostFrame } from '../../shared/host';
-import { deleteExpectation } from '../../shared/ui/dialogs/delete-confirm';
 import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
 import { serviceAccountsDeletion } from './model/deletion.store';
 import { serviceAccountsSelection } from './model/selection.store';
@@ -27,7 +26,7 @@ export function ServiceAccountDeleteDialog({
   const deleteTargets = (targets ?? []).map((user) => ({
     key: user.key,
     name: principalName(user.key),
-    displayName: user.displayName,
+    label: user.displayName,
   }));
 
   return (
@@ -35,7 +34,6 @@ export function ServiceAccountDeleteDialog({
       data-component={componentName}
       open={targets !== undefined}
       targets={deleteTargets}
-      expected={deleteExpectation(deleteTargets)}
       onClose={serviceAccountsDeletion.close}
       onConfirm={() => {
         const confirmed = targets ?? [];

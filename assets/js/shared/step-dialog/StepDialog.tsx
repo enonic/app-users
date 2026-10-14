@@ -1,11 +1,9 @@
-import { Dialog } from '@enonic/ui';
+import { ActionDialog, type FooterQuestion, useCloseGuard } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import type { ComponentType } from 'preact';
-import { useState } from 'preact/hooks';
 import type { ReactNode } from 'react';
 
 import { useI18n } from '../i18n';
-import { ConfirmDialog } from '../ui/dialogs/ConfirmDialog';
 import { useDialogLayer } from '../ui/dialogs/dialog-stack';
 import type { StepDialogStore } from './step-dialog.store';
 import { StepDialogFooter } from './StepDialogFooter';
@@ -29,7 +27,7 @@ const STEP_DIALOG_NAME = 'StepDialog';
  * `panels` are pure content, wrapped in `StepContent` and locked here.
  *
  * ! Every way out but a save — overlay, Escape, the header's cross, Cancel — asks first while the form
- * ! is dirty. The confirm is a layer above this one, so the gesture that answers it never reaches here.
+ * ! is dirty. The question is the footer's: the body goes inert under it, and Escape is the way back.
  */
 export function StepDialog<Step extends string, Field extends string, Form, Entity>({
   store,
@@ -45,78 +43,78 @@ export function StepDialog<Step extends string, Field extends string, Form, Enti
   const locks = useStore(store.$stepLocks);
   const dirty = useStore(store.$dirty);
   const { blocked } = useDialogLayer(open);
-  const [closing, setClosing] = useState(false);
 
   const closeQuestion = useI18n('browse.dialog.closeQuestion');
+
+  const guard = useCloseGuard({
+    dirty,
+    open,
+    onOpenChange: (next) => {
+      if (!next) {
+        store.close();
+      }
+    },
+  });
 
   const shown =
     view === 'wizard'
       ? store.steps.order.filter((value) => omit?.includes(value) !== true)
       : [step];
 
-  const requestClose = (): void => {
-    if (saving || blocked) {
-      return;
-    }
+  const held = saving || blocked;
 
-    if (dirty) {
-      setClosing(true);
-    } else {
-      store.close();
-    }
-  };
+  const question: FooterQuestion | undefined = guard.asking
+    ? { text: closeQuestion, onConfirm: guard.discard, onKeep: guard.keep }
+    : undefined;
 
   return (
-    <>
-      <Dialog
-        open={open}
-        step={step}
-        onStepChange={(next) => store.goToStep(next as Step)}
-        onOpenChange={(next) => {
-          if (!next) {
-            requestClose();
-          }
-        }}
-      >
-        <Dialog.Portal>
-          <Dialog.Overlay />
-          <Dialog.Content
-            data-component={componentName}
-            className="gap-10 p-5 md:max-w-184 md:min-w-180 md:p-10"
-            onEscapeKeyDown={(event) => {
-              if (blocked) {
-                event.preventDefault();
+    <ActionDialog.Root
+      open={open}
+      step={step}
+      onStepChange={(next) => store.goToStep(next as Step)}
+      onOpenChange={(next, details) => {
+        if (!held) {
+          guard.onOpenChange(next, details);
+        }
+      }}
+    >
+      <ActionDialog.Portal>
+        <ActionDialog.Overlay />
+        <ActionDialog.Content
+          data-component={componentName}
+          className="gap-10 p-5 md:max-w-184 md:min-w-180 md:p-10"
+          onEscapeKeyDown={(event) => {
+            if (blocked) {
+              event.preventDefault();
+            }
+          }}
+        >
+          <StepDialogHeader store={store} glyph={glyph} />
+
+          <ActionDialog.Body className="-m-1.5 p-1.5">
+            {shown.map((value) => {
+              const Panel: ComponentType = panels[value];
+              return (
+                <ActionDialog.StepContent key={value} step={value} locked={locks[value]}>
+                  <Panel />
+                </ActionDialog.StepContent>
+              );
+            })}
+          </ActionDialog.Body>
+
+          <StepDialogFooter
+            store={store}
+            question={question}
+            onSave={onSave}
+            onCancel={() => {
+              if (!held) {
+                guard.requestClose();
               }
             }}
-          >
-            <StepDialogHeader store={store} glyph={glyph} />
-
-            <Dialog.Body className="-m-1.5 p-1.5">
-              {shown.map((value) => {
-                const Panel: ComponentType = panels[value];
-                return (
-                  <Dialog.StepContent key={value} step={value} locked={locks[value]}>
-                    <Panel />
-                  </Dialog.StepContent>
-                );
-              })}
-            </Dialog.Body>
-
-            <StepDialogFooter store={store} onSave={onSave} onCancel={requestClose} />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog>
-
-      <ConfirmDialog
-        open={closing}
-        question={closeQuestion}
-        onConfirm={() => {
-          setClosing(false);
-          store.close();
-        }}
-        onClose={() => setClosing(false)}
-      />
-    </>
+          />
+        </ActionDialog.Content>
+      </ActionDialog.Portal>
+    </ActionDialog.Root>
   );
 }
 

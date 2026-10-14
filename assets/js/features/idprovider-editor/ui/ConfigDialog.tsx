@@ -3,13 +3,18 @@ import {
   ValidationVisibilityProvider,
   type ValidationVisibility,
 } from '@enonic/input-types';
+import { Button } from '@enonic/ui';
+import { ActionDialog, type FooterQuestion, useCloseGuard } from '@enonic/ui-kit';
 import { useStore } from '@nanostores/preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import { useHostFrame } from '../../../shared/host';
 import { useI18n } from '../../../shared/i18n';
-import { ConfirmDialog } from '../../../shared/ui/dialogs/ConfirmDialog';
-import { ModalDialog } from '../../../shared/ui/dialogs/ModalDialog';
+import {
+  contentLayerProps,
+  overlayLayerProps,
+  useDialogLayer,
+} from '../../../shared/ui/dialogs/dialog-stack';
 import { editsStoredIdProviderConfig } from '../model/idprovider-config-effective';
 import {
   isConfigChanged,
@@ -46,18 +51,16 @@ export function ConfigDialog({
 }: ConfigDialogProps) {
   const session = useStore($idProviderConfig);
   const { notify } = useHostFrame();
+  const layer = useDialogLayer(open);
 
   const title = useI18n('idProviders.dialog.configTitle', applicationName);
   const loadingLabel = useI18n('idProviders.dialog.configLoading');
   const failedLabel = useI18n('idProviders.dialog.configFailed');
-  const closeLabel = useI18n('browse.dialog.close');
   const cancelLabel = useI18n('browse.dialog.cancel');
   const applyLabel = useI18n('idProviders.dialog.configApply');
-
   const closeQuestion = useI18n('browse.dialog.closeQuestion');
 
   const [changed, setChanged] = useState(false);
-  const [closing, setClosing] = useState(false);
 
   // ! One tree per open: the form edits it in place, so a new one per render would drop every keystroke.
   // ! It starts from what was applied before, else from what is stored.
@@ -80,9 +83,19 @@ export function ConfigDialog({
   // ! Derived, not stored: a broken configuration has to show its errors on the very first frame.
   const visibility: ValidationVisibility = editing?.broken === true ? 'all' : 'interactive';
 
+  // Every way out but Apply — Cancel, the close button, Escape, a click outside — asks before it drops edits.
+  const guard = useCloseGuard({
+    dirty: changed,
+    open,
+    onOpenChange: (next) => {
+      if (!next) {
+        onClose();
+      }
+    },
+  });
+
   useEffect(() => {
     setChanged(false);
-    setClosing(false);
   }, [editing]);
 
   // Opening on a failed load reads the binding again, so one failed request does not lock the dialog.
@@ -104,15 +117,7 @@ export function ConfigDialog({
     return () => editing.tree.unChanged(recheck);
   }, [editing]);
 
-  // Every way out but Apply — Cancel, the close button, Escape, a click outside — asks before it drops edits.
-  const requestClose = (): void => {
-    if (changed) {
-      setClosing(true);
-    } else {
-      onClose();
-    }
-  };
-
+  // Apply closes through the action's own close; the guard lets that one through unasked.
   const apply = (): void => {
     if (editing === undefined) {
       return;
@@ -123,53 +128,57 @@ export function ConfigDialog({
     if (isConfigChanged(editing.tree, editing.opened)) {
       updateIdProviderEditorForm({ config: savedConfigOf(editing.tree) });
     }
-    onClose();
   };
 
-  return (
-    <>
-      <ModalDialog
-        data-component={componentName}
-        open={open}
-        title={title}
-        size="wide"
-        primaryLabel={applyLabel}
-        primaryDisabled={editing === undefined}
-        cancelLabel={cancelLabel}
-        closeLabel={closeLabel}
-        onClose={requestClose}
-        onPrimary={apply}
-      >
-        {session.status === 'loading' && <p className="text-subtle text-base">{loadingLabel}</p>}
-        {session.status === 'error' && (
-          <p className="text-error text-base" role="alert">
-            {failedLabel}
-          </p>
-        )}
-        {editing !== undefined && (
-          <ValidationVisibilityProvider visibility={visibility}>
-            <FormRenderer
-              form={editing.form}
-              propertySet={editing.tree.getRoot()}
-              applicationKey={application}
-              registry={CONFIG_INPUT_TYPES}
-              enabled
-              notify={(message) => notify('warning', message)}
-            />
-          </ValidationVisibilityProvider>
-        )}
-      </ModalDialog>
+  const question: FooterQuestion | undefined = guard.asking
+    ? { text: closeQuestion, onConfirm: guard.discard, onKeep: guard.keep }
+    : undefined;
 
-      <ConfirmDialog
-        open={closing}
-        question={closeQuestion}
-        onConfirm={() => {
-          setClosing(false);
-          onClose();
-        }}
-        onClose={() => setClosing(false)}
-      />
-    </>
+  return (
+    <ActionDialog.Root open={open} onOpenChange={guard.onOpenChange}>
+      <ActionDialog.Portal>
+        <ActionDialog.Overlay {...overlayLayerProps(layer)} />
+        <ActionDialog.Content
+          data-component={componentName}
+          size="wide"
+          {...contentLayerProps(layer)}
+        >
+          <ActionDialog.DefaultHeader title={title} withClose />
+
+          <ActionDialog.Body>
+            {session.status === 'loading' && (
+              <p className="text-subtle text-base">{loadingLabel}</p>
+            )}
+            {session.status === 'error' && (
+              <p className="text-error text-base" role="alert">
+                {failedLabel}
+              </p>
+            )}
+            {editing !== undefined && (
+              <ValidationVisibilityProvider visibility={visibility}>
+                <FormRenderer
+                  form={editing.form}
+                  propertySet={editing.tree.getRoot()}
+                  applicationKey={application}
+                  registry={CONFIG_INPUT_TYPES}
+                  enabled
+                  notify={(message) => notify('warning', message)}
+                />
+              </ValidationVisibilityProvider>
+            )}
+          </ActionDialog.Body>
+
+          <ActionDialog.Footer question={question}>
+            <Button variant="text" size="lg" label={cancelLabel} onClick={guard.requestClose} />
+            <ActionDialog.Action
+              label={applyLabel}
+              disabled={editing === undefined}
+              onClick={apply}
+            />
+          </ActionDialog.Footer>
+        </ActionDialog.Content>
+      </ActionDialog.Portal>
+    </ActionDialog.Root>
   );
 }
 

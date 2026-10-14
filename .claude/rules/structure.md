@@ -37,8 +37,12 @@ app-applications keeps its own `BrowseFilter`, `widgets/browse-search` and `shar
 to the kit, so `widgets/browse-list` differs there too. They converge through that move — do not fix one
 side only.
 
-`shared/step-dialog/` is the base of every dialog made of steps, as `shared/ui/dialogs/ModalDialog` is of
-the single-page ones. It is `@enonic/ui-kit` material like `widgets/`, so it imports nothing from
+Dialogs are `ActionDialog` from `@enonic/ui-kit`: `DeleteConfirm` under `shared/ui/dialogs/DeleteConfirmDialog`
+worded by this app, `useCloseGuard` for the dirty-close question the footer asks, and `shared/ui/dialogs/dialog-stack`
+for the one thing the kit does not do — a dialog opened over another (`ConfigDialog`, `AddPublicKeyDialog` over the
+wizard) takes `overlayLayerProps` and `contentLayerProps` so the gesture that closes it never reaches the one below.
+`shared/step-dialog/` is the base of every dialog made of steps on the same `ActionDialog`. It is `@enonic/ui-kit`
+material like `widgets/`, so it imports nothing from
 `entities/**`: a feature hands it the domain — `defineSteps` table, `initialForm`, `validate`, `same`,
 `next` — through `createStepDialogStore`, once at module level, and re-exports the pieces under its own
 names (`features/user-editor/model/user-editor.store.ts` is the worked example). The barrel carries the
