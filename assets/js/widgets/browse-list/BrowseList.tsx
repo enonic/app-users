@@ -23,6 +23,8 @@ export type BrowseListProps = {
   onSelectionChange: (keys: ReadonlySet<string>) => void;
   /** The row the user moved to, `undefined` when the active row was clicked again. */
   onActiveChange: (key: string | undefined) => void;
+  /** A row was double-clicked or `Enter` was pressed on it. Undefined where the section declared no row action. */
+  onRowActivate?: (key: string) => void;
   /** Rows can be ticked. */
   selectable?: boolean;
   status: BrowseListStatus;
@@ -45,6 +47,7 @@ export function BrowseList({
   selectedKeys,
   onSelectionChange,
   onActiveChange,
+  onRowActivate,
   selectable = true,
   status,
   emptyLabel,
@@ -149,6 +152,7 @@ export function BrowseList({
         onSelectionChange={onSelectionChange}
         active={cursorKey}
         onActiveChange={handleCursorChange}
+        onActivate={onRowActivate}
         getItemInteraction={interactionOf}
       >
         {rows.map((row) => (
