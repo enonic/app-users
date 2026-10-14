@@ -171,6 +171,25 @@ class PrincipalCombobox extends SectionPage {
     return (await this.getOptions()).map(({ displayName }) => displayName);
   }
 
+  // Waits for the option with the display name to be offered. The popup is opened when it is not -
+  // a click outside it, on the 'Show ... from all ID providers' toggle say, closes it - and the
+  // list is re-read until the option is there: the picker searches the server and answers late.
+  async waitForOptionDisplayed(displayName, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.openDropdown();
+      await this.getBrowser().waitUntil(
+        async () => (await this.getOptionsDisplayName()).includes(displayName),
+        { timeout: ms, timeoutMsg: `the option '${displayName}' should be offered` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `'${this.placeholder}' picker - the option '${displayName}' should be offered`,
+        'err_principal_option',
+        err,
+      );
+    }
+  }
+
   // Names (the line under the display name) of the options shown, in display order.
   async getOptionsName() {
     return (await this.getOptions()).map(({ name }) => name);

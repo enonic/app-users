@@ -13,6 +13,18 @@
  */
 const appConst = require('../libs/app_const');
 
+/**
+ * The base class is a parameter, so an IDE cannot tell on its own what the returned class extends:
+ * the type hints below are what lets it resolve the inherited methods (getStepTitle,
+ * isPreviousButtonEnabled, ...) on an editor's Summary class.
+ *
+ * No `@returns`: the returned class expression is what the IDE reads the Summary methods from, and a
+ * declared return type would hide them.
+ *
+ * @param {typeof import('./step.dialog')} EditorStepDialog the editor's base class, with its STEP
+ *   table and css
+ * @param {Record<string, string>} LABEL the row labels of that editor's Summary
+ */
 function withSummaryStep(EditorStepDialog, LABEL) {
   const DIALOG = EditorStepDialog.css.container;
   const PANEL = `${DIALOG} [data-registry-id='${EditorStepDialog.STEP.SUMMARY}']`;
