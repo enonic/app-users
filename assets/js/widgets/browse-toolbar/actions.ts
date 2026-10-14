@@ -13,6 +13,12 @@ export type SectionAction<T> = {
   /** Pure — no I/O, no store reads. Unit-tested per section. */
   enabled: (ctx: ActionContext<T>) => boolean;
   run: (ctx: ActionContext<T>) => void | Promise<void>;
+  /**
+   * Runs when a row is activated, which today means double-clicked. At most one action per section
+   * carries it, and its own `enabled` still decides: a double click is a shortcut to an action the
+   * user already has, never a way past its rules.
+   */
+  activatedByRow?: boolean;
 };
 
 /** What the toolbar and the row menu render: the same action with its label resolved. */
@@ -29,4 +35,14 @@ export function actionTargets<T>({ selected, active }: ActionContext<T>): readon
   }
 
   return active === undefined ? [] : [active];
+}
+
+/** The action a row activation runs, if the section declared one and it is allowed right now. */
+export function rowActivationAction<T>(
+  actions: readonly SectionAction<T>[],
+  ctx: ActionContext<T>,
+): SectionAction<T> | undefined {
+  const action = actions.find(({ activatedByRow }) => activatedByRow === true);
+
+  return action !== undefined && action.enabled(ctx) ? action : undefined;
 }

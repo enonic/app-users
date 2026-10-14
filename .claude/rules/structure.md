@@ -32,11 +32,6 @@ byte-identical where the code is the same — `cmp` against `../app-applications
 and a widget takes what it needs as props (`activeKey`, `detailsShown`) rather than reaching into
 `shared/host`, which is what keeps it portable.
 
-The filter is the exception for now: this app takes `FilterInput` from `@enonic/ui-kit`, while
-app-applications keeps its own `BrowseFilter`, `widgets/browse-search` and `shared/search` until it moves
-to the kit, so `widgets/browse-list` differs there too. They converge through that move — do not fix one
-side only.
-
 Dialogs are `ActionDialog` from `@enonic/ui-kit`: `DeleteConfirm` under `shared/ui/dialogs/DeleteConfirmDialog`
 worded by this app, `useCloseGuard` for the dirty-close question the footer asks, and `shared/ui/dialogs/dialog-stack`
 for the one thing the kit does not do — a dialog opened over another (`ConfigDialog`, `AddPublicKeyDialog` over the
