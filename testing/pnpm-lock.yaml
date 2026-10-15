@@ -43,8 +43,8 @@ importers:
   .:
     devDependencies:
       '@wdio/allure-reporter':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: ^10.0.1
+        version: 10.0.1
       '@wdio/cli':
         specifier: ^10.0.0
         version: 10.0.0(@types/node@26.6.4)(expect-webdriverio@8.0.0-alpha.3(@wdio/types@10.0.0)(webdriverio@10.0.2(yauzl@2.10.0)))(yauzl@2.10.0)
@@ -471,8 +471,8 @@ packages:
   '@vitest/utils@5.0.3':
     resolution: {integrity: sha512-77fDTZv8eu1CzlIfgPU2yrl5MXSUaUAOvgdZEeVm3X3WIxUubIX2SforqS6176lT32HCF6uBVMYVqfHxw7o6eg==}
 
-  '@wdio/allure-reporter@10.0.0':
-    resolution: {integrity: sha512-03hn9dqbehHgJYFs4AP+F2uzkygw3H56rbBZG1WsXVFNqJXQrM3CVF2ZLNTRHQ3ALNYPS45xbDEQmK3k8/ll+w==}
+  '@wdio/allure-reporter@10.0.1':
+    resolution: {integrity: sha512-Unxlc1THjU8V3DDRqcFMWvFvZVdaeYUrNgQO4RlZvLF+ygio7mOkYjfz7SGmrrCsy7xye5Elqn4VCw/ic0pstQ==}
     engines: {node: '>=22.19.0'}
 
   '@wdio/cli@10.0.0':
@@ -537,6 +537,10 @@ packages:
 
   '@wdio/reporter@10.0.0':
     resolution: {integrity: sha512-qPxe2dq0hFDd6AZj6Z3SunpMvCOv9UdXS3CINtSrJweGNGHj1VltSNVPVqWYWwzs3ywuEjGg2t91JIQVxgfgWA==}
+    engines: {node: '>=22.19.0'}
+
+  '@wdio/reporter@10.0.1':
+    resolution: {integrity: sha512-A917SeniucyosspqazR9tGH6t9JaecU5SRP3VzRGyIo0JBEKV6walJU1VBauMH+7n043huzgiQvNJ414Vi8dmQ==}
     engines: {node: '>=22.19.0'}
 
   '@wdio/runner@10.0.0':
@@ -1995,11 +1999,11 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.2.0
 
-  '@wdio/allure-reporter@10.0.0':
+  '@wdio/allure-reporter@10.0.1':
     dependencies:
       '@types/node': 22.20.5
-      '@wdio/reporter': 10.0.0
-      '@wdio/types': 10.0.0
+      '@wdio/reporter': 10.0.1
+      '@wdio/types': 10.0.1
       allure-js-commons: 3.13.0
       csv-stringify: 6.9.0
       html-entities: 2.6.0
@@ -2171,6 +2175,13 @@ snapshots:
     dependencies:
       '@types/node': 22.20.5
       '@wdio/types': 10.0.0
+      diff: 8.0.4
+      object-inspect: 1.13.4
+
+  '@wdio/reporter@10.0.1':
+    dependencies:
+      '@types/node': 22.20.5
+      '@wdio/types': 10.0.1
       diff: 8.0.4
       object-inspect: 1.13.4
 
