@@ -3,6 +3,7 @@ import type { PropertyTreeJson } from '@enonic/ui-types';
 import {
   deriveIdProviderName,
   isIllegalIdProviderName,
+  isReservedIdProviderName,
   SYSTEM_ID_PROVIDER,
   type IdProvider,
   type IdProviderAccess,
@@ -137,6 +138,8 @@ export function validateIdProviderForm(
     const name = form.name.trim();
     if (name.length === 0) {
       errors.name = 'idProviders.dialog.idRequired';
+    } else if (isReservedIdProviderName(name)) {
+      errors.name = 'idProviders.dialog.idReserved';
     } else if (isIllegalIdProviderName(name)) {
       errors.name = 'idProviders.dialog.idInvalid';
     }

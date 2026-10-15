@@ -163,8 +163,12 @@ describe('validateRoleForm', () => {
     );
   });
 
-  it.each(['a#b', 'test@', 'иван', 'blåbær', '.'])('refuses %s, which XP rejects', (name) => {
+  it.each(['a#b', 'test@', 'иван', 'blåbær'])('refuses %s, which XP rejects', (name) => {
     expect(validateRoleForm(form({ name }), 'create').name).toBe('roles.dialog.idInvalid');
+  });
+
+  it.each(['.', '..', '_'])('refuses the reserved name %s with its own message', (name) => {
+    expect(validateRoleForm(form({ name }), 'create').name).toBe('roles.dialog.idReserved');
   });
 
   it('accepts a name XP can store, once trimmed', () => {

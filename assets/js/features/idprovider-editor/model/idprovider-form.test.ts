@@ -159,11 +159,17 @@ describe('validateIdProviderForm', () => {
     );
   });
 
-  it.each(['a#b', 'test@', 'иван', 'blåbær', '.', 'Roles'])(
-    'refuses %s, which XP rejects',
+  it.each(['a#b', 'test@', 'иван', 'blåbær'])('refuses %s, which XP rejects', (name) => {
+    expect(validateIdProviderForm(form({ name }), 'create').name).toBe(
+      'idProviders.dialog.idInvalid',
+    );
+  });
+
+  it.each(['.', '..', '_', 'Roles'])(
+    'refuses the reserved name %s with its own message',
     (name) => {
       expect(validateIdProviderForm(form({ name }), 'create').name).toBe(
-        'idProviders.dialog.idInvalid',
+        'idProviders.dialog.idReserved',
       );
     },
   );

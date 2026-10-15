@@ -46,7 +46,8 @@ export function UserEditorDialogGeneralStep() {
   const shown = visitedErrors(errors, visited);
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
   const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
-  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name, providerName);
+  const idError =
+    idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name.trim(), providerName);
   const emailError =
     shown.email === undefined ? undefined : i18n(shown.email, form.email, providerName);
 

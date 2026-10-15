@@ -131,8 +131,12 @@ describe('validateUserForm', () => {
     );
   });
 
-  it.each(['a#b', 'test@', 'иван', 'blåbær', '.'])('refuses %s, which XP rejects', (name) => {
+  it.each(['a#b', 'test@', 'иван', 'blåbær'])('refuses %s, which XP rejects', (name) => {
     expect(validateUserForm(form({ name }), 'create').name).toBe('users.dialog.idInvalid');
+  });
+
+  it.each(['.', '..', '_'])('refuses the reserved name %s with its own message', (name) => {
+    expect(validateUserForm(form({ name }), 'create').name).toBe('users.dialog.idReserved');
   });
 
   it('accepts a name XP can store, once trimmed', () => {

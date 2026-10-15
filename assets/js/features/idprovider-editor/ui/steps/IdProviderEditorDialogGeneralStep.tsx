@@ -75,7 +75,7 @@ export function IdProviderEditorDialogGeneralStep() {
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
   // A taken ID is told at once: the answer arrives after the field was typed in, visited or not.
   const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
-  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name);
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name.trim());
   // One message under the field at a time: an error outranks the warning.
   const idWarningKey = idError === undefined ? idProviderNameWarning(form, mode) : undefined;
 

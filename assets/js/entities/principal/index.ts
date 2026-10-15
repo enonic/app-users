@@ -81,6 +81,8 @@ export {
   derivePrincipalName,
   isIllegalIdProviderName,
   isIllegalPrincipalName,
+  isReservedIdProviderName,
+  isReservedPrincipalName,
 } from './model/principal-name';
 export { createPrincipalNameCheck } from './model/principal-name-check.load';
 export type {

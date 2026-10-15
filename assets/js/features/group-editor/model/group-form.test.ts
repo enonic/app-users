@@ -194,8 +194,12 @@ describe('validateGroupForm', () => {
     );
   });
 
-  it.each(['a#b', 'test@', 'иван', 'blåbær', '.'])('refuses %s, which XP rejects', (name) => {
+  it.each(['a#b', 'test@', 'иван', 'blåbær'])('refuses %s, which XP rejects', (name) => {
     expect(validateGroupForm(form({ name }), 'create').name).toBe('groups.dialog.idInvalid');
+  });
+
+  it.each(['.', '..', '_'])('refuses the reserved name %s with its own message', (name) => {
+    expect(validateGroupForm(form({ name }), 'create').name).toBe('groups.dialog.idReserved');
   });
 
   it('accepts a name XP can store, once trimmed', () => {

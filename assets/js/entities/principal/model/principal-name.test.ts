@@ -5,6 +5,8 @@ import {
   derivePrincipalName,
   isIllegalIdProviderName,
   isIllegalPrincipalName,
+  isReservedIdProviderName,
+  isReservedPrincipalName,
 } from './principal-name';
 
 // XP stores a principal under its key lowercased as the node id, which must match `[a-z0-9_.:-]+`.
@@ -155,5 +157,25 @@ describe('isIllegalIdProviderName', () => {
 
   it.each(['my-idp', 'Company.Directory_2', 'roles2', 'my.roles'])('accepts %s', (name) => {
     expect(isIllegalIdProviderName(name)).toBe(false);
+  });
+});
+
+describe('isReservedPrincipalName', () => {
+  it.each(['_', '.', '..'])('reserves %s', (name) => {
+    expect(isReservedPrincipalName(name)).toBe(true);
+  });
+
+  it.each(['...', '__', 'roles', 'a#b'])('leaves %s to the other checks', (name) => {
+    expect(isReservedPrincipalName(name)).toBe(false);
+  });
+});
+
+describe('isReservedIdProviderName', () => {
+  it.each(['_', '.', '..', 'roles', 'ROLES', 'Roles'])('reserves %s', (name) => {
+    expect(isReservedIdProviderName(name)).toBe(true);
+  });
+
+  it.each(['...', '__', 'roles2', 'my.roles', 'a#b'])('leaves %s to the other checks', (name) => {
+    expect(isReservedIdProviderName(name)).toBe(false);
   });
 });

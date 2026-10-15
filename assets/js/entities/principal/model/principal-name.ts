@@ -26,11 +26,19 @@ export function deriveIdProviderName(displayName: string): string {
 }
 
 export function isIllegalPrincipalName(name: string): boolean {
-  return !PRINCIPAL_NAME.test(name) || RESERVED_NAMES.has(name);
+  return !PRINCIPAL_NAME.test(name) || isReservedPrincipalName(name);
+}
+
+export function isReservedPrincipalName(name: string): boolean {
+  return RESERVED_NAMES.has(name);
 }
 
 export function isIllegalIdProviderName(name: string): boolean {
-  return isIllegalPrincipalName(name) || name.toLowerCase() === ROLES_FOLDER;
+  return isIllegalPrincipalName(name) || isReservedIdProviderName(name);
+}
+
+export function isReservedIdProviderName(name: string): boolean {
+  return isReservedPrincipalName(name) || name.toLowerCase() === ROLES_FOLDER;
 }
 
 //
