@@ -187,6 +187,7 @@ export function createStepDialogStore<Step extends string, Field extends string,
         entity,
         form,
         saved: form,
+        visited: new Set(steps.fields[step]),
       });
     },
 

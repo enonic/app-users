@@ -120,6 +120,15 @@ describe('openAt', () => {
     expect(entity).toBe(ALICE);
   });
 
+  it('shows what the stored entity already fails on the step it opens, from the start', () => {
+    store.openAt(ALICE, 'general', ALICE.displayName);
+    expect([...store.$state.get().visited]).toEqual(['name', 'displayName', 'email']);
+
+    store.close();
+    store.open({ mode: 'create' });
+    expect(store.$state.get().visited.size).toBe(0);
+  });
+
   it('leaves the wizard and its heading behind it, so the next open walks every step again', () => {
     store.openAt(ALICE, 'members', ALICE.displayName);
     store.close();
