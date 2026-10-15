@@ -73,6 +73,14 @@ export function setRoleEditorDisplayName(displayName: string): void {
   askWhetherNameIsFree();
 }
 
+// A name still derived from the display name was decided there, so leaving it shows the name's error too.
+export function markRoleEditorDisplayNameVisited(): void {
+  markRoleEditorFieldVisited('displayName');
+  if ($roleEditor.get().form.nameEdited !== true) {
+    markRoleEditorFieldVisited('name');
+  }
+}
+
 export function setRoleEditorName(name: string, { immediate = false } = {}): void {
   updateRoleEditorForm({ name });
   roleEditorDialog.markVisited('name');

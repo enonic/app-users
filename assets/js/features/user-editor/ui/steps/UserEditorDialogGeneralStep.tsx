@@ -10,7 +10,7 @@ import {
   $userEditorProviders,
   $userEditorServiceAccount,
   $userEditorSystemUser,
-  markUserEditorFieldVisited,
+  markUserEditorDisplayNameVisited,
   setUserEditorDisplayName,
   setUserEditorEmail,
   setUserEditorName,
@@ -69,7 +69,7 @@ export function UserEditorDialogGeneralStep() {
           value={form.displayName}
           error={displayNameError}
           onInput={({ currentTarget }) => setUserEditorDisplayName(currentTarget.value)}
-          onBlur={() => markUserEditorFieldVisited('displayName')}
+          onBlur={markUserEditorDisplayNameVisited}
         />
       </div>
 

@@ -9,7 +9,7 @@ import {
   $groupEditor,
   $groupEditorErrors,
   groupNameCheck,
-  markGroupEditorFieldVisited,
+  markGroupEditorDisplayNameVisited,
   setGroupEditorDisplayName,
   setGroupEditorName,
   updateGroupEditorForm,
@@ -63,7 +63,7 @@ export function GroupEditorDialogGeneralStep() {
           value={form.displayName}
           error={displayNameError}
           onInput={({ currentTarget }) => setGroupEditorDisplayName(currentTarget.value)}
-          onBlur={() => markGroupEditorFieldVisited('displayName')}
+          onBlur={markGroupEditorDisplayNameVisited}
         />
       </div>
 

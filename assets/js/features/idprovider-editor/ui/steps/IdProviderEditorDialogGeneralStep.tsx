@@ -24,7 +24,7 @@ import {
   $idProviderEditor,
   $idProviderEditorErrors,
   idProviderNameCheck,
-  markIdProviderEditorFieldVisited,
+  markIdProviderEditorDisplayNameVisited,
   setIdProviderEditorDisplayName,
   setIdProviderEditorName,
   updateIdProviderEditorForm,
@@ -89,7 +89,7 @@ export function IdProviderEditorDialogGeneralStep() {
           value={form.displayName}
           error={displayNameError}
           onInput={({ currentTarget }) => setIdProviderEditorDisplayName(currentTarget.value)}
-          onBlur={() => markIdProviderEditorFieldVisited('displayName')}
+          onBlur={markIdProviderEditorDisplayNameVisited}
         />
       </div>
 

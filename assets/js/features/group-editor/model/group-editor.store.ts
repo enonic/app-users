@@ -103,6 +103,14 @@ export function setGroupEditorDisplayName(displayName: string): void {
   askWhetherNameIsFree();
 }
 
+// A name still derived from the display name was decided there, so leaving it shows the name's error too.
+export function markGroupEditorDisplayNameVisited(): void {
+  markGroupEditorFieldVisited('displayName');
+  if ($groupEditor.get().form.nameEdited !== true) {
+    markGroupEditorFieldVisited('name');
+  }
+}
+
 export function setGroupEditorName(name: string, { immediate = false } = {}): void {
   updateGroupEditorForm({ name });
   groupEditorDialog.markVisited('name');

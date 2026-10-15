@@ -9,6 +9,7 @@ import {
   $userEditorProviders,
   $userEditorServiceAccount,
   closeUserEditor,
+  markUserEditorDisplayNameVisited,
   openServiceAccountEditor,
   openServiceAccountEditorAt,
   openUserEditor,
@@ -302,5 +303,25 @@ describe('the fields of a user a remote system owns', () => {
     receiveIdProviderNames(ok([{ key: 'system', displayName: 'System', mode: 'LOCAL' }]));
 
     expect($userEditorErrors.get().email).toBe('users.dialog.emailRequired');
+  });
+});
+
+describe('markUserEditorDisplayNameVisited', () => {
+  it('shows the error of a name derived from the display name', () => {
+    openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ displayName: '.' });
+
+    markUserEditorDisplayNameVisited();
+
+    expect($userEditor.get().visited).toEqual(new Set(['displayName', 'name']));
+  });
+
+  it('leaves a typed name to its own field', () => {
+    openUserEditor({ mode: 'create' });
+    updateUserEditorForm({ name: 'typed' });
+
+    markUserEditorDisplayNameVisited();
+
+    expect($userEditor.get().visited).toEqual(new Set(['displayName']));
   });
 });

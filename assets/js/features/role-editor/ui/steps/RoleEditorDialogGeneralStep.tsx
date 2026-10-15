@@ -7,7 +7,7 @@ import { FieldLabel } from '../../../../shared/ui/FieldLabel';
 import {
   $roleEditor,
   $roleEditorErrors,
-  markRoleEditorFieldVisited,
+  markRoleEditorDisplayNameVisited,
   roleNameCheck,
   setRoleEditorDisplayName,
   setRoleEditorName,
@@ -48,7 +48,7 @@ export function RoleEditorDialogGeneralStep() {
           value={form.displayName}
           error={displayNameError}
           onInput={({ currentTarget }) => setRoleEditorDisplayName(currentTarget.value)}
-          onBlur={() => markRoleEditorFieldVisited('displayName')}
+          onBlur={markRoleEditorDisplayNameVisited}
         />
       </div>
 
