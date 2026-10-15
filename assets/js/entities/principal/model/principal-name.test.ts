@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { derivePrincipalName, isIllegalPrincipalName } from './principal-name';
+import {
+  derivePrincipalName,
+  isIllegalIdProviderName,
+  isIllegalPrincipalName,
+} from './principal-name';
 
 describe('derivePrincipalName', () => {
   it('lowercases and joins words with dots', () => {
@@ -20,20 +24,69 @@ describe('derivePrincipalName', () => {
   });
 });
 
+// XP stores a principal under its key lowercased as the node id, which must match `[a-z0-9_.:-]+`.
+const ALLOWED = /[A-Za-z0-9_.-]/;
+
+const ASCII = Array.from({ length: 0x80 }, (_, code) => code);
+
 describe('isIllegalPrincipalName', () => {
-  it('accepts what XP accepts', () => {
-    expect(isIllegalPrincipalName('store.manager')).toBe(false);
-    expect(isIllegalPrincipalName('store-manager_2')).toBe(false);
+  it.each(ASCII)('accepts code point %i only if XP can store it', (code) => {
+    const char = String.fromCodePoint(code);
+
+    expect(isIllegalPrincipalName(`a${char}b`)).toBe(!ALLOWED.test(char));
   });
 
-  it('refuses a space and the key separator', () => {
-    expect(isIllegalPrincipalName('store manager')).toBe(true);
-    expect(isIllegalPrincipalName('store:manager')).toBe(true);
+  it.each(['иван', 'Пользователь', 'admin.пётр'])('refuses the Russian %s', (name) => {
+    expect(isIllegalPrincipalName(name)).toBe(true);
   });
 
-  it('refuses the HTML specials and path characters PrincipalKey rejects', () => {
-    for (const name of ['a<b', 'a>b', 'a&b', 'a"b', "a'b", 'a/b', 'a\\b', 'a|b', 'a?b', 'a*b']) {
-      expect(isIllegalPrincipalName(name)).toBe(true);
-    }
+  it.each(['blåbær', 'Ødegård', 'smør'])('refuses the Norwegian %s', (name) => {
+    expect(isIllegalPrincipalName(name)).toBe(true);
+  });
+
+  it.each([
+    ['an accented letter', 'café'],
+    ['sharp s', 'straße'],
+    ['dotless i', 'ı'],
+    ['dotted capital I', 'İ'],
+    ['the Kelvin sign', 'K'],
+    ['a fullwidth letter', 'Ａ'],
+    ['a no-break space', 'a b'],
+    ['a zero-width space', 'a​b'],
+    ['a combining accent', 'é'],
+    ['an emoji', 'a😀b'],
+    ['a tab', 'a\tb'],
+    ['a newline', 'a\nb'],
+  ])('refuses %s', (_label, name) => {
+    expect(isIllegalPrincipalName(name)).toBe(true);
+  });
+
+  it.each(['store.manager', 'Store-Manager_2', '-a', 'a-', '.a', 'a.', '_a', '-', '__', '...'])(
+    'accepts %s, wherever the allowed characters stand',
+    (name) => {
+      expect(isIllegalPrincipalName(name)).toBe(false);
+    },
+  );
+
+  it('refuses an empty name', () => {
+    expect(isIllegalPrincipalName('')).toBe(true);
+  });
+
+  it.each(['_', '.', '..'])('refuses %s, which XP reserves', (name) => {
+    expect(isIllegalPrincipalName(name)).toBe(true);
+  });
+
+  it('leaves roles to principals', () => {
+    expect(isIllegalPrincipalName('roles')).toBe(false);
+  });
+});
+
+describe('isIllegalIdProviderName', () => {
+  it.each(['a#b', 'иван', '_', '.', '..', 'roles', 'ROLES', 'Roles'])('refuses %s', (name) => {
+    expect(isIllegalIdProviderName(name)).toBe(true);
+  });
+
+  it.each(['my-idp', 'Company.Directory_2', 'roles2', 'my.roles'])('accepts %s', (name) => {
+    expect(isIllegalIdProviderName(name)).toBe(false);
   });
 });

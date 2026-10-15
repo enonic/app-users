@@ -152,6 +152,21 @@ describe('validateIdProviderForm', () => {
     );
   });
 
+  it.each(['a#b', 'test@', 'иван', 'blåbær', '.', 'Roles'])(
+    'refuses %s, which XP rejects',
+    (name) => {
+      expect(validateIdProviderForm(form({ name }), 'create').name).toBe(
+        'idProviders.dialog.idInvalid',
+      );
+    },
+  );
+
+  it('accepts a name XP can store, once trimmed', () => {
+    expect(
+      validateIdProviderForm(form({ name: '  Store.Manager-1_x  ' }), 'create').name,
+    ).toBeUndefined();
+  });
+
   it('says nothing about the name while editing, where it is locked', () => {
     expect(validateIdProviderForm(form({ name: '' }), 'edit').name).toBeUndefined();
   });

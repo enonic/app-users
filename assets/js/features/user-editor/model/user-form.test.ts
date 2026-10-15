@@ -131,6 +131,16 @@ describe('validateUserForm', () => {
     );
   });
 
+  it.each(['a#b', 'test@', 'иван', 'blåbær', '.'])('refuses %s, which XP rejects', (name) => {
+    expect(validateUserForm(form({ name }), 'create').name).toBe('users.dialog.idInvalid');
+  });
+
+  it('accepts a name XP can store, once trimmed', () => {
+    expect(
+      validateUserForm(form({ name: '  Store.Manager-1_x  ' }), 'create').name,
+    ).toBeUndefined();
+  });
+
   it('refuses an address that is not one', () => {
     expect(validateUserForm(form({ email: 'alice@' }), 'create').email).toBe(
       'users.dialog.emailInvalid',

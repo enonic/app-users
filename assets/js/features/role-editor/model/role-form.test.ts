@@ -163,6 +163,16 @@ describe('validateRoleForm', () => {
     );
   });
 
+  it.each(['a#b', 'test@', 'иван', 'blåbær', '.'])('refuses %s, which XP rejects', (name) => {
+    expect(validateRoleForm(form({ name }), 'create').name).toBe('roles.dialog.idInvalid');
+  });
+
+  it('accepts a name XP can store, once trimmed', () => {
+    expect(
+      validateRoleForm(form({ name: '  Store.Manager-1_x  ' }), 'create').name,
+    ).toBeUndefined();
+  });
+
   // Fixed once the role exists: the key is the name.
   it('says nothing about the name while editing', () => {
     expect(validateRoleForm(form({ name: '' }), 'edit')).toEqual({});

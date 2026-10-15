@@ -76,7 +76,11 @@ export { collapsePrincipalChanges } from './model/principal-changes';
 export type { PrincipalEvent } from './model/principal-changes';
 export { createPrincipalReaction } from './model/principal-reaction';
 export type { PrincipalReactionOptions, PrincipalReactionScope } from './model/principal-reaction';
-export { derivePrincipalName, isIllegalPrincipalName } from './model/principal-name';
+export {
+  derivePrincipalName,
+  isIllegalIdProviderName,
+  isIllegalPrincipalName,
+} from './model/principal-name';
 export { createPrincipalNameCheck } from './model/principal-name-check.load';
 export type {
   NameCheckedType,

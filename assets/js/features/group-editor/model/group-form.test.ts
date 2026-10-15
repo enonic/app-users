@@ -194,6 +194,16 @@ describe('validateGroupForm', () => {
     );
   });
 
+  it.each(['a#b', 'test@', 'иван', 'blåbær', '.'])('refuses %s, which XP rejects', (name) => {
+    expect(validateGroupForm(form({ name }), 'create').name).toBe('groups.dialog.idInvalid');
+  });
+
+  it('accepts a name XP can store, once trimmed', () => {
+    expect(
+      validateGroupForm(form({ name: '  Store.Manager-1_x  ' }), 'create').name,
+    ).toBeUndefined();
+  });
+
   // Both are fixed once the group exists: the key holds the provider and the name.
   it('says nothing about the provider or the name while editing', () => {
     expect(validateGroupForm(form({ idProvider: '', name: '' }), 'edit')).toEqual({});
