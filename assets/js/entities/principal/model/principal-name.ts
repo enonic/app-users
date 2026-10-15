@@ -14,16 +14,15 @@ const NON_LATIN_LETTERS = /[^\P{L}a-z]/gu;
 
 const NOT_IN_NAME = /[^a-z0-9_.-]+/g;
 
+// A dot in an ID provider's key makes the vhost configuration key that carries it ambiguous.
+const NOT_IN_ID_PROVIDER_NAME = /[^a-z0-9_-]+/g;
+
 export function derivePrincipalName(displayName: string): string {
-  // Lowercase before decomposing: `İ` lowercases to `i` plus a combining dot, which goes with the marks.
-  return displayName
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(COMBINING_MARKS, '')
-    .replace(NON_LATIN_LETTERS, '')
-    .replace(NOT_IN_NAME, ' ')
-    .trim()
-    .replace(/ +/g, '.');
+  return deriveName(displayName, NOT_IN_NAME, '.');
+}
+
+export function deriveIdProviderName(displayName: string): string {
+  return deriveName(displayName, NOT_IN_ID_PROVIDER_NAME, '-');
 }
 
 export function isIllegalPrincipalName(name: string): boolean {
@@ -32,4 +31,20 @@ export function isIllegalPrincipalName(name: string): boolean {
 
 export function isIllegalIdProviderName(name: string): boolean {
   return isIllegalPrincipalName(name) || name.toLowerCase() === ROLES_FOLDER;
+}
+
+//
+// * Internal
+//
+
+function deriveName(displayName: string, notInName: RegExp, separator: string): string {
+  // Lowercase before decomposing: `İ` lowercases to `i` plus a combining dot, which goes with the marks.
+  return displayName
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(COMBINING_MARKS, '')
+    .replace(NON_LATIN_LETTERS, '')
+    .replace(notInName, ' ')
+    .trim()
+    .replace(/ +/g, separator);
 }

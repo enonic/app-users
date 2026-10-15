@@ -77,6 +77,7 @@ export type { PrincipalEvent } from './model/principal-changes';
 export { createPrincipalReaction } from './model/principal-reaction';
 export type { PrincipalReactionOptions, PrincipalReactionScope } from './model/principal-reaction';
 export {
+  deriveIdProviderName,
   derivePrincipalName,
   isIllegalIdProviderName,
   isIllegalPrincipalName,

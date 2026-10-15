@@ -85,8 +85,14 @@ describe('nextIdProviderForm', () => {
     const next = { ...previous, displayName: 'Company Directory EU' };
 
     expect(nextIdProviderForm(previous, next, { mode: 'create' }).name).toBe(
-      'company.directory.eu',
+      'company-directory-eu',
     );
+  });
+
+  it('turns a dot in the display name into a dash rather than suggest a dotted name', () => {
+    const next = { ...previous, displayName: 'Corp.Directory' };
+
+    expect(nextIdProviderForm(previous, next, { mode: 'create' }).name).toBe('corp-directory');
   });
 
   it('keeps a typed name exactly as typed, in the same edit that reports it', () => {

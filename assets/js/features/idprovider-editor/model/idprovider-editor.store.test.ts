@@ -41,7 +41,7 @@ describe('openIdProviderEditor', () => {
     openIdProviderEditor({ mode: 'create' });
     updateIdProviderEditorForm({ displayName: 'Company directory' });
 
-    expect($idProviderEditor.get().form.name).toBe('company.directory');
+    expect($idProviderEditor.get().form.name).toBe('company-directory');
   });
 });
 

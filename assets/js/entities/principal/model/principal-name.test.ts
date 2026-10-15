@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  deriveIdProviderName,
   derivePrincipalName,
   isIllegalIdProviderName,
   isIllegalPrincipalName,
@@ -68,6 +69,29 @@ describe('derivePrincipalName', () => {
       const name = derivePrincipalName(`a${char}b`);
 
       expect(isIllegalPrincipalName(name)).toBe(false);
+    },
+  );
+});
+
+describe('deriveIdProviderName', () => {
+  it.each([
+    ['My Provider', 'my-provider'],
+    ['My.Provider', 'my-provider'],
+    ['Café #1', 'cafe-1'],
+    ['Corp. Directory', 'corp-directory'],
+    ['Иван', ''],
+    ['   ', ''],
+  ])('derives %s as %s', (displayName, name) => {
+    expect(deriveIdProviderName(displayName)).toBe(name);
+  });
+
+  it.each([...ASCII.map((code) => String.fromCodePoint(code)), ...NON_ASCII])(
+    'derives an undotted name XP accepts from a display name carrying %j',
+    (char) => {
+      const name = deriveIdProviderName(`a${char}b`);
+
+      expect(name).not.toContain('.');
+      expect(isIllegalIdProviderName(name)).toBe(false);
     },
   );
 });

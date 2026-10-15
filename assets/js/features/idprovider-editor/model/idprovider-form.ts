@@ -1,7 +1,7 @@
 import type { PropertyTreeJson } from '@enonic/ui-types';
 
 import {
-  derivePrincipalName,
+  deriveIdProviderName,
   isIllegalIdProviderName,
   SYSTEM_ID_PROVIDER,
   type IdProvider,
@@ -85,7 +85,7 @@ export function nextIdProviderForm(
     return next;
   }
 
-  return { ...next, name: derivePrincipalName(next.displayName) };
+  return { ...next, name: deriveIdProviderName(next.displayName) };
 }
 
 /**
