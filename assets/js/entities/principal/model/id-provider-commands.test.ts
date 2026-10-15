@@ -1,0 +1,226 @@
+import { AppError } from '@enonic/ui-utils';
+import { errAsync, okAsync } from 'neverthrow';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { setPhrases } from '../../../shared/i18n';
+import { createSelectionStore, type SelectionStore } from '../../../shared/selection';
+import {
+  requestIdProviderExists,
+  sendIdProviderCreation,
+  sendIdProviderDeletion,
+  sendIdProviderUpdate,
+} from '../api/id-providers.api';
+import {
+  createIdProvider,
+  deleteIdProviders,
+  isIdProviderNameTaken,
+  updateIdProvider,
+  type IdProviderDraft,
+  type IdProviderSectionScope,
+} from './id-provider-commands';
+import type { IdProvider, PrincipalKey } from './principal.types';
+
+vi.mock('../api/id-providers.api', () => ({
+  requestIdProviderExists: vi.fn(),
+  sendIdProviderCreation: vi.fn(),
+  sendIdProviderDeletion: vi.fn(),
+  sendIdProviderUpdate: vi.fn(),
+}));
+
+const admins = {
+  key: 'role:system.admin' as PrincipalKey,
+  type: 'role' as const,
+  displayName: 'Administrator',
+};
+
+function draft(overrides: Partial<IdProviderDraft> = {}): IdProviderDraft {
+  return {
+    name: 'ldap',
+    displayName: 'Company directory',
+    description: '',
+    application: 'com.example.ldap',
+    permissions: [{ principal: admins, access: 'ADMINISTRATOR' }],
+    ...overrides,
+  };
+}
+
+function written(displayName: string): IdProvider {
+  return { key: 'ldap', displayName, mode: 'LOCAL', users: { total: 0 }, groups: { total: 0 } };
+}
+
+let resync: () => void;
+let closeItem: () => void;
+let selection: SelectionStore;
+
+function scope(activeKey?: string): IdProviderSectionScope {
+  return { resync, closeItem, activeKey, selection };
+}
+
+beforeEach(() => {
+  setPhrases(
+    {
+      'idProviders.notify.deleted': '{0} deleted',
+      'idProviders.notify.deletedMany': '{0} ID providers deleted',
+      'idProviders.notify.deleteFailed': 'Could not delete {0}',
+      'idProviders.notify.deleteFailedReason': 'Could not delete {0}: {1}',
+    },
+    'en',
+  );
+  resync = vi.fn();
+  closeItem = vi.fn();
+  selection = createSelectionStore();
+  vi.mocked(sendIdProviderCreation).mockReset();
+  vi.mocked(sendIdProviderUpdate).mockReset();
+  vi.mocked(sendIdProviderDeletion).mockReset();
+});
+
+describe('createIdProvider', () => {
+  it('sends the permissions as principal keys, and trims what the form padded', () => {
+    vi.mocked(sendIdProviderCreation).mockReturnValue(okAsync(written('Company directory')));
+
+    void createIdProvider(draft({ name: ' ldap ', displayName: ' Company directory ' }));
+
+    expect(vi.mocked(sendIdProviderCreation)).toHaveBeenCalledWith('ldap', {
+      displayName: 'Company directory',
+      description: undefined,
+      application: 'com.example.ldap',
+      permissions: [{ principal: 'role:system.admin', access: 'ADMINISTRATOR' }],
+    });
+  });
+
+  it('reports an empty description and an empty application as absent', () => {
+    vi.mocked(sendIdProviderCreation).mockReturnValue(okAsync(written('Company directory')));
+
+    void createIdProvider(draft({ description: '   ', application: '' }));
+
+    const input = vi.mocked(sendIdProviderCreation).mock.calls[0]?.[1];
+
+    expect(input?.description).toBeUndefined();
+    expect(input?.application).toBeUndefined();
+  });
+});
+
+describe('createIdProvider and the configuration', () => {
+  const config = [{ name: 'clientId', type: 'String' as const, values: [{ v: 'intranet' }] }];
+
+  it('sends the configuration applied with the binding it belongs to', () => {
+    vi.mocked(sendIdProviderCreation).mockReturnValue(okAsync(written('Company directory')));
+
+    void createIdProvider(draft({ config }));
+
+    expect(vi.mocked(sendIdProviderCreation).mock.calls[0]?.[1].config).toBe(config);
+  });
+
+  it('drops a configuration when there is no binding left to hold it', () => {
+    vi.mocked(sendIdProviderCreation).mockReturnValue(okAsync(written('Company directory')));
+
+    void createIdProvider(draft({ application: '', config }));
+
+    expect(vi.mocked(sendIdProviderCreation).mock.calls[0]?.[1].config).toBeUndefined();
+  });
+});
+
+describe('updateIdProvider', () => {
+  it('writes what the form holds against the key it was opened on', () => {
+    vi.mocked(sendIdProviderUpdate).mockReturnValue(okAsync(written('Renamed')));
+
+    void updateIdProvider('ldap', draft({ displayName: 'Renamed' }));
+
+    expect(vi.mocked(sendIdProviderUpdate)).toHaveBeenCalledWith('ldap', {
+      displayName: 'Renamed',
+      description: undefined,
+      application: 'com.example.ldap',
+      permissions: [{ principal: 'role:system.admin', access: 'ADMINISTRATOR' }],
+    });
+  });
+});
+
+describe('deleteIdProviders', () => {
+  const ldap = { key: 'ldap', displayName: 'Company directory', mode: 'LOCAL' };
+  const system = { key: 'system', displayName: 'System', mode: 'LOCAL' };
+
+  it('asks for nothing when there is nothing to delete', async () => {
+    await deleteIdProviders([], scope());
+
+    expect(vi.mocked(sendIdProviderDeletion)).not.toHaveBeenCalled();
+  });
+
+  it('clears the selection of what is gone and puts the list back in step', async () => {
+    selection.toggle('ldap', true);
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'ldap', deleted: true }]));
+
+    await deleteIdProviders([ldap], scope());
+
+    expect(selection.$selected.get().has('ldap')).toBe(false);
+    expect(resync).toHaveBeenCalled();
+  });
+
+  it('names the one deleted provider', async () => {
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'ldap', deleted: true }]));
+
+    const notices = await deleteIdProviders([ldap], scope());
+
+    expect(notices).toEqual({ success: 'Company directory deleted', failures: [] });
+  });
+
+  it('names the provider and the reason a refusal came with', async () => {
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(
+      okAsync([{ key: 'system', deleted: false, reason: 'It holds users' }]),
+    );
+
+    const notices = await deleteIdProviders([system], scope());
+
+    expect(notices.failures).toEqual(['Could not delete System: It holds users']);
+  });
+
+  // ! `deleted: false` also covers a provider somebody else deleted first, so the list still reloads.
+  it('reloads even when every key was refused', async () => {
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'system', deleted: false }]));
+
+    const notices = await deleteIdProviders([system], scope());
+
+    expect(notices.success).toBeUndefined();
+    expect(notices.failures).toEqual(['Could not delete System']);
+    expect(resync).toHaveBeenCalled();
+  });
+
+  it('closes the details panel when the provider it shows is gone', async () => {
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'ldap', deleted: true }]));
+
+    await deleteIdProviders([ldap], scope('ldap'));
+
+    expect(closeItem).toHaveBeenCalled();
+  });
+
+  it('leaves the panel alone when another provider was deleted', async () => {
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(okAsync([{ key: 'ldap', deleted: true }]));
+
+    await deleteIdProviders([ldap], scope('system'));
+
+    expect(closeItem).not.toHaveBeenCalled();
+  });
+
+  it('names every target when the request itself failed', async () => {
+    vi.mocked(sendIdProviderDeletion).mockReturnValue(errAsync(new AppError('Offline')));
+
+    const notices = await deleteIdProviders([ldap, system], scope());
+
+    expect(notices.success).toBeUndefined();
+    expect(notices.failures).toEqual([
+      'Could not delete Company directory: Offline',
+      'Could not delete System: Offline',
+    ]);
+    expect(resync).not.toHaveBeenCalled();
+  });
+});
+
+describe('isIdProviderNameTaken', () => {
+  it('asks about the name itself, which is the key a provider answers to', async () => {
+    vi.mocked(requestIdProviderExists).mockReturnValue(okAsync(true));
+
+    const result = await isIdProviderNameTaken('ldap');
+
+    expect(requestIdProviderExists).toHaveBeenCalledWith('ldap', undefined);
+    expect(result._unsafeUnwrap()).toBe(true);
+  });
+});

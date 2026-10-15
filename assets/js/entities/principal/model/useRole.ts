@@ -1,0 +1,23 @@
+import { useStore } from '@nanostores/preact';
+import { useEffect } from 'preact/hooks';
+
+import type { DetailState } from '../../../shared/detail';
+import type { RoleDetail } from './principal.types';
+import { $roleDetail, showRole, roleDetailFor } from './role-detail.load';
+
+/**
+ * The role the details panel shows, members included. The key is a plain string because it arrives from
+ * the route: it is a `PrincipalKey` only once a role answers to it.
+ */
+export function useRole(key: string | undefined): DetailState<RoleDetail> {
+  // Subscribes only: the answer below reads the store and the cache.
+  useStore($roleDetail);
+
+  useEffect(() => {
+    showRole(key);
+  }, [key]);
+
+  useEffect(() => () => showRole(undefined), []);
+
+  return roleDetailFor(key);
+}

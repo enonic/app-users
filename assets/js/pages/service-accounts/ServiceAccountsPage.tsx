@@ -1,0 +1,126 @@
+import { useStore } from '@nanostores/preact';
+import { useMemo } from 'preact/hooks';
+
+import {
+  forgetServiceAccountDetails,
+  replaceServiceAccount,
+  useServiceAccounts,
+} from '../../entities/principal';
+import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { UserEditorDialog } from '../../features/user-editor/ui/UserEditorDialog';
+import { isReadOnlyMode } from '../../shared/config';
+import { useHostFrame, useItemId } from '../../shared/host';
+import { useI18n } from '../../shared/i18n';
+import { DEFAULT_SORT_DIRECTION, type SortDirection } from '../../widgets/browse-list/browse-sort';
+import { BrowseSort, type BrowseSortOption } from '../../widgets/browse-list/BrowseSort';
+import { BrowseScreen } from '../../widgets/browse-screen/BrowseScreen';
+import { useBrowseSection } from '../../widgets/browse-screen/useBrowseSection';
+import { ManagedModeBanner } from '../../widgets/browse-toolbar/ManagedModeBanner';
+import { serviceAccountsFilter } from './model/filter.store';
+import {
+  $serviceAccountsSort,
+  clearServiceAccountsQuery,
+  setServiceAccountsSort,
+  sortDirectionOf,
+} from './model/query.store';
+import { serviceAccountsSelection } from './model/selection.store';
+import { SERVICE_ACCOUNT_ACTIONS } from './model/service-accounts.actions';
+import { toServiceAccountRow } from './model/service-accounts.rows';
+import {
+  loadMoreServiceAccounts,
+  reloadServiceAccountsScreen,
+} from './model/service-accounts.screen';
+import { useServiceAccountsScreen } from './model/useServiceAccountsScreen';
+import { ServiceAccountDeleteDialog } from './ServiceAccountDeleteDialog';
+import { ServiceAccountsItemPage } from './ServiceAccountsItemPage';
+
+const SERVICE_ACCOUNTS_PAGE_NAME = 'ServiceAccountsPage';
+
+export function ServiceAccountsPage() {
+  // One request for a page of the system store's users.
+  useServiceAccountsScreen();
+  const { openItem, closeItem } = useHostFrame();
+  const activeKey = useItemId();
+  const { status, items, appending, error, hasMore } = useServiceAccounts();
+  const sort = useStore($serviceAccountsSort);
+
+  const sortNameLabel = useI18n('users.sort.name');
+  const sortAscLabel = useI18n('users.sort.nameAsc');
+  const sortDescLabel = useI18n('users.sort.nameDesc');
+  const emptyLabel = useI18n('serviceAccounts.list.empty');
+  const filterPlaceholder = useI18n('serviceAccounts.filter.placeholder');
+  const readOnlyTitle = useI18n('readOnly.title');
+  const readOnlyHelp = useI18n('readOnly.help');
+  const loadMoreFailedNotice = useI18n('browse.list.loadMoreFailed');
+
+  const sortOptions = useMemo(
+    () => [
+      { id: 'asc', label: sortAscLabel, field: sortNameLabel, direction: 'asc' },
+      { id: 'desc', label: sortDescLabel, field: sortNameLabel, direction: 'desc' },
+    ],
+    [],
+  ) satisfies readonly BrowseSortOption<SortDirection>[];
+
+  const section = useBrowseSection({
+    activeKey,
+    openItem,
+    closeItem,
+    items,
+    status,
+    selection: serviceAccountsSelection,
+    filter: serviceAccountsFilter,
+    resetOnLeave: [{ clear: clearServiceAccountsQuery }],
+    // The server narrowed and ordered this page; the client adds nothing.
+    visible: items,
+    // A fresh icon element per row: Preact writes into a vnode as it renders it.
+    toRow: (user) => toServiceAccountRow(user, <PrincipalIcon principal={user} />),
+    reload: () => void reloadServiceAccountsScreen(),
+  });
+
+  return (
+    <div
+      data-component={SERVICE_ACCOUNTS_PAGE_NAME}
+      className="flex min-h-0 min-w-0 flex-1 flex-col"
+    >
+      <BrowseScreen
+        {...section}
+        actions={SERVICE_ACCOUNT_ACTIONS}
+        managedMode={isReadOnlyMode()}
+        notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
+        emptyLabel={emptyLabel}
+        filterPlaceholder={filterPlaceholder}
+        details={<ServiceAccountsItemPage />}
+        hasMore={hasMore}
+        onLoadMore={() => void loadMoreServiceAccounts()}
+        loadingMore={appending}
+        // A page that did not arrive leaves the rows valid, so it is reported beside the control rather
+        // than as a list error. Only a first page can put the list itself into an error state.
+        loadMoreError={status === 'ready' && error !== undefined ? loadMoreFailedNotice : undefined}
+        sort={
+          <BrowseSort
+            options={sortOptions}
+            value={sortDirectionOf(sort)}
+            onChange={setServiceAccountsSort}
+            defaultValue={DEFAULT_SORT_DIRECTION}
+          />
+        }
+      />
+
+      <UserEditorDialog
+        section="service-accounts"
+        onSaved={(written, mode) => {
+          if (mode === 'create') {
+            void reloadServiceAccountsScreen();
+            return;
+          }
+
+          replaceServiceAccount(written);
+          forgetServiceAccountDetails();
+        }}
+      />
+      <ServiceAccountDeleteDialog activeKey={section.activeKey} onCloseItem={closeItem} />
+    </div>
+  );
+}
+
+ServiceAccountsPage.displayName = SERVICE_ACCOUNTS_PAGE_NAME;

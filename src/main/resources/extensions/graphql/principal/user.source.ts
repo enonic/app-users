@@ -1,0 +1,431 @@
+import { generateKid } from '/lib/publickey';
+import {
+  addMembers,
+  changePassword,
+  createUser as createUserPrincipal,
+  findUsers,
+  getMemberships,
+  getPrincipal,
+  getProfile,
+  modifyProfile,
+  modifyUser,
+  removeMembers,
+  type GroupKey,
+  type RoleKey,
+  type User,
+  type UserKey,
+} from '/lib/xp/auth';
+
+import {
+  isWritablePrincipal,
+  requireWritable,
+  requireWritablePrincipals,
+} from './id-provider-mode';
+import { ADMIN_ROLE, SUPER_USER, USER_KEY } from './principal.keys';
+import {
+  byName,
+  clampCount,
+  clampStart,
+  toPrincipalItem,
+  type PrincipalItem,
+} from './principal.source';
+
+export type UserSource = User;
+
+/** The lists are typed keys because `user.fields` parses them: a group in a roles list never gets here. */
+export type UserInput = {
+  displayName: string;
+  email?: string;
+  password?: string;
+  roles: readonly RoleKey[];
+  groups: readonly GroupKey[];
+};
+
+export type UserChanges = {
+  displayName: string;
+  email?: string;
+  password?: string;
+  addRoles: readonly RoleKey[];
+  removeRoles: readonly RoleKey[];
+  addGroups: readonly GroupKey[];
+  removeGroups: readonly GroupKey[];
+};
+
+/** One page of users, and how many the search matched in total. */
+export type UserPage = {
+  total: number;
+  hits: User[];
+};
+
+/** The orders the list offers. An id, never a raw expression: `sort` is parsed, so it is injectable. */
+export type UserSort = 'displayNameAsc' | 'displayNameDesc' | 'idProviderAsc' | 'idProviderDesc';
+
+export type UserQuery = {
+  start?: number;
+  count?: number;
+  search?: string;
+  idProviders?: readonly string[];
+  excludeIdProviders?: readonly string[];
+  sort?: UserSort;
+};
+
+const DEFAULT_COUNT = 50;
+
+/**
+ * `displayName` and `_allText`, the pair XP itself searches principals on.
+ * `findPrincipals` builds this expression in `PrincipalQueryNodeQueryTranslator`; `findUsers` takes a
+ * raw constraint expression instead, so the same thing has to be written here. Both halves are kept:
+ * `fulltext` matches whole words, `ngram` matches a prefix as it is typed.
+ */
+const SEARCH_FIELDS = '_allText,displayName';
+
+/**
+ * Sort expressions, with the node path breaking ties.
+ * ! The tie-break is what makes paging sound: over a partial order, two users sharing a display name can
+ * ! swap places between requests, and a row then appears on two pages or on none.
+ *
+ * ! It has to be `_path`, and the reasoning is worth keeping because the obvious candidates both fail.
+ * ! `principalKey` is declared in `PrincipalIndexConfigFactory` but **never written**: `toCreateNodeParams`
+ * ! stores only `displayName`, `principalType`, `userStoreKey` and the type-specific fields, and index
+ * ! config for an absent property produces no index item — so ordering by it is silently ignored
+ * ! (`SortQueryBuilderFactory` sets `unmappedType`, so it does not even error). `_name` is written and
+ * ! orderable (`NodeStoreDocumentFactory` indexes it `FULLTEXT`) but is only unique **within a provider**,
+ * ! so two providers holding an `alice` leave the order partial again. `_path` is written `IndexConfig.PATH`
+ * ! and is unique repo-wide, which makes the order total.
+ *
+ * Ordering is case-insensitive for free: `OrderByValueResolver` lowercases what it writes to `_orderby`.
+ */
+// ! An order named after one field groups by it: only `userStoreKey` flips with the direction, and the
+// ! display name orders the users inside one group. It carries the provider's *name* — the display name
+// ! is on the provider's own node, and a sort expression is a list of fields, so it cannot reach it.
+const SORT_EXPRESSIONS: Record<UserSort, string> = {
+  displayNameAsc: 'displayName ASC, _path ASC',
+  displayNameDesc: 'displayName DESC, _path ASC',
+  idProviderAsc: 'userStoreKey ASC, displayName ASC, _path ASC',
+  idProviderDesc: 'userStoreKey DESC, displayName ASC, _path ASC',
+};
+
+export function listUsers({
+  start,
+  count,
+  search,
+  idProviders,
+  excludeIdProviders,
+  sort,
+}: UserQuery): UserPage {
+  const { total, hits } = findUsers({
+    start: clampStart(start),
+    count: clampCount(count, DEFAULT_COUNT),
+    query: queryExpression(search, idProviders, excludeIdProviders),
+    sort: SORT_EXPRESSIONS[sort ?? 'displayNameAsc'],
+  });
+
+  return { total, hits };
+}
+
+/**
+ * Null for a key no user answers to, which is a legitimate answer rather than a failure.
+ *
+ * Two guards, because one is not enough:
+ *
+ * ! The shape check keeps the field honest about *what* it answers for. `getPrincipal` answers for whatever
+ * ! a key names, so `group:system:editors` would come back as a group and be served as a user — with its
+ * ! memberships read as that user's.
+ *
+ * ! The `catch` keeps it honest about *failing*. This pattern is only a superset of what XP accepts:
+ * ! `PrincipalKey.ofUser` validates the id through `ID_VALIDATOR`, which rejects spaces and HTML specials
+ * ! among others, and **throws** rather than returning nothing. Replicating that charset here would be a
+ * ! second copy to keep in step, so the throw is caught instead — a key the platform will not parse names
+ * ! no user, which is exactly what null says.
+ */
+export function getUser(key: string): User | null {
+  if (!USER_KEY.test(key)) {
+    return null;
+  }
+
+  try {
+    return getPrincipal(key as UserKey);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The user holding an email in a provider, or null when none does.
+ *
+ * XP keeps an email unique per provider, not across them, so the provider is part of the question. The
+ * index normalises string values on both sides of `=`, so the match is already trimmed and case-blind.
+ */
+export function findUserByEmail(idProvider: string, email: string): User | null {
+  const address = email.trim();
+
+  if (idProvider.length === 0 || address.length === 0) {
+    return null;
+  }
+
+  const { hits } = findUsers({
+    start: 0,
+    count: 1,
+    query: `userStoreKey="${escapeQueryValue(idProvider)}" AND email="${escapeQueryValue(address)}"`,
+  });
+
+  return hits[0] ?? null;
+}
+
+export type PublicKeyItem = {
+  kid: string;
+  publicKey?: string;
+  label?: string;
+  creationTime?: string;
+};
+
+type PublicKeyProfile = {
+  publicKeys?: PublicKeyItem | PublicKeyItem[];
+};
+
+export function listUserPublicKeys(key: UserKey): PublicKeyItem[] {
+  return toPublicKeys(getProfile<PublicKeyProfile>({ key })?.publicKeys);
+}
+
+function toPublicKeys(keys?: PublicKeyItem | PublicKeyItem[]): PublicKeyItem[] {
+  if (keys == null) {
+    return [];
+  }
+
+  return Array.isArray(keys) ? keys : [keys];
+}
+
+export function listUserRoles(key: UserKey, transitive: boolean): PrincipalItem[] {
+  return membershipsOf(key, 'role', transitive);
+}
+
+export function listUserGroups(key: UserKey, transitive: boolean): PrincipalItem[] {
+  return membershipsOf(key, 'group', transitive);
+}
+
+export function addPublicKey(key: string, publicKey: string, label?: string): PublicKeyItem {
+  requireWritablePrincipals([key], 'user');
+
+  const kid = generateKid(publicKey);
+
+  const profile = modifyProfile<PublicKeyProfile>({
+    key: key as UserKey,
+    editor: (current) => {
+      const stored = toPublicKeys(current?.publicKeys);
+
+      if (stored.some((stored_) => stored_.kid === kid)) {
+        throw new Error(`A public key with id [${kid}] is already stored for [${key}]`);
+      }
+
+      return {
+        ...current,
+        publicKeys: [...stored, { kid, publicKey, label, creationTime: new Date().toISOString() }],
+      };
+    },
+  });
+
+  const written = toPublicKeys(profile?.publicKeys).find((stored) => stored.kid === kid);
+
+  if (written === undefined) {
+    throw new Error(`The public key was not stored for [${key}]`);
+  }
+
+  return written;
+}
+
+export function removePublicKey(key: string, kid: string): boolean {
+  requireWritablePrincipals([key], 'user');
+
+  const profile = modifyProfile<PublicKeyProfile>({
+    key: key as UserKey,
+    editor: (current) => ({
+      ...current,
+      publicKeys: toPublicKeys(current?.publicKeys).filter((stored) => stored.kid !== kid),
+    }),
+  });
+
+  if (profile == null) {
+    throw new Error(`No user answers to [${key}]`);
+  }
+
+  return !toPublicKeys(profile.publicKeys).some((stored) => stored.kid === kid);
+}
+
+export function createUser(idProvider: string, name: string, input: UserInput): User {
+  requireWritable(idProvider, 'user');
+  requireWritablePrincipals(input.groups, 'group');
+
+  // ! Every refusal this function owns comes before the first write. There is no transaction around the
+  // ! principal, the password and the memberships, so a password refused after `createUserPrincipal` would
+  // ! leave a passwordless user behind under a name the retry can no longer use.
+  const password = input.password != null && input.password.length > 0 ? input.password : undefined;
+  if (password !== undefined) {
+    requirePassword(password);
+  }
+
+  const user = createUserPrincipal({
+    idProvider,
+    name,
+    displayName: input.displayName,
+    email: input.email,
+  });
+
+  if (password !== undefined) {
+    changePassword({ userKey: user.key, password });
+  }
+
+  applyMemberships(user.key, input.roles, [], input.groups, []);
+
+  return user;
+}
+
+export function updateUser(key: string, changes: UserChanges): User {
+  const current = getUser(key);
+  if (current == null) {
+    throw new Error(`No user answers to [${key}]`);
+  }
+
+  // ! A remote user's memberships are still XP's: they live on the role and on the group, where the Roles
+  // ! section and the Group dialog write them too. Only the user's own fields and credentials are the
+  // ! remote system's, so those are what a locked provider refuses. `updateGroup` reasons the same way.
+  const locked = !isWritablePrincipal(key, 'user');
+  if (locked && (changes.password != null || scalarsMoved(current, changes))) {
+    requireWritablePrincipals([key], 'user');
+  }
+  requireWritablePrincipals([...changes.addGroups, ...changes.removeGroups], 'group');
+
+  // ! The platform refuses this one mid-write, in `removeRelationship`; refusing it here first keeps the
+  // ! password and the other memberships from applying before it does. `role.source` does the same.
+  if (key === SUPER_USER && changes.removeRoles.includes(ADMIN_ROLE)) {
+    throw new Error(`Cannot remove [${SUPER_USER}] from [${ADMIN_ROLE}]`);
+  }
+
+  if (changes.password != null) {
+    requirePassword(changes.password);
+
+    changePassword({
+      userKey: key as UserKey,
+      password: changes.password.length > 0 ? changes.password : null,
+    });
+  }
+
+  applyMemberships(
+    key as UserKey,
+    changes.addRoles,
+    changes.removeRoles,
+    changes.addGroups,
+    changes.removeGroups,
+  );
+
+  if (locked) {
+    return getUser(key) ?? current;
+  }
+
+  const user = modifyUser({
+    key: key as UserKey,
+    editor: (current) => ({
+      ...current,
+      displayName: changes.displayName,
+      email: changes.email ?? '',
+    }),
+  });
+
+  if (user == null) {
+    throw new Error(`No user answers to [${key}]`);
+  }
+
+  return user;
+}
+
+// *
+// * Helpers
+// *
+
+/**
+ * ! Escapes a value for a query-DSL string literal, and is the only place that does.
+ *
+ * ! The grammar reads string literals with jparsec's double-quote tokenizer, which honours backslash
+ * ! escapes — so a backslash and a double quote are what have to be escaped, backslash first or the
+ * ! second pass would escape the escapes. app-users interpolates the search box straight into the
+ * ! expression (`textQuery` in its `lib/principals.js`), where one typed `"` produces an unparseable
+ * ! query; that is the bug this exists to not repeat.
+ */
+export function escapeQueryValue(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+/**
+ * The constraint expression: the search, the provider filter, the provider exclusion, or any of them.
+ *
+ * `findUsers` adds only `principalType = USER` of its own (`UserQueryNodeQueryTranslator`), so every
+ * other narrowing belongs here. The provider lives on the node under its old name, `userStoreKey`.
+ */
+function queryExpression(
+  search?: string,
+  idProviders?: readonly string[],
+  excludeIdProviders?: readonly string[],
+): string {
+  const parts: string[] = [];
+
+  const needle = search?.trim();
+  if (needle != null && needle.length > 0) {
+    const args = `"${SEARCH_FIELDS}","${escapeQueryValue(needle)}","AND"`;
+    parts.push(`(fulltext(${args}) OR ngram(${args}))`);
+  }
+
+  // Several providers are an OR of the same constraint, so the filter can tick more than one, as the
+  // client-side filters of the other sections do.
+  const providers = named(idProviders);
+  if (providers.length > 0) {
+    const constraints = providers
+      .map((provider) => `userStoreKey="${escapeQueryValue(provider)}"`)
+      .join(' OR ');
+    parts.push(providers.length === 1 ? constraints : `(${constraints})`);
+  }
+
+  // An exclusion is an AND of `!=`: the Users section keeps the system store out whatever else narrows
+  // the query, since its users are served by the Service Accounts section instead.
+  named(excludeIdProviders).forEach((provider) => {
+    parts.push(`userStoreKey!="${escapeQueryValue(provider)}"`);
+  });
+
+  return parts.join(' AND ');
+}
+
+function named(providers?: readonly string[]): readonly string[] {
+  return (providers ?? []).filter((provider) => provider.length > 0);
+}
+
+// Both sides trimmed: the client trims what it sends, and a value a remote system stored may not be.
+function scalarsMoved(current: User, changes: UserChanges): boolean {
+  return (
+    changes.displayName.trim() !== current.displayName.trim() ||
+    (changes.email ?? '').trim() !== (current.email ?? '').trim()
+  );
+}
+
+function requirePassword(password: string): void {
+  if (/\s/.test(password)) {
+    throw new Error('A password cannot contain whitespace');
+  }
+}
+
+function applyMemberships(
+  key: UserKey,
+  addRoles: readonly RoleKey[],
+  removeRoles: readonly RoleKey[],
+  addGroups: readonly GroupKey[],
+  removeGroups: readonly GroupKey[],
+): void {
+  addRoles.forEach((role) => addMembers(role, [key]));
+  removeRoles.forEach((role) => removeMembers(role, [key]));
+  addGroups.forEach((group) => addMembers(group, [key]));
+  removeGroups.forEach((group) => removeMembers(group, [key]));
+}
+
+function membershipsOf(key: UserKey, type: 'role' | 'group', transitive: boolean): PrincipalItem[] {
+  return getMemberships(key, transitive)
+    .filter((membership) => membership.type === type)
+    .map(toPrincipalItem)
+    .sort((a, b) => byName(a.displayName, b.displayName));
+}

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    // XP runtime globals (resolve, app, log, __, ...) — vp pack does the emit.
+    "types": ["@enonic-types/global"],
+    // Type the absolute XP requires; vp pack keeps them external at build time.
+    "paths": {
+      "/lib/xp/core": ["../../../node_modules/@enonic-types/core"],
+      "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
+      // No @enonic-types package exists for lib-graphql at any version.
+      "/lib/graphql": ["./types/graphql.d.ts"],
+      "/lib/*": ["./lib/*"],
+      "/extensions/*": ["./extensions/*"]
+    },
+    "typeRoots": ["../../../node_modules"]
+  },
+  "include": ["./extensions/**/*.ts", "./admin/extensions/**/*.ts", "./lib/**/*.ts"]
+}

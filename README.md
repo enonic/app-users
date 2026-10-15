@@ -16,42 +16,43 @@ Just copy the built JAR files to the `$XP_HOME/deploy` folder, or use the `deplo
 
 ## Building
 
-#### Default
-
-Run the following command to build all applications with default options:
-
 ```
 ./gradlew build
 ```
 
-With default build, applications will use the remote `lib-admin-ui` dependency and the environment variable won't be set.
+This runs the UI checks (`vp check`, strict server `tsc`, vitest), the JUnit suites under both
+script engines, and packs the jar.
 
 #### Environment
 
-To use the specific environment, you must set its value explicitly with `env` parameter (only `prod` or `dev`):
+`-Penv=dev` builds the client for development — sourcemaps, no minification:
 
 ```
 ./gradlew build -Penv=dev
 ```
 
-If the environment is set, the Gradle will look for the local `lib-admin-ui` and `xp` repositories in the parent folder of your `app-users` repo. And if any present, will build them, along with building applications, instead of downloading the remote `lib-admin-ui` dependency.
-The environment parameter will also be passed to `lib-admin-ui`.
-
-Both environments are almost identical, except that building in the development environment will result in creating the DTS files, sourcemaps and other things, critical for the debugging.
-The build itself may also be a bit slower sometimes.
-
 #### Quick
 
-Sometimes, you may want to build your project faster. To do so, just skip some tasks. You can skip them manually, like this:
+Skip the verification tasks:
 
 ```
 ./gradlew build -x check -x test
 ```
 
-or run even faster with the `yolo` task, that will skip all tasks, that won't affect the code operability, and do deploy build:
+or use the `yolo` task, which skips them and deploys:
 
 ```
 ./gradlew yolo
+```
+
+## UI development
+
+The client and the server-side TypeScript are one pnpm project at the repository root:
+
+```
+pnpm install
+pnpm dev      # watch build
+pnpm check    # format, lint, typecheck, test
 ```
 
 <!-- Links -->

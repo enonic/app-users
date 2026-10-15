@@ -10,7 +10,8 @@
 *~
 
 # AI
-.claude/
+.claude/*
+!.claude/rules/
 .cursor/
 
 # Build files

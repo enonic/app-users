@@ -1,0 +1,73 @@
+# Structure
+
+These rules govern `assets/**`, `test/**` and `src/main/resources/{extensions,admin/extensions}/**`.
+The XP java
+layer (`src/main/java`, `src/main/resources/lib/*.js`) predates them and keeps its own style.
+
+## Client — `assets/js`
+
+Feature-Sliced Design, the same layout as app-settings and app-applications, one import direction:
+
+```
+app  →  pages  →  widgets / features  →  entities  →  shared
+```
+
+- `app/` — the module entry's glue: `mount`, bootstrap, section switch. This app ships **four
+  sections from one module**: `app/section.ts` picks the section off `host.extension`; nothing below
+  `app/` may switch on a section id.
+- `pages/<section>/` — composition only: users, groups, roles, id-providers.
+- `entities/principal/` — one domain slice (users, groups, roles and ID providers share
+  `PrincipalKey` and each other's member lists), segments `api/`, `model/`, rarely `ui/`.
+- `shared/` — transport, config, i18n, sections contract, styles, and `host/`: the host object and
+  the routing it owns. The contract is `@enonic/ui-types`, re-exported by `shared/sections`; a change to
+  it is a toolkit release the host and every provider take together.
+- **A section reaches the shell through `shared/host`, never through a router or a socket of its
+  own**: `host.path`/`host.navigate` are its whole history, and `host.notify` its toast stack.
+- File names, barrels, component and store conventions: as in the other rule files here.
+
+`widgets/` holds the browse framework, copied from app-settings with the sections (#2640) rather than
+waited for; app-settings has since deleted its copy, so this one and app-applications' are the
+canonical pair `@enonic/ui-kit` (`../npm-enonic-ui-toolkit`) extracts from. They are kept
+byte-identical where the code is the same — `cmp` against `../app-applications` is the drift check —
+and a widget takes what it needs as props (`activeKey`, `detailsShown`) rather than reaching into
+`shared/host`, which is what keeps it portable.
+
+The filter is the exception for now: this app takes `FilterInput` from `@enonic/ui-kit`, while
+app-applications keeps its own `BrowseFilter`, `widgets/browse-search` and `shared/search` until it moves
+to the kit, so `widgets/browse-list` differs there too. They converge through that move — do not fix one
+side only.
+
+Dialogs are `ActionDialog` from `@enonic/ui-kit`: `DeleteConfirm` under `shared/ui/dialogs/DeleteConfirmDialog`
+worded by this app, `useCloseGuard` for the dirty-close question the footer asks, and `shared/ui/dialogs/dialog-stack`
+for the one thing the kit does not do — a dialog opened over another (`ConfigDialog`, `AddPublicKeyDialog` over the
+wizard) takes `overlayLayerProps` and `contentLayerProps` so the gesture that closes it never reaches the one below.
+`shared/step-dialog/` is the base of every dialog made of steps on the same `ActionDialog`. It is `@enonic/ui-kit`
+material like `widgets/`, so it imports nothing from
+`entities/**`: a feature hands it the domain — `defineSteps` table, `initialForm`, `validate`, `same`,
+`next` — through `createStepDialogStore`, once at module level, and re-exports the pieces under its own
+names (`features/user-editor/model/user-editor.store.ts` is the worked example). The barrel carries the
+model alone; `StepDialog` is imported by path so `@enonic/ui` stays out of the DOM-less test run. Panels
+are pure content — the dialog wraps them in `StepContent` and applies the locks — and a rule that runs
+outside the form reports through the `$external` slot rather than by patching `$errors`. A Summary step
+reads back into `StepDialogSummary`; rows of principals are `entities/principal/ui/PrincipalsSummaryRow`,
+which is why they are not in the folder.
+
+A feature two sections share keeps one store, not one per section. The sections stay mounted side by
+side — the host keeps a section alive on switch — so a dialog both pages render must know which copy it
+is (`UserEditorDialog`'s `section` prop) and render nothing when the open is not its own.
+
+## Server — `src/main/resources`
+
+- New server TS lives under `extensions/` (shared modules: endpoint, i18n, schema) and
+  `admin/extensions/<section>/` (descriptor `.yaml` + `.svg` + a controller re-exporting the shared
+  endpoint). It is required absolutely as `/extensions/<name>`.
+- **Keep new server code out of `lib/`**: that tree is the plain-`.js` binding to the java beans,
+  and `vp pack` emits `.js` into the same jar paths.
+- Each descriptor carries its own `allow` — that per-section gate is the point of the architecture
+  (app-settings#42, D3/D5).
+
+## Toolchain boundaries
+
+- One pnpm project, at the repository root.
+- `pnpmBuild` and `pnpmPack` emit into `build/resources/main` (`assets/_static` and `extensions/`),
+  which the java tasks also read — see the build seams in `CLAUDE.md` before adding a task there.

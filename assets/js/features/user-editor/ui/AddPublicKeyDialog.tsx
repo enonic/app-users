@@ -1,0 +1,178 @@
+import { Button, Input } from '@enonic/ui';
+import { ActionDialog } from '@enonic/ui-kit';
+import { Upload } from 'lucide-react';
+import { useRef, useState } from 'preact/hooks';
+
+import { useI18n } from '../../../shared/i18n';
+import {
+  contentLayerProps,
+  overlayLayerProps,
+  useDialogLayer,
+} from '../../../shared/ui/dialogs/dialog-stack';
+import { FieldLabel } from '../../../shared/ui/FieldLabel';
+import { generateKeyPair, readPublicKeyPem } from '../model/key-pair';
+import type { PendingPublicKey } from '../model/user-form';
+
+export type AddPublicKeyDialogProps = {
+  open: boolean;
+  /** Hands the key to the wizard, which writes it when the user is saved. */
+  onStage: (pending: Omit<PendingPublicKey, 'id'>) => void;
+  onClose: () => void;
+  'data-component'?: string;
+};
+
+const LABEL_ID = 'public-key-label';
+const ADD_PUBLIC_KEY_DIALOG_NAME = 'AddPublicKeyDialog';
+
+export function AddPublicKeyDialog({
+  open,
+  onStage,
+  onClose,
+  'data-component': componentName = ADD_PUBLIC_KEY_DIALOG_NAME,
+}: AddPublicKeyDialogProps) {
+  const layer = useDialogLayer(open);
+
+  const title = useI18n('users.dialog.addKeyTitle');
+  const labelLabel = useI18n('users.dialog.keyLabel');
+  const helpText = useI18n('users.dialog.addKeyHelp');
+  const generateLabel = useI18n('users.dialog.generateKey');
+  const uploadLabel = useI18n('users.dialog.uploadKey');
+  const notPublicLabel = useI18n('users.dialog.keyNotPublic');
+  const generateFailedLabel = useI18n('users.dialog.keyGenerateFailed');
+  const uploadFailedLabel = useI18n('users.dialog.keyReadFailed');
+  const cancelLabel = useI18n('browse.dialog.cancel');
+
+  const [label, setLabel] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<string | undefined>();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const named = label.trim().length > 0 ? label.trim() : undefined;
+  const unnamed = named === undefined;
+
+  const close = (): void => {
+    if (busy) {
+      return;
+    }
+
+    setLabel('');
+    setFailure(undefined);
+    onClose();
+  };
+
+  const finish = (error: string | undefined): void => {
+    setBusy(false);
+    setFailure(error);
+
+    if (error === undefined) {
+      setLabel('');
+      onClose();
+    }
+  };
+
+  const handleGenerate = async (): Promise<void> => {
+    setBusy(true);
+    setFailure(undefined);
+
+    try {
+      const pair = await generateKeyPair();
+      onStage({ label: named, publicKey: pair.publicKey, privateKey: pair.privateKey });
+      finish(undefined);
+    } catch (thrown) {
+      finish(messageOf(thrown, generateFailedLabel));
+    }
+  };
+
+  const handleUpload = async (file: File): Promise<void> => {
+    setBusy(true);
+    setFailure(undefined);
+
+    try {
+      const publicKey = readPublicKeyPem(await file.text());
+
+      if (publicKey === undefined) {
+        setBusy(false);
+        setFailure(notPublicLabel);
+        return;
+      }
+
+      onStage({ label: named, publicKey });
+      finish(undefined);
+    } catch (thrown) {
+      finish(messageOf(thrown, uploadFailedLabel));
+    }
+  };
+
+  return (
+    <ActionDialog.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) {
+          close();
+        }
+      }}
+    >
+      <ActionDialog.Portal>
+        <ActionDialog.Overlay {...overlayLayerProps(layer)} />
+        <ActionDialog.Content data-component={componentName} {...contentLayerProps(layer)}>
+          <ActionDialog.DefaultHeader title={title} withClose />
+
+          <ActionDialog.Body>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <FieldLabel text={labelLabel} required htmlFor={LABEL_ID} />
+                <Input
+                  id={LABEL_ID}
+                  value={label}
+                  onInput={({ currentTarget }) => setLabel(currentTarget.value)}
+                />
+              </div>
+
+              <p className="text-subtle text-sm">{helpText}</p>
+
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".pem,application/x-pem-file"
+                className="hidden"
+                onChange={({ currentTarget }) => {
+                  const [file] = currentTarget.files ?? [];
+                  currentTarget.value = '';
+                  if (file !== undefined) {
+                    void handleUpload(file);
+                  }
+                }}
+              />
+
+              <Button
+                className="self-start"
+                variant="outline"
+                size="sm"
+                endIcon={Upload}
+                label={uploadLabel}
+                disabled={busy || unnamed}
+                onClick={() => fileRef.current?.click()}
+              />
+            </div>
+          </ActionDialog.Body>
+
+          <ActionDialog.Footer error={failure}>
+            <Button variant="text" size="lg" label={cancelLabel} onClick={close} />
+            <ActionDialog.Action
+              label={generateLabel}
+              disabled={busy || unnamed}
+              closeOnClick={false}
+              onClick={() => void handleGenerate()}
+            />
+          </ActionDialog.Footer>
+        </ActionDialog.Content>
+      </ActionDialog.Portal>
+    </ActionDialog.Root>
+  );
+}
+
+AddPublicKeyDialog.displayName = ADD_PUBLIC_KEY_DIALOG_NAME;
+
+function messageOf(thrown: unknown, fallback: string): string {
+  return thrown instanceof Error && thrown.message.length > 0 ? thrown.message : fallback;
+}

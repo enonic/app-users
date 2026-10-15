@@ -1,0 +1,58 @@
+import { useStore } from '@nanostores/preact';
+
+import { deletePrincipals, principalName } from '../../entities/principal';
+import { useHostFrame } from '../../shared/host';
+import { DeleteConfirmDialog } from '../../shared/ui/dialogs/DeleteConfirmDialog';
+import { usersDeletion } from './model/deletion.store';
+import { usersSelection } from './model/selection.store';
+import { reloadUsersScreen } from './model/users.screen';
+
+export type UserDeleteDialogProps = {
+  activeKey?: string;
+  onCloseItem: () => void;
+  'data-component'?: string;
+};
+
+const USER_DELETE_DIALOG_NAME = 'UserDeleteDialog';
+
+export function UserDeleteDialog({
+  activeKey,
+  onCloseItem,
+  'data-component': componentName = USER_DELETE_DIALOG_NAME,
+}: UserDeleteDialogProps) {
+  const targets = useStore(usersDeletion.$payload);
+  const { notify } = useHostFrame();
+
+  const deleteTargets = (targets ?? []).map((user) => ({
+    key: user.key,
+    name: principalName(user.key),
+    label: user.displayName,
+  }));
+
+  return (
+    <DeleteConfirmDialog
+      data-component={componentName}
+      open={targets !== undefined}
+      targets={deleteTargets}
+      onClose={usersDeletion.close}
+      onConfirm={() => {
+        const confirmed = targets ?? [];
+        usersDeletion.close();
+
+        void deletePrincipals(confirmed, {
+          resync: () => void reloadUsersScreen(),
+          closeItem: onCloseItem,
+          activeKey,
+          selection: usersSelection,
+        }).then(({ success, failures }) => {
+          if (success !== undefined) {
+            notify('success', success);
+          }
+          failures.forEach((failure) => notify('error', failure));
+        });
+      }}
+    />
+  );
+}
+
+UserDeleteDialog.displayName = USER_DELETE_DIALOG_NAME;

@@ -1,0 +1,64 @@
+/**
+ * Helper class that encapsulates webdriverio
+ * and sets up mocha hooks for easier test writing.
+ */
+function WebDriverHelper() {
+  this.browser = null;
+}
+
+WebDriverHelper.prototype.getBrowser = function () {
+  return this.browser;
+};
+
+const makeChromeOptions = (headless, width, height) => ({
+  args: [
+    ...(headless ? ['--headless', '--disable-gpu', '--no-sandbox'] : []),
+    '--lang=en',
+    '--disable-extensions',
+    `--window-size=${width},${height}`,
+  ],
+});
+
+/**
+ * Sets up a before and after mocha hook
+ * that initialize and terminate the webdriverio session.
+ */
+WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
+  let _this = this;
+  let ww = w;
+  let hh = h;
+  before(async function () {
+    let propertiesReaderModule = require('properties-reader');
+    let propertiesReader =
+      propertiesReaderModule.propertiesReader ||
+      propertiesReaderModule.default ||
+      propertiesReaderModule;
+    let path = require('path');
+    let webdriverio = require('webdriverio');
+    let file = path.join(__dirname, '/../browser.properties');
+    let properties = propertiesReader({ sourceFile: file });
+    let browser_name = properties.get('browser.name');
+    let browser_version = properties.get('browser.version');
+    let baseUrl = properties.get('base.url');
+    let isHeadless = properties.get('is.headless');
+    let width = ww === undefined ? properties.get('browser.width') : w;
+    let height = hh === undefined ? properties.get('browser.height') : h;
+    let options = {
+      logLevel: 'error',
+      automationProtocol: 'webdriver',
+      capabilities: {
+        browserName: browser_name,
+        browserVersion: browser_version,
+        'goog:chromeOptions': makeChromeOptions(isHeadless, width, height),
+      },
+    };
+    _this.browser = await webdriverio.remote(options);
+    await _this.browser.url(baseUrl);
+    console.log('BiDi ##################### ' + _this.browser.isBidi);
+    return _this.browser;
+  });
+  after(async function () {
+    await _this.browser.deleteSession();
+  });
+};
+module.exports = new WebDriverHelper();
