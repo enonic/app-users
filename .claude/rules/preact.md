@@ -12,9 +12,9 @@ the React types.
 ## Where imports come from
 
 ```ts
-import { useCallback, useEffect, useState } from 'preact/hooks'; // hooks and runtime
 import { h, render } from 'preact'; // bootstrap only, in main.ts
 import type { JSX } from 'preact'; // JSX.Element as a return type
+import { useCallback, useEffect, useState } from 'preact/hooks'; // hooks and runtime
 import type { ReactNode } from 'react'; // prop types that reach @enonic/ui slots
 ```
 
