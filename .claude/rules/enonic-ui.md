@@ -12,7 +12,7 @@ silently rather than at typecheck. Source: `../npm-enonic-ui/src/components/`; i
 ## Components that need exact composition
 
 - **`SearchField` renders only `{children}`.** There is no default input — `<SearchField value
-onChange />` with no children is an empty bordered box. Compose `<SearchField.Icon />`,
+  onChange />` with no children is an empty bordered box. Compose `<SearchField.Icon />`,
   `<SearchField.Input />`, `<SearchField.Clear />`. `SearchField.Input` hardcodes
   `aria-label='Search'` before spreading props, so an override works.
 - **`ListItem` uses `findComponentByType`** and renders only `ListItem.Left`,
