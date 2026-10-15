@@ -6,6 +6,31 @@ import {
   isIllegalPrincipalName,
 } from './principal-name';
 
+// XP stores a principal under its key lowercased as the node id, which must match `[a-z0-9_.:-]+`.
+const ALLOWED = /[A-Za-z0-9_.-]/;
+
+const ASCII = Array.from({ length: 0x80 }, (_, code) => code);
+
+const NON_ASCII = [
+  'и',
+  'П',
+  'ё',
+  'å',
+  'æ',
+  'ø',
+  'Ø',
+  'é',
+  'ß',
+  'ı',
+  'İ',
+  '\u212A',
+  'Ａ',
+  '\u00A0',
+  '\u200B',
+  '\u0301',
+  '😀',
+];
+
 describe('derivePrincipalName', () => {
   it('lowercases and joins words with dots', () => {
     expect(derivePrincipalName('Store Manager')).toBe('store.manager');
@@ -22,12 +47,30 @@ describe('derivePrincipalName', () => {
   it('answers empty for a display name that is only whitespace', () => {
     expect(derivePrincipalName('   ')).toBe('');
   });
+
+  it.each([
+    ['Café #1', 'cafe.1'],
+    ['user@mail.com', 'user.mail.com'],
+    ['50% off $ale', '50.off.ale'],
+    ['İstanbul', 'istanbul'],
+    ['Ødegård', 'degard'],
+    ['Blåbær', 'blabr'],
+    ['Admin Пётр', 'admin'],
+    ['Иван Петров', ''],
+  ])('derives %s as %s', (displayName, name) => {
+    expect(derivePrincipalName(displayName)).toBe(name);
+  });
+
+  // Wrapped, so no single character derives to a name XP reserves, such as `.` alone.
+  it.each([...ASCII.map((code) => String.fromCodePoint(code)), ...NON_ASCII])(
+    'derives a name XP accepts from a display name carrying %j',
+    (char) => {
+      const name = derivePrincipalName(`a${char}b`);
+
+      expect(isIllegalPrincipalName(name)).toBe(false);
+    },
+  );
 });
-
-// XP stores a principal under its key lowercased as the node id, which must match `[a-z0-9_.:-]+`.
-const ALLOWED = /[A-Za-z0-9_.-]/;
-
-const ASCII = Array.from({ length: 0x80 }, (_, code) => code);
 
 describe('isIllegalPrincipalName', () => {
   it.each(ASCII)('accepts code point %i only if XP can store it', (code) => {
