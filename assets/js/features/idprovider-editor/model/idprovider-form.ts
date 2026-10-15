@@ -152,6 +152,20 @@ export function validateIdProviderForm(
 }
 
 /**
+ * Told, never enforced: a dot is valid in `IdProviderKey`, but the key becomes a level of the vhost
+ * configuration (`mapping.<name>.idProvider.<key>`), where a dot splits it. Only a create can still pick
+ * another ID.
+ */
+export function idProviderNameWarning(
+  form: IdProviderForm,
+  mode: StepDialogMode,
+): string | undefined {
+  return mode === 'create' && form.name.trim().includes('.')
+    ? 'idProviders.dialog.idDotted'
+    : undefined;
+}
+
+/**
  * The list after the picker handed over a new set of principals: an entry that survives keeps the access
  * it was given, and a new one starts where app-users starts it.
  */

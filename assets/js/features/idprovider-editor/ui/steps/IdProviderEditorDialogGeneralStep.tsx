@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
-import { Pencil, X } from 'lucide-react';
+import { Pencil, TriangleAlert, X } from 'lucide-react';
 import { useMemo, useState } from 'preact/hooks';
 
 import { ApplicationIcon } from '../../../../entities/application';
@@ -29,7 +29,7 @@ import {
   setIdProviderEditorName,
   updateIdProviderEditorForm,
 } from '../../model/idprovider-editor.store';
-import { isSystemIdProvider } from '../../model/idprovider-form';
+import { idProviderNameWarning, isSystemIdProvider } from '../../model/idprovider-form';
 import { ConfigDialog } from '../ConfigDialog';
 
 const DISPLAY_NAME_ID = 'id-provider-editor-display-name';
@@ -76,6 +76,8 @@ export function IdProviderEditorDialogGeneralStep() {
   // A taken ID is told at once: the answer arrives after the field was typed in, visited or not.
   const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
   const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name);
+  // One message under the field at a time: an error outranks the warning.
+  const idWarningKey = idError === undefined ? idProviderNameWarning(form, mode) : undefined;
 
   return (
     <div className="flex flex-col gap-5">
@@ -103,6 +105,12 @@ export function IdProviderEditorDialogGeneralStep() {
           onInput={({ currentTarget }) => setIdProviderEditorName(currentTarget.value)}
           onBlur={() => setIdProviderEditorName(form.name, { immediate: true })}
         />
+        {idWarningKey !== undefined && (
+          <div className="text-warn mt-0.5 flex items-center gap-2 leading-5">
+            <TriangleAlert size={16} aria-hidden className="shrink-0" />
+            {i18n(idWarningKey)}
+          </div>
+        )}
       </div>
 
       {/* Description */}

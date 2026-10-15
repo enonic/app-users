@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { IdProvider, IdProviderPermission, PrincipalRef } from '../../../entities/principal';
 import {
+  idProviderNameWarning,
   initialIdProviderForm,
   isSystemIdProvider,
   mergePermissions,
@@ -356,5 +357,26 @@ describe('sameIdProviderForm', () => {
     });
 
     expect(sameIdProviderForm(saved, edited)).toBe(true);
+  });
+});
+
+describe('idProviderNameWarning', () => {
+  it('warns about a dot in a new provider ID', () => {
+    expect(idProviderNameWarning(form({ name: 'my.idp' }), 'create')).toBe(
+      'idProviders.dialog.idDotted',
+    );
+  });
+
+  it('says nothing about an undotted ID', () => {
+    expect(idProviderNameWarning(form({ name: 'my-idp' }), 'create')).toBeUndefined();
+  });
+
+  // The ID of an existing provider is fixed, so there is nothing left to choose.
+  it('says nothing while editing', () => {
+    expect(idProviderNameWarning(form({ name: 'my.idp' }), 'edit')).toBeUndefined();
+  });
+
+  it('leaves saving open for a dotted ID', () => {
+    expect(validateIdProviderForm(form({ name: 'my.idp' }), 'create').name).toBeUndefined();
   });
 });
