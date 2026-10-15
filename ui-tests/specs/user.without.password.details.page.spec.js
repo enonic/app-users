@@ -59,7 +59,7 @@ describe('user.without.password.details.page.spec - an ID provider made via the 
     await idProviderStepDialog.waitForLoaded();
     await idProviderStepDialog.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
     await idProviderStepDialog.clickOnNextAndWaitForGeneralStep();
-    // 2. General: display name, ID and email. The ID is typed by hand, it is not derived from the display name.
+    // 2. General: display name, ID and email.
     await generalStepDialog.typeInDisplayNameInput(USER.displayName);
     await generalStepDialog.typeInEmailInput(USER.email);
     await generalStepDialog.clickOnNextButton();
@@ -91,6 +91,10 @@ describe('user.without.password.details.page.spec - an ID provider made via the 
     assert.ok(
       !(await summaryStepDialog.isRowDisplayed(UserEditorSummaryStepDialog.LABEL.ROLES)),
       'The Roles row should be absent when no role is picked',
+    );
+    assert.ok(
+      !(await summaryStepDialog.isRowDisplayed(UserEditorSummaryStepDialog.LABEL.GROUPS)),
+      'The Groups row should be absent when no group is picked',
     );
     // 7. Create: the dialog closes, the toast confirms, the user is listed with its ID provider.
     await summaryStepDialog.clickOnCreateButtonAndWaitForClosed();

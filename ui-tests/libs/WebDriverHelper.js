@@ -20,8 +20,8 @@ const makeChromeOptions = (headless, width, height) => ({
 });
 
 /**
- * Sets up a before and after mocha hook
- * that initialize and terminate the webdriverio session.
+ * Sets up a `before` mocha hook that initializes the webdriverio session and adds, at run time,
+ * the `after` that terminates it.
  *
  * The session is deleted by an `after` hook added to the suite from inside `before`, at run time.
  * Mocha runs a suite's `after` hooks in the order they were added, and the spec's own `after` -
@@ -59,12 +59,13 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
       },
     };
     _this.browser = await webdriverio.remote(options);
-    await _this.browser.url(baseUrl);
-    console.log('BiDi ##################### ' + _this.browser.isBidi);
+    // Registered before the first request, so a failed url() still gets its session deleted.
     const browser = _this.browser;
     this.test.parent.afterAll(async function () {
       await browser.deleteSession();
     });
+    await _this.browser.url(baseUrl);
+    console.log('BiDi ##################### ' + _this.browser.isBidi);
     return _this.browser;
   });
 };

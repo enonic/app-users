@@ -114,14 +114,6 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
     await generalStep.waitForNextButtonEnabled();
   });
 
-  // No user was created in the provider - every editor here was closed without Create - so the
-  // provider is free to go.
-  it('GIVEN the suite is done THEN its ID provider should be deleted via the API', async () => {
-    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
-    await settingsUtils.deleteIdProviderViaApi(ID_PROVIDER);
-    ID_PROVIDER = undefined;
-  });
-
   beforeEach(async () => {
     await settingsUtils.navigateToSettingsApp();
   });
@@ -134,7 +126,8 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
     }
     return console.log('specification starting: ' + this.title);
   });
-  // The provider is deleted by the last test; this is for a run that stopped before it.
+  // No user was created in the provider - every editor here was closed without Create - so the
+  // provider is free to go.
   after(async () => {
     if (ID_PROVIDER !== undefined) {
       await settingsUtils.deleteIdProviderViaApi(ID_PROVIDER).catch((err) => {

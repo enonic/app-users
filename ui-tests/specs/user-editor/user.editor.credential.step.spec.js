@@ -5,8 +5,6 @@ const webDriverHelper = require('../../libs/WebDriverHelper');
 const settingsUtils = require('../../libs/settings.utils');
 const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const UsersPage = require('../../page_objects/users/users.page');
-const UserEditorIdProviderStepDialog = require('../../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
 const UserEditorGeneralStepDialog = require('../../page_objects/users/user-dialog/user.editor.general.step.dialog');
 const UserEditorCredentialStepDialog = require('../../page_objects/users/user-dialog/user.editor.credentials.step.dialog');
 const UserEditorRolesStepDialog = require('../../page_objects/users/user-dialog/user.editor.roles.step.dialog');
@@ -43,8 +41,6 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
   // step back and forth keeps it.
   it("GIVEN the Credentials step is opened WHEN 'Set password' has been clicked AND a medium password has been typed THEN Next should be enabled AND the meter should read 'Medium' AND WHEN Previous then Next have been clicked THEN the password should still be there", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
     let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let user = userItemsBuilder.buildUser({
@@ -54,12 +50,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
     });
     // 1. Open the editor and get to Credentials: the provider is picked, the display name and the
     //    email typed.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(user);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(user);
     assert.equal(await credentialsStep.getStepTitle(), 'Credentials');
     // 2. 'Set password': the input appears, empty - the step wants a password now, Next is disabled.
     await credentialsStep.clickOnSetPasswordButton();
@@ -104,9 +95,6 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
   // through again - it is only an opened, empty or too weak input that holds it.
   it("GIVEN a medium password has been typed on the Credentials step WHEN 'Discard this password' has been clicked THEN 'Set password' should be back AND the input gone AND Next enabled, as with no password at all", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let user = userItemsBuilder.buildUser({
       displayName: USER_NAME,
@@ -114,12 +102,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
       email: userItemsBuilder.generateEmail(USER_NAME),
     });
     // 1. Open the editor and get to Credentials.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(user);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(user);
     // 2. 'Set password', then a medium password: the input and the meter are shown, Next is enabled.
     await credentialsStep.setPassword(appConst.PASSWORD.MEDIUM);
     await credentialsStep.waitForNextButtonEnabled();
@@ -153,9 +136,6 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
   // reads 'Medium' or 'Strong', never below. The input hides it until Show is clicked.
   it("GIVEN 'Set password' has been clicked on the Credentials step WHEN Generate has been clicked THEN the meter should accept the password AND Next should be enabled AND WHEN Show has been clicked THEN the password should be readable in the input", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let user = userItemsBuilder.buildUser({
       displayName: USER_NAME,
@@ -163,12 +143,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
       email: userItemsBuilder.generateEmail(USER_NAME),
     });
     // 1. Open the editor and get to Credentials.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(user);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(user);
     // 2. 'Set password': the empty input holds the step.
     await credentialsStep.clickOnSetPasswordButton();
     await credentialsStep.waitForNextButtonDisabled();
@@ -206,9 +181,6 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
   // away: Confirm closes both dialogs.
   it('GIVEN a password has been typed on the Credentials step WHEN the Close icon has been clicked AND Confirm has been clicked THEN the editor should be closed', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let confirmationDialog = new ConfirmationDialog(
       appConst.SECTION_ID.USERS,
@@ -220,12 +192,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
       email: userItemsBuilder.generateEmail(USER_NAME),
     });
     // 1. Open the editor and get to Credentials; type a password.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(user);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(user);
     await credentialsStep.setPassword(appConst.PASSWORD.MEDIUM);
     await credentialsStep.waitForNextButtonEnabled();
     // 2. The Close icon: the draft is dirty, so a confirmation is asked.
@@ -245,9 +212,6 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
   // Cancel keeps the editor open where it was, with what was typed.
   it('GIVEN a password has been typed on the Credentials step WHEN the Close icon has been clicked AND Cancel has been clicked THEN the Credentials step should stay loaded with the password', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let confirmationDialog = new ConfirmationDialog(
       appConst.SECTION_ID.USERS,
@@ -259,12 +223,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
       email: userItemsBuilder.generateEmail(USER_NAME),
     });
     // 1. Open the editor and get to Credentials; type a password.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(user);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(user);
     await credentialsStep.setPassword(appConst.PASSWORD.MEDIUM);
     await credentialsStep.waitForNextButtonEnabled();
     // 2. The Close icon, then Cancel in the confirmation.

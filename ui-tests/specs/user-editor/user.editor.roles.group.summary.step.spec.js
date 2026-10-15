@@ -5,9 +5,6 @@ const webDriverHelper = require('../../libs/WebDriverHelper');
 const settingsUtils = require('../../libs/settings.utils');
 const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const UsersPage = require('../../page_objects/users/users.page');
-const UserEditorIdProviderStepDialog = require('../../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
-const UserEditorGeneralStepDialog = require('../../page_objects/users/user-dialog/user.editor.general.step.dialog');
 const UserEditorCredentialStepDialog = require('../../page_objects/users/user-dialog/user.editor.credentials.step.dialog');
 const UserEditorRolesStepDialog = require('../../page_objects/users/user-dialog/user.editor.roles.step.dialog');
 const UserEditorGroupsStepDialog = require('../../page_objects/users/user-dialog/user.editor.groups.step.dialog');
@@ -69,19 +66,11 @@ describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, G
   // option clicked again unticks it, and Apply takes the role out again.
   it("GIVEN the Roles step is opened WHEN the list has been dropped down AND 'Audit Log' has been clicked AND applied THEN the role should be picked AND WHEN the same option has been clicked again AND applied THEN no role should be picked", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let rolesStep = new UserEditorRolesStepDialog();
     // 1. Open the editor and get to Roles: the provider is picked, the display name and the email
     //    typed, Credentials skipped - a password is optional.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(USER);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(USER);
     await credentialsStep.clickOnNextButton();
     await rolesStep.waitForLoaded();
     assert.equal(await rolesStep.getStepTitle(), 'Roles');
@@ -90,19 +79,19 @@ describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, G
     await rolesStep.clickOnRolesDropdownHandle();
     let roleOptions = await rolesStep.getRoleOptions();
     assert.ok(roleOptions.includes(ROLE), `'${ROLE}' should be offered`);
-    assert.ok(!(await rolesStep.combobox.isOptionChecked(ROLE)), 'The option should not be ticked');
+    await rolesStep.combobox.waitForOptionChecked(ROLE, false);
     // 3. Tick the role, then Apply: the role is listed under the input.
     await rolesStep.clickOnRoleOption(ROLE);
-    assert.ok(await rolesStep.combobox.isOptionChecked(ROLE), 'The option should be ticked');
+    await rolesStep.combobox.waitForOptionChecked(ROLE);
     await rolesStep.clickOnApplyButton();
     await rolesStep.waitForRoleSelected(ROLE);
     assert.deepEqual(await rolesStep.getSelectedRoles(), [ROLE], 'The role should be picked');
     // 4. Drop the list down again: the picked role is shown ticked. Click it to untick, then Apply:
     //    nothing is picked any more.
     await rolesStep.clickOnRolesDropdownHandle();
-    assert.ok(await rolesStep.combobox.isOptionChecked(ROLE), 'The picked role should be ticked');
+    await rolesStep.combobox.waitForOptionChecked(ROLE);
     await rolesStep.clickOnRoleOption(ROLE);
-    assert.ok(!(await rolesStep.combobox.isOptionChecked(ROLE)), 'The option should be unticked');
+    await rolesStep.combobox.waitForOptionChecked(ROLE, false);
     await rolesStep.clickOnApplyButton();
     await rolesStep.combobox.waitForOptionNotSelected(ROLE);
     assert.deepEqual(await rolesStep.getSelectedRoles(), [], 'No role should be picked');
@@ -114,19 +103,11 @@ describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, G
   // and taken out with the Remove icon of its row under the input - no list this time.
   it("GIVEN the Roles step is opened WHEN 'Audit Log' has been picked by filtering AND applied THEN the role should be picked AND WHEN its Remove icon has been clicked THEN no role should be picked", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let rolesStep = new UserEditorRolesStepDialog();
     // 1. Open the editor and get to Roles: the provider is picked, the display name and the email
     //    typed, Credentials skipped - a password is optional.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(USER);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(USER);
     await credentialsStep.clickOnNextButton();
     await rolesStep.waitForLoaded();
     assert.deepEqual(await rolesStep.getSelectedRoles(), [], 'No role should be picked yet');
@@ -150,20 +131,12 @@ describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, G
   // it to every provider, the system's included.
   it("GIVEN the Groups step is opened WHEN the list has been dropped down THEN only the group of the user's ID provider should be offered AND WHEN 'Show groups from all ID providers' has been pressed THEN the system group should be offered too", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let rolesStep = new UserEditorRolesStepDialog();
     let groupsStep = new UserEditorGroupsStepDialog();
     // 1. Open the editor and get to Roles: the provider is picked, the display name and the email
     //    typed, Credentials skipped - a password is optional.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(USER);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(USER);
     await credentialsStep.clickOnNextButton();
     await rolesStep.waitForLoaded();
     // 2. No role: on to Groups.
@@ -201,21 +174,13 @@ describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, G
   // Credentials row. Create is offered but not clicked: the suite leaves no user behind.
   it('GIVEN a role AND a group have been picked WHEN the Summary step is opened THEN the ID provider, the user, the email, the role AND the group should be read back AND no Credentials row should be shown AND Create should be enabled', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    let idProviderStep = new UserEditorIdProviderStepDialog();
-    let generalStep = new UserEditorGeneralStepDialog();
     let credentialsStep = new UserEditorCredentialStepDialog();
     let rolesStep = new UserEditorRolesStepDialog();
     let groupsStep = new UserEditorGroupsStepDialog();
     let summaryStep = new UserEditorSummaryStepDialog();
     // 1. Open the editor and get to Roles: the provider is picked, the display name and the email
     //    typed, Credentials skipped - a password is optional.
-    await usersPage.clickOnNewButton();
-    await idProviderStep.waitForLoaded();
-    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
-    await idProviderStep.clickOnNextAndWaitForGeneralStep();
-    await generalStep.typeDataAndClickOnNext(USER);
-    await credentialsStep.waitForLoaded();
+    await settingsUtils.openNewUserEditorOnCredentials(USER);
     await credentialsStep.clickOnNextButton();
     await rolesStep.waitForLoaded();
     // 2. Pick the role by filtering, then on to Groups.

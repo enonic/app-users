@@ -204,6 +204,24 @@ class PrincipalCombobox extends SectionPage {
     return option.checked;
   }
 
+  // Waits for the option to be ticked - or, with `checked` false, unticked - in the opened popup:
+  // the tick renders a frame after the click, so a read right after it can see the old state.
+  async waitForOptionChecked(displayName, checked = true, ms = appConst.TIMEOUT.MEDIUM) {
+    const state = checked ? 'ticked' : 'unticked';
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.isOptionChecked(displayName)) === checked,
+        { timeout: ms, timeoutMsg: `the option '${displayName}' should be ${state}` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `'${this.placeholder}' picker - the option '${displayName}' should be ${state}`,
+        'err_principal_option_checked',
+        err,
+      );
+    }
+  }
+
   // 'Searching…', 'Nothing matches the search', 'The search could not be run' - or undefined.
   async getPopupMessage() {
     const messages = await this.getDisplayedElements(this.css.popupMessage);
