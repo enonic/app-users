@@ -26,6 +26,7 @@ import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import {
   defaultBranchOf,
   downloadPermissionReport,
+  initialPicks,
   reportTargets,
 } from './model/permission-report';
 
@@ -68,10 +69,12 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
-  const [picked, setPicked] = useState<readonly string[]>([]);
+  // Undefined until the user picks, so a lone repository arrives picked whenever the list lands.
+  const [chosen, setChosen] = useState<readonly string[] | undefined>(undefined);
   const [branchOf, setBranchOf] = useState<Record<string, string>>({});
   const [running, setRunning] = useState(false);
 
+  const picked = chosen ?? initialPicks(items);
   const offered = items.filter(({ id }) => id.toLowerCase().includes(query.toLowerCase()));
   const rows = items.filter(({ id }) => picked.includes(id));
 
@@ -82,15 +85,17 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
   const generate = async (): Promise<void> => {
     setRunning(true);
 
-    for (const target of reportTargets(principalKey, items, picked, branchOf)) {
-      const result = await downloadPermissionReport(host.baseUrl, target);
+    try {
+      for (const target of reportTargets(principalKey, items, picked, branchOf)) {
+        const result = await downloadPermissionReport(host.baseUrl, target);
 
-      if (result.isErr()) {
-        notify('error', i18n('report.downloadFailed', target.repositoryId));
+        if (result.isErr()) {
+          notify('error', i18n('report.downloadFailed', target.repositoryId));
+        }
       }
+    } finally {
+      setRunning(false);
     }
-
-    setRunning(false);
   };
 
   return (
@@ -113,7 +118,7 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
         onChange={(next) => setQuery(next ?? '')}
         selectionMode="multiple"
         selection={picked}
-        onSelectionChange={setPicked}
+        onSelectionChange={setChosen}
         contentType="listbox"
       >
         <Combobox.Content>
@@ -183,7 +188,9 @@ function ReportSection({ principalKey }: PermissionReportSectionProps) {
                     icon={X}
                     variant="text"
                     onClick={() =>
-                      setPicked((current) => current.filter((id) => id !== repository.id))
+                      setChosen((current) =>
+                        (current ?? initialPicks(items)).filter((id) => id !== repository.id),
+                      )
                     }
                   />
                 </GridList.Action>

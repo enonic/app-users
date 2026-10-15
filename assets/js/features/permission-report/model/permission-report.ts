@@ -26,9 +26,18 @@ export function reportUrl(baseUrl: string, target: ReportTarget): string {
   return `${baseUrl}/report?${params.toString()}`;
 }
 
-// ! `:` replaced by hand: Windows refuses it in a file name, and each browser substitutes its own.
+// ! The same name `extensions/report/report-request.ts` gives the file: `:` becomes `_`, since Windows
+// ! refuses it and each browser substitutes its own, and anything else outside a plain set is dropped.
 export function reportFileName({ principalKey, repositoryId, branch }: ReportTarget): string {
-  return `perm-report-${principalKey.replace(/:/g, '_')}-${repositoryId}(${branch}).csv`;
+  const safe = (value: string): string => value.replace(/[^A-Za-z0-9._-]/g, '');
+  const principal = safe(principalKey.replace(/:/g, '_'));
+
+  return `perm-report-${principal}-${safe(repositoryId)}(${safe(branch)}).csv`;
+}
+
+/** What starts picked: the only repository there is, since a choice of one is no choice. */
+export function initialPicks(repositories: readonly Repository[]): readonly string[] {
+  return repositories.length === 1 ? [repositories[0].id] : [];
 }
 
 /** The branch a repository starts on: the server puts `master` first where the repository has one. */

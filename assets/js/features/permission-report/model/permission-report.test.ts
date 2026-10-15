@@ -4,6 +4,7 @@ import type { Repository } from '../../../entities/repository';
 import {
   defaultBranchOf,
   downloadPermissionReport,
+  initialPicks,
   reportFileName,
   reportTargets,
   reportUrl,
@@ -41,6 +42,26 @@ describe('reportFileName', () => {
     expect(reportFileName(TARGET)).toBe(
       'perm-report-user_system_jdoe-com.enonic.cms.default(master).csv',
     );
+  });
+
+  it('drops what a path or a file system would read as its own', () => {
+    expect(reportFileName({ ...TARGET, principalKey: 'user:system:../a b', branch: 'x/y' })).toBe(
+      'perm-report-user_system_..ab-com.enonic.cms.default(xy).csv',
+    );
+  });
+});
+
+describe('initialPicks', () => {
+  it('picks the only repository there is', () => {
+    expect(initialPicks([repository('com.enonic.cms.default')])).toEqual([
+      'com.enonic.cms.default',
+    ]);
+  });
+
+  it('leaves a choice of several to the user', () => {
+    expect(
+      initialPicks([repository('com.enonic.cms.default'), repository('com.enonic.cms.intranet')]),
+    ).toEqual([]);
   });
 });
 
