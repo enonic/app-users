@@ -194,9 +194,10 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
     assert.equal(await credentialsStep.getPasswordInputType(), 'text');
     assert.ok(await credentialsStep.isHidePasswordButtonDisplayed(), "'Hide' should be offered");
     let password = await credentialsStep.getTextInPasswordInput();
-    assert.ok(
-      password.length > 5,
-      `The generated password should be more than 5 characters: '${password}'`,
+    assert.equal(
+      password.length,
+      15,
+      `The generated password should be 15 characters: '${password}'`,
     );
     assert.ok(!/\s/.test(password), 'The generated password should contain no whitespace');
   });

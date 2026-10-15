@@ -41,7 +41,7 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
       description: 'description',
       application: 'Standard ID Provider',
     });
-    // 1. Create a new ID provider in the editor (through UI) (not via the API).
+    // 1. Create a new ID provider in the editor (not via the API).
     await settingsUtils.createIdProvider(ID_PROVIDER);
     let idProvidersPage = new IdProvidersPage();
     // 2. Select the new ID provider: Delete gets enabled.
@@ -58,7 +58,7 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
       idProvider: ID_PROVIDER.displayName,
       email: userItemsBuilder.generateEmail(USER_NAME),
     });
-    // 1. Create a new user in the editor(through UI) (not via the API).
+    // 1. Create a new user in the editor (not via the API).
     await settingsUtils.createUser(user);
     let usersPage = new UsersPage();
     // 2. Select the new user

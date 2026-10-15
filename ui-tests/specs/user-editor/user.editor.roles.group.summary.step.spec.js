@@ -14,7 +14,7 @@ const UserEditorGroupsStepDialog = require('../../page_objects/users/user-dialog
 const UserEditorSummaryStepDialog = require('../../page_objects/users/user-dialog/user.editor.summary.step.dialog');
 const userItemsBuilder = require('../../libs/users.items.builder');
 
-describe("user.editor.roles.group.summary.steps - the user editor's Roles, Groups and Summary steps: a role is picked and unpicked in the picker's list", function () {
+describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, Groups and Summary steps: a role is picked and unpicked in the picker's list", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
   if (typeof browser === 'undefined') {
     webDriverHelper.setupBrowser();
@@ -67,7 +67,7 @@ describe("user.editor.roles.group.summary.steps - the user editor's Roles, Group
 
   // The picker stages a tick until Apply: a role ticked in the list and applied is picked; the same
   // option clicked again unticks it, and Apply takes the role out again.
-  it("GIVEN the Roles step is opened WHEN the list has been dropped down AND 'Administrator' has been clicked AND applied THEN the role should be picked AND WHEN the same option has been clicked again AND applied THEN no role should be picked", async () => {
+  it("GIVEN the Roles step is opened WHEN the list has been dropped down AND 'Audit Log' has been clicked AND applied THEN the role should be picked AND WHEN the same option has been clicked again AND applied THEN no role should be picked", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     let usersPage = new UsersPage();
     let idProviderStep = new UserEditorIdProviderStepDialog();
@@ -112,7 +112,7 @@ describe("user.editor.roles.group.summary.steps - the user editor's Roles, Group
 
   // The other way in and out: the role is found by typing its name into the filter and applied,
   // and taken out with the Remove icon of its row under the input - no list this time.
-  it("GIVEN the Roles step is opened WHEN 'Administrator' has been picked by filtering AND applied THEN the role should be picked AND WHEN its Remove icon has been clicked THEN no role should be picked", async () => {
+  it("GIVEN the Roles step is opened WHEN 'Audit Log' has been picked by filtering AND applied THEN the role should be picked AND WHEN its Remove icon has been clicked THEN no role should be picked", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     let usersPage = new UsersPage();
     let idProviderStep = new UserEditorIdProviderStepDialog();
@@ -175,8 +175,10 @@ describe("user.editor.roles.group.summary.steps - the user editor's Roles, Group
       "'Show groups from all ID providers' should not be pressed to begin with",
     );
     // 3. Drop the list down: only the group of the user's ID provider is offered - the provider was
-    //    made for this suite, so that group is its only one.
+    //    made for this suite, so that group is its only one. The groups come from the server after
+    //    the click, so the list is read once the group is shown.
     await groupsStep.clickOnGroupsDropdownHandle();
+    await groupsStep.waitForGroupOptionDisplayed(GROUP.displayName);
     assert.deepEqual(
       await groupsStep.getGroupOptions(),
       [GROUP.displayName],

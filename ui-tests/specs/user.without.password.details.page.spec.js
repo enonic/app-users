@@ -15,13 +15,20 @@ const UserEditorSummaryStepDialog = require('../page_objects/users/user-dialog/u
 const UserDetails = require('../page_objects/users/user.details');
 const userItemsBuilder = require('../libs/users.items.builder');
 
-describe('user.without.password.details.page.spec.spec - an ID provider made via the API, a user created in it by the editor without a password, and the password set afterwards from the details', function () {
+describe('user.without.password.details.page.spec - an ID provider made via the API, a user created in it by the editor without a password, and the password set afterwards from the details', function () {
   this.timeout(appConst.SUITE_TIMEOUT);
   if (typeof browser === 'undefined') {
     webDriverHelper.setupBrowser();
   }
   const PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
   const USER_NAME = userItemsBuilder.generateRandomName('user');
+  const USER = userItemsBuilder.buildUser({
+    displayName: USER_NAME,
+    idProvider: PROVIDER_NAME,
+    email: userItemsBuilder.generateEmail(USER_NAME),
+  });
+  // What createIdProviderViaApi() returns, with the key the delete at the end needs.
+  let ID_PROVIDER;
 
   it('GIVEN the suite starts THEN an ID provider for its user should be created via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
@@ -33,7 +40,7 @@ describe('user.without.password.details.page.spec.spec - an ID provider made via
         'role:system.user.admin': appConst.ID_PROVIDER_ACCESS.WRITE_USERS,
       },
     );
-    await settingsUtils.createIdProviderViaApi(idProvider);
+    ID_PROVIDER = await settingsUtils.createIdProviderViaApi(idProvider);
   });
 
   // A new user opens on the ID provider step; General is the step after it, then Credentials,
@@ -47,19 +54,14 @@ describe('user.without.password.details.page.spec.spec - an ID provider made via
     let summaryStepDialog = new UserEditorSummaryStepDialog();
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     let usersPage = new UsersPage();
-    let user = userItemsBuilder.buildUser({
-      displayName: USER_NAME,
-      idProvider: PROVIDER_NAME,
-      email: userItemsBuilder.generateEmail(USER_NAME),
-    });
     // 1. Open the editor: it starts on the ID provider step; the provider made via API is picked (the system one takes service accounts only).
     await usersPage.clickOnNewButton();
     await idProviderStepDialog.waitForLoaded();
     await idProviderStepDialog.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
     await idProviderStepDialog.clickOnNextAndWaitForGeneralStep();
     // 2. General: display name, ID and email. The ID is typed by hand, it is not derived from the display name.
-    await generalStepDialog.typeInDisplayNameInput(user.displayName);
-    await generalStepDialog.typeInEmailInput(user.email);
+    await generalStepDialog.typeInDisplayNameInput(USER.displayName);
+    await generalStepDialog.typeInEmailInput(USER.email);
     await generalStepDialog.clickOnNextButton();
     // 3. Credentials: no password is set - 'Set password' stays, the input never appears.
     await credentialsStepDialog.waitForLoaded();
@@ -79,9 +81,9 @@ describe('user.without.password.details.page.spec.spec - an ID provider made via
     await groupsStepDialog.clickOnNextButton();
     // 6. Summary reads the answers back; a row with nothing to say (Credentials, Roles, Groups) is absent.
     await summaryStepDialog.waitForLoaded();
-    assert.equal(await summaryStepDialog.getUser(), `${user.displayName} (${user.id})`);
+    assert.equal(await summaryStepDialog.getUser(), `${USER.displayName} (${USER.id})`);
     assert.equal(await summaryStepDialog.getIdProvider(), PROVIDER_NAME);
-    assert.equal(await summaryStepDialog.getEmail(), user.email);
+    assert.equal(await summaryStepDialog.getEmail(), USER.email);
     assert.ok(
       !(await summaryStepDialog.isRowDisplayed(UserEditorSummaryStepDialog.LABEL.CREDENTIALS)),
       'The Credentials row should be absent when no password is set',
@@ -93,10 +95,10 @@ describe('user.without.password.details.page.spec.spec - an ID provider made via
     // 7. Create: the dialog closes, the toast confirms, the user is listed with its ID provider.
     await summaryStepDialog.clickOnCreateButtonAndWaitForClosed();
     await usersPage.waitForExpectedNotificationMessage(
-      appConst.userCreatedMessage(user.displayName),
+      appConst.userCreatedMessage(USER.displayName),
     );
-    await usersPage.waitForRowByDisplayNameDisplayed(user.displayName);
-    assert.equal(await usersPage.getUserIdProviderByDisplayName(user.displayName), user.idProvider);
+    await usersPage.waitForRowByDisplayNameDisplayed(USER.displayName);
+    assert.equal(await usersPage.getUserIdProviderByDisplayName(USER.displayName), USER.idProvider);
   });
 
   // The user was created without a password. 'Edit credentials' in the details opens the Credentials
@@ -152,5 +154,19 @@ describe('user.without.password.details.page.spec.spec - an ID provider made via
         .setWindowSize(appConst.BROWSER_WIDTH, appConst.BROWSER_HEIGHT);
     }
     return console.log('specification starting: ' + this.title);
+  });
+  // The user goes first: a provider that still holds one cannot be deleted. The user's key is the
+  // one the editor gave it - 'user:<provider key>:<id>'.
+  after(async () => {
+    if (ID_PROVIDER !== undefined) {
+      await settingsUtils
+        .deletePrincipalsViaApi(`user:${ID_PROVIDER.key}:${USER.id}`)
+        .catch((err) => {
+          console.log('The user was not cleaned up: ' + err);
+        });
+      await settingsUtils.deleteIdProviderViaApi(ID_PROVIDER).catch((err) => {
+        console.log('The ID provider was not cleaned up: ' + err);
+      });
+    }
   });
 });
