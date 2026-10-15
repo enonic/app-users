@@ -14,7 +14,6 @@ import {
   setUserEditorDisplayName,
   setUserEditorEmail,
   setUserEditorName,
-  userEmailCheck,
   userNameCheck,
 } from '../../model/user-editor.store';
 
@@ -29,7 +28,6 @@ export function UserEditorDialogGeneralStep() {
   const systemUser = useStore($userEditorSystemUser);
   const serviceAccount = useStore($userEditorServiceAccount);
   const idCheck = useStore(userNameCheck.$state);
-  const emailCheck = useStore(userEmailCheck.$state);
   const providers = useStore($userEditorProviders);
 
   const persisted = mode === 'edit';
@@ -49,9 +47,8 @@ export function UserEditorDialogGeneralStep() {
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
   const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
   const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name, providerName);
-  const emailErrorKey = emailCheck.status === 'taken' ? errors.email : shown.email;
   const emailError =
-    emailErrorKey === undefined ? undefined : i18n(emailErrorKey, form.email, providerName);
+    shown.email === undefined ? undefined : i18n(shown.email, form.email, providerName);
 
   return (
     <div className="flex flex-col gap-5">
@@ -85,10 +82,7 @@ export function UserEditorDialogGeneralStep() {
           description={persisted ? undefined : idHelp}
           error={idError}
           onInput={({ currentTarget }) => setUserEditorName(currentTarget.value)}
-          onBlur={() => {
-            markUserEditorFieldVisited('name');
-            setUserEditorName(form.name, { immediate: true });
-          }}
+          onBlur={() => setUserEditorName(form.name, { immediate: true })}
         />
       </div>
 
@@ -102,10 +96,7 @@ export function UserEditorDialogGeneralStep() {
             value={form.email}
             error={emailError}
             onInput={({ currentTarget }) => setUserEditorEmail(currentTarget.value)}
-            onBlur={() => {
-              markUserEditorFieldVisited('email');
-              setUserEditorEmail(form.email, { immediate: true });
-            }}
+            onBlur={() => setUserEditorEmail(form.email, { immediate: true })}
           />
         </div>
       )}

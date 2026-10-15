@@ -82,11 +82,13 @@ export function seedIdProviderEditorPermissions(
 /** In the create wizard the display name is also where the name comes from, so it asks the same question. */
 export function setIdProviderEditorDisplayName(displayName: string): void {
   updateIdProviderEditorForm({ displayName });
+  idProviderEditorDialog.markVisited('displayName');
   askWhetherNameIsFree();
 }
 
 export function setIdProviderEditorName(name: string, { immediate = false } = {}): void {
   updateIdProviderEditorForm({ name });
+  idProviderEditorDialog.markVisited('name');
   askWhetherNameIsFree({ immediate });
 }
 

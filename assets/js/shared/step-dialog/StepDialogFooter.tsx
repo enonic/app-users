@@ -25,7 +25,7 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
   'data-component': componentName = STEP_DIALOG_FOOTER_NAME,
 }: StepDialogFooterProps<Step, Field, Form, Entity>) {
   const { view, mode, saving } = useStore(store.$state, { keys: ['view', 'mode', 'saving'] });
-  const errors = useStore(store.$errors);
+  const unanswered = useStore(store.$unanswered);
   const changed = useStore(store.$changed);
 
   if (view === 'wizard') {
@@ -43,8 +43,6 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
     );
   }
 
-  const unanswered = Object.keys(errors).length > 0;
-
   return (
     <ActionDialog.Footer data-component={componentName} question={question}>
       <Button
@@ -56,7 +54,7 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
       />
       <ActionDialog.Action
         label={i18n('browse.dialog.save')}
-        disabled={saving || unanswered || !changed}
+        disabled={saving || unanswered !== undefined || !changed}
         closeOnClick={false}
         onClick={onSave}
       />

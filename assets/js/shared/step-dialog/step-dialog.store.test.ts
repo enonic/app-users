@@ -120,6 +120,15 @@ describe('openAt', () => {
     expect(entity).toBe(ALICE);
   });
 
+  it('shows what the stored entity already fails on the step it opens, from the start', () => {
+    store.openAt(ALICE, 'general', ALICE.displayName);
+    expect([...store.$state.get().visited]).toEqual(['name', 'displayName', 'email']);
+
+    store.close();
+    store.open({ mode: 'create' });
+    expect(store.$state.get().visited.size).toBe(0);
+  });
+
   it('leaves the wizard and its heading behind it, so the next open walks every step again', () => {
     store.openAt(ALICE, 'members', ALICE.displayName);
     store.close();
@@ -235,6 +244,26 @@ describe('$errors and $stepLocks', () => {
 
     expect(store.$errors.get()).toEqual({});
     expect(store.$stepLocks.get()).toEqual({ general: false, members: true, summary: true });
+  });
+});
+
+describe('$unanswered', () => {
+  it('names the first step with an error in the wizard', () => {
+    store.open({ mode: 'create' });
+    store.goToStep('summary');
+
+    expect(store.$unanswered.get()).toBe('general');
+  });
+
+  it('looks only at the step on screen when one step is shown alone', () => {
+    store.openAt({ ...ALICE, displayName: '' }, 'members', 'Alice');
+
+    expect(store.$errors.get()).toEqual({ displayName: 'dialog.displayNameRequired' });
+    expect(store.$unanswered.get()).toBeUndefined();
+
+    store.openAt({ ...ALICE, displayName: '' }, 'general', 'Alice');
+
+    expect(store.$unanswered.get()).toBe('general');
   });
 });
 

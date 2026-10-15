@@ -69,11 +69,13 @@ export function seedRoleEditorMembers(members: readonly PrincipalRef[]): void {
 /** In the create wizard the display name is also where the name comes from, so it asks the same question. */
 export function setRoleEditorDisplayName(displayName: string): void {
   updateRoleEditorForm({ displayName });
+  roleEditorDialog.markVisited('displayName');
   askWhetherNameIsFree();
 }
 
 export function setRoleEditorName(name: string, { immediate = false } = {}): void {
   updateRoleEditorForm({ name });
+  roleEditorDialog.markVisited('name');
   askWhetherNameIsFree({ immediate });
 }
 

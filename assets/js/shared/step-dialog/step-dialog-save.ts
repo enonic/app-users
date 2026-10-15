@@ -26,9 +26,8 @@ export type StepDialogSaveOptions<Form, Entity, Written extends { displayName: s
 };
 
 /**
- * An unanswered form goes back to its first erroring step with every field marked visited; an unchanged
- * edit just closes. The gate is whole-form in `'step'` view too: a section only opens on an entity the
- * form already accepts.
+ * An unanswered form goes back to the step `$unanswered` names with every field marked visited; an
+ * unchanged edit just closes.
  */
 export async function runStepDialogSave<
   Step extends string,
@@ -42,7 +41,7 @@ export async function runStepDialogSave<
 ): Promise<void> {
   const { steps } = store;
   const { form, saved, mode, entity } = store.$state.get();
-  const unanswered = steps.firstWithError(store.$errors.get());
+  const unanswered = store.$unanswered.get();
 
   if (unanswered !== undefined) {
     steps.allFields.forEach(store.markVisited);
