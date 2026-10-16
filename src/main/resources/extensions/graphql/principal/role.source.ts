@@ -11,7 +11,14 @@ import {
   type RoleKey,
 } from '/lib/xp/auth';
 
-import { ADMIN_ROLE, ROLE_KEY, SUPER_USER, type MemberKey } from './principal.keys';
+import {
+  ADMIN_ROLE,
+  isImplicitRole,
+  isPlatformRole,
+  ROLE_KEY,
+  SUPER_USER,
+  type MemberKey,
+} from './principal.keys';
 import { byName, displayNameOf, toPrincipalItem, type PrincipalItem } from './principal.source';
 
 export type RoleSource = Role;
@@ -90,6 +97,25 @@ export function createRole(name: string, input: RoleInput): Role {
 }
 
 export function updateRole(key: string, changes: RoleChanges): Role {
+  // ! What the platform owns is refused before the first write: `modifyRole` and the members are
+  // ! separate writes, and XP refuses an implicit role's members only once the rename has applied.
+  if (isImplicitRole(key) && changes.addMembers.length + changes.removeMembers.length > 0) {
+    throw new Error(`Cannot change the members of [${key}]: the platform implies them`);
+  }
+
+  if (isPlatformRole(key)) {
+    const current = getRole(key);
+    if (current == null) {
+      throw new Error(`No role answers to [${key}]`);
+    }
+
+    if (changesDisplayNameOrDescription(current, changes)) {
+      throw new Error(
+        `Cannot change the display name or description of [${key}]: the platform owns it`,
+      );
+    }
+  }
+
   const role = modifyRole({
     key: key as RoleKey,
     // ! `ModifyRoleHandler` assigns a field only when the editor returned a non-null value, so the
@@ -132,6 +158,14 @@ function applyMembers(
   if (removed.length > 0) {
     removeMembers(key, [...removed]);
   }
+}
+
+// Against `displayNameOf`: an unnamed role reads, and comes back from the editor, under its key's name.
+function changesDisplayNameOrDescription(current: Role, changes: RoleChanges): boolean {
+  return (
+    changes.displayName.trim() !== displayNameOf(current).trim() ||
+    (changes.description ?? '').trim() !== (current.description ?? '').trim()
+  );
 }
 
 function isRole(principal: Principal): principal is Role {
