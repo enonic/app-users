@@ -245,6 +245,17 @@ describe('updateRole', () => {
     );
   }
 
+  // What `getRole` reads back: a platform role's scalars are checked against it.
+  function stored(key: string, displayName = 'Editors', overrides: Partial<Role> = {}) {
+    vi.mocked(getPrincipal).mockReturnValue(role(key, displayName, overrides));
+  }
+
+  function nothingWritten() {
+    expect(vi.mocked(modifyRole)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(removeMembers)).not.toHaveBeenCalled();
+  }
+
   it('writes the scalars through the editor the platform hands it', () => {
     modifiable('role:editors');
 
@@ -286,6 +297,7 @@ describe('updateRole', () => {
   });
 
   it('refuses to take the super user out of the administrators role', () => {
+    stored('role:system.admin');
     modifiable('role:system.admin');
 
     expect(() =>
@@ -295,12 +307,79 @@ describe('updateRole', () => {
     expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
   });
 
-  it('lets the administrators role change in every other way', () => {
+  it('lets the administrators role gain members while its scalars stay', () => {
+    stored('role:system.admin');
     modifiable('role:system.admin');
 
     updateRole('role:system.admin', changes({ addMembers: ['group:system:ops'] }));
 
     expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:system.admin', ['group:system:ops']);
+  });
+
+  it('refuses to rename a platform role, writing nothing', () => {
+    stored('role:cms.admin', 'Content Manager Administrator');
+
+    expect(() =>
+      updateRole(
+        'role:cms.admin',
+        changes({ displayName: 'Admins', addMembers: ['group:system:ops'] }),
+      ),
+    ).toThrow(
+      'Cannot change the display name or description of [role:cms.admin]: the platform owns it',
+    );
+    nothingWritten();
+  });
+
+  it('refuses to change the description of a platform role, writing nothing', () => {
+    stored('role:system.admin', 'Editors', { description: 'Before' });
+
+    expect(() => updateRole('role:system.admin', changes({ description: 'After' }))).toThrow(
+      /Cannot change the display name or description of \[role:system\.admin\]/,
+    );
+    nothingWritten();
+  });
+
+  it('reads an unnamed platform role under the name from its key, as the editor sends it back', () => {
+    stored('role:system.user.admin', '');
+    modifiable('role:system.user.admin');
+
+    updateRole('role:system.user.admin', changes({ displayName: 'system.user.admin' }));
+
+    expect(vi.mocked(modifyRole)).toHaveBeenCalled();
+  });
+
+  it('refuses any member change on Everyone and Authenticated, writing nothing', () => {
+    expect(() =>
+      updateRole(
+        'role:system.everyone',
+        changes({ displayName: 'Everyone', addMembers: ['user:system:alice'] }),
+      ),
+    ).toThrow('Cannot change the members of [role:system.everyone]: the platform implies them');
+    expect(() =>
+      updateRole(
+        'role:system.authenticated',
+        changes({ displayName: 'Authenticated', removeMembers: ['group:system:ops'] }),
+      ),
+    ).toThrow(/Cannot change the members of \[role:system\.authenticated\]/);
+    nothingWritten();
+  });
+
+  it('fails for a platform role nothing answers to, writing nothing', () => {
+    expect(() => updateRole('role:system.gone', changes())).toThrow(
+      'No role answers to [role:system.gone]',
+    );
+    nothingWritten();
+  });
+
+  it('lets a project role be renamed, since the platform does not own it', () => {
+    modifiable('role:cms.project.default.owner');
+
+    const updated = updateRole(
+      'role:cms.project.default.owner',
+      changes({ displayName: 'Owners' }),
+    );
+
+    expect(updated.displayName).toBe('Owners');
   });
 
   it('fails for a role nothing answers to any more', () => {

@@ -3,7 +3,7 @@ import { Lock } from 'lucide-react';
 
 export type PrincipalEditButtonProps = {
   label: string;
-  /** Locked by the provider's mode: the button stays, disabled, and says so with a lock. */
+  /** Locked by the provider's mode or the platform: the button stays, disabled, and says so with a lock. */
   locked?: boolean;
   onClick: () => void;
 };

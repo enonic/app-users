@@ -1,16 +1,16 @@
-import { Button, Checkbox } from '@enonic/ui';
+import { Checkbox } from '@enonic/ui';
 import { KeyRound } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
 import {
   idProviderOf,
-  isAnonymousUser,
   isSystemUser,
   principalName,
   useTransitiveMemberships,
   type PrincipalRef,
   type UserDetail,
 } from '../../entities/principal';
+import { PrincipalEditButton } from '../../entities/principal/ui/PrincipalEditButton';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openServiceAccountEditorAt } from '../../features/user-editor';
 import { isReadOnlyMode } from '../../shared/config';
@@ -26,8 +26,7 @@ const SERVICE_ACCOUNT_DETAILS_NAME = 'ServiceAccountDetails';
 
 /**
  * `UserDetails` without the ID provider field: every account here is the system store's. The accounts the
- * platform owns keep their roles and groups too — those steps only say so — so neither offers an Edit,
- * and the guest, which never signs in, offers none for its credentials either.
+ * platform owns, `su` and `anonymous`, show every Edit locked.
  */
 export function ServiceAccountDetails({
   user,
@@ -38,6 +37,7 @@ export function ServiceAccountDetails({
   const editLabel = useI18n('browse.details.edit');
   const emailNotSetLabel = useI18n('users.details.emailNotSet');
   const systemLabel = useI18n('principal.type.system');
+  const lockedLabel = useI18n('principal.details.lockedPlatform');
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -52,8 +52,6 @@ export function ServiceAccountDetails({
   const { key, displayName, login, email, hasPassword, publicKeys } = user;
 
   const system = isSystemUser(key);
-  // The guest never signs in: no password, no public keys, nothing to edit.
-  const anonymous = isAnonymousUser(key);
 
   // ? Without a group to inherit through, the toggle has nothing to add — and no request to find out.
   const inheritable = user.groups.length > 0;
@@ -76,10 +74,9 @@ export function ServiceAccountDetails({
         labelKey="serviceAccounts.details.serviceAccount"
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editLabel}
+              locked={system}
               onClick={() => openServiceAccountEditorAt(user, 'general')}
             />
           )
@@ -94,16 +91,20 @@ export function ServiceAccountDetails({
             {email ?? emailNotSetLabel}
           </DetailsPanel.Field>
         )}
+        {system && (
+          <DetailsPanel.Field labelKey="principal.details.editing">
+            {lockedLabel}
+          </DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
       <DetailsPanel.Section
         labelKey="users.details.credentials"
         action={
-          anonymous || readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+          readOnly ? undefined : (
+            <PrincipalEditButton
               label={editCredentialsLabel}
+              locked={system}
               onClick={() => openServiceAccountEditorAt(user, 'credentials')}
             />
           )
@@ -143,11 +144,10 @@ export function ServiceAccountDetails({
         labelKey="users.details.roles"
         count={roles.length}
         action={
-          system || readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+          readOnly ? undefined : (
+            <PrincipalEditButton
               label={editRolesLabel}
+              locked={system}
               onClick={() => openServiceAccountEditorAt(user, 'roles')}
             />
           )
@@ -169,11 +169,10 @@ export function ServiceAccountDetails({
         labelKey="users.details.groups"
         count={groups.length}
         action={
-          system || readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+          readOnly ? undefined : (
+            <PrincipalEditButton
               label={editGroupsLabel}
+              locked={system}
               onClick={() => openServiceAccountEditorAt(user, 'groups')}
             />
           )

@@ -7,7 +7,6 @@ import {
   idProviderOf,
   createPrincipalNameCheck,
   createUserEmailCheck,
-  isSystemUser,
   SYSTEM_ID_PROVIDER,
   type IdProviderMode,
   type IdProviderName,
@@ -107,10 +106,7 @@ export const userEditorDialog = createStepDialogStore<
   titleKey: 'users.dialog.createTitle',
   initialForm: (payload) => initialUserForm(payload, createProvider()),
   validate: (form, { mode, entity }) =>
-    validateUserForm(form, mode, {
-      systemUser: entity !== undefined && isSystemUser(entity.key),
-      remoteUser: isRemoteUser(entity, $idProviderModeByKey.get()),
-    }),
+    validateUserForm(form, mode, { remoteUser: isRemoteUser(entity, $idProviderModeByKey.get()) }),
   same: sameUserForm,
   next: nextUserForm,
   $external: $userEditorExternal,
@@ -131,11 +127,6 @@ function isRemoteUser(
 ): boolean {
   return entity !== undefined && !allowsWrite(modes.get(idProviderOf(entity.key) ?? ''), 'user');
 }
-
-export const $userEditorSystemUser = computed(
-  $userEditor,
-  ({ entity }) => entity !== undefined && isSystemUser(entity.key),
-);
 
 export function openUserEditor(payload: UserEditorPayload): void {
   $userEditorServiceAccount.set(false);
@@ -257,13 +248,9 @@ function askWhetherNameIsFree({ immediate = false } = {}): void {
 }
 
 // Both modes ask — an edit can re-address a user — and the user's own key rides along so its current
-// address is no clash. `su` and `anonymous` have no email and are asked nothing.
+// address is no clash.
 function askWhetherEmailIsFree({ immediate = false } = {}): void {
   const { form, entity } = $userEditor.get();
-
-  if (entity !== undefined && isSystemUser(entity.key)) {
-    return;
-  }
 
   userEmailCheck.ask(form.idProvider, form.email, { immediate, except: entity?.key });
 }

@@ -1,6 +1,44 @@
 import { describe, expect, it } from 'vitest';
 
-import { toGroupKeys, toMemberKeys, toRoleKeys } from './principal.keys';
+import {
+  isImplicitRole,
+  isPlatformRole,
+  isSystemUser,
+  toGroupKeys,
+  toMemberKeys,
+  toRoleKeys,
+} from './principal.keys';
+
+describe('isSystemUser', () => {
+  it('holds for su and anonymous alone', () => {
+    expect(isSystemUser('user:system:su')).toBe(true);
+    expect(isSystemUser('user:system:anonymous')).toBe(true);
+    expect(isSystemUser('user:system:alice')).toBe(false);
+    expect(isSystemUser('user:ldap:su')).toBe(false);
+  });
+});
+
+describe('isImplicitRole', () => {
+  it('holds for Everyone and Authenticated alone', () => {
+    expect(isImplicitRole('role:system.everyone')).toBe(true);
+    expect(isImplicitRole('role:system.authenticated')).toBe(true);
+    expect(isImplicitRole('role:system.admin')).toBe(false);
+  });
+});
+
+describe('isPlatformRole', () => {
+  it('holds for the system roles and the cms ones outside any project', () => {
+    expect(isPlatformRole('role:system.admin')).toBe(true);
+    expect(isPlatformRole('role:system.everyone')).toBe(true);
+    expect(isPlatformRole('role:cms.admin')).toBe(true);
+    expect(isPlatformRole('role:cms.cm.app')).toBe(true);
+  });
+
+  it('fails for a project role and a role an administrator created', () => {
+    expect(isPlatformRole('role:cms.project.default.owner')).toBe(false);
+    expect(isPlatformRole('role:store.manager')).toBe(false);
+  });
+});
 
 describe('toRoleKeys', () => {
   it('passes role keys through, in order', () => {

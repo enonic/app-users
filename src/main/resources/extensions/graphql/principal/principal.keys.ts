@@ -6,6 +6,39 @@ export const ADMIN_ROLE: RoleKey = 'role:system.admin';
 
 export const SUPER_USER: UserKey = `user:${SYSTEM_ID_PROVIDER}:su`;
 
+const SYSTEM_USERS: ReadonlySet<string> = new Set([
+  SUPER_USER,
+  `user:${SYSTEM_ID_PROVIDER}:anonymous`,
+]);
+
+/** `su` and `anonymous`, which the platform provisions and owns. */
+export function isSystemUser(key: string): boolean {
+  return SYSTEM_USERS.has(key);
+}
+
+const IMPLICIT_ROLES: ReadonlySet<string> = new Set([
+  'role:system.everyone',
+  'role:system.authenticated',
+]);
+
+/** Everyone and Authenticated, which nobody can be put into: membership in them is implied, not stored. */
+export function isImplicitRole(key: string): boolean {
+  return IMPLICIT_ROLES.has(key);
+}
+
+const SYSTEM_ROLE_PREFIX = 'role:system.';
+const CMS_ROLE_PREFIX = 'role:cms.';
+const PROJECT_ROLE_PREFIX = 'role:cms.project.';
+
+/** Roles that ship with the platform, by prefix as the client's `isPlatformRole` does: never a project's. */
+export function isPlatformRole(key: string): boolean {
+  if (key.startsWith(PROJECT_ROLE_PREFIX)) {
+    return false;
+  }
+
+  return key.startsWith(SYSTEM_ROLE_PREFIX) || key.startsWith(CMS_ROLE_PREFIX);
+}
+
 /**
  * Supersets of what XP accepts — `PrincipalKey.ofRole` and its siblings validate the id through
  * `ID_VALIDATOR`, which rejects spaces and HTML specials among others. These settle only which kind of
