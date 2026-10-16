@@ -86,6 +86,14 @@ export function setIdProviderEditorDisplayName(displayName: string): void {
   askWhetherNameIsFree();
 }
 
+// A name still derived from the display name was decided there, so leaving it shows the name's error too.
+export function markIdProviderEditorDisplayNameVisited(): void {
+  markIdProviderEditorFieldVisited('displayName');
+  if ($idProviderEditor.get().form.nameEdited !== true) {
+    markIdProviderEditorFieldVisited('name');
+  }
+}
+
 export function setIdProviderEditorName(name: string, { immediate = false } = {}): void {
   updateIdProviderEditorForm({ name });
   idProviderEditorDialog.markVisited('name');

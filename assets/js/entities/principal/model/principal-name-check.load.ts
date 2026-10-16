@@ -8,7 +8,7 @@ import {
 } from './availability-check';
 import { isGroupNameTaken } from './group-commands';
 import { isIdProviderNameTaken } from './id-provider-commands';
-import { isIllegalPrincipalName } from './principal-name';
+import { isIllegalIdProviderName, isIllegalPrincipalName } from './principal-name';
 import type { PrincipalType } from './principal.types';
 import { isRoleNameTaken } from './role-commands';
 import { isUserNameTaken } from './user-commands';
@@ -42,13 +42,18 @@ export function createPrincipalNameCheck(type: NameCheckedType): PrincipalNameCh
   return createAvailabilityCheck({
     ask: (idProvider, name, _except, signal) => ASK[type](idProvider, name, signal),
     keyOf: (idProvider, name) =>
-      isIllegalPrincipalName(name) ? undefined : keyOf(type, idProvider, name),
+      isIllegalName(type, name) ? undefined : keyOf(type, idProvider, name),
   });
 }
 
 //
 // * Internal
 //
+
+// A name the form refuses is not worth asking about.
+function isIllegalName(type: NameCheckedType, name: string): boolean {
+  return type === 'idProvider' ? isIllegalIdProviderName(name) : isIllegalPrincipalName(name);
+}
 
 // The answer is filed under the key the named thing would have, so one name in two providers is two
 // questions. A user or a group has no key until its provider is chosen; an ID provider's key is its name.
