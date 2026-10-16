@@ -14,7 +14,7 @@ const css = {
   displayNameInput: `${DIALOG} input#role-editor-display-name`,
   idInput: `${DIALOG} input#role-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#role-editor-description`,
-  validationMessages: `${DIALOG} [data-registry-id='general'] p.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='general'] div.text-error`,
 };
 
 class RoleEditorGeneralStepDialog extends RoleEditorStepDialog {

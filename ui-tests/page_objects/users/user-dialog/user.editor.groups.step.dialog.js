@@ -81,6 +81,11 @@ class UserEditorGroupsStepDialog extends UserEditorStepDialog {
     return this.combobox.getSelectedOptionIdProvider(displayName);
   }
 
+  // Waits for the group to be offered in the popup, opening it when it is closed.
+  waitForGroupOptionDisplayed(displayName) {
+    return this.combobox.waitForOptionDisplayed(displayName);
+  }
+
   waitForGroupSelected(displayName) {
     return this.waitForPrincipalPicked(displayName);
   }

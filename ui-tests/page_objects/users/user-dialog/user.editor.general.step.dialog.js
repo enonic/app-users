@@ -17,7 +17,7 @@ const css = {
   displayNameInput: `${DIALOG} input#user-editor-display-name`,
   idInput: `${DIALOG} input#user-editor-id`,
   emailInput: `${DIALOG} input#user-editor-email`,
-  validationMessages: `${DIALOG} [data-registry-id='general'] p.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='general'] div.text-error`,
 };
 
 class UserEditorGeneralStepDialog extends UserEditorStepDialog {

@@ -17,7 +17,7 @@ const css = {
   displayNameInput: `${DIALOG} input#group-editor-display-name`,
   idInput: `${DIALOG} input#group-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#group-editor-description`,
-  validationMessages: `${DIALOG} [data-registry-id='general'] p.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='general'] div.text-error`,
 };
 
 class GroupEditorGeneralStepDialog extends GroupEditorStepDialog {

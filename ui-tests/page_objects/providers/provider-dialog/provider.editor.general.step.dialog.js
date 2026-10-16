@@ -20,7 +20,7 @@ const css = {
   displayNameInput: `${DIALOG} input#id-provider-editor-display-name`,
   idInput: `${DIALOG} input#id-provider-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#id-provider-editor-description`,
-  validationMessages: `${PANEL} p.text-error`,
+  validationMessages: `${PANEL} div.text-error`,
   // Application
   applicationSelectorTrigger: APPLICATION_TRIGGER,
   // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.

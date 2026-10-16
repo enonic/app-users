@@ -27,7 +27,7 @@ const css = {
   passwordStrengthMeter: `${DIALOG} [data-component='PasswordStrengthMeter']`,
   // The first p.text-subtle of the step; the 'No public keys' line, when shown, comes after it.
   passwordNotice: `${DIALOG} [data-registry-id='credentials'] p.text-subtle`,
-  validationMessages: `${DIALOG} [data-registry-id='credentials'] p.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='credentials'] div.text-error`,
   // Public keys (system ID provider only)
   addPublicKeyButton: `${DIALOG} [data-registry-id='credentials'] button[data-component='Button'][aria-label='Add']`,
   publicKeyRows: `${DIALOG} [data-registry-id='credentials'] [data-component='GridList.Row'][id$='-key']`,
@@ -294,7 +294,16 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     }
   }
 
+  isDiscardPasswordButtonDisplayed() {
+    return this.isElementDisplayed(css.discardPasswordButton);
+  }
+
   // Strength meter
+
+  // Shown under the input while a password is typed; gone with it.
+  isPasswordStrengthMeterDisplayed() {
+    return this.isElementDisplayed(css.passwordStrengthMeter);
+  }
 
   // 0..4, from the meter's aria-valuenow
   async getPasswordStrengthScore() {

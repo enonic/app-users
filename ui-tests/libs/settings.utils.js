@@ -367,6 +367,24 @@ module.exports = {
       );
     }
   },
+  // Opens the user editor on the Credentials step: New, the user's ID provider picked by filtering,
+  // General filled. For the tests of the steps after General, which would otherwise walk the two
+  // before them in every test. `user` is what users.items.builder.buildUser() returns, with the
+  // display name of its `idProvider`.
+  //
+  // Precondition: the Users section is open (navigateToExtension(appConst.EXTENSIONS.USERS)).
+  async openNewUserEditorOnCredentials(user) {
+    const usersPage = new UsersPage();
+    const idProviderStep = new UserEditorIdProviderStepDialog();
+    const generalStep = new UserEditorGeneralStepDialog();
+    const credentialsStep = new UserEditorCredentialsStepDialog();
+    await usersPage.clickOnNewButton();
+    await idProviderStep.waitForLoaded();
+    await idProviderStep.doFilterAndSelectIdProviderByDisplayName(user.idProvider);
+    await idProviderStep.clickOnNextAndWaitForGeneralStep();
+    await generalStep.typeDataAndClickOnNext(user);
+    await credentialsStep.waitForLoaded();
+  },
   // Creates a service account through its editor and returns when it is listed. For the tests that
   // need an account to exist, not for the ones that test the editor itself.
   //

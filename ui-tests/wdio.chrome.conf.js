@@ -8,7 +8,8 @@ const height = properties.get('browser.height');
 const baseURL = properties.get('base.url');
 
 exports.config = {
-  specs: [path.join(__dirname, './specs/*.spec.js')],
+  // The specs of an editor live in a folder of their own (specs/user-editor, specs/role-editor).
+  specs: [path.join(__dirname, './specs/**/*.spec.js')],
 
   maxInstances: 1,
 

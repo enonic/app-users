@@ -171,6 +171,25 @@ class PrincipalCombobox extends SectionPage {
     return (await this.getOptions()).map(({ displayName }) => displayName);
   }
 
+  // Waits for the option with the display name to be offered. The popup is opened when it is not -
+  // a click outside it, on the 'Show ... from all ID providers' toggle say, closes it - and the
+  // list is re-read until the option is there: the picker searches the server and answers late.
+  async waitForOptionDisplayed(displayName, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.openDropdown();
+      await this.getBrowser().waitUntil(
+        async () => (await this.getOptionsDisplayName()).includes(displayName),
+        { timeout: ms, timeoutMsg: `the option '${displayName}' should be offered` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `'${this.placeholder}' picker - the option '${displayName}' should be offered`,
+        'err_principal_option',
+        err,
+      );
+    }
+  }
+
   // Names (the line under the display name) of the options shown, in display order.
   async getOptionsName() {
     return (await this.getOptions()).map(({ name }) => name);
@@ -183,6 +202,24 @@ class PrincipalCombobox extends SectionPage {
       throw new Error(`'${this.placeholder}' picker - no option '${displayName}' is shown`);
     }
     return option.checked;
+  }
+
+  // Waits for the option to be ticked - or, with `checked` false, unticked - in the opened popup:
+  // the tick renders a frame after the click, so a read right after it can see the old state.
+  async waitForOptionChecked(displayName, checked = true, ms = appConst.TIMEOUT.MEDIUM) {
+    const state = checked ? 'ticked' : 'unticked';
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.isOptionChecked(displayName)) === checked,
+        { timeout: ms, timeoutMsg: `the option '${displayName}' should be ${state}` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `'${this.placeholder}' picker - the option '${displayName}' should be ${state}`,
+        'err_principal_option_checked',
+        err,
+      );
+    }
   }
 
   // 'Searching…', 'Nothing matches the search', 'The search could not be run' - or undefined.
