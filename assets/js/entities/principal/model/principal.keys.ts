@@ -79,10 +79,6 @@ export function isSystemUser(key: PrincipalKey): boolean {
   return SYSTEM_USER_KEYS.has(key);
 }
 
-export function isAnonymousUser(key: PrincipalKey): boolean {
-  return key === ANONYMOUS_USER_KEY;
-}
-
 export const ADMIN_ROLE_KEY = 'role:system.admin';
 
 /**

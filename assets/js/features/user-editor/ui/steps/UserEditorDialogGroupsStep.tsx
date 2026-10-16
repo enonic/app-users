@@ -4,17 +4,12 @@ import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import { $idProviderModeByKey, allowsWrite, idProviderOf } from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
-import { i18n, useI18n } from '../../../../shared/i18n';
+import { useI18n } from '../../../../shared/i18n';
 import { $userEditDetail } from '../../model/user-edit-detail';
-import {
-  $userEditor,
-  $userEditorSystemUser,
-  updateUserEditorForm,
-} from '../../model/user-editor.store';
+import { $userEditor, updateUserEditorForm } from '../../model/user-editor.store';
 
 export function UserEditorDialogGroupsStep() {
   const { form } = useStore($userEditor, { keys: ['form'] });
-  const systemUser = useStore($userEditorSystemUser);
   const { status } = useStore($userEditDetail);
   const modes = useStore($idProviderModeByKey);
 
@@ -39,10 +34,6 @@ export function UserEditorDialogGroupsStep() {
       ),
     [form.groups, writable],
   );
-
-  if (systemUser) {
-    return <p className="text-subtle text-sm">{i18n('users.dialog.platformOwnedGroups')}</p>;
-  }
 
   return (
     <div className="flex flex-col gap-3">

@@ -94,7 +94,6 @@ export type { PrincipalMembers } from './model/principal-members';
 export {
   idProviderOf,
   IMPLICIT_ROLE_KEYS,
-  isAnonymousUser,
   isPlatformRole,
   isReservedRole,
   isPinnedMembership,
