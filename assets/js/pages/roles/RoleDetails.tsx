@@ -1,6 +1,5 @@
-import { Button } from '@enonic/ui';
-
 import {
+  IMPLICIT_ROLE_KEYS,
   idProviderOf,
   isPlatformRole,
   principalName,
@@ -8,6 +7,7 @@ import {
   type RoleDetail,
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
+import { PrincipalEditButton } from '../../entities/principal/ui/PrincipalEditButton';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
 import { openRoleEditorAt } from '../../features/role-editor';
 import { isReadOnlyMode } from '../../shared/config';
@@ -27,6 +27,9 @@ export function RoleDetails({
   'data-component': componentName = ROLE_DETAILS_NAME,
 }: RoleDetailsProps) {
   const readOnly = isReadOnlyMode();
+  // The platform owns its roles' names, and Everyone's and Authenticated's members too.
+  const platform = isPlatformRole(role.key);
+  const implicit = IMPLICIT_ROLE_KEYS.has(role.key);
 
   const editLabel = useI18n('browse.details.edit');
   const editUsersLabel = useI18n('roles.details.editUsers');
@@ -34,6 +37,9 @@ export function RoleDetails({
   const editGroupsLabel = useI18n('roles.details.editGroups');
   const noDescriptionLabel = useI18n('roles.details.noDescription');
   const systemLabel = useI18n('principal.type.system');
+  const lockedLabel = useI18n(
+    implicit ? 'principal.details.lockedImplicit' : 'principal.details.lockedPlatform',
+  );
 
   const { key, displayName, description, modifiedTime, members } = role;
 
@@ -51,16 +57,15 @@ export function RoleDetails({
         labelKey="roles.details.role"
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editLabel}
+              locked={platform}
               onClick={() => openRoleEditorAt(role, 'general')}
             />
           )
         }
       >
-        {isPlatformRole(key) && (
+        {platform && (
           <DetailsPanel.Field labelKey="roles.details.type">{systemLabel}</DetailsPanel.Field>
         )}
         <DetailsPanel.Field labelKey="roles.details.description">
@@ -71,6 +76,11 @@ export function RoleDetails({
             {formatDateTime(modifiedTime)}
           </DetailsPanel.Field>
         )}
+        {platform && (
+          <DetailsPanel.Field labelKey="principal.details.editing">
+            {lockedLabel}
+          </DetailsPanel.Field>
+        )}
       </DetailsPanel.Section>
 
       <DetailsPanel.Section
@@ -78,10 +88,9 @@ export function RoleDetails({
         count={users.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editUsersLabel}
+              locked={implicit}
               onClick={() => openRoleEditorAt(role, 'users')}
             />
           )
@@ -95,10 +104,9 @@ export function RoleDetails({
         count={serviceAccounts.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editServiceAccountsLabel}
+              locked={implicit}
               onClick={() => openRoleEditorAt(role, 'users')}
             />
           )
@@ -121,10 +129,9 @@ export function RoleDetails({
         count={groups.length}
         action={
           readOnly ? undefined : (
-            <Button
-              variant="outline"
-              size="sm"
+            <PrincipalEditButton
               label={editGroupsLabel}
+              locked={implicit}
               onClick={() => openRoleEditorAt(role, 'groups')}
             />
           )
