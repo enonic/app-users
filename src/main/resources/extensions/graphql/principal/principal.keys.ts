@@ -6,6 +6,16 @@ export const ADMIN_ROLE: RoleKey = 'role:system.admin';
 
 export const SUPER_USER: UserKey = `user:${SYSTEM_ID_PROVIDER}:su`;
 
+const SYSTEM_USERS: ReadonlySet<string> = new Set([
+  SUPER_USER,
+  `user:${SYSTEM_ID_PROVIDER}:anonymous`,
+]);
+
+/** `su` and `anonymous`, which the platform provisions and owns. */
+export function isSystemUser(key: string): boolean {
+  return SYSTEM_USERS.has(key);
+}
+
 const IMPLICIT_ROLES: ReadonlySet<string> = new Set([
   'role:system.everyone',
   'role:system.authenticated',

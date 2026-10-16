@@ -3,10 +3,20 @@ import { describe, expect, it } from 'vitest';
 import {
   isImplicitRole,
   isPlatformRole,
+  isSystemUser,
   toGroupKeys,
   toMemberKeys,
   toRoleKeys,
 } from './principal.keys';
+
+describe('isSystemUser', () => {
+  it('holds for su and anonymous alone', () => {
+    expect(isSystemUser('user:system:su')).toBe(true);
+    expect(isSystemUser('user:system:anonymous')).toBe(true);
+    expect(isSystemUser('user:system:alice')).toBe(false);
+    expect(isSystemUser('user:ldap:su')).toBe(false);
+  });
+});
 
 describe('isImplicitRole', () => {
   it('holds for Everyone and Authenticated alone', () => {
