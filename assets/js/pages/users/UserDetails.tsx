@@ -12,6 +12,7 @@ import {
 } from '../../entities/principal';
 import { PrincipalEditButton } from '../../entities/principal/ui/PrincipalEditButton';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
+import { PermissionReportSection } from '../../features/permission-report';
 import { openUserEditorAt } from '../../features/user-editor';
 import { isReadOnlyMode } from '../../shared/config';
 import { useI18n } from '../../shared/i18n';
@@ -169,6 +170,8 @@ export function UserDetails({
           )}
         </DetailsPanel.List>
       </DetailsPanel.Section>
+
+      <PermissionReportSection principalKey={key} />
     </DetailsPanel>
   );
 }

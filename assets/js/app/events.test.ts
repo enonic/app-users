@@ -20,6 +20,7 @@ describe('startSectionEvents', () => {
       appVersion: '8.1.0',
       eventsUrl: '/_/admin:events',
       readOnlyMode: false,
+      admin: true,
     });
   });
 

@@ -35,6 +35,7 @@ dependencies {
     include xplibs.io
     include xplibs.node
     include xplibs.portal
+    include xplibs.repo
 
     include libs.lib.graphql
 
