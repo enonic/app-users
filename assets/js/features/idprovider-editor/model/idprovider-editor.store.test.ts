@@ -6,6 +6,7 @@ import {
   $idProviderEditorApplication,
   $idProviderEditorErrors,
   closeIdProviderEditor,
+  markIdProviderEditorDisplayNameVisited,
   idProviderEditorDialog,
   idProviderNameCheck,
   openIdProviderEditor,
@@ -41,7 +42,7 @@ describe('openIdProviderEditor', () => {
     openIdProviderEditor({ mode: 'create' });
     updateIdProviderEditorForm({ displayName: 'Company directory' });
 
-    expect($idProviderEditor.get().form.name).toBe('company.directory');
+    expect($idProviderEditor.get().form.name).toBe('company-directory');
   });
 });
 
@@ -137,5 +138,25 @@ describe('$idProviderEditorApplication', () => {
     unsubscribe();
 
     expect(listener).not.toHaveBeenCalled();
+  });
+});
+
+describe('markIdProviderEditorDisplayNameVisited', () => {
+  it('shows the error of a name derived from the display name', () => {
+    openIdProviderEditor({ mode: 'create' });
+    updateIdProviderEditorForm({ displayName: '.' });
+
+    markIdProviderEditorDisplayNameVisited();
+
+    expect($idProviderEditor.get().visited).toEqual(new Set(['displayName', 'name']));
+  });
+
+  it('leaves a typed name to its own field', () => {
+    openIdProviderEditor({ mode: 'create' });
+    updateIdProviderEditorForm({ name: 'typed' });
+
+    markIdProviderEditorDisplayNameVisited();
+
+    expect($idProviderEditor.get().visited).toEqual(new Set(['displayName']));
   });
 });

@@ -187,6 +187,14 @@ export function setUserEditorDisplayName(displayName: string): void {
   askWhetherNameIsFree();
 }
 
+// A name still derived from the display name was decided there, so leaving it shows the name's error too.
+export function markUserEditorDisplayNameVisited(): void {
+  markUserEditorFieldVisited('displayName');
+  if ($userEditor.get().form.nameEdited !== true) {
+    markUserEditorFieldVisited('name');
+  }
+}
+
 export function setUserEditorName(name: string, { immediate = false } = {}): void {
   updateUserEditorForm({ name });
   userEditorDialog.markVisited('name');

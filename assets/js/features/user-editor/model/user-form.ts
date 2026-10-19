@@ -2,6 +2,7 @@ import {
   derivePrincipalName,
   idProviderOf,
   isIllegalPrincipalName,
+  isReservedPrincipalName,
   SYSTEM_ID_PROVIDER,
   type PrincipalRef,
   type User,
@@ -142,6 +143,8 @@ export function validateUserForm(
     const name = form.name.trim();
     if (name.length === 0) {
       errors.name = 'users.dialog.idRequired';
+    } else if (isReservedPrincipalName(name)) {
+      errors.name = 'users.dialog.idReserved';
     } else if (isIllegalPrincipalName(name)) {
       errors.name = 'users.dialog.idInvalid';
     }

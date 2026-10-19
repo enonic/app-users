@@ -1,8 +1,9 @@
 import type { PropertyTreeJson } from '@enonic/ui-types';
 
 import {
-  derivePrincipalName,
-  isIllegalPrincipalName,
+  deriveIdProviderName,
+  isIllegalIdProviderName,
+  isReservedIdProviderName,
   SYSTEM_ID_PROVIDER,
   type IdProvider,
   type IdProviderAccess,
@@ -85,7 +86,7 @@ export function nextIdProviderForm(
     return next;
   }
 
-  return { ...next, name: derivePrincipalName(next.displayName) };
+  return { ...next, name: deriveIdProviderName(next.displayName) };
 }
 
 /**
@@ -137,7 +138,9 @@ export function validateIdProviderForm(
     const name = form.name.trim();
     if (name.length === 0) {
       errors.name = 'idProviders.dialog.idRequired';
-    } else if (isIllegalPrincipalName(name)) {
+    } else if (isReservedIdProviderName(name)) {
+      errors.name = 'idProviders.dialog.idReserved';
+    } else if (isIllegalIdProviderName(name)) {
       errors.name = 'idProviders.dialog.idInvalid';
     }
   }
@@ -149,6 +152,20 @@ export function validateIdProviderForm(
   }
 
   return errors;
+}
+
+/**
+ * Told, never enforced: a dot is valid in `IdProviderKey`, but the key becomes a level of the vhost
+ * configuration (`mapping.<name>.idProvider.<key>`), where a dot splits it. Only a create can still pick
+ * another ID.
+ */
+export function idProviderNameWarning(
+  form: IdProviderForm,
+  mode: StepDialogMode,
+): string | undefined {
+  return mode === 'create' && form.name.trim().includes('.')
+    ? 'idProviders.dialog.idDotted'
+    : undefined;
 }
 
 /**

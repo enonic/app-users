@@ -5,6 +5,7 @@ import {
   $roleEditor,
   $roleEditorErrors,
   closeRoleEditor,
+  markRoleEditorDisplayNameVisited,
   openRoleEditor,
   openRoleEditorAt,
   roleNameCheck,
@@ -93,5 +94,25 @@ describe('$roleEditorErrors', () => {
     roleNameCheck.fail('role:store.manager');
 
     expect($roleEditorErrors.get().name).toBeUndefined();
+  });
+});
+
+describe('markRoleEditorDisplayNameVisited', () => {
+  it('shows the error of a name derived from the display name', () => {
+    openRoleEditor({ mode: 'create' });
+    updateRoleEditorForm({ displayName: '.' });
+
+    markRoleEditorDisplayNameVisited();
+
+    expect($roleEditor.get().visited).toEqual(new Set(['displayName', 'name']));
+  });
+
+  it('leaves a typed name to its own field', () => {
+    openRoleEditor({ mode: 'create' });
+    updateRoleEditorForm({ name: 'typed' });
+
+    markRoleEditorDisplayNameVisited();
+
+    expect($roleEditor.get().visited).toEqual(new Set(['displayName']));
   });
 });

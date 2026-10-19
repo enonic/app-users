@@ -142,7 +142,39 @@ describe('ask', () => {
     check.ask('system', 'ali ce');
     expect(check.$state.get()).toEqual({ status: 'idle' });
 
+    check.ask('system', 'ali#ce');
+    expect(check.$state.get()).toEqual({ status: 'idle' });
+
+    check.ask('system', '..');
+    expect(check.$state.get()).toEqual({ status: 'idle' });
+
     expect(asked).not.toHaveBeenCalled();
+  });
+
+  it('leaves the names each kind reserves alone', () => {
+    const roleCheck = createPrincipalNameCheck('role');
+    const idProviderCheck = createPrincipalNameCheck('idProvider');
+
+    roleCheck.ask('', '.');
+    idProviderCheck.ask('', 'Roles');
+
+    expect(roleCheck.$state.get()).toEqual({ status: 'idle' });
+    expect(idProviderCheck.$state.get()).toEqual({ status: 'idle' });
+    expect(askedForRole).not.toHaveBeenCalled();
+    expect(askedForIdProvider).not.toHaveBeenCalled();
+
+    roleCheck.forget();
+    idProviderCheck.forget();
+  });
+
+  // A role may take the name an ID provider may not.
+  it('asks about a role named roles', () => {
+    const roleCheck = createPrincipalNameCheck('role');
+
+    roleCheck.ask('', 'roles');
+
+    expect(roleCheck.$state.get()).toEqual({ status: 'pending', key: 'role:roles' });
+    roleCheck.forget();
   });
 
   it('blocks nothing when the check itself fails', async () => {
