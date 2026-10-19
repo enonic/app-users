@@ -35,7 +35,8 @@ configurations {
 }
 
 def unpackDir = layout.buildDirectory.dir( 'install' ).get()
-def distroDir = unpackDir.dir( "enonic-xp-generic-$version" )
+// The distro and the app it bundles are of xpVersion, not of this build's version.
+def distroDir = unpackDir.dir( "enonic-xp-generic-$xpVersion" )
 def xpHome = distroDir.dir('home')
 def testConfDir = "$projectDir/test-config"
 def deployDir = distroDir.dir( 'home/deploy' )
@@ -92,7 +93,7 @@ tasks.register( 'deployApp', DefaultTask ) {
     group = 'Test Setup'
 
     def appName = rootProject.tasks.named("jar", Jar).get().archiveBaseName.get()
-    def appFile = distroDir.file("system/40/${appName}-${version}.jar").asFile
+    def appFile = distroDir.file("system/40/${appName}-${xpVersion}.jar").asFile
 
     outputs.files( appFile )
     outputs.upToDateWhen { false }

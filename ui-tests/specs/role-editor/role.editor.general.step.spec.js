@@ -27,6 +27,7 @@ describe("role.editor.general.step.spec - the role editor's General step: the ID
     let role = userItemsBuilder.buildRole({ displayName: ROLE_NAME });
     // 1. New: the editor opens on General.
     await rolesPage.clickOnNewButton();
+    await settingsUtils.saveScreenshot('role-editor-general-step');
     await generalStep.waitForLoaded();
     assert.equal(await generalStep.getStepTitle(), 'General');
     // 2. Empty: the inputs are there, nothing is reported yet, Next is disabled.

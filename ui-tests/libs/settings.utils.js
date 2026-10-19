@@ -23,6 +23,7 @@ const IdProvidersPage = require('../page_objects/providers/id.providers.page');
 const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
 const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
 const IdProviderEditorSummaryStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.summary.step.dialog');
+const userItemsBuilder = require('./users.items.builder');
 const fs = require('fs');
 const path = require('path');
 
@@ -731,6 +732,50 @@ module.exports = {
     });
     console.log('Group created via API: ' + data.createGroup.key);
     return Object.assign({}, group, { key: data.createGroup.key });
+  },
+
+  // Creates a user through the GraphQL API instead of the editor. `user` is what
+  // users.items.builder.buildUser() returns: { idProvider, displayName, id, email?, password?,
+  // roles?, groups? }. `idProvider` is a display name or a key; `roles` are display names or
+  // 'role:' keys; `groups` are group keys ('group:system:editors') - the API grants membership to
+  // a key, and a display name is not one. An empty or missing `password` leaves the user without
+  // one. Returns the user with its 'key'.
+  async createUserViaApi(user) {
+    if (!user.idProvider) {
+      throw new Error(`createUserViaApi: '${user.displayName}' names no ID provider`);
+    }
+    const groups = user.groups ?? [];
+    const notKeys = groups.filter((group) => !group.startsWith('group:'));
+    if (notKeys.length > 0) {
+      throw new Error(
+        `createUserViaApi: groups are group keys ('group:<provider>:<name>'), got '${notKeys.join("', '")}'`,
+      );
+    }
+    const query = `mutation ($idProvider: String!, $name: String!, $displayName: String!, $email: String, $password: String, $roles: [String!], $groups: [String!]) {
+      createUser(idProvider: $idProvider, name: $name, displayName: $displayName, email: $email, password: $password, roles: $roles, groups: $groups) {
+        key displayName
+      }
+    }`;
+    const data = await this.sendGraphQlRequest(query, {
+      idProvider: await this.resolveIdProviderKey(user.idProvider),
+      name: user.id ?? user.name ?? user.displayName,
+      displayName: user.displayName,
+      email: user.email,
+      password: user.password || undefined,
+      roles: await this.resolveRoleKeys(user.roles ?? []),
+      groups,
+    });
+    console.log('User created via API: ' + data.createUser.key);
+    return Object.assign({}, user, { key: data.createUser.key });
+  },
+
+  // Creates a service account - a user of the system ID provider - through the GraphQL API.
+  // `serviceAccount` is what users.items.builder.buildServiceAccount() returns; the rest is as
+  // createUserViaApi(). Returns the service account with its 'key'.
+  createServiceAccountViaApi(serviceAccount) {
+    return this.createUserViaApi(
+      Object.assign({}, serviceAccount, { idProvider: userItemsBuilder.SYSTEM_ID_PROVIDER }),
+    );
   },
 
   // Deletes principals (users, groups, roles) through the GraphQL API. `keys` is a principal key, a
