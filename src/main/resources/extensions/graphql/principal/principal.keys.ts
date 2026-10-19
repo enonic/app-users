@@ -6,6 +6,9 @@ export const ADMIN_ROLE: RoleKey = 'role:system.admin';
 
 export const SUPER_USER: UserKey = `user:${SYSTEM_ID_PROVIDER}:su`;
 
+// ! The system users, implicit roles and platform-role prefixes below repeat the client's
+// ! `assets/js/entities/principal/model/principal.keys.ts`, which the server bundle cannot import:
+// ! change one and the other must follow, or the UI lock and the server refusal drift apart.
 const SYSTEM_USERS: ReadonlySet<string> = new Set([
   SUPER_USER,
   `user:${SYSTEM_ID_PROVIDER}:anonymous`,
@@ -30,7 +33,7 @@ const SYSTEM_ROLE_PREFIX = 'role:system.';
 const CMS_ROLE_PREFIX = 'role:cms.';
 const PROJECT_ROLE_PREFIX = 'role:cms.project.';
 
-/** Roles that ship with the platform, by prefix as the client's `isPlatformRole` does: never a project's. */
+/** Roles that ship with the platform, by prefix: never a project's. */
 export function isPlatformRole(key: string): boolean {
   if (key.startsWith(PROJECT_ROLE_PREFIX)) {
     return false;
