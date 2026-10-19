@@ -182,15 +182,6 @@ describe('setUserEditorEmail', () => {
     });
   });
 
-  it('asks nothing for su and anonymous, which have no email', () => {
-    openUserEditorAt({ ...ALICE, key: 'user:system:su' as User['key'], login: 'su' }, 'general');
-
-    setUserEditorEmail('su@example.com', { immediate: true });
-
-    expect(userEmailCheck.$state.get()).toEqual({ status: 'idle' });
-    expect(holder).not.toHaveBeenCalled();
-  });
-
   it('asks the new provider about an address already typed', async () => {
     openUserEditor({ mode: 'create' });
     updateUserEditorForm({ idProvider: 'ldap' });

@@ -119,8 +119,6 @@ export function sameUserForm(saved: UserForm, edited: UserForm): boolean {
 }
 
 export type UserFormContext = {
-  /** `su` or `anonymous`, which have no email and are asked for none. */
-  systemUser?: boolean;
   /**
    * A user whose fields a remote system owns: the dialog shows no step for them, so an error on one
    * could never be seen or fixed — and a membership edit must still save.
@@ -131,7 +129,7 @@ export type UserFormContext = {
 export function validateUserForm(
   form: UserForm,
   mode: StepDialogMode,
-  { systemUser = false, remoteUser = false }: UserFormContext = {},
+  { remoteUser = false }: UserFormContext = {},
 ): UserFormErrors {
   const errors: UserFormErrors = {};
 
@@ -150,7 +148,7 @@ export function validateUserForm(
     }
   }
 
-  if (!systemUser && !remoteUser) {
+  if (!remoteUser) {
     const email = form.email.trim();
     if (email.length === 0) {
       errors.email = 'users.dialog.emailRequired';

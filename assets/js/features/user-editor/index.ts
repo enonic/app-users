@@ -5,7 +5,6 @@ export {
   $userEditorProviders,
   $userEditorServiceAccount,
   $userEditorStepLocks,
-  $userEditorSystemUser,
   closeUserEditor,
   markUserEditorFieldVisited,
   openServiceAccountEditor,

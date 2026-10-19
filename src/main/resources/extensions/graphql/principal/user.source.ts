@@ -21,7 +21,7 @@ import {
   requireWritable,
   requireWritablePrincipals,
 } from './id-provider-mode';
-import { ADMIN_ROLE, SUPER_USER, USER_KEY } from './principal.keys';
+import { ADMIN_ROLE, isSystemUser, SUPER_USER, USER_KEY } from './principal.keys';
 import {
   byName,
   clampCount,
@@ -204,6 +204,7 @@ export function listUserGroups(key: UserKey, transitive: boolean): PrincipalItem
 }
 
 export function addPublicKey(key: string, publicKey: string, label?: string): PublicKeyItem {
+  requireNotSystemUser(key, 'public keys');
   requireWritablePrincipals([key], 'user');
 
   const kid = generateKid(publicKey);
@@ -234,6 +235,7 @@ export function addPublicKey(key: string, publicKey: string, label?: string): Pu
 }
 
 export function removePublicKey(key: string, kid: string): boolean {
+  requireNotSystemUser(key, 'public keys');
   requireWritablePrincipals([key], 'user');
 
   const profile = modifyProfile<PublicKeyProfile>({
@@ -289,7 +291,7 @@ export function updateUser(key: string, changes: UserChanges): User {
   // ! section and the Group dialog write them too. Only the user's own fields and credentials are the
   // ! remote system's, so those are what a locked provider refuses. `updateGroup` reasons the same way.
   const locked = !isWritablePrincipal(key, 'user');
-  if (locked && (changes.password != null || scalarsMoved(current, changes))) {
+  if (locked && (changes.password != null || changesDisplayNameOrEmail(current, changes))) {
     requireWritablePrincipals([key], 'user');
   }
   requireWritablePrincipals([...changes.addGroups, ...changes.removeGroups], 'group');
@@ -298,6 +300,11 @@ export function updateUser(key: string, changes: UserChanges): User {
   // ! password and the other memberships from applying before it does. `role.source` does the same.
   if (key === SUPER_USER && changes.removeRoles.includes(ADMIN_ROLE)) {
     throw new Error(`Cannot remove [${SUPER_USER}] from [${ADMIN_ROLE}]`);
+  }
+
+  // Memberships stay open: #2793 settles them apart from the fields and credentials refused here.
+  if (changes.password != null || changesDisplayNameOrEmail(current, changes)) {
+    requireNotSystemUser(key, 'password, display name or email');
   }
 
   if (changes.password != null) {
@@ -397,11 +404,17 @@ function named(providers?: readonly string[]): readonly string[] {
 }
 
 // Both sides trimmed: the client trims what it sends, and a value a remote system stored may not be.
-function scalarsMoved(current: User, changes: UserChanges): boolean {
+function changesDisplayNameOrEmail(current: User, changes: UserChanges): boolean {
   return (
     changes.displayName.trim() !== current.displayName.trim() ||
     (changes.email ?? '').trim() !== (current.email ?? '').trim()
   );
+}
+
+function requireNotSystemUser(key: string, what: string): void {
+  if (isSystemUser(key)) {
+    throw new Error(`Cannot change the ${what} of [${key}]: the platform owns it`);
+  }
 }
 
 function requirePassword(password: string): void {

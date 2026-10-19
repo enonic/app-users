@@ -718,6 +718,56 @@ describe('updateUser', () => {
     expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
   });
 
+  it('refuses a password for su and anonymous, writing nothing', () => {
+    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+
+    expect(() =>
+      updateUser(
+        'user:system:su',
+        changes({
+          displayName: 'Super User',
+          password: 'Str0ng!Passw0rd',
+          addGroups: ['group:system:ops'],
+        }),
+      ),
+    ).toThrow(
+      'Cannot change the password, display name or email of [user:system:su]: the platform owns it',
+    );
+    vi.mocked(getPrincipal).mockReturnValue(user('anonymous', 'Anonymous User'));
+    expect(() =>
+      updateUser('user:system:anonymous', changes({ displayName: 'Anonymous User', password: '' })),
+    ).toThrow(/Cannot change the password, display name or email of \[user:system:anonymous\]/);
+
+    expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('refuses a display name or email change for su, writing nothing', () => {
+    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+
+    expect(() => updateUser('user:system:su', changes({ displayName: 'Root' }))).toThrow(
+      /Cannot change the password, display name or email of \[user:system:su\]/,
+    );
+    expect(() =>
+      updateUser('user:system:su', changes({ displayName: 'Super User', email: 'su@example.com' })),
+    ).toThrow(/Cannot change the password, display name or email of \[user:system:su\]/);
+
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('lets the memberships of su change while its fields stay', () => {
+    modifiable('su');
+    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+
+    updateUser(
+      'user:system:su',
+      changes({ displayName: 'Super User', addGroups: ['group:system:ops'] }),
+    );
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('group:system:ops', ['user:system:su']);
+  });
+
   it('fails when the platform loses the user between the guard and the write', () => {
     vi.mocked(getPrincipal).mockReturnValue(user('alice', 'Alice'));
     vi.mocked(modifyUser).mockReturnValue(null);
@@ -760,6 +810,18 @@ describe('addPublicKey', () => {
     expect(profile.publicKeys.map(({ kid }) => kid)).toEqual(['other', 'abc123']);
   });
 
+  it('refuses su and anonymous, storing nothing', () => {
+    stored();
+
+    expect(() => addPublicKey('user:system:su', 'pem')).toThrow(
+      'Cannot change the public keys of [user:system:su]: the platform owns it',
+    );
+    expect(() => addPublicKey('user:system:anonymous', 'pem')).toThrow(
+      /Cannot change the public keys of \[user:system:anonymous\]/,
+    );
+    expect(vi.mocked(modifyProfile)).not.toHaveBeenCalled();
+  });
+
   it('refuses a key already stored under the same id', () => {
     stored({ kid: 'abc123' });
 
@@ -797,6 +859,16 @@ describe('removePublicKey', () => {
       publicKeys: { kid: string }[];
     };
     expect(profile.publicKeys.map(({ kid }) => kid)).toEqual(['kept']);
+  });
+
+  it('refuses su and anonymous, removing nothing', () => {
+    expect(() => removePublicKey('user:system:su', 'kid')).toThrow(
+      'Cannot change the public keys of [user:system:su]: the platform owns it',
+    );
+    expect(() => removePublicKey('user:system:anonymous', 'kid')).toThrow(
+      /Cannot change the public keys of \[user:system:anonymous\]/,
+    );
+    expect(vi.mocked(modifyProfile)).not.toHaveBeenCalled();
   });
 
   it('answers true for an id nothing answers to', () => {

@@ -151,10 +151,6 @@ describe('validateUserForm', () => {
     );
   });
 
-  it('asks a system user for no email', () => {
-    expect(validateUserForm(form({ email: '' }), 'edit', { systemUser: true })).toEqual({});
-  });
-
   it('requires a provider only while creating, because the key carries it', () => {
     expect(validateUserForm(form({ idProvider: '' }), 'create').idProvider).toBe(
       'users.dialog.idProviderRequired',

@@ -9,7 +9,6 @@ import {
   $userEditorErrors,
   $userEditorProviders,
   $userEditorServiceAccount,
-  $userEditorSystemUser,
   markUserEditorDisplayNameVisited,
   setUserEditorDisplayName,
   setUserEditorEmail,
@@ -25,7 +24,6 @@ const EMAIL_ID = 'user-editor-email';
 export function UserEditorDialogGeneralStep() {
   const { form, visited, mode } = useStore($userEditor, { keys: ['form', 'visited', 'mode'] });
   const errors = useStore($userEditorErrors);
-  const systemUser = useStore($userEditorSystemUser);
   const serviceAccount = useStore($userEditorServiceAccount);
   const idCheck = useStore(userNameCheck.$state);
   const providers = useStore($userEditorProviders);
@@ -87,20 +85,17 @@ export function UserEditorDialogGeneralStep() {
         />
       </div>
 
-      {/* Email input — `su` and `anonymous` have none, and `validateUserForm` asks them for none. */}
-      {!systemUser && (
-        <div className="flex flex-col gap-1.5">
-          <FieldLabel text={emailLabel} required htmlFor={EMAIL_ID} />
-          <Input
-            id={EMAIL_ID}
-            type="email"
-            value={form.email}
-            error={emailError}
-            onInput={({ currentTarget }) => setUserEditorEmail(currentTarget.value)}
-            onBlur={() => setUserEditorEmail(form.email, { immediate: true })}
-          />
-        </div>
-      )}
+      <div className="flex flex-col gap-1.5">
+        <FieldLabel text={emailLabel} required htmlFor={EMAIL_ID} />
+        <Input
+          id={EMAIL_ID}
+          type="email"
+          value={form.email}
+          error={emailError}
+          onInput={({ currentTarget }) => setUserEditorEmail(currentTarget.value)}
+          onBlur={() => setUserEditorEmail(form.email, { immediate: true })}
+        />
+      </div>
     </div>
   );
 }
