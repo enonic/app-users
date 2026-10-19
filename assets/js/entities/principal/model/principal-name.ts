@@ -9,6 +9,21 @@ const ROLES_FOLDER = 'roles';
 
 const COMBINING_MARKS = /\p{M}/gu;
 
+// Latin letters with no decomposition, which `normalize` leaves whole.
+const UNDECOMPOSED_LATIN: Readonly<Record<string, string>> = {
+  æ: 'ae',
+  ð: 'd',
+  đ: 'd',
+  ı: 'i',
+  ł: 'l',
+  ø: 'o',
+  œ: 'oe',
+  ß: 'ss',
+  þ: 'th',
+};
+
+const UNDECOMPOSED_LATIN_LETTERS = new RegExp(`[${Object.keys(UNDECOMPOSED_LATIN).join('')}]`, 'g');
+
 // Any letter but a-z: one with no Latin form is dropped, not turned into a separator.
 const NON_LATIN_LETTERS = /[^\P{L}a-z]/gu;
 
@@ -16,6 +31,8 @@ const NOT_IN_NAME = /[^a-z0-9_.-]+/g;
 
 // A dot in an ID provider's key makes the vhost configuration key that carries it ambiguous.
 const NOT_IN_ID_PROVIDER_NAME = /[^a-z0-9_-]+/g;
+
+const SPACED_SEPARATOR = / *([._-]) */g;
 
 export function derivePrincipalName(displayName: string): string {
   return deriveName(displayName, NOT_IN_NAME, '.');
@@ -46,13 +63,14 @@ export function isReservedIdProviderName(name: string): boolean {
 //
 
 function deriveName(displayName: string, notInName: RegExp, separator: string): string {
-  // Lowercase before decomposing: `İ` lowercases to `i` plus a combining dot, which goes with the marks.
   return displayName
+    .normalize('NFKD')
     .toLowerCase()
-    .normalize('NFD')
     .replace(COMBINING_MARKS, '')
+    .replace(UNDECOMPOSED_LATIN_LETTERS, (letter) => UNDECOMPOSED_LATIN[letter] ?? '')
     .replace(NON_LATIN_LETTERS, '')
     .replace(notInName, ' ')
     .trim()
+    .replace(SPACED_SEPARATOR, '$1')
     .replace(/ +/g, separator);
 }
