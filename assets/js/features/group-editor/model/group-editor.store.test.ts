@@ -7,6 +7,7 @@ import {
   $groupEditorErrors,
   $groupEditorProviders,
   closeGroupEditor,
+  markGroupEditorDisplayNameVisited,
   groupNameCheck,
   openGroupEditor,
   openGroupEditorAt,
@@ -167,5 +168,25 @@ describe('the fields of a group a remote system owns', () => {
     receiveIdProviderNames(ok([{ key: 'store', displayName: 'Store', mode: 'LOCAL' }]));
 
     expect($groupEditorErrors.get().displayName).toBe('groups.dialog.displayNameRequired');
+  });
+});
+
+describe('markGroupEditorDisplayNameVisited', () => {
+  it('shows the error of a name derived from the display name', () => {
+    openGroupEditor({ mode: 'create' });
+    updateGroupEditorForm({ displayName: '.' });
+
+    markGroupEditorDisplayNameVisited();
+
+    expect($groupEditor.get().visited).toEqual(new Set(['displayName', 'name']));
+  });
+
+  it('leaves a typed name to its own field', () => {
+    openGroupEditor({ mode: 'create' });
+    updateGroupEditorForm({ name: 'typed' });
+
+    markGroupEditorDisplayNameVisited();
+
+    expect($groupEditor.get().visited).toEqual(new Set(['displayName']));
   });
 });

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { IdProvider, IdProviderPermission, PrincipalRef } from '../../../entities/principal';
 import {
+  idProviderNameWarning,
   initialIdProviderForm,
   isSystemIdProvider,
   mergePermissions,
@@ -85,8 +86,14 @@ describe('nextIdProviderForm', () => {
     const next = { ...previous, displayName: 'Company Directory EU' };
 
     expect(nextIdProviderForm(previous, next, { mode: 'create' }).name).toBe(
-      'company.directory.eu',
+      'company-directory-eu',
     );
+  });
+
+  it('turns a dot in the display name into a dash rather than suggest a dotted name', () => {
+    const next = { ...previous, displayName: 'Corp.Directory' };
+
+    expect(nextIdProviderForm(previous, next, { mode: 'create' }).name).toBe('corp-directory');
   });
 
   it('keeps a typed name exactly as typed, in the same edit that reports it', () => {
@@ -150,6 +157,27 @@ describe('validateIdProviderForm', () => {
     expect(validateIdProviderForm(form({ name: 'company directory' }), 'create').name).toBe(
       'idProviders.dialog.idInvalid',
     );
+  });
+
+  it.each(['a#b', 'test@', 'иван', 'blåbær'])('refuses %s, which XP rejects', (name) => {
+    expect(validateIdProviderForm(form({ name }), 'create').name).toBe(
+      'idProviders.dialog.idInvalid',
+    );
+  });
+
+  it.each(['.', '..', '_', 'Roles'])(
+    'refuses the reserved name %s with its own message',
+    (name) => {
+      expect(validateIdProviderForm(form({ name }), 'create').name).toBe(
+        'idProviders.dialog.idReserved',
+      );
+    },
+  );
+
+  it('accepts a name XP can store, once trimmed', () => {
+    expect(
+      validateIdProviderForm(form({ name: '  Store.Manager-1_x  ' }), 'create').name,
+    ).toBeUndefined();
   });
 
   it('says nothing about the name while editing, where it is locked', () => {
@@ -335,5 +363,26 @@ describe('sameIdProviderForm', () => {
     });
 
     expect(sameIdProviderForm(saved, edited)).toBe(true);
+  });
+});
+
+describe('idProviderNameWarning', () => {
+  it('warns about a dot in a new provider ID', () => {
+    expect(idProviderNameWarning(form({ name: 'my.idp' }), 'create')).toBe(
+      'idProviders.dialog.idDotted',
+    );
+  });
+
+  it('says nothing about an undotted ID', () => {
+    expect(idProviderNameWarning(form({ name: 'my-idp' }), 'create')).toBeUndefined();
+  });
+
+  // The ID of an existing provider is fixed, so there is nothing left to choose.
+  it('says nothing while editing', () => {
+    expect(idProviderNameWarning(form({ name: 'my.idp' }), 'edit')).toBeUndefined();
+  });
+
+  it('leaves saving open for a dotted ID', () => {
+    expect(validateIdProviderForm(form({ name: 'my.idp' }), 'create').name).toBeUndefined();
   });
 });

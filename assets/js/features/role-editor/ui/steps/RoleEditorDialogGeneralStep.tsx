@@ -7,7 +7,7 @@ import { FieldLabel } from '../../../../shared/ui/FieldLabel';
 import {
   $roleEditor,
   $roleEditorErrors,
-  markRoleEditorFieldVisited,
+  markRoleEditorDisplayNameVisited,
   roleNameCheck,
   setRoleEditorDisplayName,
   setRoleEditorName,
@@ -36,7 +36,7 @@ export function RoleEditorDialogGeneralStep() {
   const displayNameError = shown.displayName === undefined ? undefined : i18n(shown.displayName);
   // A taken ID is told at once: the answer arrives after the field was typed in, visited or not.
   const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
-  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name);
+  const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name.trim());
 
   return (
     <div className="flex flex-col gap-5">
@@ -48,7 +48,7 @@ export function RoleEditorDialogGeneralStep() {
           value={form.displayName}
           error={displayNameError}
           onInput={({ currentTarget }) => setRoleEditorDisplayName(currentTarget.value)}
-          onBlur={() => markRoleEditorFieldVisited('displayName')}
+          onBlur={markRoleEditorDisplayNameVisited}
         />
       </div>
 

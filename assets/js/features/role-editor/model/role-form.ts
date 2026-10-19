@@ -1,6 +1,7 @@
 import {
   derivePrincipalName,
   isIllegalPrincipalName,
+  isReservedPrincipalName,
   principalName,
   type PrincipalRef,
   type PrincipalType,
@@ -104,6 +105,8 @@ export function validateRoleForm(form: RoleForm, mode: StepDialogMode): RoleForm
     const name = form.name.trim();
     if (name.length === 0) {
       errors.name = 'roles.dialog.idRequired';
+    } else if (isReservedPrincipalName(name)) {
+      errors.name = 'roles.dialog.idReserved';
     } else if (isIllegalPrincipalName(name)) {
       errors.name = 'roles.dialog.idInvalid';
     }

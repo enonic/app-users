@@ -2,6 +2,7 @@ import {
   derivePrincipalName,
   idProviderOf,
   isIllegalPrincipalName,
+  isReservedPrincipalName,
   principalName,
   type Group,
   type PrincipalRef,
@@ -117,6 +118,8 @@ export function validateGroupForm(
     const name = form.name.trim();
     if (name.length === 0) {
       errors.name = 'groups.dialog.idRequired';
+    } else if (isReservedPrincipalName(name)) {
+      errors.name = 'groups.dialog.idReserved';
     } else if (isIllegalPrincipalName(name)) {
       errors.name = 'groups.dialog.idInvalid';
     }
