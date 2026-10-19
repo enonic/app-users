@@ -52,9 +52,18 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
     let options = {
       logLevel: 'error',
       automationProtocol: 'webdriver',
+      // webdriverio 10 makes $() throw when a selector matches more than one element; the page
+      // objects wait on the first match of a list (options, rows) and pick from $$() afterwards.
+      // The same setting as in wdio.chrome.conf.js.
+      strictSelectors: false,
       capabilities: {
         browserName: browser_name,
         browserVersion: browser_version,
+        // ! WebDriver Classic, not BiDi: in a BiDi session webdriverio probes every known shadow
+        // ! root before each lookup, and an XPath cannot be evaluated in one - each probe fails
+        // ! after ~1.5 s, and the 3 s waits of the specs run out. The page objects locate the light
+        // ! DOM by XPath and pierce a section's root with '>>>', which Classic serves directly.
+        'wdio:enforceWebDriverClassic': true,
         'goog:chromeOptions': makeChromeOptions(isHeadless, width, height),
       },
     };

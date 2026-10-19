@@ -489,23 +489,21 @@ module.exports = {
   // cookie. The browser must be logged in (doLogin) and stay on the XP admin origin.
 
   // Posts a GraphQL request from the current page and returns { status, text } without interpreting it.
+  // An async function under execute(): webdriverio awaits its promise (executeAsync is gone in v10).
   async postGraphQl(url, query, variables) {
-    return await this.getBrowser().executeAsync(
-      function (url, query, variables, done) {
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
-          body: JSON.stringify({ query: query, variables: variables }),
-        })
-          .then(function (response) {
-            return response.text().then(function (text) {
-              done({ status: response.status, text: text });
-            });
-          })
-          .catch(function (err) {
-            done({ status: 0, text: String(err) });
+    return await this.getBrowser().execute(
+      async function (url, query, variables) {
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ query: query, variables: variables }),
           });
+          return { status: response.status, text: await response.text() };
+        } catch (err) {
+          return { status: 0, text: String(err) };
+        }
       },
       url,
       query,
@@ -810,11 +808,10 @@ module.exports = {
     const appBarTitle = `//header//h2[text()='${section}']`;
     await this.waitForElementDisplayed(appBarTitle, ms);
 
-    // Light DOM: the shadow host of the section's mount. Inactive sections stay mounted with the
-    // class 'hidden', hence the scoping by section id and the ':not(.hidden)'.
-    const shadowHost =
-      `div[data-component='SectionMount'][data-section='${this.getSectionId(section)}']:not(.hidden)` +
-      " div[data-component='SectionMountHost']";
+    // Light DOM: the shadow host of the section's mount, the SectionMount element itself. Inactive
+    // sections stay mounted too, hence the scoping by section id and by the status only the visible
+    // one carries.
+    const shadowHost = `div[data-component='SectionMount'][data-section='${this.getSectionId(section)}'][data-status='active']`;
     // 'BrowseToolbar' once a section carries its own data-component (app-users#2764),
     // 'Toolbar.Container' until then (app-applications). One selector each: a deep selector must
     // not be a comma-separated list, webdriverio splits it on the commas when it re-matches the

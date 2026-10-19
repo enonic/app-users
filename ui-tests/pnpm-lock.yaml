@@ -26,6 +26,9 @@ importers:
       allure-commandline:
         specifier: ^2.46.1
         version: 2.46.1
+      mocha:
+        specifier: ^12.0.3
+        version: 12.0.3
       properties-reader:
         specifier: ^3.0.1
         version: 3.0.1
