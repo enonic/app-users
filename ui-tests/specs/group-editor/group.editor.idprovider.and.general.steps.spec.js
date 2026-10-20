@@ -149,7 +149,7 @@ describe("group.editor.id.provider.step.spec - the group editor's ID provider st
     assert.equal(await idProviderStep.combobox.getPopupMessage(), 'Nothing matches the search');
   });
 
-  // TODO bug: github.com/enonic/app-users/issues/2796
+  // TODO bug: github.com/enonic/app-users/issues/2851
   it.skip('GIVEN an ID provider has been selected by filtering WHEN Next then Previous have been clicked THEN the General step should open AND the pick should still be there on the way back', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.GROUPS);
     let groupsPage = new GroupsPage();
