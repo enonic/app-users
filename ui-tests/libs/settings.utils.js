@@ -23,6 +23,9 @@ const IdProvidersPage = require('../page_objects/providers/id.providers.page');
 const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
 const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
 const IdProviderEditorSummaryStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.summary.step.dialog');
+const RolesPage = require('../page_objects/roles/roles.page');
+const RoleEditorGeneralStepDialog = require('../page_objects/roles/role-dialog/role.editor.general.step.dialog');
+const RoleEditorUsersStepDialog = require('../page_objects/roles/role-dialog/role.editor.users.step.dialog');
 const userItemsBuilder = require('./users.items.builder');
 const fs = require('fs');
 const path = require('path');
@@ -63,23 +66,9 @@ module.exports = {
     let el = await this.getBrowser().$(selector);
     return await el.isDisplayed();
   },
-  getPageSource() {
-    return this.getBrowser().getPageSource();
-  },
 
   getTitle() {
     return this.getBrowser().getTitle();
-  },
-
-  scrollViewPort(viewportElement, step) {
-    return this.getBrowser().execute('arguments[0].scrollTop=arguments[1]', viewportElement, step);
-  },
-  async doCloseCurrentBrowserTab() {
-    let title = await this.getBrowser().getTitle();
-    if (title !== 'Enonic XP Home') {
-      //return await this.getBrowser().closeWindow();
-      return await this.getBrowser().execute('window.close();');
-    }
   },
   async saveScreenshotUniqueName(namePart) {
     let screenshotName = appConst.generateRandomName(namePart);
@@ -133,75 +122,8 @@ module.exports = {
     }
     throw new Error('Browser tab with title ' + title + ' was not found');
   },
-  async waitForNewTabAndSwitch(expectedTitlePart) {
-    let matchedHandle = null;
-    try {
-      await this.getBrowser().waitUntil(
-        async () => {
-          let handles = await this.getBrowser().getWindowHandles();
-          for (const handle of handles) {
-            try {
-              await this.getBrowser().switchToWindow(handle);
-              let currentTitle = await this.getBrowser().getTitle();
-              if (currentTitle.includes(expectedTitlePart)) {
-                matchedHandle = handle;
-                return true;
-              }
-            } catch (err) {
-              // the tab is not ready yet or has been closed
-            }
-          }
-          return false;
-        },
-        {
-          timeout: appConst.TIMEOUT.MEDIUM,
-          timeoutMsg: `A browser tab with the title containing '${expectedTitlePart}' was not opened`,
-        },
-      );
-      return matchedHandle;
-    } catch (err) {
-      let screenshot = await this.saveScreenshotUniqueName('err_new_tab_switch');
-      throw new Error(
-        `Error when switching to the new browser tab: ${err} [screenshot]: ${screenshot}`,
-      );
-    }
-  },
-
-  async doPressBackspace() {
-    await this.getBrowser().keys('\uE003');
-    return await this.getBrowser().pause(200);
-  },
   doPressTabKey() {
     return this.getBrowser().keys('Tab');
-  },
-  doPressEnter() {
-    return this.getBrowser().keys('Enter');
-  },
-  async doSwitchToNewTab() {
-    try {
-      console.log('testUtils:switching to the new wizard tab...');
-      let tabs = await this.getBrowser().getWindowHandles();
-      await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
-    } catch (err) {
-      throw new Error('Error when switching to the new browser tab ' + err);
-    }
-  },
-
-  async doSwitchToTabByIndex(index) {
-    try {
-      let tabs = await this.getBrowser().getWindowHandles();
-      await this.getBrowser().switchToWindow(tabs[index]);
-    } catch (err) {
-      throw new Error('Error occurred during switching to the new browser tab ' + err);
-    }
-  },
-  async doSwitchToPrevTab() {
-    try {
-      let tabs = await this.getBrowser().getWindowHandles();
-      return await this.getBrowser().switchToWindow(tabs[tabs.length - 2]);
-    } catch (err) {
-      throw new Error('Error occurred while switching to the new browser tab' + err);
-    }
   },
 
   async doCloseAllWindowTabsAndNavigateToHome() {
@@ -264,25 +186,6 @@ module.exports = {
     return await Promise.all(pr).then((result) => {
       return elements.filter((el, i) => result[i]);
     });
-  },
-  waitUntilDisplayed(selector, ms) {
-    return this.getBrowser().waitUntil(
-      () => {
-        return this.getDisplayedElements(selector).then((result) => {
-          return result.length > 0;
-        });
-      },
-      {
-        timeout: ms,
-        timeoutMsg: 'Timeout exception. Element ' + selector + ' still not visible in: ' + ms,
-      },
-    );
-  },
-  loadUrl(url) {
-    return this.getBrowser().url(url);
-  },
-  async saveScreen(name) {
-    await this.getBrowser().saveScreen();
   },
   // Opens a section (extension) of the Settings app through the sections rail and waits until its
   // browse screen is shown: the rail link is active, the app bar shows the section title and the
@@ -385,6 +288,22 @@ module.exports = {
     await idProviderStep.clickOnNextAndWaitForGeneralStep();
     await generalStep.typeDataAndClickOnNext(user);
     await credentialsStep.waitForLoaded();
+  },
+  // Opens the role editor and fills its General step, so it is left standing on Users. For the
+  // tests of the steps that follow General.
+  //
+  // `role` is what users.items.builder.buildRole() returns: { displayName, id, description? }. A
+  // role lives in the system store, so there is no ID provider step: the editor opens on General.
+  //
+  // Precondition: the Roles section is open (navigateToExtension(appConst.EXTENSIONS.ROLES)).
+  async openNewRoleEditorOnUsers(role) {
+    const rolesPage = new RolesPage();
+    const generalStep = new RoleEditorGeneralStepDialog();
+    const usersStep = new RoleEditorUsersStepDialog();
+    await rolesPage.clickOnNewButton();
+    await generalStep.waitForLoaded();
+    await generalStep.typeDataAndClickOnNext(role);
+    await usersStep.waitForLoaded();
   },
   // Creates a service account through its editor and returns when it is listed. For the tests that
   // need an account to exist, not for the ones that test the editor itself.

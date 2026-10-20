@@ -37,6 +37,20 @@ class RoleEditorUsersStepDialog extends RoleEditorStepDialog {
     return this.getPickerOptions();
   }
 
+  // The ID provider shown beside the offered user - its key ('system'), not its display name.
+  getUserOptionIdProvider(displayName) {
+    return this.combobox.getOptionIdProvider(displayName);
+  }
+
+  // Waits for the user to be offered in the popup, opening it when it is closed.
+  waitForUserOptionDisplayed(displayName) {
+    return this.combobox.waitForOptionDisplayed(displayName);
+  }
+
+  clearUsersFilterInput() {
+    return this.combobox.clearFilterInput();
+  }
+
   clickOnUserOption(displayName) {
     return this.clickOnPickerOption(displayName);
   }
@@ -61,8 +75,17 @@ class RoleEditorUsersStepDialog extends RoleEditorStepDialog {
     return this.getPickedPrincipals();
   }
 
+  // The ID provider shown beside the picked user - its key ('system'), not its display name.
+  getSelectedUserIdProvider(displayName) {
+    return this.combobox.getSelectedOptionIdProvider(displayName);
+  }
+
   waitForUserSelected(displayName) {
     return this.waitForPrincipalPicked(displayName);
+  }
+
+  waitForUserNotSelected(displayName) {
+    return this.combobox.waitForOptionNotSelected(displayName);
   }
 
   // Clicks on the Remove icon of the picked user.

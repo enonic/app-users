@@ -246,6 +246,23 @@ class PrincipalCombobox extends SectionPage {
     return messages.length === 0 ? undefined : await messages[0].getText();
   }
 
+  // Waits for the popup to show the message, e.g. 'Nothing matches the search': the picker searches
+  // the server, so 'Searching…' is what a read right after the filter was typed finds.
+  async waitForPopupMessage(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(async () => (await this.getPopupMessage()) === expected, {
+        timeout: ms,
+        timeoutMsg: `the popup should show '${expected}'`,
+      });
+    } catch (err) {
+      await this.handleError(
+        `'${this.placeholder}' picker - the popup should show '${expected}'`,
+        'err_principal_popup_message',
+        err,
+      );
+    }
+  }
+
   // Ticks (or unticks) the option with the display name in the opened popup - staged until Apply.
   async clickOnOptionByDisplayName(displayName) {
     try {

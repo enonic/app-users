@@ -37,6 +37,20 @@ class RoleEditorGroupsStepDialog extends RoleEditorStepDialog {
     return this.getPickerOptions();
   }
 
+  // The ID provider shown beside the offered group - its key ('system'), not its display name.
+  getGroupOptionIdProvider(displayName) {
+    return this.combobox.getOptionIdProvider(displayName);
+  }
+
+  // Waits for the group to be offered in the popup, opening it when it is closed.
+  waitForGroupOptionDisplayed(displayName) {
+    return this.combobox.waitForOptionDisplayed(displayName);
+  }
+
+  clearGroupsFilterInput() {
+    return this.combobox.clearFilterInput();
+  }
+
   clickOnGroupOption(displayName) {
     return this.clickOnPickerOption(displayName);
   }
@@ -61,8 +75,17 @@ class RoleEditorGroupsStepDialog extends RoleEditorStepDialog {
     return this.getPickedPrincipals();
   }
 
+  // The ID provider shown beside the picked group - its key ('system'), not its display name.
+  getSelectedGroupIdProvider(displayName) {
+    return this.combobox.getSelectedOptionIdProvider(displayName);
+  }
+
   waitForGroupSelected(displayName) {
     return this.waitForPrincipalPicked(displayName);
+  }
+
+  waitForGroupNotSelected(displayName) {
+    return this.combobox.waitForOptionNotSelected(displayName);
   }
 
   // Clicks on the Remove icon of the picked group.
