@@ -34,6 +34,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
       },
     );
     ID_PROVIDER = await settingsUtils.createIdProviderViaApi(idProvider);
+    await settingsUtils.saveScreenshot('id-provider-created_for-credentials-step');
   });
 
   // 'Set password' opens an empty input, which the step rejects until something is typed; a password

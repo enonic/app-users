@@ -33,6 +33,7 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
       },
     );
     ID_PROVIDER = await settingsUtils.createIdProviderViaApi(idProvider);
+    await settingsUtils.saveScreenshot('id-provider-created');
   });
 
   // The step asks for a display name, an ID and an email, and Next waits for all three. The ID is
@@ -50,6 +51,7 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
     });
     // 1. Open the editor, pick the provider, get to General.
     await usersPage.clickOnNewButton();
+    await settingsUtils.saveScreenshot('user-editor-id-provider-step');
     await idProviderStep.waitForLoaded();
     await idProviderStep.doFilterAndSelectIdProviderByDisplayName(PROVIDER_NAME);
     await idProviderStep.clickOnNextAndWaitForGeneralStep();

@@ -20,19 +20,6 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
   const PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
   let USER_NAME = userItemsBuilder.generateRandomName('user');
 
-  it('WHEN Users page is loaded THEN New button should be enabled AND Delete is disabled', async () => {
-    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let usersPage = new UsersPage();
-    // 1. Verify that New button is enabled.
-    await usersPage.waitForNewButtonEnabled();
-    // 2. Verify that Delete button is disabled.
-    await usersPage.waitForDeleteButtonDisabled();
-    await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
-    //await usersPage.waitForSelectedSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
-    let actual = await usersPage.getSelectedSortOrder();
-    assert.equal(actual, appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
-  });
-
   it('WHEN new created idProvider has been selected THEN Delete button should be enabled', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     ID_PROVIDER = userItemsBuilder.buildIdProvider({
@@ -49,6 +36,19 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
     await idProvidersPage.waitForDeleteButtonEnabled();
     // 3. Verify that New button is enabled.
     await idProvidersPage.waitForNewButtonEnabled();
+  });
+
+  it('WHEN Users page is loaded THEN New button should be enabled AND Delete is disabled', async () => {
+    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
+    let usersPage = new UsersPage();
+    // 1. Verify that New button is enabled.
+    await usersPage.waitForNewButtonEnabled();
+    // 2. Verify that Delete button is disabled.
+    await usersPage.waitForDeleteButtonDisabled();
+    await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
+    //await usersPage.waitForSelectedSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
+    let actual = await usersPage.getSelectedSortOrder();
+    assert.equal(actual, appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
   });
 
   it('WHEN new created user has been selected THEN Delete button should be enabled', async () => {

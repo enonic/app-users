@@ -36,6 +36,10 @@ function buildCss(container, step, placeholder) {
     optionDisplayName: ITEM_LABEL.DISPLAY_NAME,
     optionName: ITEM_LABEL.NAME,
     optionCheckbox: "[data-component='Checkbox'] input",
+    // The ID provider of an option, the muted span beside its label (shown by the pickers that span
+    // providers: groups, members, permissions). A direct child: the name under the display name is
+    // a muted <small> inside the label.
+    optionIdProvider: ':scope > span.text-subtle',
     popupMessage: COMBOBOX.POPUP_MESSAGE,
     // The picked principals, listed under the input; a row's id is '<key>-picked'.
     pickedRows: PICKED,
@@ -147,17 +151,21 @@ class PrincipalCombobox extends SectionPage {
   // Options
 
   // The options shown in the opened popup as [{ displayName, name, key, checked, disabled }], in
-  // display order. `name` is the line under the display name, `key` the principal key.
+  // display order. `name` is the line under the display name, `key` the principal key,
+  // `idProvider` the key of the provider shown beside the label - undefined when the picker shows
+  // none.
   async getOptions() {
     await this.waitForElementDisplayed(this.css.popup);
     const options = await this.getDisplayedElements(this.css.options);
     const result = [];
     for (const option of options) {
       const checkboxes = await option.$$(this.css.optionCheckbox);
+      const providers = await option.$$(this.css.optionIdProvider);
       result.push({
         displayName: await option.$(this.css.optionDisplayName).getText(),
         name: await option.$(this.css.optionName).getText(),
         key: await option.getAttribute('data-value'),
+        idProvider: providers.length === 0 ? undefined : await providers[0].getText(),
         checked:
           checkboxes.length > 0 && (await checkboxes[0].getAttribute('aria-checked')) === 'true',
         disabled: (await option.getAttribute('aria-disabled')) === 'true',
@@ -188,6 +196,16 @@ class PrincipalCombobox extends SectionPage {
         err,
       );
     }
+  }
+
+  // The ID provider shown beside the option - its key ('system'), not its display name - or
+  // undefined when the option shows none. Throws when the option is not offered.
+  async getOptionIdProvider(displayName) {
+    const option = (await this.getOptions()).find((item) => item.displayName === displayName);
+    if (option === undefined) {
+      throw new Error(`'${this.placeholder}' picker - '${displayName}' is not offered`);
+    }
+    return option.idProvider;
   }
 
   // Names (the line under the display name) of the options shown, in display order.
@@ -226,6 +244,23 @@ class PrincipalCombobox extends SectionPage {
   async getPopupMessage() {
     const messages = await this.getDisplayedElements(this.css.popupMessage);
     return messages.length === 0 ? undefined : await messages[0].getText();
+  }
+
+  // Waits for the popup to show the message, e.g. 'Nothing matches the search': the picker searches
+  // the server, so 'Searching…' is what a read right after the filter was typed finds.
+  async waitForPopupMessage(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(async () => (await this.getPopupMessage()) === expected, {
+        timeout: ms,
+        timeoutMsg: `the popup should show '${expected}'`,
+      });
+    } catch (err) {
+      await this.handleError(
+        `'${this.placeholder}' picker - the popup should show '${expected}'`,
+        'err_principal_popup_message',
+        err,
+      );
+    }
   }
 
   // Ticks (or unticks) the option with the display name in the opened popup - staged until Apply.

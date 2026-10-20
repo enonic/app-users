@@ -23,6 +23,10 @@ const IdProvidersPage = require('../page_objects/providers/id.providers.page');
 const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
 const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
 const IdProviderEditorSummaryStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.summary.step.dialog');
+const RolesPage = require('../page_objects/roles/roles.page');
+const RoleEditorGeneralStepDialog = require('../page_objects/roles/role-dialog/role.editor.general.step.dialog');
+const RoleEditorUsersStepDialog = require('../page_objects/roles/role-dialog/role.editor.users.step.dialog');
+const userItemsBuilder = require('./users.items.builder');
 const fs = require('fs');
 const path = require('path');
 
@@ -62,23 +66,9 @@ module.exports = {
     let el = await this.getBrowser().$(selector);
     return await el.isDisplayed();
   },
-  getPageSource() {
-    return this.getBrowser().getPageSource();
-  },
 
   getTitle() {
     return this.getBrowser().getTitle();
-  },
-
-  scrollViewPort(viewportElement, step) {
-    return this.getBrowser().execute('arguments[0].scrollTop=arguments[1]', viewportElement, step);
-  },
-  async doCloseCurrentBrowserTab() {
-    let title = await this.getBrowser().getTitle();
-    if (title !== 'Enonic XP Home') {
-      //return await this.getBrowser().closeWindow();
-      return await this.getBrowser().execute('window.close();');
-    }
   },
   async saveScreenshotUniqueName(namePart) {
     let screenshotName = appConst.generateRandomName(namePart);
@@ -132,75 +122,8 @@ module.exports = {
     }
     throw new Error('Browser tab with title ' + title + ' was not found');
   },
-  async waitForNewTabAndSwitch(expectedTitlePart) {
-    let matchedHandle = null;
-    try {
-      await this.getBrowser().waitUntil(
-        async () => {
-          let handles = await this.getBrowser().getWindowHandles();
-          for (const handle of handles) {
-            try {
-              await this.getBrowser().switchToWindow(handle);
-              let currentTitle = await this.getBrowser().getTitle();
-              if (currentTitle.includes(expectedTitlePart)) {
-                matchedHandle = handle;
-                return true;
-              }
-            } catch (err) {
-              // the tab is not ready yet or has been closed
-            }
-          }
-          return false;
-        },
-        {
-          timeout: appConst.TIMEOUT.MEDIUM,
-          timeoutMsg: `A browser tab with the title containing '${expectedTitlePart}' was not opened`,
-        },
-      );
-      return matchedHandle;
-    } catch (err) {
-      let screenshot = await this.saveScreenshotUniqueName('err_new_tab_switch');
-      throw new Error(
-        `Error when switching to the new browser tab: ${err} [screenshot]: ${screenshot}`,
-      );
-    }
-  },
-
-  async doPressBackspace() {
-    await this.getBrowser().keys('\uE003');
-    return await this.getBrowser().pause(200);
-  },
   doPressTabKey() {
     return this.getBrowser().keys('Tab');
-  },
-  doPressEnter() {
-    return this.getBrowser().keys('Enter');
-  },
-  async doSwitchToNewTab() {
-    try {
-      console.log('testUtils:switching to the new wizard tab...');
-      let tabs = await this.getBrowser().getWindowHandles();
-      await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
-    } catch (err) {
-      throw new Error('Error when switching to the new browser tab ' + err);
-    }
-  },
-
-  async doSwitchToTabByIndex(index) {
-    try {
-      let tabs = await this.getBrowser().getWindowHandles();
-      await this.getBrowser().switchToWindow(tabs[index]);
-    } catch (err) {
-      throw new Error('Error occurred during switching to the new browser tab ' + err);
-    }
-  },
-  async doSwitchToPrevTab() {
-    try {
-      let tabs = await this.getBrowser().getWindowHandles();
-      return await this.getBrowser().switchToWindow(tabs[tabs.length - 2]);
-    } catch (err) {
-      throw new Error('Error occurred while switching to the new browser tab' + err);
-    }
   },
 
   async doCloseAllWindowTabsAndNavigateToHome() {
@@ -263,25 +186,6 @@ module.exports = {
     return await Promise.all(pr).then((result) => {
       return elements.filter((el, i) => result[i]);
     });
-  },
-  waitUntilDisplayed(selector, ms) {
-    return this.getBrowser().waitUntil(
-      () => {
-        return this.getDisplayedElements(selector).then((result) => {
-          return result.length > 0;
-        });
-      },
-      {
-        timeout: ms,
-        timeoutMsg: 'Timeout exception. Element ' + selector + ' still not visible in: ' + ms,
-      },
-    );
-  },
-  loadUrl(url) {
-    return this.getBrowser().url(url);
-  },
-  async saveScreen(name) {
-    await this.getBrowser().saveScreen();
   },
   // Opens a section (extension) of the Settings app through the sections rail and waits until its
   // browse screen is shown: the rail link is active, the app bar shows the section title and the
@@ -384,6 +288,22 @@ module.exports = {
     await idProviderStep.clickOnNextAndWaitForGeneralStep();
     await generalStep.typeDataAndClickOnNext(user);
     await credentialsStep.waitForLoaded();
+  },
+  // Opens the role editor and fills its General step, so it is left standing on Users. For the
+  // tests of the steps that follow General.
+  //
+  // `role` is what users.items.builder.buildRole() returns: { displayName, id, description? }. A
+  // role lives in the system store, so there is no ID provider step: the editor opens on General.
+  //
+  // Precondition: the Roles section is open (navigateToExtension(appConst.EXTENSIONS.ROLES)).
+  async openNewRoleEditorOnUsers(role) {
+    const rolesPage = new RolesPage();
+    const generalStep = new RoleEditorGeneralStepDialog();
+    const usersStep = new RoleEditorUsersStepDialog();
+    await rolesPage.clickOnNewButton();
+    await generalStep.waitForLoaded();
+    await generalStep.typeDataAndClickOnNext(role);
+    await usersStep.waitForLoaded();
   },
   // Creates a service account through its editor and returns when it is listed. For the tests that
   // need an account to exist, not for the ones that test the editor itself.
@@ -488,23 +408,21 @@ module.exports = {
   // cookie. The browser must be logged in (doLogin) and stay on the XP admin origin.
 
   // Posts a GraphQL request from the current page and returns { status, text } without interpreting it.
+  // An async function under execute(): webdriverio awaits its promise (executeAsync is gone in v10).
   async postGraphQl(url, query, variables) {
-    return await this.getBrowser().executeAsync(
-      function (url, query, variables, done) {
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
-          body: JSON.stringify({ query: query, variables: variables }),
-        })
-          .then(function (response) {
-            return response.text().then(function (text) {
-              done({ status: response.status, text: text });
-            });
-          })
-          .catch(function (err) {
-            done({ status: 0, text: String(err) });
+    return await this.getBrowser().execute(
+      async function (url, query, variables) {
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ query: query, variables: variables }),
           });
+          return { status: response.status, text: await response.text() };
+        } catch (err) {
+          return { status: 0, text: String(err) };
+        }
       },
       url,
       query,
@@ -733,6 +651,50 @@ module.exports = {
     return Object.assign({}, group, { key: data.createGroup.key });
   },
 
+  // Creates a user through the GraphQL API instead of the editor. `user` is what
+  // users.items.builder.buildUser() returns: { idProvider, displayName, id, email?, password?,
+  // roles?, groups? }. `idProvider` is a display name or a key; `roles` are display names or
+  // 'role:' keys; `groups` are group keys ('group:system:editors') - the API grants membership to
+  // a key, and a display name is not one. An empty or missing `password` leaves the user without
+  // one. Returns the user with its 'key'.
+  async createUserViaApi(user) {
+    if (!user.idProvider) {
+      throw new Error(`createUserViaApi: '${user.displayName}' names no ID provider`);
+    }
+    const groups = user.groups ?? [];
+    const notKeys = groups.filter((group) => !group.startsWith('group:'));
+    if (notKeys.length > 0) {
+      throw new Error(
+        `createUserViaApi: groups are group keys ('group:<provider>:<name>'), got '${notKeys.join("', '")}'`,
+      );
+    }
+    const query = `mutation ($idProvider: String!, $name: String!, $displayName: String!, $email: String, $password: String, $roles: [String!], $groups: [String!]) {
+      createUser(idProvider: $idProvider, name: $name, displayName: $displayName, email: $email, password: $password, roles: $roles, groups: $groups) {
+        key displayName
+      }
+    }`;
+    const data = await this.sendGraphQlRequest(query, {
+      idProvider: await this.resolveIdProviderKey(user.idProvider),
+      name: user.id ?? user.name ?? user.displayName,
+      displayName: user.displayName,
+      email: user.email,
+      password: user.password || undefined,
+      roles: await this.resolveRoleKeys(user.roles ?? []),
+      groups,
+    });
+    console.log('User created via API: ' + data.createUser.key);
+    return Object.assign({}, user, { key: data.createUser.key });
+  },
+
+  // Creates a service account - a user of the system ID provider - through the GraphQL API.
+  // `serviceAccount` is what users.items.builder.buildServiceAccount() returns; the rest is as
+  // createUserViaApi(). Returns the service account with its 'key'.
+  createServiceAccountViaApi(serviceAccount) {
+    return this.createUserViaApi(
+      Object.assign({}, serviceAccount, { idProvider: userItemsBuilder.SYSTEM_ID_PROVIDER }),
+    );
+  },
+
   // Deletes principals (users, groups, roles) through the GraphQL API. `keys` is a principal key, a
   // list of them, or what a create*ViaApi() returned (its 'key' is taken). Throws when any was not
   // deleted.
@@ -765,11 +727,10 @@ module.exports = {
     const appBarTitle = `//header//h2[text()='${section}']`;
     await this.waitForElementDisplayed(appBarTitle, ms);
 
-    // Light DOM: the shadow host of the section's mount. Inactive sections stay mounted with the
-    // class 'hidden', hence the scoping by section id and the ':not(.hidden)'.
-    const shadowHost =
-      `div[data-component='SectionMount'][data-section='${this.getSectionId(section)}']:not(.hidden)` +
-      " div[data-component='SectionMountHost']";
+    // Light DOM: the shadow host of the section's mount, the SectionMount element itself. Inactive
+    // sections stay mounted too, hence the scoping by section id and by the status only the visible
+    // one carries.
+    const shadowHost = `div[data-component='SectionMount'][data-section='${this.getSectionId(section)}'][data-status='active']`;
     // 'BrowseToolbar' once a section carries its own data-component (app-users#2764),
     // 'Toolbar.Container' until then (app-applications). One selector each: a deep selector must
     // not be a comma-separated list, webdriverio splits it on the commas when it re-matches the

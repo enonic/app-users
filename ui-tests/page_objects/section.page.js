@@ -4,10 +4,11 @@
 const Page = require('./page');
 const appConst = require('../libs/app_const');
 
-// A section is rendered inside its own shadow root (SectionMount > SectionMountHost > #shadow-root).
-// Chrome cannot evaluate XPath below a shadow root, so every lookup here is CSS, scoped to the
-// active section's host through webdriverio's deep selector. Inactive sections stay mounted with
-// the class 'hidden'.
+// A section is rendered inside its own shadow root, attached to the SectionMount element itself
+// (app-settings docs/extensions/host-facts.md): it carries data-section and, on the visible one,
+// data-status='active'. Chrome cannot evaluate XPath below a shadow root, so every lookup here is
+// CSS, scoped to the active section's host through webdriverio's deep selector. Inactive sections
+// stay mounted, without the status; the 'hidden' class sits on their wrapper, not on the host.
 const DEEP = '>>> ';
 
 class SectionPage extends Page {
@@ -17,10 +18,7 @@ class SectionPage extends Page {
   }
 
   get shadowHostLocator() {
-    return (
-      `div[data-component='SectionMount'][data-section='${this.sectionId}']:not(.hidden)` +
-      " div[data-component='SectionMountHost']"
-    );
+    return `div[data-component='SectionMount'][data-section='${this.sectionId}'][data-status='active']`;
   }
 
   async getShadowHost(ms = appConst.TIMEOUT.MEDIUM) {

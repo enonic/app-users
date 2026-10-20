@@ -22,9 +22,10 @@ share (log in, open a section, create a user or an ID provider).
 
 ## Running
 
-The suite is a Gradle subproject of this repository and a package of its pnpm workspace. The whole
-run — unpack an XP distro, deploy the app, start the server, run the specs, write the Allure
-report, stop the server — is one task from the repository root:
+The suite is a Gradle subproject of this repository and a pnpm project of its own (its
+`pnpm-workspace.yaml` keeps it out of the root workspace, its `pnpm-lock.yaml` pins the wdio
+toolchain). The whole run — unpack an XP distro, deploy the app, start the server, run the specs,
+write the Allure report, stop the server — is one task from the repository root:
 
 ```bash
 ./gradlew build
@@ -38,11 +39,12 @@ distro; pass `-PappUrl=<url>` to deploy another build. The XP version comes from
 Against an XP that is already running at `base.url` of `browser.properties`:
 
 ```bash
-pnpm --filter test_app_users run test_users_ext:wdio_chrome
+pnpm --dir ui-tests run test_users_ext:wdio_chrome
 ```
 
 The report lands in `ui-tests/build/reports/allure-report`, screenshots of failures in
 `ui-tests/build/reports/screenshots`.
 
-The suite is not part of CI: it needs a running XP with the `dev` test applications and a Chrome
-matching `browser.version` in `browser.properties`.
+On GitHub the `ui-tests` job of `.github/workflows/gradle.yml` runs the same Gradle task after
+`build`, with the jar that job uploaded, and keeps `ui-tests/build/reports` as an artifact.
+WebdriverIO downloads the Chrome of `browser.version` (`browser.properties`) itself.

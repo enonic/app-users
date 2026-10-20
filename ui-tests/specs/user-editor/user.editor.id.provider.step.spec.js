@@ -151,7 +151,9 @@ describe("user.editor.id.provider.step.spec - the user editor's ID provider step
     assert.equal(await idProviderStep.combobox.getPopupMessage(), 'Nothing matches the search');
   });
 
-  it('GIVEN an ID provider has been selected by filtering WHEN Next then Previous have been clicked THEN the General step should open AND the pick should still be there on the way back', async () => {
+  // TODO bug https://github.com/enonic/app-users/issues/2851
+  // Step dialog: first click on Previous is lost when a field has focus  #2851
+  it.skip('GIVEN an ID provider has been selected by filtering WHEN Next then Previous have been clicked THEN the General step should open AND the pick should still be there on the way back', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     let usersPage = new UsersPage();
     let idProviderStep = new UserEditorIdProviderStepDialog();

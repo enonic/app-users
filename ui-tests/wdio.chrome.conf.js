@@ -19,6 +19,7 @@ exports.config = {
     {
       browserName: 'chrome',
       browserVersion: browser_version,
+      'wdio:enforceWebDriverClassic': true,
       'goog:chromeOptions': {
         args: [
           '--headless',

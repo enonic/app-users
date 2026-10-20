@@ -51,6 +51,16 @@ class GroupEditorMembersStepDialog extends GroupEditorStepDialog {
     return this.getPickerOptions();
   }
 
+  // The ID provider shown beside the offered user or group - its key ('system'), not its display
+  // name.
+  getMemberOptionIdProvider(displayName) {
+    return this.combobox.getOptionIdProvider(displayName);
+  }
+
+  clearMembersFilterInput() {
+    return this.combobox.clearFilterInput();
+  }
+
   clickOnMemberOption(displayName) {
     return this.clickOnPickerOption(displayName);
   }
@@ -73,6 +83,11 @@ class GroupEditorMembersStepDialog extends GroupEditorStepDialog {
   // Display names of the picked members.
   getSelectedMembers() {
     return this.getPickedPrincipals();
+  }
+
+  // Waits for the user or group to be offered in the popup, opening it when it is closed.
+  waitForMemberOptionDisplayed(displayName) {
+    return this.combobox.waitForOptionDisplayed(displayName);
   }
 
   waitForMemberSelected(displayName) {
