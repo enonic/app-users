@@ -36,8 +36,8 @@ function buildCss(pageComponent) {
     selectAllCheckbox: `${HEADER} [data-component='Checkbox'] input`,
     selectAllCheckboxLabel: `${HEADER} [data-component='Checkbox'] label`,
     refreshButton: `${HEADER} button[aria-label='Refresh']`,
-    // The sort trigger's title/aria-label follow the current order, so it is located by its component
-    // name; the open menu is rendered in AppRoot.PortalLayer, still inside the section's shadow root.
+    // The sort trigger's tooltip follows the current order, so it is located by its component name;
+    // the open menu is rendered in AppRoot.PortalLayer, still inside the section's shadow root.
     sortButton: `${PAGE} button[data-component='BrowseSort']`,
     sortMenu: "[data-component='BrowseSort.Menu'][role='menu']",
     sortMenuItems: "[data-component='BrowseSort.Menu'][role='menu'] [role='menuitemradio']",
@@ -341,16 +341,25 @@ class BrowsePage extends SectionPage {
     return this.isElementDisplayed(this.sortButton);
   }
 
-  // Returns the current sort order without opening the menu: the trigger's 'title' is the label of
-  // the picked item (appConst.SORT_MENU_ITEM.*), or 'Sort by' while nothing matches an option.
+  // Returns the current sort order without opening the menu: the trigger's tooltip, kept in the
+  // sr-only node its aria-describedby points to, is the label of the picked item
+  // (appConst.SORT_MENU_ITEM.*), or 'Sort by' while nothing matches an option.
   async getSelectedSortOrder() {
     await this.waitForElementDisplayed(this.sortButton);
-    return await this.getAttribute(this.sortButton, 'title');
+    const tooltipId = await this.getAttribute(this.sortButton, 'aria-describedby');
+    if (tooltipId == null) {
+      return null;
+    }
+    const tooltip = await this.findElement(`[id='${tooltipId}']`);
+    return await tooltip.getProperty('textContent');
   }
 
   async waitForSelectedSortOrder(expectedItem) {
     try {
-      await this.waitForAttributeValue(this.sortButton, 'title', expectedItem);
+      await this.getBrowser().waitUntil(
+        async () => (await this.getSelectedSortOrder()) === expectedItem,
+        { timeout: appConst.TIMEOUT.MEDIUM, timeoutMsg: `sort order is not '${expectedItem}'` },
+      );
     } catch (err) {
       await this.handleError(
         `${this.pageName} - expected sort order '${expectedItem}' is not selected`,
