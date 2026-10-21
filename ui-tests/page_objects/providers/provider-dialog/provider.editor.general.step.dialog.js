@@ -21,6 +21,9 @@ const css = {
   idInput: `${DIALOG} input#id-provider-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#id-provider-editor-description`,
   validationMessages: `${PANEL} div.text-error`,
+  // A dot is legal in an ID but makes an ambiguous vhost key, so it is warned about rather than
+  // refused: its own line under the input, outside the error messages.
+  idWarning: `${PANEL} div#id-provider-editor-id-warning`,
   // Application
   applicationSelectorTrigger: APPLICATION_TRIGGER,
   // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
@@ -153,6 +156,17 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     return this.getTextInDisplayedElements(css.validationMessages);
   }
 
+  // 'Avoid dots: the ID is used as a key in the virtual host configuration' - or undefined. A
+  // warning, not an error: it never holds Next back, and an error under the field outranks it.
+  async getIdWarning() {
+    const warnings = await this.getDisplayedElements(css.idWarning);
+    return warnings.length === 0 ? undefined : await warnings[0].getText();
+  }
+
+  isIdWarningDisplayed() {
+    return this.isElementDisplayed(css.idWarning);
+  }
+
   // Application selector
 
   isApplicationSelectorDisplayed() {
@@ -255,10 +269,12 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     }
   }
 
-  // Display name of the bound application - or undefined when none is bound.
+  // Display name of the bound application - or undefined when none is bound. The first line only:
+  // ItemLabel wraps the name and the configuration icon in one span, so the icon's tooltip text
+  // joins the cell on a line of its own whenever that icon is there.
   async getSelectedApplication() {
     const names = await this.getDisplayedElements(css.applicationName);
-    return names.length === 0 ? undefined : await names[0].getText();
+    return names.length === 0 ? undefined : (await names[0].getText()).split('\n')[0];
   }
 
   // Only when the application has a configuration form.
@@ -284,6 +300,12 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
   // The warning icon beside the name: 'The application configuration has required fields to fill in'.
   isApplicationConfigIssueDisplayed() {
     return this.isElementDisplayed(css.applicationConfigIssueIcon);
+  }
+
+  // What that icon says - its label is the tooltip's text - or undefined when no icon is shown.
+  async getApplicationConfigIssue() {
+    const icons = await this.getDisplayedElements(css.applicationConfigIssueIcon);
+    return icons.length === 0 ? undefined : await icons[0].getAttribute('aria-label');
   }
 
   async clickOnRemoveApplicationButton() {

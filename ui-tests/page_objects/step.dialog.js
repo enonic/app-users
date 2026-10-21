@@ -30,6 +30,10 @@ function buildStepDialogCss(dialogComponent) {
     // Footer (wizard view)
     nextButton: `${DIALOG} [data-component='Stepper.Next']`,
     previousButton: `${DIALOG} [data-component='Stepper.Previous']`,
+    question: `${DIALOG} [data-component='ActionDialog.Question']`,
+    questionText: `${DIALOG} [data-component='ActionDialog.Question'] [role='alert']`,
+    keepButton: `${DIALOG} [data-component='ActionDialog.Question'] button[aria-label='Keep editing']`,
+    discardButton: `${DIALOG} [data-component='ActionDialog.Question'] button[aria-label='Confirm']`,
     // Step view - the editor opened on one step from a details panel's Edit button: no stepper,
     // Cancel and Save in the footer, Save disabled until something changed.
     stepperDots: `${DIALOG} [data-component='Stepper.Dots']`,
@@ -274,6 +278,72 @@ class StepDialog extends SectionPage {
       }
     }
     throw new Error('the footer has no Next, Create or Save button');
+  }
+
+  // The dirty-close question
+
+  // 'Do you want to close the dialog? Changes will be lost.' - or undefined while nothing is asked.
+  async getCloseQuestion() {
+    const questions = await this.getDisplayedElements(this.css.questionText);
+    return questions.length === 0 ? undefined : await questions[0].getText();
+  }
+
+  isCloseQuestionDisplayed() {
+    return this.isElementDisplayed(this.css.question);
+  }
+
+  async waitForCloseQuestionDisplayed(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisplayed(this.css.question, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - the close question should be asked`,
+        'err_close_question',
+        err,
+      );
+    }
+  }
+
+  async waitForCloseQuestionNotDisplayed(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementNotDisplayed(this.css.question, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.dialogName} - the close question should be gone`,
+        'err_close_question',
+        err,
+      );
+    }
+  }
+
+  isKeepButtonDisplayed() {
+    return this.isElementDisplayed(this.css.keepButton);
+  }
+
+  isDiscardButtonDisplayed() {
+    return this.isElementDisplayed(this.css.discardButton);
+  }
+
+  // 'Keep editing': the question goes and the form is as it was left.
+  async clickOnKeepButton() {
+    try {
+      await this.waitForElementDisplayed(this.css.keepButton);
+      await this.clickOnElement(this.css.keepButton);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(`${this.dialogName} - Keep editing button`, 'err_keep_btn', err);
+    }
+  }
+
+  // 'Confirm': what was typed is discarded and the dialog closes.
+  async clickOnDiscardButton() {
+    try {
+      await this.waitForElementDisplayed(this.css.discardButton);
+      await this.clickOnElement(this.css.discardButton);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(`${this.dialogName} - Confirm button`, 'err_discard_btn', err);
+    }
   }
 
   // Step view (Cancel / Save)

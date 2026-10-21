@@ -17,11 +17,15 @@ const LABEL = Object.freeze({
 });
 
 const DIALOG = IdProviderEditorStepDialog.css.container;
+const PERMISSIONS = `${DIALOG} [data-registry-id='summary'] [data-component='PrincipalsSummaryRow']`;
+
+// The permissions row is one line per principal: its name and, after it, its access level. Read as
+// two flat lists rather than line by line - a lookup below the section's shadow root drops the '>'
+// combinator and matches every descendant, so 'row > span' finds the lines *and* the spans inside
+// them. The two lists come back in display order, one entry each per line.
 const css = {
-  // The permissions row: one line per principal - its name and, after it, its access level.
-  permissionLines: `${DIALOG} [data-registry-id='summary'] [data-component='PrincipalsSummaryRow'] > span`,
-  principalName: 'span.truncate',
-  accessLevel: 'span.text-subtle',
+  principalNames: `${PERMISSIONS} span.truncate`,
+  accessLevels: `${PERMISSIONS} span.text-subtle`,
 };
 
 class IdProviderEditorSummaryStepDialog extends withSummaryStep(IdProviderEditorStepDialog, LABEL) {
@@ -43,12 +47,12 @@ class IdProviderEditorSummaryStepDialog extends withSummaryStep(IdProviderEditor
   // The permissions as { displayName: access }, access one of appConst.ID_PROVIDER_ACCESS.*.
   // Absent when no principal has access: the row is not rendered at all.
   async getPermissions() {
-    const lines = await this.getDisplayedElements(css.permissionLines);
+    const names = await this.getTextInDisplayedElements(css.principalNames);
+    const levels = await this.getTextInDisplayedElements(css.accessLevels);
     const permissions = {};
-    for (const line of lines) {
-      const name = await line.$(css.principalName).getText();
-      permissions[name] = await line.$(css.accessLevel).getText();
-    }
+    names.forEach((name, index) => {
+      permissions[name] = levels[index];
+    });
     return permissions;
   }
 
