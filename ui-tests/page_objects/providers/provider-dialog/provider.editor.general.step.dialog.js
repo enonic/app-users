@@ -308,6 +308,24 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     return icons.length === 0 ? undefined : await icons[0].getAttribute('aria-label');
   }
 
+  // Waits for the icon to say it. Binding an application only starts the read of its configuration
+  // form, and a form still loading has nothing to report: the row is there a while before the icon
+  // is, so a read right after the pick finds none.
+  async waitForApplicationConfigIssue(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.getApplicationConfigIssue()) === expected,
+        { timeout: ms, timeoutMsg: `the configuration icon should say '${expected}'` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `New ID provider dialog - the configuration icon should say '${expected}'`,
+        'err_application_config_issue',
+        err,
+      );
+    }
+  }
+
   async clickOnRemoveApplicationButton() {
     try {
       await this.waitForElementEnabled(css.applicationRemoveButton);

@@ -187,15 +187,13 @@ describe("idprovider.editor.permissions.summary.step.spec - the ID provider edit
     await generalStep.waitForApplicationRowDisplayed();
     assert.equal(await generalStep.getSelectedApplication(), ADFS_APPLICATION);
     // 2. Its configuration has required fields, so the red icon is shown, and the pencil is offered to open the configuration form.
+    //    The icon waits for the configuration form to be read: binding the application only starts
+    //    that request, and a form still loading reports nothing, so the row appears before the icon.
+    await generalStep.waitForApplicationConfigIssue(CONFIG_INCOMPLETE);
     await settingsUtils.saveScreenshot('idprovider-editor-general-step-config-issue');
     assert.ok(
       await generalStep.isApplicationConfigIssueDisplayed(),
       'The bound application should carry the configuration icon',
-    );
-    assert.equal(
-      await generalStep.getApplicationConfigIssue(),
-      CONFIG_INCOMPLETE,
-      'The icon should say the configuration has required fields to fill in',
     );
     assert.ok(
       await generalStep.isApplicationConfigButtonDisplayed(),
