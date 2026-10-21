@@ -50,6 +50,8 @@ export function StepDialogFooter<Step extends string, Field extends string, Form
         size="lg"
         label={i18n('browse.dialog.cancel')}
         disabled={saving}
+        // ! Takes no focus from the field, as the kit's own controls do: "Keep editing" returns there.
+        onMouseDown={(event) => event.preventDefault()}
         onClick={onCancel}
       />
       <ActionDialog.Action
