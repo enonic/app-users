@@ -19,6 +19,7 @@ const ServiceAccountEditorCredentialsStepDialog = require('../page_objects/servi
 const ServiceAccountEditorRolesStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.roles.step.dialog');
 const ServiceAccountEditorGroupsStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.groups.step.dialog');
 const ServiceAccountEditorSummaryStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.summary.step.dialog');
+const AddPublicKeyDialog = require('../page_objects/users/user-dialog/add.public.key.dialog');
 const IdProvidersPage = require('../page_objects/providers/id.providers.page');
 const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
 const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
@@ -256,7 +257,7 @@ module.exports = {
         await groupsStep.addGroups(user.groups);
       }
       await groupsStep.clickOnNextButton();
-      // 6. Summary → Create; the toast confirms and the row appears.
+      // 6. Summary → Create; the notification message confirms and the row appears.
       await summaryStep.waitForLoaded();
       await summaryStep.clickOnCreateButtonAndWaitForClosed();
       await usersPage.waitForExpectedNotificationMessage(
@@ -305,13 +306,33 @@ module.exports = {
     await generalStep.typeDataAndClickOnNext(role);
     await usersStep.waitForLoaded();
   },
+  // Opens the service account editor and fills its General step, so it is left standing on
+  // Credentials. For the tests of the steps that follow General.
+  //
+  // `serviceAccount` is what users.items.builder.buildServiceAccount() returns; only `displayName`,
+  // `id` and `email` are typed here. A service account lives in the system ID provider, so there is
+  // no ID provider step: the editor opens on General.
+  //
+  // Precondition: the Service Accounts section is open
+  // (navigateToExtension(appConst.EXTENSIONS.SERVICE_ACCOUNTS)).
+  async openNewServiceAccountEditorOnCredentials(serviceAccount) {
+    const serviceAccountsPage = new ServiceAccountsPage();
+    const generalStep = new ServiceAccountEditorGeneralStepDialog();
+    const credentialsStep = new ServiceAccountEditorCredentialsStepDialog();
+    await serviceAccountsPage.clickOnNewButton();
+    await generalStep.waitForLoaded();
+    await generalStep.typeDataAndClickOnNext(serviceAccount);
+    await credentialsStep.waitForLoaded();
+  },
   // Creates a service account through its editor and returns when it is listed. For the tests that
   // need an account to exist, not for the ones that test the editor itself.
   //
   // `serviceAccount` is what users.items.builder.buildServiceAccount() returns: { displayName, id,
-  // email?, password?, roles?, groups? }. A service account lives in the system ID provider, so
-  // there is no ID provider step: the editor opens on General. An empty or missing `password`,
-  // `roles` or `groups` skips that step.
+  // email?, password?, publicKeys?, roles?, groups? }. A service account lives in the system ID
+  // provider, so there is no ID provider step: the editor opens on General. An empty or missing
+  // `password`, `publicKeys`, `roles` or `groups` skips that step. `publicKeys` is a list of labels,
+  // one key generated per label on the Credentials step; the private half of each is handed over as
+  // a file download once Create lands (see the download prefs in wdio.chrome.conf.js).
   //
   // Precondition: the Settings app is open (navigateToSettingsApp). The Service Accounts section is
   // opened here.
@@ -319,6 +340,7 @@ module.exports = {
     const serviceAccountsPage = new ServiceAccountsPage();
     const generalStep = new ServiceAccountEditorGeneralStepDialog();
     const credentialsStep = new ServiceAccountEditorCredentialsStepDialog();
+    const addPublicKeyDialog = new AddPublicKeyDialog(appConst.SECTION_ID.SERVICE_ACCOUNTS);
     const rolesStep = new ServiceAccountEditorRolesStepDialog();
     const groupsStep = new ServiceAccountEditorGroupsStepDialog();
     const summaryStep = new ServiceAccountEditorSummaryStepDialog();
@@ -328,10 +350,15 @@ module.exports = {
       // 1. General: display name, id, email - the first step, no ID provider to pick.
       await generalStep.waitForLoaded();
       await generalStep.typeDataAndClickOnNext(serviceAccount);
-      // 2. Credentials: a password, when there is one.
+      // 2. Credentials: a password and the public keys, when there are any.
       await credentialsStep.waitForLoaded();
       if (serviceAccount.password) {
         await credentialsStep.setPassword(serviceAccount.password);
+      }
+      for (const label of serviceAccount.publicKeys ?? []) {
+        await credentialsStep.clickOnAddPublicKeyButton();
+        await addPublicKeyDialog.generateKey(label);
+        await credentialsStep.waitForPublicKeyDisplayed(label);
       }
       await credentialsStep.clickOnNextButton();
       // 3. Roles
@@ -346,9 +373,11 @@ module.exports = {
         await groupsStep.addGroups(serviceAccount.groups);
       }
       await groupsStep.clickOnNextButton();
-      // 5. Summary → Create; the toast confirms and the row appears.
+      // 5. Summary → Create; the notification message confirms and the row appears. A staged public
+      //    key is written after the account itself, and the dialog closes only once that write has
+      //    answered, so the close is given the longer wait.
       await summaryStep.waitForLoaded();
-      await summaryStep.clickOnCreateButtonAndWaitForClosed();
+      await summaryStep.clickOnCreateButtonAndWaitForClosed(appConst.TIMEOUT.LONG);
       await serviceAccountsPage.waitForExpectedNotificationMessage(
         appConst.serviceAccountCreatedMessage(serviceAccount.displayName),
       );
@@ -390,7 +419,7 @@ module.exports = {
         await permissionsStep.addPrincipalWithAccess(displayName, access);
       }
       await permissionsStep.clickOnNextAndWaitForSummaryStep();
-      // 3. Summary → Create; the toast confirms and the row appears.
+      // 3. Summary → Create; the notification message confirms and the row appears.
       await summaryStep.clickOnCreateButtonAndWaitForClosed();
       await idProvidersPage.waitForExpectedNotificationMessage(
         appConst.idProviderCreatedMessage(idProvider.displayName),
@@ -688,7 +717,8 @@ module.exports = {
 
   // Creates a service account - a user of the system ID provider - through the GraphQL API.
   // `serviceAccount` is what users.items.builder.buildServiceAccount() returns; the rest is as
-  // createUserViaApi(). Returns the service account with its 'key'.
+  // createUserViaApi(). Its `publicKeys` are not written here - a key is generated in the browser,
+  // so it takes the editor (createServiceAccount). Returns the service account with its 'key'.
   createServiceAccountViaApi(serviceAccount) {
     return this.createUserViaApi(
       Object.assign({}, serviceAccount, { idProvider: userItemsBuilder.SYSTEM_ID_PROVIDER }),

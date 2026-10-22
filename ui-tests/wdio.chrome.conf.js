@@ -6,6 +6,11 @@ const browser_version = properties.get('browser.version');
 const width = properties.get('browser.width');
 const height = properties.get('browser.height');
 const baseURL = properties.get('base.url');
+// Generating a public key hands the private half over as a file download (an <a download> of a
+// blob). Chrome's 'Ask where to save each file' would answer it with the OS save dialog, which no
+// WebDriver command can reach, so the prompt is switched off and the keys land in a throwaway
+// directory of their own rather than in the machine's Downloads.
+const downloadDir = path.join(__dirname, './build/downloads');
 
 exports.config = {
   // The specs of an editor live in a folder of their own (specs/user-editor, specs/role-editor).
@@ -30,6 +35,12 @@ exports.config = {
           '--disable-extensions',
           `--window-size=${width},${height}`,
         ],
+        prefs: {
+          'download.default_directory': downloadDir,
+          'download.prompt_for_download': false,
+          'download.directory_upgrade': true,
+          'savefile.default_directory': downloadDir,
+        },
       },
     },
   ],

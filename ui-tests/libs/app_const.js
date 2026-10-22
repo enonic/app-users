@@ -66,12 +66,13 @@ module.exports = Object.freeze({
     ROLES: 'Roles',
     ID_PROVIDERS: 'ID Providers',
   },
-  // Toasts of the editors (phrases: <section>.notify.*).
+  // Notification messages of the editors (phrases: <section>.notify.*).
   userCreatedMessage: (displayName) => `User "${displayName}" created`,
   userUpdatedMessage: (displayName) => `User "${displayName}" updated`,
   groupCreatedMessage: (displayName) => `Group "${displayName}" created`,
   roleCreatedMessage: (displayName) => `Role "${displayName}" created`,
   idProviderCreatedMessage: (displayName) => `ID provider "${displayName}" created`,
+  idProviderUpdatedMessage: (displayName) => `ID provider "${displayName}" updated`,
   serviceAccountCreatedMessage: (displayName) => `Service account "${displayName}" created`,
   serviceAccountUpdatedMessage: (displayName) => `Service account "${displayName}" updated`,
   // One deleted principal (user, service account, group, role) and several (phrases: principal.notify.*).

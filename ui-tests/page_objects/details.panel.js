@@ -2,8 +2,8 @@
  * Created on 05.10.2026.
  *
  * Base class of the details panels shown on the right of a browse screen when an item is selected:
- * UserDetails, ServiceAccountDetails, GroupDetails, RoleDetails (widgets/details-panel). They share
- * one layout:
+ * UserDetails, ServiceAccountDetails, GroupDetails, RoleDetails, IdProviderDetails
+ * (widgets/details-panel). They share one layout:
  *
  *   header            - icon, the display name (h3), the name under it
  *   section*          - a Separator with the section's label, e.g. 'Roles (2)' (the count in
@@ -247,7 +247,8 @@ class DetailsPanel extends SectionPage {
   // Lists
 
   // The rows of the section's list as [{ title, subtitle, meta }] - a principal's display name, its
-  // name and the key of its ID provider ('system') on the right (undefined when the row has none).
+  // name and the meta column on the right: the key of its ID provider ('system'), or the access
+  // level in an ID provider's Permissions list (undefined when the row has none).
   async getListItems(sectionLabel) {
     const section = await this.getSection(sectionLabel);
     const items = await section.$$(IN_SECTION.listItems);

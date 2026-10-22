@@ -105,7 +105,7 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
     await confirmationDialog.waitForDeleteButtonDisabled();
     await confirmationDialog.typeInConfirmInput(USER_NAME);
     await confirmationDialog.waitForDeleteButtonEnabled();
-    // 4. Confirm: the dialog closes, the toast reports the deletion.
+    // 4. Confirm: the dialog closes, the notification message reports the deletion.
     await confirmationDialog.clickOnDeleteButton();
     await confirmationDialog.waitForDialogClosed();
     await usersPage.waitForExpectedNotificationMessage(appConst.principalDeletedMessage(USER_NAME));
