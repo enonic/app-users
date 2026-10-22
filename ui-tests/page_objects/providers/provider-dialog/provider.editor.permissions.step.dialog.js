@@ -67,7 +67,7 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
     return this.clickOnPickerApply(PERMISSIONS_PLACEHOLDER);
   }
 
-  // Filter → tick the principal → Apply. The new row starts at the access app-users grants a
+  // Filter → tick the principal → Apply.
   addPrincipal(displayName) {
     return super.addPrincipal(PERMISSIONS_PLACEHOLDER, displayName);
   }
@@ -140,7 +140,7 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
     return await this.getTextInDisplayedElements(css.accessOptions);
   }
 
-  // Picks the level by its label (appConst.ID_PROVIDER_ACCESS.*) in a selector that is already
+  // Picks the level by its label (appConst.ID_PROVIDER_ACCESS.*)
   async clickOnAccessOption(access) {
     try {
       await this.waitForElementDisplayed(css.accessOptions);

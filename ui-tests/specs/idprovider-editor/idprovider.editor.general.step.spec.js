@@ -31,7 +31,6 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
   const NEW_PROVIDER = userItemsBuilder.buildIdProvider({
     displayName: PROVIDER_NAME,
     description: 'description',
-    application: APPLICATION,
   });
 
   // A new provider opens on General.

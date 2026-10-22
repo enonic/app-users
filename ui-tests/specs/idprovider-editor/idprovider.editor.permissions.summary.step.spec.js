@@ -65,7 +65,6 @@ describe("idprovider.editor.permissions.summary.step.spec - the ID provider edit
     );
   });
 
-  // No application is bound on General: a provider serves no login until one is, but nothing in the
   it("GIVEN the General step has been filled without an application WHEN Next has been pressed THEN the Permissions step should offer the user made in the suite's provider AND the seeded entries should be pinned AND an added one should not be AND Summary should read every answer back", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     let idProvidersPage = new IdProvidersPage();
@@ -171,7 +170,6 @@ describe("idprovider.editor.permissions.summary.step.spec - the ID provider edit
     assert.ok(await summaryStep.isPreviousButtonEnabled(), 'Previous should be enabled');
   });
 
-  // An application whose configuration has required fields is told about, never refused: the icon
   it("GIVEN 'Test ADFS ID Provider' has been bound on the General step THEN the icon should say its configuration has required fields AND the Permissions step should behave as it does without an application AND Summary should name the bound application", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     let idProvidersPage = new IdProvidersPage();
@@ -280,6 +278,7 @@ describe("idprovider.editor.permissions.summary.step.spec - the ID provider edit
     await generalStep.waitForLoaded();
     await generalStep.typeInDisplayNameInput(NEW_PROVIDER.displayName);
     await generalStep.typeInDescriptionTextArea(NEW_PROVIDER.description);
+    await generalStep.waitForNextButtonEnabled();
     await generalStep.clickOnNextButton();
     await permissionsStep.waitForLoaded();
     // 2. The group made in the suite's provider is offered, with that provider's key beside it.
