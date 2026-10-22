@@ -67,7 +67,7 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
     return this.clickOnPickerApply(PERMISSIONS_PLACEHOLDER);
   }
 
-  // Filter → tick the principal → Apply. The new row gets the lowest access, 'Read'.
+  // Filter → tick the principal → Apply.
   addPrincipal(displayName) {
     return super.addPrincipal(PERMISSIONS_PLACEHOLDER, displayName);
   }
@@ -140,10 +140,10 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
     return await this.getTextInDisplayedElements(css.accessOptions);
   }
 
-  // Opens the row's selector and picks the level by its label (appConst.ID_PROVIDER_ACCESS.*).
-  async selectAccess(displayName, access) {
+  // Picks the level by its label (appConst.ID_PROVIDER_ACCESS.*)
+  async clickOnAccessOption(access) {
     try {
-      await this.clickOnAccessSelector(displayName);
+      await this.waitForElementDisplayed(css.accessOptions);
       const options = await this.getDisplayedElements(css.accessOptions);
       for (const option of options) {
         if ((await option.getText()) === access) {
@@ -152,6 +152,20 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
         }
       }
       throw new Error(`no access level '${access}'`);
+    } catch (err) {
+      await this.handleError(
+        `Permissions step - access option '${access}'`,
+        'err_access_option',
+        err,
+      );
+    }
+  }
+
+  // Opens the row's selector and picks the level by its label (appConst.ID_PROVIDER_ACCESS.*).
+  async selectAccess(displayName, access) {
+    try {
+      await this.clickOnAccessSelector(displayName);
+      return await this.clickOnAccessOption(access);
     } catch (err) {
       await this.handleError(
         `Permissions step - access '${access}' was not selected for '${displayName}'`,
