@@ -251,6 +251,8 @@ describe("service.accounts.details.page.spec - the details panel of a service ac
     // 1. 'Edit credentials': the step lists the key the account was created with, by its kid.
     await serviceAccountDetails.clickOnEditCredentialsButton();
     await credentialsStep.waitForLoaded();
+    // The stored keys arrive with a read of their own, which the step does not wait for.
+    await credentialsStep.waitForPublicKeyDisplayed(KEY_LABEL);
     assert.deepEqual(await credentialsStep.getPublicKeyLabels(), [KEY_LABEL]);
     assert.ok(
       !(await credentialsStep.isPublicKeyPending(KEY_LABEL)),

@@ -358,7 +358,9 @@ module.exports = {
       for (const label of serviceAccount.publicKeys ?? []) {
         await credentialsStep.clickOnAddPublicKeyButton();
         await addPublicKeyDialog.generateKey(label);
-        await credentialsStep.waitForPublicKeyDisplayed(label);
+        // The dialog trims the label before it stages the key, so the row - and the Remove button
+        // named after it - carries the trimmed one.
+        await credentialsStep.waitForPublicKeyDisplayed(label.trim());
       }
       await credentialsStep.clickOnNextButton();
       // 3. Roles

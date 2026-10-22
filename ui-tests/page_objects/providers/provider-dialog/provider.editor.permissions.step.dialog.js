@@ -119,6 +119,20 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
     return this.isElementEnabled(css.accessSelectorTrigger(displayName));
   }
 
+  // A row is pinned once the default permissions have arrived, and those are a read of their own:
+  // the step is on screen, with its entries, a moment before any of them is locked.
+  async waitForAccessSelectorDisabled(displayName, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisabled(css.accessSelectorTrigger(displayName), ms);
+    } catch (err) {
+      await this.handleError(
+        `Permissions step - the access of '${displayName}' should be locked`,
+        'err_access_locked',
+        err,
+      );
+    }
+  }
+
   async clickOnAccessSelector(displayName) {
     try {
       await this.waitForElementEnabled(css.accessSelectorTrigger(displayName));

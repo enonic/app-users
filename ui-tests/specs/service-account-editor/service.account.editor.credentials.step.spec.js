@@ -243,6 +243,8 @@ describe("service.account.editor.credentials.step.spec - the public keys of the 
     //    under rather than the pending line. Nothing changed, so Save is disabled.
     await serviceAccountDetails.clickOnEditCredentialsButton();
     await credentialsStep.waitForLoaded();
+    // The stored keys arrive with a read of their own, which the step does not wait for.
+    await credentialsStep.waitForPublicKeyDisplayed(STORED_KEY_LABEL);
     assert.deepEqual(await credentialsStep.getPublicKeyLabels(), [STORED_KEY_LABEL]);
     assert.ok(
       !(await credentialsStep.isPublicKeyPending(STORED_KEY_LABEL)),

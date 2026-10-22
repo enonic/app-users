@@ -83,24 +83,31 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
       IdProviderDetails.MODE.LOCAL,
       'The Standard ID Provider keeps users and groups in XP',
     );
-    // 3. Permissions: the three entries a new provider is seeded with, each with its access level.
+    // 3. The permissions and the principals are read apart from the provider itself, so the panel
+    //    is titled and its fields are filled a moment before either list is there.
+    for (const displayName of Object.keys(SEEDED_PERMISSIONS)) {
+      await idProviderDetails.waitForPermission(displayName);
+    }
+    await idProviderDetails.waitForUser(USER_NAME);
+    await idProviderDetails.waitForGroup(GROUP_NAME);
+    // 4. Permissions: the three entries a new provider is seeded with, each with its access level.
     assert.equal(
       await idProviderDetails.getPermissionsCount(),
       Object.keys(SEEDED_PERMISSIONS).length,
     );
     assert.deepEqual(await idProviderDetails.getPermissions(), SEEDED_PERMISSIONS);
-    // 4. Every entry shows the principal's name under its display name.
+    // 5. Every entry shows the principal's name under its display name.
     let permissionItems = await idProviderDetails.getPermissionItems();
     for (const { title, subtitle } of permissionItems) {
       assert.equal(subtitle, SEEDED_NAMES[title], `'${title}' should show its name`);
     }
-    // 5. Users: the one made via the API, an avatar with its display name beside it.
+    // 6. Users: the one made via the API, an avatar with its display name beside it.
     assert.equal(await idProviderDetails.getUsersCount(), 1);
     assert.ok(
       (await idProviderDetails.getUsers()).includes(USER_NAME),
       `The user '${USER_NAME}' should be one of the users`,
     );
-    // 6. Groups: the one made via the API, with its name under the display name.
+    // 7. Groups: the one made via the API, with its name under the display name.
     assert.equal(await idProviderDetails.getGroupsCount(), 1);
     let [group] = await idProviderDetails.getGroupItems();
     assert.equal(group.title, GROUP_NAME);
@@ -222,9 +229,15 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
     );
     assert.equal(await permissionsStep.getStepTitle(), 'Permissions');
     assert.ok(await permissionsStep.isStepView(), 'One step, no stepper dots');
-    // 2. The step opens on the provider's own entries, with the access each was saved with.
+    // 2. The provider's own entries and the defaults that pin them are two reads of their own, so
+    //    the step is on screen before either has answered: wait for the rows and for the lock.
+    for (const displayName of Object.keys(SEEDED_PERMISSIONS)) {
+      await permissionsStep.waitForPrincipalSelected(displayName);
+      await permissionsStep.waitForAccessSelectorDisabled(displayName);
+    }
+    // 3. The step opens on the provider's own entries, with the access each was saved with, and
+    //    they are pinned: neither their access nor their presence may change.
     assert.deepEqual(await permissionsStep.getPermissions(), SEEDED_PERMISSIONS);
-    // 3. The seeded entries are pinned: neither their access nor their presence may change.
     for (const displayName of Object.keys(SEEDED_PERMISSIONS)) {
       assert.ok(
         !(await permissionsStep.isAccessSelectorEnabled(displayName)),
