@@ -1,7 +1,7 @@
 # UI tests
 
 Browser tests of the four sections this app adds to the Settings shell, plus Service Accounts:
-WebdriverIO 9 + Mocha against a real XP with the app deployed, Chrome driven over WebDriver.
+WebdriverIO 10 + Mocha against a real XP with the app deployed, Chrome driven over WebDriver.
 
 ## What is covered
 

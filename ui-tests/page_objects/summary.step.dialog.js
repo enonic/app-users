@@ -219,15 +219,15 @@ function withSummaryStep(EditorStepDialog, LABEL) {
     }
 
     // Create, then the dialog goes away.
-    async clickOnCreateButtonAndWaitForClosed() {
+    async clickOnCreateButtonAndWaitForClosed(ms = appConst.TIMEOUT.MEDIUM) {
       await this.clickOnCreateButton();
-      await this.waitForClosed();
+      await this.waitForClosed(ms);
     }
 
     // Save, then the dialog goes away.
-    async clickOnSaveButtonAndWaitForClosed() {
+    async clickOnSaveButtonAndWaitForClosed(ms = appConst.TIMEOUT.MEDIUM) {
       await this.clickOnSaveButton();
-      await this.waitForClosed();
+      await this.waitForClosed(ms);
     }
   };
 }

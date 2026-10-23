@@ -126,6 +126,28 @@ class ServiceAccountDetails extends DetailsPanel {
     return (await this.getPublicKeys()).map(({ title }) => title);
   }
 
+  // Waits for the key to be listed - the panel re-reads the account after a save, so a check right
+  // after one has to wait.
+  async waitForPublicKey(label, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => {
+          // The subsection is not rendered at all while the account has no key, and reading it
+          // then throws - that is 'not yet', not a failure.
+          const labels = await this.getPublicKeyLabels().catch(() => []);
+          return labels.includes(label);
+        },
+        { timeout: ms, timeoutMsg: `'${label}' is not listed under '${SUBSECTION.PUBLIC_KEYS}'` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `${this.panelName} - '${label}' should be listed under '${SUBSECTION.PUBLIC_KEYS}'`,
+        'err_details_public_keys',
+        err,
+      );
+    }
+  }
+
   // The count in 'Public keys (N)'
   getPublicKeysCount() {
     return this.getSubsectionCount(SECTION.CREDENTIALS, SUBSECTION.PUBLIC_KEYS);

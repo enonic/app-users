@@ -100,7 +100,8 @@ module.exports = {
   },
 
   // A service account is a user of the system ID provider, created without the ID provider step:
-  // { displayName, id, email, password, roles, groups }
+  // { displayName, id, email, password, publicKeys, roles, groups }. `publicKeys` is a list of
+  // labels, one key generated per label on the Credentials step.
   buildServiceAccount(...args) {
     const overrides = overridesFrom(args, ['displayName', 'password', 'email', 'roles']);
     const { displayName, id } = named('ServiceAccount', overrides);
@@ -110,6 +111,7 @@ module.exports = {
       name: id,
       email: overrides.email ?? emailOf(id),
       password: overrides.password ?? appConst.PASSWORD.MEDIUM,
+      publicKeys: overrides.publicKeys ?? [],
       roles: overrides.roles ?? [],
       groups: overrides.groups ?? [],
     };

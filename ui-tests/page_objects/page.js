@@ -400,7 +400,7 @@ class Page {
     return await message.isDisplayed();
   }
 
-  // Waits for a toast and returns its text.
+  // Waits for a notification message and returns its text.
   async waitForNotificationMessage() {
     try {
       const message = await this.getBrowser().$(COMMON.NOTIFICATION_TEXT);
@@ -415,7 +415,7 @@ class Page {
     }
   }
 
-  // Texts of every toast currently shown.
+  // Texts of every notification message currently shown.
   async getNotificationMessages() {
     const messages = await this.getBrowser().$$(COMMON.NOTIFICATION_TEXT);
     const texts = [];

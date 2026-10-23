@@ -421,10 +421,11 @@ class StepDialog extends SectionPage {
     return this.isElementDisplayed(this.css.cancelButton);
   }
 
-  // Save, then the dialog goes away.
-  async clickOnSaveButtonAndWaitForClosed() {
+  // Save, then the dialog goes away. A save that writes public keys takes longer than the default
+  // wait: the keys are written after the user is, and only then does the dialog close.
+  async clickOnSaveButtonAndWaitForClosed(ms = appConst.TIMEOUT.MEDIUM) {
     await this.clickOnSaveButton();
-    await this.waitForClosed();
+    await this.waitForClosed(ms);
   }
 
   // Cancel, then the dialog goes away (a dirty step asks to confirm first - ConfirmationDialog).

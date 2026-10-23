@@ -249,7 +249,7 @@ describe("user.details.panel.spec - the details panel of a user: what it shows, 
       'The picked group should show the key of its ID provider',
     );
     await groupsStep.waitForSaveButtonEnabled();
-    // 5. Save: the dialog closes, the toast reports the update.
+    // 5. Save: the dialog closes, the notification message reports the update.
     await groupsStep.clickOnSaveButtonAndWaitForClosed();
     await usersPage.waitForExpectedNotificationMessage(appConst.userUpdatedMessage(USER_NAME));
     // 6. The details list the group, with its ID provider on the right.

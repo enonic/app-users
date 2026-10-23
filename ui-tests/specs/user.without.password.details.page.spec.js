@@ -96,7 +96,7 @@ describe('user.without.password.details.page.spec - an ID provider made via the 
       !(await summaryStepDialog.isRowDisplayed(UserEditorSummaryStepDialog.LABEL.GROUPS)),
       'The Groups row should be absent when no group is picked',
     );
-    // 7. Create: the dialog closes, the toast confirms, the user is listed with its ID provider.
+    // 7. Create: the dialog closes, the notification message confirms, the user is listed with its ID provider.
     await summaryStepDialog.clickOnCreateButtonAndWaitForClosed();
     await usersPage.waitForExpectedNotificationMessage(
       appConst.userCreatedMessage(USER.displayName),
@@ -141,7 +141,7 @@ describe('user.without.password.details.page.spec - an ID provider made via the 
     // 4. 'Set password', then the password: Save is enabled.
     await credentialsStepDialog.setPassword(appConst.PASSWORD.MEDIUM);
     await credentialsStepDialog.waitForSaveButtonEnabled();
-    // 5. Save: the dialog closes, the toast reports the update, the details say 'Set'.
+    // 5. Save: the dialog closes, the notification message reports the update, the details say 'Set'.
     await credentialsStepDialog.clickOnSaveButtonAndWaitForClosed();
     await usersPage.waitForExpectedNotificationMessage(appConst.userUpdatedMessage(USER_NAME));
     await userDetails.waitForPassword(UserDetails.PASSWORD.SET);

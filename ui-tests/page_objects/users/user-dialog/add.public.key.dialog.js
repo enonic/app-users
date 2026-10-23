@@ -146,11 +146,20 @@ class AddPublicKeyDialog extends SectionPage {
 
   // Uploads the .pem at the absolute path through the hidden file input (the Upload button itself
   // only opens the browser's chooser, which WebDriver cannot drive).
+  //
+  // ! The path is handed over as keystrokes, and the browser opens it itself: the runner drives a
+  // ! chromedriver on this machine, so what the test can read the browser can read. `browser.uploadFile`,
+  // ! which copied it to a remote node first, is gone in webdriverio 10, and its replacement
+  // ! `setFiles` speaks BiDi only - this suite pins 'wdio:enforceWebDriverClassic'.
+  //
+  // ? addValue, not setValue: the input is display:none, and the clear setValue does first is
+  // ? refused for an element that is not interactable. Send Keys is the one command the WebDriver
+  // ? spec lets through for a file input whatever its state. There is nothing to clear anyway - the
+  // ? dialog empties the input after every pick.
   async uploadPublicKey(filePath) {
     try {
       const fileInput = await this.findElement(css.fileInput);
-      const remotePath = await this.getBrowser().uploadFile(filePath);
-      await fileInput.setValue(remotePath);
+      await fileInput.addValue(filePath);
       return await this.pause(500);
     } catch (err) {
       await this.handleError(
@@ -187,6 +196,23 @@ class AddPublicKeyDialog extends SectionPage {
   async getErrorMessage() {
     const errors = await this.getDisplayedElements(css.errorMessage);
     return errors.length === 0 ? undefined : await errors[0].getText();
+  }
+
+  // Waits for the footer to report it - a refused upload is read from the file and matched first, so
+  // a check right after the file was handed over finds nothing yet.
+  async waitForErrorMessage(expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(async () => (await this.getErrorMessage()) === expected, {
+        timeout: ms,
+        timeoutMsg: `the dialog should report '${expected}'`,
+      });
+    } catch (err) {
+      await this.handleError(
+        `Add public key dialog - the error '${expected}'`,
+        'err_add_key_error',
+        err,
+      );
+    }
   }
 
   // Flows
