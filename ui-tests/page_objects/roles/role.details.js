@@ -5,7 +5,8 @@
  * name, then the sections
  *
  *   Role                  - Type ('System', for a built-in role), Description ('No description' when
- *                           empty), Modified (the timestamp, when known); Edit
+ *                           empty), Modified (the timestamp, when known), Editing (why a platform
+ *                           role is locked); Edit
  *   Users (N)             - the member users with their ID provider on the right; Edit users
  *   Service accounts (N)  - the member service accounts; Edit service accounts
  *   Groups (N)            - the member groups with their ID provider on the right; Edit groups
@@ -27,6 +28,14 @@ const FIELD = Object.freeze({
   TYPE: 'Type',
   DESCRIPTION: 'Description',
   MODIFIED: 'Modified',
+  EDITING: 'Editing',
+});
+
+// What the 'Editing' field reads for a role the platform owns: IMPLICIT for Everyone and
+// Authenticated, whose membership is implied rather than stored.
+const EDITING = Object.freeze({
+  PLATFORM: 'Locked (Managed by the platform)',
+  IMPLICIT: 'Locked (Managed by the platform; membership is implied)',
 });
 
 const BUTTON = Object.freeze({
@@ -37,6 +46,9 @@ const BUTTON = Object.freeze({
 });
 
 const NO_DESCRIPTION = 'No description';
+
+// The 'Type' of a role the platform ships with; a role made here shows no Type field at all.
+const SYSTEM_TYPE = 'System';
 
 class RoleDetails extends DetailsPanel {
   constructor() {
@@ -62,6 +74,14 @@ class RoleDetails extends DetailsPanel {
 
   static get NO_DESCRIPTION() {
     return NO_DESCRIPTION;
+  }
+
+  static get SYSTEM_TYPE() {
+    return SYSTEM_TYPE;
+  }
+
+  static get EDITING() {
+    return EDITING;
   }
 
   // The name shown under the display name, e.g. 'system.admin'
@@ -90,12 +110,22 @@ class RoleDetails extends DetailsPanel {
     return this.getFieldValue(SECTION.ROLE, FIELD.MODIFIED);
   }
 
+  // Why the role cannot be edited (EDITING.*)
+  getEditing() {
+    return this.getFieldValue(SECTION.ROLE, FIELD.EDITING);
+  }
+
   clickOnEditButton() {
     return super.clickOnEditButton(BUTTON.EDIT, SECTION.ROLE);
   }
 
   isEditButtonDisplayed() {
     return super.isEditButtonDisplayed(BUTTON.EDIT, SECTION.ROLE);
+  }
+
+  // The platform owns its roles' names: the button stays, disabled, with a lock on it.
+  isEditButtonEnabled() {
+    return super.isEditButtonEnabled(BUTTON.EDIT, SECTION.ROLE);
   }
 
   // Users (members)

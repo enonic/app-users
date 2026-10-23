@@ -1,11 +1,11 @@
 /**
  * Created on 30.09.2026
  */
-const webDriverHelper = require('../libs/WebDriverHelper');
-const settingsUtils = require('../libs/settings.utils');
-const appConst = require('../libs/app_const');
+const webDriverHelper = require('../../libs/WebDriverHelper');
+const settingsUtils = require('../../libs/settings.utils');
+const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const RolesPage = require('../page_objects/roles/roles.page');
+const RolesPage = require('../../page_objects/roles/roles.page');
 
 describe('roles.page.toolbar.sorting.spec - Roles page: New is enabled and Delete disabled with nothing selected, and the Sort by menu sets the order', function () {
   this.timeout(appConst.SUITE_TIMEOUT);

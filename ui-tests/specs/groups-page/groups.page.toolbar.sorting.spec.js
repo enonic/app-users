@@ -1,11 +1,11 @@
 /**
  * Created on 01.10.2026
  */
-const webDriverHelper = require('../libs/WebDriverHelper');
-const settingsUtils = require('../libs/settings.utils');
-const appConst = require('../libs/app_const');
+const webDriverHelper = require('../../libs/WebDriverHelper');
+const settingsUtils = require('../../libs/settings.utils');
+const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const GroupsPage = require('../page_objects/groups/groups.page');
+const GroupsPage = require('../../page_objects/groups/groups.page');
 
 describe('groups.page.toolbar.sorting.spec - Groups page: New is enabled and Delete disabled with nothing selected, and the Sort by menu sets the order', function () {
   this.timeout(appConst.SUITE_TIMEOUT);
