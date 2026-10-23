@@ -2,6 +2,13 @@ const path = require('path');
 const { propertiesReader } = require('properties-reader');
 const file = path.join(__dirname, './browser.properties');
 const properties = propertiesReader({ sourceFile: file });
+// Left unset in browser.properties, and then not sent at all: WebdriverIO reads the version off the
+// installed Chrome and pairs a driver with it, with no version lookup and no download. Any value
+// here - an exact version, but a channel ('stable') or a milestone just as much - makes it fetch a
+// Chrome for Testing of its own into the browser cache under %TEMP%, which Windows is free to clean
+// out from under it: a half-emptied cache leaves a browser that starts and hangs, and the run dies
+// on 'session not created: DevToolsActivePort file doesn't exist'. Pin one only to reproduce a
+// version-specific failure.
 const browser_version = properties.get('browser.version');
 const width = properties.get('browser.width');
 const height = properties.get('browser.height');
@@ -23,7 +30,7 @@ exports.config = {
   capabilities: [
     {
       browserName: 'chrome',
-      browserVersion: browser_version,
+      ...(browser_version ? { browserVersion: String(browser_version) } : {}),
       'wdio:enforceWebDriverClassic': true,
       'goog:chromeOptions': {
         args: [
@@ -31,7 +38,11 @@ exports.config = {
           '--disable-gpu',
           '--no-sandbox',
           '--lang=en',
-          'guest',
+          // ! Nothing without a '--' belongs in this list. Chrome reads a bare word as a target to
+          // ! open, Chromedriver passes one of its own, and 'Multiple targets are not supported in
+          // ! headless mode' kills the browser before it writes its port file - which reaches the
+          // ! run as 'session not created: DevToolsActivePort file doesn't exist'. The profile is
+          // ! Chromedriver's own throwaway one anyway, so there is nothing here for '--guest' to do.
           '--disable-extensions',
           `--window-size=${width},${height}`,
         ],
@@ -66,8 +77,13 @@ exports.config = {
     ui: 'bdd',
     timeout: 120000,
   },
-  // Set directory to store all logs into
-  outputDir: './build/reports/logs/',
+  // Set directory to store all logs into.
+  //
+  // ! Absolute, and it has to stay that way: Chromedriver puts Chrome's --user-data-dir under this
+  // ! directory and passes it on as it reads here. Chrome 155 quits on the spot on a relative one
+  // ! (exit code 21, no output), which reaches the run as 'session not created: DevToolsActivePort
+  // ! file doesn't exist' - the browser is gone before it can write the port file.
+  outputDir: path.join(__dirname, './build/reports/logs'),
 
   reporters: [
     'concise',

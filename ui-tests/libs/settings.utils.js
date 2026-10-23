@@ -727,6 +727,35 @@ module.exports = {
     );
   },
 
+  // Creates a role through the GraphQL API instead of the editor. `role` is what
+  // users.items.builder.buildRole() returns: { displayName, id, description?, users?, groups? }.
+  // A role lives in the system store, so it names no ID provider, and its members may come from any
+  // of them: `users` and `groups` - or `members`, which is the two in one list - are principal keys
+  // ('user:system:bob', 'group:system:editors'), since the API grants membership to a key and a
+  // display name is not one. Returns the role with its 'key'.
+  async createRoleViaApi(role) {
+    const members = role.members ?? [...(role.users ?? []), ...(role.groups ?? [])];
+    const notKeys = members.filter((member) => !/^(user|group):/.test(member));
+    if (notKeys.length > 0) {
+      throw new Error(
+        `createRoleViaApi: members are principal keys ('user:<provider>:<name>'), got '${notKeys.join("', '")}'`,
+      );
+    }
+    const query = `mutation ($name: String!, $displayName: String!, $description: String, $members: [String!]) {
+      createRole(name: $name, displayName: $displayName, description: $description, members: $members) {
+        key displayName
+      }
+    }`;
+    const data = await this.sendGraphQlRequest(query, {
+      name: role.id ?? role.name ?? role.displayName,
+      displayName: role.displayName,
+      description: role.description,
+      members,
+    });
+    console.log('Role created via API: ' + data.createRole.key);
+    return Object.assign({}, role, { key: data.createRole.key });
+  },
+
   // Deletes principals (users, groups, roles) through the GraphQL API. `keys` is a principal key, a
   // list of them, or what a create*ViaApi() returned (its 'key' is taken). Throws when any was not
   // deleted.

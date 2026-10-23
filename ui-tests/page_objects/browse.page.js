@@ -7,6 +7,9 @@
  * to and what a row shows on its right. A section's page object passes those in and adds what is
  * its own (the Edit button and the filter of Users, the key format of its rows).
  *
+ * Right-clicking a row opens the same actions as a context menu, so the toolbar's rules are asserted
+ * once here and read back from both.
+ *
  * Locators are CSS, resolved inside the section's shadow root (see SectionPage). A row's id ends
  * with '-item-<key>', the key being the item's own key (a principal key for users, groups and roles,
  * the provider key for ID providers); rows are also found by what they show, since CSS cannot match
@@ -14,6 +17,8 @@
  */
 const SectionPage = require('./section.page');
 const appConst = require('../libs/app_const');
+
+const CONTEXT_MENU = "[data-component='BrowseListContextMenu'][role='menu']";
 
 // The browse toolbar carries its own name in place of the library's 'Toolbar.Container'
 // (app-users#2764); the buttons keep 'Toolbar.Item', which Slot puts on the button element itself.
@@ -53,6 +58,11 @@ function buildCss(pageComponent) {
     rowName: "[data-component='ItemLabel'] small",
     rowMeta: "[data-component='TreeList.RowRight'] span",
     rowCheckboxLabelInRow: "[data-component='Checkbox'] label",
+    // The row menu (BrowseListContextMenu): the toolbar's own actions, offered over the row that was
+    // right-clicked. Like the Sort menu it is portalled into AppRoot.PortalLayer, still inside the
+    // section's shadow root, so it carries no page prefix either.
+    contextMenu: CONTEXT_MENU,
+    contextMenuItems: `${CONTEXT_MENU} [data-component='ContextMenu.Item']`,
   };
 }
 
@@ -592,18 +602,28 @@ class BrowsePage extends SectionPage {
     return checked === 'true';
   }
 
-  // The row the user clicked on (aria-selected), not a ticked checkbox.
-  async isRowSelected(key) {
-    const selected = await this.getAttribute(this.css.rowByKey(key), 'aria-selected');
-    return selected === 'true';
+  // A row the operator may not act on keeps its checkbox, greyed in place rather than left out: the
+  // platform's own roles and the system users are the case.
+  isRowCheckboxEnabled(key) {
+    return this.isElementEnabled(this.css.rowCheckbox(key));
   }
 
-  async waitForRowSelected(key, ms = appConst.TIMEOUT.MEDIUM) {
+  // The row painted as selected: ticked, or the row the user clicked on while nothing is ticked -
+  // which is what BrowseListRow calls `highlighted` and renders as data-tone='inverse'.
+  //
+  // ! Not aria-selected: TreeList.Row sets that from the ticks alone, so a clicked but unticked row
+  // ! reads false there. isRowChecked is the one that answers for the checkbox.
+  async isRowHighlighted(key) {
+    const tone = await this.getAttribute(this.css.rowByKey(key), 'data-tone');
+    return tone === 'inverse';
+  }
+
+  async waitForRowHighlighted(key, ms = appConst.TIMEOUT.MEDIUM) {
     try {
-      await this.waitForAttributeValue(this.css.rowByKey(key), 'aria-selected', 'true', ms);
+      await this.waitForAttributeValue(this.css.rowByKey(key), 'data-tone', 'inverse', ms);
     } catch (err) {
       await this.handleError(
-        `${this.pageName} - the row '${key}' should be selected`,
+        `${this.pageName} - the row '${key}' should be painted as selected`,
         'err_browse_row',
         err,
       );
@@ -752,6 +772,125 @@ class BrowsePage extends SectionPage {
     await this.clickOnCheckboxByDisplayName(displayName);
     await this.waitForDeleteButtonEnabled();
     return await this.clickOnDeleteButton();
+  }
+
+  // Context menu - the toolbar's actions over one row. The right click retargets the row before the
+  // menu opens, so what it offers is what the toolbar would offer for that row.
+
+  get contextMenu() {
+    return this.css.contextMenu;
+  }
+
+  // Right-clicks the row with the display name and waits for its menu. A right click fires
+  // 'contextmenu' alone, so the row is retargeted without being ticked.
+  async openContextMenu(displayName) {
+    try {
+      const row = await this.waitForRowByDisplayNameDisplayed(displayName);
+      await row.click({ button: 'right' });
+      await this.waitForElementDisplayed(this.css.contextMenu);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the context menu of the row '${displayName}'`,
+        'err_browse_context_menu',
+        err,
+      );
+    }
+  }
+
+  isContextMenuDisplayed() {
+    return this.isElementDisplayed(this.css.contextMenu);
+  }
+
+  async waitForContextMenuOpened(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisplayed(this.css.contextMenu, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the context menu should be opened`,
+        'err_browse_context_menu',
+        err,
+      );
+    }
+  }
+
+  async waitForContextMenuClosed(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementNotDisplayed(this.css.contextMenu, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the context menu should be closed`,
+        'err_browse_context_menu',
+        err,
+      );
+    }
+  }
+
+  // The items of the open menu as [{ label, enabled }], in display order. A menu item is a div, not
+  // a button, so a disabled one says so with aria-disabled and nothing else: isEnabled() answers
+  // true for every one of them. Labels are trimmed, which is what every lookup here compares
+  // against.
+  async getContextMenuItems() {
+    await this.waitForElementDisplayed(this.css.contextMenu);
+    const items = await this.getDisplayedElements(this.css.contextMenuItems);
+    const result = [];
+    for (const item of items) {
+      result.push({
+        label: (await item.getText()).trim(),
+        enabled: (await item.getAttribute('aria-disabled')) !== 'true',
+      });
+    }
+    return result;
+  }
+
+  // Labels of the items in the open menu, in display order.
+  async getContextMenuItemLabels() {
+    return (await this.getContextMenuItems()).map(({ label }) => label);
+  }
+
+  async isContextMenuItemEnabled(label) {
+    const item = (await this.getContextMenuItems()).find((entry) => entry.label === label);
+    if (item === undefined) {
+      throw new Error(`${this.pageName} - no item '${label}' in the context menu`);
+    }
+    return item.enabled;
+  }
+
+  // Clicks the item with the label in the open menu, which closes on pick.
+  async clickOnContextMenuItem(label) {
+    try {
+      await this.waitForElementDisplayed(this.css.contextMenu);
+      const items = await this.getDisplayedElements(this.css.contextMenuItems);
+      for (const item of items) {
+        if ((await item.getText()).trim() !== label) {
+          continue;
+        }
+        // ! A menu item is a div, so a disabled one has no click to refuse: it swallows it, leaves
+        // ! the menu open and lets this method answer as though the action had run. The state is
+        // ! read here rather than left to the click, the way the toolbar's buttons go through
+        // ! waitForElementEnabled.
+        if ((await item.getAttribute('aria-disabled')) === 'true') {
+          throw new Error(`item '${label}' is disabled`);
+        }
+        await item.click();
+        // The menu closing is what says the click landed.
+        await this.waitForContextMenuClosed();
+        return await this.pause(300);
+      }
+      throw new Error(`item '${label}' was not found in the context menu`);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after clicking on the context menu item '${label}'`,
+        'err_browse_context_menu_item',
+        err,
+      );
+    }
+  }
+
+  // Closes the open menu without picking.
+  async closeContextMenu() {
+    await this.pressEscKey();
+    return await this.waitForContextMenuClosed();
   }
 }
 

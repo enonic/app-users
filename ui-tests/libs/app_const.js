@@ -104,6 +104,12 @@ module.exports = Object.freeze({
     ID_PROVIDER_ASC: 'ID provider (A–Z)',
     ID_PROVIDER_DESC: 'ID provider (Z–A)',
   },
+  // Items of a browse row's context menu: the section's toolbar actions, offered over the row that
+  // was right-clicked and nothing else (phrases: <section>.action.*).
+  ROW_MENU_ITEM: {
+    NEW: 'New',
+    DELETE: 'Delete',
+  },
   // 'data-section' of the SectionMount that hosts the extension's shadow root
   SECTION_ID: {
     APPLICATIONS: 'com.enonic.xp.app.applications:applications',
