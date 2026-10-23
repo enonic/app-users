@@ -53,6 +53,7 @@ describe("roles.page.system.role.delete.spec - a platform role is not the operat
     // 1. Click on the role: the details open on the right, so the click did make it the active row.
     await rolesPage.clickOnRowByDisplayName(appConst.SYSTEM_ROLES.ADMINISTRATOR);
     await roleDetails.waitForTitle(appConst.SYSTEM_ROLES.ADMINISTRATOR);
+    await settingsUtils.saveScreenshot('click_on_administrator_role');
     // 2. The click painted the row as selected without ticking it - and it cannot be ticked: its
     //    checkbox is disabled.
     await rolesPage.waitForRowHighlighted(RolesPage.roleKey(appConst.roleName.ADMINISTRATOR));
@@ -76,6 +77,7 @@ describe("roles.page.system.role.delete.spec - a platform role is not the operat
     await roleDetails.waitForTitle(appConst.SYSTEM_ROLES.ADMINISTRATOR);
     // 1. Right-click on the role: the menu opens over the row with the toolbar's two actions.
     await rolesPage.openContextMenu(appConst.SYSTEM_ROLES.ADMINISTRATOR);
+    await settingsUtils.saveScreenshot('context_menu_on_administrator_role');
     assert.deepEqual(
       await rolesPage.getContextMenuItemLabels(),
       [appConst.ROW_MENU_ITEM.NEW, appConst.ROW_MENU_ITEM.DELETE],
