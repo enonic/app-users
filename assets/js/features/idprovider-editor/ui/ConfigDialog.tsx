@@ -169,7 +169,14 @@ export function ConfigDialog({
           </ActionDialog.Body>
 
           <ActionDialog.Footer question={question}>
-            <Button variant="text" size="lg" label={cancelLabel} onClick={guard.requestClose} />
+            <Button
+              variant="text"
+              size="lg"
+              label={cancelLabel}
+              // ! Takes no focus from the field, as the kit's own controls do: "Keep editing" returns there.
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={guard.requestClose}
+            />
             <ActionDialog.Action
               label={applyLabel}
               disabled={editing === undefined}
