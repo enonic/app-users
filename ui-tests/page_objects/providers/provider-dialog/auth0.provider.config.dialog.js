@@ -73,6 +73,11 @@ class Auth0IdProviderConfigDialog extends ApplicationConfigDialog {
     return this.waitForItemSetOccurrenceCount(ITEM_SET.PROXY, count, ms);
   }
 
+  // The labels the proxies should carry, in display order - a host each.
+  waitForProxyLabels(labels, ms) {
+    return this.waitForItemSetOccurrenceLabels(ITEM_SET.PROXY, labels, ms);
+  }
+
   typeInProxyHostInput(host) {
     return this.typeInInput(PROXY_FIELD.HOST, host);
   }

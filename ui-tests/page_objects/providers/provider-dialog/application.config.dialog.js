@@ -165,6 +165,23 @@ class ApplicationConfigDialog extends SectionPage {
     return this.getTextInDisplayedElements(css.validationMessages);
   }
 
+  // Waits for nothing to be reported: a field re-validates a frame after it was typed in, so a
+  // read right after the keystrokes can still see the message.
+  async waitForValidationMessagesGone(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.getValidationMessages()).length === 0,
+        { timeout: ms, timeoutMsg: 'no validation message should be shown' },
+      );
+    } catch (err) {
+      await this.handleError(
+        'Application configuration dialog - no validation message should be shown',
+        'err_config_validation',
+        err,
+      );
+    }
+  }
+
   async waitForValidationMessage(expected, ms = appConst.TIMEOUT.MEDIUM) {
     try {
       await this.getBrowser().waitUntil(
@@ -247,6 +264,24 @@ class ApplicationConfigDialog extends SectionPage {
       await this.handleError(
         `Application configuration dialog - '${title}' should hold ${count} occurrence(s)`,
         'err_config_item_set_count',
+        err,
+      );
+    }
+  }
+
+  // Waits for the set's occurrences to carry the labels, in display order: the label follows the
+  // occurrence's first input a frame after it was typed in.
+  async waitForItemSetOccurrenceLabels(title, labels, ms = appConst.TIMEOUT.MEDIUM) {
+    const expected = JSON.stringify(labels);
+    try {
+      await this.getBrowser().waitUntil(
+        async () => JSON.stringify(await this.getItemSetOccurrenceLabels(title)) === expected,
+        { timeout: ms, timeoutMsg: `'${title}' should be labelled ${expected}` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `Application configuration dialog - '${title}' should be labelled ${expected}`,
+        'err_config_item_set_labels',
         err,
       );
     }
@@ -362,6 +397,22 @@ class ApplicationConfigDialog extends SectionPage {
         err,
       );
     }
+  }
+
+  async waitForCloseQuestionNotDisplayed(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementNotDisplayed(css.question, ms);
+    } catch (err) {
+      await this.handleError(
+        'Application configuration dialog - the close question should be gone',
+        'err_config_close_question',
+        err,
+      );
+    }
+  }
+
+  isKeepButtonDisplayed() {
+    return this.isElementDisplayed(css.keepButton);
   }
 
   async clickOnKeepButton() {

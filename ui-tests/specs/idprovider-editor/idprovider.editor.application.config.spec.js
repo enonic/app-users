@@ -25,6 +25,7 @@ describe('idprovider.editor.application.config.spec - the configuration of the b
   const AUTH0_APPLICATION = Auth0IdProviderConfigDialog.APPLICATION;
   const CONFIG_INCOMPLETE = 'The application configuration has required fields to fill in';
   const FIELD_REQUIRED = 'This field is required';
+  const CLOSE_QUESTION = 'Do you want to close the dialog? Changes will be lost.';
   const { DOMAIN, CLIENT_ID, CLIENT_SECRET } = AdfsIdProviderConfigDialog.FIELD;
   // The three required inputs of the Client fieldset - the configuration is complete once they are.
   const CLIENT_SETTINGS = Object.freeze({
@@ -328,20 +329,97 @@ describe('idprovider.editor.application.config.spec - the configuration of the b
     // 6. The host, then Apply: the occurrence takes the host as its label, nothing is reported, and
     //    the icon goes - the configuration is complete, item set included.
     await configDialog.typeInProxyHostInput(host);
-    assert.deepEqual(
-      await configDialog.getProxyLabels(),
-      [host],
-      'The occurrence should be labelled by its host',
-    );
-    assert.deepEqual(
-      await configDialog.getValidationMessages(),
-      [],
-      'A filled Host should report nothing',
-    );
+    await configDialog.waitForProxyLabels([host]);
+    await configDialog.waitForValidationMessagesGone();
     await configDialog.clickOnApplyButtonAndWaitForClosed();
     await generalStep.waitForApplicationConfigIssueGone();
     await settingsUtils.saveScreenshot('idprovider-config-issue-gone-auth0');
     // 7. Nothing is created: the dirty editor asks on the cross, and the question is confirmed.
+    await generalStep.clickOnCloseButton();
+    await generalStep.waitForCloseQuestionDisplayed();
+    await generalStep.clickOnDiscardButton();
+    await generalStep.waitForClosed();
+  });
+
+  // The dialog over the editor asks before it drops edits, and the question stays inside it: the
+  // way out it offers never reaches the editor underneath, which is left as it was - open, with
+  // the application bound and its icon as before - and 'Keep editing' keeps what was typed.
+  it("GIVEN a value has been typed in the configuration dialog WHEN Cancel has been clicked THEN the dialog should ask before closing AND WHEN 'Keep editing' has been clicked THEN the value should still be there AND WHEN Cancel has been confirmed THEN the dialog should be closed AND the editor left open with its icon unchanged", async () => {
+    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
+    let idProvidersPage = new IdProvidersPage();
+    let generalStep = new IdProviderEditorGeneralStepDialog();
+    let configDialog = new AdfsIdProviderConfigDialog();
+    const domain = userItemsBuilder.generateRandomName('domain');
+    // 1. New, the display name, the ADFS application, the pencil: the dialog opens on an empty
+    //    Client fieldset.
+    await idProvidersPage.clickOnNewButton();
+    await generalStep.waitForLoaded();
+    await generalStep.typeInDisplayNameInput(userItemsBuilder.generateRandomName('provider'));
+    await generalStep.selectApplication(ADFS_APPLICATION);
+    await generalStep.waitForApplicationConfigIssue(CONFIG_INCOMPLETE);
+    await generalStep.clickOnApplicationConfigButton();
+    await configDialog.waitForLoaded();
+    assert.ok(
+      !(await configDialog.isCloseQuestionDisplayed()),
+      'Nothing should be asked before the dialog is closed',
+    );
+    // 2. A value, then Cancel: the dialog stays open and its footer asks instead.
+    await configDialog.typeInDomainInput(domain);
+    await configDialog.clickOnCancelButton();
+    await configDialog.waitForCloseQuestionDisplayed();
+    await settingsUtils.saveScreenshot('idprovider-config-dialog-close-question');
+    assert.ok(await configDialog.isDialogDisplayed(), 'The dialog should stay open while it asks');
+    assert.equal(
+      await configDialog.getCloseQuestion(),
+      CLOSE_QUESTION,
+      'The question should say the changes would be lost',
+    );
+    assert.ok(
+      await configDialog.isKeepButtonDisplayed(),
+      "The 'Keep editing' button should be shown",
+    );
+    assert.ok(
+      !(await generalStep.isCloseQuestionDisplayed()),
+      'The question should be asked in the dialog, not in the editor underneath',
+    );
+    // 3. 'Keep editing': the question goes, the value is as it was typed.
+    await configDialog.clickOnKeepButton();
+    await configDialog.waitForCloseQuestionNotDisplayed();
+    assert.ok(await configDialog.isDialogDisplayed(), 'The dialog should still be open');
+    assert.equal(
+      await configDialog.getTextInDomainInput(),
+      domain,
+      'The value should have survived the question',
+    );
+    // 4. Cancel again, then Confirm: the dialog closes and the edit is dropped. The editor is left
+    //    as it was - open on General, the application bound, the icon still there since nothing
+    //    was applied.
+    await configDialog.clickOnCancelButton();
+    await configDialog.waitForCloseQuestionDisplayed();
+    await configDialog.clickOnDiscardButton();
+    await configDialog.waitForClosed();
+    assert.ok(await generalStep.isDialogDisplayed(), 'The editor should still be open');
+    assert.equal(await generalStep.getStepTitle(), 'General');
+    assert.ok(
+      !(await generalStep.isCloseQuestionDisplayed()),
+      'The answer should not have reached the editor',
+    );
+    assert.equal(await generalStep.getSelectedApplication(), ADFS_APPLICATION);
+    assert.equal(
+      await generalStep.getApplicationConfigIssue(),
+      CONFIG_INCOMPLETE,
+      'The icon should be as before: the dropped edit applied nothing',
+    );
+    // 5. The pencil again: the dropped value is not there.
+    await generalStep.clickOnApplicationConfigButton();
+    await configDialog.waitForLoaded();
+    assert.equal(
+      await configDialog.getTextInDomainInput(),
+      '',
+      'The dropped value should not be in the reopened dialog',
+    );
+    await configDialog.clickOnCancelButtonAndWaitForClosed();
+    // 6. Nothing is created: the dirty editor asks on the cross, and the question is confirmed.
     await generalStep.clickOnCloseButton();
     await generalStep.waitForCloseQuestionDisplayed();
     await generalStep.clickOnDiscardButton();
