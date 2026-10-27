@@ -14,14 +14,17 @@
  *
  * One instance per picker: the constructor takes the dialog's container (the editor's
  * `css.container`), the step the picker is on and the placeholder of its input, which tells the
- * pickers of one dialog apart. The popup is portalled beside the dialog, so it is not scoped.
+ * pickers of one dialog apart. A picker outside a step - the PrincipalSelector input of an
+ * application's configuration form (application.config.dialog.js) - passes the selector of the
+ * element holding it as `panel` instead of a step. The popup is portalled beside the dialog, so it
+ * is not scoped.
  */
 const SectionPage = require('./section.page');
 const appConst = require('../libs/app_const');
 const { COMBOBOX, ITEM_LABEL } = require('../libs/elements');
 
-function buildCss(container, step, placeholder) {
-  const PANEL = `${container} [data-registry-id='${step}']`;
+function buildCss(container, step, placeholder, panel) {
+  const PANEL = panel ?? `${container} [data-registry-id='${step}']`;
   const SEARCH = `${PANEL} ${COMBOBOX.searchByPlaceholder(placeholder)}`;
   const PICKED = `${PANEL} [data-component='GridList.Row'][id$='-picked']`;
   return {
@@ -56,10 +59,10 @@ function buildCss(container, step, placeholder) {
 }
 
 class PrincipalCombobox extends SectionPage {
-  constructor({ sectionId, container, step, placeholder }) {
+  constructor({ sectionId, container, step, placeholder, panel }) {
     super(sectionId);
     this.placeholder = placeholder;
-    this.css = buildCss(container, step, placeholder);
+    this.css = buildCss(container, step, placeholder, panel);
   }
 
   get input() {
@@ -375,6 +378,13 @@ class PrincipalCombobox extends SectionPage {
         err,
       );
     }
+  }
+
+  // Scrolls the picked row into view - for a screenshot of a picker low in a scrolling dialog.
+  async scrollToSelectedOption(displayName) {
+    const button = await this.findElement(this.css.pickedRemoveButton(displayName));
+    await button.scrollIntoView({ block: 'center' });
+    return await this.pause(200);
   }
 
   async waitForOptionNotSelected(displayName, ms = appConst.TIMEOUT.MEDIUM) {

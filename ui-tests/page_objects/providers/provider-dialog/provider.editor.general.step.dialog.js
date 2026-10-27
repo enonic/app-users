@@ -326,6 +326,20 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     }
   }
 
+  // Waits for the icon to go: the configuration applied in the dialog satisfies the form, or the
+  // application was removed.
+  async waitForApplicationConfigIssueGone(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementNotDisplayed(css.applicationConfigIssueIcon, ms);
+    } catch (err) {
+      await this.handleError(
+        'New ID provider dialog - the configuration icon should be gone',
+        'err_application_config_issue_gone',
+        err,
+      );
+    }
+  }
+
   async clickOnRemoveApplicationButton() {
     try {
       await this.waitForElementEnabled(css.applicationRemoveButton);
