@@ -3,8 +3,8 @@
  *
  * 'General' step of the ID provider editor: Display name, ID, Description and the Application
  * selector. The first step, so it is what opens after New (or Edit) has been clicked. The selector
- * always reads 'Select an application'; the bound application is listed under it as a row with its
- * key, a pencil button ('Edit the application configuration', when the application has a config
+ * is a search field ('Select an application') that narrows the list by display name or key; the
+ * bound application is listed under it as a row with its key, a pencil button ('Edit the application configuration', when the application has a config
  * form) and a Remove button. When an existing provider is edited the ID input is read-only.
  */
 const IdProviderEditorStepDialog = require('./provider.editor.step.dialog');
@@ -12,9 +12,7 @@ const appConst = require('../../../libs/app_const');
 
 const DIALOG = IdProviderEditorStepDialog.css.container;
 const PANEL = `${DIALOG} [data-registry-id='general']`;
-const APPLICATION_TRIGGER =
-  `${DIALOG} [data-component='Selector.Trigger']` +
-  "[aria-labelledby='id-provider-editor-application-label']";
+const APPLICATION_SELECTOR = `${DIALOG} [data-component='ApplicationSelector']`;
 
 const css = {
   displayNameInput: `${DIALOG} input#id-provider-editor-display-name`,
@@ -25,11 +23,14 @@ const css = {
   // refused: its own line under the input, outside the error messages.
   idWarning: `${PANEL} div#id-provider-editor-id-warning`,
   // Application
-  applicationSelectorTrigger: APPLICATION_TRIGGER,
+  applicationSearchInput: `${APPLICATION_SELECTOR} [data-component='Combobox.Input']`,
+  applicationToggle: `${APPLICATION_SELECTOR} [data-component='Combobox.Toggle']`,
   // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
-  applicationOptions: "[data-component='SelectorPopup'] [data-component='Selector.Item']",
+  applicationOptions: "[data-component='Combobox.Popup'] [data-component='Listbox.Item']",
   applicationOptionByKey: (key) =>
-    `[data-component='SelectorPopup'] [data-component='Selector.Item'][data-value='${key}']`,
+    `[data-component='Combobox.Popup'] [data-component='Listbox.Item'][data-value='${key}']`,
+  // The display name inside an option: the key is shown under it.
+  applicationOptionName: "[data-component='ItemLabel'] span.font-semibold",
   // The bound application: one row under the selector (id '<key>-bound').
   applicationRow: `${PANEL} [data-component='GridList.Row'][id$='-bound']`,
   applicationName:
@@ -60,7 +61,7 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
   }
 
   get applicationSelectorTrigger() {
-    return css.applicationSelectorTrigger;
+    return css.applicationSearchInput;
   }
 
   // Inputs
@@ -170,18 +171,19 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
   // Application selector
 
   isApplicationSelectorDisplayed() {
-    return this.isElementDisplayed(css.applicationSelectorTrigger);
+    return this.isElementDisplayed(css.applicationSearchInput);
   }
 
   // Disabled while the application is fixed (an existing provider whose application may not change).
   isApplicationSelectorEnabled() {
-    return this.isElementEnabled(css.applicationSelectorTrigger);
+    return this.isElementEnabled(css.applicationSearchInput);
   }
 
+  // Opens the popup with the toggle: a click on the input alone does not open it.
   async clickOnApplicationSelector() {
     try {
-      await this.waitForElementDisplayed(css.applicationSelectorTrigger);
-      await this.clickOnElement(css.applicationSelectorTrigger);
+      await this.waitForElementDisplayed(css.applicationToggle);
+      await this.clickOnElement(css.applicationToggle);
       await this.waitForElementDisplayed(css.applicationOptions);
       return await this.pause(200);
     } catch (err) {
@@ -193,20 +195,38 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     }
   }
 
+  // Types into the search, which opens the popup and narrows it by display name or key.
+  async typeInApplicationSearch(text) {
+    try {
+      await this.waitForElementDisplayed(css.applicationSearchInput);
+      await this.typeTextInInput(css.applicationSearchInput, text);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        'New ID provider dialog - Application search',
+        'err_application_search',
+        err,
+      );
+    }
+  }
+
   // Display names of the applications offered in the opened selector.
   async getApplicationOptions() {
     await this.waitForElementDisplayed(css.applicationOptions);
-    return await this.getTextInDisplayedElements(css.applicationOptions);
+    return await this.getTextInDisplayedElements(
+      `${css.applicationOptions} ${css.applicationOptionName}`,
+    );
   }
 
-  // Opens the selector and picks the application by its display name. Picking again replaces the
+  // Opens the selector and picks the application by its display name. An option carries only the
+  // key (`data-value`), so the display name of each option is compared. Picking again replaces the
   // bound application.
   async selectApplication(displayName) {
     try {
       await this.clickOnApplicationSelector();
       const options = await this.getDisplayedElements(css.applicationOptions);
       for (const option of options) {
-        if ((await option.getText()) === displayName) {
+        if ((await option.$(css.applicationOptionName).getText()) === displayName) {
           await option.click();
           await this.waitForElementDisplayed(css.applicationRow);
           return await this.pause(300);
