@@ -8,6 +8,7 @@ const assert = require('node:assert');
 const userItemsBuilder = require('../../libs/users.items.builder');
 const IdProvidersPage = require('../../page_objects/providers/id.providers.page');
 const IdProviderEditorGeneralStepDialog = require('../../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
+const Auth0IdProviderConfigDialog = require('../../page_objects/providers/provider-dialog/auth0.provider.config.dialog');
 
 describe("idprovider.editor.general.step.spec - the ID provider editor's General step: the ID follows the display name, the application is bound here, and the ID's own rules are reported under the input", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
@@ -17,6 +18,11 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
   const PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
   // The application every provider of this suite is bound to; it ships with XP.
   const APPLICATION = 'Standard ID Provider';
+  // A test application: the only one whose name and key carry 'auth0'.
+  const AUTH0_APPLICATION = Auth0IdProviderConfigDialog.APPLICATION;
+  // In the key of the Standard ID Provider only: its display name has spaces where the key has none.
+  const STANDARD_KEY_PART = 'standardidprovider';
+  const NO_MATCHES = 'Nothing matches the search';
   const DISPLAY_NAME_REQUIRED = 'Display name is required';
   const ID_REQUIRED = 'ID is required';
   const ID_INVALID = 'The ID can only contain Latin letters, digits and the characters . - _';
@@ -117,6 +123,68 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
       'Removing the application should report nothing',
     );
     await generalStep.waitForNextButtonEnabled();
+  });
+
+  // The selector is a search: typing narrows the list by the display name or the key, and a match
+  // is picked from the narrowed list.
+  it("GIVEN the ID provider editor is opened WHEN 'auth0' has been typed in the application selector THEN only the Auth0 application should be offered AND WHEN a part of a key has been typed THEN only its application should be offered AND WHEN nothing matches THEN the popup should say so", async () => {
+    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
+    let idProvidersPage = new IdProvidersPage();
+    let generalStep = new IdProviderEditorGeneralStepDialog();
+    // 1. New: the editor opens on General.
+    await idProvidersPage.clickOnNewButton();
+    await generalStep.waitForLoaded();
+    // 2. By the display name, in another case than it is written in.
+    await generalStep.typeInApplicationSearch('auth0');
+    await settingsUtils.saveScreenshot('idprovider-editor-application-search');
+    assert.deepEqual(
+      await generalStep.getApplicationOptions(),
+      [AUTH0_APPLICATION],
+      'The filter by display name should offer the Auth0 application alone',
+    );
+    // 3. By the key - a text the display name does not contain.
+    await generalStep.clearApplicationSearch();
+    await generalStep.typeInApplicationSearch(STANDARD_KEY_PART);
+    assert.deepEqual(
+      await generalStep.getApplicationOptions(),
+      [APPLICATION],
+      'The filter by key should offer the Standard ID Provider alone',
+    );
+    // 4. Something no application is called: no option, and the popup says why.
+    await generalStep.clearApplicationSearch();
+    await generalStep.typeInApplicationSearch(userItemsBuilder.generateRandomName('none'));
+    assert.deepEqual(await generalStep.getApplicationOptions(), [], 'No option should match');
+    assert.equal(await generalStep.getApplicationPopupMessage(), NO_MATCHES);
+  });
+
+  it('GIVEN the application list has been narrowed by typing WHEN the match has been clicked THEN it should be listed as the bound application', async () => {
+    await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
+    let idProvidersPage = new IdProvidersPage();
+    let generalStep = new IdProviderEditorGeneralStepDialog();
+    // 1. New, then the display name.
+    await idProvidersPage.clickOnNewButton();
+    await generalStep.waitForLoaded();
+    await generalStep.typeInDisplayNameInput(NEW_PROVIDER.displayName);
+    // 2. Type the display name and click the one option left.
+    await generalStep.filterAndSelectApplication(APPLICATION);
+    await generalStep.waitForApplicationRowDisplayed();
+    assert.equal(
+      await generalStep.getSelectedApplication(),
+      APPLICATION,
+      'The application picked from the narrowed list should be the bound one',
+    );
+    // 3. The pick closes the popup and clears the search: every application is offered again.
+    await generalStep.waitForApplicationPopupClosed();
+    assert.equal(
+      await generalStep.getTextInApplicationSearch(),
+      '',
+      'The search should be cleared once an application has been picked',
+    );
+    await generalStep.clickOnApplicationSelector();
+    assert.ok(
+      (await generalStep.getApplicationOptions()).includes(AUTH0_APPLICATION),
+      'Every application should be offered again after the pick',
+    );
   });
 
   // Both fields are required. The display name is also where the ID comes from until the ID is

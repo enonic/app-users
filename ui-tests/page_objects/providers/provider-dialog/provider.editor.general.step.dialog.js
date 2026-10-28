@@ -3,12 +3,14 @@
  *
  * 'General' step of the ID provider editor: Display name, ID, Description and the Application
  * selector. The first step, so it is what opens after New (or Edit) has been clicked. The selector
- * is a search field ('Select an application') that narrows the list by display name or key; the
- * bound application is listed under it as a row with its key, a pencil button ('Edit the application configuration', when the application has a config
- * form) and a Remove button. When an existing provider is edited the ID input is read-only.
+ * is a combobox: a search input ('Select an application') that narrows the list by display name or
+ * key, and a toggle that drops the whole list down. The bound application is listed under it as a
+ * row with its key, a pencil button ('Edit the application configuration', when the application has
+ * a config form) and a Remove button. When an existing provider is edited the ID input is read-only.
  */
 const IdProviderEditorStepDialog = require('./provider.editor.step.dialog');
 const appConst = require('../../../libs/app_const');
+const { COMBOBOX, ITEM_LABEL } = require('../../../libs/elements');
 
 const DIALOG = IdProviderEditorStepDialog.css.container;
 const PANEL = `${DIALOG} [data-registry-id='general']`;
@@ -23,14 +25,16 @@ const css = {
   // refused: its own line under the input, outside the error messages.
   idWarning: `${PANEL} div#id-provider-editor-id-warning`,
   // Application
-  applicationSearchInput: `${APPLICATION_SELECTOR} [data-component='Combobox.Input']`,
-  applicationToggle: `${APPLICATION_SELECTOR} [data-component='Combobox.Toggle']`,
+  applicationSearchInput: `${APPLICATION_SELECTOR} ${COMBOBOX.INPUT}`,
+  applicationToggle: `${APPLICATION_SELECTOR} ${COMBOBOX.TOGGLE}`,
   // The popup is portalled beside the dialog, not inside it: no DIALOG prefix.
-  applicationOptions: "[data-component='Combobox.Popup'] [data-component='Listbox.Item']",
-  applicationOptionByKey: (key) =>
-    `[data-component='Combobox.Popup'] [data-component='Listbox.Item'][data-value='${key}']`,
+  applicationPopup: COMBOBOX.POPUP,
+  applicationOptions: COMBOBOX.OPTIONS,
+  applicationOptionByKey: COMBOBOX.optionByValue,
   // The display name inside an option: the key is shown under it.
-  applicationOptionName: "[data-component='ItemLabel'] span.font-semibold",
+  applicationOptionName: ITEM_LABEL.DISPLAY_NAME,
+  // 'Nothing matches the search'
+  applicationPopupMessage: COMBOBOX.POPUP_MESSAGE,
   // The bound application: one row under the selector (id '<key>-bound').
   applicationRow: `${PANEL} [data-component='GridList.Row'][id$='-bound']`,
   applicationName:
@@ -200,6 +204,7 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.applicationSearchInput);
       await this.typeTextInInput(css.applicationSearchInput, text);
+      await this.waitForElementDisplayed(css.applicationPopup);
       return await this.pause(300);
     } catch (err) {
       await this.handleError(
@@ -210,20 +215,45 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     }
   }
 
-  // Display names of the applications offered in the opened selector.
+  clearApplicationSearch() {
+    return this.clearInputText(css.applicationSearchInput);
+  }
+
+  getTextInApplicationSearch() {
+    return this.getTextInInput(css.applicationSearchInput);
+  }
+
+  async waitForApplicationPopupClosed(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementNotDisplayed(css.applicationPopup, ms);
+    } catch (err) {
+      await this.handleError(
+        'New ID provider dialog - the application popup should be closed',
+        'err_application_popup',
+        err,
+      );
+    }
+  }
+
+  // Display names of the applications offered in the opened popup - none when nothing matches.
   async getApplicationOptions() {
-    await this.waitForElementDisplayed(css.applicationOptions);
+    await this.waitForElementDisplayed(css.applicationPopup);
     return await this.getTextInDisplayedElements(
       `${css.applicationOptions} ${css.applicationOptionName}`,
     );
   }
 
-  // Opens the selector and picks the application by its display name. An option carries only the
-  // key (`data-value`), so the display name of each option is compared. Picking again replaces the
-  // bound application.
-  async selectApplication(displayName) {
+  // 'Nothing matches the search' - or undefined while options are shown.
+  async getApplicationPopupMessage() {
+    const messages = await this.getDisplayedElements(css.applicationPopupMessage);
+    return messages.length === 0 ? undefined : await messages[0].getText();
+  }
+
+  // Clicks the option with the display name in the opened popup. An option carries only the key
+  // (`data-value`), so the display name of each option is compared.
+  async clickOnApplicationOption(displayName) {
     try {
-      await this.clickOnApplicationSelector();
+      await this.waitForElementDisplayed(css.applicationOptions);
       const options = await this.getDisplayedElements(css.applicationOptions);
       for (const option of options) {
         if ((await option.$(css.applicationOptionName).getText()) === displayName) {
@@ -240,6 +270,19 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
         err,
       );
     }
+  }
+
+  // Opens the selector and picks the application by its display name. Picking again replaces the
+  // bound application.
+  async selectApplication(displayName) {
+    await this.clickOnApplicationSelector();
+    return await this.clickOnApplicationOption(displayName);
+  }
+
+  // Narrows the list by the display name, then picks the match.
+  async filterAndSelectApplication(displayName) {
+    await this.typeInApplicationSearch(displayName);
+    return await this.clickOnApplicationOption(displayName);
   }
 
   // Opens the selector and picks the application by its key, e.g. 'com.enonic.app.standardidprovider'.
