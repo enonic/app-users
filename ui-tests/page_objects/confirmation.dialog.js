@@ -57,7 +57,8 @@ function buildCss(kind) {
     gateText: `${GATE} [data-component='Gate.Hint']`,
     expectedValue: `${GATE} [data-component='Gate.Hint'] strong`,
     confirmInput: `${GATE} input`,
-    mismatchMessage: `${GATE} p.text-error`,
+    // '<typed> does not match <expected>': the Input's own error line under the gate's input.
+    mismatchMessage: `${GATE} .text-error`,
     // Footer: Cancel and Delete.
     deleteButton: `${FOOTER} button[aria-label='Delete']`,
     confirmButton: `${FOOTER} button[aria-label='Confirm']`,
@@ -145,6 +146,13 @@ class ConfirmationDialog extends SectionPage {
   async getTargetDisplayName() {
     const names = await this.getDisplayedElements(this.css.targetDisplayName);
     return names.length === 0 ? undefined : await names[0].getText();
+  }
+
+  // Every target listed under the delete question, in display order - the display names of the
+  // items about to be deleted.
+  async getTargetDisplayNames() {
+    await this.waitForElementDisplayed(this.css.targetDisplayName);
+    return this.getTextInDisplayedElements(this.css.targetDisplayName);
   }
 
   // Gate (delete confirmation)

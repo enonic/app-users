@@ -2,10 +2,11 @@
  * Created on 02.10.2026.
  *
  * Base class of the five browse screens (Users, Service Accounts, Groups, Roles, ID Providers):
- * the same toolbar (New, Delete), search field, list header (Select all, Sort by, Refresh) and
- * list of rows, differing only in the page's data-component, the section the shadow root belongs
- * to and what a row shows on its right. A section's page object passes those in and adds what is
- * its own (the Edit button and the filter of Users, the key format of its rows).
+ * the same toolbar (New, Delete), search box with its filter dropdown, list header (Select all,
+ * Sort by, Refresh) and list of rows, differing only in the page's data-component, the section the
+ * shadow root belongs to, the fields the filter offers and what a row shows on its right. A
+ * section's page object passes those in and adds what is its own (the Edit button of Users, the
+ * key format of its rows, a pick in its own filter field).
  *
  * Right-clicking a row opens the same actions as a context menu, so the toolbar's rules are asserted
  * once here and read back from both.
@@ -17,6 +18,7 @@
  */
 const SectionPage = require('./section.page');
 const appConst = require('../libs/app_const');
+const { COMBOBOX } = require('../libs/elements');
 
 const CONTEXT_MENU = "[data-component='BrowseListContextMenu'][role='menu']";
 
@@ -28,14 +30,36 @@ function buildCss(pageComponent) {
   const HEADER = `${PAGE} [data-component='BrowseListHeader']`;
   const LIST = `${PAGE} [data-component='BrowseList']`;
   const ROW = `${LIST} [data-component='BrowseListRow']`;
+  const SEARCH = `${PAGE} [data-component='FilterInput']`;
   return {
     container: PAGE,
     toolbar: TOOLBAR,
     toolbarButtons: `${TOOLBAR} button[data-component='Toolbar.Item']`,
     toolbarButton: (label) =>
       `${TOOLBAR} button[data-component='Toolbar.Item'][aria-label='${label}']`,
-    // Search (BrowseScreen)
-    searchInput: `${PAGE} [data-component='BrowseSearch'] input[data-component='SearchField.Input']`,
+    // Search: the kit's FilterInput (BrowseScreen). Text narrows the list only once Enter has made
+    // it a tag; the tags are the terms in force, the input empties on each.
+    search: SEARCH,
+    searchInput: `${SEARCH} input[data-component='Combobox.Input']`,
+    searchTerms: `${SEARCH} [data-component='Tag'] [data-component='Tag.Label']`,
+    searchTermRemoveButton: (text) =>
+      `${SEARCH} [data-component='Tag.Remove'][aria-label='Remove ${text}']`,
+    searchClearButton: `${SEARCH} button[aria-label='Clear the filter']`,
+    // The dropdown of the search box (the FilterInput's Combobox.Popup), portalled into
+    // AppRoot.PortalLayer like the Sort menu: no page prefix. Its options are Listbox.Items whose
+    // 'data-value' is 'field:<id>' while the fields are offered and 'value:<id>' once a field has
+    // been entered - its values, each with the number of rows it would leave, disabled while that
+    // number is 0 and the value is not picked.
+    filterPopup: COMBOBOX.POPUP,
+    filterFieldOption: (id) =>
+      `${COMBOBOX.POPUP} [data-component='Listbox.Item'][data-value='field:${id}']`,
+    filterValueOptions: `${COMBOBOX.POPUP} [data-component='Listbox.Item'][data-value^='value:']`,
+    filterValueOption: (id) =>
+      `${COMBOBOX.POPUP} [data-component='Listbox.Item'][data-value='value:${id}']`,
+    filterOptionLabel: 'span.truncate',
+    filterOptionCount: 'span.tabular-nums',
+    // The input once a field has been entered: it invites one of the field's values.
+    filterValueInput: `${SEARCH} input[data-component='Combobox.Input'][placeholder='Pick a value']`,
     // List header (BrowseListHeader)
     listHeader: HEADER,
     selectAllCheckbox: `${HEADER} [data-component='Checkbox'] input`,
@@ -280,6 +304,7 @@ class BrowsePage extends SectionPage {
 
   // Search
 
+  // Types without committing: the list stays as it is until addSearchTerm's Enter.
   async typeTextInSearchInput(text) {
     try {
       await this.waitForElementDisplayed(this.css.searchInput);
@@ -310,8 +335,177 @@ class BrowsePage extends SectionPage {
     return this.getTextInInput(this.css.searchInput);
   }
 
+  // Types the text and presses Enter: it becomes a tag and the list is narrowed by it.
+  async addSearchTerm(text) {
+    try {
+      await this.typeTextInSearchInput(text);
+      await this.pressEnterKey();
+      await this.waitForElementDisplayed(this.css.searchTermRemoveButton(text));
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after adding the search term '${text}'`,
+        'err_search_term',
+        err,
+      );
+    }
+  }
+
+  // Labels of the terms in force, in the order they were added; a field term reads as its value.
+  getSearchTerms() {
+    return this.getTextInElements(this.css.searchTerms);
+  }
+
+  async removeSearchTerm(text) {
+    try {
+      await this.clickOnElement(this.css.searchTermRemoveButton(text));
+      await this.waitForElementNotDisplayed(this.css.searchTermRemoveButton(text));
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after removing the search term '${text}'`,
+        'err_search_term',
+        err,
+      );
+    }
+  }
+
+  // The cross at the right end of the box, shown while a term is in force: every term goes.
+  async clickOnClearSearchButton() {
+    try {
+      await this.clickOnElement(this.css.searchClearButton);
+      await this.waitForElementNotDisplayed(this.css.searchClearButton);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after clearing the search`,
+        'err_search_clear',
+        err,
+      );
+    }
+  }
+
   isSearchInputDisplayed() {
     return this.isElementDisplayed(this.css.searchInput);
+  }
+
+  // Filter dropdown
+
+  // A click in the search input opens the dropdown on its first stage, the fields (not a focus:
+  // the focus Escape returns to the input must not reopen it).
+  async openFilterDropdown() {
+    try {
+      await this.waitForElementDisplayed(this.css.searchInput);
+      await this.clickOnElement(this.css.searchInput);
+      await this.waitForElementDisplayed(this.css.filterPopup);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after opening the filter dropdown`,
+        'err_filter_dropdown',
+        err,
+      );
+    }
+  }
+
+  // Enters the field with the id ('idProvider'): its option is clicked and the dropdown moves on
+  // to the field's values, the input now inviting one ('Pick a value').
+  async openFilterFieldValues(fieldId) {
+    try {
+      if (!(await this.isElementDisplayed(this.css.filterPopup))) {
+        await this.openFilterDropdown();
+      }
+      await this.clickOnElement(this.css.filterFieldOption(fieldId));
+      await this.waitForElementDisplayed(this.css.filterValueInput);
+      await this.waitForElementDisplayed(this.css.filterPopup);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after entering the filter field '${fieldId}'`,
+        'err_filter_field',
+        err,
+      );
+    }
+  }
+
+  // The values the entered field offers as [{ id, label, count, disabled, selected }], in display
+  // order: `count` is the number of rows the value would leave (undefined without one), `disabled`
+  // whether the option is greyed out - a value with no rows and not picked is.
+  async getFilterValues() {
+    await this.waitForElementDisplayed(this.css.filterValueOptions);
+    const options = await this.getDisplayedElements(this.css.filterValueOptions);
+    const values = [];
+    for (const option of options) {
+      const counts = await option.$$(this.css.filterOptionCount);
+      values.push({
+        id: (await option.getAttribute('data-value')).slice('value:'.length),
+        label: await option.$(this.css.filterOptionLabel).getText(),
+        count:
+          counts.length === 0
+            ? undefined
+            : Number((await counts[0].getText()).replace(/[()\s]/g, '')),
+        disabled: (await option.getAttribute('aria-disabled')) === 'true',
+        selected: (await option.getAttribute('aria-selected')) === 'true',
+      });
+    }
+    return values;
+  }
+
+  // Picks the value with the id ('system', a provider key) of the entered field: it becomes a term
+  // whose tag reads the value and whose Remove button names '<field>: <value>', and the list is
+  // narrowed by it. A pick by click closes the dropdown (the values stay open across keyboard picks
+  // only), so it is not waited for either way. `label` is what the tag's Remove button names.
+  async clickOnFilterValue(id, label) {
+    try {
+      await this.waitForElementDisplayed(this.css.filterValueOption(id));
+      await this.clickOnElement(this.css.filterValueOption(id));
+      await this.waitForElementDisplayed(this.css.searchTermRemoveButton(label));
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after picking the filter value '${id}'`,
+        'err_filter_value',
+        err,
+      );
+    }
+  }
+
+  // Escape steps out of the entered field, a second one closes the dropdown.
+  async closeFilterDropdown() {
+    try {
+      if (await this.isElementDisplayed(this.css.filterValueInput)) {
+        await this.pressEscKey();
+      }
+      if (await this.isElementDisplayed(this.css.filterPopup)) {
+        await this.pressEscKey();
+      }
+      await this.waitForElementNotDisplayed(this.css.filterPopup);
+      return await this.pause(300);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - error after closing the filter dropdown`,
+        'err_filter_dropdown',
+        err,
+      );
+    }
+  }
+
+  isFilterDropdownDisplayed() {
+    return this.isElementDisplayed(this.css.filterPopup);
+  }
+
+  // Waits until no field is entered any more: the input invites a search again, not a value.
+  // 'Clear the filter' and Escape both step out of the field without closing the dropdown.
+  async waitForFilterFieldLeft(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementNotDisplayed(this.css.filterValueInput, ms);
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the filter field should have been left`,
+        'err_filter_field',
+        err,
+      );
+    }
   }
 
   // Sort by
