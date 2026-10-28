@@ -1,22 +1,14 @@
-import {
-  FilledOctagonAlert,
-  GridList,
-  IconButton,
-  Input,
-  Selector,
-  TextArea,
-  Tooltip,
-} from '@enonic/ui';
+import { FilledOctagonAlert, GridList, IconButton, Input, TextArea, Tooltip } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { Pencil, TriangleAlert, X } from 'lucide-react';
 import { useMemo, useState } from 'preact/hooks';
 
 import { ApplicationIcon } from '../../../../entities/application';
+import { ApplicationSelector } from '../../../../entities/application/ui/ApplicationSelector';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
 import { ItemLabel } from '../../../../shared/ui/ItemLabel';
-import { SelectorPopup } from '../../../../shared/ui/SelectorPopup';
 import { $idProviderApplications } from '../../model/idprovider-applications';
 import { idProviderConfigIssue } from '../../model/idprovider-config-issue';
 import { $idProviderConfig } from '../../model/idprovider-config.store';
@@ -132,29 +124,14 @@ export function IdProviderEditorDialogGeneralStep() {
       <div className="flex flex-col gap-1.5">
         <FieldLabel id={APPLICATION_LABEL_ID} text={applicationLabel} />
 
-        {/* Value fixed at empty, so the trigger reads as "pick one" and never repeats what the row
-            below already says — the same division `PrincipalPicker` draws between its input and its
-            picked rows. Choosing again replaces the binding in one click. */}
-        <Selector.Root
-          value=""
+        <ApplicationSelector
+          applications={applications}
+          value={form.application}
+          onChange={(application) => updateIdProviderEditorForm({ application })}
+          labelledBy={APPLICATION_LABEL_ID}
+          placeholder={applicationPlaceholder}
           disabled={applicationFixed}
-          onValueChange={(application) => updateIdProviderEditorForm({ application })}
-        >
-          <Selector.Trigger aria-labelledby={APPLICATION_LABEL_ID}>
-            <Selector.Value placeholder={applicationPlaceholder} />
-            <Selector.Icon />
-          </Selector.Trigger>
-          <SelectorPopup>
-            {applications.map(({ key, displayName, icon }) => (
-              <Selector.Item key={key} value={key} textValue={displayName}>
-                <span className="flex items-center gap-2.5">
-                  <ApplicationIcon icon={icon} />
-                  <Selector.ItemText>{displayName}</Selector.ItemText>
-                </span>
-              </Selector.Item>
-            ))}
-          </SelectorPopup>
-        </Selector.Root>
+        />
 
         {form.application !== '' && (
           <GridList
