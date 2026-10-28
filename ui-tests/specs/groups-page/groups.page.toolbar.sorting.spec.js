@@ -33,13 +33,8 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
   let GROUP3;
   let TEST_GROUP;
 
-  // Display names of the suite's own groups, in the order the list shows them.
-  async function getOwnGroupsInListOrder(groupsPage) {
-    const names = await groupsPage.getGroupDisplayNames();
-    return names.filter((name) =>
-      [GROUP1_NAME, GROUP2_NAME, GROUP3_NAME, GROUP4_NAME, GROUP5_NAME].includes(name),
-    );
-  }
+  // The suite's own groups: the rows waitForRowsInOrder looks at, the rest of the list passed over.
+  const OWN_GROUP_NAMES = [GROUP1_NAME, GROUP2_NAME, GROUP3_NAME, GROUP4_NAME, GROUP5_NAME];
 
   // The groups are made in two ID providers: the suite's own, whose name ('provider...') sorts
   // before 'system', and the system one. By display name the order is group1, group2, group3; by
@@ -84,12 +79,7 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
     );
     // 4. The rows follow the display names, the ID provider of a group playing no part.
     await groupsPage.waitForRowByDisplayNameDisplayed(GROUP3_NAME);
-    let ownGroups = await getOwnGroupsInListOrder(groupsPage);
-    assert.deepEqual(
-      ownGroups,
-      [GROUP1_NAME, GROUP2_NAME, GROUP3_NAME],
-      'The groups should be listed by display name (A–Z) by default',
-    );
+    await groupsPage.waitForRowsInOrder([GROUP1_NAME, GROUP2_NAME, GROUP3_NAME], OWN_GROUP_NAMES);
     // 5. Each row shows the name of its own ID provider on the right ('system', not its display name).
     assert.equal(
       await groupsPage.getGroupIdProviderByDisplayName(GROUP1_NAME),
@@ -112,12 +102,7 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
       'The Sort by button should be lit while the order differs from the default one',
     );
     // 3. The rows follow the display names, reversed.
-    let ownGroups = await getOwnGroupsInListOrder(groupsPage);
-    assert.deepEqual(
-      ownGroups,
-      [GROUP3_NAME, GROUP2_NAME, GROUP1_NAME],
-      'The groups should be listed by display name (Z–A)',
-    );
+    await groupsPage.waitForRowsInOrder([GROUP3_NAME, GROUP2_NAME, GROUP1_NAME], OWN_GROUP_NAMES);
   });
 
   it("WHEN 'ID provider (A–Z)' has been selected in the Sort menu THEN the groups should be grouped by ID provider, the new provider's group first", async () => {
@@ -130,12 +115,7 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
     assert.equal(actual, appConst.SORT_MENU_ITEM.ID_PROVIDER_ASC);
     assert.ok(await groupsPage.isSortButtonActive(), 'The Sort by button should be lit');
     // 2. 'provider...' sorts before 'system': group3 comes first, then the system groups by name.
-    let ownGroups = await getOwnGroupsInListOrder(groupsPage);
-    assert.deepEqual(
-      ownGroups,
-      [GROUP3_NAME, GROUP1_NAME, GROUP2_NAME],
-      'The groups should be listed by ID provider (A–Z)',
-    );
+    await groupsPage.waitForRowsInOrder([GROUP3_NAME, GROUP1_NAME, GROUP2_NAME], OWN_GROUP_NAMES);
   });
 
   it("WHEN 'ID provider (Z–A)' has been selected in the Sort menu THEN the groups should be grouped by ID provider, the system groups first and still ascending by name", async () => {
@@ -149,12 +129,7 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
     assert.ok(await groupsPage.isSortButtonActive(), 'The Sort by button should be lit');
     // 2. The direction flips the providers alone: 'system' comes first, and its groups keep the
     // ascending order of their names.
-    let ownGroups = await getOwnGroupsInListOrder(groupsPage);
-    assert.deepEqual(
-      ownGroups,
-      [GROUP1_NAME, GROUP2_NAME, GROUP3_NAME],
-      'The groups should be listed by ID provider (Z–A)',
-    );
+    await groupsPage.waitForRowsInOrder([GROUP1_NAME, GROUP2_NAME, GROUP3_NAME], OWN_GROUP_NAMES);
   });
 
   it("GIVEN 'Display name (Z–A)' is selected WHEN 'Display name (A–Z)' has been selected THEN the default order should be restored", async () => {
@@ -172,12 +147,7 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
       !(await groupsPage.isSortButtonActive()),
       'The Sort by button should not be lit once the default order is back',
     );
-    let ownGroups = await getOwnGroupsInListOrder(groupsPage);
-    assert.deepEqual(
-      ownGroups,
-      [GROUP1_NAME, GROUP2_NAME, GROUP3_NAME],
-      'The groups should be listed by display name (A–Z) again',
-    );
+    await groupsPage.waitForRowsInOrder([GROUP1_NAME, GROUP2_NAME, GROUP3_NAME], OWN_GROUP_NAMES);
   });
 
   // The search narrows the list before the order applies: the groups 'group' matches keep the order
@@ -195,19 +165,11 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
     // 1. 'group', entered as a term: the three groups stay, 'testgroup-...' goes.
     await groupsPage.addSearchTerm('group');
     await groupsPage.waitForRowByDisplayNameNotDisplayed(TEST_GROUP_NAME);
-    assert.deepEqual(
-      await getOwnGroupsInListOrder(groupsPage),
-      [GROUP1_NAME, GROUP2_NAME, GROUP3_NAME],
-      "The groups 'group' matches should be listed in the default order",
-    );
+    await groupsPage.waitForRowsInOrder([GROUP1_NAME, GROUP2_NAME, GROUP3_NAME], OWN_GROUP_NAMES);
     // 2. The search stays in force while the order changes, and the narrowed list follows it.
     await groupsPage.selectSortOrder(appConst.SORT_MENU_ITEM.DISPLAY_NAME_DESC);
     assert.deepEqual(await groupsPage.getSearchTerms(), ['group']);
-    assert.deepEqual(
-      await getOwnGroupsInListOrder(groupsPage),
-      [GROUP3_NAME, GROUP2_NAME, GROUP1_NAME],
-      'The narrowed list should follow the order picked in the Sort menu',
-    );
+    await groupsPage.waitForRowsInOrder([GROUP3_NAME, GROUP2_NAME, GROUP1_NAME], OWN_GROUP_NAMES);
     assert.ok(
       !(await groupsPage.isRowByDisplayNameDisplayed(TEST_GROUP_NAME)),
       "'testgroup-...' should stay out of the narrowed list whatever the order",
@@ -234,10 +196,9 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
       countBefore + 1,
       'The narrowed list should show one group more',
     );
-    assert.deepEqual(
-      await getOwnGroupsInListOrder(groupsPage),
+    await groupsPage.waitForRowsInOrder(
       [GROUP1_NAME, GROUP2_NAME, GROUP3_NAME, GROUP4_NAME],
-      'The new group should take its place in the default order',
+      OWN_GROUP_NAMES,
     );
     assert.ok(
       !(await groupsPage.isRowByDisplayNameDisplayed(TEST_GROUP_NAME)),

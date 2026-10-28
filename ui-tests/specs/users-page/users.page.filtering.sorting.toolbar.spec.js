@@ -29,12 +29,6 @@ describe("users.page.filtering.sorting.toolbar.spec - Users page: the ID provide
   let USER_A;
   let USER_B;
 
-  // Display names of the suite's own users, in the order the list shows them.
-  async function getOwnUsersInListOrder(usersPage) {
-    const names = await usersPage.getUserDisplayNames();
-    return names.filter((name) => [USER_A_NAME, USER_B_NAME].includes(name));
-  }
-
   it('GIVEN the suite starts THEN two ID providers AND a user in each should be created via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     ID_PROVIDER_A = await settingsUtils.createIdProviderViaApi(
@@ -120,11 +114,7 @@ describe("users.page.filtering.sorting.toolbar.spec - Users page: the ID provide
       !(await usersPage.isSortButtonActive()),
       'The Sort by button should not be lit while the default order holds',
     );
-    assert.deepEqual(
-      await getOwnUsersInListOrder(usersPage),
-      [USER_A_NAME, USER_B_NAME],
-      'The users should be listed by display name (A–Z) by default',
-    );
+    await usersPage.waitForRowsInOrder([USER_A_NAME, USER_B_NAME]);
     // 2. 'Display name (Z–A)': the trigger is lit and the rows are reversed.
     await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.DISPLAY_NAME_DESC);
     assert.equal(await usersPage.getSelectedSortOrder(), appConst.SORT_MENU_ITEM.DISPLAY_NAME_DESC);
@@ -132,11 +122,7 @@ describe("users.page.filtering.sorting.toolbar.spec - Users page: the ID provide
       await usersPage.isSortButtonActive(),
       'The Sort by button should be lit while the order differs from the default one',
     );
-    assert.deepEqual(
-      await getOwnUsersInListOrder(usersPage),
-      [USER_B_NAME, USER_A_NAME],
-      'The users should be listed by display name (Z–A)',
-    );
+    await usersPage.waitForRowsInOrder([USER_B_NAME, USER_A_NAME]);
   });
 
   // By ID provider the users follow their providers, not their names: user b (provider a) comes
@@ -149,30 +135,18 @@ describe("users.page.filtering.sorting.toolbar.spec - Users page: the ID provide
     await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_ASC);
     assert.equal(await usersPage.getSelectedSortOrder(), appConst.SORT_MENU_ITEM.ID_PROVIDER_ASC);
     assert.ok(await usersPage.isSortButtonActive(), 'The Sort by button should be lit');
-    assert.deepEqual(
-      await getOwnUsersInListOrder(usersPage),
-      [USER_B_NAME, USER_A_NAME],
-      'The users should be listed by ID provider (A–Z)',
-    );
+    await usersPage.waitForRowsInOrder([USER_B_NAME, USER_A_NAME]);
     // 2. 'ID provider (Z–A)': provider b's user first.
     await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
     assert.equal(await usersPage.getSelectedSortOrder(), appConst.SORT_MENU_ITEM.ID_PROVIDER_DESC);
-    assert.deepEqual(
-      await getOwnUsersInListOrder(usersPage),
-      [USER_A_NAME, USER_B_NAME],
-      'The users should be listed by ID provider (Z–A)',
-    );
+    await usersPage.waitForRowsInOrder([USER_A_NAME, USER_B_NAME]);
     // 3. Back to the default: the trigger is not lit and the names decide again.
     await usersPage.selectSortOrder(appConst.SORT_MENU_ITEM.DISPLAY_NAME_ASC);
     assert.ok(
       !(await usersPage.isSortButtonActive()),
       'The Sort by button should not be lit once the default order is back',
     );
-    assert.deepEqual(
-      await getOwnUsersInListOrder(usersPage),
-      [USER_A_NAME, USER_B_NAME],
-      'The users should be listed by display name (A–Z) again',
-    );
+    await usersPage.waitForRowsInOrder([USER_A_NAME, USER_B_NAME]);
   });
 
   it('WHEN the name of a user has been entered in the search input THEN that user alone should be listed, with its ID provider on the right', async () => {

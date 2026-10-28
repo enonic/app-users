@@ -873,6 +873,35 @@ class BrowsePage extends SectionPage {
     }
   }
 
+  // Waits until the rows with these display names are listed in this order. Only the rows named in
+  // `among` are looked at (the suite's own, say), the rest of the list passed over; it defaults to
+  // the expected names themselves. The list is re-read on every try rather than once: a sort or a
+  // search is answered by the server, and the rows already on show stay until the answer arrives.
+  async waitForRowsInOrder(displayNames, among = displayNames, ms = appConst.TIMEOUT.MEDIUM) {
+    let seen = [];
+    try {
+      await this.getBrowser().waitUntil(
+        async () => {
+          seen = (await this.getRowDisplayNames()).filter((name) => among.includes(name));
+          return (
+            seen.length === displayNames.length &&
+            seen.every((name, index) => name === displayNames[index])
+          );
+        },
+        {
+          timeout: ms,
+          timeoutMsg: `expected the order ${JSON.stringify(displayNames)}, last seen ${JSON.stringify(seen)}`,
+        },
+      );
+    } catch (err) {
+      await this.handleError(
+        `${this.pageName} - the rows should be listed in the order ${displayNames.join(', ')}`,
+        'err_browse_rows_order',
+        err,
+      );
+    }
+  }
+
   // Waits until a row with the name (the line under the display name) is listed and returns it.
   async waitForRowByNameDisplayed(name, ms = appConst.TIMEOUT.MEDIUM) {
     let row;
