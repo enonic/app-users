@@ -25,6 +25,12 @@ const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/pro
 const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
 const IdProviderEditorSummaryStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.summary.step.dialog');
 const RolesPage = require('../page_objects/roles/roles.page');
+const GroupsPage = require('../page_objects/groups/groups.page');
+const GroupEditorIdProviderStepDialog = require('../page_objects/groups/group-dialog/group.editor.id.provider.step.dialog');
+const GroupEditorGeneralStepDialog = require('../page_objects/groups/group-dialog/group.editor.general.step.dialog');
+const GroupEditorMembersStepDialog = require('../page_objects/groups/group-dialog/group.editor.members.step.dialog');
+const GroupEditorRolesStepDialog = require('../page_objects/groups/group-dialog/group.editor.roles.step.dialog');
+const GroupEditorSummaryStepDialog = require('../page_objects/groups/group-dialog/group.editor.summary.step.dialog');
 const RoleEditorGeneralStepDialog = require('../page_objects/roles/role-dialog/role.editor.general.step.dialog');
 const RoleEditorUsersStepDialog = require('../page_objects/roles/role-dialog/role.editor.users.step.dialog');
 const userItemsBuilder = require('./users.items.builder');
@@ -269,6 +275,63 @@ module.exports = {
       const screenshot = await this.saveScreenshotUniqueName('err_create_user');
       throw new Error(
         `User '${user.displayName}' was not created, screenshot: ${screenshot} ` + err,
+      );
+    }
+  },
+  // Creates a group through the group editor and returns when the notification message confirms
+  // it. For the tests that need a group to exist, not for the ones that test the editor itself.
+  //
+  // `group` is what users.items.builder.buildGroup() returns: { idProvider, displayName, id,
+  // description?, members?, roles? }. `idProvider` is the display name of the provider the group
+  // lives in; when it is the one the step opens with, nothing is picked. Empty or missing `members`
+  // and `roles` skip that step. The row is not waited for: the list may be narrowed by a search
+  // that leaves the new group out, which is a thing a test asserts.
+  //
+  // Precondition: the Groups section is open (navigateToExtension(appConst.EXTENSIONS.GROUPS)); it
+  // is not opened here, so a search typed before the call stays in force.
+  async createGroup(group) {
+    const groupsPage = new GroupsPage();
+    const idProviderStep = new GroupEditorIdProviderStepDialog();
+    const generalStep = new GroupEditorGeneralStepDialog();
+    const membersStep = new GroupEditorMembersStepDialog();
+    const rolesStep = new GroupEditorRolesStepDialog();
+    const summaryStep = new GroupEditorSummaryStepDialog();
+    if (!group.idProvider) {
+      throw new Error(`createGroup: '${group.displayName}' names no ID provider`);
+    }
+    try {
+      await groupsPage.clickOnNewButton();
+      // 1. ID provider: picked by filtering, the one way that does not depend on how long the list is.
+      await idProviderStep.waitForLoaded();
+      if ((await idProviderStep.getSelectedIdProvider()) !== group.idProvider) {
+        await idProviderStep.doFilterAndSelectIdProviderByDisplayName(group.idProvider);
+      }
+      await idProviderStep.clickOnNextAndWaitForGeneralStep();
+      // 2. General: display name, id, description.
+      await generalStep.typeDataAndClickOnNext(group);
+      // 3. Members
+      await membersStep.waitForLoaded();
+      if (group.members && group.members.length > 0) {
+        await membersStep.addMembers(group.members);
+      }
+      await membersStep.clickOnNextButton();
+      // 4. Roles
+      await rolesStep.waitForLoaded();
+      if (group.roles && group.roles.length > 0) {
+        await rolesStep.addRoles(group.roles);
+      }
+      await rolesStep.clickOnNextButton();
+      // 5. Summary → Create; the notification message confirms.
+      await summaryStep.waitForLoaded();
+      await summaryStep.clickOnCreateButtonAndWaitForClosed();
+      await groupsPage.waitForExpectedNotificationMessage(
+        appConst.groupCreatedMessage(group.displayName),
+      );
+      return group;
+    } catch (err) {
+      const screenshot = await this.saveScreenshotUniqueName('err_create_group');
+      throw new Error(
+        `Group '${group.displayName}' was not created, screenshot: ${screenshot} ` + err,
       );
     }
   },

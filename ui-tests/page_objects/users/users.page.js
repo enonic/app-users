@@ -4,14 +4,20 @@
  * The Users section: a browse screen with a toolbar (New, Edit, Delete), a search field, the list
  * header (Select all, Sort by, Refresh) and the list of users, one row per user with its display
  * name, its name and, on the right, the display name of its ID provider. The browse screen itself is
- * BrowsePage (browse.page.js); this class adds the Edit button, the ID provider filter and the key
- * the rows are identified by.
+ * BrowsePage (browse.page.js); this class adds the Edit button, the 'ID provider' field of the
+ * filter and the key the rows are identified by.
  */
 const BrowsePage = require('../browse.page');
 const appConst = require('../../libs/app_const');
 
 // A user's principal key, the way the rows are identified; `idProvider` defaults to 'system'.
 const userKey = (name, idProvider = 'system') => `user:${idProvider}:${name}`;
+
+// The one field the filter offers (pages/users/model/users.filter.ts): the ID providers by key, the
+// system one left out, each counting the users the search would leave in it. Its label is the
+// phrase users.filter.idProvider.
+const FILTER_FIELD = Object.freeze({ ID_PROVIDER: 'idProvider' });
+const ID_PROVIDER_FIELD_LABEL = 'ID provider';
 
 class UsersPage extends BrowsePage {
   constructor() {
@@ -20,22 +26,24 @@ class UsersPage extends BrowsePage {
       pageComponent: 'UsersPage',
       pageName: 'Users page',
     });
-    // The filter trigger is not rendered yet: BrowseListHeader keeps its slot commented out until
-    // the filter component lands (TODO there). Located like the sort trigger, by its component name.
-    this.css.filterButton = `${this.css.container} button[data-component='BrowseFilter']`;
-    this.css.filterMenu = "[data-component='BrowseFilter.Menu'][role='menu']";
   }
 
   static userKey(name, idProvider) {
     return userKey(name, idProvider);
   }
 
-  get editButton() {
-    return this.css.toolbarButton('Edit');
+  static get FILTER_FIELD() {
+    return FILTER_FIELD;
   }
 
-  get filterListButton() {
-    return this.css.filterButton;
+  // What the Remove button of a picked provider's tag names: 'ID provider: <display name>'. The tag
+  // itself reads the display name alone.
+  static idProviderTerm(displayName) {
+    return `${ID_PROVIDER_FIELD_LABEL}: ${displayName}`;
+  }
+
+  get editButton() {
+    return this.css.toolbarButton('Edit');
   }
 
   // Edit
@@ -64,32 +72,19 @@ class UsersPage extends BrowsePage {
     return this.isElementDisplayed(this.editButton);
   }
 
-  // Filter list (the button is absent from the current build, see the constructor)
+  // Filter: the 'ID provider' field
 
-  clickOnFilterListButton() {
-    return this.clickOnButton(this.filterListButton, 'Filter list', 'err_filter_list_btn');
+  // Enters the 'ID provider' field of the filter: its values are shown (getFilterValues).
+  openIdProviderFilterValues() {
+    return this.openFilterFieldValues(FILTER_FIELD.ID_PROVIDER);
   }
 
-  waitForFilterListButtonEnabled(ms = appConst.TIMEOUT.MEDIUM) {
-    return this.waitForButtonEnabled(
-      this.filterListButton,
-      'Filter list',
-      'err_filter_list_btn',
-      ms,
-    );
-  }
-
-  waitForFilterListButtonDisabled(ms = appConst.TIMEOUT.MEDIUM) {
-    return this.waitForButtonDisabled(
-      this.filterListButton,
-      'Filter list',
-      'err_filter_list_btn',
-      ms,
-    );
-  }
-
-  isFilterListButtonEnabled() {
-    return this.isElementEnabled(this.filterListButton);
+  // Narrows the list to the provider: the field is entered, the provider picked by its key, the
+  // dropdown closed. `displayName` is the provider's, which the term's tag reads.
+  async filterByIdProvider(key, displayName) {
+    await this.openIdProviderFilterValues();
+    await this.clickOnFilterValue(key, UsersPage.idProviderTerm(displayName));
+    return await this.closeFilterDropdown();
   }
 
   // List

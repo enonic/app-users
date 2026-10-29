@@ -35,7 +35,7 @@ class GroupsPage extends BrowsePage {
     return this.getRowNames();
   }
 
-  // The ID provider shown on the right of the row, e.g. 'System Id Provider' - or undefined.
+  // The name of the ID provider shown on the right of the row, e.g. 'system' - or undefined.
   getGroupIdProvider(key) {
     return this.getRowMeta(key);
   }

@@ -79,6 +79,11 @@ module.exports = Object.freeze({
   principalDeletedMessage: (displayName) => `"${displayName}" deleted`,
   principalsDeletedMessage: (count) => `${count} items deleted`,
   idProviderDeletedMessage: (displayName) => `"${displayName}" deleted`,
+  // What the browse list shows in place of its rows (phrases: browse.list.*): a search in force that
+  // matches nothing. An empty section says 'No users', 'No groups', ... instead.
+  LIST_MESSAGE: {
+    NOTHING_MATCHES: 'Nothing matches the search',
+  },
   // Access levels of the ID provider editor's Permissions step, widening (phrases:
   // idProviders.dialog.access.*).
   // The GraphQL endpoint of a section (extensions/section-endpoint), relative to the admin origin.
