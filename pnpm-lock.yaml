@@ -59,8 +59,8 @@ importers:
         version: 4.18.19(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@enonic-types/core':
-        specifier: ^8.0.4
-        version: 8.0.4
+        specifier: ^8.1.1
+        version: 8.1.1
       '@enonic-types/global':
         specifier: ^8.1.0
         version: 8.1.0
