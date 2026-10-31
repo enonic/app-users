@@ -8,6 +8,7 @@ const FORM: UserForm = {
   name: 'jane',
   displayName: 'Jane Doe',
   email: 'jane@example.com',
+  disabled: false,
   roles: [],
   groups: [],
   keyAdditions: [],
@@ -91,6 +92,10 @@ describe('userSummaryRows', () => {
     expect(credentials({ keyAdditions: [added], keyRemovals: ['kid-1'] })).toEqual([
       { key: 'users.dialog.keysAddedRemoved', args: [1, 1] },
     ]);
+  });
+
+  it('reports a disabled user, whatever else the dialog set', () => {
+    expect(credentials({ disabled: true })).toEqual([{ key: 'users.dialog.loginDisabled' }]);
   });
 
   it('gives the password and the keys a line each', () => {

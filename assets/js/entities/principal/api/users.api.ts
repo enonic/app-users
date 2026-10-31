@@ -18,6 +18,7 @@ const USER_FIELDS = `
   email
   idProvider
   hasPassword
+  disabled
 `;
 
 /**
@@ -127,6 +128,7 @@ type UserDto = {
   email: string | null;
   idProvider: string;
   hasPassword: boolean;
+  disabled: boolean;
 };
 
 export type UsersPageDto = {
@@ -237,6 +239,7 @@ export type UserInput = {
   displayName: string;
   email?: string;
   password?: string;
+  disabled?: boolean;
   roles: readonly PrincipalKey[];
   groups: readonly PrincipalKey[];
 };
@@ -245,6 +248,8 @@ export type UserChanges = {
   displayName: string;
   email?: string;
   password?: string;
+  /** Left out, the server keeps the flag as it is. */
+  disabled?: boolean;
   addRoles: readonly PrincipalKey[];
   removeRoles: readonly PrincipalKey[];
   addGroups: readonly PrincipalKey[];
@@ -252,14 +257,14 @@ export type UserChanges = {
 };
 
 const CREATE_USER_DOCUMENT = `
-  mutation CreateUser($idProvider: String!, $name: String!, $displayName: String!, $email: String, $password: String, $roles: [String!], $groups: [String!]) {
-    createUser(idProvider: $idProvider, name: $name, displayName: $displayName, email: $email, password: $password, roles: $roles, groups: $groups) {${USER_FIELDS}}
+  mutation CreateUser($idProvider: String!, $name: String!, $displayName: String!, $email: String, $password: String, $disabled: Boolean, $roles: [String!], $groups: [String!]) {
+    createUser(idProvider: $idProvider, name: $name, displayName: $displayName, email: $email, password: $password, disabled: $disabled, roles: $roles, groups: $groups) {${USER_FIELDS}}
   }
 `;
 
 const UPDATE_USER_DOCUMENT = `
-  mutation UpdateUser($key: String!, $displayName: String!, $email: String, $password: String, $addRoles: [String!], $removeRoles: [String!], $addGroups: [String!], $removeGroups: [String!]) {
-    updateUser(key: $key, displayName: $displayName, email: $email, password: $password, addRoles: $addRoles, removeRoles: $removeRoles, addGroups: $addGroups, removeGroups: $removeGroups) {${USER_FIELDS}}
+  mutation UpdateUser($key: String!, $displayName: String!, $email: String, $password: String, $disabled: Boolean, $addRoles: [String!], $removeRoles: [String!], $addGroups: [String!], $removeGroups: [String!]) {
+    updateUser(key: $key, displayName: $displayName, email: $email, password: $password, disabled: $disabled, addRoles: $addRoles, removeRoles: $removeRoles, addGroups: $addGroups, removeGroups: $removeGroups) {${USER_FIELDS}}
   }
 `;
 
@@ -374,5 +379,6 @@ function toUser(dto: UserDto): User {
     email: dto.email ?? undefined,
     idProvider: dto.idProvider,
     hasPassword: dto.hasPassword,
+    disabled: dto.disabled,
   };
 }

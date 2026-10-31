@@ -46,8 +46,15 @@ export function userSummaryRows(form: UserForm, providerName: string): readonly 
 }
 
 // One line for the password, one for the keys; a password left alone is no change and says nothing.
+// A disabled user says so whatever the edit did: it is the one answer that keeps the others from working.
 function credentialLines(form: UserForm): readonly SummaryPhrase[] {
-  return [passwordLine(form), publicKeyLine(form)].filter((line) => line !== undefined);
+  return [passwordLine(form), publicKeyLine(form), disabledLine(form)].filter(
+    (line) => line !== undefined,
+  );
+}
+
+function disabledLine(form: UserForm): SummaryPhrase | undefined {
+  return form.disabled ? { key: 'users.dialog.loginDisabled' } : undefined;
 }
 
 function passwordLine(form: UserForm): SummaryPhrase | undefined {

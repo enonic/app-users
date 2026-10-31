@@ -15,6 +15,7 @@ export function userDraftFrom(form: UserForm): UserDraft {
     displayName: form.displayName,
     email: form.email,
     password: form.password,
+    disabled: form.disabled,
     roles: form.roles.map(({ key }) => key),
     groups: form.groups.map(({ key }) => key),
   };

@@ -76,11 +76,13 @@ export const UserType: GraphQLType = generator.createObjectType({
       type: nonNull(GraphQLBoolean),
       description: 'Whether an authentication hash is stored — not whether the user may log in.',
     },
-    // ! No `disabled`, though `PrincipalMapper` serializes it: nothing persists it.
-    // ! `populateUserData` never writes the property and `createUserFromNode` never reads one, so
-    // ! `User.isDisabled()` is the builder default and the field is always `false`. The Active/Inactive
-    // ! cell the mockups show has no source — see § 5 of `docs/browse-framework.md`.
-    // ! No `description` or `createdTime` either, for the same reason: a user node stores neither.
+    disabled: {
+      type: nonNull(GraphQLBoolean),
+      description: 'Whether the user is barred from logging in, by any credential or provider.',
+      // ! An XP older than enonic/xp#12486 never persisted the flag, and answers `false` for everyone.
+      resolve: (env: { source: UserSource }) => env.source.disabled === true,
+    },
+    // ! No `description` or `createdTime`: a user node stores neither.
     roles: {
       type: principals,
       description:

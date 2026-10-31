@@ -33,6 +33,7 @@ function draft(overrides: Partial<UserDraft> = {}): UserDraft {
     name: 'alice',
     displayName: 'Alice',
     email: 'alice@example.com',
+    disabled: false,
     roles: [],
     groups: [],
     ...overrides,
@@ -93,6 +94,7 @@ describe('createUser', () => {
       displayName: 'Alice',
       email: 'alice@example.com',
       password: undefined,
+      disabled: false,
       roles: [],
       groups: [],
     });

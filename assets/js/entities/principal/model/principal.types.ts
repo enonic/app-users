@@ -86,11 +86,10 @@ export type GroupDetail = Group &
 /**
  * A user as a list row: what the server returns a page of.
  *
- * ! No `description`, no `createdTime`, no `disabled`. XP stores none of them for a user —
- * ! `populateUserData` writes email, login, the authentication hash and the profile, and nothing else —
- * ! so the description and the created/modified pair the mockups draw have no source, and `disabled`
- * ! arrives from `PrincipalMapper` always `false` because nothing ever persists it. See the `disabled`
- * ! and `modifiedTime` entries in `docs/platform-facts.md`.
+ * ! No `description`, no `createdTime`. XP stores neither for a user — `populateUserData` writes email,
+ * ! login, the disabled flag, the authentication hash and the profile, and nothing else — so the
+ * ! description and the created/modified pair the mockups draw have no source. See the `modifiedTime`
+ * ! entry in `docs/platform-facts.md`.
  *
  * `modifiedTime` is dropped from the platform's type for the same reason it is optional on `Role`.
  */

@@ -214,6 +214,10 @@ export function clearUserEditorPassword(cleared: boolean): void {
   updateUserEditorForm({ password: undefined, clearPassword: cleared });
 }
 
+export function setUserEditorDisabled(disabled: boolean): void {
+  updateUserEditorForm({ disabled });
+}
+
 export function stagePublicKey(pending: Omit<PendingPublicKey, 'id'>): void {
   const { keyAdditions } = $userEditor.get().form;
 

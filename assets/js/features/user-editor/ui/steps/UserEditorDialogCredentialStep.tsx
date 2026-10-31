@@ -1,4 +1,4 @@
-import { Button, IconButton, Input } from '@enonic/ui';
+import { Button, Checkbox, IconButton, Input } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { Eye, EyeOff, X } from 'lucide-react';
 import { useState } from 'preact/hooks';
@@ -14,6 +14,7 @@ import {
   $userEditorErrors,
   clearUserEditorPassword,
   markUserEditorFieldVisited,
+  setUserEditorDisabled,
   setUserEditorPassword,
 } from '../../model/user-editor.store';
 import { passwordActions, showsPublicKeys } from '../../model/user-form';
@@ -51,6 +52,8 @@ export function UserEditorDialogCredentialStep() {
   const showLabel = useI18n('users.dialog.showPassword');
   const hideLabel = useI18n('users.dialog.hidePassword');
   const discardLabel = useI18n('users.dialog.discardPassword');
+  const disabledLabel = useI18n('users.dialog.disabled');
+  const disabledHelp = useI18n('users.dialog.disabledHelp');
 
   // Errors
   const shownErrors = visitedErrors(errors, visited);
@@ -155,6 +158,15 @@ export function UserEditorDialogCredentialStep() {
       </div>
 
       {showsPublicKeys(form) && <PublicKeysSection form={form} stored={stored} />}
+
+      <div className="flex flex-col gap-1.5">
+        <Checkbox
+          checked={form.disabled}
+          label={disabledLabel}
+          onCheckedChange={(next) => setUserEditorDisabled(next === true)}
+        />
+        <p className="text-subtle text-sm">{disabledHelp}</p>
+      </div>
     </div>
   );
 }

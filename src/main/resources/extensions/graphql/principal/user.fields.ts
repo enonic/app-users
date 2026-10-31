@@ -28,6 +28,7 @@ type CreateArgs = {
   displayName: string;
   email?: string;
   password?: string;
+  disabled?: boolean;
   roles?: string[];
   groups?: string[];
 };
@@ -37,6 +38,7 @@ type UpdateArgs = {
   displayName: string;
   email?: string;
   password?: string;
+  disabled?: boolean;
   addRoles?: string[];
   removeRoles?: string[];
   addGroups?: string[];
@@ -101,6 +103,7 @@ export const userMutationFields: GraphQLFields = {
       displayName: nonNull(GraphQLString),
       email: GraphQLString,
       password: GraphQLString,
+      disabled: GraphQLBoolean,
       roles: keys,
       groups: keys,
     },
@@ -109,6 +112,7 @@ export const userMutationFields: GraphQLFields = {
         displayName: env.args.displayName,
         email: env.args.email,
         password: env.args.password,
+        disabled: env.args.disabled,
         roles: toRoleKeys(env.args.roles ?? []),
         groups: toGroupKeys(env.args.groups ?? []),
       } satisfies UserInput),
@@ -138,12 +142,13 @@ export const userMutationFields: GraphQLFields = {
   updateUser: {
     type: UserType,
     description:
-      'Renames and re-addresses a user, applies the membership the edit changed, and optionally sets or clears the password. The four lists are what moved, not what the user is to hold.',
+      'Renames and re-addresses a user, applies the membership the edit changed, optionally sets or clears the password, and enables or disables it when `disabled` is given. The four lists are what moved, not what the user is to hold.',
     args: {
       key: nonNull(GraphQLString),
       displayName: nonNull(GraphQLString),
       email: GraphQLString,
       password: GraphQLString,
+      disabled: GraphQLBoolean,
       addRoles: keys,
       removeRoles: keys,
       addGroups: keys,
@@ -160,6 +165,7 @@ function toUserChanges(args: UpdateArgs): UserChanges {
     displayName: args.displayName,
     email: args.email,
     password: args.password,
+    disabled: args.disabled,
     addRoles: toRoleKeys(args.addRoles ?? []),
     removeRoles: toRoleKeys(args.removeRoles ?? []),
     addGroups: toGroupKeys(args.addGroups ?? []),
