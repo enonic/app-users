@@ -39,6 +39,7 @@ describe('createUser', () => {
       displayName: 'Alice',
       email: undefined,
       password: undefined,
+      disabled: undefined,
       roles: ['role:cms.admin'],
       groups: [],
     });
@@ -84,6 +85,7 @@ describe('updateUser', () => {
       displayName: 'Alice',
       email: undefined,
       password: undefined,
+      disabled: undefined,
       addRoles: [],
       removeRoles: ['role:cms.admin'],
       addGroups: ['group:system:editors'],

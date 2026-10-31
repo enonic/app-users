@@ -19,6 +19,7 @@ export type UserDraft = {
   displayName: string;
   email: string;
   password?: string;
+  disabled: boolean;
   roles: readonly PrincipalKey[];
   groups: readonly PrincipalKey[];
 };
@@ -27,6 +28,8 @@ export type UserEdit = {
   displayName: string;
   email: string;
   password?: string;
+  /** Only when the edit flips it. */
+  disabled?: boolean;
   addRoles: readonly PrincipalKey[];
   removeRoles: readonly PrincipalKey[];
   addGroups: readonly PrincipalKey[];
@@ -38,6 +41,7 @@ export function createUser(draft: UserDraft): ResultAsync<User, AppError> {
     displayName: draft.displayName.trim(),
     email: trimmed(draft.email),
     password: draft.password,
+    disabled: draft.disabled,
     roles: draft.roles,
     groups: draft.groups,
   } satisfies UserInput);
@@ -48,6 +52,7 @@ export function updateUser(key: PrincipalKey, edit: UserEdit): ResultAsync<User,
     displayName: edit.displayName.trim(),
     email: trimmed(edit.email),
     password: edit.password,
+    disabled: edit.disabled,
     addRoles: edit.addRoles,
     removeRoles: edit.removeRoles,
     addGroups: edit.addGroups,

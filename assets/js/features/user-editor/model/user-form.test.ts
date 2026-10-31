@@ -27,6 +27,7 @@ function form(overrides: Partial<UserForm> = {}): UserForm {
     name: 'alice',
     displayName: 'Alice Anderson',
     email: 'alice@example.com',
+    disabled: false,
     roles: [],
     groups: [],
     keyAdditions: [],
@@ -42,6 +43,7 @@ describe('initialUserForm', () => {
       name: '',
       displayName: '',
       email: '',
+      disabled: false,
       roles: [],
       groups: [],
       keyAdditions: [],
@@ -219,6 +221,10 @@ describe('sameUserForm', () => {
   it('sees a renamed and a re-addressed user', () => {
     expect(sameUserForm(form(), form({ displayName: 'Alice A.' }))).toBe(false);
     expect(sameUserForm(form(), form({ email: 'other@example.com' }))).toBe(false);
+  });
+
+  it('sees a user disabled or enabled', () => {
+    expect(sameUserForm(form(), form({ disabled: true }))).toBe(false);
   });
 
   it('ignores whitespace the save would trim away', () => {

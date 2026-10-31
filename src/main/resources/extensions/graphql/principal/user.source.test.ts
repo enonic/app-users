@@ -514,7 +514,19 @@ describe('createUser', () => {
       name: 'alice',
       displayName: 'Alice',
       email: 'alice@example.com',
+      disabled: false,
     });
+  });
+
+  it('creates a disabled user disabled, in the same write', () => {
+    providers('system');
+    vi.mocked(createUserPrincipal).mockReturnValue(user('alice', 'Alice'));
+
+    createUser('system', 'alice', input({ disabled: true }));
+
+    expect(vi.mocked(createUserPrincipal)).toHaveBeenCalledWith(
+      expect.objectContaining({ disabled: true }),
+    );
   });
 
   it('sets a password when one was given, against the key the platform answered', () => {
@@ -622,6 +634,40 @@ describe('updateUser', () => {
 
     expect(updated.displayName).toBe('Alice Smith');
     expect(updated.email).toBe('after@example.com');
+  });
+
+  it('disables and enables a user through the editor', () => {
+    modifiable('alice');
+
+    expect(updateUser('user:system:alice', changes({ disabled: true })).disabled).toBe(true);
+    expect(updateUser('user:system:alice', changes({ disabled: false })).disabled).toBe(false);
+  });
+
+  it('leaves the flag as it is when the edit says nothing of it', () => {
+    vi.mocked(getPrincipal).mockReturnValue({ ...user('alice', 'Alice'), disabled: true });
+    vi.mocked(modifyUser).mockImplementation(({ editor }) =>
+      editor({ ...user('alice', 'Alice'), disabled: true }),
+    );
+
+    expect(updateUser('user:system:alice', changes()).disabled).toBe(true);
+  });
+
+  it('refuses to disable su or anonymous, writing nothing', () => {
+    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+
+    expect(() =>
+      updateUser('user:system:su', changes({ displayName: 'Super User', disabled: true })),
+    ).toThrow(/Cannot change the disabled state of \[user:system:su\]/);
+
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('lets su through when the flag it is sent is the one it already has', () => {
+    modifiable('su');
+
+    updateUser('user:system:su', changes({ displayName: 'Whatever', disabled: false }));
+
+    expect(vi.mocked(modifyUser)).toHaveBeenCalled();
   });
 
   it('clears an email the edit dropped, with an empty string rather than nothing', () => {
@@ -1003,6 +1049,19 @@ describe('writes a remote system owns', () => {
     expect(() =>
       updateUser('user:remote:alice', { ...noChanges, email: 'alice@example.com' }),
     ).toThrow(/remote/);
+
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('refuses to disable a user of an EXTERNAL provider', () => {
+    vi.mocked(getPrincipal).mockReturnValue({
+      ...user('alice', 'Alice'),
+      key: 'user:remote:alice',
+    });
+
+    expect(() => updateUser('user:remote:alice', { ...noChanges, disabled: true })).toThrow(
+      /remote/,
+    );
 
     expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
   });

@@ -34,6 +34,8 @@ export type UserForm = {
   email: string;
   password?: string;
   clearPassword?: boolean;
+  /** Barred from logging in, whatever the credential. */
+  disabled: boolean;
   roles: readonly PrincipalRef[];
   groups: readonly PrincipalRef[];
   keyAdditions: readonly PendingPublicKey[];
@@ -66,6 +68,7 @@ export function initialUserForm(
       name: '',
       displayName: '',
       email: '',
+      disabled: false,
       roles: [],
       groups: [],
       keyAdditions: [],
@@ -80,6 +83,7 @@ export function initialUserForm(
     name: user.login,
     displayName: user.displayName,
     email: user.email ?? '',
+    disabled: user.disabled === true,
     roles: memberships.roles ?? [],
     groups: memberships.groups ?? [],
     keyAdditions: [],
@@ -113,6 +117,7 @@ export function sameUserForm(saved: UserForm, edited: UserForm): boolean {
     saved.name.trim() === edited.name.trim() &&
     saved.displayName.trim() === edited.displayName.trim() &&
     saved.email.trim() === edited.email.trim() &&
+    saved.disabled === edited.disabled &&
     sameKeys(saved.roles, edited.roles) &&
     sameKeys(saved.groups, edited.groups)
   );

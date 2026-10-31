@@ -27,6 +27,7 @@ function wireUser(overrides: Record<string, unknown> = {}) {
     email: 'alice@example.com',
     idProvider: 'system',
     hasPassword: true,
+    disabled: false,
     ...overrides,
   };
 }
@@ -107,7 +108,25 @@ describe('sendUserCreation', () => {
       email: 'alice@example.com',
       idProvider: 'system',
       hasPassword: true,
+      disabled: false,
     });
+  });
+
+  it('asks for the disabled flag, and sends it as a variable', async () => {
+    respondWith({ data: { createUser: wireUser({ disabled: true }) } });
+
+    const user = (
+      await sendUserCreation('system', 'alice', {
+        displayName: 'Alice',
+        disabled: true,
+        roles: [],
+        groups: [],
+      })
+    )._unsafeUnwrap();
+
+    expect(sent?.query).toContain('disabled: $disabled');
+    expect(sent?.variables).toMatchObject({ disabled: true });
+    expect(user.disabled).toBe(true);
   });
 
   it('fails when the field came back null', async () => {
