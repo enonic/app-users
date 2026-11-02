@@ -33,6 +33,8 @@ const GroupEditorRolesStepDialog = require('../page_objects/groups/group-dialog/
 const GroupEditorSummaryStepDialog = require('../page_objects/groups/group-dialog/group.editor.summary.step.dialog');
 const RoleEditorGeneralStepDialog = require('../page_objects/roles/role-dialog/role.editor.general.step.dialog');
 const RoleEditorUsersStepDialog = require('../page_objects/roles/role-dialog/role.editor.users.step.dialog');
+const RoleEditorGroupsStepDialog = require('../page_objects/roles/role-dialog/role.editor.groups.step.dialog');
+const RoleEditorSummaryStepDialog = require('../page_objects/roles/role-dialog/role.editor.summary.step.dialog');
 const userItemsBuilder = require('./users.items.builder');
 const fs = require('fs');
 const path = require('path');
@@ -368,6 +370,48 @@ module.exports = {
     await generalStep.waitForLoaded();
     await generalStep.typeDataAndClickOnNext(role);
     await usersStep.waitForLoaded();
+  },
+  // Creates a role through the role editor and returns when the notification message confirms it.
+  // For the tests that need a role made in the browser, not for the ones that test the editor
+  // itself - those walk the steps themselves.
+  //
+  // `role` is what users.items.builder.buildRole() returns: { displayName, id, description?,
+  // users?, groups? } - the members by display name. An empty or missing `users` or `groups` skips
+  // the picking on that step. Returns the role with its 'key'.
+  //
+  // Precondition: the Roles section is open (navigateToExtension(appConst.EXTENSIONS.ROLES)).
+  async createRole(role) {
+    const rolesPage = new RolesPage();
+    const usersStep = new RoleEditorUsersStepDialog();
+    const groupsStep = new RoleEditorGroupsStepDialog();
+    const summaryStep = new RoleEditorSummaryStepDialog();
+    try {
+      // 1. General, filled; the editor stands on Users.
+      await this.openNewRoleEditorOnUsers(role);
+      // 2. Users
+      if (role.users && role.users.length > 0) {
+        await usersStep.addUsers(role.users);
+      }
+      await usersStep.clickOnNextButton();
+      // 3. Groups
+      await groupsStep.waitForLoaded();
+      if (role.groups && role.groups.length > 0) {
+        await groupsStep.addGroups(role.groups);
+      }
+      await groupsStep.clickOnNextButton();
+      // 4. Summary → Create; the notification message confirms.
+      await summaryStep.waitForLoaded();
+      await summaryStep.clickOnCreateButtonAndWaitForClosed();
+      await rolesPage.waitForExpectedNotificationMessage(
+        appConst.roleCreatedMessage(role.displayName),
+      );
+      return Object.assign({}, role, { key: RolesPage.roleKey(role.id ?? role.name) });
+    } catch (err) {
+      const screenshot = await this.saveScreenshotUniqueName('err_create_role');
+      throw new Error(
+        `Role '${role.displayName}' was not created, screenshot: ${screenshot} ` + err,
+      );
+    }
   },
   // Opens the service account editor and fills its General step, so it is left standing on
   // Credentials. For the tests of the steps that follow General.

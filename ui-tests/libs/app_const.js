@@ -70,6 +70,7 @@ module.exports = Object.freeze({
   userCreatedMessage: (displayName) => `User "${displayName}" created`,
   userUpdatedMessage: (displayName) => `User "${displayName}" updated`,
   groupCreatedMessage: (displayName) => `Group "${displayName}" created`,
+  groupUpdatedMessage: (displayName) => `Group "${displayName}" updated`,
   roleCreatedMessage: (displayName) => `Role "${displayName}" created`,
   idProviderCreatedMessage: (displayName) => `ID provider "${displayName}" created`,
   idProviderUpdatedMessage: (displayName) => `ID provider "${displayName}" updated`,

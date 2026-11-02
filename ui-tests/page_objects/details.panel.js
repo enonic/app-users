@@ -204,6 +204,23 @@ class DetailsPanel extends SectionPage {
     return splitCount(text).count;
   }
 
+  // Waits for the count in the section's label to read as expected - the panel re-reads the item
+  // after a save and the lists follow a toggle, so a check right after either has to wait.
+  async waitForSectionCount(label, expected, ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.getBrowser().waitUntil(
+        async () => (await this.getSectionCount(label)) === expected,
+        { timeout: ms, timeoutMsg: `the '${label}' section should count ${expected}` },
+      );
+    } catch (err) {
+      await this.handleError(
+        `${this.panelName} - the '${label}' section should count ${expected}`,
+        'err_details_count',
+        err,
+      );
+    }
+  }
+
   // Fields
 
   // The fields of the section as { label: value }, e.g. { 'ID provider': 'System Id Provider' }.

@@ -7,7 +7,9 @@
  *   Group                 - ID provider, Description ('No description' when empty); Edit
  *   Memberships           - the 'Transitive memberships' checkbox (only when the group may inherit
  *                           any)
- *   Member of (N)         - the groups this group is a member of (only with the checkbox ticked)
+ *   Member of (N)         - the groups this group is a member of: the direct ones, and with the
+ *                           checkbox ticked those inherited through them as well (only when there
+ *                           is at least one)
  *   Roles (N)             - the roles, one row each; Edit roles
  *   Users (N)             - the member users with their ID provider on the right; Edit users
  *   Service accounts (N)  - the member service accounts; Edit service accounts

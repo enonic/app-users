@@ -1,18 +1,18 @@
 /**
  * Created on 08.10.2026
  */
-const webDriverHelper = require('../libs/WebDriverHelper');
-const settingsUtils = require('../libs/settings.utils');
-const appConst = require('../libs/app_const');
+const webDriverHelper = require('../../libs/WebDriverHelper');
+const settingsUtils = require('../../libs/settings.utils');
+const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const UsersPage = require('../page_objects/users/users.page');
-const UserDetails = require('../page_objects/users/user.details');
-const UserEditorGeneralStepDialog = require('../page_objects/users/user-dialog/user.editor.general.step.dialog');
-const UserEditorRolesStepDialog = require('../page_objects/users/user-dialog/user.editor.roles.step.dialog');
-const UserEditorCredentialsStepDialog = require('../page_objects/users/user-dialog/user.editor.credentials.step.dialog');
-const UserEditorGroupsStepDialog = require('../page_objects/users/user-dialog/user.editor.groups.step.dialog');
-const userItemsBuilder = require('../libs/users.items.builder');
-const ConfirmationDialog = require('../page_objects/confirmation.dialog');
+const UsersPage = require('../../page_objects/users/users.page');
+const UserDetails = require('../../page_objects/users/user.details');
+const UserEditorGeneralStepDialog = require('../../page_objects/users/user-dialog/user.editor.general.step.dialog');
+const UserEditorRolesStepDialog = require('../../page_objects/users/user-dialog/user.editor.roles.step.dialog');
+const UserEditorCredentialsStepDialog = require('../../page_objects/users/user-dialog/user.editor.credentials.step.dialog');
+const UserEditorGroupsStepDialog = require('../../page_objects/users/user-dialog/user.editor.groups.step.dialog');
+const userItemsBuilder = require('../../libs/users.items.builder');
+const ConfirmationDialog = require('../../page_objects/confirmation.dialog');
 
 describe("user.details.panel.spec - the details panel of a user: what it shows, and the editor each of its Edit buttons opens on the user's saved data", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
