@@ -23,6 +23,10 @@ describe("roles.page.filtering.spec - Roles page: the search by name in either c
   // Made in the editor; the one custom role the search for its name leaves.
   const ROLE_NAME = userItemsBuilder.generateRandomName('role');
   let ROLE;
+  // What 'Custom' counts over the whole list before the role is made: the spec owns that one role
+  // alone, and a sandbox may hold others, so the last test checks the count returns to this rather
+  // than to zero.
+  let CUSTOM_COUNT_BEFORE;
 
   // Every value of the filter but the one the role falls in counts 0 and is disabled: the fixed
   // 'System' and 'Custom', and one per project under 'Project roles'.
@@ -127,12 +131,22 @@ describe("roles.page.filtering.spec - Roles page: the search by name in either c
   it("GIVEN a new role has been created in the editor WHEN its name has been entered in the search input THEN that role alone should be listed AND 'Origin' should count it under 'Custom' alone AND WHEN 'Custom' has been picked THEN the role should still be listed", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ROLES);
     let rolesPage = new RolesPage();
-    // 1. Create the role in the editor (not via the API): General filled, Users and Groups skipped.
+    await rolesPage.waitForRowByDisplayNameDisplayed(SYSTEM_ROLE);
+    // 1. Read what 'Custom' counts before the role exists - the baseline the last test compares
+    //    against once the role is deleted.
+    await rolesPage.openOriginFilterValues();
+    let baseline = (await rolesPage.getFilterValues()).find(
+      ({ id }) => id === RolesPage.ORIGIN_VALUE.CUSTOM,
+    );
+    assert.ok(baseline !== undefined, "'Custom' should be offered by the filter");
+    CUSTOM_COUNT_BEFORE = baseline.count;
+    await rolesPage.closeFilterDropdown();
+    // 2. Create the role in the editor (not via the API): General filled, Users and Groups skipped.
     ROLE = await settingsUtils.createRole(
       userItemsBuilder.buildRole({ displayName: ROLE_NAME, description: 'custom role' }),
     );
     await rolesPage.waitForRowByDisplayNameDisplayed(ROLE_NAME);
-    // 2. Its name, entered as a term, leaves it alone in the list.
+    // 3. Its name, entered as a term, leaves it alone in the list.
     await rolesPage.addSearchTerm(ROLE_NAME);
     await rolesPage.waitForRowByDisplayNameNotDisplayed(SYSTEM_ROLE);
     assert.deepEqual(
@@ -140,7 +154,7 @@ describe("roles.page.filtering.spec - Roles page: the search by name in either c
       [ROLE_NAME],
       'Only the new role should be listed',
     );
-    // 3. 'Origin' counts it under 'Custom': one, enabled; 'System' and the projects' values are
+    // 4. 'Origin' counts it under 'Custom': one, enabled; 'System' and the projects' values are
     //    disabled.
     await rolesPage.openOriginFilterValues();
     let values = await rolesPage.getFilterValues();
@@ -150,7 +164,7 @@ describe("roles.page.filtering.spec - Roles page: the search by name in either c
       values.some(({ id }) => id === RolesPage.ORIGIN_VALUE.SYSTEM),
       "'System' should be offered, disabled, as well",
     );
-    // 4. 'Custom' picked: a second term, and the role is still the one listed.
+    // 5. 'Custom' picked: a second term, and the role is still the one listed.
     await rolesPage.clickOnFilterValue(
       RolesPage.ORIGIN_VALUE.CUSTOM,
       RolesPage.originTerm(RolesPage.ORIGIN_LABEL.CUSTOM),
@@ -176,9 +190,9 @@ describe("roles.page.filtering.spec - Roles page: the search by name in either c
 
   // The search stays in force while the one role it matches is deleted: the list has nothing to
   // show and says so, and 'Custom' counts no role, since the search matches none. Once the term is
-  // taken back the list is whole again, and 'Custom' still counts none: the deleted role was the
-  // only custom one, every other role being the platform's or a project's.
-  it("GIVEN the name of the new role has been entered in the search input WHEN that role has been deleted THEN 'Nothing matches the search' should be shown AND 'Custom' should be disabled AND WHEN the term has been removed THEN 'Custom' should still count no role", async () => {
+  // taken back the list is whole again, and 'Custom' counts what it did before the role was made:
+  // none on a fresh instance, where every other role is the platform's or a project's.
+  it("GIVEN the name of the new role has been entered in the search input WHEN that role has been deleted THEN 'Nothing matches the search' should be shown AND 'Custom' should be disabled AND WHEN the term has been removed THEN 'Custom' should count what it did before the role was made", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ROLES);
     let rolesPage = new RolesPage();
     let confirmationDialog = new ConfirmationDialog(appConst.SECTION_ID.ROLES);
@@ -231,8 +245,9 @@ describe("roles.page.filtering.spec - Roles page: the search by name in either c
       !(await rolesPage.isRowByDisplayNameDisplayed(ROLE_NAME)),
       'The deleted role should not be listed',
     );
-    // 7. 'Origin' over the whole list: 'System' counts the system roles, enabled; 'Custom' still
-    //    counts none and stays disabled - there is no custom role left.
+    // 7. 'Origin' over the whole list: 'System' counts the system roles, enabled; 'Custom' is back
+    //    to its count before the role was made - and disabled only when that count is 0, which it
+    //    is on a fresh instance.
     await rolesPage.openOriginFilterValues();
     values = await rolesPage.getFilterValues();
     await settingsUtils.saveScreenshot('roles_filter_origin_values_no_custom');
@@ -243,10 +258,14 @@ describe("roles.page.filtering.spec - Roles page: the search by name in either c
     custom = values.find(({ id }) => id === RolesPage.ORIGIN_VALUE.CUSTOM);
     assert.equal(
       custom.count,
-      0,
-      "'Custom' should count no role: the deleted one was the only one",
+      CUSTOM_COUNT_BEFORE,
+      "'Custom' should count what it did before the role was made",
     );
-    assert.ok(custom.disabled, "'Custom' should stay disabled");
+    assert.equal(
+      custom.disabled,
+      CUSTOM_COUNT_BEFORE === 0,
+      "'Custom' should be disabled exactly when it counts no role",
+    );
     await rolesPage.closeFilterDropdown();
   });
 
