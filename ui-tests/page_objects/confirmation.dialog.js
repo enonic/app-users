@@ -218,7 +218,6 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementEnabled(this.css.primaryButton);
       await this.clickOnElement(this.css.primaryButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError('Confirmation dialog - Delete/Confirm button', 'err_confirm_btn', err);
     }
@@ -228,7 +227,6 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForDeleteButtonEnabled();
       await this.clickOnElement(this.css.deleteButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError('Confirmation dialog - Delete button', 'err_confirm_delete_btn', err);
     }
@@ -238,7 +236,6 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForConfirmButtonEnabled();
       await this.clickOnElement(this.css.confirmButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError('Confirmation dialog - Confirm button', 'err_confirm_btn', err);
     }
@@ -334,7 +331,6 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.closeButton);
       await this.clickOnElement(this.css.closeButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError('Confirmation dialog - Close button', 'err_confirm_close_btn', err);
     }

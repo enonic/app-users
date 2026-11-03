@@ -85,6 +85,10 @@ module.exports = Object.freeze({
   LIST_MESSAGE: {
     NOTHING_MATCHES: 'Nothing matches the search',
   },
+  // What the details panel shows in place of an item (phrases: browse.details.*): nothing selected.
+  DETAILS_MESSAGE: {
+    SELECT_AN_ITEM: 'Select an item to see its details',
+  },
   // Access levels of the ID provider editor's Permissions step, widening (phrases:
   // idProviders.dialog.access.*).
   // The GraphQL endpoint of a section (extensions/section-endpoint), relative to the admin origin.

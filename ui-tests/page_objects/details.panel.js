@@ -67,7 +67,10 @@ class DetailsPanel extends SectionPage {
       subtitle: `${PANEL} > div:first-child p`,
       sections: `${PANEL} > section`,
       sectionLabels: `${PANEL} > section ${IN_SECTION.separatorLabel}`,
-      emptyMessage: `[data-component='${itemPageComponent}'] [data-component='DetailsEmpty']`,
+      emptyMessages: [
+        "p[data-component='DetailsEmpty']",
+        `p[data-component='${itemPageComponent}']`,
+      ],
       skeleton: `[data-component='${itemPageComponent}'] [data-component='DetailsSkeleton']`,
     };
   }
@@ -102,14 +105,26 @@ class DetailsPanel extends SectionPage {
   // 'Select an item to see its details', or the failed message ('The user could not be loaded') -
   // shown in place of the panel - or undefined while the panel itself is shown.
   async getEmptyMessage() {
-    const messages = await this.getDisplayedElements(this.css.emptyMessage);
-    return messages.length === 0 ? undefined : await messages[0].getText();
+    for (const selector of this.css.emptyMessages) {
+      const messages = await this.getDisplayedElements(selector);
+      if (messages.length > 0) {
+        return await messages[0].getText();
+      }
+    }
+    return undefined;
   }
 
   async waitForEmptyMessage(ms = appConst.TIMEOUT.MEDIUM) {
     try {
-      await this.waitForElementDisplayed(this.css.emptyMessage, ms);
-      return await this.getText(this.css.emptyMessage);
+      let message;
+      await this.getBrowser().waitUntil(
+        async () => {
+          message = await this.getEmptyMessage();
+          return message !== undefined;
+        },
+        { timeout: ms, timeoutMsg: 'no empty message is displayed' },
+      );
+      return message;
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the empty message should be displayed`,
@@ -356,7 +371,7 @@ class DetailsPanel extends SectionPage {
       const button = await section.$(IN_SECTION.moreButton);
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(500);
+      return await this.pause(200);
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the '+N more' button of '${sectionLabel}'`,
@@ -374,7 +389,6 @@ class DetailsPanel extends SectionPage {
       const button = await section.$(IN_SECTION.editButton(label));
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the '${label}' button of '${sectionLabel}'`,
@@ -404,7 +418,6 @@ class DetailsPanel extends SectionPage {
     try {
       const section = await this.getSection(sectionLabel);
       await section.$(IN_SECTION.checkboxLabel).click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the checkbox of '${sectionLabel}'`,

@@ -104,8 +104,12 @@ describe("user.details.panel.spec - the details panel of a user: what it shows, 
     // 6. 'Edit roles' of the Roles section: the Roles step opens with the two roles picked.
     await userDetails.clickOnEditRolesButton();
     await rolesStep.waitForLoaded();
-    // 7. Expected roles should be displayed in the Roles step of the editor.
+    // 7. Expected roles should be displayed in the Roles step of the editor. The step loads the
+    //    saved roles after it opens, so each one is waited for before the list is read.
     assert.equal(await rolesStep.getStepTitle(), 'Roles');
+    for (const role of USER_ROLES) {
+      await rolesStep.waitForRoleSelected(role);
+    }
     let roles = await rolesStep.getSelectedRoles();
     for (const role of USER_ROLES) {
       assert.ok(roles.includes(role), `The role '${role}' should be picked in the editor`);

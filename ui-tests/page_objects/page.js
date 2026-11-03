@@ -171,18 +171,6 @@ class Page {
       await inputElement.click();
       await this.browser.keys([Key.Ctrl, 'a']);
       await this.browser.keys('Delete');
-      return await this.pause(300);
-    } catch (err) {
-      throw new Error('Tried to clear the value in the input: ' + err);
-    }
-  }
-
-  async clearInputTextElement(element) {
-    try {
-      await element.click();
-      await this.browser.keys([Key.Ctrl, 'a']);
-      await this.browser.keys('Delete');
-      return await this.pause(300);
     } catch (err) {
       throw new Error('Tried to clear the value in the input: ' + err);
     }
@@ -377,29 +365,6 @@ class Page {
     );
   }
 
-  // Notifications are the host's toasts, rendered in the light DOM outside every section's shadow
-  // root, so they are looked up in the document directly - not through findElement, which a
-  // SectionPage scopes to its shadow host.
-  async removeNotificationMessage() {
-    try {
-      const button = await this.getBrowser().$(COMMON.NOTIFICATION_CLOSE_BUTTON);
-      await button.waitForDisplayed({ timeout: appConst.TIMEOUT.MEDIUM });
-      await button.click();
-      return await this.pause(300);
-    } catch (err) {
-      await this.handleError(
-        'Error after removing the notification message',
-        'err_remove_notif_msg',
-        err,
-      );
-    }
-  }
-
-  async isNotificationMessageDisplayed() {
-    const message = await this.getBrowser().$(COMMON.NOTIFICATION_TEXT);
-    return await message.isDisplayed();
-  }
-
   // Waits for a notification message and returns its text.
   async waitForNotificationMessage() {
     try {
@@ -507,80 +472,6 @@ class Page {
     await this.getBrowser().releaseActions();
   }
 
-  async doTouchAction(selector) {
-    let el = await this.findElement(selector);
-    return await this.doTouchActionOnElement(el);
-  }
-
-  async doTouchActionOnElement(el) {
-    await el.moveTo();
-    let x = await el.getLocation('x');
-    let y = await el.getLocation('y');
-    console.log('X:' + x + 'Y ' + y);
-    return await this.browser.performActions([
-      {
-        type: 'pointer',
-        id: 'pointer1',
-        parameters: {
-          pointerType: 'touch',
-        },
-        actions: [
-          { type: 'pointerMove', origin: 'pointer', x: Math.floor(x), y: Math.floor(y) },
-          { type: 'pointerDown', button: 0 },
-          { type: 'pause', duration: 500 },
-          { type: 'pointerUp', button: 0 },
-        ],
-      },
-    ]);
-  }
-
-  async doRightClickWithOffset(selector, offsetX, offsetY) {
-    let el = await this.findElement(selector);
-    await el.moveTo();
-    let xValue = await el.getLocation('x');
-    let yValue = await el.getLocation('y');
-    let y = parseInt(yValue) + offsetY;
-    let x = parseInt(xValue) + offsetX;
-    return await this.browser.performActions([
-      {
-        type: 'pointer',
-        id: 'pointer1',
-        parameters: {
-          pointerType: 'mouse',
-        },
-        actions: [
-          { type: 'pointerMove', origin: 'pointer', x: x, y: y },
-          {
-            type: 'pointerDown',
-            button: 2,
-          },
-          {
-            type: 'pointerUp',
-            button: 2,
-          },
-        ],
-      },
-    ]);
-  }
-
-  async doPerformMoveToAction(element, offsetX, offsetY) {
-    await element.moveTo();
-    let xValue = await element.getLocation('x');
-    let yValue = await element.getLocation('y');
-    let x = Math.floor(xValue); //parseInt(yValue) + offsetY;
-    let y = Math.floor(yValue); // + offsetX;
-    return await this.getBrowser().performActions([
-      {
-        type: 'pointer',
-        id: 'pointer1',
-        parameters: {
-          pointerType: 'mouse',
-        },
-        actions: [{ type: 'pointerMove', origin: 'pointer', x: x, y: y }],
-      },
-    ]);
-  }
-
   async holdDownShiftAndPressArrowDown(count) {
     // holding down the Shift key
     await this.getBrowser().performActions([
@@ -617,74 +508,40 @@ class Page {
     ]);
   }
 
-  async isFocused(selctor) {
-    let el = await this.findElement(selctor);
-    return await el.isFocused();
-  }
-
-  isAlertPresent() {
-    return this.getBrowser()
-      .getAlertText()
-      .then(() => {
-        return true;
-      })
-      .catch((err) => {
-        if (err.seleniumStack === undefined) {
-          return false;
-        }
-        if (
-          err.seleniumStack.type == 'NoAlertOpenError' ||
-          err.seleniumStack.type == 'NoSuchWindow'
-        ) {
-          return false;
-        } else {
-          throw new Error(err);
-        }
-      });
-  }
-
   alertAccept() {
     return this.getBrowser().acceptAlert();
   }
 
   async pressEscKey() {
     await this.keys('Escape');
-    return await this.pause(500);
   }
 
   async pressEnterKey() {
     await this.keys('Enter');
-    return await this.pause(400);
   }
 
   async pressArrowDown() {
     await this.keys('ArrowDown');
-    return await this.pause(400);
   }
 
   async pressArrowUp() {
     await this.keys('ArrowUp');
-    return await this.pause(400);
   }
 
   async pressBackspace() {
     await this.keys('\uE003');
-    return await this.pause(200);
   }
 
   async pressWhiteSpace() {
     await this.keys('\ue00D');
-    return await this.pause(200);
   }
 
   async pressArrowLeft() {
     await this.keys('\ue012');
-    return await this.pause(1000);
   }
 
   async pressArrowRight() {
     await this.keys('\ue014');
-    return await this.pause(1000);
   }
 
   async switchToFrame(selector) {
@@ -718,84 +575,14 @@ class Page {
     }
   }
 
-  switchToParentFrame() {
-    return this.getBrowser().switchToParentFrame();
-  }
-
-  waitUntilInvalid(selector) {
-    return this.getBrowser().waitUntil(
-      () => {
-        return this.getAttribute(selector, 'class').then((result) => {
-          return result.includes('invalid');
-        });
-      },
-      { timeout: appConst.mediumTimeout, timeoutMsg: "Class should contain 'invalid' " },
-    );
-  }
-
-  // checks the attribute value (actual value contains expected value)
-  waitForAttributeHasValue(selector, attribute, value) {
-    return this.getBrowser().waitUntil(
-      () => {
-        return this.getAttribute(selector, attribute).then((result) => {
-          return result.includes(value);
-        });
-      },
-      {
-        timeout: appConst.shortTimeout,
-        timeoutMsg:
-          'Attribute ' +
-          attribute +
-          '  does not contain the value:' +
-          value +
-          ' locator:' +
-          selector,
-      },
-    );
-  }
-
-  waitForAttributeNotIncludesValue(selector, attribute, value) {
-    return this.getBrowser().waitUntil(
-      () => {
-        return this.getAttribute(selector, attribute).then((result) => {
-          return !result.includes(value);
-        });
-      },
-      {
-        timeout: appConst.shortTimeout,
-        timeoutMsg: 'Attribute ' + attribute + '  contains the value: ' + value,
-      },
-    );
-  }
-
   //is checkbox selected...
   async isSelected(selector) {
     let elems = await this.findElements(selector);
     return await elems[0].isSelected();
   }
 
-  async isDisplayedElementSelected(selector) {
-    let elems = await this.getDisplayedElements(selector);
-    return await elems[0].isSelected();
-  }
-
   refresh() {
     return this.getBrowser().refresh();
-  }
-
-  async scrollPanel(scrollTop) {
-    let element = await this.findElement(
-      "//div[contains(@id,'Panel') and contains(@class,'panel-strip-scrollable')]",
-    );
-    let id = await element.getAttribute('id');
-    let script = 'document.getElementById(arguments[0]).scrollTop=arguments[1]';
-    await this.getBrowser().execute(script, id, scrollTop);
-    return await this.pause(900);
-  }
-
-  async getCSSProperty(locator, property) {
-    let elems = await this.findElements(locator);
-    return await elems[0].getCSSProperty(property);
   }
 
   async isAlertOpen() {
@@ -828,10 +615,6 @@ class Page {
         timeoutMsg: `Expected attribute ${attrName} is not set in the element ${locator}`,
       },
     );
-  }
-
-  async getPuppeteer() {
-    return await browser.getPuppeteer();
   }
 
   async getBrowserStatus() {

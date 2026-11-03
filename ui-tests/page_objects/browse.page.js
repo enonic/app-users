@@ -178,7 +178,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementEnabled(selector);
       await this.clickOnElement(selector);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on ${label} button`,
@@ -480,7 +479,6 @@ class BrowsePage extends SectionPage {
         await this.pressEscKey();
       }
       await this.waitForElementNotDisplayed(this.css.filterPopup);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after closing the filter dropdown`,
@@ -521,7 +519,6 @@ class BrowsePage extends SectionPage {
       await this.waitForElementEnabled(this.sortButton);
       await this.clickOnElement(this.sortButton);
       await this.waitForElementDisplayed(this.css.sortMenu);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on Sort by button`,
@@ -772,7 +769,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForRowDisplayed(key);
       await this.clickOnElement(this.css.rowByKey(key));
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the row '${key}'`,
@@ -787,7 +783,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.rowCheckboxLabel(key));
       await this.clickOnElement(this.css.rowCheckboxLabel(key));
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - checkbox of the row '${key}'`,
@@ -953,7 +948,6 @@ class BrowsePage extends SectionPage {
     try {
       const row = await this.waitForRowByDisplayNameDisplayed(displayName);
       await row.click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the row '${displayName}'`,
@@ -968,7 +962,6 @@ class BrowsePage extends SectionPage {
     try {
       const row = await this.waitForRowByDisplayNameDisplayed(displayName);
       await row.$(this.css.rowCheckboxLabelInRow).click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - checkbox of the row '${displayName}'`,
