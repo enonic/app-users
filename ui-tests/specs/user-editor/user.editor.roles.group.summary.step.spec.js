@@ -75,8 +75,10 @@ describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, G
     await rolesStep.waitForLoaded();
     assert.equal(await rolesStep.getStepTitle(), 'Roles');
     assert.deepEqual(await rolesStep.getSelectedRoles(), [], 'No role should be picked yet');
-    // 2. Drop the list down: the system roles are offered, none ticked.
+    // 2. Drop the list down: the system roles are offered, none ticked. The picker asks the server
+    //    for its options, so the list is waited for rather than read as soon as the popup opens.
     await rolesStep.clickOnRolesDropdownHandle();
+    await rolesStep.combobox.waitForOptionDisplayed(ROLE);
     let roleOptions = await rolesStep.getRoleOptions();
     assert.ok(roleOptions.includes(ROLE), `'${ROLE}' should be offered`);
     await rolesStep.combobox.waitForOptionChecked(ROLE, false);
