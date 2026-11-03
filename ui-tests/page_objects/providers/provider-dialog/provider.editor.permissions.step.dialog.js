@@ -138,7 +138,6 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
       await this.waitForElementEnabled(css.accessSelectorTrigger(displayName));
       await this.clickOnElement(css.accessSelectorTrigger(displayName));
       await this.waitForElementDisplayed(css.accessOptions);
-      return await this.pause(200);
     } catch (err) {
       await this.handleError(
         `Permissions step - access selector of '${displayName}'`,
@@ -162,7 +161,7 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
       for (const option of options) {
         if ((await option.getText()) === access) {
           await option.click();
-          return await this.pause(300);
+          return await this.waitForRender();
         }
       }
       throw new Error(`no access level '${access}'`);
@@ -195,7 +194,7 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
       await this.clickOnAccessSelector(displayName);
       await this.waitForElementDisplayed(css.accessOptionByValue(value));
       await this.clickOnElement(css.accessOptionByValue(value));
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `Permissions step - access '${value}' was not selected for '${displayName}'`,

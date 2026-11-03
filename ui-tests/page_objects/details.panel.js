@@ -374,7 +374,7 @@ class DetailsPanel extends SectionPage {
       const button = await section.$(IN_SECTION.editButton(label));
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the '${label}' button of '${sectionLabel}'`,

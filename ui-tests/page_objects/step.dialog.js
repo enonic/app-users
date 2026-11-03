@@ -206,7 +206,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.closeButton);
       await this.clickOnElement(this.css.closeButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - Close button`, 'err_editor_close_btn', err);
     }
@@ -218,7 +218,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForNextButtonEnabled();
       await this.clickOnElement(this.css.nextButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - Next button`, 'err_editor_next_btn', err);
     }
@@ -228,7 +228,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForElementEnabled(this.css.previousButton);
       await this.clickOnElement(this.css.previousButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - Previous button`, 'err_editor_prev_btn', err);
     }
@@ -329,7 +329,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.keepButton);
       await this.clickOnElement(this.css.keepButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - Keep editing button`, 'err_keep_btn', err);
     }
@@ -340,7 +340,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.discardButton);
       await this.clickOnElement(this.css.discardButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - Confirm button`, 'err_discard_btn', err);
     }
@@ -357,7 +357,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForSaveButtonEnabled();
       await this.clickOnElement(this.css.saveButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - Save button`, 'err_editor_save_btn', err);
     }
@@ -411,7 +411,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.cancelButton);
       await this.clickOnElement(this.css.cancelButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - Cancel button`, 'err_editor_cancel_btn', err);
     }
@@ -439,7 +439,7 @@ class StepDialog extends SectionPage {
     try {
       await this.waitForElementEnabled(this.css.stepDot(step));
       await this.clickOnElement(this.css.stepDot(step));
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(`${this.dialogName} - '${step}' step dot`, 'err_editor_step_dot', err);
     }

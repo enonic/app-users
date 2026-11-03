@@ -63,6 +63,14 @@ class Page {
     return this.browser.pause(ms);
   }
 
+  // Two frames: the render a click or a key schedules, then the effects Preact runs after paint.
+  // ! Not enough where the app debounces or asks the server - wait for the result there instead.
+  waitForRender() {
+    return this.browser.executeAsync((done) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => done())),
+    );
+  }
+
   async doFilterDisplayedElements(elements) {
     let pr = await elements.map(async (el) => await el.isDisplayed());
     let result = await Promise.all(pr);
@@ -124,7 +132,7 @@ class Page {
       // panel (or in-flight animation) does not throw "element not interactable".
       await inputElement.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await inputElement.setValue(text);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       throw new Error('Tried to set the value in the input ' + err);
     }
@@ -141,7 +149,7 @@ class Page {
     let inputElement = await this.findElement(selector);
     //await inputElement.clearValue();
     await inputElement.addValue(text);
-    await this.pause(300);
+    await this.waitForRender();
   }
 
   // Wait for an element for the provided amount of milliseconds to be present within the DOM. Returns true if the selector matches at least one
@@ -171,7 +179,7 @@ class Page {
       await inputElement.click();
       await this.browser.keys([Key.Ctrl, 'a']);
       await this.browser.keys('Delete');
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       throw new Error('Tried to clear the value in the input: ' + err);
     }
@@ -182,7 +190,7 @@ class Page {
       await element.click();
       await this.browser.keys([Key.Ctrl, 'a']);
       await this.browser.keys('Delete');
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       throw new Error('Tried to clear the value in the input: ' + err);
     }
@@ -649,42 +657,42 @@ class Page {
 
   async pressEscKey() {
     await this.keys('Escape');
-    return await this.pause(500);
+    return await this.waitForRender();
   }
 
   async pressEnterKey() {
     await this.keys('Enter');
-    return await this.pause(400);
+    return await this.waitForRender();
   }
 
   async pressArrowDown() {
     await this.keys('ArrowDown');
-    return await this.pause(400);
+    return await this.waitForRender();
   }
 
   async pressArrowUp() {
     await this.keys('ArrowUp');
-    return await this.pause(400);
+    return await this.waitForRender();
   }
 
   async pressBackspace() {
     await this.keys('\uE003');
-    return await this.pause(200);
+    return await this.waitForRender();
   }
 
   async pressWhiteSpace() {
     await this.keys('\ue00D');
-    return await this.pause(200);
+    return await this.waitForRender();
   }
 
   async pressArrowLeft() {
     await this.keys('\ue012');
-    return await this.pause(1000);
+    return await this.waitForRender();
   }
 
   async pressArrowRight() {
     await this.keys('\ue014');
-    return await this.pause(1000);
+    return await this.waitForRender();
   }
 
   async switchToFrame(selector) {

@@ -177,7 +177,6 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.confirmInput);
       await this.typeTextInInput(this.css.confirmInput, String(value));
-      return await this.pause(300);
     } catch (err) {
       await this.handleError('Confirmation dialog - the gate input', 'err_confirm_input', err);
     }
@@ -218,7 +217,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementEnabled(this.css.primaryButton);
       await this.clickOnElement(this.css.primaryButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - Delete/Confirm button', 'err_confirm_btn', err);
     }
@@ -228,7 +227,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForDeleteButtonEnabled();
       await this.clickOnElement(this.css.deleteButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - Delete button', 'err_confirm_delete_btn', err);
     }
@@ -238,7 +237,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForConfirmButtonEnabled();
       await this.clickOnElement(this.css.confirmButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - Confirm button', 'err_confirm_btn', err);
     }
@@ -324,7 +323,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.cancelButton);
       await this.clickOnElement(this.css.cancelButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - Cancel button', 'err_confirm_cancel_btn', err);
     }
@@ -334,7 +333,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.closeButton);
       await this.clickOnElement(this.css.closeButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - Close button', 'err_confirm_close_btn', err);
     }

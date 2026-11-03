@@ -80,7 +80,6 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
       await this.waitForElementDisplayed(css.setPasswordButton);
       await this.clickOnElement(css.setPasswordButton);
       await this.waitForElementDisplayed(css.passwordInput);
-      return await this.pause(200);
     } catch (err) {
       await this.handleError('Credentials step - Set password button', 'err_set_password_btn', err);
     }
@@ -100,7 +99,6 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
       await this.waitForElementDisplayed(css.changePasswordButton);
       await this.clickOnElement(css.changePasswordButton);
       await this.waitForElementDisplayed(css.passwordInput);
-      return await this.pause(200);
     } catch (err) {
       await this.handleError(
         'Credentials step - Change password button',
@@ -118,7 +116,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.clearPasswordButton);
       await this.clickOnElement(css.clearPasswordButton);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'Credentials step - Clear password button',
@@ -137,7 +135,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.keepPasswordButton);
       await this.clickOnElement(css.keepPasswordButton);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'Credentials step - Keep password button',
@@ -233,7 +231,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.generatePasswordButton);
       await this.clickOnElement(css.generatePasswordButton);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'Credentials step - Generate button',
@@ -247,7 +245,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.showPasswordButton);
       await this.clickOnElement(css.showPasswordButton);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'Credentials step - Show password button',
@@ -261,7 +259,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.hidePasswordButton);
       await this.clickOnElement(css.hidePasswordButton);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'Credentials step - Hide password button',
@@ -284,7 +282,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.discardPasswordButton);
       await this.clickOnElement(css.discardPasswordButton);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'Credentials step - Discard password button',
@@ -334,7 +332,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementEnabled(css.addPublicKeyButton);
       await this.clickOnElement(css.addPublicKeyButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Credentials step - Add public key button', 'err_add_key_btn', err);
     }
@@ -388,7 +386,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.removePublicKeyButton(label));
       await this.clickOnElement(css.removePublicKeyButton(label));
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `Credentials step - removing the public key '${label}'`,
@@ -403,7 +401,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.keepPublicKeyButton);
       await this.clickOnElement(css.keepPublicKeyButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Credentials step - Keep public key button', 'err_keep_key_btn', err);
     }

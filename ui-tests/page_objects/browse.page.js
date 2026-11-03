@@ -178,7 +178,7 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementEnabled(selector);
       await this.clickOnElement(selector);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on ${label} button`,
@@ -309,7 +309,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.searchInput);
       await this.typeTextInInput(this.css.searchInput, text);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after typing in the search input`,
@@ -341,7 +340,6 @@ class BrowsePage extends SectionPage {
       await this.typeTextInSearchInput(text);
       await this.pressEnterKey();
       await this.waitForElementDisplayed(this.css.searchTermRemoveButton(text));
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after adding the search term '${text}'`,
@@ -360,7 +358,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.clickOnElement(this.css.searchTermRemoveButton(text));
       await this.waitForElementNotDisplayed(this.css.searchTermRemoveButton(text));
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after removing the search term '${text}'`,
@@ -375,7 +372,6 @@ class BrowsePage extends SectionPage {
     try {
       await this.clickOnElement(this.css.searchClearButton);
       await this.waitForElementNotDisplayed(this.css.searchClearButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clearing the search`,
@@ -398,7 +394,6 @@ class BrowsePage extends SectionPage {
       await this.waitForElementDisplayed(this.css.searchInput);
       await this.clickOnElement(this.css.searchInput);
       await this.waitForElementDisplayed(this.css.filterPopup);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after opening the filter dropdown`,
@@ -418,7 +413,6 @@ class BrowsePage extends SectionPage {
       await this.clickOnElement(this.css.filterFieldOption(fieldId));
       await this.waitForElementDisplayed(this.css.filterValueInput);
       await this.waitForElementDisplayed(this.css.filterPopup);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after entering the filter field '${fieldId}'`,
@@ -460,7 +454,6 @@ class BrowsePage extends SectionPage {
       await this.waitForElementDisplayed(this.css.filterValueOption(id));
       await this.clickOnElement(this.css.filterValueOption(id));
       await this.waitForElementDisplayed(this.css.searchTermRemoveButton(label));
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after picking the filter value '${id}'`,
@@ -480,7 +473,6 @@ class BrowsePage extends SectionPage {
         await this.pressEscKey();
       }
       await this.waitForElementNotDisplayed(this.css.filterPopup);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after closing the filter dropdown`,
@@ -521,7 +513,6 @@ class BrowsePage extends SectionPage {
       await this.waitForElementEnabled(this.sortButton);
       await this.clickOnElement(this.sortButton);
       await this.waitForElementDisplayed(this.css.sortMenu);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on Sort by button`,
@@ -640,7 +631,6 @@ class BrowsePage extends SectionPage {
         if ((await item.getText()).trim() === itemName) {
           await item.click();
           await this.waitForSortMenuClosed();
-          return await this.pause(300);
         }
       }
       throw new Error(`item '${itemName}' was not found in the Sort menu`);
@@ -671,7 +661,7 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.selectAllCheckboxLabel);
       await this.clickOnElement(this.css.selectAllCheckboxLabel);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.pageName} - Select all checkbox`,
@@ -772,7 +762,7 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForRowDisplayed(key);
       await this.clickOnElement(this.css.rowByKey(key));
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the row '${key}'`,
@@ -787,7 +777,7 @@ class BrowsePage extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.rowCheckboxLabel(key));
       await this.clickOnElement(this.css.rowCheckboxLabel(key));
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.pageName} - checkbox of the row '${key}'`,
@@ -953,7 +943,7 @@ class BrowsePage extends SectionPage {
     try {
       const row = await this.waitForRowByDisplayNameDisplayed(displayName);
       await row.click();
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on the row '${displayName}'`,
@@ -968,7 +958,7 @@ class BrowsePage extends SectionPage {
     try {
       const row = await this.waitForRowByDisplayNameDisplayed(displayName);
       await row.$(this.css.rowCheckboxLabelInRow).click();
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.pageName} - checkbox of the row '${displayName}'`,
@@ -1017,7 +1007,6 @@ class BrowsePage extends SectionPage {
       const row = await this.waitForRowByDisplayNameDisplayed(displayName);
       await row.click({ button: 'right' });
       await this.waitForElementDisplayed(this.css.contextMenu);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.pageName} - the context menu of the row '${displayName}'`,
@@ -1104,7 +1093,6 @@ class BrowsePage extends SectionPage {
         await item.click();
         // The menu closing is what says the click landed.
         await this.waitForContextMenuClosed();
-        return await this.pause(300);
       }
       throw new Error(`item '${label}' was not found in the context menu`);
     } catch (err) {

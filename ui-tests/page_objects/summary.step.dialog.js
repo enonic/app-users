@@ -112,7 +112,7 @@ function withSummaryStep(EditorStepDialog, LABEL) {
       try {
         await this.waitForCreateButtonEnabled();
         await this.clickOnElement(css.createButton);
-        return await this.pause(300);
+        return await this.waitForRender();
       } catch (err) {
         await this.handleError('Summary step - Create button', 'err_summary_create_btn', err);
       }
@@ -168,7 +168,7 @@ function withSummaryStep(EditorStepDialog, LABEL) {
       try {
         await this.waitForSaveButtonEnabled();
         await this.clickOnElement(css.saveButton);
-        return await this.pause(300);
+        return await this.waitForRender();
       } catch (err) {
         await this.handleError('Summary step - Save button', 'err_summary_save_btn', err);
       }

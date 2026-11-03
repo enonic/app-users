@@ -176,7 +176,7 @@ class AddPublicKeyDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.cancelButton);
       await this.clickOnElement(css.cancelButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Add public key dialog - Cancel button', 'err_add_key_cancel', err);
     }
@@ -186,7 +186,7 @@ class AddPublicKeyDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.closeButton);
       await this.clickOnElement(css.closeButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Add public key dialog - Close button', 'err_add_key_close', err);
     }

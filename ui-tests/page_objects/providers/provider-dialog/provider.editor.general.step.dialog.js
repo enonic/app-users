@@ -189,7 +189,6 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
       await this.waitForElementDisplayed(css.applicationToggle);
       await this.clickOnElement(css.applicationToggle);
       await this.waitForElementDisplayed(css.applicationOptions);
-      return await this.pause(200);
     } catch (err) {
       await this.handleError(
         'New ID provider dialog - Application selector',
@@ -205,7 +204,6 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
       await this.waitForElementDisplayed(css.applicationSearchInput);
       await this.typeTextInInput(css.applicationSearchInput, text);
       await this.waitForElementDisplayed(css.applicationPopup);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         'New ID provider dialog - Application search',
@@ -259,7 +257,6 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
         if ((await option.$(css.applicationOptionName).getText()) === displayName) {
           await option.click();
           await this.waitForElementDisplayed(css.applicationRow);
-          return await this.pause(300);
         }
       }
       throw new Error(`no option with the display name '${displayName}'`);
@@ -292,7 +289,6 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
       await this.waitForElementDisplayed(css.applicationOptionByKey(key));
       await this.clickOnElement(css.applicationOptionByKey(key));
       await this.waitForElementDisplayed(css.applicationRow);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `New ID provider dialog - application '${key}' was not selected`,
@@ -350,7 +346,7 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.applicationConfigButton);
       await this.clickOnElement(css.applicationConfigButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'New ID provider dialog - Edit the application configuration button',
@@ -407,7 +403,7 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
     try {
       await this.waitForElementEnabled(css.applicationRemoveButton);
       await this.clickOnElement(css.applicationRemoveButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'New ID provider dialog - Remove application button',

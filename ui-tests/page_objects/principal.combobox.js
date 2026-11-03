@@ -274,7 +274,7 @@ class PrincipalCombobox extends SectionPage {
       for (const option of options) {
         if ((await option.$(this.css.optionDisplayName).getText()) === displayName) {
           await option.click();
-          return await this.pause(200);
+          return await this.waitForRender();
         }
       }
       throw new Error(`no option with the display name '${displayName}'`);
@@ -291,7 +291,7 @@ class PrincipalCombobox extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.optionByKey(key));
       await this.clickOnElement(this.css.optionByKey(key));
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - option '${key}'`,
@@ -314,7 +314,6 @@ class PrincipalCombobox extends SectionPage {
       await this.waitForElementDisplayed(this.css.applyButton);
       await this.clickOnElement(this.css.applyButton);
       await this.waitForPopupClosed();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - Apply button`,
@@ -384,7 +383,7 @@ class PrincipalCombobox extends SectionPage {
   async scrollToSelectedOption(displayName) {
     const button = await this.findElement(this.css.pickedRemoveButton(displayName));
     await button.scrollIntoView({ block: 'center' });
-    return await this.pause(200);
+    return await this.waitForRender();
   }
 
   async waitForOptionNotSelected(displayName, ms = appConst.TIMEOUT.MEDIUM) {
@@ -406,7 +405,7 @@ class PrincipalCombobox extends SectionPage {
       const button = this.css.pickedRemoveButton(displayName);
       await this.waitForElementEnabled(button);
       await this.clickOnElement(button);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - removing the picked '${displayName}'`,
