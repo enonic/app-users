@@ -66,8 +66,8 @@ class Page {
   // Two frames: the render a click or a key schedules, then the effects Preact runs after paint.
   // ! Not enough where the app debounces or asks the server - wait for the result there instead.
   waitForRender() {
-    return this.browser.executeAsync((done) =>
-      requestAnimationFrame(() => requestAnimationFrame(() => done())),
+    return this.browser.execute(
+      () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
     );
   }
 

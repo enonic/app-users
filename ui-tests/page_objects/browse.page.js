@@ -513,6 +513,7 @@ class BrowsePage extends SectionPage {
       await this.waitForElementEnabled(this.sortButton);
       await this.clickOnElement(this.sortButton);
       await this.waitForElementDisplayed(this.css.sortMenu);
+      await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `${this.pageName} - error after clicking on Sort by button`,
