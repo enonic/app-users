@@ -63,11 +63,30 @@ class Page {
     return this.browser.pause(ms);
   }
 
-  // Two frames: the render a click or a key schedules, then the effects Preact runs after paint.
+  // Two frames for the render a click or a key schedules and the effects run after paint, then until
+  // the finite animations are over: a popup fading in reads as not displayed, its text as ''.
   // ! Not enough where the app debounces or asks the server - wait for the result there instead.
   waitForRender() {
     return this.browser.execute(
-      () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+      () =>
+        new Promise((done) => {
+          const deadline = performance.now() + 1000;
+          const roots = [document];
+          for (const host of document.querySelectorAll("[data-component='SectionMount']")) {
+            if (host.shadowRoot) roots.push(host.shadowRoot);
+          }
+          const busy = () =>
+            roots.some((root) =>
+              root
+                .getAnimations()
+                .some(
+                  (a) => a.playState === 'running' && a.effect?.getTiming().iterations !== Infinity,
+                ),
+            );
+          const tick = () =>
+            busy() && performance.now() < deadline ? requestAnimationFrame(tick) : done();
+          requestAnimationFrame(() => requestAnimationFrame(tick));
+        }),
     );
   }
 

@@ -314,6 +314,7 @@ class PrincipalCombobox extends SectionPage {
       await this.waitForElementDisplayed(this.css.applyButton);
       await this.clickOnElement(this.css.applyButton);
       await this.waitForPopupClosed();
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - Apply button`,

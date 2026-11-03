@@ -177,6 +177,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.confirmInput);
       await this.typeTextInInput(this.css.confirmInput, String(value));
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - the gate input', 'err_confirm_input', err);
     }

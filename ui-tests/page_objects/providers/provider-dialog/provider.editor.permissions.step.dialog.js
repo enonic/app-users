@@ -138,6 +138,7 @@ class IdProviderEditorPermissionsStepDialog extends IdProviderEditorStepDialog {
       await this.waitForElementEnabled(css.accessSelectorTrigger(displayName));
       await this.clickOnElement(css.accessSelectorTrigger(displayName));
       await this.waitForElementDisplayed(css.accessOptions);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `Permissions step - access selector of '${displayName}'`,
