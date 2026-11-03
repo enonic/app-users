@@ -21,11 +21,14 @@ describe('service.accounts.page.filtering.spec - Service Accounts page: the sear
   const DISPLAY_NAME = `account${SUFFIX}`;
   const ID = `sa-${SUFFIX}`;
   const EMAIL = `mail${SUFFIX}@gmail.com`;
+  // Matches no field of any account: added over the three terms, it proves every term in force
+  // must match, since the account the three match alone disappears with it.
+  const NO_MATCH = `nomatch${SUFFIX}`;
   let SERVICE_ACCOUNT;
 
   // The search matches any of the three fields, and every term in force must match: the three
   // terms together leave the account alone in the list.
-  it('GIVEN a new service account with its own display name, ID and email has been created in the editor WHEN the three have been entered as terms THEN that account alone should be listed', async () => {
+  it('GIVEN a new service account with its own display name, ID and email has been created in the editor WHEN the three have been entered as terms THEN that account alone should be listed AND WHEN a term matching nothing has been added THEN no account should be listed', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.SERVICE_ACCOUNTS);
     let serviceAccountsPage = new ServiceAccountsPage();
     await serviceAccountsPage.waitForRowByDisplayNameDisplayed(SUPER_USER);
@@ -58,7 +61,33 @@ describe('service.accounts.page.filtering.spec - Service Accounts page: the sear
       undefined,
       'No message should be shown',
     );
-    // 3. The three tags taken back one by one: the list is whole again.
+    // 3. A fourth term that matches nothing, over the three that match the account: the terms are
+    //    combined with AND, so the account goes and the list says nothing matches. (Combined with
+    //    OR, the three would keep it listed - which is what this step tells apart.)
+    await serviceAccountsPage.addSearchTerm(NO_MATCH);
+    await serviceAccountsPage.waitForRowByDisplayNameNotDisplayed(DISPLAY_NAME);
+    await settingsUtils.saveScreenshot('service_accounts_search_term_matching_nothing');
+    assert.deepEqual(await serviceAccountsPage.getSearchTerms(), [
+      DISPLAY_NAME,
+      EMAIL,
+      ID,
+      NO_MATCH,
+    ]);
+    assert.deepEqual(
+      await serviceAccountsPage.getServiceAccountDisplayNames(),
+      [],
+      'No account should match a term that matches nothing',
+    );
+    assert.equal(
+      await serviceAccountsPage.getListMessage(),
+      appConst.LIST_MESSAGE.NOTHING_MATCHES,
+      "The list should read 'Nothing matches the search'",
+    );
+    // 4. That term taken back: the account is listed again, alone, under the three terms.
+    await serviceAccountsPage.removeSearchTerm(NO_MATCH);
+    await serviceAccountsPage.waitForRowByDisplayNameDisplayed(DISPLAY_NAME);
+    assert.deepEqual(await serviceAccountsPage.getServiceAccountDisplayNames(), [DISPLAY_NAME]);
+    // 5. The three tags taken back one by one: the list is whole again.
     await serviceAccountsPage.removeSearchTerm(ID);
     await serviceAccountsPage.removeSearchTerm(EMAIL);
     await serviceAccountsPage.removeSearchTerm(DISPLAY_NAME);
