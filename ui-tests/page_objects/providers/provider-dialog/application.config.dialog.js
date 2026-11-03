@@ -224,7 +224,7 @@ class ApplicationConfigDialog extends SectionPage {
       const button = await set.$(css.itemSetAddButton);
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(300);
+      return await this.pause(100);
     } catch (err) {
       await this.handleError(
         `Application configuration dialog - the Add button of '${title}'`,
@@ -327,7 +327,6 @@ class ApplicationConfigDialog extends SectionPage {
     try {
       await this.waitForElementEnabled(css.applyButton);
       await this.clickOnElement(css.applyButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         'Application configuration dialog - Apply button',
@@ -346,7 +345,6 @@ class ApplicationConfigDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.cancelButton);
       await this.clickOnElement(css.cancelButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         'Application configuration dialog - Cancel button',
@@ -366,7 +364,6 @@ class ApplicationConfigDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.closeButton);
       await this.clickOnElement(css.closeButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         'Application configuration dialog - Close button',
@@ -419,7 +416,6 @@ class ApplicationConfigDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.keepButton);
       await this.clickOnElement(css.keepButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         "Application configuration dialog - 'Keep editing' button",
@@ -433,7 +429,6 @@ class ApplicationConfigDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.discardButton);
       await this.clickOnElement(css.discardButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         'Application configuration dialog - Confirm button',

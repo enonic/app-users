@@ -371,7 +371,7 @@ class DetailsPanel extends SectionPage {
       const button = await section.$(IN_SECTION.moreButton);
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(500);
+      return await this.pause(200);
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the '+N more' button of '${sectionLabel}'`,
@@ -389,7 +389,6 @@ class DetailsPanel extends SectionPage {
       const button = await section.$(IN_SECTION.editButton(label));
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the '${label}' button of '${sectionLabel}'`,
@@ -419,7 +418,6 @@ class DetailsPanel extends SectionPage {
     try {
       const section = await this.getSection(sectionLabel);
       await section.$(IN_SECTION.checkboxLabel).click();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `${this.panelName} - the checkbox of '${sectionLabel}'`,

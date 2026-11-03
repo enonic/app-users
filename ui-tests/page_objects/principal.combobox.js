@@ -77,7 +77,7 @@ class PrincipalCombobox extends SectionPage {
       await this.waitForElementDisplayed(this.css.input);
       await this.typeTextInInput(this.css.input, text);
       await this.waitForElementDisplayed(this.css.popup);
-      return await this.pause(300);
+      return await this.pause(100);
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - typing '${text}' in the filter input`,
@@ -106,7 +106,7 @@ class PrincipalCombobox extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.toggle);
       await this.clickOnElement(this.css.toggle);
-      return await this.pause(300);
+      return await this.pause(100);
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - the dropdown handle`,
@@ -291,7 +291,7 @@ class PrincipalCombobox extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.optionByKey(key));
       await this.clickOnElement(this.css.optionByKey(key));
-      return await this.pause(200);
+      return await this.pause(100);
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - option '${key}'`,
@@ -314,7 +314,6 @@ class PrincipalCombobox extends SectionPage {
       await this.waitForElementDisplayed(this.css.applyButton);
       await this.clickOnElement(this.css.applyButton);
       await this.waitForPopupClosed();
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - Apply button`,
@@ -384,7 +383,7 @@ class PrincipalCombobox extends SectionPage {
   async scrollToSelectedOption(displayName) {
     const button = await this.findElement(this.css.pickedRemoveButton(displayName));
     await button.scrollIntoView({ block: 'center' });
-    return await this.pause(200);
+    return await this.pause(100);
   }
 
   async waitForOptionNotSelected(displayName, ms = appConst.TIMEOUT.MEDIUM) {

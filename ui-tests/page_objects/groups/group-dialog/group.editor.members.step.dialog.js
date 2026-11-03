@@ -109,7 +109,6 @@ class GroupEditorMembersStepDialog extends GroupEditorStepDialog {
     try {
       await this.waitForElementDisplayed(css.showAllMembersToggle);
       await this.clickOnElement(css.showAllMembersToggle);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         "Members step - 'Show members from all ID providers' toggle",

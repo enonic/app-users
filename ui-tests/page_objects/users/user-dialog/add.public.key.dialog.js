@@ -134,7 +134,6 @@ class AddPublicKeyDialog extends SectionPage {
     try {
       await this.waitForElementEnabled(css.generateButton);
       await this.clickOnElement(css.generateButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         'Add public key dialog - Generate button',
@@ -160,7 +159,7 @@ class AddPublicKeyDialog extends SectionPage {
     try {
       const fileInput = await this.findElement(css.fileInput);
       await fileInput.addValue(filePath);
-      return await this.pause(500);
+      return await this.pause(300);
     } catch (err) {
       await this.handleError(
         `Add public key dialog - uploading '${filePath}'`,
@@ -176,7 +175,6 @@ class AddPublicKeyDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.cancelButton);
       await this.clickOnElement(css.cancelButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError('Add public key dialog - Cancel button', 'err_add_key_cancel', err);
     }
@@ -186,7 +184,6 @@ class AddPublicKeyDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(css.closeButton);
       await this.clickOnElement(css.closeButton);
-      return await this.pause(300);
     } catch (err) {
       await this.handleError('Add public key dialog - Close button', 'err_add_key_close', err);
     }
