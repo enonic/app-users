@@ -1,19 +1,19 @@
 /**
  * Created on 24.09.2026
  */
-const webDriverHelper = require('../libs/WebDriverHelper');
-const settingsUtils = require('../libs/settings.utils');
-const appConst = require('../libs/app_const');
+const webDriverHelper = require('../../libs/WebDriverHelper');
+const settingsUtils = require('../../libs/settings.utils');
+const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const UsersPage = require('../page_objects/users/users.page');
-const UserEditorIdProviderStepDialog = require('../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
-const UserEditorGeneralStepDialog = require('../page_objects/users/user-dialog/user.editor.general.step.dialog');
-const UserEditorCredentialStepDialog = require('../page_objects/users/user-dialog/user.editor.credentials.step.dialog');
-const UserEditorRolesStepDialog = require('../page_objects/users/user-dialog/user.editor.roles.step.dialog');
-const UserEditorGroupsStepDialog = require('../page_objects/users/user-dialog/user.editor.groups.step.dialog');
-const UserEditorSummaryStepDialog = require('../page_objects/users/user-dialog/user.editor.summary.step.dialog');
-const UserDetails = require('../page_objects/users/user.details');
-const userItemsBuilder = require('../libs/users.items.builder');
+const UsersPage = require('../../page_objects/users/users.page');
+const UserEditorIdProviderStepDialog = require('../../page_objects/users/user-dialog/user.editor.id.provider.step.dialog');
+const UserEditorGeneralStepDialog = require('../../page_objects/users/user-dialog/user.editor.general.step.dialog');
+const UserEditorCredentialStepDialog = require('../../page_objects/users/user-dialog/user.editor.credentials.step.dialog');
+const UserEditorRolesStepDialog = require('../../page_objects/users/user-dialog/user.editor.roles.step.dialog');
+const UserEditorGroupsStepDialog = require('../../page_objects/users/user-dialog/user.editor.groups.step.dialog');
+const UserEditorSummaryStepDialog = require('../../page_objects/users/user-dialog/user.editor.summary.step.dialog');
+const UserDetails = require('../../page_objects/users/user.details');
+const userItemsBuilder = require('../../libs/users.items.builder');
 
 describe('user.without.password.details.page.spec - an ID provider made via the API, a user created in it by the editor without a password, and the password set afterwards from the details', function () {
   this.timeout(appConst.SUITE_TIMEOUT);

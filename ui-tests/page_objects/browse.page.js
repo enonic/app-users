@@ -494,6 +494,12 @@ class BrowsePage extends SectionPage {
     return this.isElementDisplayed(this.css.filterPopup);
   }
 
+  // Whether the dropdown, open on its first stage, offers the field with the id ('idProvider',
+  // 'scope').
+  isFilterFieldOffered(fieldId) {
+    return this.isElementDisplayed(this.css.filterFieldOption(fieldId));
+  }
+
   // Waits until no field is entered any more: the input invites a search again, not a value.
   // 'Clear the filter' and Escape both step out of the field without closing the dropdown.
   async waitForFilterFieldLeft(ms = appConst.TIMEOUT.MEDIUM) {

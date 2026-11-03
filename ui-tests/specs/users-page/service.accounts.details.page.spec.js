@@ -1,19 +1,19 @@
 /**
  * Created on 08.10.2026
  */
-const webDriverHelper = require('../libs/WebDriverHelper');
-const settingsUtils = require('../libs/settings.utils');
-const appConst = require('../libs/app_const');
+const webDriverHelper = require('../../libs/WebDriverHelper');
+const settingsUtils = require('../../libs/settings.utils');
+const appConst = require('../../libs/app_const');
 const assert = require('node:assert');
-const ServiceAccountsPage = require('../page_objects/service-accounts/service.accounts.page');
-const ServiceAccountDetails = require('../page_objects/service-accounts/service.account.details');
-const ServiceAccountEditorGeneralStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.general.step.dialog');
-const ServiceAccountEditorRolesStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.roles.step.dialog');
-const ServiceAccountEditorCredentialsStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.credentials.step.dialog');
-const ServiceAccountEditorGroupsStepDialog = require('../page_objects/service-accounts/service-account-dialog/service.account.editor.groups.step.dialog');
-const AddPublicKeyDialog = require('../page_objects/users/user-dialog/add.public.key.dialog');
-const userItemsBuilder = require('../libs/users.items.builder');
-const ConfirmationDialog = require('../page_objects/confirmation.dialog');
+const ServiceAccountsPage = require('../../page_objects/service-accounts/service.accounts.page');
+const ServiceAccountDetails = require('../../page_objects/service-accounts/service.account.details');
+const ServiceAccountEditorGeneralStepDialog = require('../../page_objects/service-accounts/service-account-dialog/service.account.editor.general.step.dialog');
+const ServiceAccountEditorRolesStepDialog = require('../../page_objects/service-accounts/service-account-dialog/service.account.editor.roles.step.dialog');
+const ServiceAccountEditorCredentialsStepDialog = require('../../page_objects/service-accounts/service-account-dialog/service.account.editor.credentials.step.dialog');
+const ServiceAccountEditorGroupsStepDialog = require('../../page_objects/service-accounts/service-account-dialog/service.account.editor.groups.step.dialog');
+const AddPublicKeyDialog = require('../../page_objects/users/user-dialog/add.public.key.dialog');
+const userItemsBuilder = require('../../libs/users.items.builder');
+const ConfirmationDialog = require('../../page_objects/confirmation.dialog');
 
 describe("service.accounts.details.page.spec - the details panel of a service account: what it shows, and the editor each of its Edit buttons opens on the account's saved data", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
