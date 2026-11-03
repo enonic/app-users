@@ -64,7 +64,8 @@ class Page {
   }
 
   // Two frames for the render a click or a key schedules and the effects run after paint, then until
-  // the finite animations are over: a popup fading in reads as not displayed, its text as ''.
+  // nothing fades: a popup fading in reads as not displayed, its text as ''. The colour, shadow and
+  // scale transitions every click sets off on its button are not waited for.
   // ! Not enough where the app debounces or asks the server - wait for the result there instead.
   waitForRender() {
     return this.browser.execute(
@@ -75,14 +76,13 @@ class Page {
           for (const host of document.querySelectorAll("[data-component='SectionMount']")) {
             if (host.shadowRoot) roots.push(host.shadowRoot);
           }
-          const busy = () =>
-            roots.some((root) =>
-              root
-                .getAnimations()
-                .some(
-                  (a) => a.playState === 'running' && a.effect?.getTiming().iterations !== Infinity,
-                ),
-            );
+          const fades = (a) =>
+            a.playState === 'running' &&
+            a.effect?.getTiming().iterations !== Infinity &&
+            (a.transitionProperty !== undefined
+              ? a.transitionProperty === 'opacity'
+              : a.effect.getKeyframes().some((frame) => 'opacity' in frame));
+          const busy = () => roots.some((root) => root.getAnimations().some(fades));
           const tick = () =>
             busy() && performance.now() < deadline ? requestAnimationFrame(tick) : done();
           requestAnimationFrame(() => requestAnimationFrame(tick));
