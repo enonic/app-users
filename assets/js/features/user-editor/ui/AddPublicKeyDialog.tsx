@@ -157,15 +157,8 @@ export function AddPublicKeyDialog({
           </ActionDialog.Body>
 
           <ActionDialog.Footer error={failure}>
-            <Button
-              className="shrink-0"
-              variant="text"
-              size="lg"
-              label={cancelLabel}
-              onClick={close}
-            />
+            <Button variant="text" size="lg" label={cancelLabel} onClick={close} />
             <ActionDialog.Action
-              className="shrink-0"
               label={generateLabel}
               disabled={busy || unnamed}
               closeOnClick={false}
