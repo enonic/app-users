@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { type ActionContext, actionTargets, rowActivationAction } from './actions';
+import { type ActionContext, actionTargets, rowActivationAction, shortcutAction } from './actions';
+import type { ShortcutEvent } from './shortcuts';
 
 const a = { id: 'a' };
 const b = { id: 'b' };
@@ -52,5 +53,56 @@ describe('rowActivationAction', () => {
 
   it('answers nothing where the section marked no action at all', () => {
     expect(rowActivationAction([remove], context({ active: a }))).toBeUndefined();
+  });
+});
+
+describe('shortcutAction', () => {
+  const create = {
+    id: 'new',
+    labelKey: 'new',
+    enabled: () => true,
+    run: () => undefined,
+    shortcut: { code: 'KeyN', alt: true },
+  };
+
+  const remove = {
+    id: 'delete',
+    labelKey: 'delete',
+    enabled: (ctx: ActionContext<typeof a>) => actionTargets(ctx).length > 0,
+    run: () => undefined,
+    shortcut: { code: 'Delete', mod: true },
+  };
+
+  const actions = [create, remove];
+
+  function key(overrides: Partial<ShortcutEvent>): ShortcutEvent {
+    return {
+      code: '',
+      altKey: false,
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      ...overrides,
+    };
+  }
+
+  it('answers the action bound to the chord, when it is allowed', () => {
+    expect(
+      shortcutAction(actions, context({ active: a }), key({ code: 'Delete', ctrlKey: true }), false)
+        ?.id,
+    ).toBe('delete');
+  });
+
+  // ! A shortcut is the button: when the button is disabled, the key does nothing.
+  it('answers nothing while the bound action is disabled', () => {
+    expect(
+      shortcutAction(actions, context(), key({ code: 'Delete', ctrlKey: true }), false),
+    ).toBeUndefined();
+  });
+
+  it('answers nothing for a chord no action is bound to', () => {
+    expect(
+      shortcutAction([remove], context({ active: a }), key({ code: 'KeyN', altKey: true }), false),
+    ).toBeUndefined();
   });
 });

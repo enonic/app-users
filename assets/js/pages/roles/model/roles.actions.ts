@@ -16,12 +16,14 @@ export const ROLE_ACTIONS: readonly SectionAction<Role>[] = [
   {
     id: 'new',
     labelKey: 'roles.action.new',
+    shortcut: { code: 'KeyN', alt: true },
     enabled: () => true,
     run: () => openRoleEditor({ mode: 'create' }),
   },
   {
     id: 'delete',
     labelKey: 'roles.action.delete',
+    shortcut: { code: 'Delete', mod: true },
     enabled: deletable,
     run: (ctx) => rolesDeletion.open(actionTargets(ctx)),
   },

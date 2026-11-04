@@ -29,12 +29,14 @@ export const ID_PROVIDER_ACTIONS: readonly SectionAction<IdProvider>[] = [
   {
     id: 'new',
     labelKey: 'idProviders.action.new',
+    shortcut: { code: 'KeyN', alt: true },
     enabled: () => true,
     run: () => openIdProviderEditor({ mode: 'create' }),
   },
   {
     id: 'delete',
     labelKey: 'idProviders.action.delete',
+    shortcut: { code: 'Delete', mod: true },
     enabled: deletable,
     run: (ctx) => idProvidersDeletion.open(actionTargets(ctx)),
   },

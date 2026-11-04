@@ -13,12 +13,14 @@ export function createUserActions(canCreate: boolean): readonly SectionAction<Us
     {
       id: 'new',
       labelKey: 'users.action.new',
+      shortcut: { code: 'KeyN', alt: true },
       enabled: () => canCreate,
       run: () => openUserEditor({ mode: 'create' }),
     },
     {
       id: 'delete',
       labelKey: 'users.action.delete',
+      shortcut: { code: 'Delete', mod: true },
       enabled: (ctx) => {
         const targets = actionTargets(ctx);
         return targets.length > 0 && targets.every(({ key }) => !isSystemUser(key));
