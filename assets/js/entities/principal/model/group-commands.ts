@@ -1,4 +1,4 @@
-import type { AppError } from '@enonic/ui-utils';
+import { groupKey, type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
@@ -63,7 +63,7 @@ export function isGroupNameTaken(
   name: string,
   signal?: AbortSignal,
 ): ResultAsync<boolean, AppError> {
-  return requestGroupExists(`group:${idProvider}:${name}`, signal);
+  return requestGroupExists(groupKey(idProvider, name), signal);
 }
 
 function scalars({ displayName, description }: { displayName: string; description: string }) {

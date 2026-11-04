@@ -1,7 +1,8 @@
 import type { FilterField, FilterValue } from '@enonic/ui-kit';
+import { idProviderOf } from '@enonic/ui-utils';
 import { ShieldLock } from 'lucide-react';
 
-import { idProviderOf, type Group } from '../../../entities/principal';
+import { type Group } from '../../../entities/principal';
 import { matchesEveryWord } from '../../../shared/filter';
 
 export const ID_PROVIDER_FIELD = 'idProvider';

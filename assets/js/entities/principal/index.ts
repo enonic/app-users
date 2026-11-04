@@ -99,7 +99,6 @@ export type { PrincipalLock } from './model/principal-lock';
 export { splitMembers } from './model/principal-members';
 export type { PrincipalMembers } from './model/principal-members';
 export {
-  idProviderOf,
   IMPLICIT_ROLE_KEYS,
   isPlatformRole,
   isReservedRole,
@@ -107,7 +106,6 @@ export {
   isSystemUser,
   principalName,
   projectRoleIdOf,
-  SYSTEM_ID_PROVIDER,
   SYSTEM_USER_KEYS,
 } from './model/principal.keys';
 export { DEFAULT_PRINCIPAL_SORT } from './model/principal.sort';

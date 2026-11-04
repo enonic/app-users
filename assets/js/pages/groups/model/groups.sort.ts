@@ -1,4 +1,6 @@
-import { idProviderOf, type Group, type PrincipalSort } from '../../../entities/principal';
+import { idProviderOf } from '@enonic/ui-utils';
+
+import { type Group, type PrincipalSort } from '../../../entities/principal';
 import { sortByDisplayName, sortByValue } from '../../../widgets/browse-list/browse-sort';
 
 export function sortGroups(groups: readonly Group[], sort: PrincipalSort): Group[] {

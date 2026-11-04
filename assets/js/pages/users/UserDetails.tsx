@@ -1,8 +1,8 @@
 import { Checkbox } from '@enonic/ui';
+import { idProviderOf } from '@enonic/ui-utils';
 import { useState } from 'preact/hooks';
 
 import {
-  idProviderOf,
   principalName,
   useIdProviderName,
   usePrincipalLock,

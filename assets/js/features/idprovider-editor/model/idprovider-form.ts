@@ -1,10 +1,10 @@
 import type { PropertyTreeJson } from '@enonic/ui-types';
+import { SYSTEM_ID_PROVIDER } from '@enonic/ui-utils';
 
 import {
   deriveIdProviderName,
   isIllegalIdProviderName,
   isReservedIdProviderName,
-  SYSTEM_ID_PROVIDER,
   type IdProvider,
   type IdProviderAccess,
   type IdProviderPermission,

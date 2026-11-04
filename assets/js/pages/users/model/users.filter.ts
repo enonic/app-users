@@ -1,7 +1,8 @@
 import type { FilterField } from '@enonic/ui-kit';
+import { SYSTEM_ID_PROVIDER } from '@enonic/ui-utils';
 import { ShieldLock } from 'lucide-react';
 
-import { SYSTEM_ID_PROVIDER, type IdProviderUserCount } from '../../../entities/principal';
+import { type IdProviderUserCount } from '../../../entities/principal';
 
 export const ID_PROVIDER_FIELD = 'idProvider';
 

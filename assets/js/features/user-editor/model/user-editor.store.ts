@@ -1,13 +1,12 @@
+import { idProviderOf, SYSTEM_ID_PROVIDER } from '@enonic/ui-utils';
 import { atom, computed } from 'nanostores';
 
 import {
   $idProviderModeByKey,
   $idProviderNames,
   allowsWrite,
-  idProviderOf,
   createPrincipalNameCheck,
   createUserEmailCheck,
-  SYSTEM_ID_PROVIDER,
   type IdProviderMode,
   type IdProviderName,
   type PrincipalRef,

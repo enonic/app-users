@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  idProviderOf,
   isPinnedMembership,
   isPlatformRole,
   isReservedRole,
@@ -101,17 +100,6 @@ describe('principalName', () => {
   it('takes the name after the provider for a user or a group', () => {
     expect(principalName('user:ldap:alice')).toBe('alice');
     expect(principalName('group:system:administrators')).toBe('administrators');
-  });
-});
-
-describe('idProviderOf', () => {
-  it('reads the provider out of a user or group key', () => {
-    expect(idProviderOf('user:system:su')).toBe('system');
-    expect(idProviderOf('group:ldap:developers')).toBe('ldap');
-  });
-
-  it('gives a role no provider', () => {
-    expect(idProviderOf('role:system.admin')).toBeUndefined();
   });
 });
 

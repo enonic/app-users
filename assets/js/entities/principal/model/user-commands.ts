@@ -1,4 +1,4 @@
-import type { AppError } from '@enonic/ui-utils';
+import { userKey, type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
@@ -79,7 +79,7 @@ export function isUserNameTaken(
   name: string,
   signal?: AbortSignal,
 ): ResultAsync<boolean, AppError> {
-  return requestUserExists(`user:${idProvider}:${name}`, signal);
+  return requestUserExists(userKey(idProvider, name), signal);
 }
 
 /**

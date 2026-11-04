@@ -1,4 +1,4 @@
-import type { AppError } from '@enonic/ui-utils';
+import { groupKey, roleKey, userKey, type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
@@ -59,12 +59,16 @@ function isIllegalName(type: NameCheckedType, name: string): boolean {
 // questions. A user or a group has no key until its provider is chosen; an ID provider's key is its name.
 function keyOf(type: NameCheckedType, idProvider: string, name: string): string | undefined {
   if (type === 'role') {
-    return `role:${name}`;
+    return roleKey(name);
   }
 
   if (type === 'idProvider') {
     return name;
   }
 
-  return idProvider.length === 0 ? undefined : `${type}:${idProvider}:${name}`;
+  if (idProvider.length === 0) {
+    return undefined;
+  }
+
+  return type === 'user' ? userKey(idProvider, name) : groupKey(idProvider, name);
 }

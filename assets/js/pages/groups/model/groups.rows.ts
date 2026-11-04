@@ -1,6 +1,7 @@
+import { idProviderOf } from '@enonic/ui-utils';
 import type { ReactNode } from 'react';
 
-import { type Group, idProviderOf, principalName } from '../../../entities/principal';
+import { type Group, principalName } from '../../../entities/principal';
 import type { BrowseRow } from '../../../widgets/browse-list/browse-list';
 
 export function toGroupRow(group: Group, icon?: ReactNode): BrowseRow {

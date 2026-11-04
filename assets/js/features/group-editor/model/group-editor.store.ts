@@ -1,10 +1,10 @@
+import { idProviderOf } from '@enonic/ui-utils';
 import { computed } from 'nanostores';
 
 import {
   $idProviderModeByKey,
   $idProviderNames,
   allowsWrite,
-  idProviderOf,
   createPrincipalNameCheck,
   type Group,
   type IdProviderMode,

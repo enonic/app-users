@@ -1,11 +1,11 @@
 import { Button } from '@enonic/ui';
+import { SYSTEM_ID_PROVIDER } from '@enonic/ui-utils';
 import { ShieldLock } from 'lucide-react';
 
 import {
   ID_PROVIDER_MODE_KEYS,
   loadMoreIdProviderPrincipals,
   principalName,
-  SYSTEM_ID_PROVIDER,
   type IdProvider,
   type IdProviderAccess,
   type IdProviderPermission,

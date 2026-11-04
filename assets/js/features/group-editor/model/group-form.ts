@@ -1,6 +1,7 @@
+import { idProviderOf } from '@enonic/ui-utils';
+
 import {
   derivePrincipalName,
-  idProviderOf,
   isIllegalPrincipalName,
   isReservedPrincipalName,
   principalName,

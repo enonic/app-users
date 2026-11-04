@@ -1,6 +1,7 @@
+import { idProviderOf } from '@enonic/ui-utils';
+
 import {
   IMPLICIT_ROLE_KEYS,
-  idProviderOf,
   isPlatformRole,
   principalName,
   splitMembers,
