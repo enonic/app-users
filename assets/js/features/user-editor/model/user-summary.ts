@@ -1,4 +1,5 @@
-import { SYSTEM_ID_PROVIDER } from '../../../entities/principal';
+import { SYSTEM_ID_PROVIDER } from '@enonic/ui-utils';
+
 import { publicKeyChangeCounts } from './public-key-changes';
 import type { UserForm } from './user-form';
 

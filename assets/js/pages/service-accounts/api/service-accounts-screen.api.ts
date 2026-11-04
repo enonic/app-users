@@ -1,9 +1,8 @@
-import { type AppError } from '@enonic/ui-utils';
+import { type AppError, SYSTEM_ID_PROVIDER } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
   ID_PROVIDER_NAMES_ROOT,
-  SYSTEM_ID_PROVIDER,
   USERS_ROOT,
   type IdProviderNamesData,
   type UsersData,

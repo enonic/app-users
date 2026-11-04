@@ -1,3 +1,12 @@
+import {
+  ADMIN_ROLE_KEY,
+  ANONYMOUS_USER_KEY,
+  AUTHENTICATED_ROLE_KEY,
+  EVERYONE_ROLE_KEY,
+  SUPER_USER_KEY,
+  SYSTEM_ID_PROVIDER,
+} from '@enonic/ui-utils';
+
 import type { PrincipalKey, PrincipalRef } from './principal.types';
 
 const SYSTEM_ROLE_PREFIX = 'role:system.';
@@ -55,17 +64,9 @@ export function isReservedRole(key: PrincipalKey): boolean {
  * ! every relationship from either, so offering one offers a save that cannot succeed.
  */
 export const IMPLICIT_ROLE_KEYS: ReadonlySet<string> = new Set([
-  'role:system.everyone',
-  'role:system.authenticated',
+  EVERYONE_ROLE_KEY,
+  AUTHENTICATED_ROLE_KEY,
 ]);
-
-/** The built-in store whose users are service accounts. It cannot be created, renamed or deleted. */
-export const SYSTEM_ID_PROVIDER = 'system';
-
-export const SUPER_USER_KEY = 'user:system:su';
-
-/** The guest: it never signs in, so it has no credentials to edit. */
-export const ANONYMOUS_USER_KEY = 'user:system:anonymous';
 
 /**
  * The two users the platform owns and lib-admin-ui's `isSystem()` refuses to delete. Their memberships
@@ -78,8 +79,6 @@ export const SYSTEM_USER_KEYS: ReadonlySet<string> = new Set([SUPER_USER_KEY, AN
 export function isSystemUser(key: PrincipalKey): boolean {
   return SYSTEM_USER_KEYS.has(key);
 }
-
-export const ADMIN_ROLE_KEY = 'role:system.admin';
 
 /**
  * Whether a membership is one the platform refuses to end: `su` leaving Administrators would lock the
@@ -101,15 +100,6 @@ export function isServiceAccount(key: PrincipalKey): boolean {
  */
 export function principalName(key: string): string {
   return key.slice(key.lastIndexOf(':') + 1);
-}
-
-/**
- * Provenance, read off the key: `user:system:su` and `group:system:administrators` both belong to
- * the `system` provider. A role belongs to none.
- */
-export function idProviderOf(key: string): string | undefined {
-  const [type, provider] = key.split(':');
-  return type === 'role' ? undefined : provider;
 }
 
 /**

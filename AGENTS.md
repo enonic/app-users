@@ -58,7 +58,8 @@ its types mislead. `../app-applications` (branch `extensions`) is the **other pr
 `shared/ui` and most of `shared/` are kept byte-identical between the two (`cmp` is the drift check)
 until `@enonic/ui-kit` and `@enonic/ui-utils` in `../npm-enonic-ui-toolkit` extract them; the browse
 screen they make up is specified in that repository's `docs/browse-framework.md`. The request
-transport, `AppError` and the i18n core (`localize`, `fromPhrases`) have already moved and are imported
+transport, `AppError`, the i18n core (`localize`, `fromPhrases`) and the principal-key helpers
+(`idProviderOf`, `roleKey`, `SYSTEM_ID_PROVIDER` and the rest) have already moved and are imported
 from `@enonic/ui-utils` directly. `../npm-enonic-ui`
 is the source of `@enonic/ui` — read a component before composing it.
 

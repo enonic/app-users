@@ -1,8 +1,9 @@
+import { idProviderOf, isPrincipalKey } from '@enonic/ui-utils';
+
 import {
   createIdProviderModeReaction,
   createPrincipalReaction,
   evictIdProviderPermissions,
-  idProviderOf,
   loadIdProvider,
   loadIdProviders,
   reloadIdProviderPermissions,
@@ -47,7 +48,9 @@ export function startIdProvidersEvents(frame: HostFrame): void {
       const providers = new Set(
         events
           .filter(({ kind }) => kind === 'user' || kind === 'group')
-          .map(({ key }) => idProviderOf(key))
+          .map(({ key }) => key)
+          .filter(isPrincipalKey)
+          .map(idProviderOf)
           .filter((provider) => provider !== undefined),
       );
 

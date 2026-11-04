@@ -1,4 +1,4 @@
-import type { AppError } from '@enonic/ui-utils';
+import { roleKey, type AppError } from '@enonic/ui-utils';
 import type { ResultAsync } from 'neverthrow';
 
 import {
@@ -56,7 +56,7 @@ export function isRoleNameTaken(
   name: string,
   signal?: AbortSignal,
 ): ResultAsync<boolean, AppError> {
-  return requestRoleExists(`role:${name}`, signal);
+  return requestRoleExists(roleKey(name), signal);
 }
 
 function scalars({ displayName, description }: { displayName: string; description: string }) {

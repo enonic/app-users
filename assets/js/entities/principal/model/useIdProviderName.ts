@@ -1,8 +1,8 @@
+import { idProviderOf } from '@enonic/ui-utils';
 import { useStore } from '@nanostores/preact';
 import { useCallback } from 'preact/hooks';
 
 import { $idProviderNameByKey } from './id-providers.store';
-import { idProviderOf } from './principal.keys';
 import type { PrincipalKey } from './principal.types';
 
 /**

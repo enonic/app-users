@@ -1,8 +1,9 @@
 import { Toggle } from '@enonic/ui';
+import { idProviderOf } from '@enonic/ui-utils';
 import { useStore } from '@nanostores/preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
-import { $idProviderModeByKey, allowsWrite, idProviderOf } from '../../../../entities/principal';
+import { $idProviderModeByKey, allowsWrite } from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
 import { useI18n } from '../../../../shared/i18n';
 import { $userEditDetail } from '../../model/user-edit-detail';

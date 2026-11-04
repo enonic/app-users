@@ -1,9 +1,9 @@
+import { idProviderOf, SYSTEM_ID_PROVIDER } from '@enonic/ui-utils';
+
 import {
   derivePrincipalName,
-  idProviderOf,
   isIllegalPrincipalName,
   isReservedPrincipalName,
-  SYSTEM_ID_PROVIDER,
   type PrincipalRef,
   type User,
 } from '../../../entities/principal';

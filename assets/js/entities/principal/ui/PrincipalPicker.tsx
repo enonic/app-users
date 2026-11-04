@@ -1,4 +1,5 @@
 import { Checkbox, Combobox, GridList, IconButton, Listbox, useCombobox } from '@enonic/ui';
+import { idProviderOf } from '@enonic/ui-utils';
 import { X } from 'lucide-react';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 import type { ReactNode, UIEvent } from 'react';
@@ -6,7 +7,6 @@ import type { ReactNode, UIEvent } from 'react';
 import { sameKeys } from '../../../shared/form';
 import { i18n, useI18n } from '../../../shared/i18n';
 import { FieldLabel } from '../../../shared/ui/FieldLabel';
-import { idProviderOf } from '../model/principal.keys';
 import type { PrincipalKey, PrincipalRef, PrincipalType } from '../model/principal.types';
 import { usePrincipalSearch, type PrincipalSearch } from '../model/usePrincipalSearch';
 import { PrincipalLabel } from './PrincipalLabel';

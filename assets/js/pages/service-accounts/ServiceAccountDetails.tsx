@@ -1,9 +1,9 @@
 import { Checkbox } from '@enonic/ui';
+import { idProviderOf } from '@enonic/ui-utils';
 import { KeyRound } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
 import {
-  idProviderOf,
   isSystemUser,
   principalName,
   useTransitiveMemberships,
