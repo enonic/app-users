@@ -63,6 +63,33 @@ class Page {
     return this.browser.pause(ms);
   }
 
+  // Two frames for the render a click or a key schedules and the effects run after paint, then until
+  // nothing fades: a popup fading in reads as not displayed, its text as ''. The colour, shadow and
+  // scale transitions every click sets off on its button are not waited for.
+  // ! Not enough where the app debounces or asks the server - wait for the result there instead.
+  waitForRender() {
+    return this.browser.execute(
+      () =>
+        new Promise((done) => {
+          const deadline = performance.now() + 1000;
+          const roots = [document];
+          for (const host of document.querySelectorAll("[data-component='SectionMount']")) {
+            if (host.shadowRoot) roots.push(host.shadowRoot);
+          }
+          const fades = (a) =>
+            a.playState === 'running' &&
+            a.effect?.getTiming().iterations !== Infinity &&
+            (a.transitionProperty !== undefined
+              ? a.transitionProperty === 'opacity'
+              : a.effect.getKeyframes().some((frame) => 'opacity' in frame));
+          const busy = () => roots.some((root) => root.getAnimations().some(fades));
+          const tick = () =>
+            busy() && performance.now() < deadline ? requestAnimationFrame(tick) : done();
+          requestAnimationFrame(() => requestAnimationFrame(tick));
+        }),
+    );
+  }
+
   async doFilterDisplayedElements(elements) {
     let pr = await elements.map(async (el) => await el.isDisplayed());
     let result = await Promise.all(pr);
@@ -109,14 +136,6 @@ class Page {
     return results;
   }
 
-  async typeChars(selector, text) {
-    let inputElement = await this.findElement(selector);
-    for (const ch of text) {
-      await inputElement.addValue(ch);
-      await this.pause(40);
-    }
-  }
-
   async typeTextInInput(selector, text) {
     try {
       let inputElement = await this.findElement(selector);
@@ -124,7 +143,7 @@ class Page {
       // panel (or in-flight animation) does not throw "element not interactable".
       await inputElement.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await inputElement.setValue(text);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       throw new Error('Tried to set the value in the input ' + err);
     }
@@ -141,7 +160,7 @@ class Page {
     let inputElement = await this.findElement(selector);
     //await inputElement.clearValue();
     await inputElement.addValue(text);
-    await this.pause(300);
+    await this.waitForRender();
   }
 
   // Wait for an element for the provided amount of milliseconds to be present within the DOM. Returns true if the selector matches at least one
@@ -470,42 +489,6 @@ class Page {
       },
     ]);
     await this.getBrowser().releaseActions();
-  }
-
-  async holdDownShiftAndPressArrowDown(count) {
-    // holding down the Shift key
-    await this.getBrowser().performActions([
-      {
-        type: 'key',
-        id: 'keyboard',
-        actions: [{ type: 'keyDown', value: Key.Shift }],
-      },
-    ]);
-
-    // press ArrowDown key 'count' times
-    for (let i = 1; i < count; i++) {
-      await this.getBrowser().performActions([
-        {
-          type: 'key',
-          id: 'keyboard',
-          actions: [
-            { type: 'keyDown', value: Key.ArrowDown },
-            { type: 'keyUp', value: Key.ArrowDown },
-          ],
-        },
-      ]);
-      await this.getBrowser().pause(400);
-    }
-
-    await this.getBrowser().performActions([
-      {
-        type: 'key',
-        id: 'keyboard',
-        actions: [
-          { type: 'keyUp', value: Key.Shift }, // Shift
-        ],
-      },
-    ]);
   }
 
   alertAccept() {

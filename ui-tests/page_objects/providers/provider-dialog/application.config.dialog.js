@@ -225,7 +225,7 @@ class ApplicationConfigDialog extends SectionPage {
       const button = await set.$(css.itemSetAddButton);
       await button.waitForClickable({ timeout: appConst.TIMEOUT.MEDIUM });
       await button.click();
-      return await this.pause(100);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `Application configuration dialog - the Add button of '${title}'`,

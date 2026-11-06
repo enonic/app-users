@@ -177,7 +177,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.confirmInput);
       await this.typeTextInInput(this.css.confirmInput, String(value));
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - the gate input', 'err_confirm_input', err);
     }
@@ -321,7 +321,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.cancelButton);
       await this.clickOnElement(this.css.cancelButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - Cancel button', 'err_confirm_cancel_btn', err);
     }
