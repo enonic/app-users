@@ -77,7 +77,8 @@ class PrincipalCombobox extends SectionPage {
       await this.waitForElementDisplayed(this.css.input);
       await this.typeTextInInput(this.css.input, text);
       await this.waitForElementDisplayed(this.css.popup);
-      return await this.pause(100);
+      // The search is debounced by 250 ms and the old options stay on screen while it loads.
+      return await this.pause(400);
     } catch (err) {
       await this.handleError(
         `'${this.placeholder}' picker - typing '${text}' in the filter input`,
