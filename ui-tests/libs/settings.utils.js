@@ -145,7 +145,6 @@ module.exports = {
   },
   async navigateToHomePage() {
     await this.getBrowser().url(this.getBaseUrl());
-    await this.getBrowser().pause(500);
   },
   async doCloseAllWindowTabs(keepTitle1 = 'Enonic XP Admin', keepTitle2 = 'Settings') {
     const handles = await this.getBrowser().getWindowHandles();

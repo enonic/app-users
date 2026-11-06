@@ -125,7 +125,7 @@ class IdProviderCombobox extends SectionPage {
       await this.waitForElementDisplayed(this.css.input);
       await this.typeTextInInput(this.css.input, text);
       await this.waitForElementDisplayed(this.css.popup);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `ID provider combobox - typing '${text}' in the filter input`,
@@ -150,7 +150,7 @@ class IdProviderCombobox extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.toggle);
       await this.clickOnElement(this.css.toggle);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'ID provider combobox - the dropdown handle',
@@ -240,7 +240,7 @@ class IdProviderCombobox extends SectionPage {
         if ((await option.$(this.css.optionDisplayName).getText()) === displayName) {
           await option.click();
           await this.waitForPopupClosed();
-          return await this.pause(300);
+          return await this.waitForRender();
         }
       }
       throw new Error(`no option with the display name '${displayName}'`);
@@ -259,7 +259,7 @@ class IdProviderCombobox extends SectionPage {
       await this.waitForElementDisplayed(this.css.optionByKey(key));
       await this.clickOnElement(this.css.optionByKey(key));
       await this.waitForPopupClosed();
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         `ID provider combobox - option '${key}'`,
@@ -280,7 +280,7 @@ class IdProviderCombobox extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.pickedRemoveButton);
       await this.clickOnElement(this.css.pickedRemoveButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'ID provider combobox - the Remove button of the picked provider',
