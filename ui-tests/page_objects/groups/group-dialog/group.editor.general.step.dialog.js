@@ -8,6 +8,7 @@
  */
 const GroupEditorStepDialog = require('./group.editor.step.dialog');
 const appConst = require('../../../libs/app_const');
+const { COMMON } = require('../../../libs/elements');
 
 const DIALOG = GroupEditorStepDialog.css.container;
 
@@ -17,7 +18,7 @@ const css = {
   displayNameInput: `${DIALOG} input#group-editor-display-name`,
   idInput: `${DIALOG} input#group-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#group-editor-description`,
-  validationMessages: `${DIALOG} [data-registry-id='general'] div.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='general'] ${COMMON.FIELD_ERROR}`,
 };
 
 class GroupEditorGeneralStepDialog extends GroupEditorStepDialog {

@@ -25,6 +25,7 @@
 const SectionPage = require('../../section.page');
 const PrincipalCombobox = require('../../principal.combobox');
 const appConst = require('../../../libs/app_const');
+const { COMMON } = require('../../../libs/elements');
 
 const DIALOG = "[data-component='ConfigDialog'][data-state='open']";
 const BODY = `${DIALOG} [data-component='ActionDialog.Body']`;
@@ -43,7 +44,7 @@ const css = {
   principalSelector: `${BODY} [data-component='PrincipalSelectorInput']`,
   // 'This field is required' under a field - an input's own, a selector's FieldError or an
   // occurrence's. The text node sits in the div beside the icon.
-  validationMessages: `${BODY} div.text-error`,
+  validationMessages: `${BODY} ${COMMON.FIELD_ERROR}`,
   // Item sets: one block per set with its title in the header, an Add button, and an
   // ItemSetOccurrenceView per occurrence - a header button labelled by the occurrence, over the
   // set's inputs.

@@ -63,11 +63,7 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
     assert.equal(await generalStep.getTextInDisplayNameInput(), '');
     assert.equal(await generalStep.getTextInIdInput(), '');
     assert.equal(await generalStep.getTextInEmailInput(), '');
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'No message should be shown before an input is touched',
-    );
+    await generalStep.assertNoValidationMessages('before an input is touched');
     await generalStep.waitForNextButtonDisabled();
     // 3. The display name: the ID follows it; the email is still missing, so Next stays disabled.
     await generalStep.typeInDisplayNameInput(user.displayName);
@@ -80,11 +76,7 @@ describe("user.editor.general.step.spec - the user editor's General step: Next w
     // 4. The email: all three answered, Next is enabled.
     await generalStep.typeInEmailInput(user.email);
     await generalStep.waitForNextButtonEnabled();
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'No message should be shown for valid data',
-    );
+    await generalStep.assertNoValidationMessages('for valid data');
   });
 
   // A message is shown once the input has been left (Tab), and Next is disabled while it stands.

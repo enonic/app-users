@@ -61,11 +61,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
     await credentialsStep.typeInPasswordInput(appConst.PASSWORD.MEDIUM);
     await credentialsStep.waitForNextButtonEnabled();
     assert.equal(await credentialsStep.getPasswordStrengthLabel(), 'Medium');
-    assert.deepEqual(
-      await credentialsStep.getValidationMessages(),
-      [],
-      'No validation message should be shown for a medium password',
-    );
+    await credentialsStep.assertNoValidationMessages('for a medium password');
     // 4. Previous: General, with what was typed there.
     await credentialsStep.clickOnPreviousButton();
     await generalStep.waitForLoaded();
@@ -126,11 +122,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
     );
     // 4. No password is a valid answer, so Next is enabled - the same as before 'Set password'.
     await credentialsStep.waitForNextButtonEnabled();
-    assert.deepEqual(
-      await credentialsStep.getValidationMessages(),
-      [],
-      'No validation message should be shown after the discard',
-    );
+    await credentialsStep.assertNoValidationMessages('after the discard');
   });
 
   // Generate fills the input with a random password of 15 characters that the meter accepts, so it
@@ -156,11 +148,7 @@ describe("user.editor.credential.step.spec - the user editor's Credentials step:
       ['Medium', 'Strong'].includes(strength),
       `A generated password should be rated Medium or Strong, got '${strength}'`,
     );
-    assert.deepEqual(
-      await credentialsStep.getValidationMessages(),
-      [],
-      'No validation message should be shown for a generated password',
-    );
+    await credentialsStep.assertNoValidationMessages('for a generated password');
     // 4. The input hides the password: its type is 'password', the eye reads 'Show'.
     assert.equal(await credentialsStep.getPasswordInputType(), 'password');
     assert.ok(await credentialsStep.isShowPasswordButtonDisplayed(), "'Show' should be offered");

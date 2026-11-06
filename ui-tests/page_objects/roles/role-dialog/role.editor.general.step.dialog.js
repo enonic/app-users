@@ -7,6 +7,7 @@
  */
 const RoleEditorStepDialog = require('./role.editor.step.dialog');
 const appConst = require('../../../libs/app_const');
+const { COMMON } = require('../../../libs/elements');
 
 const DIALOG = RoleEditorStepDialog.css.container;
 
@@ -14,7 +15,7 @@ const css = {
   displayNameInput: `${DIALOG} input#role-editor-display-name`,
   idInput: `${DIALOG} input#role-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#role-editor-description`,
-  validationMessages: `${DIALOG} [data-registry-id='general'] div.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='general'] ${COMMON.FIELD_ERROR}`,
 };
 
 class RoleEditorGeneralStepDialog extends RoleEditorStepDialog {

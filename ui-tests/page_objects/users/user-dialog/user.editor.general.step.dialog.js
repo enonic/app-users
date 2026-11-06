@@ -8,6 +8,7 @@
  */
 const UserEditorStepDialog = require('./user.editor.step.dialog');
 const appConst = require('../../../libs/app_const');
+const { COMMON } = require('../../../libs/elements');
 
 const DIALOG = UserEditorStepDialog.css.container;
 
@@ -17,7 +18,7 @@ const css = {
   displayNameInput: `${DIALOG} input#user-editor-display-name`,
   idInput: `${DIALOG} input#user-editor-id`,
   emailInput: `${DIALOG} input#user-editor-email`,
-  validationMessages: `${DIALOG} [data-registry-id='general'] div.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='general'] ${COMMON.FIELD_ERROR}`,
 };
 
 class UserEditorGeneralStepDialog extends UserEditorStepDialog {

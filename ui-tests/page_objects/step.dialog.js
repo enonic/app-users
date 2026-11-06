@@ -202,6 +202,20 @@ class StepDialog extends SectionPage {
     }
   }
 
+  // Reads once and fails on anything shown: a message on an untouched field stays until the field is
+  // filled, so there is nothing to wait for. The failure names the messages and takes a screenshot.
+  async assertNoValidationMessages(when) {
+    const messages = await this.getValidationMessages();
+    if (messages.length === 0) {
+      return;
+    }
+    await this.handleError(
+      `${this.dialogName} - no validation message should be shown ${when}`,
+      'err_validation_message',
+      new Error(`found ${JSON.stringify(messages)}`),
+    );
+  }
+
   async clickOnCloseButton() {
     try {
       await this.waitForElementDisplayed(this.css.closeButton);

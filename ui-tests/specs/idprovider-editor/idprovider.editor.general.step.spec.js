@@ -61,11 +61,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
       !(await generalStep.isApplicationRowDisplayed()),
       'No application should be bound before one is picked',
     );
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'No message should be shown before an input is touched',
-    );
+    await generalStep.assertNoValidationMessages('before an input is touched');
     await generalStep.waitForNextButtonDisabled();
     // 3. The display name alone: the ID follows it, Next is enabled.
     await generalStep.typeInDisplayNameInput(NEW_PROVIDER.displayName);
@@ -75,11 +71,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
       'The ID should be derived from the display name',
     );
     await generalStep.waitForNextButtonEnabled();
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'No message should be shown for valid data',
-    );
+    await generalStep.assertNoValidationMessages('for valid data');
   });
 
   // The application is bound on this step: picking one lists it under the selector
@@ -117,11 +109,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
     // 4. Remove: the row goes and Next stays enabled - the application is not what it waits for.
     await generalStep.clickOnRemoveApplicationButton();
     await generalStep.waitForApplicationRowNotDisplayed();
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'Removing the application should report nothing',
-    );
+    await generalStep.assertNoValidationMessages('once the application is removed');
     await generalStep.waitForNextButtonEnabled();
   });
 
@@ -247,11 +235,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
     //    the input.
     await generalStep.typeInIdInput(`${NEW_PROVIDER.id}.dotted`);
     await generalStep.waitForValidationMessageGone(ID_RESERVED);
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'A dotted ID should not be refused',
-    );
+    await generalStep.assertNoValidationMessages('for a dotted ID');
     assert.equal(
       await generalStep.getIdWarning(),
       ID_DOTTED,
@@ -264,11 +248,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
       !(await generalStep.isIdWarningDisplayed()),
       'The warning should be gone once the dot is',
     );
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'No message should be shown for a valid ID',
-    );
+    await generalStep.assertNoValidationMessages('for a valid ID');
     await generalStep.waitForNextButtonEnabled();
   });
 
