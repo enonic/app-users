@@ -36,11 +36,7 @@ describe("role.editor.general.step.spec - the role editor's General step: the ID
     assert.ok(await generalStep.isDescriptionTextAreaDisplayed(), 'Description text area');
     assert.equal(await generalStep.getTextInDisplayNameInput(), '');
     assert.equal(await generalStep.getTextInIdInput(), '');
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'No message should be shown before an input is touched',
-    );
+    await generalStep.assertNoValidationMessages('before an input is touched');
     await generalStep.waitForNextButtonDisabled();
     // 3. The display name alone: the ID follows it, Next is enabled.
     await generalStep.typeInDisplayNameInput(role.displayName);
@@ -50,11 +46,7 @@ describe("role.editor.general.step.spec - the role editor's General step: the ID
       'The ID should be derived from the display name',
     );
     await generalStep.waitForNextButtonEnabled();
-    assert.deepEqual(
-      await generalStep.getValidationMessages(),
-      [],
-      'No message should be shown for valid data',
-    );
+    await generalStep.assertNoValidationMessages('for valid data');
   });
 
   // The derived ID can be edited; emptied, it is required like any other. The message is shown

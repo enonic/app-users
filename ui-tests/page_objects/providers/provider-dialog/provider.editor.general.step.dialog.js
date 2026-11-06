@@ -10,7 +10,7 @@
  */
 const IdProviderEditorStepDialog = require('./provider.editor.step.dialog');
 const appConst = require('../../../libs/app_const');
-const { COMBOBOX, ITEM_LABEL } = require('../../../libs/elements');
+const { COMBOBOX, COMMON, ITEM_LABEL } = require('../../../libs/elements');
 
 const DIALOG = IdProviderEditorStepDialog.css.container;
 const PANEL = `${DIALOG} [data-registry-id='general']`;
@@ -20,7 +20,7 @@ const css = {
   displayNameInput: `${DIALOG} input#id-provider-editor-display-name`,
   idInput: `${DIALOG} input#id-provider-editor-id`,
   descriptionTextArea: `${DIALOG} textarea#id-provider-editor-description`,
-  validationMessages: `${PANEL} div.text-error`,
+  validationMessages: `${PANEL} ${COMMON.FIELD_ERROR}`,
   // A dot is legal in an ID but makes an ambiguous vhost key, so it is warned about rather than
   // refused: its own line under the input, outside the error messages.
   idWarning: `${PANEL} div#id-provider-editor-id-warning`,

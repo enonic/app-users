@@ -10,6 +10,7 @@
  */
 const UserEditorStepDialog = require('./user.editor.step.dialog');
 const appConst = require('../../../libs/app_const');
+const { COMMON } = require('../../../libs/elements');
 
 const DIALOG = UserEditorStepDialog.css.container;
 
@@ -27,7 +28,7 @@ const css = {
   passwordStrengthMeter: `${DIALOG} [data-component='PasswordStrengthMeter']`,
   // The first p.text-subtle of the step; the 'No public keys' line, when shown, comes after it.
   passwordNotice: `${DIALOG} [data-registry-id='credentials'] p.text-subtle`,
-  validationMessages: `${DIALOG} [data-registry-id='credentials'] div.text-error`,
+  validationMessages: `${DIALOG} [data-registry-id='credentials'] ${COMMON.FIELD_ERROR}`,
   // Public keys (system ID provider only)
   addPublicKeyButton: `${DIALOG} [data-registry-id='credentials'] button[data-component='Button'][aria-label='Add']`,
   publicKeyRows: `${DIALOG} [data-registry-id='credentials'] [data-component='GridList.Row'][id$='-key']`,

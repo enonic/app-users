@@ -5,6 +5,9 @@ const COMMON = {
   },
   DISPLAY_NAME_INPUT: "//input[@name='displayName']",
   FOOTER_ELEMENT: `//footer`,
+  // The message under a field. @enonic/ui renders the div for every Input, a live region that is
+  // empty until there is an error - `:not(:empty)` leaves those out.
+  FIELD_ERROR: `div.text-error:not(:empty)`,
   // The host's toasts (app-settings NotificationList → @enonic/ui Toast), light DOM.
   NOTIFICATION_TEXT: "//*[@data-component='Toast']//*[@data-component='Toast.Description']",
   NOTIFICATION_CLOSE_BUTTON: "//*[@data-component='Toast']//*[@data-component='Toast.Close']",
