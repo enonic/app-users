@@ -128,6 +128,8 @@ export function BrowseLayout({
   return (
     <div
       data-component={componentName}
+      // ? Focusable: a click on plain text inside would otherwise drop focus to body and kill the keys.
+      tabIndex={-1}
       onKeyDown={onKeyDown}
       className="flex min-h-0 min-w-0 flex-1 flex-col"
     >

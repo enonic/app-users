@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { matchesShortcut, type ShortcutEvent } from './shortcuts';
+import { ariaKeyShortcuts, matchesShortcut, type ShortcutEvent } from './shortcuts';
 
 const NEW = { code: 'KeyN', alt: true };
 const DELETE = { code: 'Delete', mod: true };
@@ -33,5 +33,16 @@ describe('matchesShortcut', () => {
 
   it('does not take Backspace for Delete', () => {
     expect(matchesShortcut(DELETE, key({ code: 'Backspace', ctrlKey: true }), false)).toBe(false);
+  });
+});
+
+describe('ariaKeyShortcuts', () => {
+  it('names the key the way aria-keyshortcuts spells it', () => {
+    expect(ariaKeyShortcuts(NEW, false)).toBe('Alt+N');
+  });
+
+  it('spells Mod as Control off a Mac and as Meta on one', () => {
+    expect(ariaKeyShortcuts(DELETE, false)).toBe('Control+Delete');
+    expect(ariaKeyShortcuts(DELETE, true)).toBe('Meta+Delete');
   });
 });

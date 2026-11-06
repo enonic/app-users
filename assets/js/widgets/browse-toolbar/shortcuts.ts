@@ -27,6 +27,16 @@ export function isApplePlatform(): boolean {
   return typeof navigator !== 'undefined' && /Mac|iPhone|iPad/i.test(navigator.platform);
 }
 
+/** The chord as `aria-keyshortcuts` spells it: `Alt+N`, `Control+Delete`, `Meta+Delete`. */
+export function ariaKeyShortcuts(
+  { code, alt = false, mod = false }: Shortcut,
+  apple = isApplePlatform(),
+): string {
+  const modifiers = [alt && 'Alt', mod && (apple ? 'Meta' : 'Control')].filter(Boolean);
+
+  return [...modifiers, code.replace(/^(Key|Digit)/, '')].join('+');
+}
+
 /** Where a key types rather than acts. */
 export function isTextEntry(target: EventTarget | null): boolean {
   return (

@@ -93,7 +93,6 @@ describe('shortcutAction', () => {
     ).toBe('delete');
   });
 
-  // ! A shortcut is the button: when the button is disabled, the key does nothing.
   it('answers nothing while the bound action is disabled', () => {
     expect(
       shortcutAction(actions, context(), key({ code: 'Delete', ctrlKey: true }), false),
