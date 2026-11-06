@@ -150,6 +150,8 @@ describe('idprovider.editor.application.config.spec - the configuration of the b
       ADFS_APPLICATION,
       'The row should show the bound application',
     );
+    // The row comes from the client; the next test reloads the list from an index not yet caught up.
+    await settingsUtils.waitForIdProviderListed(NEW_PROVIDER.id);
   });
 
   // The configuration was written with the provider: the editor opened on the saved one shows the
