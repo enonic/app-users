@@ -1,3 +1,5 @@
+import { isApplePlatform, matchesShortcut, type Shortcut, type ShortcutEvent } from './shortcuts';
+
 export type ActionContext<T> = {
   selected: readonly T[];
   active: T | undefined;
@@ -19,6 +21,11 @@ export type SectionAction<T> = {
    * user already has, never a way past its rules.
    */
   activatedByRow?: boolean;
+  /**
+   * The chord that runs it from anywhere in the screen but a text field. As with `activatedByRow`, its
+   * own `enabled` still decides: when the button is disabled, the key does nothing.
+   */
+  shortcut?: Shortcut;
 };
 
 /** What the toolbar and the row menu render: the same action with its label resolved. */
@@ -43,6 +50,20 @@ export function rowActivationAction<T>(
   ctx: ActionContext<T>,
 ): SectionAction<T> | undefined {
   const action = actions.find(({ activatedByRow }) => activatedByRow === true);
+
+  return action !== undefined && action.enabled(ctx) ? action : undefined;
+}
+
+/** The action a key chord runs, if the section bound one to it and it is allowed right now. */
+export function shortcutAction<T>(
+  actions: readonly SectionAction<T>[],
+  ctx: ActionContext<T>,
+  event: ShortcutEvent,
+  apple = isApplePlatform(),
+): SectionAction<T> | undefined {
+  const action = actions.find(
+    ({ shortcut }) => shortcut !== undefined && matchesShortcut(shortcut, event, apple),
+  );
 
   return action !== undefined && action.enabled(ctx) ? action : undefined;
 }

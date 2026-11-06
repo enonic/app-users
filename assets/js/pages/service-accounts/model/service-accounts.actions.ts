@@ -9,12 +9,14 @@ export const SERVICE_ACCOUNT_ACTIONS: readonly SectionAction<User>[] = [
   {
     id: 'new',
     labelKey: 'serviceAccounts.action.new',
+    shortcut: { code: 'KeyN', alt: true },
     enabled: () => true,
     run: () => openServiceAccountEditor({ mode: 'create' }),
   },
   {
     id: 'delete',
     labelKey: 'serviceAccounts.action.delete',
+    shortcut: { code: 'Delete', mod: true },
     enabled: (ctx) => {
       const targets = actionTargets(ctx);
       return targets.length > 0 && targets.every(({ key }) => !isSystemUser(key));

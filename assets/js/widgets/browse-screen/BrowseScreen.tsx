@@ -1,4 +1,5 @@
 import { FilterInput, type FilterField, type FilterQuery } from '@enonic/ui-kit';
+import type { JSX } from 'preact';
 import type { ReactNode } from 'react';
 
 import { useI18n, useLabelled } from '../../shared/i18n';
@@ -14,10 +15,12 @@ import { BrowseListContextMenu } from '../browse-list/BrowseListContextMenu';
 import { BrowseListHeader } from '../browse-list/BrowseListHeader';
 import {
   rowActivationAction,
+  shortcutAction,
   type ActionContext,
   type SectionAction,
 } from '../browse-toolbar/actions';
 import { BrowseToolbar } from '../browse-toolbar/BrowseToolbar';
+import { isTextEntry } from '../browse-toolbar/shortcuts';
 
 export type BrowseScreenProps<T> = {
   actions: readonly SectionAction<T>[];
@@ -112,6 +115,26 @@ export function BrowseScreen<T>({
     void action.run(ctx);
   };
 
+  /**
+   * A chord runs an action the toolbar already offers, off the same context and the same `enabled`. A text
+   * field keeps its keys: Alt+N in the filter types a character on macOS, it does not open New. A dialog
+   * is never reached, since `AppRoot` portals it beside the screen rather than inside it.
+   */
+  const handleKeyDown = (event: JSX.TargetedKeyboardEvent<HTMLDivElement>): void => {
+    if (managedMode || event.defaultPrevented || isTextEntry(event.target)) {
+      return;
+    }
+
+    const action = shortcutAction(actions, context, event);
+    if (action === undefined) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    void action.run(context);
+  };
+
   const handleSelectAllChange = (checked: boolean): void => {
     onSelectionChange(checked ? new Set(selectableKeys(rows)) : new Set());
   };
@@ -119,6 +142,7 @@ export function BrowseScreen<T>({
   return (
     <BrowseLayout
       data-component={componentName}
+      onKeyDown={handleKeyDown}
       toolbar={managedMode ? notice : <BrowseToolbar actions={labelledActions} context={context} />}
       // The active row is what the shell's url resolved to, so it is also what says whether the
       // details column has anything to show.

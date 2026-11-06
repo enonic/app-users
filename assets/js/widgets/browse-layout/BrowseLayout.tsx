@@ -22,6 +22,8 @@ export type BrowseLayoutProps = {
    * shell, not under a router of its own, so only the section — which owns its sub-path — knows.
    */
   detailsShown?: boolean;
+  /** Keys pressed anywhere in the screen, which is where `BrowseScreen` runs the section's shortcuts. */
+  onKeyDown?: JSX.KeyboardEventHandler<HTMLDivElement>;
   'data-component'?: string;
 };
 
@@ -39,6 +41,7 @@ export function BrowseLayout({
   list,
   details,
   detailsShown,
+  onKeyDown,
   'data-component': componentName = BROWSE_LAYOUT_NAME,
 }: BrowseLayoutProps) {
   const resizeLabel = useI18n('browse.details.resize');
@@ -123,7 +126,13 @@ export function BrowseLayout({
     );
 
   return (
-    <div data-component={componentName} className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <div
+      data-component={componentName}
+      // ? Focusable: a click on plain text inside would otherwise drop focus to body and kill the keys.
+      tabIndex={-1}
+      onKeyDown={onKeyDown}
+      className="flex min-h-0 min-w-0 flex-1 flex-col"
+    >
       {toolbar}
 
       <div ref={columnsRef} className="flex min-h-0 flex-1">

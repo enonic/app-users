@@ -12,12 +12,14 @@ export function createGroupActions(canCreate: boolean): readonly SectionAction<G
     {
       id: 'new',
       labelKey: 'groups.action.new',
+      shortcut: { code: 'KeyN', alt: true },
       enabled: () => canCreate,
       run: () => openGroupEditor({ mode: 'create' }),
     },
     {
       id: 'delete',
       labelKey: 'groups.action.delete',
+      shortcut: { code: 'Delete', mod: true },
       enabled: (ctx) => actionTargets(ctx).length > 0,
       run: (ctx) => groupsDeletion.open(actionTargets(ctx)),
     },
