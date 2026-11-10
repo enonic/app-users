@@ -24,6 +24,8 @@ import { vi } from 'vitest';
 
 export const hasRole = vi.fn<(role: string) => boolean>();
 
+export const getUser = vi.fn<(params?: { includeProfile?: boolean }) => User | null>();
+
 export const getIdProviders = vi.fn<() => IdProvider[]>();
 
 export const findPrincipals = vi.fn<(params: FindPrincipalsParams) => FindPrincipalsResult>();

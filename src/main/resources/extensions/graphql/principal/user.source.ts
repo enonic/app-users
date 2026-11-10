@@ -17,6 +17,7 @@ import {
   type UserKey,
 } from '/lib/xp/auth';
 
+import { callerKey } from '../auth/caller';
 import {
   isWritablePrincipal,
   requireWritable,
@@ -322,6 +323,11 @@ export function updateUser(key: string, changes: UserChanges): User {
   // ! The platform never lets su or anonymous be disabled, nor modified at all.
   if (togglesDisabled) {
     requireNotSystemUser(key, 'disabled state');
+  }
+  // ! An administrator who disables their own account stays signed in until they sign out, and then
+  // ! cannot come back until another administrator lets them.
+  if (togglesDisabled && changes.disabled === true && key === callerKey()) {
+    throw new Error(`Cannot disable [${key}]: it is the user making the change`);
   }
 
   if (changes.password != null) {

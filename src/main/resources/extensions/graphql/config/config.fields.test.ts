@@ -1,4 +1,4 @@
-import { hasRole } from '/lib/xp/auth';
+import { getUser, hasRole } from '/lib/xp/auth';
 import { apiUrl } from '/lib/xp/portal';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -27,6 +27,21 @@ describe('config', () => {
       eventsUrl: '/_/admin:events',
     });
     expect(vi.mocked(apiUrl)).toHaveBeenCalledWith({ api: 'admin:events' });
+  });
+
+  it('names the caller, so that the section knows which user is its own', () => {
+    vi.mocked(getUser).mockReturnValue({
+      type: 'user',
+      key: 'user:system:alice',
+      displayName: 'Alice',
+      login: 'alice',
+      idProvider: 'system',
+      hasPassword: true,
+    });
+
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({
+      userKey: 'user:system:alice',
+    });
   });
 
   it.each([

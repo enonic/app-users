@@ -8,6 +8,7 @@ import {
   getMemberships,
   getPrincipal,
   getProfile,
+  getUser as getCaller,
   modifyProfile,
   modifyUser,
   removeMembers,
@@ -660,6 +661,29 @@ describe('updateUser', () => {
     ).toThrow(/Cannot change the disabled state of \[user:system:su\]/);
 
     expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('refuses the caller disabling their own account, writing nothing', () => {
+    modifiable('alice');
+    vi.mocked(getCaller).mockReturnValue(user('alice', 'Alice'));
+
+    expect(() =>
+      updateUser(
+        'user:system:alice',
+        changes({ disabled: true, password: 'secret', addRoles: ['role:cms.admin'] }),
+      ),
+    ).toThrow('Cannot disable [user:system:alice]: it is the user making the change');
+
+    expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('lets the caller disable another user', () => {
+    modifiable('alice');
+    vi.mocked(getCaller).mockReturnValue(user('bob', 'Bob'));
+
+    expect(updateUser('user:system:alice', changes({ disabled: true })).disabled).toBe(true);
   });
 
   it('lets su through when the flag it is sent is the one it already has, without modifying it', () => {

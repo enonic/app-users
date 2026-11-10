@@ -26,5 +26,10 @@ export const ConfigType: GraphQLType = generator.createObjectType({
       description:
         'Whether the caller holds neither `system.admin` nor `system.user.admin`, so every write would be refused.',
     },
+    userKey: {
+      type: GraphQLString,
+      description:
+        'The caller, so that the section can keep an administrator from locking themselves out.',
+    },
   },
 });
