@@ -81,7 +81,7 @@ class UserEditorCredentialStepDialog extends UserEditorStepDialog {
       await this.waitForElementDisplayed(css.setPasswordButton);
       await this.clickOnElement(css.setPasswordButton);
       await this.waitForElementDisplayed(css.passwordInput);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Credentials step - Set password button', 'err_set_password_btn', err);
     }

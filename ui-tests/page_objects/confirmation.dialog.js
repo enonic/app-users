@@ -177,7 +177,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.confirmInput);
       await this.typeTextInInput(this.css.confirmInput, String(value));
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - the gate input', 'err_confirm_input', err);
     }
@@ -200,8 +200,16 @@ class ConfirmationDialog extends SectionPage {
 
   async waitForMismatchMessage(ms = appConst.TIMEOUT.MEDIUM) {
     try {
-      await this.waitForElementDisplayed(this.css.mismatchMessage, ms);
-      return await this.getText(this.css.mismatchMessage);
+      // The line is on screen empty: the gate fills it in 500 ms after the last keystroke.
+      let text = '';
+      await this.getBrowser().waitUntil(
+        async () => {
+          text = (await this.getMismatchMessage()) ?? '';
+          return text !== '';
+        },
+        { timeout: ms, timeoutMsg: 'the mismatch message was not shown' },
+      );
+      return text;
     } catch (err) {
       await this.handleError(
         'Confirmation dialog - the mismatch message should be displayed',
@@ -321,7 +329,7 @@ class ConfirmationDialog extends SectionPage {
     try {
       await this.waitForElementDisplayed(this.css.cancelButton);
       await this.clickOnElement(this.css.cancelButton);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError('Confirmation dialog - Cancel button', 'err_confirm_cancel_btn', err);
     }

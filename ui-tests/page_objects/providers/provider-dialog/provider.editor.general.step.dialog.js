@@ -189,7 +189,7 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
       await this.waitForElementDisplayed(css.applicationToggle);
       await this.clickOnElement(css.applicationToggle);
       await this.waitForElementDisplayed(css.applicationOptions);
-      return await this.pause(200);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'New ID provider dialog - Application selector',
@@ -205,7 +205,7 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
       await this.waitForElementDisplayed(css.applicationSearchInput);
       await this.typeTextInInput(css.applicationSearchInput, text);
       await this.waitForElementDisplayed(css.applicationPopup);
-      return await this.pause(300);
+      return await this.waitForRender();
     } catch (err) {
       await this.handleError(
         'New ID provider dialog - Application search',
@@ -259,7 +259,7 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
         if ((await option.$(css.applicationOptionName).getText()) === displayName) {
           await option.click();
           await this.waitForElementDisplayed(css.applicationRow);
-          return await this.pause(200);
+          return await this.waitForRender();
         }
       }
       throw new Error(`no option with the display name '${displayName}'`);
