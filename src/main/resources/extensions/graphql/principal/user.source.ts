@@ -319,7 +319,7 @@ export function updateUser(key: string, changes: UserChanges): User {
   if (changes.password != null || changesDisplayNameOrEmail(current, changes)) {
     requireNotSystemUser(key, 'password, display name or email');
   }
-  // ! A disabled su locks out the one account that recovers every other; anonymous is no login at all.
+  // ! The platform never lets su or anonymous be disabled, nor modified at all.
   if (togglesDisabled) {
     requireNotSystemUser(key, 'disabled state');
   }
@@ -341,7 +341,9 @@ export function updateUser(key: string, changes: UserChanges): User {
     changes.removeGroups,
   );
 
-  if (locked) {
+  // ! The platform refuses every `modifyUser` on su and anonymous (enonic/xp#12486), and by here the
+  // ! guards above have established there is no field of theirs to write.
+  if (locked || isSystemUser(key)) {
     return getUser(key) ?? current;
   }
 

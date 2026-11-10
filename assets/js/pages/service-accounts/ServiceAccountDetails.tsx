@@ -43,13 +43,15 @@ export function ServiceAccountDetails({
   const editGroupsLabel = useI18n('users.details.editGroups');
   const passwordSetLabel = useI18n('users.details.passwordSet');
   const passwordNotSetLabel = useI18n('users.details.passwordNotSet');
+  const signInEnabledLabel = useI18n('users.details.signInEnabled');
+  const signInDisabledLabel = useI18n('users.details.signInDisabled');
   const unlabelledKeyLabel = useI18n('users.dialog.keyUnlabelled');
   const transitiveLabel = useI18n('users.details.transitive');
   const transitiveFailedLabel = useI18n('users.details.transitiveFailed');
 
   const [transitive, setTransitive] = useState(false);
 
-  const { key, displayName, login, email, hasPassword, publicKeys } = user;
+  const { key, displayName, login, email, hasPassword, disabled, publicKeys } = user;
 
   const system = isSystemUser(key);
 
@@ -113,6 +115,11 @@ export function ServiceAccountDetails({
         <DetailsPanel.Field labelKey="users.details.password">
           {hasPassword ? passwordSetLabel : passwordNotSetLabel}
         </DetailsPanel.Field>
+        {!system && (
+          <DetailsPanel.Field labelKey="users.details.signIn">
+            {disabled === true ? signInDisabledLabel : signInEnabledLabel}
+          </DetailsPanel.Field>
+        )}
         <DetailsPanel.Subsection labelKey="users.details.publicKeys" count={publicKeys.length}>
           <DetailsPanel.List items={publicKeys}>
             {({ kid, label }) => (

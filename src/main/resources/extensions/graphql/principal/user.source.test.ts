@@ -662,12 +662,14 @@ describe('updateUser', () => {
     expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
   });
 
-  it('lets su through when the flag it is sent is the one it already has', () => {
+  it('lets su through when the flag it is sent is the one it already has, without modifying it', () => {
     modifiable('su');
 
-    updateUser('user:system:su', changes({ displayName: 'Whatever', disabled: false }));
+    expect(() =>
+      updateUser('user:system:su', changes({ displayName: 'Whatever', disabled: false })),
+    ).not.toThrow();
 
-    expect(vi.mocked(modifyUser)).toHaveBeenCalled();
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
   });
 
   it('clears an email the edit dropped, with an empty string rather than nothing', () => {
@@ -812,6 +814,7 @@ describe('updateUser', () => {
     );
 
     expect(vi.mocked(addMembers)).toHaveBeenCalledWith('group:system:ops', ['user:system:su']);
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
   });
 
   it('fails when the platform loses the user between the guard and the write', () => {
