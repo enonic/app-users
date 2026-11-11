@@ -11,4 +11,6 @@ export type Config = {
   eventsUrl: string;
   /** Neither `system.admin` nor `system.user.admin`: XP refuses every write, so none is offered. */
   readOnlyMode: boolean;
+  /** The user this section runs as; what keeps an administrator from locking themselves out. */
+  userKey: string | null;
 };

@@ -8,6 +8,7 @@ const FORM: UserForm = {
   name: 'jane',
   displayName: 'Jane Doe',
   email: 'jane@example.com',
+  disabled: false,
   roles: [{ key: 'role:system.admin', displayName: 'Administrator', type: 'role' }],
   groups: [{ key: 'group:system:editors', displayName: 'Editors', type: 'group' }],
   keyAdditions: [],

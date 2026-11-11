@@ -12,6 +12,7 @@ const SAVED: UserForm = {
   name: 'jane',
   displayName: 'Jane Doe',
   email: 'jane@example.com',
+  disabled: false,
   roles: [ADMIN],
   groups: [EDITORS],
   keyAdditions: [],
@@ -48,6 +49,15 @@ describe('userEditFrom', () => {
 
   it('clears the password with the empty string', () => {
     expect(userEditFrom({ ...SAVED, clearPassword: true }, SAVED).password).toBe('');
+  });
+
+  it('leaves the disabled flag out while the edit keeps it', () => {
+    expect(userEditFrom(SAVED, SAVED).disabled).toBeUndefined();
+  });
+
+  it('sends the disabled flag the edit flipped, either way', () => {
+    expect(userEditFrom({ ...SAVED, disabled: true }, SAVED).disabled).toBe(true);
+    expect(userEditFrom(SAVED, { ...SAVED, disabled: true }).disabled).toBe(false);
   });
 
   it('carries no staged key material', () => {

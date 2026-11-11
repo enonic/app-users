@@ -10,12 +10,14 @@ import {
   modifyProfile,
   modifyUser,
   removeMembers,
+  type CreateUserParams,
   type GroupKey,
   type RoleKey,
   type User,
   type UserKey,
 } from '/lib/xp/auth';
 
+import { callerKey } from '../auth/caller';
 import {
   isWritablePrincipal,
   requireWritable,
@@ -37,6 +39,7 @@ export type UserInput = {
   displayName: string;
   email?: string;
   password?: string;
+  disabled?: boolean;
   roles: readonly RoleKey[];
   groups: readonly GroupKey[];
 };
@@ -45,6 +48,8 @@ export type UserChanges = {
   displayName: string;
   email?: string;
   password?: string;
+  /** Left out, the flag stays as it is. */
+  disabled?: boolean;
   addRoles: readonly RoleKey[];
   removeRoles: readonly RoleKey[];
   addGroups: readonly GroupKey[];
@@ -265,12 +270,16 @@ export function createUser(idProvider: string, name: string, input: UserInput): 
     requirePassword(password);
   }
 
-  const user = createUserPrincipal({
+  // ! `disabled` goes in with the principal, so a user created disabled is never briefly able to log in.
+  // ! `@enonic-types/lib-auth` 8.1 predates the parameter (enonic/xp#12486), hence the widened type.
+  const params: CreateUserParams & { disabled?: boolean } = {
     idProvider,
     name,
     displayName: input.displayName,
     email: input.email,
-  });
+    disabled: input.disabled === true,
+  };
+  const user = createUserPrincipal(params);
 
   if (password !== undefined) {
     changePassword({ userKey: user.key, password });
@@ -291,7 +300,12 @@ export function updateUser(key: string, changes: UserChanges): User {
   // ! section and the Group dialog write them too. Only the user's own fields and credentials are the
   // ! remote system's, so those are what a locked provider refuses. `updateGroup` reasons the same way.
   const locked = !isWritablePrincipal(key, 'user');
-  if (locked && (changes.password != null || changesDisplayNameOrEmail(current, changes))) {
+  const togglesDisabled =
+    changes.disabled != null && changes.disabled !== (current.disabled === true);
+  if (
+    locked &&
+    (changes.password != null || togglesDisabled || changesDisplayNameOrEmail(current, changes))
+  ) {
     requireWritablePrincipals([key], 'user');
   }
   requireWritablePrincipals([...changes.addGroups, ...changes.removeGroups], 'group');
@@ -305,6 +319,15 @@ export function updateUser(key: string, changes: UserChanges): User {
   // Memberships stay open: #2793 settles them apart from the fields and credentials refused here.
   if (changes.password != null || changesDisplayNameOrEmail(current, changes)) {
     requireNotSystemUser(key, 'password, display name or email');
+  }
+  // ! The platform never lets su or anonymous be disabled, nor modified at all.
+  if (togglesDisabled) {
+    requireNotSystemUser(key, 'disabled state');
+  }
+  // ! An administrator who disables their own account stays signed in until they sign out, and then
+  // ! cannot come back until another administrator lets them.
+  if (togglesDisabled && changes.disabled === true && key === callerKey()) {
+    throw new Error(`Cannot disable [${key}]: it is the user making the change`);
   }
 
   if (changes.password != null) {
@@ -324,7 +347,9 @@ export function updateUser(key: string, changes: UserChanges): User {
     changes.removeGroups,
   );
 
-  if (locked) {
+  // ! The platform refuses every `modifyUser` on su and anonymous (enonic/xp#12486), and by here the
+  // ! guards above have established there is no field of theirs to write.
+  if (locked || isSystemUser(key)) {
     return getUser(key) ?? current;
   }
 
@@ -334,6 +359,7 @@ export function updateUser(key: string, changes: UserChanges): User {
       ...current,
       displayName: changes.displayName,
       email: changes.email ?? '',
+      ...(changes.disabled == null ? {} : { disabled: changes.disabled }),
     }),
   });
 

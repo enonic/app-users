@@ -12,6 +12,7 @@ const FORM: UserForm = {
   name: 'jane',
   displayName: 'Jane Doe',
   email: 'jane@example.com',
+  disabled: false,
   roles: [],
   groups: [],
   keyAdditions: [],

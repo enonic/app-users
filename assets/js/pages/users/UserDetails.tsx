@@ -39,12 +39,14 @@ export function UserDetails({
   const editGroupsLabel = useI18n('users.details.editGroups');
   const passwordSetLabel = useI18n('users.details.passwordSet');
   const passwordNotSetLabel = useI18n('users.details.passwordNotSet');
+  const signInEnabledLabel = useI18n('users.details.signInEnabled');
+  const signInDisabledLabel = useI18n('users.details.signInDisabled');
   const transitiveLabel = useI18n('users.details.transitive');
   const transitiveFailedLabel = useI18n('users.details.transitiveFailed');
 
   const [transitive, setTransitive] = useState(false);
 
-  const { key, displayName, login, email, hasPassword } = user;
+  const { key, displayName, login, email, hasPassword, disabled } = user;
 
   // ? Without a group to inherit through, the toggle has nothing to add — and no request to find out.
   const inheritable = user.groups.length > 0;
@@ -56,7 +58,7 @@ export function UserDetails({
   const groups: readonly PrincipalRef[] = showInherited ? inherited.groups : user.groups;
 
   // ! No description and no created/modified pair, though the mockups draw both: XP stores neither for a
-  // ! user — see the `disabled` and `modifiedTime` entries in `docs/platform-facts.md`.
+  // ! user — see the `modifiedTime` entry in `docs/platform-facts.md`.
   return (
     <DetailsPanel data-component={componentName}>
       <DetailsPanel.Header
@@ -105,6 +107,9 @@ export function UserDetails({
       >
         <DetailsPanel.Field labelKey="users.details.password">
           {hasPassword ? passwordSetLabel : passwordNotSetLabel}
+        </DetailsPanel.Field>
+        <DetailsPanel.Field labelKey="users.details.signIn">
+          {disabled === true ? signInDisabledLabel : signInEnabledLabel}
         </DetailsPanel.Field>
       </DetailsPanel.Section>
 

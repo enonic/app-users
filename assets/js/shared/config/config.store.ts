@@ -14,3 +14,7 @@ export function setConfig(config: Config): void {
 export function isReadOnlyMode(): boolean {
   return $config.get()?.readOnlyMode === true;
 }
+
+export function isCurrentUser(key: string): boolean {
+  return $config.get()?.userKey === key;
+}

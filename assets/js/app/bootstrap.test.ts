@@ -15,6 +15,7 @@ const CONFIG = {
   appVersion: '8.1.0',
   eventsUrl: '/_/admin:events',
   readOnlyMode: false,
+  userKey: 'user:system:su',
 };
 const PHRASES = { 'browse.toolbar': 'Users' };
 

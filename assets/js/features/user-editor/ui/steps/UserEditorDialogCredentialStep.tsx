@@ -1,8 +1,9 @@
-import { Button, IconButton, Input } from '@enonic/ui';
+import { Button, Checkbox, IconButton, Input } from '@enonic/ui';
 import { useStore } from '@nanostores/preact';
 import { Eye, EyeOff, X } from 'lucide-react';
 import { useState } from 'preact/hooks';
 
+import { isCurrentUser } from '../../../../shared/config';
 import { visitedErrors } from '../../../../shared/form';
 import { i18n, useI18n } from '../../../../shared/i18n';
 import { FieldLabel } from '../../../../shared/ui/FieldLabel';
@@ -14,6 +15,7 @@ import {
   $userEditorErrors,
   clearUserEditorPassword,
   markUserEditorFieldVisited,
+  setUserEditorDisabled,
   setUserEditorPassword,
 } from '../../model/user-editor.store';
 import { passwordActions, showsPublicKeys } from '../../model/user-form';
@@ -35,6 +37,7 @@ export function UserEditorDialogCredentialStep() {
   const { password, clearPassword } = form;
   const stored = detail.item?.key === user?.key ? (detail.item?.publicKeys ?? []) : [];
   const { action, clearable } = passwordActions(user?.hasPassword === true);
+  const self = user !== undefined && isCurrentUser(user.key);
   const strength = passwordStrength(password ?? '');
   const strengthLabel = useI18n(strength.labelKey);
 
@@ -51,6 +54,9 @@ export function UserEditorDialogCredentialStep() {
   const showLabel = useI18n('users.dialog.showPassword');
   const hideLabel = useI18n('users.dialog.hidePassword');
   const discardLabel = useI18n('users.dialog.discardPassword');
+  const disabledLabel = useI18n('users.dialog.disabled');
+  const disabledHelp = useI18n('users.dialog.disabledHelp');
+  const disabledSelfHelp = useI18n('users.dialog.disabledSelf');
 
   // Errors
   const shownErrors = visitedErrors(errors, visited);
@@ -155,6 +161,16 @@ export function UserEditorDialogCredentialStep() {
       </div>
 
       {showsPublicKeys(form) && <PublicKeysSection form={form} stored={stored} />}
+
+      <div className="flex flex-col gap-1.5">
+        <Checkbox
+          checked={form.disabled}
+          disabled={self}
+          label={disabledLabel}
+          onCheckedChange={(next) => setUserEditorDisabled(next === true)}
+        />
+        <p className="text-subtle text-sm">{self ? disabledSelfHelp : disabledHelp}</p>
+      </div>
     </div>
   );
 }
