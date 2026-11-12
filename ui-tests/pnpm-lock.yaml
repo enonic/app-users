@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@wdio/allure-reporter':
-        specifier: ^10.0.1
-        version: 10.1.0
+        specifier: ^10.2.0
+        version: 10.2.0
       '@wdio/cli':
         specifier: ^10.0.2
         version: 10.1.0(@types/node@22.20.5)(expect-webdriverio@8.1.0(@wdio/types@10.2.0)(webdriverio@10.1.0))
@@ -459,9 +459,9 @@ packages:
   '@vitest/utils@5.1.0':
     resolution: {integrity: sha512-V+qgCwkvVw+s1t1S5TaoBHsLi5Sz/YmohCMoOu0mZ8ZQst2bKhRYARAQucWpVg8D0mv0x5MHcWXY5QdOsoiGBQ==}
 
-  '@wdio/allure-reporter@10.1.0':
-    resolution: {integrity: sha512-+GRmFuEwVB3O5sNvbuA20qpteSE8Ub86G5FRu+yPoWRFgxu9aRhI0ju5FvgDw5r3FdqKYmzNRfRDM+jWpTxu1g==}
-    engines: {node: '>=22.19.0'}
+  '@wdio/allure-reporter@10.2.0':
+    resolution: {integrity: sha512-UcsvuymffxfAutb51QyO4LibGJqTXdarisFQ/ETeqb9tqnzxapYKE/Ung3VLikmD+iHSWOZtl2R37cFaz/umEQ==}
+    engines: {node: '>=22.23.4 <23 || >=24.22.1 <25 || >=26.12.1'}
 
   '@wdio/cli@10.1.0':
     resolution: {integrity: sha512-63cAdy/+lu2Z/2FdHA/8rRoV2NyiYg+pVRdi2pUADQZ20yzUQCjmu6clk+fWZ9sk3SeayUyMkm/8pvcO3hcoHA==}
@@ -645,16 +645,16 @@ packages:
     resolution: {integrity: sha512-4HTxbXR9D2+cJV9z4MO/IUa7sfYiLLXBP3/4MWSqC63ey55wBMvXAk83yZYwJ2t+jKU1Z7QW6LgCUx0BhPy9EQ==}
     hasBin: true
 
-  allure-js-commons@3.13.0:
-    resolution: {integrity: sha512-NC4qcbmfpuYTstdw+EgimzhpHD2T85wzBNWRMPpu9rukkLzRlLvSmUCo5hy6vEvwQd9BUQh2yMFplJ+shIpVrA==}
+  allure-js-commons@3.14.0:
+    resolution: {integrity: sha512-Qr/F/tvc+PJv7Q5mniFF2DUJIOvVXmfaFqDZMgSpM2dfzPmSO/D//zGiO8w6kidJMB0VHuPdHPLx5ncLcxj3Gg==}
     peerDependencies:
-      allure-playwright: 3.13.0
+      allure-playwright: 3.14.0
     peerDependenciesMeta:
       allure-playwright:
         optional: true
 
-  ansi-regex@6.4.0:
-    resolution: {integrity: sha512-KzTVk2tCWAHtYrvvvaP8bJKJq2pVinhLcGEQdtLIYPbmNGNyYe8QwNaTUYQp2J7/vIsUKt5QCqAfUkYyG9DkOw==}
+  ansi-regex@6.6.0:
+    resolution: {integrity: sha512-XZ5apbzreCbXSKwPjJstu8R0zOi247w3XYwWxtwBXgpZrCyc1Ka7p9/xY0A9/diMewmHbEKz+FIraWaEWjlN5g==}
     engines: {node: '>=12'}
 
   ansi-styles@4.3.0:
@@ -2006,12 +2006,13 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.2.0
 
-  '@wdio/allure-reporter@10.1.0':
+  '@wdio/allure-reporter@10.2.0':
     dependencies:
       '@types/node': 22.20.5
-      '@wdio/reporter': 10.1.0
-      '@wdio/types': 10.1.0
-      allure-js-commons: 3.13.0
+      '@wdio/logger': 10.2.0
+      '@wdio/reporter': 10.2.0
+      '@wdio/types': 10.2.0
+      allure-js-commons: 3.14.0
       csv-stringify: 6.9.0
       html-entities: 2.6.0
       strip-ansi: 7.2.0
@@ -2374,11 +2375,11 @@ snapshots:
 
   allure-commandline@2.46.1: {}
 
-  allure-js-commons@3.13.0:
+  allure-js-commons@3.14.0:
     dependencies:
       md5: 2.3.0
 
-  ansi-regex@6.4.0: {}
+  ansi-regex@6.6.0: {}
 
   ansi-styles@4.3.0:
     dependencies:
@@ -3234,7 +3235,7 @@ snapshots:
 
   strip-ansi@7.2.0:
     dependencies:
-      ansi-regex: 6.4.0
+      ansi-regex: 6.6.0
 
   strip-final-newline@4.0.0: {}
 
