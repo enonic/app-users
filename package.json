@@ -42,7 +42,7 @@
     "@enonic-types/lib-auth": "^8.1.0",
     "@enonic-types/lib-i18n": "^8.1.1",
     "@enonic-types/lib-io": "^8.1.2",
-    "@enonic-types/lib-portal": "^8.1.1",
+    "@enonic-types/lib-portal": "^8.1.2",
     "@enonic/ui-types": "0.7.0",
     "@tailwindcss/vite": "^4.3.5",
     "@types/node": "^26.6.5",
