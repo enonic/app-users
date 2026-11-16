@@ -14,6 +14,10 @@ exports.config = {
 
     maxInstances: 1,
 
+    // Chrome runs with --headless, so no X display is needed. Without this @wdio/xvfb wraps every
+    // worker in xvfb-run on Linux, which broke worker IPC on Ubuntu 26.04 (write EINVAL).
+    autoXvfb: false,
+
     capabilities: [{
         browserName: 'chrome',
         browserVersion: browser_version,
