@@ -3,7 +3,11 @@ import { idProviderOf } from '@enonic/ui-utils';
 import { useStore } from '@nanostores/preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
-import { $idProviderModeByKey, allowsWrite } from '../../../../entities/principal';
+import {
+  $idProviderModeByKey,
+  allowsWrite,
+  useAdministratorOnly,
+} from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
 import { useI18n } from '../../../../shared/i18n';
 import { $userEditDetail } from '../../model/user-edit-detail';
@@ -13,6 +17,7 @@ export function UserEditorDialogGroupsStep() {
   const { form } = useStore($userEditor, { keys: ['form'] });
   const { status } = useStore($userEditDetail);
   const modes = useStore($idProviderModeByKey);
+  const adminOnly = useAdministratorOnly();
 
   const groupsPlaceholder = useI18n('users.dialog.groupsPlaceholder');
   const showAllLabel = useI18n('users.dialog.showAllProviders');
@@ -29,11 +34,13 @@ export function UserEditorDialogGroupsStep() {
     [modes],
   );
   const remoteGroups = useMemo(
-    () =>
-      new Set(
-        form.groups.filter(({ key }) => !writable(idProviderOf(key) ?? '')).map(({ key }) => key),
-      ),
+    () => form.groups.filter(({ key }) => !writable(idProviderOf(key) ?? '')).map(({ key }) => key),
     [form.groups, writable],
+  );
+  // A group that holds the administrator role keeps its members too, for a caller without that role.
+  const lockedGroups = useMemo(
+    () => new Set([...remoteGroups, ...adminOnly]),
+    [remoteGroups, adminOnly],
   );
 
   return (
@@ -62,7 +69,7 @@ export function UserEditorDialogGroupsStep() {
         placeholder={groupsPlaceholder}
         selected={form.groups}
         offersIdProvider={writable}
-        locked={remoteGroups}
+        locked={lockedGroups}
         onChange={(groups) => updateUserEditorForm({ groups })}
       />
     </div>

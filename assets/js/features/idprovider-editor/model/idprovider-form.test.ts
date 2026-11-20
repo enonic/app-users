@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import type { IdProvider, IdProviderPermission, PrincipalRef } from '../../../entities/principal';
 import {
-  idProviderNameWarning,
+  offeredApplications,
+  standardBindingWarning,
   initialIdProviderForm,
   isSystemIdProvider,
   mergePermissions,
@@ -159,7 +160,7 @@ describe('validateIdProviderForm', () => {
     );
   });
 
-  it.each(['a#b', 'test@', 'иван', 'blåbær'])('refuses %s, which XP rejects', (name) => {
+  it.each(['a#b', 'test@', 'иван', 'blåbær', 'corp.eu'])('refuses %s, which XP rejects', (name) => {
     expect(validateIdProviderForm(form({ name }), 'create').name).toBe(
       'idProviders.dialog.idInvalid',
     );
@@ -176,12 +177,16 @@ describe('validateIdProviderForm', () => {
 
   it('accepts a name XP can store, once trimmed', () => {
     expect(
-      validateIdProviderForm(form({ name: '  Store.Manager-1_x  ' }), 'create').name,
+      validateIdProviderForm(form({ name: '  Store-Manager-1_x  ' }), 'create').name,
     ).toBeUndefined();
   });
 
   it('says nothing about the name while editing, where it is locked', () => {
     expect(validateIdProviderForm(form({ name: '' }), 'edit').name).toBeUndefined();
+  });
+
+  it('keeps an existing provider with a dot in its key editable', () => {
+    expect(validateIdProviderForm(form({ name: 'corp.eu' }), 'edit')).toEqual({});
   });
 
   it('asks for no application: a provider serving no login is legitimate', () => {
@@ -366,23 +371,36 @@ describe('sameIdProviderForm', () => {
   });
 });
 
-describe('idProviderNameWarning', () => {
-  it('warns about a dot in a new provider ID', () => {
-    expect(idProviderNameWarning(form({ name: 'my.idp' }), 'create')).toBe(
-      'idProviders.dialog.idDotted',
+describe('offeredApplications', () => {
+  const standard = { key: 'com.enonic.xp.app.standardidprovider' };
+  const oidc = { key: 'com.enonic.app.oidc' };
+
+  it('leaves the standard application out for a new provider', () => {
+    expect(offeredApplications([standard, oidc], undefined)).toEqual([oidc]);
+  });
+
+  it('leaves it out for an existing provider other than the system one', () => {
+    expect(offeredApplications([standard, oidc], 'intranet')).toEqual([oidc]);
+  });
+
+  it('keeps it for the system provider', () => {
+    expect(offeredApplications([standard, oidc], 'system')).toEqual([standard, oidc]);
+  });
+});
+
+describe('standardBindingWarning', () => {
+  it('warns while a provider other than the system one holds the standard binding', () => {
+    expect(standardBindingWarning('intranet', 'com.enonic.xp.app.standardidprovider')).toBe(
+      'idProviders.dialog.standardBindingKept',
     );
   });
 
-  it('says nothing about an undotted ID', () => {
-    expect(idProviderNameWarning(form({ name: 'my-idp' }), 'create')).toBeUndefined();
-  });
-
-  // The ID of an existing provider is fixed, so there is nothing left to choose.
-  it('says nothing while editing', () => {
-    expect(idProviderNameWarning(form({ name: 'my.idp' }), 'edit')).toBeUndefined();
-  });
-
-  it('leaves saving open for a dotted ID', () => {
-    expect(validateIdProviderForm(form({ name: 'my.idp' }), 'create').name).toBeUndefined();
+  it.each([
+    { provider: 'system', application: 'com.enonic.xp.app.standardidprovider' },
+    { provider: 'intranet', application: 'com.enonic.app.oidc' },
+    { provider: 'intranet', application: '' },
+    { provider: undefined, application: 'com.enonic.xp.app.standardidprovider' },
+  ])('says nothing for $provider bound to "$application"', ({ provider, application }) => {
+    expect(standardBindingWarning(provider, application)).toBeUndefined();
   });
 });

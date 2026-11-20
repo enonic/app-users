@@ -42,7 +42,7 @@ describe("role.editor.users.groups.summary.steps.spec - the role editor's Users,
   it('GIVEN the suite starts THEN an ID provider with a user and a group in it AND a service account and a group in the system ID provider should be created via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ROLES);
     ID_PROVIDER = await settingsUtils.createIdProviderViaApi(
-      userItemsBuilder.buildIdProvider(PROVIDER_NAME, 'description', 'Standard ID Provider', {
+      userItemsBuilder.buildIdProvider(PROVIDER_NAME, 'description', undefined, {
         'role:system.user.admin': appConst.ID_PROVIDER_ACCESS.WRITE_USERS,
       }),
     );

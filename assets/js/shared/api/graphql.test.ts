@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { requestGraphQlRoots, setGraphQlEndpoint, type GraphQlRoot } from './graphql';
+import { requestGraphQlRoots, serverReason, setGraphQlEndpoint, type GraphQlRoot } from './graphql';
 
 const fetchMock = vi.fn<typeof fetch>();
 
@@ -98,5 +98,27 @@ describe('requestGraphQlRoots', () => {
       'Roots disagree on the type of $search: String and String!',
     );
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('serverReason', () => {
+  it("drops graphql-java's wrapping around a resolver's exception", () => {
+    expect(
+      serverReason(
+        'Exception while fetching data (/createIdProvider) : [x] can only be bound to the [system] id provider',
+      ),
+    ).toBe('[x] can only be bound to the [system] id provider');
+  });
+
+  it('keeps every message of several, each without its wrapping', () => {
+    expect(
+      serverReason(
+        'Exception while fetching data (/a) : first; Exception while fetching data (/b) : second',
+      ),
+    ).toBe('first; second');
+  });
+
+  it('leaves a message without the wrapping as it is', () => {
+    expect(serverReason('Failed to fetch')).toBe('Failed to fetch');
   });
 });

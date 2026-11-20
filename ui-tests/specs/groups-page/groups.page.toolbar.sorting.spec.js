@@ -43,7 +43,7 @@ describe("groups.page.toolbar.sorting.spec - Groups page: the toolbar with nothi
   it('GIVEN the suite starts THEN an ID provider AND two groups in the system ID provider AND a group in the new provider should be created via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     ID_PROVIDER = await settingsUtils.createIdProviderViaApi(
-      userItemsBuilder.buildIdProvider(PROVIDER_NAME, 'description', 'Standard ID Provider'),
+      userItemsBuilder.buildIdProvider(PROVIDER_NAME, 'description', undefined),
     );
     GROUP1 = await settingsUtils.createGroupViaApi(
       userItemsBuilder.buildGroup({

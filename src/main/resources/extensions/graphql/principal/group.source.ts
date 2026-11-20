@@ -13,6 +13,7 @@ import {
   type RoleKey,
 } from '/lib/xp/auth';
 
+import { administratorOnlyKeys, requireChangeableMembers } from '../auth/administrator';
 import {
   isWritablePrincipal,
   requireWritable,
@@ -88,6 +89,10 @@ export function listGroupGroups(key: GroupKey, transitive: boolean): PrincipalIt
 
 export function createGroup(idProvider: string, name: string, input: GroupInput): Group {
   requireWritable(idProvider, 'group');
+  // The new group holds nothing yet, so only the roles it is to join can be an administrator's alone.
+  if (input.roles.length > 0) {
+    requireChangeableMembers(administratorOnlyKeys(), input.roles);
+  }
 
   const group = createGroupPrincipal({
     idProvider,
@@ -103,6 +108,18 @@ export function createGroup(idProvider: string, name: string, input: GroupInput)
 }
 
 export function updateGroup(key: string, changes: GroupChanges): Group {
+  // ! The display name and description of a group that holds the administrator role stay anyone's to
+  // ! edit; its members, and who is in the administrator role, are an administrator's.
+  const changesMembers = changes.addMembers.length + changes.removeMembers.length > 0;
+  const memberLists = [
+    ...(changesMembers ? [key] : []),
+    ...changes.addRoles,
+    ...changes.removeRoles,
+  ];
+  if (memberLists.length > 0) {
+    requireChangeableMembers(administratorOnlyKeys(), memberLists);
+  }
+
   // ! The roles stay open for the reason `updateUser` gives; the group's own fields and its members are
   // ! what a locked provider refuses.
   const locked = !isWritablePrincipal(key, 'group');

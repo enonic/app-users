@@ -154,17 +154,32 @@ export function validateIdProviderForm(
   return errors;
 }
 
+/** The system store's own login, which XP lets no other provider be bound to (enonic/xp#12615). */
+export const STANDARD_ID_PROVIDER_APPLICATION = 'com.enonic.xp.app.standardidprovider';
+
 /**
- * Told, never enforced: a dot is valid in `IdProviderKey`, but the key becomes a level of the vhost
- * configuration (`mapping.<name>.idProvider.<key>`), where a dot splits it. Only a create can still pick
- * another ID.
+ * The applications a provider may be bound to: the standard one is the system provider's alone. A
+ * provider bound to it before the rule keeps the binding for as long as it is left alone — XP checks a
+ * binding only when it changes — so the application is still shown as bound, just no longer offered.
  */
-export function idProviderNameWarning(
-  form: IdProviderForm,
-  mode: StepDialogMode,
+export function offeredApplications<T extends { key: string }>(
+  applications: readonly T[],
+  idProvider: string | undefined,
+): readonly T[] {
+  return idProvider !== undefined && isSystemIdProvider(idProvider)
+    ? applications
+    : applications.filter(({ key }) => key !== STANDARD_ID_PROVIDER_APPLICATION);
+}
+
+/** Told while a provider other than the system one still holds the standard binding it cannot get back. */
+export function standardBindingWarning(
+  idProvider: string | undefined,
+  application: string,
 ): string | undefined {
-  return mode === 'create' && form.name.trim().includes('.')
-    ? 'idProviders.dialog.idDotted'
+  return idProvider !== undefined &&
+    !isSystemIdProvider(idProvider) &&
+    application === STANDARD_ID_PROVIDER_APPLICATION
+    ? 'idProviders.dialog.standardBindingKept'
     : undefined;
 }
 

@@ -4,6 +4,7 @@ import { useMemo } from 'preact/hooks';
 import {
   forgetServiceAccountDetails,
   replaceServiceAccount,
+  useAdministratorOnly,
   useServiceAccounts,
 } from '../../entities/principal';
 import { PrincipalIcon } from '../../entities/principal/ui/PrincipalIcon';
@@ -24,7 +25,7 @@ import {
   sortDirectionOf,
 } from './model/query.store';
 import { serviceAccountsSelection } from './model/selection.store';
-import { SERVICE_ACCOUNT_ACTIONS } from './model/service-accounts.actions';
+import { createServiceAccountActions } from './model/service-accounts.actions';
 import { toServiceAccountRow } from './model/service-accounts.rows';
 import {
   loadMoreServiceAccounts,
@@ -43,6 +44,8 @@ export function ServiceAccountsPage() {
   const activeKey = useItemId();
   const { status, items, appending, error, hasMore } = useServiceAccounts();
   const sort = useStore($serviceAccountsSort);
+  const adminOnly = useAdministratorOnly();
+  const actions = useMemo(() => createServiceAccountActions(adminOnly), [adminOnly]);
 
   const sortNameLabel = useI18n('users.sort.name');
   const sortAscLabel = useI18n('users.sort.nameAsc');
@@ -84,7 +87,7 @@ export function ServiceAccountsPage() {
     >
       <BrowseScreen
         {...section}
-        actions={SERVICE_ACCOUNT_ACTIONS}
+        actions={actions}
         managedMode={isReadOnlyMode()}
         notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
         emptyLabel={emptyLabel}

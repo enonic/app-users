@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { principalLock, principalLockPending } from './principal-lock';
+import { administratorLock, principalLock, principalLockPending } from './principal-lock';
 
 describe('principalLock', () => {
   it('leaves a principal of a provider that allows the write open', () => {
@@ -53,5 +53,28 @@ describe('principalLockPending', () => {
     ).toBe(false);
     expect(principalLockPending({ status: 'ready', items: [] })).toBe(false);
     expect(principalLockPending({ status: 'error', items: [] })).toBe(false);
+  });
+});
+
+describe('administratorLock', () => {
+  const holders = new Set(['role:system.admin', 'group:system:ops', 'user:corp:alice']);
+
+  it('locks a principal that holds the administrator role for a caller without it', () => {
+    expect(administratorLock('user:corp:alice', holders, false)).toEqual({
+      locked: true,
+      reasonKey: 'principal.details.lockedAdministrator',
+    });
+  });
+
+  it('leaves every other principal open', () => {
+    expect(administratorLock('user:corp:bob', holders, false)).toEqual({ locked: false });
+  });
+
+  it('leaves everything open to an administrator', () => {
+    expect(administratorLock('group:system:ops', holders, true)).toEqual({ locked: false });
+  });
+
+  it('leaves a principal not created yet open', () => {
+    expect(administratorLock(undefined, holders, false)).toEqual({ locked: false });
   });
 });

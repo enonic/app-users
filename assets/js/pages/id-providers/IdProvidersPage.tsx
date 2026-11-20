@@ -11,7 +11,7 @@ import {
   useIdProviders,
 } from '../../entities/principal';
 import { IdProviderEditorDialog } from '../../features/idprovider-editor/ui/IdProviderEditorDialog';
-import { isReadOnlyMode } from '../../shared/config';
+import { isAdministrator, isReadOnlyMode } from '../../shared/config';
 import { useHostFrame, useItemId } from '../../shared/host';
 import { useI18n } from '../../shared/i18n';
 import {
@@ -57,6 +57,9 @@ export function IdProvidersPage() {
   const filterPlaceholder = useI18n('idProviders.filter.placeholder');
   const readOnlyTitle = useI18n('readOnly.title');
   const readOnlyHelp = useI18n('readOnly.help');
+  const adminOnlyTitle = useI18n('idProviders.adminOnly.title');
+  const adminOnlyHelp = useI18n('idProviders.adminOnly.help');
+  const readOnly = isReadOnlyMode();
 
   const sortOptions = useMemo(
     () => [
@@ -108,8 +111,14 @@ export function IdProvidersPage() {
       <BrowseScreen
         {...section}
         actions={ID_PROVIDER_ACTIONS}
-        managedMode={isReadOnlyMode()}
-        notice={<ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />}
+        managedMode={readOnly || !isAdministrator()}
+        notice={
+          readOnly ? (
+            <ManagedModeBanner title={readOnlyTitle} help={readOnlyHelp} />
+          ) : (
+            <ManagedModeBanner title={adminOnlyTitle} help={adminOnlyHelp} />
+          )
+        }
         emptyLabel={emptyLabel}
         filterPlaceholder={filterPlaceholder}
         details={<IdProvidersItemPage />}

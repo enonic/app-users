@@ -12,5 +12,5 @@ export type {
   StepDialogStore,
   StepDialogView,
 } from './step-dialog.store';
-export { runStepDialogSave } from './step-dialog-save';
+export { failureNotice, runStepDialogSave } from './step-dialog-save';
 export type { StepDialogSaveOptions, StepDialogWriteContext } from './step-dialog-save';

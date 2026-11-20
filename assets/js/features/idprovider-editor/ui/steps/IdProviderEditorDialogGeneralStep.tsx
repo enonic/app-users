@@ -21,12 +21,15 @@ import {
   setIdProviderEditorName,
   updateIdProviderEditorForm,
 } from '../../model/idprovider-editor.store';
-import { idProviderNameWarning, isSystemIdProvider } from '../../model/idprovider-form';
+import {
+  isSystemIdProvider,
+  offeredApplications,
+  standardBindingWarning,
+} from '../../model/idprovider-form';
 import { ConfigDialog } from '../ConfigDialog';
 
 const DISPLAY_NAME_ID = 'id-provider-editor-display-name';
 const ID_FIELD_ID = 'id-provider-editor-id';
-const ID_WARNING_ID = 'id-provider-editor-id-warning';
 const DESCRIPTION_ID = 'id-provider-editor-description';
 const APPLICATION_LABEL_ID = 'id-provider-editor-application-label';
 
@@ -45,7 +48,13 @@ export function IdProviderEditorDialogGeneralStep() {
 
   const [configuring, setConfiguring] = useState(false);
 
+  // Looked up in everything installed, not in what is offered: a binding kept from before is still named.
   const selected = applications.find(({ key }) => key === form.application);
+  const offered = useMemo(
+    () => offeredApplications(applications, entity?.key),
+    [applications, entity?.key],
+  );
+  const applicationWarningKey = standardBindingWarning(entity?.key, form.application);
 
   // Labels
   const displayNameLabel = useI18n('idProviders.dialog.displayName');
@@ -69,8 +78,6 @@ export function IdProviderEditorDialogGeneralStep() {
   // A taken ID is told at once: the answer arrives after the field was typed in, visited or not.
   const idErrorKey = idCheck.status === 'taken' ? errors.name : shown.name;
   const idError = idErrorKey === undefined ? undefined : i18n(idErrorKey, form.name.trim());
-  // One message under the field at a time: an error outranks the warning.
-  const idWarningKey = idError === undefined ? idProviderNameWarning(form, mode) : undefined;
 
   return (
     <div className="flex flex-col gap-5">
@@ -96,15 +103,8 @@ export function IdProviderEditorDialogGeneralStep() {
           description={persisted ? undefined : idHelp}
           error={idError}
           onInput={({ currentTarget }) => setIdProviderEditorName(currentTarget.value)}
-          aria-describedby={idWarningKey === undefined ? undefined : ID_WARNING_ID}
           onBlur={() => setIdProviderEditorName(form.name, { immediate: true })}
         />
-        {idWarningKey !== undefined && (
-          <div id={ID_WARNING_ID} className="text-warn mt-0.5 flex items-center gap-2 leading-5">
-            <TriangleAlert size={16} aria-hidden className="shrink-0" />
-            {i18n(idWarningKey)}
-          </div>
-        )}
       </div>
 
       {/* Description */}
@@ -125,7 +125,7 @@ export function IdProviderEditorDialogGeneralStep() {
         <FieldLabel id={APPLICATION_LABEL_ID} text={applicationLabel} />
 
         <ApplicationSelector
-          applications={applications}
+          applications={offered}
           value={form.application}
           onChange={(application) => updateIdProviderEditorForm({ application })}
           labelledBy={APPLICATION_LABEL_ID}
@@ -183,6 +183,16 @@ export function IdProviderEditorDialogGeneralStep() {
               </GridList.Cell>
             </GridList.Row>
           </GridList>
+        )}
+
+        {applicationWarningKey !== undefined && (
+          <div
+            data-component="IdProviderEditorApplicationWarning"
+            className="text-warn mt-0.5 flex items-start gap-2 leading-5"
+          >
+            <TriangleAlert size={16} aria-hidden className="mt-0.5 shrink-0" />
+            {i18n(applicationWarningKey)}
+          </div>
         )}
       </div>
 

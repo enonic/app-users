@@ -18,7 +18,8 @@ describe('idprovider.page.filtering.spec - ID Providers page: a provider made in
   const SUFFIX = userItemsBuilder.generateRandomNumber();
   const PROVIDER_NAME = `provider${SUFFIX}`;
   const PROVIDER_ID = `id${SUFFIX}`;
-  const APPLICATION = 'Standard ID Provider';
+  // Not the Standard ID Provider: that one is the system provider's alone (enonic/xp#12615).
+  const APPLICATION = 'Test Auth0 ID Provider';
   // The provider as built; the key of its application is resolved through the API once the suite
   // runs - the filter's value carries the key, its label the display name.
   const ID_PROVIDER = userItemsBuilder.buildIdProvider({
@@ -30,7 +31,7 @@ describe('idprovider.page.filtering.spec - ID Providers page: a provider made in
   let APPLICATION_KEY;
   let created = false;
 
-  it("GIVEN the suite starts THEN an ID provider with an id of its own and 'Standard ID Provider' as its application should be created in the editor AND listed with its id under its display name and the application on the right", async () => {
+  it("GIVEN the suite starts THEN an ID provider with an id of its own and 'Test Auth0 ID Provider' as its application should be created in the editor AND listed with its id under its display name and the application on the right", async () => {
     let idProvidersPage = new IdProvidersPage();
     // 1. Create the provider in the editor (not via the API): the id typed over the derived one.
     await settingsUtils.createIdProvider(ID_PROVIDER);
@@ -86,7 +87,7 @@ describe('idprovider.page.filtering.spec - ID Providers page: a provider made in
   // application picked beside them narrows to the same row. The field counts the provider under its
   // application alone; every other value - another application, 'Bound to no application' - counts
   // none and is disabled.
-  it("WHEN the display name AND the id of the provider have been entered in the search input AND 'Standard ID Provider' has been picked in 'Application' THEN the three terms should be shown as tags AND that provider alone should be listed", async () => {
+  it("WHEN the display name AND the id of the provider have been entered in the search input AND 'Test Auth0 ID Provider' has been picked in 'Application' THEN the three terms should be shown as tags AND that provider alone should be listed", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     let idProvidersPage = new IdProvidersPage();
     await idProvidersPage.waitForRowByDisplayNameDisplayed(PROVIDER_NAME);
@@ -98,7 +99,7 @@ describe('idprovider.page.filtering.spec - ID Providers page: a provider made in
     );
     assert.deepEqual(await idProvidersPage.getSearchTerms(), [PROVIDER_NAME, PROVIDER_ID]);
     assert.deepEqual(await idProvidersPage.getProviderDisplayNames(), [PROVIDER_NAME]);
-    // 2. 'Application', entered: 'Standard ID Provider' counts the one provider, enabled; every
+    // 2. 'Application', entered: 'Test Auth0 ID Provider' counts the one provider, enabled; every
     //    other value counts none and is disabled.
     await idProvidersPage.openFilterDropdown();
     assert.ok(
@@ -108,16 +109,12 @@ describe('idprovider.page.filtering.spec - ID Providers page: a provider made in
     await idProvidersPage.openApplicationFilterValues();
     let values = await idProvidersPage.getFilterValues();
     await settingsUtils.saveScreenshot('idproviders_filter_application_values');
-    let standard = values.find(({ id }) => id === APPLICATION_KEY);
-    assert.ok(standard !== undefined, `'${APPLICATION}' should be offered by the filter`);
-    assert.equal(standard.label, APPLICATION);
-    assert.equal(
-      standard.count,
-      1,
-      `'${APPLICATION}' should count the one provider the search left`,
-    );
-    assert.ok(!standard.disabled, `'${APPLICATION}' should be enabled`);
-    assert.ok(!standard.selected, `'${APPLICATION}' should not be picked yet`);
+    let bound = values.find(({ id }) => id === APPLICATION_KEY);
+    assert.ok(bound !== undefined, `'${APPLICATION}' should be offered by the filter`);
+    assert.equal(bound.label, APPLICATION);
+    assert.equal(bound.count, 1, `'${APPLICATION}' should count the one provider the search left`);
+    assert.ok(!bound.disabled, `'${APPLICATION}' should be enabled`);
+    assert.ok(!bound.selected, `'${APPLICATION}' should not be picked yet`);
     for (const value of values.filter(({ id }) => id !== APPLICATION_KEY)) {
       assert.equal(value.count, 0, `'${value.label}' should count no provider`);
       assert.ok(value.disabled, `'${value.label}' should be disabled`);
@@ -147,8 +144,8 @@ describe('idprovider.page.filtering.spec - ID Providers page: a provider made in
     // 4. The field, entered again, marks the application as picked.
     await idProvidersPage.openApplicationFilterValues();
     values = await idProvidersPage.getFilterValues();
-    standard = values.find(({ id }) => id === APPLICATION_KEY);
-    assert.ok(standard?.selected, `'${APPLICATION}' should be marked as picked`);
+    bound = values.find(({ id }) => id === APPLICATION_KEY);
+    assert.ok(bound?.selected, `'${APPLICATION}' should be marked as picked`);
     await idProvidersPage.closeFilterDropdown();
     // 5. 'Clear the filter' takes every term back: the system provider is listed again.
     await idProvidersPage.clickOnClearSearchButton();

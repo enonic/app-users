@@ -23,7 +23,6 @@ const css = {
   validationMessages: `${PANEL} ${COMMON.FIELD_ERROR}`,
   // A dot is legal in an ID but makes an ambiguous vhost key, so it is warned about rather than
   // refused: its own line under the input, outside the error messages.
-  idWarning: `${PANEL} div#id-provider-editor-id-warning`,
   // Application
   applicationSearchInput: `${APPLICATION_SELECTOR} ${COMBOBOX.INPUT}`,
   applicationToggle: `${APPLICATION_SELECTOR} ${COMBOBOX.TOGGLE}`,
@@ -159,17 +158,6 @@ class IdProviderEditorGeneralStepDialog extends IdProviderEditorStepDialog {
   // Texts of the validation messages shown under the fields, e.g. 'ID is required'.
   getValidationMessages() {
     return this.getTextInDisplayedElements(css.validationMessages);
-  }
-
-  // 'Avoid dots: the ID is used as a key in the virtual host configuration' - or undefined. A
-  // warning, not an error: it never holds Next back, and an error under the field outranks it.
-  async getIdWarning() {
-    const warnings = await this.getDisplayedElements(css.idWarning);
-    return warnings.length === 0 ? undefined : await warnings[0].getText();
-  }
-
-  isIdWarningDisplayed() {
-    return this.isElementDisplayed(css.idWarning);
   }
 
   // Application selector

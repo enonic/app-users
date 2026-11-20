@@ -10,6 +10,7 @@ const IdProvidersPage = require('../page_objects/providers/id.providers.page');
 const IdProviderDetails = require('../page_objects/providers/id.provider.details');
 const IdProviderEditorGeneralStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
 const IdProviderEditorPermissionsStepDialog = require('../page_objects/providers/provider-dialog/provider.editor.permissions.step.dialog');
+const Auth0IdProviderConfigDialog = require('../page_objects/providers/provider-dialog/auth0.provider.config.dialog');
 
 describe("id.provider.details.panel.spec - the details panel of an ID provider: what it shows, and the editor its Edit and 'Edit permissions' buttons open on the saved provider", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
@@ -25,7 +26,9 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
   const NEW_PROVIDER_NAME = userItemsBuilder.generateRandomName('renamedprovider');
   const USER_NAME = userItemsBuilder.generateRandomName('user');
   const GROUP_NAME = userItemsBuilder.generateRandomName('group');
-  const APPLICATION = 'Standard ID Provider';
+  // Created bound to nothing, so that a user can be made in it: the Standard ID Provider is the system
+  // provider's alone (enonic/xp#12615), and the Auth0 test application leaves users to Auth0.
+  const APPLICATION = Auth0IdProviderConfigDialog.APPLICATION;
   const DESCRIPTION = 'created in the editor for the details panel';
   // The entries a new provider is seeded with, pinned both in the editor and in the saved provider.
   const SEEDED_PERMISSIONS = Object.freeze({
@@ -47,7 +50,6 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
     ID_PROVIDER = userItemsBuilder.buildIdProvider({
       displayName: PROVIDER_NAME,
       description: DESCRIPTION,
-      application: APPLICATION,
     });
     // 1. Create a new ID provider in the editor (not via the API).
     await settingsUtils.createIdProvider(ID_PROVIDER);
@@ -77,11 +79,11 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
     // 2. The header and the fields of the 'ID provider' section hold what was typed in the editor.
     assert.equal(await idProviderDetails.getKey(), ID_PROVIDER.id);
     assert.equal(await idProviderDetails.getDescription(), DESCRIPTION);
-    assert.equal(await idProviderDetails.getApplication(), APPLICATION);
+    assert.equal(await idProviderDetails.getApplication(), IdProviderDetails.APPLICATION_NOT_SET);
     assert.equal(
       await idProviderDetails.getMode(),
       IdProviderDetails.MODE.LOCAL,
-      'The Standard ID Provider keeps users and groups in XP',
+      'A provider bound to no application keeps users and groups in XP',
     );
     // 3. The permissions and the principals are read apart from the provider itself, so the panel
     //    is titled and its fields are filled a moment before either list is there.
@@ -135,7 +137,7 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
     assert.equal(await generalStep.getTextInDisplayNameInput(), PROVIDER_NAME);
     assert.equal(await generalStep.getTextInIdInput(), ID_PROVIDER.id);
     assert.equal(await generalStep.getTextInDescriptionTextArea(), DESCRIPTION);
-    assert.equal(await generalStep.getSelectedApplication(), APPLICATION);
+    assert.strictEqual(await generalStep.getSelectedApplication(), undefined);
     // 3. The ID cannot be changed after creation, and nothing changed yet: Save is disabled.
     assert.ok(!(await generalStep.isIdInputEnabled()), 'The ID input should be disabled');
     await generalStep.waitForSaveButtonDisabled();
@@ -163,28 +165,24 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
     );
   });
 
-  // The application is the one thing on General a saved provider may still lose: removing it is
-  // staged like any other change, so the way out of the dirty dialog asks before it closes.
-  it("GIVEN the General step has been opened from the details WHEN the application has been removed AND the dialog has been closed THEN 'Keep editing' should be offered AND WHEN the step has been saved THEN the details should say no application is set", async () => {
+  // Binding an application is staged like any other change, so the way out of the dirty dialog asks
+  // before it closes.
+  it("GIVEN the General step has been opened from the details WHEN an application has been bound AND the dialog has been closed THEN 'Keep editing' should be offered AND WHEN the step has been saved THEN the details should name the application", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     let idProvidersPage = new IdProvidersPage();
     let idProviderDetails = new IdProviderDetails();
     let generalStep = new IdProviderEditorGeneralStepDialog();
     await idProvidersPage.clickOnRowByName(ID_PROVIDER.id);
     await idProviderDetails.waitForTitle(NEW_PROVIDER_NAME);
-    assert.equal(await idProviderDetails.getApplication(), APPLICATION);
-    // 1. 'Edit': the General step opens with the bound application listed under the selector.
+    assert.equal(await idProviderDetails.getApplication(), IdProviderDetails.APPLICATION_NOT_SET);
+    // 1. 'Edit': the General step opens with no application listed under the selector.
     await idProviderDetails.clickOnEditButton();
     await generalStep.waitForLoaded();
-    await generalStep.waitForApplicationRowDisplayed();
-    // 2. Remove the application: the row goes and Save is enabled.
-    await generalStep.clickOnRemoveApplicationButton();
     await generalStep.waitForApplicationRowNotDisplayed();
-    assert.strictEqual(
-      await generalStep.getSelectedApplication(),
-      undefined,
-      'No application should be bound any more',
-    );
+    // 2. Bind the Auth0 application: the row appears and Save is enabled.
+    await generalStep.selectApplication(APPLICATION);
+    await generalStep.waitForApplicationRowDisplayed();
+    assert.equal(await generalStep.getSelectedApplication(), APPLICATION);
     await generalStep.waitForSaveButtonEnabled();
     // 3. Close the dirty dialog: the question takes the footer's place, with the way back on it.
     await generalStep.clickOnCloseButton();
@@ -194,22 +192,22 @@ describe("id.provider.details.panel.spec - the details panel of an ID provider: 
       'Do you want to close the dialog? Changes will be lost.',
     );
     assert.ok(await generalStep.isKeepButtonDisplayed(), "'Keep editing' should be offered");
-    // 4. 'Keep editing': the question goes and the removal is still staged.
+    // 4. 'Keep editing': the question goes and the binding is still staged.
     await generalStep.clickOnKeepButton();
     await generalStep.waitForCloseQuestionNotDisplayed();
     assert.ok(await generalStep.isDialogDisplayed(), 'The editor should stay open');
     assert.ok(
-      !(await generalStep.isApplicationRowDisplayed()),
-      'The removal should survive the question',
+      await generalStep.isApplicationRowDisplayed(),
+      'The binding should survive the question',
     );
     // 5. Save: the dialog closes and the notification message reports the update.
     await generalStep.clickOnSaveButtonAndWaitForClosed();
     await idProvidersPage.waitForExpectedNotificationMessage(
       appConst.idProviderUpdatedMessage(NEW_PROVIDER_NAME),
     );
-    // 6. The details say no application is set; a provider bound to nothing keeps its accounts in XP.
-    await idProviderDetails.waitForApplication(IdProviderDetails.APPLICATION_NOT_SET);
-    assert.equal(await idProviderDetails.getMode(), IdProviderDetails.MODE.LOCAL);
+    // 6. The details name the application; it leaves users to Auth0 and keeps groups in XP.
+    await idProviderDetails.waitForApplication(APPLICATION);
+    assert.equal(await idProviderDetails.getMode(), IdProviderDetails.MODE.MIXED);
   });
 
   it("GIVEN the ID provider is selected WHEN 'Edit permissions' in the details has been clicked THEN the Permissions step should show the saved entries pinned AND WHEN the group has been added with an access and saved THEN the details should list it", async () => {

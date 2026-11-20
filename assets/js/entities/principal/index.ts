@@ -1,3 +1,5 @@
+export { ADMIN_HOLDERS_ROOT } from './api/admin-holders.api';
+export type { AdminHoldersData } from './api/admin-holders.api';
 export { fetchGroupDetail, GROUPS_ROOT, toGroups } from './api/groups.api';
 export type { GroupsData } from './api/groups.api';
 export {
@@ -21,6 +23,8 @@ export { fetchRoleDetail, ROLES_ROOT, toRoles } from './api/roles.api';
 export type { RolesData } from './api/roles.api';
 export { fetchUserDetail, fetchUserMemberships, USERS_ROOT, toUsersPage } from './api/users.api';
 export type { UsersData, UsersPage } from './api/users.api';
+export { reloadAdminHolders } from './model/admin-holders.load';
+export { $adminHolders, receiveAdminHolders } from './model/admin-holders.store';
 export { createGroup, updateGroup } from './model/group-commands';
 export type { GroupDraft, GroupEdit } from './model/group-commands';
 export { evictGroupDetail, forgetGroupDetails, forgetGroups } from './model/group-detail.load';
@@ -94,7 +98,7 @@ export type {
   PrincipalNameCheckState,
   PrincipalNameCheckStatus,
 } from './model/principal-name-check.store';
-export { principalLockPending } from './model/principal-lock';
+export { administratorLock, principalLockPending } from './model/principal-lock';
 export type { PrincipalLock } from './model/principal-lock';
 export { splitMembers } from './model/principal-members';
 export type { PrincipalMembers } from './model/principal-members';
@@ -192,7 +196,11 @@ export { useIdProviderNames } from './model/useIdProviderNames';
 export { useIdProviderPermissions } from './model/useIdProviderPermissions';
 export { useIdProviderPrincipals } from './model/useIdProviderPrincipals';
 export { useIdProviders } from './model/useIdProviders';
-export { usePrincipalLock } from './model/usePrincipalLock';
+export {
+  useAdministratorLock,
+  useAdministratorOnly,
+  usePrincipalLock,
+} from './model/usePrincipalLock';
 export { useRole } from './model/useRole';
 export { useRoles } from './model/useRoles';
 export { useTransitiveMemberships } from './model/useTransitiveMemberships';

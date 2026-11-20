@@ -2,7 +2,8 @@ import { AppError } from '@enonic/ui-utils';
 import { errAsync, okAsync } from 'neverthrow';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { runStepDialogSave, type StepDialogSaveOptions } from './step-dialog-save';
+import { setPhrases } from '../i18n';
+import { failureNotice, runStepDialogSave, type StepDialogSaveOptions } from './step-dialog-save';
 import { createStepDialogStore } from './step-dialog.store';
 import { defineSteps } from './steps';
 
@@ -130,17 +131,28 @@ describe('runStepDialogSave', () => {
     );
   });
 
-  it('keeps a failed save open, unbusy, with a toast', async () => {
+  it('keeps a failed save open, unbusy, with a toast saying why', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    setPhrases({ 'browse.dialog.failedReason': '{0}: {1}' }, 'en');
     store.open({ mode: 'edit', entity: ALICE });
     store.update({ displayName: 'Alice Cooper' });
-    const opts = options({ write: () => errAsync(new AppError('refused')) });
+    const opts = options({
+      write: () =>
+        errAsync(
+          new AppError(
+            'Exception while fetching data (/updateUser) : [user:corp:alice] can only be modified by an administrator',
+          ),
+        ),
+    });
 
     await runStepDialogSave(store, opts);
 
     const { open, saving } = store.$state.get();
     expect({ open, saving }).toEqual({ open: true, saving: false });
-    expect(opts.notify).toHaveBeenCalledWith('error', '#notify.updateFailed#');
+    expect(opts.notify).toHaveBeenCalledWith(
+      'error',
+      '#notify.updateFailed#: [user:corp:alice] can only be modified by an administrator',
+    );
     expect(opts.onSaved).not.toHaveBeenCalled();
   });
 
@@ -158,5 +170,12 @@ describe('runStepDialogSave', () => {
     await runStepDialogSave(store, opts);
 
     expect(busy).toBe(true);
+  });
+});
+
+describe('failureNotice', () => {
+  it('says what failed alone when the server gave no reason', () => {
+    expect(failureNotice('Could not save', undefined)).toBe('Could not save');
+    expect(failureNotice('Could not save', { message: '  ' })).toBe('Could not save');
   });
 });

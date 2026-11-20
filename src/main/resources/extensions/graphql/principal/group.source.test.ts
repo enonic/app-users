@@ -6,9 +6,10 @@ import {
   getMembers,
   getMemberships,
   getPrincipal,
+  type Group,
+  hasRole,
   modifyGroup,
   removeMembers,
-  type Group,
   type Role,
   type User,
 } from '/lib/xp/auth';
@@ -79,6 +80,11 @@ function remoteProvider(key: string): LibIdProvider {
 function found(hits: Group[]) {
   return { total: hits.length, count: hits.length, hits };
 }
+
+// An administrator unless a test says otherwise: what only one may do has its own describe below.
+beforeEach(() => {
+  vi.mocked(hasRole).mockReturnValue(true);
+});
 
 afterEach(() => {
   vi.resetAllMocks();
@@ -481,5 +487,78 @@ describe('writes a remote system owns', () => {
     createGroup('remote', 'staff', { displayName: 'Staff', members: [], roles: [] });
 
     expect(vi.mocked(createGroupPrincipal)).toHaveBeenCalled();
+  });
+});
+
+describe('a group that holds the administrator role, for a caller without it', () => {
+  beforeEach(() => {
+    providerStore([localProvider('store')]);
+    vi.mocked(hasRole).mockImplementation((key) => key === 'role:system.user.admin');
+    vi.mocked(getMembers).mockImplementation((key) =>
+      key === 'role:system.admin' ? [group('group:store:ops', 'Ops')] : [],
+    );
+    vi.mocked(modifyGroup).mockImplementation(({ editor }) =>
+      editor(group('group:store:ops', 'Ops')),
+    );
+  });
+
+  function changes(overrides: Partial<GroupChanges> = {}): GroupChanges {
+    return {
+      displayName: 'Ops',
+      addMembers: [],
+      removeMembers: [],
+      addRoles: [],
+      removeRoles: [],
+      ...overrides,
+    };
+  }
+
+  it.each([
+    { what: 'gains', change: { addMembers: ['user:store:mallory' as const] } },
+    { what: 'loses', change: { removeMembers: ['user:store:alice' as const] } },
+  ])('$what no member, and nothing is written at all', ({ change }) => {
+    expect(() => updateGroup('group:store:ops', changes(change))).toThrow(
+      'Members of [group:store:ops] can only be changed by an administrator',
+    );
+    expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(removeMembers)).not.toHaveBeenCalled();
+  });
+
+  it('still takes a new display name and description', () => {
+    updateGroup('group:store:ops', changes({ displayName: 'Operations', description: 'On call' }));
+
+    expect(vi.mocked(modifyGroup)).toHaveBeenCalled();
+  });
+
+  it('still joins and leaves other roles', () => {
+    updateGroup('group:store:ops', changes({ addRoles: ['role:editors'] }));
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:editors', ['group:store:ops']);
+  });
+
+  it('does not let another group into the administrator role, by an edit or at creation', () => {
+    expect(() =>
+      updateGroup('group:store:sales', changes({ addRoles: ['role:system.admin'] })),
+    ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+    expect(() =>
+      createGroup('store', 'sales', {
+        displayName: 'Sales',
+        members: [],
+        roles: ['role:system.admin'],
+      }),
+    ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+    expect(vi.mocked(createGroupPrincipal)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
+  });
+
+  it('leaves the members of any other group open', () => {
+    vi.mocked(modifyGroup).mockImplementation(({ editor }) =>
+      editor(group('group:store:sales', 'Sales')),
+    );
+
+    updateGroup('group:store:sales', changes({ addMembers: ['user:store:alice'] }));
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('group:store:sales', ['user:store:alice']);
   });
 });

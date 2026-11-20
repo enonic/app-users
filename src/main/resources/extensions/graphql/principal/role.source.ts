@@ -11,6 +11,7 @@ import {
   type RoleKey,
 } from '/lib/xp/auth';
 
+import { administratorOnlyKeys, requireChangeableMembers } from '../auth/administrator';
 import {
   ADMIN_ROLE,
   isImplicitRole,
@@ -101,6 +102,10 @@ export function updateRole(key: string, changes: RoleChanges): Role {
   // ! separate writes, and XP refuses an implicit role's members only once the rename has applied.
   if (isImplicitRole(key) && changes.addMembers.length + changes.removeMembers.length > 0) {
     throw new Error(`Cannot change the members of [${key}]: the platform implies them`);
+  }
+
+  if (changes.addMembers.length + changes.removeMembers.length > 0) {
+    requireChangeableMembers(administratorOnlyKeys(), [key]);
   }
 
   if (isPlatformRole(key)) {

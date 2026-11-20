@@ -5,14 +5,16 @@ import {
   changePassword,
   createUser as createUserPrincipal,
   findUsers,
+  getMembers,
   getMemberships,
   getPrincipal,
   getProfile,
   getUser as getCaller,
+  type Group,
+  hasRole,
   modifyProfile,
   modifyUser,
   removeMembers,
-  type Group,
   type Role,
   type User,
 } from '/lib/xp/auth';
@@ -107,6 +109,11 @@ function found(hits: User[], total = hits.length) {
 function calledWith() {
   return vi.mocked(findUsers).mock.calls[0]?.[0];
 }
+
+// An administrator unless a test says otherwise: what only one may do has its own describe below.
+beforeEach(() => {
+  vi.mocked(hasRole).mockReturnValue(true);
+});
 
 afterEach(() => {
   vi.resetAllMocks();
@@ -1147,5 +1154,98 @@ describe('writes a remote system owns', () => {
     expect(() => removePublicKey('user:remote:alice', 'abc123')).toThrow(/remote/);
 
     expect(vi.mocked(modifyProfile)).not.toHaveBeenCalled();
+  });
+});
+
+describe('a user who holds the administrator role, for a caller without it', () => {
+  beforeEach(() => {
+    boundProviders();
+    vi.mocked(hasRole).mockImplementation((key) => key === 'role:system.user.admin');
+    // alice holds the role through the ops group; bob holds nothing.
+    vi.mocked(getMembers).mockImplementation((key) => {
+      if (key === 'role:system.admin') {
+        return [group('group:system:ops', 'Ops')];
+      }
+      return key === 'group:system:ops' ? [user('alice', 'Alice')] : [];
+    });
+    vi.mocked(getPrincipal).mockImplementation((key) =>
+      key === 'user:system:alice' ? user('alice', 'Alice') : user('bob', 'Bob'),
+    );
+  });
+
+  function changes(overrides: Partial<UserChanges> = {}): UserChanges {
+    return {
+      displayName: 'Alice',
+      addRoles: [],
+      removeRoles: [],
+      addGroups: [],
+      removeGroups: [],
+      ...overrides,
+    };
+  }
+
+  function nothingWritten() {
+    expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    expect(vi.mocked(removeMembers)).not.toHaveBeenCalled();
+  }
+
+  it.each([
+    { what: 'the display name', change: { displayName: 'Mallory' } },
+    { what: 'the email', change: { email: 'mallory@example.com' } },
+    { what: 'the password', change: { password: 'hunter2' } },
+    { what: 'the disabled flag', change: { disabled: true } },
+  ])('keeps $what, and a membership sent along is not applied either', ({ change }) => {
+    expect(() =>
+      updateUser('user:system:alice', changes({ ...change, addRoles: ['role:editors'] })),
+    ).toThrow('[user:system:alice] can only be modified by an administrator');
+    nothingWritten();
+  });
+
+  it('joins another role without a write to the user itself, which the platform would refuse', () => {
+    updateUser('user:system:alice', changes({ addRoles: ['role:editors'] }));
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:editors', ['user:system:alice']);
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { what: 'joins the administrator role', change: { addRoles: ['role:system.admin' as const] } },
+    {
+      what: 'leaves the administrator role',
+      change: { removeRoles: ['role:system.admin' as const] },
+    },
+    { what: 'joins a group that holds it', change: { addGroups: ['group:system:ops' as const] } },
+    {
+      what: 'leaves a group that holds it',
+      change: { removeGroups: ['group:system:ops' as const] },
+    },
+  ])('no user $what, and nothing is written at all', ({ change }) => {
+    expect(() =>
+      updateUser('user:system:bob', changes({ displayName: 'Robert', ...change })),
+    ).toThrow(
+      /^Members of \[(role:system\.admin|group:system:ops)\] can only be changed by an administrator$/,
+    );
+    nothingWritten();
+  });
+
+  it('is not created into a group that holds the role: no user is left behind without it', () => {
+    expect(() =>
+      createUser('system', 'mallory', {
+        displayName: 'Mallory',
+        roles: [],
+        groups: ['group:system:ops'],
+      }),
+    ).toThrow('Members of [group:system:ops] can only be changed by an administrator');
+    expect(vi.mocked(createUserPrincipal)).not.toHaveBeenCalled();
+  });
+
+  it('still writes the fields of every other user', () => {
+    vi.mocked(modifyUser).mockImplementation(({ editor }) => editor(user('bob', 'Bob')));
+
+    expect(updateUser('user:system:bob', changes({ displayName: 'Robert' })).displayName).toBe(
+      'Robert',
+    );
   });
 });

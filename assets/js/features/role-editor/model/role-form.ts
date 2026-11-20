@@ -94,7 +94,22 @@ export function sameRoleForm(saved: RoleForm, edited: RoleForm): boolean {
   );
 }
 
-export function validateRoleForm(form: RoleForm, mode: StepDialogMode): RoleFormErrors {
+// The platform's own roles and every project's. XP reads the name in lower case, so `CMS.x` is in too.
+const RESERVED_ROLE_NAMESPACES = ['system.', 'cms.'];
+
+export type RoleFormContext = {
+  /**
+   * Whether the caller holds `system.admin`, who alone may create a role in a reserved namespace
+   * (enonic/xp#12615). Absent, the caller is taken not to.
+   */
+  administrator?: boolean;
+};
+
+export function validateRoleForm(
+  form: RoleForm,
+  mode: StepDialogMode,
+  { administrator = false }: RoleFormContext = {},
+): RoleFormErrors {
   const errors: RoleFormErrors = {};
 
   if (form.displayName.trim().length === 0) {
@@ -109,8 +124,15 @@ export function validateRoleForm(form: RoleForm, mode: StepDialogMode): RoleForm
       errors.name = 'roles.dialog.idReserved';
     } else if (isIllegalPrincipalName(name)) {
       errors.name = 'roles.dialog.idInvalid';
+    } else if (!administrator && inReservedNamespace(name)) {
+      errors.name = 'roles.dialog.idReservedNamespace';
     }
   }
 
   return errors;
+}
+
+function inReservedNamespace(name: string): boolean {
+  const lowered = name.toLowerCase();
+  return RESERVED_ROLE_NAMESPACES.some((namespace) => lowered.startsWith(namespace));
 }

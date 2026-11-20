@@ -5,6 +5,7 @@ import { useState } from 'preact/hooks';
 import {
   principalName,
   splitMembers,
+  useAdministratorLock,
   useIdProviderName,
   usePrincipalLock,
   useTransitiveMemberships,
@@ -32,7 +33,12 @@ export function GroupDetails({
 }: GroupDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
-  const { locked, reasonKey } = usePrincipalLock(group.key, 'group');
+  const { locked, reasonKey: providerReasonKey } = usePrincipalLock(group.key, 'group');
+  // ! The members alone: the name and description of a group that holds the administrator role stay
+  // ! open, and so do the roles it is in.
+  const adminLock = useAdministratorLock(group.key);
+  const membersLocked = locked || adminLock.locked;
+  const reasonKey = providerReasonKey ?? adminLock.reasonKey;
 
   const editLabel = useI18n('browse.details.edit');
   const lockedLabel = useI18n(reasonKey ?? 'principal.details.lockedExternal');
@@ -153,7 +159,7 @@ export function GroupDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editUsersLabel}
-              locked={locked}
+              locked={membersLocked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
@@ -169,7 +175,7 @@ export function GroupDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editServiceAccountsLabel}
-              locked={locked}
+              locked={membersLocked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
@@ -194,7 +200,7 @@ export function GroupDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editGroupsLabel}
-              locked={locked}
+              locked={membersLocked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
