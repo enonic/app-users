@@ -26,7 +26,6 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
       displayName: PROVIDER_NAME,
       //id: 'my-provider-id1',
       description: 'description',
-      application: 'Standard ID Provider',
     });
     // 1. Create a new ID provider in the editor (not via the API).
     await settingsUtils.createIdProvider(ID_PROVIDER);
@@ -79,9 +78,9 @@ describe('idprovider.in.use.delete.spec - an ID provider in use by a user cannot
     // 2. Verify that Delete button is disabled because the ID provider is being used by a user.
     await idProvidersPage.waitForDeleteButtonDisabled();
     await idProvidersPage.waitForNewButtonEnabled();
-    // 3. Verify that the application of the ID provider is correct.
+    // 3. Bound to no application: the row shows none.
     let application = await idProvidersPage.getProviderApplication(PROVIDER_NAME);
-    assert.equal(application, ID_PROVIDER.application);
+    assert.equal(application, undefined);
   });
 
   // Deleting takes a typed confirmation: the dialog names the user and the Delete button stays

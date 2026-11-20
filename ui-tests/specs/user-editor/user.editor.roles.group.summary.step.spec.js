@@ -35,14 +35,9 @@ describe("user.editor.roles.group.summary.step.spec - the user editor's Roles, G
   // user's provider, one in the system's.
   it('GIVEN the suite starts THEN an ID provider for its user AND two groups should be created via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
-    let idProvider = userItemsBuilder.buildIdProvider(
-      PROVIDER_NAME,
-      'description',
-      'Standard ID Provider',
-      {
-        'role:system.user.admin': appConst.ID_PROVIDER_ACCESS.WRITE_USERS,
-      },
-    );
+    let idProvider = userItemsBuilder.buildIdProvider(PROVIDER_NAME, 'description', undefined, {
+      'role:system.user.admin': appConst.ID_PROVIDER_ACCESS.WRITE_USERS,
+    });
     ID_PROVIDER = await settingsUtils.createIdProviderViaApi(idProvider);
 
     GROUP_SYSTEM = await settingsUtils.createGroupViaApi(

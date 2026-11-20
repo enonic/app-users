@@ -4,13 +4,14 @@ import {
   findPrincipals,
   getMembers,
   getPrincipal,
+  type Group,
+  hasRole,
   modifyRole,
   removeMembers,
-  type Group,
   type Role,
   type User,
 } from '/lib/xp/auth';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   createRole,
@@ -55,6 +56,11 @@ function group(key: string, displayName: string): Group {
     modifiedTime: '2026-08-01T10:00:00Z',
   };
 }
+
+// An administrator unless a test says otherwise: what only one may do has its own describe below.
+beforeEach(() => {
+  vi.mocked(hasRole).mockReturnValue(true);
+});
 
 afterEach(() => {
   vi.resetAllMocks();
@@ -387,5 +393,41 @@ describe('updateRole', () => {
 
     expect(() => updateRole('role:gone', changes())).toThrow('No role answers to [role:gone]');
     expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+  });
+});
+
+describe('updateRole, for a caller without the administrator role', () => {
+  beforeEach(() => {
+    vi.mocked(hasRole).mockImplementation((key) => key === 'role:system.user.admin');
+    vi.mocked(getMembers).mockReturnValue([]);
+  });
+
+  it('keeps the members of the administrator role, writing nothing at all', () => {
+    expect(() =>
+      updateRole('role:system.admin', {
+        displayName: 'Administrator',
+        addMembers: ['user:corp:mallory'],
+        removeMembers: [],
+      }),
+    ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+    expect(vi.mocked(modifyRole)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+  });
+
+  it("changes the members of any other role, the user administrators' included", () => {
+    vi.mocked(getPrincipal).mockReturnValue(role('role:system.user.admin', 'Users Administrator'));
+    vi.mocked(modifyRole).mockImplementation(({ editor }) =>
+      editor(role('role:system.user.admin', 'Users Administrator')),
+    );
+
+    updateRole('role:system.user.admin', {
+      displayName: 'Users Administrator',
+      addMembers: ['user:corp:alice'],
+      removeMembers: [],
+    });
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:system.user.admin', [
+      'user:corp:alice',
+    ]);
   });
 });

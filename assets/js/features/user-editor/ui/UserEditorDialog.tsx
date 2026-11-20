@@ -5,7 +5,7 @@ import { useEffect } from 'preact/hooks';
 import { createUser, updateUser, type User } from '../../../entities/principal';
 import { useHostFrame } from '../../../shared/host';
 import { i18n } from '../../../shared/i18n';
-import { runStepDialogSave, type StepDialogMode } from '../../../shared/step-dialog';
+import { failureNotice, runStepDialogSave, type StepDialogMode } from '../../../shared/step-dialog';
 import { StepDialog } from '../../../shared/step-dialog/StepDialog';
 import { downloadPrivateKey } from '../model/key-file';
 import { applyPublicKeyChanges } from '../model/public-key-writes';
@@ -76,14 +76,14 @@ export function UserEditorDialog({
   // The keys are written against a user that now exists, and the private half of a generated pair
   // reaches its owner here — the only moment it can be named after the key the server stored.
   const writeStagedPublicKeys = async (written: User, form: UserForm): Promise<void> => {
-    const { downloads, failed } = await applyPublicKeyChanges(written.key, form);
+    const { downloads, failed, failure } = await applyPublicKeyChanges(written.key, form);
 
     downloads.forEach(({ pair, stored }) => {
       notify('success', i18n('users.notify.keySaved', downloadPrivateKey(written, pair, stored)));
     });
 
     if (failed > 0) {
-      notify('error', i18n('users.notify.keysFailed'));
+      notify('error', failureNotice(i18n('users.notify.keysFailed'), failure));
     }
   };
 

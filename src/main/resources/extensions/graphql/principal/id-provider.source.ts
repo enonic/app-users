@@ -14,7 +14,7 @@ import {
 import { getDescriptor } from '/lib/xp/app';
 import { findPrincipals, getIdProviders, type IdProvider } from '/lib/xp/auth';
 
-import { isReadOnlyCaller } from '../auth/read-only';
+import { isAdministratorCaller, requireIdProviderAdministrator } from '../auth/administrator';
 import {
   byName,
   displayNameOf,
@@ -75,14 +75,15 @@ export function boundApplicationOf(provider: IdProvider): BoundApplication | nul
 }
 
 /**
- * The configuration the binding holds, as typed properties. Empty for a caller that may only read: the
- * tree carries the login's secrets — a client secret, a bind password — and only a writer edits it.
+ * The configuration the binding holds, as typed properties. Empty for anyone but an administrator: the
+ * tree carries the login's secrets — a client secret, a bind password — and since enonic/xp#12615 only an
+ * administrator may write a provider, so nobody else has a reason to read them.
  *
  * Its own read rather than part of the provider: `getIdProviders` hands the config over as a plain object,
  * which has already lost which values are `Reference`s.
  */
 export function configOf({ idProvider }: BoundApplication): IdProviderConfigProperty[] {
-  if (isReadOnlyCaller()) {
+  if (!isAdministratorCaller()) {
     return [];
   }
 
@@ -170,6 +171,8 @@ export type IdProviderDeletion = {
 };
 
 export function createIdProvider(name: string, input: IdProviderInput): IdProvider {
+  requireIdProviderAdministrator(name);
+
   const provider = createProvider({
     key: name,
     displayName: input.displayName,
@@ -188,6 +191,9 @@ export function createIdProvider(name: string, input: IdProviderInput): IdProvid
 
 /** Null when no provider answers to the key, which is an answer rather than a failure. */
 export function updateIdProvider(key: string, changes: IdProviderInput): IdProvider | null {
+  // ! Before `bindingFor` below reads the stored configuration, secrets and all.
+  requireIdProviderAdministrator(key);
+
   const provider = updateProvider({
     idProvider: key,
     displayName: changes.displayName,
@@ -199,7 +205,16 @@ export function updateIdProvider(key: string, changes: IdProviderInput): IdProvi
   return provider == null ? null : toSource(provider);
 }
 
+/** One outcome per key for a caller who may delete none of them too, as the field promises. */
 export function deleteIdProviders(keys: readonly string[]): IdProviderDeletion[] {
+  if (!isAdministratorCaller()) {
+    return keys.map((key) => ({
+      key,
+      deleted: false,
+      reason: `[${key}] id provider can only be managed by an administrator`,
+    }));
+  }
+
   return deleteProviders({ idProviders: [...keys] });
 }
 

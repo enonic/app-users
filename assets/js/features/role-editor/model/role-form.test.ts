@@ -225,3 +225,31 @@ describe('ROLE_FORM_FIELDS', () => {
     );
   });
 });
+
+describe('validateRoleForm, for the reserved namespaces', () => {
+  it.each(['system.custom', 'cms.project.next.owner', 'CMS.custom', 'System.X'])(
+    'refuses %s to a caller without the administrator role',
+    (name) => {
+      expect(validateRoleForm(form({ name }), 'create').name).toBe(
+        'roles.dialog.idReservedNamespace',
+      );
+    },
+  );
+
+  it('lets an administrator create a role in a reserved namespace', () => {
+    expect(
+      validateRoleForm(form({ name: 'cms.custom' }), 'create', { administrator: true }).name,
+    ).toBeUndefined();
+  });
+
+  it.each(['systematic', 'cmsx', 'my.system.role'])(
+    'passes %s, which only looks like one',
+    (name) => {
+      expect(validateRoleForm(form({ name }), 'create').name).toBeUndefined();
+    },
+  );
+
+  it('says nothing while editing a role that is in one', () => {
+    expect(validateRoleForm(form({ name: 'system.admin' }), 'edit').name).toBeUndefined();
+  });
+});

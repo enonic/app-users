@@ -13,6 +13,7 @@ vi.mock('../shared/api', () => ({ requestGraphQlRoots, setGraphQlEndpoint }));
 const CONFIG = {
   appId: 'com.enonic.xp.app.users',
   appVersion: '8.1.0',
+  administrator: false,
   eventsUrl: '/_/admin:events',
   readOnlyMode: false,
   userKey: 'user:system:su',
@@ -36,16 +37,18 @@ function answers(data: unknown, message?: string) {
 async function run(locale = 'en') {
   vi.resetModules();
 
-  const [{ bootstrap }, { $bootstrap }, { $config }, { $phrases }] = await Promise.all([
-    import('./bootstrap'),
-    import('./bootstrap.store'),
-    import('../shared/config'),
-    import('../shared/i18n'),
-  ]);
+  const [{ bootstrap }, { $bootstrap }, { $config }, { $phrases }, { $adminHolders }] =
+    await Promise.all([
+      import('./bootstrap'),
+      import('./bootstrap.store'),
+      import('../shared/config'),
+      import('../shared/i18n'),
+      import('../entities/principal'),
+    ]);
 
   await bootstrap(host(locale));
 
-  return { bootstrap, $bootstrap, $config, $phrases };
+  return { bootstrap, $bootstrap, $config, $phrases, $adminHolders };
 }
 
 beforeEach(() => {
@@ -55,6 +58,27 @@ beforeEach(() => {
 });
 
 describe('bootstrap', () => {
+  it('keeps the holders of the administrator role the same document read', async () => {
+    answers({
+      config: CONFIG,
+      phrases: PHRASES,
+      adminHolders: ['role:system.admin', 'user:system:su'],
+    });
+
+    const { $adminHolders } = await run();
+
+    expect([...$adminHolders.get()]).toEqual(['role:system.admin', 'user:system:su']);
+  });
+
+  it('still starts when the holders could not be read, locking nothing', async () => {
+    answers({ config: CONFIG, phrases: PHRASES, adminHolders: null }, 'Denied');
+
+    const { $bootstrap, $adminHolders } = await run();
+
+    expect($bootstrap.get()).toEqual({ status: 'ready' });
+    expect($adminHolders.get().size).toBe(0);
+  });
+
   it('fills both stores from one document', async () => {
     const { $bootstrap, $config, $phrases } = await run();
 
@@ -72,7 +96,7 @@ describe('bootstrap', () => {
       { values: Record<string, unknown> },
     ];
 
-    expect(roots.map((root) => root.field)).toEqual(['config', 'phrases']);
+    expect(roots.map((root) => root.field)).toEqual(['config', 'phrases', 'adminHolders']);
     expect(name).toBe('Bootstrap');
     expect(options.values).toEqual({ locale: 'no' });
   });

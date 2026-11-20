@@ -17,7 +17,7 @@ import {
   ID_PROVIDER_ACCESS_LEVELS,
   openIdProviderEditorAt,
 } from '../../features/idprovider-editor';
-import { isReadOnlyMode } from '../../shared/config';
+import { isAdministrator, isReadOnlyMode } from '../../shared/config';
 import { useI18n, useLabelled } from '../../shared/i18n';
 import { DetailsPanel } from '../../widgets/details-panel/DetailsPanel';
 import { DetailsListSkeleton } from '../../widgets/details-panel/DetailsSkeleton';
@@ -48,7 +48,8 @@ export function IdProviderDetails({
   permissionsFailed,
   'data-component': componentName = ID_PROVIDER_DETAILS_NAME,
 }: IdProviderDetailsProps) {
-  const readOnly = isReadOnlyMode();
+  // Only an administrator manages a provider (enonic/xp#12615); anyone else reads it.
+  const readOnly = isReadOnlyMode() || !isAdministrator();
   const editLabel = useI18n('browse.details.edit');
   const editPermissionsLabel = useI18n('idProviders.details.editPermissions');
   const permissionsFailedLabel = useI18n('idProviders.details.permissionsFailed');

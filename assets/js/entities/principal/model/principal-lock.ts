@@ -1,6 +1,6 @@
 import { allowsWrite, type PrincipalWrite } from './id-provider-mode';
 import type { IdProviderNamesState } from './id-providers.store';
-import type { IdProviderMode } from './principal.types';
+import type { IdProviderMode, PrincipalKey } from './principal.types';
 
 export type PrincipalLock = {
   locked: boolean;
@@ -41,4 +41,19 @@ export function principalLock(
  */
 export function principalLockPending(providers: IdProviderNamesState): boolean {
   return providers.status === 'loading' && providers.items.length === 0;
+}
+
+/**
+ * Whether the caller is kept from a principal because it holds `role:system.admin`: only an
+ * administrator may change such a user or delete it, or change the members of such a group or of the
+ * role. Open for a principal not created yet, which holds nothing.
+ */
+export function administratorLock(
+  key: PrincipalKey | undefined,
+  holders: ReadonlySet<string>,
+  administrator: boolean,
+): PrincipalLock {
+  return !administrator && key !== undefined && holders.has(key)
+    ? { locked: true, reasonKey: 'principal.details.lockedAdministrator' }
+    : { locked: false };
 }

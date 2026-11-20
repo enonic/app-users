@@ -6,6 +6,7 @@ import { useState } from 'preact/hooks';
 import {
   isSystemUser,
   principalName,
+  useAdministratorLock,
   useTransitiveMemberships,
   type PrincipalRef,
   type UserDetail,
@@ -37,7 +38,12 @@ export function ServiceAccountDetails({
   const editLabel = useI18n('browse.details.edit');
   const emailNotSetLabel = useI18n('users.details.emailNotSet');
   const systemLabel = useI18n('principal.type.system');
-  const lockedLabel = useI18n('principal.details.lockedPlatform');
+  const adminLock = useAdministratorLock(user.key);
+  const lockedLabel = useI18n(
+    isSystemUser(user.key)
+      ? 'principal.details.lockedPlatform'
+      : 'principal.details.lockedAdministrator',
+  );
   const editCredentialsLabel = useI18n('users.details.editCredentials');
   const editRolesLabel = useI18n('users.details.editRoles');
   const editGroupsLabel = useI18n('users.details.editGroups');
@@ -54,6 +60,9 @@ export function ServiceAccountDetails({
   const { key, displayName, login, email, hasPassword, disabled, publicKeys } = user;
 
   const system = isSystemUser(key);
+  // ! The account's own fields, its password and its public keys. An account the platform owns keeps
+  // ! its memberships too; one that merely holds the administrator role keeps them open, as a user does.
+  const fieldsLocked = system || adminLock.locked;
 
   // ? Without a group to inherit through, the toggle has nothing to add — and no request to find out.
   const inheritable = user.groups.length > 0;
@@ -78,7 +87,7 @@ export function ServiceAccountDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editLabel}
-              locked={system}
+              locked={fieldsLocked}
               onClick={() => openServiceAccountEditorAt(user, 'general')}
             />
           )
@@ -93,7 +102,7 @@ export function ServiceAccountDetails({
             {email ?? emailNotSetLabel}
           </DetailsPanel.Field>
         )}
-        {system && (
+        {fieldsLocked && (
           <DetailsPanel.Field labelKey="principal.details.editing">
             {lockedLabel}
           </DetailsPanel.Field>
@@ -106,7 +115,7 @@ export function ServiceAccountDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editCredentialsLabel}
-              locked={system}
+              locked={fieldsLocked}
               onClick={() => openServiceAccountEditorAt(user, 'credentials')}
             />
           )

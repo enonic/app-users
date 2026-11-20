@@ -6,6 +6,7 @@ import {
   DEFAULT_PRINCIPAL_SORT,
   forgetUserDetails,
   replaceUser,
+  useAdministratorOnly,
   useUsers,
   type PrincipalSort,
 } from '../../entities/principal';
@@ -78,7 +79,8 @@ export function UsersPage() {
   ) satisfies readonly BrowseSortOption<PrincipalSort>[];
 
   const canCreate = creatable.length > 0;
-  const actions = useMemo(() => createUserActions(canCreate), [canCreate]);
+  const adminOnly = useAdministratorOnly();
+  const actions = useMemo(() => createUserActions(canCreate, adminOnly), [canCreate, adminOnly]);
 
   // ! The values come from the provider list, never from the rows: the rows are one page, so a provider
   // ! the page happens not to contain would disappear from the filter while still narrowing the query.

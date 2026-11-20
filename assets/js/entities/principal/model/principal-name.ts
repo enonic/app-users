@@ -1,6 +1,11 @@
 // XP stores a principal under its key lowercased as the node id, which must match `[a-z0-9_.:-]+`.
 const PRINCIPAL_NAME = /^[A-Za-z0-9_.-]+$/;
 
+// ! A new ID provider's key takes no dot (enonic/xp#12615): it becomes a level of the vhost configuration,
+// ! `mapping.<name>.idProvider.<key>`, where a dot would split it. A stored key with one keeps working,
+// ! and is never checked here — a key cannot change once the provider exists.
+const ID_PROVIDER_NAME = /^[A-Za-z0-9_-]+$/;
+
 // XP's `NameValidator` refuses these as a whole name.
 const RESERVED_NAMES: ReadonlySet<string> = new Set(['_', '.', '..']);
 
@@ -29,7 +34,6 @@ const NON_LATIN_LETTERS = /[^\P{L}a-z]/gu;
 
 const NOT_IN_NAME = /[^a-z0-9_.-]+/g;
 
-// A dot in an ID provider's key makes the vhost configuration key that carries it ambiguous.
 const NOT_IN_ID_PROVIDER_NAME = /[^a-z0-9_-]+/g;
 
 const SPACED_SEPARATOR = / *([._-]) */g;
@@ -51,7 +55,7 @@ export function isReservedPrincipalName(name: string): boolean {
 }
 
 export function isIllegalIdProviderName(name: string): boolean {
-  return isIllegalPrincipalName(name) || isReservedIdProviderName(name);
+  return !ID_PROVIDER_NAME.test(name) || isReservedIdProviderName(name);
 }
 
 export function isReservedIdProviderName(name: string): boolean {

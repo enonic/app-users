@@ -80,6 +80,17 @@ type GraphQlBody<T> = {
   errors?: GraphQlError[];
 };
 
+// What graphql-java puts in front of the message of an exception a resolver threw.
+const RESOLVER_EXCEPTION_PREFIX = /Exception while fetching data \([^)]*\) : /g;
+
+/**
+ * What the server said, without graphql-java's wrapping. A refusal of XP's is written for a person —
+ * `[user:corp:alice] can only be modified by an administrator` — and the prefix in front of it is not.
+ */
+export function serverReason(message: string): string {
+  return message.replace(RESOLVER_EXCEPTION_PREFIX, '').trim();
+}
+
 function readErrorMessage(error: GraphQlError | undefined): string {
   const { message } = error ?? {};
   return typeof message === 'string' && message.length > 0 ? message : 'GraphQL request failed';

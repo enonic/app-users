@@ -18,6 +18,7 @@ describe('startSectionEvents', () => {
     setConfig({
       appId: 'com.enonic.xp.app.users',
       appVersion: '8.1.0',
+      administrator: false,
       eventsUrl: '/_/admin:events',
       readOnlyMode: false,
       userKey: 'user:system:su',

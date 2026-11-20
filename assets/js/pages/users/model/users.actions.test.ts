@@ -70,3 +70,19 @@ describe('delete user', () => {
     expect(action('delete').enabled(context({ selected: [jane, su] }))).toBe(false);
   });
 });
+
+describe('Delete, when a target holds the administrator role and the caller does not', () => {
+  const holder = { key: 'user:corp:alice', displayName: 'Holder' } as never;
+  const other = { key: 'user:corp:alice-other', displayName: 'Other' } as never;
+  const remove = createUserActions(true, new Set(['user:corp:alice'])).find(
+    ({ id }) => id === 'delete',
+  );
+
+  it('is not offered for a selection it is part of', () => {
+    expect(remove?.enabled({ selected: [holder, other], active: undefined })).toBe(false);
+  });
+
+  it('is offered for the rest', () => {
+    expect(remove?.enabled({ selected: [other], active: undefined })).toBe(true);
+  });
+});

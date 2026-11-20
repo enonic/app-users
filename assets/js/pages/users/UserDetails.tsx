@@ -4,6 +4,7 @@ import { useState } from 'preact/hooks';
 
 import {
   principalName,
+  useAdministratorLock,
   useIdProviderName,
   usePrincipalLock,
   useTransitiveMemberships,
@@ -30,7 +31,12 @@ export function UserDetails({
 }: UserDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
-  const { locked, reasonKey } = usePrincipalLock(user.key, 'user');
+  const providerLock = usePrincipalLock(user.key, 'user');
+  const adminLock = useAdministratorLock(user.key);
+  // ! The fields and the credentials; the roles and groups stay open either way, for the reason
+  // ! `updateUser` gives on the server.
+  const locked = providerLock.locked || adminLock.locked;
+  const reasonKey = providerLock.reasonKey ?? adminLock.reasonKey;
 
   const editLabel = useI18n('browse.details.edit');
   const lockedLabel = useI18n(reasonKey ?? 'principal.details.lockedExternal');

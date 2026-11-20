@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { IdProvider } from '../../../entities/principal';
 import { $idProviderEditor, closeIdProviderEditor } from '../../../features/idprovider-editor';
+import { $config, type Config } from '../../../shared/config';
 import type { ActionContext, SectionAction } from '../../../widgets/browse-toolbar/actions';
 import { ID_PROVIDER_ACTIONS } from './id-providers.actions';
 
@@ -46,8 +47,17 @@ function action(id: string): SectionAction<IdProvider> {
   return found;
 }
 
+function callerIs(administrator: boolean): void {
+  $config.set({ administrator } as Config);
+}
+
+beforeEach(() => {
+  callerIs(true);
+});
+
 afterEach(() => {
   closeIdProviderEditor();
+  $config.set(undefined);
 });
 
 describe('ID provider actions', () => {
@@ -84,5 +94,20 @@ describe('delete provider', () => {
   // The platform deletes the provider's whole node path, so groups go with it as silently as users do.
   it('refuses a provider that still has groups', () => {
     expect(action('delete').enabled(context({ selected: [grouped] }))).toBe(false);
+  });
+});
+
+// ! enonic/xp#12615: a user administrator sees the providers and manages none of them.
+describe('ID provider actions for a caller without the administrator role', () => {
+  beforeEach(() => {
+    callerIs(false);
+  });
+
+  it('offers no new provider', () => {
+    expect(action('new').enabled(context())).toBe(false);
+  });
+
+  it('offers no delete, even of an empty provider', () => {
+    expect(action('delete').enabled(context({ active: empty }))).toBe(false);
   });
 });

@@ -1,5 +1,6 @@
 import type { IdProvider } from '../../../entities/principal';
 import { openIdProviderEditor } from '../../../features/idprovider-editor';
+import { isAdministrator } from '../../../shared/config';
 import {
   type ActionContext,
   actionTargets,
@@ -10,13 +11,15 @@ import { idProvidersDeletion } from './deletion.store';
 const SYSTEM_PROVIDER_KEY = 'system';
 
 /**
- * ! The only guard there is: `deleteIdProvider` deletes the provider's node path recursively and refuses
- * ! nothing, so every user and group under it goes too. The counts decide, never the loaded rows — the
- * ! list takes totals without fetching anyone.
+ * ! The guard that matters: `deleteIdProvider` deletes the provider's node path recursively, and all it
+ * ! refuses is the system provider and a caller who is no administrator — so every user and group under
+ * ! any other provider goes too. The counts decide, never the loaded rows — the list takes totals
+ * ! without fetching anyone.
  */
 function deletable(ctx: ActionContext<IdProvider>): boolean {
   const targets = actionTargets(ctx);
   return (
+    isAdministrator() &&
     targets.length > 0 &&
     targets.every(
       ({ key, users, groups }) =>
@@ -30,7 +33,7 @@ export const ID_PROVIDER_ACTIONS: readonly SectionAction<IdProvider>[] = [
     id: 'new',
     labelKey: 'idProviders.action.new',
     shortcut: { code: 'KeyN', alt: true },
-    enabled: () => true,
+    enabled: isAdministrator,
     run: () => openIdProviderEditor({ mode: 'create' }),
   },
   {

@@ -17,6 +17,11 @@ import {
   type UserKey,
 } from '/lib/xp/auth';
 
+import {
+  administratorOnlyKeys,
+  requireChangeableMembers,
+  requireModifiable,
+} from '../auth/administrator';
 import { callerKey } from '../auth/caller';
 import {
   isWritablePrincipal,
@@ -261,6 +266,9 @@ export function removePublicKey(key: string, kid: string): boolean {
 export function createUser(idProvider: string, name: string, input: UserInput): User {
   requireWritable(idProvider, 'user');
   requireWritablePrincipals(input.groups, 'group');
+  if (input.roles.length + input.groups.length > 0) {
+    requireChangeableMembers(administratorOnlyKeys(), [...input.roles, ...input.groups]);
+  }
 
   // ! Every refusal this function owns comes before the first write. There is no transaction around the
   // ! principal, the password and the memberships, so a password refused after `createUserPrincipal` would
@@ -330,6 +338,23 @@ export function updateUser(key: string, changes: UserChanges): User {
     throw new Error(`Cannot disable [${key}]: it is the user making the change`);
   }
 
+  // ! A user who holds the administrator role is an administrator's to change: the fields, the password
+  // ! and the disabled flag. Which other roles and groups such a user is in stays open — the platform
+  // ! guards a member list by its holder, so only the lists of the role and of the groups holding it
+  // ! are closed, for every user alike.
+  const adminOnly = administratorOnlyKeys();
+  const changesFields =
+    changes.password != null || togglesDisabled || changesDisplayNameOrEmail(current, changes);
+  if (changesFields) {
+    requireModifiable(adminOnly, [key]);
+  }
+  requireChangeableMembers(adminOnly, [
+    ...changes.addRoles,
+    ...changes.removeRoles,
+    ...changes.addGroups,
+    ...changes.removeGroups,
+  ]);
+
   if (changes.password != null) {
     requirePassword(changes.password);
 
@@ -347,9 +372,10 @@ export function updateUser(key: string, changes: UserChanges): User {
     changes.removeGroups,
   );
 
-  // ! The platform refuses every `modifyUser` on su and anonymous (enonic/xp#12486), and by here the
-  // ! guards above have established there is no field of theirs to write.
-  if (locked || isSystemUser(key)) {
+  // ! The platform refuses every `modifyUser` on su and anonymous (enonic/xp#12486), and on a user who
+  // ! holds the administrator role when the caller does not (enonic/xp#12615) — a write that changes
+  // ! nothing included. By here the guards above have established there is no field of theirs to write.
+  if (locked || isSystemUser(key) || adminOnly.has(key)) {
     return getUser(key) ?? current;
   }
 
