@@ -36,6 +36,9 @@ describe('idprovider.page.filtering.spec - ID Providers page: a provider made in
     // 1. Create the provider in the editor (not via the API): the id typed over the derived one.
     await settingsUtils.createIdProvider(ID_PROVIDER);
     created = true;
+    // The next tests read the list anew, and the list comes from the search index, which a create
+    // leaves stale for a moment: without the wait the reloaded page can miss the provider.
+    await settingsUtils.waitForIdProviderListed(PROVIDER_ID);
     APPLICATION_KEY = await settingsUtils.resolveIdProviderApplicationKey(APPLICATION);
     // 2. The row shows the id under the display name, the application on the right.
     assert.equal(
