@@ -35,6 +35,10 @@ function buildCss(pageComponent) {
     container: PAGE,
     toolbar: TOOLBAR,
     toolbarButtons: `${TOOLBAR} button[data-component='Toolbar.Item']`,
+    readOnlyBanner: `${PAGE} [data-component='ManagedModeBanner']`,
+    readOnlyBannerTitle: `${PAGE} [data-component='ManagedModeBanner'] span.font-semibold`,
+    readOnlyBannerHelp: `${PAGE} [data-component='ManagedModeBanner'] span.text-subtle`,
+
     toolbarButton: (label) =>
       `${TOOLBAR} button[data-component='Toolbar.Item'][aria-label='${label}']`,
     // Search: the kit's FilterInput (BrowseScreen). Text narrows the list only once Enter has made
@@ -160,11 +164,51 @@ class BrowsePage extends SectionPage {
       );
     }
   }
+  // Read-only mode: the page with the banner where the toolbar would be.
+
+  async waitForLoadedInReadOnlyMode(ms = appConst.TIMEOUT.MEDIUM) {
+    try {
+      await this.waitForElementDisplayed(this.css.container, ms);
+      await this.waitForElementDisplayed(this.css.readOnlyBanner, ms);
+    } catch (err) {
+      await this.handleError(
+          `${this.pageName} was not loaded in read-only mode`,
+          'err_browse_page_read_only',
+          err,
+      );
+    }
+  }
+
+  async isToolbarDisplayed() {
+    const toolbars = await this.findElements(this.css.toolbar);
+    return toolbars.length > 0 && (await toolbars[0].isDisplayed());
+  }
+
+  async isReadOnlyBannerDisplayed() {
+    const banners = await this.findElements(this.css.readOnlyBanner);
+    return banners.length > 0 && (await banners[0].isDisplayed());
+  }
+
+  // 'Read-only mode'
+  async getReadOnlyBannerTitle() {
+    const title = await this.findElement(this.css.readOnlyBannerTitle);
+    return (await title.getText()).trim();
+  }
+
+  // 'Contact your administrator to make changes'
+  async getReadOnlyBannerHelp() {
+    const help = await this.findElement(this.css.readOnlyBannerHelp);
+    return (await help.getText()).trim();
+  }
 
   // Returns aria-labels of the buttons currently rendered in the toolbar, in display order.
   async getToolbarButtonLabels() {
     const buttons = await this.findElements(this.css.toolbarButtons);
-    return await Promise.all(buttons.map((el) => el.getAttribute('aria-label')));
+    const labels = [];
+    for (const button of buttons) {
+      labels.push(await button.getAttribute('aria-label'));
+    }
+    return labels;
   }
 
   // Waits for the toolbar's 'role' attribute (accessibility check).

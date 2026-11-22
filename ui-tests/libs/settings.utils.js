@@ -88,13 +88,17 @@ module.exports = {
   async doLogout() {
     let loginPage = new LoginPage();
     let homePage = new HomePage();
+    await this.navigateToHomePage();
+    if (await loginPage.isLoaded()) {
+      return;
+    }
     await homePage.clickOnAvatarButton();
     await homePage.clickOnLogoutDropdownMenuItem();
     return await loginPage.waitForPageLoaded();
   },
   // Logs in, opens the Settings app and, when a section is given, switches to it via the rail.
-  // `section` is one of MenuSectionsRail.SECTION.* ('Users', 'Roles', ...).
-  async navigateToSettingsApp(userName, password, section) {
+  // `section` is one of appConst.EXTENSIONS.*; `options` are navigateToExtension()'s.
+  async navigateToSettingsApp(userName, password, section, options) {
     try {
       await this.doLogin(userName, password);
       let homePage = new HomePage();
@@ -102,7 +106,7 @@ module.exports = {
       let menuSectionsRail = new MenuSectionsRail();
       await menuSectionsRail.waitForLoaded();
       if (section) {
-        await this.navigateToExtension(section);
+        await this.navigateToExtension(section, options);
       }
     } catch (err) {
       let screenshot = await this.saveScreenshotUniqueName('err_navigate_settings');
@@ -197,18 +201,61 @@ module.exports = {
   },
   // Opens a section (extension) of the Settings app through the sections rail and waits until its
   // browse screen is shown: the rail link is active, the app bar shows the section title and the
-  // 'Actions' toolbar is displayed. `section` is one of MenuSectionsRail.SECTION.*
-  async navigateToExtension(section) {
+  // 'Actions' toolbar is displayed - or, with `{ readOnly: true }`, the read-only banner a visitor
+  // without write access gets in its place. `section` is one of appConst.EXTENSIONS.*
+  async navigateToExtension(section, { readOnly = false } = {}) {
     try {
       let menuSectionsRail = new MenuSectionsRail();
       await menuSectionsRail.waitForLoaded();
       await menuSectionsRail.clickOnSectionButton(section);
-      await this.waitForSectionScreenLoaded(section);
+      await this.waitForSectionScreenLoaded(section, { readOnly });
       return menuSectionsRail;
     } catch (err) {
       let screenshot = await this.saveScreenshotUniqueName('err_navigate_extension');
       throw new Error(`'${section}' section was not opened, screenshot: ${screenshot} ` + err);
     }
+  },
+
+  // The direct link to a section, e.g. 'http://localhost:8080/admin/com.enonic.xp.app.settings/main#/roles'.
+  getSectionUrl(section) {
+    const path = appConst.SECTION_PATH[this.getSectionName(section)];
+    return `${this.getBaseUrl()}${appConst.SETTINGS_TOOL_PATH}#/${path}`;
+  },
+  async openSectionByUrl(section) {
+    await this.getBrowser().url('about:blank');
+    await this.getBrowser().url(this.getSectionUrl(section));
+    let menuSectionsRail = new MenuSectionsRail();
+    await menuSectionsRail.waitForLoaded();
+    return menuSectionsRail;
+  },
+
+  // The Settings tool's own url, no section named: 'http://localhost:8080/admin/com.enonic.xp.app.settings/main'.
+  getSettingsUrl() {
+    return `${this.getBaseUrl()}${appConst.SETTINGS_TOOL_PATH}`;
+  },
+  // Loads the Settings app anew at `hash` ('#/', '#/no-such-section', '#/roles/role%253Asystem.admin')
+  // and waits for the rail.
+  async openSettingsByHash(hash) {
+    await this.getBrowser().url('about:blank');
+    await this.getBrowser().url(this.getSettingsUrl() + hash);
+    let menuSectionsRail = new MenuSectionsRail();
+    await menuSectionsRail.waitForLoaded();
+    return menuSectionsRail;
+  },
+
+  getBrowserLogs() {
+    return this.getBrowser().getLogs('browser');
+  },
+
+  // The name a section goes by in appConst ('ID_PROVIDERS') from its title ('ID Providers').
+  getSectionName(section) {
+    const key = Object.keys(appConst.EXTENSIONS).find(
+      (name) => appConst.EXTENSIONS[name] === section,
+    );
+    if (key === undefined) {
+      throw new Error(`Unknown section '${section}': not one of appConst.EXTENSIONS`);
+    }
+    return key;
   },
   // Creates a user through the user editor and returns when it is listed. For the tests that need a
   // user to exist, not for the ones that test the editor itself - those walk the steps themselves.
@@ -699,6 +746,11 @@ module.exports = {
     return data.deleteIdProviders;
   },
 
+  // The same under the name the specs shared with app-settings call it by.
+  deleteIdProvidersViaApi(keys) {
+    return this.deleteIdProviderViaApi(keys);
+  },
+
   // The key of an ID provider from its key ('system') or its display name ('System Id Provider').
   // A key is read directly (`idProvider(key)`, a get), which sees a provider the moment it is
   // created; the list (`idProviders`) comes from the search index, which a create leaves stale for
@@ -890,7 +942,13 @@ module.exports = {
   // where Chrome cannot evaluate XPath ("#document-fragment is not a valid context node type"), so it
   // is located with CSS through webdriverio's deep selector from the section's shadow host - the
   // same way SectionPage scopes every lookup (see page_objects/section.page.js).
-  async waitForSectionScreenLoaded(section, ms = appConst.TIMEOUT.MEDIUM) {
+  //
+  // With `{ readOnly: true }` the read-only banner is waited for instead of the toolbar: a visitor
+  // who may read but not write gets it in the toolbar's place.
+  async waitForSectionScreenLoaded(
+    section,
+    { readOnly = false, ms = appConst.TIMEOUT.MEDIUM } = {},
+  ) {
     const appBarTitle = `//header//h2[text()='${section}']`;
     await this.waitForElementDisplayed(appBarTitle, ms);
 
@@ -902,18 +960,21 @@ module.exports = {
     // 'Toolbar.Container' until then (app-applications). One selector each: a deep selector must
     // not be a comma-separated list, webdriverio splits it on the commas when it re-matches the
     // element.
-    const toolbars = [
-      ">>> [data-component='BrowseToolbar'][aria-label='Actions']",
-      ">>> [data-component='Toolbar.Container'][aria-label='Actions']",
-    ];
+    const landmarks = readOnly
+      ? [">>> [data-component='ManagedModeBanner']"]
+      : [
+          ">>> [data-component='BrowseToolbar'][aria-label='Actions']",
+          ">>> [data-component='Toolbar.Container'][aria-label='Actions']",
+        ];
+    const what = readOnly ? 'read-only banner' : "'Actions' toolbar";
     await this.getBrowser().waitUntil(
       async () => {
         const host = await this.getBrowser().$(shadowHost);
         if (!(await host.isExisting())) {
           return false;
         }
-        for (const toolbar of toolbars) {
-          if (await host.$(toolbar).isDisplayed()) {
+        for (const landmark of landmarks) {
+          if (await host.$(landmark).isDisplayed()) {
             return true;
           }
         }
@@ -921,19 +982,13 @@ module.exports = {
       },
       {
         timeout: ms,
-        timeoutMsg: `'${section}' section - the 'Actions' toolbar is still not displayed in: ${ms}`,
+        timeoutMsg: `'${section}' section - the ${what} is still not displayed in: ${ms}`,
       },
     );
   },
   // The 'data-section' of a section's mount (appConst.SECTION_ID.*) from its title
   // (appConst.EXTENSIONS.*, what MenuSectionsRail.SECTION.* and the app bar show).
   getSectionId(section) {
-    const key = Object.keys(appConst.EXTENSIONS).find(
-      (name) => appConst.EXTENSIONS[name] === section,
-    );
-    if (key === undefined) {
-      throw new Error(`Unknown section '${section}': not one of appConst.EXTENSIONS`);
-    }
-    return appConst.SECTION_ID[key];
+    return appConst.SECTION_ID[this.getSectionName(section)];
   },
 };
