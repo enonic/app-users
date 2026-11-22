@@ -172,9 +172,9 @@ class BrowsePage extends SectionPage {
       await this.waitForElementDisplayed(this.css.readOnlyBanner, ms);
     } catch (err) {
       await this.handleError(
-          `${this.pageName} was not loaded in read-only mode`,
-          'err_browse_page_read_only',
-          err,
+        `${this.pageName} was not loaded in read-only mode`,
+        'err_browse_page_read_only',
+        err,
       );
     }
   }
