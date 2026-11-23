@@ -86,6 +86,28 @@ beforeEach(() => {
   vi.mocked(hasRole).mockReturnValue(true);
 });
 
+// The platform as a store. A principal named answers to its key in any case, as XP finds a node by a
+// path in any case and answers with the node's own key; every other key answers as itself.
+function stored(...principals: (User | Group | Role)[]): void {
+  vi.mocked(getPrincipal).mockImplementation(
+    (key) =>
+      principals.find((principal) => principal.key.toLowerCase() === key.toLowerCase()) ??
+      itself(key),
+  );
+}
+
+function itself(key: string): User | Group | Role {
+  if (key.startsWith('role:')) {
+    return role(key, key);
+  }
+
+  return key.startsWith('group:') ? group(key, 'Whatever') : user(key, key);
+}
+
+beforeEach(() => {
+  stored();
+});
+
 afterEach(() => {
   vi.resetAllMocks();
 });
@@ -397,6 +419,37 @@ describe('updateGroup', () => {
     expect(vi.mocked(removeMembers)).not.toHaveBeenCalled();
   });
 
+  it('adds a member under the key the platform keeps, and removes one as it was given', () => {
+    stored(user('user:store:alice', 'Alice'));
+    modifiable('group:store:managers');
+
+    updateGroup(
+      'group:store:managers',
+      changes({ addMembers: ['user:STORE:Alice'], removeMembers: ['user:STORE:Bob'] }),
+    );
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('group:store:managers', [
+      'user:store:alice',
+    ]);
+    expect(vi.mocked(removeMembers)).toHaveBeenCalledWith('group:store:managers', [
+      'user:STORE:Bob',
+    ]);
+  });
+
+  it('refuses a role nothing answers to, before any write', () => {
+    vi.mocked(getPrincipal).mockImplementation((key) =>
+      key.startsWith('group:') ? group(key, 'Managers') : null,
+    );
+
+    expect(() =>
+      updateGroup(
+        'group:store:managers',
+        changes({ displayName: 'Shop managers', addRoles: ['role:gone'] }),
+      ),
+    ).toThrow('No role answers to [role:gone]');
+    expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
+  });
+
   it('fails for a group nothing answers to any more', () => {
     vi.mocked(modifyGroup).mockReturnValue(null);
 
@@ -432,7 +485,7 @@ describe('writes a remote system owns', () => {
 
   it('refuses the fields and the members of a group of an EXTERNAL provider, before any write', () => {
     vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
-    vi.mocked(getPrincipal).mockReturnValue(group('group:remote:staff', 'Staff'));
+    stored(group('group:remote:staff', 'Staff'));
 
     expect(() =>
       updateGroup('group:remote:staff', { ...noChanges, addMembers: ['user:system:alice'] }),
@@ -448,7 +501,7 @@ describe('writes a remote system owns', () => {
   // Roles live on the role, where the Roles section writes them as well.
   it('reads whitespace around a stored value as no change, since the client trims what it sends', () => {
     vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
-    vi.mocked(getPrincipal).mockReturnValue({
+    stored({
       ...group('group:remote:staff', 'Staff '),
       description: 'Remote staff\n',
     });
@@ -465,7 +518,7 @@ describe('writes a remote system owns', () => {
 
   it('lets a group of an EXTERNAL provider join and leave roles', () => {
     vi.mocked(getIdProviderDescriptor).mockReturnValue({ mode: 'EXTERNAL', hasConfig: false });
-    vi.mocked(getPrincipal).mockReturnValue(group('group:remote:staff', 'Staff'));
+    stored(group('group:remote:staff', 'Staff'));
 
     updateGroup('group:remote:staff', {
       ...noChanges,
@@ -523,6 +576,32 @@ describe('a group that holds the administrator role, for a caller without it', (
     expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
     expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
     expect(vi.mocked(removeMembers)).not.toHaveBeenCalled();
+  });
+
+  // ! XP finds a group and a role under any case of the key and refuses their members there, midway.
+  it('knows the group and the role under keys spelled in another case', () => {
+    stored(group('group:store:ops', 'Ops'), role('role:system.admin', 'Administrator'));
+
+    expect(() =>
+      updateGroup('group:STORE:Ops', changes({ addMembers: ['user:store:mallory'] })),
+    ).toThrow('Members of [group:store:ops] can only be changed by an administrator');
+    expect(() =>
+      updateGroup(
+        'group:store:staff',
+        changes({ displayName: 'Staff', addRoles: ['role:SYSTEM.ADMIN'] }),
+      ),
+    ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+    expect(() =>
+      createGroup('store', 'staff', {
+        displayName: 'Staff',
+        members: [],
+        roles: ['role:SYSTEM.ADMIN'],
+      }),
+    ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+
+    expect(vi.mocked(createGroupPrincipal)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyGroup)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
   });
 
   it('still takes a new display name and description', () => {

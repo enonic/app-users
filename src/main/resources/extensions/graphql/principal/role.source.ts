@@ -20,7 +20,13 @@ import {
   SUPER_USER,
   type MemberKey,
 } from './principal.keys';
-import { byName, displayNameOf, toPrincipalItem, type PrincipalItem } from './principal.source';
+import {
+  byName,
+  canonicalKeys,
+  displayNameOf,
+  toPrincipalItem,
+  type PrincipalItem,
+} from './principal.source';
 
 export type RoleSource = Role;
 
@@ -86,18 +92,29 @@ export function listRoleMembers(key: RoleKey): PrincipalItem[] {
 }
 
 export function createRole(name: string, input: RoleInput): Role {
+  const members = canonicalKeys(input.members);
+
   const role = createRolePrincipal({
     name,
     displayName: input.displayName,
     description: input.description,
   });
 
-  applyMembers(role.key, input.members, []);
+  applyMembers(role.key, members, []);
 
   return role;
 }
 
-export function updateRole(key: string, changes: RoleChanges): Role {
+export function updateRole(given: string, changes: RoleChanges): Role {
+  const current = getRole(given);
+  if (current == null) {
+    throw new Error(`No role answers to [${given}]`);
+  }
+  // ! The key the platform keeps, not the one the request spelled: `canonicalKeys` in
+  // ! `principal.source` says why every check below needs it.
+  const key = current.key;
+  const added = canonicalKeys(changes.addMembers);
+
   // ! What the platform owns is refused before the first write: `modifyRole` and the members are
   // ! separate writes, and XP refuses an implicit role's members only once the rename has applied.
   if (isImplicitRole(key) && changes.addMembers.length + changes.removeMembers.length > 0) {
@@ -108,21 +125,14 @@ export function updateRole(key: string, changes: RoleChanges): Role {
     requireChangeableMembers(administratorOnlyKeys(), [key]);
   }
 
-  if (isPlatformRole(key)) {
-    const current = getRole(key);
-    if (current == null) {
-      throw new Error(`No role answers to [${key}]`);
-    }
-
-    if (changesDisplayNameOrDescription(current, changes)) {
-      throw new Error(
-        `Cannot change the display name or description of [${key}]: the platform owns it`,
-      );
-    }
+  if (isPlatformRole(key) && changesDisplayNameOrDescription(current, changes)) {
+    throw new Error(
+      `Cannot change the display name or description of [${key}]: the platform owns it`,
+    );
   }
 
   const role = modifyRole({
-    key: key as RoleKey,
+    key,
     // ! `ModifyRoleHandler` assigns a field only when the editor returned a non-null value, so the
     // ! empty string is what clears a description and `undefined` would not.
     editor: (current) => ({
@@ -136,7 +146,7 @@ export function updateRole(key: string, changes: RoleChanges): Role {
     throw new Error(`No role answers to [${key}]`);
   }
 
-  applyMembers(role.key, changes.addMembers, changes.removeMembers);
+  applyMembers(role.key, added, changes.removeMembers);
 
   return role;
 }

@@ -20,7 +20,13 @@ import {
   requireWritablePrincipals,
 } from './id-provider-mode';
 import { GROUP_KEY, type MemberKey } from './principal.keys';
-import { byName, displayNameOf, toPrincipalItem, type PrincipalItem } from './principal.source';
+import {
+  byName,
+  canonicalKeys,
+  displayNameOf,
+  toPrincipalItem,
+  type PrincipalItem,
+} from './principal.source';
 
 export type GroupSource = Group;
 
@@ -90,8 +96,10 @@ export function listGroupGroups(key: GroupKey, transitive: boolean): PrincipalIt
 export function createGroup(idProvider: string, name: string, input: GroupInput): Group {
   requireWritable(idProvider, 'group');
   // The new group holds nothing yet, so only the roles it is to join can be an administrator's alone.
-  if (input.roles.length > 0) {
-    requireChangeableMembers(administratorOnlyKeys(), input.roles);
+  const roles = canonicalKeys(input.roles);
+  const members = canonicalKeys(input.members);
+  if (roles.length > 0) {
+    requireChangeableMembers(administratorOnlyKeys(), roles);
   }
 
   const group = createGroupPrincipal({
@@ -101,21 +109,27 @@ export function createGroup(idProvider: string, name: string, input: GroupInput)
     description: input.description,
   });
 
-  applyMembers(group.key, input.members, []);
-  applyRoles(group.key, input.roles, []);
+  applyMembers(group.key, members, []);
+  applyRoles(group.key, roles, []);
 
   return group;
 }
 
-export function updateGroup(key: string, changes: GroupChanges): Group {
+export function updateGroup(given: string, changes: GroupChanges): Group {
+  const current = getGroup(given);
+  if (current == null) {
+    throw new Error(`No group answers to [${given}]`);
+  }
+  // ! The key the platform keeps, not the one the request spelled: see `canonicalKeys`.
+  const key = current.key;
+  const addRoles = canonicalKeys(changes.addRoles);
+  const removeRoles = canonicalKeys(changes.removeRoles);
+  const added = canonicalKeys(changes.addMembers);
+
   // ! The display name and description of a group that holds the administrator role stay anyone's to
   // ! edit; its members, and who is in the administrator role, are an administrator's.
   const changesMembers = changes.addMembers.length + changes.removeMembers.length > 0;
-  const memberLists = [
-    ...(changesMembers ? [key] : []),
-    ...changes.addRoles,
-    ...changes.removeRoles,
-  ];
+  const memberLists = [...(changesMembers ? [key] : []), ...addRoles, ...removeRoles];
   if (memberLists.length > 0) {
     requireChangeableMembers(administratorOnlyKeys(), memberLists);
   }
@@ -124,27 +138,21 @@ export function updateGroup(key: string, changes: GroupChanges): Group {
   // ! what a locked provider refuses.
   const locked = !isWritablePrincipal(key, 'group');
   if (locked) {
-    const current = getGroup(key);
-    if (current == null) {
-      throw new Error(`No group answers to [${key}]`);
-    }
-
     if (
       changes.displayName.trim() !== current.displayName.trim() ||
       (changes.description ?? '').trim() !== (current.description ?? '').trim() ||
-      changes.addMembers.length > 0 ||
-      changes.removeMembers.length > 0
+      changesMembers
     ) {
       requireWritablePrincipals([key], 'group');
     }
 
-    applyRoles(current.key, changes.addRoles, changes.removeRoles);
+    applyRoles(key, addRoles, removeRoles);
 
     return getGroup(key) ?? current;
   }
 
   const group = modifyGroup({
-    key: key as GroupKey,
+    key,
     // ! `ModifyGroupHandler` assigns a field only when the editor returned a non-null value, so the
     // ! empty string is what clears a description and `undefined` would not.
     editor: (current) => ({
@@ -158,8 +166,8 @@ export function updateGroup(key: string, changes: GroupChanges): Group {
     throw new Error(`No group answers to [${key}]`);
   }
 
-  applyMembers(group.key, changes.addMembers, changes.removeMembers);
-  applyRoles(group.key, changes.addRoles, changes.removeRoles);
+  applyMembers(group.key, added, changes.removeMembers);
+  applyRoles(group.key, addRoles, removeRoles);
 
   return group;
 }

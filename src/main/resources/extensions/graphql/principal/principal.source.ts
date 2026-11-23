@@ -2,9 +2,12 @@ import {
   deletePrincipal,
   findPrincipals,
   getPrincipal,
+  type GroupKey,
   type Principal,
   type PrincipalKey,
   type PrincipalType,
+  type RoleKey,
+  type UserKey,
 } from '/lib/xp/auth';
 
 /** A principal reduced to what a member or membership list shows. */
@@ -118,6 +121,37 @@ export function getPrincipalsByKeys(keys: readonly string[]): PrincipalItem[] {
   return [...new Set(keys)].flatMap((key) => {
     const principal = getPrincipalOrNull(key);
     return principal == null ? [] : [toPrincipalItem(principal)];
+  });
+}
+
+/**
+ * The roles and groups a write is about to change the members of, and the members it is about to add,
+ * under the keys the platform keeps.
+ *
+ * ! XP finds a node whatever the case of its path and guards a member list by that path, so
+ * ! `role:SYSTEM.ADMIN` is the administrator role to the platform while every exact comparison here lets
+ * ! it by — and the refusal then comes midway, after the first writes. The key a read answers with is
+ * ! built from the node's own name, so everything downstream compares what the platform compares.
+ * ! Lower-casing instead would be wrong: an id keeps its case, and a member is stored as the exact string.
+ *
+ * ! That exact string is why an added member comes through here as well. The platform resolves a
+ * ! membership through the index, in any case, but removes a member by comparing strings — so
+ * ! `user:SYSTEM:alice` would hold the role and survive the removal the UI sends under the real key.
+ * ! A member being *removed* is passed as it was given, for the same reason: it has to match what is stored.
+ *
+ * A key nothing answers to is refused here, which is also before the first write.
+ */
+export function canonicalKeys<Key extends GroupKey | RoleKey | UserKey>(
+  keys: readonly Key[],
+): Key[] {
+  return keys.map((key) => {
+    const type = key.slice(0, key.indexOf(':'));
+    const principal = getPrincipalOrNull(key);
+    if (principal == null || principal.type !== type) {
+      throw new Error(`No ${type} answers to [${key}]`);
+    }
+
+    return principal.key as Key;
   });
 }
 

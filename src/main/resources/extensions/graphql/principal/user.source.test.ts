@@ -110,9 +110,30 @@ function calledWith() {
   return vi.mocked(findUsers).mock.calls[0]?.[0];
 }
 
+// The platform as a store. A principal named answers to its key in any case, as XP finds a node by a
+// path in any case and answers with the node's own key; every other key answers as itself.
+function stored(...principals: (User | Group | Role)[]): void {
+  vi.mocked(getPrincipal).mockImplementation(
+    (key) =>
+      principals.find((principal) => principal.key.toLowerCase() === key.toLowerCase()) ??
+      itself(key),
+  );
+}
+
+function itself(key: string): User | Group | Role {
+  if (key.startsWith('role:')) {
+    return role(key, key);
+  }
+
+  return key.startsWith('group:')
+    ? group(key, key)
+    : { ...user(key.split(':')[2] ?? key, key), key: key as User['key'] };
+}
+
 // An administrator unless a test says otherwise: what only one may do has its own describe below.
 beforeEach(() => {
   vi.mocked(hasRole).mockReturnValue(true);
+  stored();
 });
 
 afterEach(() => {
@@ -593,7 +614,7 @@ describe('createUser', () => {
 describe('updateUser', () => {
   it('refuses to take the super user out of the administrators role, before any write', () => {
     boundProviders();
-    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+    stored(user('su', 'Super User'));
 
     expect(() =>
       updateUser('user:system:su', {
@@ -626,7 +647,7 @@ describe('updateUser', () => {
   }
 
   function modifiable(name: string) {
-    vi.mocked(getPrincipal).mockReturnValue(user(name, 'Whatever'));
+    stored(user(name, 'Whatever'));
     vi.mocked(modifyUser).mockImplementation(({ editor }) =>
       editor({ ...user(name, 'Whatever'), email: 'before@example.com' }),
     );
@@ -652,7 +673,7 @@ describe('updateUser', () => {
   });
 
   it('leaves the flag as it is when the edit says nothing of it', () => {
-    vi.mocked(getPrincipal).mockReturnValue({ ...user('alice', 'Alice'), disabled: true });
+    stored({ ...user('alice', 'Alice'), disabled: true });
     vi.mocked(modifyUser).mockImplementation(({ editor }) =>
       editor({ ...user('alice', 'Alice'), disabled: true }),
     );
@@ -661,7 +682,7 @@ describe('updateUser', () => {
   });
 
   it('refuses to disable su or anonymous, writing nothing', () => {
-    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+    stored(user('su', 'Super User'));
 
     expect(() =>
       updateUser('user:system:su', changes({ displayName: 'Super User', disabled: true })),
@@ -767,7 +788,7 @@ describe('updateUser', () => {
 
   it('sets the password before touching the profile, so a rejected profile cannot swallow it', () => {
     const order: string[] = [];
-    vi.mocked(getPrincipal).mockReturnValue(user('alice', 'Alice'));
+    stored(user('alice', 'Alice'));
     vi.mocked(changePassword).mockImplementation(() => {
       order.push('password');
     });
@@ -776,10 +797,77 @@ describe('updateUser', () => {
       throw new Error('Email address is already in use');
     });
 
-    expect(() => updateUser('user:system:alice', changes({ password: 'Str0ng!Passw0rd' }))).toThrow(
-      'Email address is already in use',
-    );
+    expect(() =>
+      updateUser(
+        'user:system:alice',
+        changes({ password: 'Str0ng!Passw0rd', email: 'taken@example.com' }),
+      ),
+    ).toThrow('Email address is already in use');
     expect(order).toEqual(['password', 'profile']);
+  });
+
+  // ! The memberships go last: a refusal the platform makes on the user's own fields — an email already
+  // ! taken, an administrator this caller could not see — then leaves none of them applied.
+  it('applies no membership when the platform refuses the fields', () => {
+    stored(user('alice', 'Alice'));
+    vi.mocked(modifyUser).mockImplementation(() => {
+      throw new Error('Email address is already in use');
+    });
+
+    expect(() =>
+      updateUser(
+        'user:system:alice',
+        changes({ email: 'taken@example.com', addRoles: ['role:cms.admin'] }),
+      ),
+    ).toThrow('Email address is already in use');
+
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+  });
+
+  it('writes nothing to the user itself when only the memberships moved', () => {
+    stored(user('alice', 'Alice'));
+
+    const updated = updateUser('user:system:alice', changes({ addRoles: ['role:cms.admin'] }));
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:cms.admin', ['user:system:alice']);
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+    expect(updated).toEqual(user('alice', 'Alice'));
+  });
+
+  it('writes a membership against the key the platform keeps, whatever case the request spelled', () => {
+    stored(user('alice', 'Alice'), role('role:cms.admin', 'CMS Admin'));
+
+    updateUser('user:SYSTEM:Alice', changes({ addRoles: ['role:CMS.Admin'] }));
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:cms.admin', ['user:system:alice']);
+  });
+
+  it('knows su under a key spelled in another case', () => {
+    stored(user('su', 'Super User'));
+
+    expect(() => updateUser('user:SYSTEM:SU', changes({ displayName: 'Root' }))).toThrow(
+      /Cannot change the password, display name or email of \[user:system:su\]/,
+    );
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
+  });
+
+  it('refuses a role or a group nothing answers to, before any write', () => {
+    vi.mocked(getPrincipal).mockImplementation((key) =>
+      key === 'user:system:alice' ? user('alice', 'Alice') : null,
+    );
+
+    expect(() =>
+      updateUser(
+        'user:system:alice',
+        changes({ password: 'Str0ng!Passw0rd', addRoles: ['role:gone'] }),
+      ),
+    ).toThrow('No role answers to [role:gone]');
+    expect(() =>
+      updateUser('user:system:alice', changes({ removeGroups: ['group:system:gone'] })),
+    ).toThrow('No group answers to [group:system:gone]');
+
+    expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
+    expect(vi.mocked(modifyUser)).not.toHaveBeenCalled();
   });
 
   it('refuses a user that is gone without writing anything', () => {
@@ -798,7 +886,7 @@ describe('updateUser', () => {
   });
 
   it('refuses a password for su and anonymous, writing nothing', () => {
-    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+    stored(user('su', 'Super User'));
 
     expect(() =>
       updateUser(
@@ -812,7 +900,7 @@ describe('updateUser', () => {
     ).toThrow(
       'Cannot change the password, display name or email of [user:system:su]: the platform owns it',
     );
-    vi.mocked(getPrincipal).mockReturnValue(user('anonymous', 'Anonymous User'));
+    stored(user('anonymous', 'Anonymous User'));
     expect(() =>
       updateUser('user:system:anonymous', changes({ displayName: 'Anonymous User', password: '' })),
     ).toThrow(/Cannot change the password, display name or email of \[user:system:anonymous\]/);
@@ -823,7 +911,7 @@ describe('updateUser', () => {
   });
 
   it('refuses a display name or email change for su, writing nothing', () => {
-    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+    stored(user('su', 'Super User'));
 
     expect(() => updateUser('user:system:su', changes({ displayName: 'Root' }))).toThrow(
       /Cannot change the password, display name or email of \[user:system:su\]/,
@@ -837,7 +925,7 @@ describe('updateUser', () => {
 
   it('lets the memberships of su change while its fields stay', () => {
     modifiable('su');
-    vi.mocked(getPrincipal).mockReturnValue(user('su', 'Super User'));
+    stored(user('su', 'Super User'));
 
     updateUser(
       'user:system:su',
@@ -849,10 +937,10 @@ describe('updateUser', () => {
   });
 
   it('fails when the platform loses the user between the guard and the write', () => {
-    vi.mocked(getPrincipal).mockReturnValue(user('alice', 'Alice'));
+    stored(user('alice', 'Alice'));
     vi.mocked(modifyUser).mockReturnValue(null);
 
-    expect(() => updateUser('user:system:alice', changes())).toThrow(
+    expect(() => updateUser('user:system:alice', changes({ displayName: 'Alice Smith' }))).toThrow(
       'No user answers to [user:system:alice]',
     );
   });
@@ -861,7 +949,7 @@ describe('updateUser', () => {
 describe('addPublicKey', () => {
   beforeEach(boundProviders);
 
-  function stored(...keys: { kid: string }[]) {
+  function storedKeys(...keys: { kid: string }[]) {
     vi.mocked(generateKid).mockReturnValue('abc123');
     vi.mocked(modifyProfile).mockImplementation(({ editor }) =>
       editor({ publicKeys: keys } as never),
@@ -869,7 +957,7 @@ describe('addPublicKey', () => {
   }
 
   it('stores the key under the id the bean computed, with a timestamp', () => {
-    stored();
+    storedKeys();
 
     const written = addPublicKey('user:system:alice', '-----BEGIN PUBLIC KEY-----abc', 'Laptop');
 
@@ -880,7 +968,7 @@ describe('addPublicKey', () => {
   });
 
   it('keeps the keys already stored', () => {
-    stored({ kid: 'other' });
+    storedKeys({ kid: 'other' });
 
     addPublicKey('user:system:alice', 'pem');
 
@@ -891,7 +979,7 @@ describe('addPublicKey', () => {
   });
 
   it('refuses su and anonymous, storing nothing', () => {
-    stored();
+    storedKeys();
 
     expect(() => addPublicKey('user:system:su', 'pem')).toThrow(
       'Cannot change the public keys of [user:system:su]: the platform owns it',
@@ -902,8 +990,17 @@ describe('addPublicKey', () => {
     expect(vi.mocked(modifyProfile)).not.toHaveBeenCalled();
   });
 
+  it('refuses su under a key spelled in another case', () => {
+    stored(user('su', 'Super User'));
+
+    expect(() => addPublicKey('user:SYSTEM:SU', 'pem')).toThrow(
+      'Cannot change the public keys of [user:system:su]: the platform owns it',
+    );
+    expect(vi.mocked(modifyProfile)).not.toHaveBeenCalled();
+  });
+
   it('refuses a key already stored under the same id', () => {
-    stored({ kid: 'abc123' });
+    storedKeys({ kid: 'abc123' });
 
     expect(() => addPublicKey('user:system:alice', 'pem')).toThrow(
       'A public key with id [abc123] is already stored for [user:system:alice]',
@@ -978,7 +1075,7 @@ describe('password arguments', () => {
 
     expect(vi.mocked(changePassword)).not.toHaveBeenCalled();
 
-    vi.mocked(getPrincipal).mockReturnValue(user('alice', 'Alice'));
+    stored(user('alice', 'Alice'));
     vi.mocked(modifyUser).mockImplementation(({ editor }) => editor(user('alice', 'Alice')));
 
     updateUser('user:system:alice', {
@@ -1000,7 +1097,7 @@ describe('password arguments', () => {
   it('refuses whitespace in a password, on both writes, before anything is written', () => {
     providers();
     vi.mocked(createUserPrincipal).mockReturnValue(user('alice', 'Alice'));
-    vi.mocked(getPrincipal).mockReturnValue(user('alice', 'Alice'));
+    stored(user('alice', 'Alice'));
 
     expect(() =>
       createUser('system', 'alice', {
@@ -1057,7 +1154,7 @@ describe('writes a remote system owns', () => {
   });
 
   it('refuses to edit a user of an EXTERNAL provider, before any write', () => {
-    vi.mocked(getPrincipal).mockReturnValue({
+    stored({
       ...user('alice', 'Alice'),
       key: 'user:remote:alice',
     });
@@ -1072,7 +1169,7 @@ describe('writes a remote system owns', () => {
   });
 
   it('refuses to rename or re-address a user of an EXTERNAL provider', () => {
-    vi.mocked(getPrincipal).mockReturnValue({
+    stored({
       ...user('alice', 'Alice'),
       key: 'user:remote:alice',
     });
@@ -1088,7 +1185,7 @@ describe('writes a remote system owns', () => {
   });
 
   it('refuses to disable a user of an EXTERNAL provider', () => {
-    vi.mocked(getPrincipal).mockReturnValue({
+    stored({
       ...user('alice', 'Alice'),
       key: 'user:remote:alice',
     });
@@ -1102,7 +1199,7 @@ describe('writes a remote system owns', () => {
 
   // Memberships live on the role and on the group, where the Roles section writes them as well.
   it('lets a user of an EXTERNAL provider join and leave roles and local groups', () => {
-    vi.mocked(getPrincipal).mockReturnValue({
+    stored({
       ...user('alice', 'Alice'),
       key: 'user:remote:alice',
     });
@@ -1121,7 +1218,7 @@ describe('writes a remote system owns', () => {
   });
 
   it('reads whitespace around a stored value as no change, since the client trims what it sends', () => {
-    vi.mocked(getPrincipal).mockReturnValue({
+    stored({
       ...user('alice', 'Alice '),
       key: 'user:remote:alice',
       email: ' alice@example.com',
@@ -1138,7 +1235,7 @@ describe('writes a remote system owns', () => {
   });
 
   it('refuses to move a local user in or out of a group a remote system owns', () => {
-    vi.mocked(getPrincipal).mockReturnValue(user('alice', 'Alice'));
+    stored(user('alice', 'Alice'));
 
     expect(() =>
       updateUser('user:system:alice', { ...noChanges, removeGroups: ['group:remote:staff'] }),
@@ -1168,9 +1265,7 @@ describe('a user who holds the administrator role, for a caller without it', () 
       }
       return key === 'group:system:ops' ? [user('alice', 'Alice')] : [];
     });
-    vi.mocked(getPrincipal).mockImplementation((key) =>
-      key === 'user:system:alice' ? user('alice', 'Alice') : user('bob', 'Bob'),
-    );
+    stored(user('alice', 'Alice'), user('bob', 'Bob'));
   });
 
   function changes(overrides: Partial<UserChanges> = {}): UserChanges {
@@ -1228,6 +1323,52 @@ describe('a user who holds the administrator role, for a caller without it', () 
       /^Members of \[(role:system\.admin|group:system:ops)\] can only be changed by an administrator$/,
     );
     nothingWritten();
+  });
+
+  // ! XP finds `role:system.admin` under any case and refuses its members there, midway through the writes.
+  it('does not join the administrator role under a key spelled in another case, and nothing is written', () => {
+    stored(user('bob', 'Bob'), role('role:system.admin', 'Administrator'));
+
+    expect(() =>
+      updateUser(
+        'user:system:bob',
+        changes({ displayName: 'Bob', password: 'hunter2', addRoles: ['role:SYSTEM.ADMIN'] }),
+      ),
+    ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+    nothingWritten();
+
+    expect(() =>
+      createUser('system', 'mallory', {
+        displayName: 'Mallory',
+        roles: ['role:SYSTEM.ADMIN'],
+        groups: [],
+      }),
+    ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+    expect(vi.mocked(createUserPrincipal)).not.toHaveBeenCalled();
+  });
+
+  // ! The walk reads as the caller, the platform as an administrator: a group the caller cannot read
+  // ! answers no members, so alice is an administrator only the platform knows of.
+  it('leaves no membership behind when the platform knows an administrator the walk could not see', () => {
+    vi.mocked(getMembers).mockImplementation((key) =>
+      key === 'role:system.admin' ? [group('group:system:ops', 'Ops')] : [],
+    );
+    vi.mocked(modifyUser).mockImplementation(() => {
+      throw new Error('[user:system:alice] can only be modified by an administrator');
+    });
+
+    expect(() =>
+      updateUser(
+        'user:system:alice',
+        changes({ displayName: 'Mallory', addRoles: ['role:editors'] }),
+      ),
+    ).toThrow('[user:system:alice] can only be modified by an administrator');
+    expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+
+    updateUser('user:system:alice', changes({ addRoles: ['role:editors'] }));
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:editors', ['user:system:alice']);
+    expect(vi.mocked(modifyUser)).toHaveBeenCalledTimes(1);
   });
 
   it('is not created into a group that holds the role: no user is left behind without it', () => {
