@@ -7,6 +7,28 @@ module.exports = Object.freeze({
   itemSavedNotificationMessage(name) {
     return `Item "${name}" has been saved.`;
   },
+  // 'data-component' of a section's browse screen, the root of what BrowsePage locates.
+  PAGE_COMPONENT: {
+    SERVICE_ACCOUNTS: 'ServiceAccountsPage',
+    USERS: 'UsersPage',
+    GROUPS: 'GroupsPage',
+    ROLES: 'RolesPage',
+    ID_PROVIDERS: 'IdProvidersPage',
+  },
+  // The url segment a section answers to (`config.path` of its extension descriptor): the section
+  // is at '<tool url>#/<path>'.
+  SECTION_PATH: {
+    APPLICATIONS: 'applications',
+    SERVICE_ACCOUNTS: 'service-accounts',
+    USERS: 'users',
+    GROUPS: 'groups',
+    ROLES: 'roles',
+    ID_PROVIDERS: 'id-providers',
+  },
+  // The browser tab over a section (phrase: app.tabTitle, then the section's title).
+  documentTitle: (section) => `XP Settings / ${section}`,
+  // The Settings admin tool, relative to 'base.url'.
+  SETTINGS_TOOL_PATH: 'com.enonic.xp.app.settings/main',
 
   BROWSER_XP_TITLES: {
     XP_HOME: 'Enonic XP Home',
@@ -52,6 +74,7 @@ module.exports = Object.freeze({
   SYSTEM_ROLES: {
     ADMIN_CONSOLE: 'Administration Console Login',
     ADMINISTRATOR: 'Administrator',
+    CM_ADMIN: 'Content Manager Administrator',
     USERS_APP: 'Users App',
     AUTHENTICATED: 'Authenticated',
     USERS_ADMINISTRATOR: 'Users Administrator',
@@ -88,6 +111,24 @@ module.exports = Object.freeze({
   // What the details panel shows in place of an item (phrases: browse.details.*): nothing selected.
   DETAILS_MESSAGE: {
     SELECT_AN_ITEM: 'Select an item to see its details',
+  },
+  // The shell's own toasts about the events connection (phrases: connection.*).
+  CONNECTION: {
+    LOST: 'Lost connection to the server. Changes will show once it is back',
+    SESSION_ENDED: 'Your session has ended. Reload the page to sign in again',
+    RELOAD: 'Reload',
+  },
+  // The banner a section shows in place of its toolbar to a visitor who may read but not write
+  // (phrases: readOnly.*).
+  READ_ONLY: {
+    TITLE: 'Read-only mode',
+    HELP: 'Contact your administrator to make changes',
+  },
+  // The banner 'ID Providers' shows in place of its toolbar to a visitor who may write to the other
+  // Users sections but is not an administrator (phrases: idProviders.adminOnly.*).
+  ADMIN_ONLY: {
+    TITLE: 'Managed by administrators',
+    HELP: 'Only an administrator can create, edit or delete ID providers',
   },
   // Access levels of the ID provider editor's Permissions step, widening (phrases:
   // idProviders.dialog.access.*).

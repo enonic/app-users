@@ -34,6 +34,7 @@ const IN_SECTION = {
   itemMeta: "[data-component='ListItem.Right'] span",
   moreButton: "[data-component='MoreButton']",
   editButton: (label) => `button[data-component='Button'][aria-label='${label}']`,
+  anyEditButton: "button[data-component='Button'][aria-label^='Edit']",
   checkbox: "[data-component='Checkbox'] input",
   checkboxLabel: "[data-component='Checkbox'] label",
   errorNotice: 'p.text-error',
@@ -431,6 +432,30 @@ class DetailsPanel extends SectionPage {
     const section = await this.getSection(sectionLabel);
     const checked = await section.$(IN_SECTION.checkbox).getAttribute('aria-checked');
     return checked === 'true';
+  }
+  // The labels of every Edit button the panel shows, whichever section it is in: 'Edit',
+  // 'Edit credentials', 'Edit roles', ... Empty for an item the visitor may not change.
+  async getEditButtonLabels() {
+    const buttons = await this.findElements(`${this.css.container} ${IN_SECTION.anyEditButton}`);
+    const labels = [];
+    for (const button of buttons) {
+      if (await button.isDisplayed()) {
+        labels.push(await button.getAttribute('aria-label'));
+      }
+    }
+    return labels;
+  }
+
+  // The labels of the Edit buttons that are shown and enabled, whichever section they are in.
+  async getEnabledEditButtonLabels() {
+    const buttons = await this.findElements(`${this.css.container} ${IN_SECTION.anyEditButton}`);
+    const labels = [];
+    for (const button of buttons) {
+      if ((await button.isDisplayed()) && (await button.isEnabled())) {
+        labels.push(await button.getAttribute('aria-label'));
+      }
+    }
+    return labels;
   }
 
   async getCheckboxLabel(sectionLabel) {

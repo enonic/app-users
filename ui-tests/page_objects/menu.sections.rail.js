@@ -135,6 +135,30 @@ class MenuSectionsRail extends Page {
     return names;
   }
 
+  // The aria-labels of the links marked aria-current='page' - the active one and no other.
+  async getCurrentPageSectionNames() {
+    const elements = await this.findElements(XPATH.sectionButtons);
+    const names = [];
+    for (const el of elements) {
+      if ((await el.getAttribute('aria-current')) === 'page') {
+        names.push(await el.getAttribute('aria-label'));
+      }
+    }
+    return names;
+  }
+
+  // The aria-labels of the links carrying data-status='active'.
+  async getActiveSectionNames() {
+    const elements = await this.findElements(XPATH.sectionButtons);
+    const names = [];
+    for (const el of elements) {
+      if ((await el.getAttribute('data-status')) === 'active') {
+        names.push(await el.getAttribute('aria-label'));
+      }
+    }
+    return names;
+  }
+
   // Returns the `href` of the section link, e.g. '#/users'.
   getSectionHref(label) {
     return this.getAttribute(XPATH.sectionButtonByLabel(label), 'href');
