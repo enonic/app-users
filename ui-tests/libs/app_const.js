@@ -124,6 +124,12 @@ module.exports = Object.freeze({
     TITLE: 'Read-only mode',
     HELP: 'Contact your administrator to make changes',
   },
+  // The banner 'ID Providers' shows in place of its toolbar to a visitor who may write to the other
+  // Users sections but is not an administrator (phrases: idProviders.adminOnly.*).
+  ADMIN_ONLY: {
+    TITLE: 'Managed by administrators',
+    HELP: 'Only an administrator can create, edit or delete ID providers',
+  },
   // Access levels of the ID provider editor's Permissions step, widening (phrases:
   // idProviders.dialog.access.*).
   // The GraphQL endpoint of a section (extensions/section-endpoint), relative to the admin origin.

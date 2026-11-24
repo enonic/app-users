@@ -8,7 +8,7 @@ const MenuSectionsRail = require('../page_objects/menu.sections.rail');
 const ServiceAccountsPage = require('../page_objects/service-accounts/service.accounts.page');
 const ServiceAccountDetails = require('../page_objects/service-accounts/service.account.details');
 
-describe("service.account.users.administrator.role.spec - an account with 'Users Administrator' may write to the Users sections: the toolbar with New and Delete in place of the read-only banner, and the Edit buttons in the details panel", function () {
+describe("service.account.users.administrator.role.spec - an account with 'Users Administrator' may write to the Users sections but 'ID Providers': the toolbar with New and Delete in place of the read-only banner, and the Edit buttons in the details panel; 'ID Providers' is left to administrators", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
   if (typeof browser === 'undefined') {
     webDriverHelper.setupBrowser();
@@ -21,17 +21,17 @@ describe("service.account.users.administrator.role.spec - an account with 'Users
     roles: ROLES,
   });
   const EDIT_BUTTONS = Object.values(ServiceAccountDetails.BUTTON);
-  // The sections of app-users, in the order the rail lists them.
-  const USERS_SECTIONS = [
+  // The sections of app-users the role may write to, in the order the rail lists them. 'ID Providers'
+  // is written by an administrator alone.
+  const WRITABLE_SECTIONS = [
     appConst.EXTENSIONS.SERVICE_ACCOUNTS,
     appConst.EXTENSIONS.USERS,
     appConst.EXTENSIONS.GROUPS,
     appConst.EXTENSIONS.ROLES,
-    appConst.EXTENSIONS.ID_PROVIDERS,
   ];
   let SERVICE_ACCOUNT;
   const ITEMS = {};
-  let ID_PROVIDER, EMPTY_ID_PROVIDER, USER, GROUP, ROLE;
+  let ID_PROVIDER, USER, GROUP, ROLE;
 
   function browsePageOf(section) {
     const name = settingsUtils.getSectionName(section);
@@ -49,14 +49,8 @@ describe("service.account.users.administrator.role.spec - an account with 'Users
     SERVICE_ACCOUNT = await settingsUtils.createServiceAccountViaApi(NEW_ACCOUNT);
     assert.equal(SERVICE_ACCOUNT.key, ServiceAccountsPage.serviceAccountKey(NEW_ACCOUNT.id));
     // 3. Something to select in each of the other sections: an ID provider, a user and a group in
-    //    it, a role - and a second ID provider left empty, since one that holds a user or a group
-    //    cannot be deleted and keeps Delete disabled.
+    //    it, a role.
     ID_PROVIDER = await settingsUtils.createIdProviderViaApi(
-      userItemsBuilder.buildIdProvider({
-        displayName: userItemsBuilder.generateRandomName('provider'),
-      }),
-    );
-    EMPTY_ID_PROVIDER = await settingsUtils.createIdProviderViaApi(
       userItemsBuilder.buildIdProvider({
         displayName: userItemsBuilder.generateRandomName('provider'),
       }),
@@ -80,7 +74,6 @@ describe("service.account.users.administrator.role.spec - an account with 'Users
     ITEMS[appConst.EXTENSIONS.USERS] = USER.displayName;
     ITEMS[appConst.EXTENSIONS.GROUPS] = GROUP.displayName;
     ITEMS[appConst.EXTENSIONS.ROLES] = ROLE.displayName;
-    ITEMS[appConst.EXTENSIONS.ID_PROVIDERS] = EMPTY_ID_PROVIDER.displayName;
     // 4. Log out.
     await settingsUtils.doLogout();
   });
@@ -127,9 +120,9 @@ describe("service.account.users.administrator.role.spec - an account with 'Users
     await serviceAccountsPage.waitForDeleteButtonEnabled();
   });
 
-  it("GIVEN the account is logged in WHEN an item has been selected in each section THEN 'New' and 'Delete' should be enabled in every section AND 'Read-only mode' banner should not be shown", async () => {
+  it("GIVEN the account is logged in WHEN an item has been selected in each writable section THEN 'New' and 'Delete' should be enabled in every one AND 'Read-only mode' banner should not be shown", async () => {
     let menuSectionsRail = new MenuSectionsRail();
-    for (const section of USERS_SECTIONS) {
+    for (const section of WRITABLE_SECTIONS) {
       const page = browsePageOf(section);
       // 1. Open the section by its rail item.
       await menuSectionsRail.clickOnSectionButton(section);
@@ -150,6 +143,26 @@ describe("service.account.users.administrator.role.spec - an account with 'Users
     await settingsUtils.saveScreenshot('sections_users_administrator');
   });
 
+  it("GIVEN the account is logged in WHEN 'ID Providers' section has been opened THEN 'Managed by administrators' banner should be shown in place of the toolbar AND the ID provider should still be listed", async () => {
+    const section = appConst.EXTENSIONS.ID_PROVIDERS;
+    const page = browsePageOf(section);
+    // 1. Open the section by its rail item: it loads read-only, the banner where the toolbar would be.
+    await new MenuSectionsRail().clickOnSectionButton(section);
+    await settingsUtils.waitForSectionScreenLoaded(section, { readOnly: true });
+    await page.waitForLoadedInReadOnlyMode();
+    await settingsUtils.saveScreenshot('id_providers_users_administrator');
+    // 2. Verify the banner: the administrators' one, not 'Read-only mode'.
+    assert.equal(await page.getReadOnlyBannerTitle(), appConst.ADMIN_ONLY.TITLE);
+    assert.equal(await page.getReadOnlyBannerHelp(), appConst.ADMIN_ONLY.HELP);
+    // 3. Verify that there is no toolbar: no New, no Delete.
+    assert.ok(
+      !(await page.isToolbarDisplayed()),
+      "'ID Providers' - the toolbar should not be displayed for 'Users Administrator'",
+    );
+    // 4. The section is still readable: the ID provider made above can be selected.
+    await page.clickOnRowByDisplayName(ID_PROVIDER.displayName);
+  });
+
   // Everything made here is deleted by SU, the members of the ID provider before the provider - one
   // that still holds a user or a group is refused.
   after(async () => {
@@ -160,9 +173,8 @@ describe("service.account.users.administrator.role.spec - an account with 'Users
     await settingsUtils.doLogin('su', 'password');
     const principals = [SERVICE_ACCOUNT, USER, GROUP, ROLE].filter((item) => item !== undefined);
     await settingsUtils.deletePrincipalsViaApi(principals);
-    const idProviders = [ID_PROVIDER, EMPTY_ID_PROVIDER].filter((item) => item !== undefined);
-    if (idProviders.length > 0) {
-      await settingsUtils.deleteIdProvidersViaApi(idProviders);
+    if (ID_PROVIDER !== undefined) {
+      await settingsUtils.deleteIdProvidersViaApi([ID_PROVIDER]);
     }
   });
 });
