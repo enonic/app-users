@@ -4,13 +4,14 @@ import {
   findPrincipals,
   getMembers,
   getPrincipal,
+  type Group,
+  hasRole,
   modifyRole,
   removeMembers,
-  type Group,
   type Role,
   type User,
 } from '/lib/xp/auth';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   createRole,
@@ -55,6 +56,19 @@ function group(key: string, displayName: string): Group {
     modifiedTime: '2026-08-01T10:00:00Z',
   };
 }
+
+// A member answers to its key as itself, unless a test stores it under another.
+function member(key: string): User | Group {
+  return key.startsWith('group:') ? group(key, key) : user(key, key);
+}
+
+// An administrator unless a test says otherwise: what only one may do has its own describe below.
+beforeEach(() => {
+  vi.mocked(hasRole).mockReturnValue(true);
+  vi.mocked(getPrincipal).mockImplementation((key) =>
+    key.startsWith('role:') ? null : member(key),
+  );
+});
 
 afterEach(() => {
   vi.resetAllMocks();
@@ -247,7 +261,9 @@ describe('updateRole', () => {
 
   // What `getRole` reads back: a platform role's scalars are checked against it.
   function stored(key: string, displayName = 'Editors', overrides: Partial<Role> = {}) {
-    vi.mocked(getPrincipal).mockReturnValue(role(key, displayName, overrides));
+    vi.mocked(getPrincipal).mockImplementation((asked) =>
+      asked.startsWith('role:') ? role(key, displayName, overrides) : member(asked),
+    );
   }
 
   function nothingWritten() {
@@ -257,6 +273,7 @@ describe('updateRole', () => {
   }
 
   it('writes the scalars through the editor the platform hands it', () => {
+    stored('role:editors', 'Whatever');
     modifiable('role:editors');
 
     const updated = updateRole(
@@ -269,12 +286,14 @@ describe('updateRole', () => {
   });
 
   it('clears a description the edit dropped, with an empty string rather than nothing', () => {
+    stored('role:editors', 'Whatever');
     modifiable('role:editors');
 
     expect(updateRole('role:editors', changes()).description).toBe('');
   });
 
   it('reads no membership at all when the member list did not move', () => {
+    stored('role:editors', 'Whatever');
     modifiable('role:editors');
 
     updateRole('role:editors', changes({ description: 'Just the description' }));
@@ -285,6 +304,7 @@ describe('updateRole', () => {
   });
 
   it('applies exactly the members it was told moved', () => {
+    stored('role:editors', 'Whatever');
     modifiable('role:editors');
 
     updateRole(
@@ -349,12 +369,14 @@ describe('updateRole', () => {
   });
 
   it('refuses any member change on Everyone and Authenticated, writing nothing', () => {
+    stored('role:system.everyone', 'Everyone');
     expect(() =>
       updateRole(
         'role:system.everyone',
         changes({ displayName: 'Everyone', addMembers: ['user:system:alice'] }),
       ),
     ).toThrow('Cannot change the members of [role:system.everyone]: the platform implies them');
+    stored('role:system.authenticated', 'Authenticated');
     expect(() =>
       updateRole(
         'role:system.authenticated',
@@ -372,6 +394,7 @@ describe('updateRole', () => {
   });
 
   it('lets a project role be renamed, since the platform does not own it', () => {
+    stored('role:cms.project.default.owner');
     modifiable('role:cms.project.default.owner');
 
     const updated = updateRole(
@@ -382,10 +405,108 @@ describe('updateRole', () => {
     expect(updated.displayName).toBe('Owners');
   });
 
-  it('fails for a role nothing answers to any more', () => {
+  // ! The platform stores a member as the exact string and removes it by comparing strings, so a member
+  // ! added under another case would outlive the removal the UI sends under the real key.
+  it('adds a member under the key the platform keeps, and removes one as it was given', () => {
+    vi.mocked(getPrincipal).mockImplementation((asked) =>
+      asked.startsWith('role:')
+        ? role('role:editors', 'Editors')
+        : user('user:system:alice', 'Alice'),
+    );
+    modifiable('role:editors');
+
+    updateRole(
+      'role:editors',
+      changes({ addMembers: ['user:SYSTEM:Alice'], removeMembers: ['user:SYSTEM:Bob'] }),
+    );
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:editors', ['user:system:alice']);
+    expect(vi.mocked(removeMembers)).toHaveBeenCalledWith('role:editors', ['user:SYSTEM:Bob']);
+  });
+
+  it('refuses a new member nothing answers to, before any write', () => {
+    vi.mocked(getPrincipal).mockImplementation((asked) =>
+      asked.startsWith('role:') ? role('role:editors', 'Editors') : null,
+    );
+
+    expect(() =>
+      updateRole(
+        'role:editors',
+        changes({ displayName: 'Writers', addMembers: ['user:system:gone'] }),
+      ),
+    ).toThrow('No user answers to [user:system:gone]');
+    nothingWritten();
+  });
+
+  // ! XP finds a role under any case of its key, so each refusal has to know it under any case too.
+  it('knows a platform role under a key spelled in another case', () => {
+    stored('role:system.everyone', 'Everyone');
+    expect(() =>
+      updateRole(
+        'role:SYSTEM.Everyone',
+        changes({ displayName: 'Everyone', addMembers: ['user:system:alice'] }),
+      ),
+    ).toThrow('Cannot change the members of [role:system.everyone]: the platform implies them');
+
+    stored('role:cms.admin', 'Content Manager Administrator');
+    expect(() => updateRole('role:CMS.ADMIN', changes({ displayName: 'Admins' }))).toThrow(
+      'Cannot change the display name or description of [role:cms.admin]: the platform owns it',
+    );
+    nothingWritten();
+  });
+
+  it('fails for a role the platform loses between the read and the write', () => {
+    stored('role:gone');
     vi.mocked(modifyRole).mockReturnValue(null);
 
     expect(() => updateRole('role:gone', changes())).toThrow('No role answers to [role:gone]');
     expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+  });
+});
+
+describe('updateRole, for a caller without the administrator role', () => {
+  function storedRole(stored: Role) {
+    vi.mocked(getPrincipal).mockImplementation((key) =>
+      key.startsWith('role:') ? stored : member(key),
+    );
+  }
+
+  beforeEach(() => {
+    vi.mocked(hasRole).mockImplementation((key) => key === 'role:system.user.admin');
+    vi.mocked(getMembers).mockReturnValue([]);
+  });
+
+  it.each(['role:system.admin', 'role:SYSTEM.ADMIN'])(
+    'keeps the members of the administrator role asked for as %s, writing nothing at all',
+    (key) => {
+      storedRole(role('role:system.admin', 'Administrator'));
+
+      expect(() =>
+        updateRole(key, {
+          displayName: 'Administrator',
+          addMembers: ['user:corp:mallory'],
+          removeMembers: [],
+        }),
+      ).toThrow('Members of [role:system.admin] can only be changed by an administrator');
+      expect(vi.mocked(modifyRole)).not.toHaveBeenCalled();
+      expect(vi.mocked(addMembers)).not.toHaveBeenCalled();
+    },
+  );
+
+  it("changes the members of any other role, the user administrators' included", () => {
+    storedRole(role('role:system.user.admin', 'Users Administrator'));
+    vi.mocked(modifyRole).mockImplementation(({ editor }) =>
+      editor(role('role:system.user.admin', 'Users Administrator')),
+    );
+
+    updateRole('role:system.user.admin', {
+      displayName: 'Users Administrator',
+      addMembers: ['user:corp:alice'],
+      removeMembers: [],
+    });
+
+    expect(vi.mocked(addMembers)).toHaveBeenCalledWith('role:system.user.admin', [
+      'user:corp:alice',
+    ]);
   });
 });

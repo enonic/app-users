@@ -1,6 +1,7 @@
 import { GraphQLInt, GraphQLString, list, nonNull, type GraphQLFields } from '/lib/graphql';
 import type { PrincipalType } from '/lib/xp/auth';
 
+import { adminHolderKeys } from '../auth/administrator';
 import { deletePrincipals, getPrincipalsByKeys, searchPrincipals } from './principal.source';
 import {
   PrincipalDeletionType,
@@ -18,6 +19,12 @@ type SearchArgs = {
 };
 
 export const principalQueryFields: GraphQLFields = {
+  adminHolders: {
+    type: list(nonNull(GraphQLString)),
+    description:
+      'The key of every principal that holds `role:system.admin`, directly or through groups, the role itself included: what a caller without that role may not change.',
+    resolve: () => [...adminHolderKeys()].sort(),
+  },
   principals: {
     type: PrincipalPageType,
     description:

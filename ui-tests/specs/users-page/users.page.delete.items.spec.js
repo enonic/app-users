@@ -30,7 +30,7 @@ describe('users.page.delete.items.spec - Users page: two users of one provider t
   it('GIVEN the suite starts THEN an ID provider AND two users in it should be created via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     ID_PROVIDER = await settingsUtils.createIdProviderViaApi(
-      userItemsBuilder.buildIdProvider(PROVIDER_NAME, 'description', 'Standard ID Provider'),
+      userItemsBuilder.buildIdProvider(PROVIDER_NAME, 'description'),
     );
     USER1 = await settingsUtils.createUserViaApi(
       userItemsBuilder.buildUser({ displayName: USER1_NAME, idProvider: PROVIDER_NAME }),

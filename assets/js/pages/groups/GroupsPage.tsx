@@ -4,6 +4,7 @@ import { useMemo } from 'preact/hooks';
 
 import {
   DEFAULT_PRINCIPAL_SORT,
+  useAdministratorOnly,
   useGroups,
   useIdProviderName,
   type PrincipalSort,
@@ -82,7 +83,8 @@ export function GroupsPage() {
   ) satisfies readonly BrowseSortOption<PrincipalSort>[];
 
   const canCreate = creatable.length > 0;
-  const actions = useMemo(() => createGroupActions(canCreate), [canCreate]);
+  const adminOnly = useAdministratorOnly();
+  const actions = useMemo(() => createGroupActions(canCreate, adminOnly), [canCreate, adminOnly]);
 
   // Shared with the field's counts below, so the text runs once per render rather than twice.
   const searched = useMemo(() => searchGroups(items, textOf(query)), [items, query]);

@@ -1,3 +1,5 @@
+import type { AppError } from '@enonic/ui-utils';
+
 import { addPublicKey, removePublicKey, type PrincipalKey } from '../../../entities/principal';
 import type { KeyPair } from './key-pair';
 import type { UserForm } from './user-form';
@@ -11,6 +13,8 @@ export type PublicKeyWriteOutcome = {
   /** One file per generated pair, handed over only now that the key is really on the user. */
   downloads: readonly GeneratedKeyFile[];
   failed: number;
+  /** Why the first of them failed, as the server said it; the others most likely failed the same way. */
+  failure?: AppError;
 };
 
 /**
@@ -25,32 +29,32 @@ export async function applyPublicKeyChanges(
 ): Promise<PublicKeyWriteOutcome> {
   const downloads: GeneratedKeyFile[] = [];
   let failed = 0;
+  let failure: AppError | undefined;
+  const fail = (error: AppError): void => {
+    failed += 1;
+    failure ??= error;
+  };
 
   for (const kid of form.keyRemovals) {
     const removed = await removePublicKey(key, kid);
 
     if (removed.isErr()) {
-      failed += 1;
+      fail(removed.error);
     }
   }
 
   for (const pending of form.keyAdditions) {
     const written = await addPublicKey(key, pending.publicKey, pending.label);
 
-    written.match(
-      (stored) => {
-        if (pending.privateKey !== undefined) {
-          downloads.push({
-            pair: { publicKey: pending.publicKey, privateKey: pending.privateKey },
-            stored,
-          });
-        }
-      },
-      () => {
-        failed += 1;
-      },
-    );
+    written.match((stored) => {
+      if (pending.privateKey !== undefined) {
+        downloads.push({
+          pair: { publicKey: pending.publicKey, privateKey: pending.privateKey },
+          stored,
+        });
+      }
+    }, fail);
   }
 
-  return { downloads, failed };
+  return { downloads, failed, failure };
 }

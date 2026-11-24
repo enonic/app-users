@@ -34,7 +34,6 @@ describe("user.details.panel.spec - the details panel of a user: what it shows, 
     ID_PROVIDER = userItemsBuilder.buildIdProvider({
       displayName: PROVIDER_NAME,
       description: 'description',
-      application: 'Standard ID Provider',
     });
     // 1. Create a new ID provider via the API - the users of this suite live in it.
     await settingsUtils.createIdProviderViaApi(ID_PROVIDER);

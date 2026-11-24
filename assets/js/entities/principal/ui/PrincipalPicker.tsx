@@ -41,6 +41,11 @@ export type PrincipalPickerProps = {
   idProvider?: string;
   /** Names each row's provider, for a picker whose offer can widen past the form's own. */
   showIdProvider?: boolean;
+  /**
+   * The picked principals alone, with no search and no remove: a member list the caller may read but
+   * not change.
+   */
+  readOnly?: boolean;
   /** The popup, controlled: a step that widens the offer opens it so the wider list is seen at once. */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -60,6 +65,7 @@ export function PrincipalPicker({
   offersIdProvider,
   idProvider,
   showIdProvider = false,
+  readOnly = false,
   open: controlledOpen,
   onOpenChange,
 }: PrincipalPickerProps) {
@@ -129,45 +135,47 @@ export function PrincipalPicker({
     <div className="flex flex-col gap-1.5">
       {label !== undefined && <FieldLabel id={labelId} text={label} />}
 
-      <Combobox
-        open={open}
-        onOpenChange={setOpen}
-        value={query}
-        onChange={(next) => setQuery(next ?? '')}
-        selectionMode="staged"
-        selection={pickedKeys}
-        onSelectionChange={replace}
-        contentType="listbox"
-      >
-        <Combobox.Content>
-          <Combobox.Control>
-            <Combobox.Search>
-              <Combobox.SearchIcon />
-              <Combobox.Input
-                aria-label={label === undefined ? placeholder : undefined}
-                aria-labelledby={label === undefined ? undefined : labelId}
-                placeholder={placeholder}
-              />
-              <Combobox.Apply label={applyLabel} />
-              <Combobox.Toggle />
-            </Combobox.Search>
-          </Combobox.Control>
+      {!readOnly && (
+        <Combobox
+          open={open}
+          onOpenChange={setOpen}
+          value={query}
+          onChange={(next) => setQuery(next ?? '')}
+          selectionMode="staged"
+          selection={pickedKeys}
+          onSelectionChange={replace}
+          contentType="listbox"
+        >
+          <Combobox.Content>
+            <Combobox.Control>
+              <Combobox.Search>
+                <Combobox.SearchIcon />
+                <Combobox.Input
+                  aria-label={label === undefined ? placeholder : undefined}
+                  aria-labelledby={label === undefined ? undefined : labelId}
+                  placeholder={placeholder}
+                />
+                <Combobox.Apply label={applyLabel} />
+                <Combobox.Toggle />
+              </Combobox.Search>
+            </Combobox.Control>
 
-          <Combobox.Portal>
-            <Combobox.Popup>
-              <PrincipalOptions
-                principals={offered}
-                search={search}
-                locked={locked}
-                providerCell={showIdProvider ? providerCell : undefined}
-                searchingLabel={searchingLabel}
-                noMatchesLabel={noMatchesLabel}
-                failedLabel={failedLabel}
-              />
-            </Combobox.Popup>
-          </Combobox.Portal>
-        </Combobox.Content>
-      </Combobox>
+            <Combobox.Portal>
+              <Combobox.Popup>
+                <PrincipalOptions
+                  principals={offered}
+                  search={search}
+                  locked={locked}
+                  providerCell={showIdProvider ? providerCell : undefined}
+                  searchingLabel={searchingLabel}
+                  noMatchesLabel={noMatchesLabel}
+                  failedLabel={failedLabel}
+                />
+              </Combobox.Popup>
+            </Combobox.Portal>
+          </Combobox.Content>
+        </Combobox>
+      )}
 
       {selected.length > 0 && (
         <GridList className="flex flex-col gap-2.5 rounded-md py-1.5 pr-1 pl-1">
@@ -191,7 +199,7 @@ export function PrincipalPicker({
                     aria-label={removeLabel(member)}
                     icon={X}
                     variant="text"
-                    disabled={locked?.has(member.key)}
+                    disabled={readOnly || locked?.has(member.key)}
                     onClick={() => remove(member.key)}
                   />
                 </GridList.Action>

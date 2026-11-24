@@ -1,5 +1,6 @@
 import { type Phrases } from '@enonic/ui-utils';
 
+import { ADMIN_HOLDERS_ROOT, receiveAdminHolders } from '../entities/principal';
 import { requestGraphQlRoots, setGraphQlEndpoint, type GraphQlRoot } from '../shared/api';
 import { setConfig, type Config } from '../shared/config';
 import { setPhrases } from '../shared/i18n';
@@ -8,7 +9,7 @@ import { bootstrapFailed, bootstrapReady } from './bootstrap.store';
 
 const CONFIG_ROOT: GraphQlRoot = {
   field: 'config',
-  selection: '{ appId appVersion eventsUrl readOnlyMode userKey }',
+  selection: '{ appId appVersion administrator eventsUrl readOnlyMode userKey }',
 };
 
 // ! A `Json` scalar, so no selection — and the locale travels as a variable rather than as text, like
@@ -21,6 +22,8 @@ const PHRASES_ROOT: GraphQlRoot = {
 
 type BootstrapData = {
   config: Config | null;
+  /** Not the bootstrap's to fail on: unread, it locks nothing, and the server still refuses. */
+  adminHolders: string[] | null;
   /** `Json` arrives unshaped, so it is checked rather than cast. */
   phrases: unknown;
 };
@@ -48,9 +51,11 @@ export function bootstrap(host: Host): Promise<void> {
 function load({ baseUrl, locale }: Host): Promise<void> {
   setGraphQlEndpoint(`${baseUrl}/graphql`);
 
-  return requestGraphQlRoots<BootstrapData>([CONFIG_ROOT, PHRASES_ROOT], 'Bootstrap', {
-    values: { locale },
-  })
+  return requestGraphQlRoots<BootstrapData>(
+    [CONFIG_ROOT, PHRASES_ROOT, ADMIN_HOLDERS_ROOT],
+    'Bootstrap',
+    { values: { locale } },
+  )
     .match(({ data, message }) => {
       const phrases = toPhrases(data.phrases);
 
@@ -61,6 +66,7 @@ function load({ baseUrl, locale }: Host): Promise<void> {
 
       setConfig(data.config);
       setPhrases(phrases, locale);
+      receiveAdminHolders(data.adminHolders ?? []);
       bootstrapReady();
     }, fail)
     .catch(fail);

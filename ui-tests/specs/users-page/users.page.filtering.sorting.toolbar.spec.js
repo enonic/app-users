@@ -32,10 +32,10 @@ describe("users.page.filtering.sorting.toolbar.spec - Users page: the ID provide
   it('GIVEN the suite starts THEN two ID providers AND a user in each should be created via the API', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.USERS);
     ID_PROVIDER_A = await settingsUtils.createIdProviderViaApi(
-      userItemsBuilder.buildIdProvider(PROVIDER_A_NAME, 'description', 'Standard ID Provider'),
+      userItemsBuilder.buildIdProvider(PROVIDER_A_NAME, 'description'),
     );
     ID_PROVIDER_B = await settingsUtils.createIdProviderViaApi(
-      userItemsBuilder.buildIdProvider(PROVIDER_B_NAME, 'description', 'Standard ID Provider'),
+      userItemsBuilder.buildIdProvider(PROVIDER_B_NAME, 'description'),
     );
     USER_A = await settingsUtils.createUserViaApi(
       userItemsBuilder.buildUser({ displayName: USER_A_NAME, idProvider: PROVIDER_B_NAME }),

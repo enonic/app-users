@@ -10,6 +10,7 @@ import {
 } from '../../../shared/admin-events';
 import { i18n } from '../../../shared/i18n';
 import type { SelectionStore } from '../../../shared/selection';
+import { reloadAdminHolders } from './admin-holders.load';
 import { collapsePrincipalChanges, type PrincipalEvent } from './principal-changes';
 import { principalName } from './principal.keys';
 
@@ -77,8 +78,13 @@ export function createPrincipalReaction({
     topic: HUB_TOPICS.principals,
     parse: toPrincipalsMessage,
     visible: scope.$visible,
-    refresh,
+    refresh: () => {
+      reloadAdminHolders();
+      refresh();
+    },
     apply: (messages) => {
+      // Any change of a principal can be a membership that makes, or unmakes, an administrator.
+      reloadAdminHolders();
       const events = collapsePrincipalChanges(messages);
       const own = events.filter((event) => event.kind === kind);
       const others = events.filter((event) => event.kind !== kind);

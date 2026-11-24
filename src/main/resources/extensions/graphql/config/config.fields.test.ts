@@ -63,3 +63,14 @@ describe('config', () => {
     expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ readOnlyMode });
   });
 });
+
+describe('config.administrator', () => {
+  it.each([
+    { roles: ['role:system.admin'], administrator: true },
+    { roles: ['role:system.user.admin', 'role:system.user.app'], administrator: false },
+  ])('answers $administrator for a caller holding $roles', ({ roles, administrator }) => {
+    vi.mocked(hasRole).mockImplementation((role) => roles.includes(role));
+
+    expect(configQueryFields.config.resolve?.({} as never)).toMatchObject({ administrator });
+  });
+});

@@ -1,7 +1,11 @@
 import { useStore } from '@nanostores/preact';
 import { useMemo } from 'preact/hooks';
 
-import { isPinnedMembership, SYSTEM_USER_KEYS } from '../../../../entities/principal';
+import {
+  isPinnedMembership,
+  SYSTEM_USER_KEYS,
+  useAdministratorLock,
+} from '../../../../entities/principal';
 import { PrincipalPicker } from '../../../../entities/principal/ui/PrincipalPicker';
 import { useI18n } from '../../../../shared/i18n';
 import { $roleEditDetail } from '../../model/role-edit-detail';
@@ -11,9 +15,11 @@ import { roleMembersOf, withRoleMembersOf } from '../../model/role-form';
 export function RoleEditorDialogUsersStep() {
   const { form, entity } = useStore($roleEditor, { keys: ['form', 'entity'] });
   const { status } = useStore($roleEditDetail);
+  const { locked } = useAdministratorLock(entity?.key);
 
   const placeholder = useI18n('roles.dialog.usersPlaceholder');
   const failedNotice = useI18n('roles.dialog.membersFailed');
+  const lockedNotice = useI18n('principal.details.lockedAdministratorRole');
 
   const users = useMemo(() => roleMembersOf(form.members, 'user'), [form.members]);
 
@@ -31,11 +37,13 @@ export function RoleEditorDialogUsersStep() {
   return (
     <>
       {status === 'error' && <p className="text-error mb-3 text-sm">{failedNotice}</p>}
+      {locked && <p className="text-subtle mb-3 text-sm">{lockedNotice}</p>}
 
       <PrincipalPicker
         kinds={['user']}
         showIdProvider
         excluded={SYSTEM_USER_KEYS}
+        readOnly={locked}
         locked={pinned}
         placeholder={placeholder}
         selected={users}

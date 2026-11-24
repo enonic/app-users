@@ -17,6 +17,11 @@ export const ConfigType: GraphQLType = generator.createObjectType({
     appVersion: {
       type: nonNull(GraphQLString),
     },
+    administrator: {
+      type: nonNull(GraphQLBoolean),
+      description:
+        'Whether the caller holds `system.admin`. Only such a caller manages ID providers, creates a role in the `system.` or `cms.` namespace, or changes a principal that holds `system.admin`.',
+    },
     eventsUrl: {
       type: nonNull(GraphQLString),
       description: 'The admin events hub api; `client.js` under it is the client to import.',

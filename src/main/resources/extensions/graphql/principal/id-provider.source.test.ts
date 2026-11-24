@@ -7,12 +7,12 @@ import {
 import {
   findPrincipals,
   getIdProviders,
-  hasRole,
   type Group,
+  hasRole,
   type IdProvider,
   type User,
 } from '/lib/xp/auth';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   configOf,
@@ -57,6 +57,11 @@ function group(key: string, displayName: string): Group {
 function found(hits: (User | Group)[], total = hits.length) {
   return { total, count: hits.length, hits };
 }
+
+// An administrator unless a test says otherwise: what only one may do has its own describe below.
+beforeEach(() => {
+  vi.mocked(hasRole).mockReturnValue(true);
+});
 
 afterEach(() => {
   vi.resetAllMocks();
@@ -358,7 +363,7 @@ describe('configOf', () => {
   }
 
   it('reads the typed configuration of the provider the binding belongs to', () => {
-    callerHolds('role:system.user.admin');
+    callerHolds('role:system.admin');
     const config = [{ name: 'defaultGroups', type: 'Reference', values: [] }];
     vi.mocked(getIdProvider).mockReturnValue({
       key: 'intranet',
@@ -370,29 +375,19 @@ describe('configOf', () => {
     expect(vi.mocked(getIdProvider)).toHaveBeenCalledWith({ idProvider: 'intranet' });
   });
 
-  it('reads it for a system administrator too', () => {
-    callerHolds('role:system.admin');
-    vi.mocked(getIdProvider).mockReturnValue({
-      key: 'intranet',
-      displayName: 'Intranet',
-      idProviderConfig: { applicationKey: 'com.enonic.app.oidc', config: [] },
-    });
-
-    configOf(binding);
-
-    expect(vi.mocked(getIdProvider)).toHaveBeenCalled();
-  });
-
-  // ! The tree holds the login's secrets; a caller who may only look never needs them.
-  it('answers an empty tree to a caller that may only read, without reading the provider', () => {
-    callerHolds('role:system.user.app');
+  // ! The tree holds the login's secrets, and only an administrator may write a provider.
+  it.each([
+    { caller: 'a user administrator', roles: ['role:system.user.admin'] },
+    { caller: 'a caller that may only read', roles: ['role:system.user.app'] },
+  ])('answers an empty tree to $caller, without reading the provider', ({ roles }) => {
+    callerHolds(...roles);
 
     expect(configOf(binding)).toEqual([]);
     expect(vi.mocked(getIdProvider)).not.toHaveBeenCalled();
   });
 
   it('answers an empty tree for a provider that is gone', () => {
-    callerHolds('role:system.user.admin');
+    callerHolds('role:system.admin');
     vi.mocked(getIdProvider).mockReturnValue(null);
 
     expect(configOf(binding)).toEqual([]);
@@ -411,5 +406,45 @@ describe('deleteIdProviders', () => {
     expect(vi.mocked(deleteIdProviders)).toHaveBeenCalledWith({
       idProviders: ['intranet', 'system'],
     });
+  });
+});
+
+// ! enonic/xp#12615: whatever the provider's ACL grants, only `system.admin` manages a provider.
+describe('managing a provider without the administrator role', () => {
+  const input = { displayName: 'Intranet', permissions: [] };
+
+  beforeEach(() => {
+    vi.mocked(hasRole).mockImplementation((role) => role === 'role:system.user.admin');
+  });
+
+  it('refuses a create before reaching the platform', () => {
+    expect(() => createProvider('intranet', input)).toThrow(
+      '[intranet] id provider can only be managed by an administrator',
+    );
+    expect(vi.mocked(createIdProvider)).not.toHaveBeenCalled();
+  });
+
+  it('refuses an update before reading the stored configuration', () => {
+    expect(() =>
+      updateProvider('intranet', { ...input, application: 'com.enonic.app.oidc' }),
+    ).toThrow('[intranet] id provider can only be managed by an administrator');
+    expect(vi.mocked(getIdProvider)).not.toHaveBeenCalled();
+    expect(vi.mocked(updateIdProvider)).not.toHaveBeenCalled();
+  });
+
+  it('answers a refusal per key to a delete, deleting nothing', () => {
+    expect(deleteProviders(['intranet', 'partners'])).toEqual([
+      {
+        key: 'intranet',
+        deleted: false,
+        reason: '[intranet] id provider can only be managed by an administrator',
+      },
+      {
+        key: 'partners',
+        deleted: false,
+        reason: '[partners] id provider can only be managed by an administrator',
+      },
+    ]);
+    expect(vi.mocked(deleteIdProviders)).not.toHaveBeenCalled();
   });
 });

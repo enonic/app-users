@@ -17,15 +17,17 @@ import {
   type UserKey,
 } from '/lib/xp/auth';
 
-import { callerKey } from '../auth/caller';
 import {
-  isWritablePrincipal,
-  requireWritable,
-  requireWritablePrincipals,
-} from './id-provider-mode';
+  administratorOnlyKeys,
+  requireChangeableMembers,
+  requireModifiable,
+} from '../auth/administrator';
+import { callerKey } from '../auth/caller';
+import { requireWritable, requireWritablePrincipals } from './id-provider-mode';
 import { ADMIN_ROLE, isSystemUser, SUPER_USER, USER_KEY } from './principal.keys';
 import {
   byName,
+  canonicalKeys,
   clampCount,
   clampStart,
   toPrincipalItem,
@@ -208,14 +210,15 @@ export function listUserGroups(key: UserKey, transitive: boolean): PrincipalItem
   return membershipsOf(key, 'group', transitive);
 }
 
-export function addPublicKey(key: string, publicKey: string, label?: string): PublicKeyItem {
+export function addPublicKey(given: string, publicKey: string, label?: string): PublicKeyItem {
+  const key = requireUser(given).key;
   requireNotSystemUser(key, 'public keys');
   requireWritablePrincipals([key], 'user');
 
   const kid = generateKid(publicKey);
 
   const profile = modifyProfile<PublicKeyProfile>({
-    key: key as UserKey,
+    key,
     editor: (current) => {
       const stored = toPublicKeys(current?.publicKeys);
 
@@ -239,12 +242,13 @@ export function addPublicKey(key: string, publicKey: string, label?: string): Pu
   return written;
 }
 
-export function removePublicKey(key: string, kid: string): boolean {
+export function removePublicKey(given: string, kid: string): boolean {
+  const key = requireUser(given).key;
   requireNotSystemUser(key, 'public keys');
   requireWritablePrincipals([key], 'user');
 
   const profile = modifyProfile<PublicKeyProfile>({
-    key: key as UserKey,
+    key,
     editor: (current) => ({
       ...current,
       publicKeys: toPublicKeys(current?.publicKeys).filter((stored) => stored.kid !== kid),
@@ -260,7 +264,12 @@ export function removePublicKey(key: string, kid: string): boolean {
 
 export function createUser(idProvider: string, name: string, input: UserInput): User {
   requireWritable(idProvider, 'user');
-  requireWritablePrincipals(input.groups, 'group');
+  const roles = canonicalKeys(input.roles);
+  const groups = canonicalKeys(input.groups);
+  requireWritablePrincipals(groups, 'group');
+  if (roles.length + groups.length > 0) {
+    requireChangeableMembers(administratorOnlyKeys(), [...roles, ...groups]);
+  }
 
   // ! Every refusal this function owns comes before the first write. There is no transaction around the
   // ! principal, the password and the memberships, so a password refused after `createUserPrincipal` would
@@ -285,34 +294,36 @@ export function createUser(idProvider: string, name: string, input: UserInput): 
     changePassword({ userKey: user.key, password });
   }
 
-  applyMemberships(user.key, input.roles, [], input.groups, []);
+  applyMemberships(user.key, roles, [], groups, []);
 
   return user;
 }
 
-export function updateUser(key: string, changes: UserChanges): User {
-  const current = getUser(key);
-  if (current == null) {
-    throw new Error(`No user answers to [${key}]`);
-  }
+export function updateUser(given: string, changes: UserChanges): User {
+  const current = requireUser(given);
+  // ! The key the platform keeps, not the one the request spelled: see `canonicalKeys`.
+  const key = current.key;
+  const addRoles = canonicalKeys(changes.addRoles);
+  const removeRoles = canonicalKeys(changes.removeRoles);
+  const addGroups = canonicalKeys(changes.addGroups);
+  const removeGroups = canonicalKeys(changes.removeGroups);
+
+  const togglesDisabled =
+    changes.disabled != null && changes.disabled !== (current.disabled === true);
+  const changesProfile = togglesDisabled || changesDisplayNameOrEmail(current, changes);
+  const changesFields = changes.password != null || changesProfile;
 
   // ! A remote user's memberships are still XP's: they live on the role and on the group, where the Roles
   // ! section and the Group dialog write them too. Only the user's own fields and credentials are the
   // ! remote system's, so those are what a locked provider refuses. `updateGroup` reasons the same way.
-  const locked = !isWritablePrincipal(key, 'user');
-  const togglesDisabled =
-    changes.disabled != null && changes.disabled !== (current.disabled === true);
-  if (
-    locked &&
-    (changes.password != null || togglesDisabled || changesDisplayNameOrEmail(current, changes))
-  ) {
+  if (changesFields) {
     requireWritablePrincipals([key], 'user');
   }
-  requireWritablePrincipals([...changes.addGroups, ...changes.removeGroups], 'group');
+  requireWritablePrincipals([...addGroups, ...removeGroups], 'group');
 
   // ! The platform refuses this one mid-write, in `removeRelationship`; refusing it here first keeps the
   // ! password and the other memberships from applying before it does. `role.source` does the same.
-  if (key === SUPER_USER && changes.removeRoles.includes(ADMIN_ROLE)) {
+  if (key === SUPER_USER && removeRoles.includes(ADMIN_ROLE)) {
     throw new Error(`Cannot remove [${SUPER_USER}] from [${ADMIN_ROLE}]`);
   }
 
@@ -330,44 +341,37 @@ export function updateUser(key: string, changes: UserChanges): User {
     throw new Error(`Cannot disable [${key}]: it is the user making the change`);
   }
 
+  // ! A user who holds the administrator role is an administrator's to change: the fields, the password
+  // ! and the disabled flag. Which other roles and groups such a user is in stays open — the platform
+  // ! guards a member list by its holder, so only the lists of the role and of the groups holding it
+  // ! are closed, for every user alike.
+  const adminOnly = administratorOnlyKeys();
+  if (changesFields) {
+    requireModifiable(adminOnly, [key]);
+  }
+  requireChangeableMembers(adminOnly, [...addRoles, ...removeRoles, ...addGroups, ...removeGroups]);
+
+  // ! The order of the three writes is the last guard. The platform checks who may change a user on the
+  // ! password and on `modifyUser`, and reads the memberships for it as an administrator — so it sees an
+  // ! administrator `administratorOnlyKeys` could not, one held through a group the caller cannot read.
+  // ! With the memberships last, that refusal, like one for an email already taken, leaves none applied.
   if (changes.password != null) {
     requirePassword(changes.password);
 
     changePassword({
-      userKey: key as UserKey,
+      userKey: key,
       password: changes.password.length > 0 ? changes.password : null,
     });
   }
 
-  applyMemberships(
-    key as UserKey,
-    changes.addRoles,
-    changes.removeRoles,
-    changes.addGroups,
-    changes.removeGroups,
-  );
+  // ! No field moved, no `modifyUser`: the platform refuses even a write that changes nothing on su and
+  // ! anonymous (enonic/xp#12486) and on an administrator for a caller who is not one (enonic/xp#12615),
+  // ! and every guard above has already refused the edits that would have moved one of theirs.
+  const user = changesProfile ? writeProfile(key, changes) : undefined;
 
-  // ! The platform refuses every `modifyUser` on su and anonymous (enonic/xp#12486), and by here the
-  // ! guards above have established there is no field of theirs to write.
-  if (locked || isSystemUser(key)) {
-    return getUser(key) ?? current;
-  }
+  applyMemberships(key, addRoles, removeRoles, addGroups, removeGroups);
 
-  const user = modifyUser({
-    key: key as UserKey,
-    editor: (current) => ({
-      ...current,
-      displayName: changes.displayName,
-      email: changes.email ?? '',
-      ...(changes.disabled == null ? {} : { disabled: changes.disabled }),
-    }),
-  });
-
-  if (user == null) {
-    throw new Error(`No user answers to [${key}]`);
-  }
-
-  return user;
+  return user ?? getUser(key) ?? current;
 }
 
 // *
@@ -435,6 +439,33 @@ function changesDisplayNameOrEmail(current: User, changes: UserChanges): boolean
     changes.displayName.trim() !== current.displayName.trim() ||
     (changes.email ?? '').trim() !== (current.email ?? '').trim()
   );
+}
+
+function writeProfile(key: UserKey, changes: UserChanges): User {
+  const user = modifyUser({
+    key,
+    editor: (current) => ({
+      ...current,
+      displayName: changes.displayName,
+      email: changes.email ?? '',
+      ...(changes.disabled == null ? {} : { disabled: changes.disabled }),
+    }),
+  });
+
+  if (user == null) {
+    throw new Error(`No user answers to [${key}]`);
+  }
+
+  return user;
+}
+
+function requireUser(key: string): User {
+  const user = getUser(key);
+  if (user == null) {
+    throw new Error(`No user answers to [${key}]`);
+  }
+
+  return user;
 }
 
 function requireNotSystemUser(key: string, what: string): void {

@@ -15,6 +15,11 @@ export function isReadOnlyMode(): boolean {
   return $config.get()?.readOnlyMode === true;
 }
 
+// ! Read at render, for the reason `isReadOnlyMode` gives.
+export function isAdministrator(): boolean {
+  return $config.get()?.administrator === true;
+}
+
 export function isCurrentUser(key: string): boolean {
   return $config.get()?.userKey === key;
 }

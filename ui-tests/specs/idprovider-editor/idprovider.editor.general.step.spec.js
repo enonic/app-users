@@ -9,6 +9,7 @@ const userItemsBuilder = require('../../libs/users.items.builder');
 const IdProvidersPage = require('../../page_objects/providers/id.providers.page');
 const IdProviderEditorGeneralStepDialog = require('../../page_objects/providers/provider-dialog/provider.editor.general.step.dialog');
 const Auth0IdProviderConfigDialog = require('../../page_objects/providers/provider-dialog/auth0.provider.config.dialog');
+const AdfsIdProviderConfigDialog = require('../../page_objects/providers/provider-dialog/adfs.provider.config.dialog');
 
 describe("idprovider.editor.general.step.spec - the ID provider editor's General step: the ID follows the display name, the application is bound here, and the ID's own rules are reported under the input", function () {
   this.timeout(appConst.SUITE_TIMEOUT);
@@ -16,21 +17,23 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
     webDriverHelper.setupBrowser();
   }
   const PROVIDER_NAME = userItemsBuilder.generateRandomName('provider');
-  // The application every provider of this suite is bound to; it ships with XP.
-  const APPLICATION = 'Standard ID Provider';
-  // A test application: the only one whose name and key carry 'auth0'.
+  // A test application: the only one whose name and key carry 'auth0'. The providers of this suite
+  // are bound to it, since the Standard ID Provider is the system provider's alone (enonic/xp#12615).
   const AUTH0_APPLICATION = Auth0IdProviderConfigDialog.APPLICATION;
-  // In the key of the Standard ID Provider only: its display name has spaces where the key has none.
+  const APPLICATION = AUTH0_APPLICATION;
+  const ADFS_APPLICATION = AdfsIdProviderConfigDialog.APPLICATION;
+  // In the key of the ADFS test application only: its display name has spaces where the key has '_'.
+  const ADFS_KEY_PART = 'adfs_idprovider';
+  // In the key of the Standard ID Provider, which no new provider is offered.
   const STANDARD_KEY_PART = 'standardidprovider';
   const NO_MATCHES = 'Nothing matches the search';
   const DISPLAY_NAME_REQUIRED = 'Display name is required';
   const ID_REQUIRED = 'ID is required';
-  const ID_INVALID = 'The ID can only contain Latin letters, digits and the characters . - _';
+  const ID_INVALID = 'The ID can only contain Latin letters, digits and the characters - _';
   // XP's NameValidator refuses '_', '.' and '..' outright, and an ID provider's key may not be the
   // roles folder's name either.
   const RESERVED_ID = 'roles';
   const ID_RESERVED = `The ID cannot be "${RESERVED_ID}"`;
-  const ID_DOTTED = 'Avoid dots: the ID is used as a key in the virtual host configuration';
   const CLOSE_QUESTION = 'Do you want to close the dialog? Changes will be lost.';
   // The provider the editor is opened for. It is never created: every editor here is closed without
   // Create, so the suite leaves nothing behind to clean up.
@@ -75,7 +78,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
   });
 
   // The application is bound on this step: picking one lists it under the selector
-  it("GIVEN the display name has been typed on the General step WHEN 'Standard ID Provider' has been picked THEN it should be listed as the bound application AND WHEN it has been removed THEN the row should be gone AND Next should stay enabled", async () => {
+  it("GIVEN the display name has been typed on the General step WHEN 'Test Auth0 ID Provider' has been picked THEN it should be listed as the bound application AND WHEN it has been removed THEN the row should be gone AND Next should stay enabled", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     let idProvidersPage = new IdProvidersPage();
     let generalStep = new IdProviderEditorGeneralStepDialog();
@@ -115,7 +118,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
 
   // The selector is a search: typing narrows the list by the display name or the key, and a match
   // is picked from the narrowed list.
-  it("GIVEN the ID provider editor is opened WHEN 'auth0' has been typed in the application selector THEN only the Auth0 application should be offered AND WHEN a part of a key has been typed THEN only its application should be offered AND WHEN nothing matches THEN the popup should say so", async () => {
+  it("GIVEN the ID provider editor is opened WHEN 'auth0' has been typed in the application selector THEN only the Auth0 application should be offered AND WHEN a part of a key has been typed THEN only its application should be offered AND WHEN the Standard ID Provider's key has been typed THEN nothing should be offered AND WHEN nothing matches THEN the popup should say so", async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     let idProvidersPage = new IdProvidersPage();
     let generalStep = new IdProviderEditorGeneralStepDialog();
@@ -132,13 +135,21 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
     );
     // 3. By the key - a text the display name does not contain.
     await generalStep.clearApplicationSearch();
+    await generalStep.typeInApplicationSearch(ADFS_KEY_PART);
+    assert.deepEqual(
+      await generalStep.getApplicationOptions(),
+      [ADFS_APPLICATION],
+      'The filter by key should offer the ADFS application alone',
+    );
+    // 4. The Standard ID Provider belongs to the system provider, so a new provider is not offered it.
+    await generalStep.clearApplicationSearch();
     await generalStep.typeInApplicationSearch(STANDARD_KEY_PART);
     assert.deepEqual(
       await generalStep.getApplicationOptions(),
-      [APPLICATION],
-      'The filter by key should offer the Standard ID Provider alone',
+      [],
+      'The Standard ID Provider should not be offered for a new provider',
     );
-    // 4. Something no application is called: no option, and the popup says why.
+    // 5. Something no application is called: no option, and the popup says why.
     await generalStep.clearApplicationSearch();
     await generalStep.typeInApplicationSearch(userItemsBuilder.generateRandomName('none'));
     assert.deepEqual(await generalStep.getApplicationOptions(), [], 'No option should match');
@@ -207,7 +218,7 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
     await generalStep.waitForNextButtonEnabled();
   });
 
-  it('GIVEN the display name has been typed on the General step WHEN an ID with forbidden characters has been typed THEN it should be reported AND Next should be disabled AND WHEN a reserved ID has been typed THEN that should be reported too AND WHEN a dotted ID has been typed THEN it should be warned about rather than refused', async () => {
+  it('GIVEN the display name has been typed on the General step WHEN an ID with forbidden characters has been typed THEN it should be reported AND Next should be disabled AND WHEN a reserved ID has been typed THEN that should be reported too AND WHEN a dotted ID has been typed THEN it should be refused', async () => {
     await settingsUtils.navigateToExtension(appConst.EXTENSIONS.ID_PROVIDERS);
     let idProvidersPage = new IdProvidersPage();
     let generalStep = new IdProviderEditorGeneralStepDialog();
@@ -231,23 +242,14 @@ describe("idprovider.editor.general.step.spec - the ID provider editor's General
     await generalStep.waitForValidationMessageGone(ID_INVALID);
     await generalStep.waitForValidationMessage(ID_RESERVED);
     await generalStep.waitForNextButtonDisabled();
-    // 4. A dot is legal: nothing is reported and Next is enabled, but the warning is shown under
-    //    the input.
+    // 4. A dot is refused for a new provider: the key becomes a level of the vhost configuration.
     await generalStep.typeInIdInput(`${NEW_PROVIDER.id}.dotted`);
     await generalStep.waitForValidationMessageGone(ID_RESERVED);
-    await generalStep.assertNoValidationMessages('for a dotted ID');
-    assert.equal(
-      await generalStep.getIdWarning(),
-      ID_DOTTED,
-      'A dotted ID should be warned about under the input',
-    );
-    await generalStep.waitForNextButtonEnabled();
-    // 5. An ID the rules are happy with: neither a message nor the warning, Next enabled.
+    await generalStep.waitForValidationMessage(ID_INVALID);
+    await generalStep.waitForNextButtonDisabled();
+    // 5. An ID the rules are happy with: no message, Next enabled.
     await generalStep.typeInIdInput(NEW_PROVIDER.id);
-    assert.ok(
-      !(await generalStep.isIdWarningDisplayed()),
-      'The warning should be gone once the dot is',
-    );
+    await generalStep.waitForValidationMessageGone(ID_INVALID);
     await generalStep.assertNoValidationMessages('for a valid ID');
     await generalStep.waitForNextButtonEnabled();
   });

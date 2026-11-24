@@ -5,6 +5,7 @@ import {
   type PrincipalRef,
   type Role,
 } from '../../../entities/principal';
+import { isAdministrator } from '../../../shared/config';
 import { mergeByKey } from '../../../shared/form';
 import { createStepDialogStore, type StepDialogExternal } from '../../../shared/step-dialog';
 import { ROLE_EDITOR_STEPS, type RoleEditorStep } from './role-editor-steps';
@@ -38,7 +39,7 @@ export const roleEditorDialog = createStepDialogStore<
   steps: ROLE_EDITOR_STEPS,
   titleKey: 'roles.dialog.createTitle',
   initialForm: (payload) => initialRoleForm(payload),
-  validate: (form, { mode }) => validateRoleForm(form, mode),
+  validate: (form, { mode }) => validateRoleForm(form, mode, { administrator: isAdministrator() }),
   same: sameRoleForm,
   next: nextRoleForm,
   $external: $roleNameExternal,

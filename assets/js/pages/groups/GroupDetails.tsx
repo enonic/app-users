@@ -5,6 +5,7 @@ import { useState } from 'preact/hooks';
 import {
   principalName,
   splitMembers,
+  useAdministratorLock,
   useIdProviderName,
   usePrincipalLock,
   useTransitiveMemberships,
@@ -32,10 +33,16 @@ export function GroupDetails({
 }: GroupDetailsProps) {
   const readOnly = isReadOnlyMode();
   const providerName = useIdProviderName();
-  const { locked, reasonKey } = usePrincipalLock(group.key, 'group');
+  const { locked, reasonKey: providerReasonKey } = usePrincipalLock(group.key, 'group');
+  // ! The members alone: the name and description of a group that holds the administrator role stay
+  // ! open, and so do the roles it is in.
+  const adminLock = useAdministratorLock(group.key);
+  const membersLocked = locked || adminLock.locked;
+  const membersOnlyLocked = adminLock.locked && providerReasonKey === undefined;
 
   const editLabel = useI18n('browse.details.edit');
-  const lockedLabel = useI18n(reasonKey ?? 'principal.details.lockedExternal');
+  const lockedLabel = useI18n(providerReasonKey ?? 'principal.details.lockedExternal');
+  const membersLockedLabel = useI18n('groups.details.membersLockedAdministrator');
   const editRolesLabel = useI18n('groups.details.editRoles');
   const editUsersLabel = useI18n('groups.details.editUsers');
   const editServiceAccountsLabel = useI18n('groups.details.editServiceAccounts');
@@ -85,9 +92,14 @@ export function GroupDetails({
         <DetailsPanel.Field labelKey="groups.details.description">
           {description ?? noDescriptionLabel}
         </DetailsPanel.Field>
-        {reasonKey !== undefined && (
+        {providerReasonKey !== undefined && (
           <DetailsPanel.Field labelKey="principal.details.editing">
             {lockedLabel}
+          </DetailsPanel.Field>
+        )}
+        {membersOnlyLocked && (
+          <DetailsPanel.Field labelKey="groups.details.members">
+            {membersLockedLabel}
           </DetailsPanel.Field>
         )}
       </DetailsPanel.Section>
@@ -153,7 +165,7 @@ export function GroupDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editUsersLabel}
-              locked={locked}
+              locked={membersLocked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
@@ -169,7 +181,7 @@ export function GroupDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editServiceAccountsLabel}
-              locked={locked}
+              locked={membersLocked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )
@@ -194,7 +206,7 @@ export function GroupDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editGroupsLabel}
-              locked={locked}
+              locked={membersLocked}
               onClick={() => openGroupEditorAt(group, 'members')}
             />
           )

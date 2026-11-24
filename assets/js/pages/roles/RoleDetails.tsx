@@ -5,6 +5,7 @@ import {
   isPlatformRole,
   principalName,
   splitMembers,
+  useAdministratorLock,
   type RoleDetail,
 } from '../../entities/principal';
 import { PrincipalAvatars } from '../../entities/principal/ui/PrincipalAvatars';
@@ -31,6 +32,9 @@ export function RoleDetails({
   // The platform owns its roles' names, and Everyone's and Authenticated's members too.
   const platform = isPlatformRole(role.key);
   const implicit = IMPLICIT_ROLE_KEYS.has(role.key);
+  // Who is an administrator is an administrator's to decide (enonic/xp#12615).
+  const adminLock = useAdministratorLock(role.key);
+  const membersLocked = implicit || adminLock.locked;
 
   const editLabel = useI18n('browse.details.edit');
   const editUsersLabel = useI18n('roles.details.editUsers');
@@ -38,9 +42,7 @@ export function RoleDetails({
   const editGroupsLabel = useI18n('roles.details.editGroups');
   const noDescriptionLabel = useI18n('roles.details.noDescription');
   const systemLabel = useI18n('principal.type.system');
-  const lockedLabel = useI18n(
-    implicit ? 'principal.details.lockedImplicit' : 'principal.details.lockedPlatform',
-  );
+  const lockedLabel = useI18n(lockedReasonKey(implicit, adminLock.locked));
 
   const { key, displayName, description, modifiedTime, members } = role;
 
@@ -91,7 +93,7 @@ export function RoleDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editUsersLabel}
-              locked={implicit}
+              locked={membersLocked}
               onClick={() => openRoleEditorAt(role, 'users')}
             />
           )
@@ -107,7 +109,7 @@ export function RoleDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editServiceAccountsLabel}
-              locked={implicit}
+              locked={membersLocked}
               onClick={() => openRoleEditorAt(role, 'users')}
             />
           )
@@ -132,7 +134,7 @@ export function RoleDetails({
           readOnly ? undefined : (
             <PrincipalEditButton
               label={editGroupsLabel}
-              locked={implicit}
+              locked={membersLocked}
               onClick={() => openRoleEditorAt(role, 'groups')}
             />
           )
@@ -155,3 +157,17 @@ export function RoleDetails({
 }
 
 RoleDetails.displayName = ROLE_DETAILS_NAME;
+
+//
+// * Internal
+//
+
+function lockedReasonKey(implicit: boolean, administratorOnly: boolean): string {
+  if (implicit) {
+    return 'principal.details.lockedImplicit';
+  }
+
+  return administratorOnly
+    ? 'principal.details.lockedAdministratorRole'
+    : 'principal.details.lockedPlatform';
+}

@@ -169,11 +169,14 @@ describe('isIllegalPrincipalName', () => {
 });
 
 describe('isIllegalIdProviderName', () => {
-  it.each(['a#b', 'иван', '_', '.', '..', 'roles', 'ROLES', 'Roles'])('refuses %s', (name) => {
-    expect(isIllegalIdProviderName(name)).toBe(true);
-  });
+  it.each(['a#b', 'иван', '_', '.', '..', 'roles', 'ROLES', 'Roles', 'corp.eu', 'my.roles'])(
+    'refuses %s',
+    (name) => {
+      expect(isIllegalIdProviderName(name)).toBe(true);
+    },
+  );
 
-  it.each(['my-idp', 'Company.Directory_2', 'roles2', 'my.roles'])('accepts %s', (name) => {
+  it.each(['my-idp', 'Company-Directory_2', 'roles2', 'corp-eu'])('accepts %s', (name) => {
     expect(isIllegalIdProviderName(name)).toBe(false);
   });
 });
