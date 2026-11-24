@@ -1,6 +1,5 @@
 import { FilterInput, type FilterField, type FilterQuery } from '@enonic/ui-kit';
-import type { JSX } from 'preact';
-import type { ReactNode } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 
 import { useI18n, useLabelled } from '../../shared/i18n';
 import { BrowseLayout } from '../browse-layout/BrowseLayout';
@@ -120,7 +119,7 @@ export function BrowseScreen<T>({
    * field keeps its keys: Alt+N in the filter types a character on macOS, it does not open New. A dialog
    * is never reached, since `AppRoot` portals it beside the screen rather than inside it.
    */
-  const handleKeyDown = (event: JSX.TargetedKeyboardEvent<HTMLDivElement>): void => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
     if (managedMode || event.defaultPrevented || isTextEntry(event.target)) {
       return;
     }
