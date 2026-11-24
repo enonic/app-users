@@ -1,6 +1,5 @@
-import type { JSX } from 'preact';
 import { useRef, useState } from 'preact/hooks';
-import type { ReactNode } from 'react';
+import type { KeyboardEvent, KeyboardEventHandler, PointerEvent, ReactNode } from 'react';
 
 import { useI18n } from '../../shared/i18n';
 import { DetailsEmpty } from '../details-panel/DetailsEmpty';
@@ -23,7 +22,7 @@ export type BrowseLayoutProps = {
    */
   detailsShown?: boolean;
   /** Keys pressed anywhere in the screen, which is where `BrowseScreen` runs the section's shortcuts. */
-  onKeyDown?: JSX.KeyboardEventHandler<HTMLDivElement>;
+  onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
   'data-component'?: string;
 };
 
@@ -57,13 +56,13 @@ export function BrowseLayout({
     return applied;
   };
 
-  const handlePointerDown = (event: JSX.TargetedPointerEvent<HTMLDivElement>): void => {
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>): void => {
     event.currentTarget.setPointerCapture(event.pointerId);
     draggingRef.current = true;
     setDragging(true);
   };
 
-  const handlePointerMove = (event: JSX.TargetedPointerEvent<HTMLDivElement>): void => {
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>): void => {
     const columns = columnsRef.current;
     if (!draggingRef.current || !columns) {
       return;
@@ -72,7 +71,7 @@ export function BrowseLayout({
     resize(columns.getBoundingClientRect().right - event.clientX);
   };
 
-  const handlePointerUp = (event: JSX.TargetedPointerEvent<HTMLDivElement>): void => {
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>): void => {
     if (!draggingRef.current) {
       return;
     }
@@ -83,7 +82,7 @@ export function BrowseLayout({
     writeDetailsWidth(detailsWidth);
   };
 
-  const handleKeyDown = (event: JSX.TargetedKeyboardEvent<HTMLDivElement>): void => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
     const steps: Record<string, number> = { ArrowLeft: RESIZE_STEP, ArrowRight: -RESIZE_STEP };
     const step = steps[event.key];
     if (step === undefined) {
