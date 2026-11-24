@@ -33,6 +33,7 @@ export function ApplicationSelector({
   disabled = false,
 }: ApplicationSelectorProps) {
   const noMatchesLabel = useI18n('principal.picker.noMatches');
+  const emptyLabel = useI18n('applications.selector.empty');
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -80,8 +81,10 @@ export function ApplicationSelector({
           <Combobox.Portal>
             <Combobox.Popup>
               <Combobox.ListContent className="max-h-60 overflow-y-auto">
-                {offered.length === 0 && query.trim().length > 0 && (
-                  <p className="text-subtle px-2.5 py-1 text-sm">{noMatchesLabel}</p>
+                {offered.length === 0 && (
+                  <p className="text-subtle px-2.5 py-1 text-sm">
+                    {applications.length === 0 ? emptyLabel : noMatchesLabel}
+                  </p>
                 )}
 
                 {offered.map(({ key, displayName, icon }) => (
