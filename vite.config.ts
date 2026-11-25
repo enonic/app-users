@@ -85,6 +85,7 @@ export default defineConfig(({ mode }) => {
     // XP supplies these at runtime; under vitest they resolve to local doubles.
     alias: {
       '/lib/graphql': join(REPO, 'test/mocks/lib-graphql.ts'),
+      '/lib/graphql-aliases': join(REPO, 'test/mocks/lib-graphql-aliases.ts'),
       '/lib/icon': join(REPO, 'test/mocks/lib-icon.ts'),
       '/lib/idprovider': join(REPO, 'test/mocks/lib-idprovider.ts'),
       '/lib/publickey': join(REPO, 'test/mocks/lib-publickey.ts'),

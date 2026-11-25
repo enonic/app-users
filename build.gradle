@@ -27,6 +27,8 @@ repositories {
 dependencies {
     implementation xplibs.api.core
     implementation xplibs.api.portal
+    // graphql-java for CountAliasesHandler: runtime-only in lib-graphql, so compile against what ships.
+    compileOnly files( configurations.include )
 
     include xplibs.admin
     include xplibs.app
