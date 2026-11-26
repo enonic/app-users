@@ -31,6 +31,10 @@ decided.
   are schema root fields — the guest bootstraps from them.
 - Queries are built on the server: no variable ever carries a raw query or sort expression; escape
   every interpolated value.
+- **The endpoint refuses what the client never sends**: a body over `MAX_BODY_LENGTH` (413) and any
+  alias (`MAX_ALIASES`, 400), both in `extensions/graphql/request.ts`. An alias is how one document
+  repeats a resolver, so a client document that needs one raises the constant on purpose — it is not
+  a bug to work around with a second endpoint.
 - Never log or echo secrets: passwords, keys, tokens.
 - ID-provider writes (`modifyIdProvider`, `deleteIdProviders`, ACL, mode) have no `lib-auth`
   equivalent — they go through `/lib/auth`, which binds the java beans under

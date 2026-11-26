@@ -62,6 +62,8 @@ the same GraalJS engine XP does:
 - The fixtures `require` the wrapper by its runtime path, so `./gradlew test` depends on the pack
   task to emit it. `pnpm check` does not run them.
 
+A bean that needs no XP service gets plain JUnit instead, no fixture, e.g. `CountAliasesHandlerTest`.
+
 ## What to cover
 
 Pure logic: mappers into view models, `enabled(ctx)` of every toolbar action, store commands, api
