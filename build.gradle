@@ -57,8 +57,8 @@ app {
 // Download and pin the toolchain, so a clean checkout and CI build the same thing.
 node {
     download = true
-    version = '24.18.0'
-    pnpmVersion = '10.33.4' // match packageManager in package.json
+    version = '24.22.3'
+    pnpmVersion = '10.34.9' // match packageManager in package.json
 }
 
 def ci = System.getenv( 'CI' ) != null
